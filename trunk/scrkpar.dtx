@@ -1,0 +1,464 @@
+% \CheckSum{411}
+% \iffalse meta-comment
+% ======================================================================
+% scrkpar.dtx
+% Copyright (c) Markus Kohm, 2002
+%
+% This file is part of the LaTeX2e KOMA-Script-Bundle
+%
+% This file can be redistributed and/or modified under the terms
+% of the LaTeX Project Public License Version 1.0 distributed 
+% together with this file. See LEGAL.TXT or LEGALDE.TXT.
+% ----------------------------------------------------------------------
+% scrkpar.dtx
+% Copyright (c) Markus Kohm, 2002
+%
+% Diese Datei ist Teil des LaTeX2e KOMA-Script-Pakets.
+%
+% Diese Datei kann nach den Regeln der LaTeX Project Public
+% Licence Version 1.0, wie sie zusammen mit dieser Datei verteilt
+% wird, weiterverbreitet und/oder modifiziert werden. Siehe dazu
+% auch LEGAL.TXT oder LEGALDE.TXT.
+% ======================================================================
+% \fi
+% \iffalse
+%%% From File: scrkpar.dtx
+%<*driver>
+% \fi
+\ProvidesFile{scrkpar.dtx}[2002/12/04 v3.0 KOMA-Script (paragraphs)]
+% \iffalse
+\documentclass[halfparskip-]{scrdoc}
+\usepackage[english,german]{babel}
+\usepackage[latin1]{inputenc}
+\CodelineIndex
+\RecordChanges
+\GetFileInfo{scrkpar.dtx}
+\title{\KOMAScript{} \partname\ \texttt{\filename}%
+  \footnote{Dies ist Version \fileversion\ von Datei \texttt{\filename}.}}
+\date{\filedate}
+\author{Markus Kohm}
+
+\begin{document}
+  \maketitle
+  \tableofcontents
+  \DocInput{\filename}
+\end{document}
+%</driver>
+% \fi
+%
+% \selectlanguage{german}
+%
+% \changes{v3.0}{2002/06/25}{%
+%   erste Version aus der Aufteilung von \texttt{scrclass.dtx}}
+%
+% \section{Absatzformatierung und -umbruch}
+%
+% In diesen Bereich gehört alles, was die Absatzformatierung selbst
+% betrifft. Dazu kommen dann noch einige Kleinigkeiten aus dem
+% Seitenumbruch.
+%
+% \StopEventually{\PrintIndex\PrintChanges}
+%
+%
+% \iffalse
+%<*option>
+% \fi
+%
+% \subsection{Optionen für das Absatzlayout}
+%
+% Ab Version 2.8i können wir auch mit Absatzlayouts umgehen, die einen
+% Absatzabstand statt einem Absatzeinzug verlangen. Gesteuert wird
+% dies über Optionen und Schalter.
+%
+%  \begin{macro}{\setparsizes}
+%    \changes{v3.0}{2004/11/05}{neues Macro}
+% Über dieses Makro wird die Änderung der Absatzparameter |\parskip|,
+% |\parindent|, |\parfillskip| gesetzt. Das erste Argument ist der Einzug, das
+% zweite der Abstand und das dritte die Füllung. Aktiviert werden die
+% Änderungen wie bei |\fontsize| über |\selectfont|. Obwohl in der
+% Voreinstellung absolut gearbeitet wird, wird hier intern
+% |\par@updaterelative| verwendet.
+%    \begin{macrocode}
+\newcommand*{\setparsizes}[3]{%
+  \edef\f@parindent{\the\parindent}%
+  \edef\f@parskip{\the\parskip}%
+  \edef\f@parfillskip{\the\parfillskip}%
+  \def\scr@parindent{#1}%
+  \def\scr@parskip{#2}%
+  \def\scr@parfillskip{#3}%
+  \def\par@update{\let\par@update\default@par@update\par@updaterelative}%
+}
+%    \end{macrocode}
+%  \begin{macro}{\f@parindent}
+%    \changes{v3.0}{2004/11/05}{neu (intern)}
+% Eingestellter Absatzeinzug.
+%  \begin{macro}{\f@parskip}
+%    \changes{v2.8i}{2001/07/22}{neu (intern)}
+%    \changes{v3.0}{2004/11/05}{Bedeutung geändert}
+% Eingestellter Absatzabstand.
+%  \begin{macro}{\f@parfillskip}
+%    \changes{v2.8i}{2001/07/22}{neu (intern)}
+%    \changes{v3.0}{2004/11/05}{Bedeutung geändert}
+% Eingestellte Absatzfüllung.
+%
+% Diese drei Werte werden automatisch bei der Font-Initialisierung eingestellt
+% und sind vorher ungültig!
+%    \begin{macrocode}
+\newcommand*{\f@parindent}{\the\parindent}
+\newcommand*{\f@parskip}{\the\parskip}
+\newcommand*{\f@parfillskip}{\the\parfillskip}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%
+%  \begin{macro}{\par@update}
+%    \changes{v3.0}{2004/11/05}{neues internes Macro}
+% Dieses Makro wird später in |\selectfont| die Änderung vornehmen.
+%  \begin{macro}{\default@par@update}
+%    \changes{v3.0}{2004/11/05}{neues internes Macro}
+% In der Voreinstellung findet keine Änderung statt. Dies wird jedoch durch
+% die Auswahl einer entsprechenden Option geändert.
+%    \begin{macrocode}
+\newcommand*{\par@update}{}
+\let\par@update\relax
+\newcommand*{\default@par@update}{}
+\let\default@par@update\relax
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%
+%  \begin{option}{parskip}
+%    \changes{v2.8i}{2001/07/22}{neue Option}
+%  \begin{option}{parskip-}
+%    \changes{v2.8l}{2001/08/16}{neue Option}
+%  \begin{option}{parskip+}
+%    \changes{v2.8i}{2001/07/22}{neue Option}
+%  \begin{option}{parskip*}
+%    \changes{v2.8i}{2001/07/22}{neue Option}
+%  \begin{option}{halfparskip}
+%    \changes{v2.8i}{2001/07/22}{neue Option}
+%  \begin{option}{halfparskip-}
+%    \changes{v2.8l}{2001/08/16}{neue Option}
+%  \begin{option}{halfparskip+}
+%    \changes{v2.8i}{2001/07/22}{neue Option}
+%  \begin{option}{halfparskip*}
+%    \changes{v2.8i}{2001/07/22}{neue Option}
+%  \begin{option}{parindent}
+%    \changes{v2.8i}{2001/07/22}{neue Option}
+% Diese neun Optionen steuern die Umschaltung zwischen den Modi. Dabei
+% schalten alle \texttt{parskip}-Optionen einen Absatzabstand ein,
+% wohingegen die \texttt{parindent}-Option den Absatzeinzug
+% einschaltet. Die \texttt{+}-Variante sorgt außerdem dafür, dass
+% die letzte Zeile eines Absatzes maximal zu zwei Dritteln gefüllt
+% wird. Entsprechend sorgt die \texttt{*}-Variante für eine maximale
+% Füllung von drei Vierteln. Die normale Variante sorgt lediglich
+% für einen freien Raum von 1\,em. Die \texttt{-}-Variante sorgt für
+% überhaupt nichts.
+%  \begin{macro}{\scr@parindent}
+%    \changes{v3.0}{2004/11/05}{neu (intern)}
+% Der einzustellende Absatzeinzug.
+%  \begin{macro}{\scr@parskip}
+%    \changes{v2.8i}{2001/07/22}{neu (intern)}
+%    \changes{v3.0}{2004/11/05}{Bedeutung geändert}
+% Der einzustellende Absatzabstand.
+%  \begin{macro}{\scr@parfillskip}
+%    \changes{v2.8i}{2001/07/22}{neu (intern)}
+%    \changes{v3.0}{2004/11/05}{Bedeutung geändert}
+% Die einzustellende Absatzfüllung.
+%    \begin{macrocode}
+\newcommand*{\scr@parindent}{1em}
+\newcommand*{\scr@parskip}{\z@}
+\newcommand*{\scr@parfillskip}{\z@ \@plus 1fil}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%    \begin{macrocode}
+\DeclareOption{parskip}{%
+  \setparsizes{\z@}{\baselineskip \@plus .1\baselineskip}{%
+    1em \@plus 1fil}%
+}
+\DeclareOption{parskip-}{%
+  \setparsizes{\z@}{\baselineskip \@plus .1\baselineskip}{%
+    \z@ \@plus 1fil}%
+}
+\DeclareOption{parskip+}{%
+  \setparsizes{\z@}{\baselineskip \@plus .1\baselineskip}{%
+    .3333\linewidth\@plus 1fil}%
+}
+\DeclareOption{parskip*}{%
+  \setparsizes{\z@}{\baselineskip \@plus .1\baselineskip}{%
+    .25\linewidth \@plus 1fil}%
+}
+\DeclareOption{halfparskip}{%
+  \setparsizes{\z@}{.5\baselineskip \@plus .5\baselineskip}{%
+    1em \@plus 1fil}%
+}
+\DeclareOption{halfparskip-}{%
+  \setparsizes{\z@}{.5\baselineskip \@plus .5\baselineskip}{%
+    \z@ \@plus 1fil}%
+}
+\DeclareOption{halfparskip+}{%
+  \setparsizes{\z@}{.5\baselineskip \@plus .5\baselineskip}{%
+    .3333\linewidth \@plus 1fil}%
+}
+\DeclareOption{halfparskip*}{%
+  \setparsizes{\z@}{.5\baselineskip \@plus .5\baselineskip}{%
+    .25\linewidth \@plus 1fil}%
+}
+\DeclareOption{parindent}{%
+  \setparsizes{1em}{\z@ \@plus \p@}{\z@ \@plus 1fil}%
+}
+%    \end{macrocode}
+%  \end{option}
+%  \end{option}
+%  \end{option}
+%  \end{option}
+%  \end{option}
+%  \end{option}
+%  \end{option}
+%  \end{option}
+%  \end{option}
+%
+% \iffalse
+%</option>
+%<*body>
+% \fi
+%
+%
+% \subsection{Abatzformatierung}
+%
+% \changes{v2.8i}{2001/07/22}{\cs{baselinestretch} wird nicht
+%   umdefiniert}
+%  \begin{Length}{lineskip}
+%  \begin{Length}{normallineskip}
+% Minimaler Zeilenabstand:
+%    \begin{macrocode}
+\setlength{\lineskip}{\p@}
+\setlength{\normallineskip}{\p@}
+%    \end{macrocode}
+%  \end{Length}
+%  \end{Length}
+%
+%  \begin{Length}{columnsep}
+%  \begin{Length}{columnseprule}
+% Spaltenabstand und Spaltentrennlinie:
+%    \begin{macrocode}
+\setlength{\columnsep}{10\p@}
+\setlength{\columnseprule}{\z@}
+%    \end{macrocode}
+%  \end{Length}
+%  \end{Length}
+%
+%  \begin{macro}{\selectfont}
+%    \changes{v3.0}{2004/11/05}{neue Änderung}
+% Ab Version~3.0 soll die Möglichkeit bestehen, |\parskip|, |\parindent| und
+% |\parfillskip| mit der Schriftgröße automatisch anzupassen. Dazu muss
+% |\selectfont| entsprechend erweitert werden.
+%    \begin{macrocode}
+\expandafter\g@addto@macro\csname selectfont \endcsname{\par@update}
+%    \end{macrocode}
+%  \begin{macro}{\par@updaterelative}
+%    \changes{v3.0}{2004/11/05}{neues internes Macro}
+% Die eigentliche Änderung verbirgt sich in |\par@updaterelative|. Ggf. wird
+% |\par@update| zu |\par@updaterelative|.
+%    \begin{macrocode}
+\newcommand*{\par@updaterelative}{%
+%    \end{macrocode}
+% Die neuen Werte werden nur gesetzt, wenn die bisherigen Werten den
+% erwarteten Werten entsprechen. Sonst lassen wir lieber die Finger davon,
+% weil wir dann davon ausgehen, dass der Anwender die so setzen wollte.
+%    \begin{macrocode}
+  \begingroup
+    \edef\@tempa{\the\parindent}\ifx\@tempa\f@parindent
+      \aftergroup\parindent@update
+%<*trace>
+    \else
+      \ClassInfo{\KOMAClassName}{\string\parindent\space not changed}%
+%</trace>
+    \fi
+    \edef\@tempa{\the\parskip}\ifx\@tempa\f@parskip
+      \aftergroup\parskip@update
+%<*trace>
+    \else
+      \ClassInfo{\KOMAClassName}{\string\parskip\space not changed}%
+%</trace>
+    \fi
+    \edef\@tempa{\the\parfillskip}\ifx\@tempa\f@parfillskip
+      \aftergroup\parfillskip@update
+%<*trace>
+    \else
+      \ClassInfo{\KOMAClassName}{\string\parfillskip\space not changed}%
+%</trace>
+    \fi
+  \endgroup
+}
+%    \end{macrocode}
+%  \begin{macro}{\parindent@update}
+%    \changes{v3.0}{2004/11/05}{neues internes Macro}
+%  \begin{macro}{\parskip@update}
+%    \changes{v3.0}{2004/11/05}{neues internes Macro}
+%  \begin{macro}{\parfillskip@update}
+%    \changes{v3.0}{2004/11/05}{neues internes Macro}
+% Ein paar Hilfsmakros.
+%    \begin{macrocode}
+\newcommand*{\parindent@update}{%
+  \scr@defaultunits\parindent\scr@parindent
+  \begingroup
+    \let\@tempb\endgroup
+    \edef\@tempa{\the\parindent}\ifx\@tempa\f@parindent\else
+      \def\@tempb{\endgroup\edef\f@parindent{\the\parindent}}%
+%<trace>      \ClassInfo{\KOMAClassName}{\string\parindent=\f@parindent}%
+    \fi
+  \@tempb
+}
+\newcommand*{\parskip@update}{%
+  \scr@defaultunits\parskip\scr@parskip
+  \begingroup
+    \let\@tempb\endgroup
+    \edef\@tempa{\the\parskip}\ifx\@tempa\f@parskip\else
+      \def\@tempb{\endgroup\edef\f@parskip{\the\parskip}}%
+%<trace>      \ClassInfo{\KOMAClassName}{\string\parskip=\f@parskip}%
+    \fi
+  \@tempb
+}
+\newcommand*{\parfillskip@update}{%
+  \scr@defaultunits\parfillskip\scr@parfillskip
+  \begingroup
+    \let\@tempb\endgroup
+    \edef\@tempa{\the\parfillskip}\ifx\@tempa\f@parfillskip\else
+      \def\@tempb{\endgroup\edef\f@parfillskip{\the\parfillskip}}%
+%<trace>      \ClassInfo{\KOMAClassName}{\string\parfillskip=\f@parfillskip}%
+    \fi
+  \@tempb
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%
+%  \begin{macro}{\scr@defaultunits}
+%    \changes{v3.0}{2004/11/05}{neues internes Macro}
+%  \begin{macro}{\scr@@defaultunits}
+%    \changes{v3.0}{2004/11/05}{neues internes Macro}
+%  \begin{macro}{\scr@@@defaultunits}
+%    \changes{v3.0}{2004/11/05}{neues internes Macro}
+% Damit |\par@updaterelative| überhaupt funktionieren kann, wird
+% |\scr@defaultunits| benötigt. Dieses Makro arbeitet prinzipiell wie
+% |\@defaultunits| bekommt aber Dimension bzw. Skip als erstes und den Wert
+% als zweites Argument. Als Besonderheit dürften im Wert auch andere
+% Dimensions bzw. Skips vor und nach \texttt{plus} und \texttt{minus}
+% verwendet werden. Es sind also auch Angaben der Art "`\texttt{12 plus 1
+% minus 2}"' sowie
+% "`\texttt{\string\baselineskip\string\@plus.1\string\baselineskip}"'
+% gültig.
+%    \begin{macrocode}
+\newcommand*{\scr@defaultunits}[2]{%
+  \begingroup
+    \edef\@tempa{#2}%
+    \expandafter\scr@@defaultunits\expandafter#1\@tempa plusplus\@nnil
+    \edef\@tempa{\noexpand\endgroup\noexpand\setlength{\noexpand#1}{\the#1}}%
+  \@tempa
+}
+\newcommand*{\scr@@defaultunits}{}
+\def\scr@@defaultunits#1#2plus#3plus#4\@nnil{%
+  \ifx\relax#3\relax
+    \scr@@@defaultunits#1{}#2minusminus\@nnil
+  \else
+    \scr@@@defaultunits#1{#2}#3minusminus\@nnil
+  \fi
+}
+\newcommand*{\scr@@@defaultunits}{}
+\def\scr@@@defaultunits#1#2#3minus#4minus#5\@nnil{%
+  \ifx\relax#2\relax
+    \@defaultunits\@tempskipa#3pt\relax\@nnil
+    \setlength{#1}{\@tempskipa}%
+  \else
+    \@defaultunits\@tempskipa\z@\@plus#3pt\relax\@nnil
+    \setlength{#1}{\@tempskipa}%
+    \@defaultunits\@tempskipa#2pt\relax\@nnil
+    \addtolength{#1}{\@tempskipa}%
+  \fi
+  \ifx\relax#4\relax\else
+    \@defaultunits\@tempskipa\z@\@minus #4pt\relax\@nnil
+    \addtolength{#1}{\@tempskipa}%
+  \fi
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%
+% Absatzabstand und Absatzeinzug:
+%  \begin{macro}{\@listi}
+%  \begin{macro}{\@listI}
+%  \begin{macro}{\@listii}
+%  \begin{macro}{\@listiii}
+%  \begin{macro}{\@list@extra}
+%    \changes{v2.8q}{2001/11/06}{neu (intern)}
+%  \begin{macro}{\add@extra@listi}
+%    \changes{v2.9h}{2002/09/03}{neu (intern)}
+%  \begin{macro}{\footnotesize}
+%    \changes{v2.9h}{2002/09/03}{etwas robuster}
+%  \begin{macro}{\small}
+%    \changes{v2.9h}{2002/09/03}{etwas robuster}
+% Ab Version 2.8i wird hier optionsabhängig gearbeitet. Dabei müssen
+% auch die Befehle bei der Umschaltung der Schriftgröße für \cs{small}
+% und \cs{footnotesize} geändert werden. 
+%    \begin{macrocode}
+\g@addto@macro{\@listi}{\@list@extra}
+\let\@listI=\@listi
+\g@addto@macro{\@listii}{\@list@extra}
+\g@addto@macro{\@listiii}{\@list@extra}
+\newcommand*{\add@extra@listi}[1]{%
+  \expandafter\let\csname #1@listi\endcsname=\@listi
+  \def\@listi{\csname #1@listi\endcsname\@list@extra}%
+}
+\g@addto@macro{\footnotesize}{\protect\add@extra@listi{ftns}}
+\g@addto@macro{\small}{\protect\add@extra@listi{sml}}
+\newcommand*{\@list@extra}{%
+  \ifdim\parskip>\z@\topsep\z@\parskip\parskip\itemsep\z@\fi
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%
+%
+% \subsection{Umbruchsteuerung}
+%
+% Für die Umbruchsteuerung sind einige Penalties zuständig. Diese sind
+% im \LaTeX-Kern definiert. Leider sind \cs{@lowpenalty},
+% \cs{@medpenalty} und \cs{@highpenalty} aber nicht mit
+% Voreinstellungen versehen, besitzen einheitlich die Voreinstellung
+% 0. Hier werden deshalb die Werte aus den Standardklassen übernommen:
+%    \begin{macrocode}
+\@lowpenalty  = 51
+\@medpenalty  =151
+\@highpenalty =301
+%    \end{macrocode}
+%
+%
+% \iffalse
+%</body>
+% \fi
+%
+% \Finale
+%
+\endinput
+%
+% end of file `scrkpar.dtx'
+%%% Local Variables:
+%%% mode: latex
+%%% mode: font-lock
+%%% TeX-master: t
+%%% End:

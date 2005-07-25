@@ -1,0 +1,576 @@
+% \CheckSum{579}
+% \iffalse meta-comment
+% ======================================================================
+% scrktitl.dtx
+% Copyright (c) Markus Kohm, 2002
+%
+% This file is part of the LaTeX2e KOMA-Script-Bundle
+%
+% This file can be redistributed and/or modified under the terms
+% of the LaTeX Project Public License Version 1.0 distributed 
+% together with this file. See LEGAL.TXT or LEGALDE.TXT.
+% ----------------------------------------------------------------------
+% scrktitl.dtx
+% Copyright (c) Markus Kohm, 2002
+%
+% Diese Datei ist Teil des LaTeX2e KOMA-Script-Pakets.
+%
+% Diese Datei kann nach den Regeln der LaTeX Project Public
+% Licence Version 1.0, wie sie zusammen mit dieser Datei verteilt
+% wird, weiterverbreitet und/oder modifiziert werden. Siehe dazu
+% auch LEGAL.TXT oder LEGALDE.TXT.
+% ======================================================================
+% \fi
+% \iffalse
+%%% From File: scrktitl.dtx
+%<*driver>
+% \fi
+\ProvidesFile{scrktitl.dtx}[2002/06/26 v3.0 KOMA-Script (title pages)]
+% \iffalse
+\documentclass[halfparskip-]{scrdoc}
+\usepackage[english,german]{babel}
+\usepackage[latin1]{inputenc}
+\CodelineIndex
+\RecordChanges
+\GetFileInfo{scrktitl.dtx}
+\title{\KOMAScript{} \partname\ \texttt{\filename}%
+  \footnote{Dies ist Version \fileversion\ von Datei
+    \texttt{\filename}.}}
+\date{\filedate}
+\author{Markus Kohm}
+
+\begin{document}
+  \maketitle
+  \tableofcontents
+  \DocInput{\filename}
+\end{document}
+%</driver>
+% \fi
+%
+% \selectlanguage{german}
+%
+% \changes{v3.0}{2002/06/26}{%
+%   erste Version aus der Aufteilung von \texttt{scrclass.dtx}}
+%
+% \section{Die Titelei}
+%
+% Die Titelei ist gegenüber den Standardklassen erheblich
+% erweitert. Trotzdem kann ein Titel einer Standardklasse unmittelbar
+% mit einer \KOMAScript-Klasse gesetzt werden.
+%
+% \StopEventually{\PrintIndex\PrintChanges}
+%
+% \iffalse
+%<*option>
+% \fi
+%
+%
+% \subsection{Optionen der Titelei}
+%
+%  \begin{option}{titlepage}
+%  \begin{option}{notitlepage}
+% Es werden zei Arten von Titeln unterstützt. Da sind zum einen eigene
+% Titelseiten, zum anderen sogenannte \emph{in-page} Titel, also
+% Titel, die nicht eine eigene Seite erhalten, sondern am Anfang einer
+% Seite stehen. Zwischen den beiden Arten wird mit einer Option
+%  umgeschaltet.
+%  \begin{macro}{\if@titlepage}
+%  \begin{macro}{\@titlepagetrue}
+%  \begin{macro}{\@titlepagefalse}
+% Die gewählte Einstellung wird in einem Schalter gespeichert.
+%    \begin{macrocode}
+\newif\if@titlepage
+%<article>\@titlepagefalse
+%<report|book>\@titlepagetrue
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%    \begin{macrocode}
+\DeclareOption{titlepage}{\@titlepagetrue}
+\DeclareOption{notitlepage}{\@titlepagefalse}
+%    \end{macrocode}
+%  \end{option}
+%  \end{option}
+%
+%  \begin{option}{abstracton}
+%  \begin{option}{abstractoff}
+% Obwohl die Zusammenfassung nicht unbedingt auf einer Titelseite
+% steht, gehört sie doch zur Titelei und wird daher hier mit
+% behandelt. Die Zusammenfassung kann mit einem standardmäßigen Titel
+% versehen werden. Der Titel kann aber auch unterdrückt werden.
+%
+% \iffalse
+%<*article|report>
+% \fi
+% Bei Büchern gibt es keine Zusammenfassung als gesonderte
+% Umgebung. Als Ersatz kann bei Büchern auf \cs{addchap*}
+% zurückgegriffen werden.
+%
+%  \begin{macro}{\if@abstrt}
+%  \begin{macro}{\@abstrttrue}
+%  \begin{macro}{\@abstrtfalse}
+% Die Enscheidung, ob der Titel der Zusammenfassung gesetzt werden
+% soll, wird in einem Schalter gespeichert.
+%    \begin{macrocode}
+\newif\if@abstrt
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%
+%    \begin{macrocode}
+\DeclareOption{abstracton}{\@abstrttrue}
+\DeclareOption{abstractoff}{\@abstrtfalse}
+%    \end{macrocode}
+%  \end{option}
+%  \end{option}
+% \iffalse
+%</article|report>
+% \fi
+%
+%
+% \iffalse
+%</option>
+%<*body>
+% \fi
+%
+%
+% \subsection{Definitionen der Titelei}
+%
+%  \begin{macro}{\extratitle}
+%  \begin{macro}{\@extratitle}
+%  \begin{macro}{\titlehead}
+%  \begin{macro}{\@titlehead}
+%  \begin{macro}{\subject}
+%  \begin{macro}{\@subject}
+%  \begin{macro}{\publishers}
+%  \begin{macro}{\@publishers}
+%  \begin{macro}{\uppertitleback}
+%  \begin{macro}{\@uppertitleback}
+%  \begin{macro}{\lowertitleback}
+%  \begin{macro}{\@lowertitleback}
+%  \begin{macro}{\dedication}
+%  \begin{macro}{\@dedication}
+% Da der Titel im \KOMAScript{} Paket wesentlich mehr Angaben erlaubt
+% als bei den Standardklassen, gibt es natürlich auch einige Befehle,
+% mit denen diese gesetzt werden können. Alle zusätzlichen Angaben
+% sind optional und können auch weggelassen werden. In diesem Fall
+% werden Leerfelder verwendet. Bis auf \cs{subject} sind alle
+% Zusatzbefehle \cs{long} deklariert, können also ganze Absätze
+% enthalten.
+%    \begin{macrocode}
+\newcommand*{\@extratitle}{}
+\newcommand{\extratitle}[1]{\gdef\@extratitle{#1}}
+\newcommand*{\@titlehead}{}
+\newcommand{\titlehead}[1]{\gdef\@titlehead{#1}}
+\newcommand*{\@subject}{}
+\newcommand*{\subject}[1]{\gdef\@subject{#1}}
+\newcommand*{\@publishers}{}
+\newcommand{\publishers}[1]{\gdef\@publishers{#1}}
+\newcommand*{\@uppertitleback}{}
+\newcommand{\uppertitleback}[1]{\gdef\@uppertitleback{#1}}
+\newcommand*{\@lowertitleback}{}
+\newcommand{\lowertitleback}[1]{\gdef\@lowertitleback{#1}}
+\newcommand*{\@dedication}{}
+\newcommand{\dedication}[1]{\gdef\@dedication{#1}}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%
+%  \begin{macro}{\next@tpage}
+%    \changes{v2.3b}{1995/07/24}{\cs{null} entfernt.}
+%    \changes{v2.3g}{1996/01/14}{\cs{newpage} durch \cs{clearpage}
+%      ersetzt}
+% Innerhalb eines Titels auf die nächste Seite umschalten.
+%    \begin{macrocode}
+\newcommand*{\next@tpage}{\clearpage\thispagestyle{empty}}
+%    \end{macrocode}
+%  \end{macro}
+%  \begin{macro}{\maketitle}
+% Mit dieser Anweisung wird der Titel generiert, dessen Inhalt zuvor
+% gesetzt wurde. Es muss unterschieden werden, ob der Titel auf einer
+% eigenen Titelseite oder als Seitenkopf erstellt werden soll. Der
+% \KOMAScript-Titel ist u.\,U. sehr groß. Im Fall dass diverse
+% Zusatzelemente verwendet werden, sollte eigentlich immer eine
+% Titelseite verwendet werden.
+%    \changes{v2.1a}{1994/10/29}{das Hilfskonstrukt \cs{@maketitle}
+%      wurde aus der Unterscheidung herausgenommen (für den Fall, dass
+%      \cs{maketitle} von einem Paket überladen wird)}
+%    \changes{v2.3a}{1995/07/08}{\texttt{plus} durch \cs{@plus}
+%      ersetzt}
+%    \changes{v2.3a}{1995/07/08}{\texttt{fill} durch \cs{fill}
+%      ersetzt}
+%    \changes{v2.3d}{1995/08/19}{\cs{fill} durch \texttt{fill}
+%      ersetzt}
+%    \changes{v2.3a}{1995/07/08}{\cs{vfil} durch \cs{vfill} ersetzt}
+%    \changes{v2.3b}{1995/07/24}{Umbruch bei \cs{@extratitle} in der
+%      beidseitigen Titelseite korrigiert}
+%    \changes{v2.3g}{1996/01/14}{\cs{footnote} funktioniert nun auch
+%      im Titel} 
+%    \changes{v2.4}{1996/02/25}{\cs{footnote} funktioniert nun
+%      wirklich im Titel}
+%    \changes{v2.4h}{1996/11/09}{egal ob der Titel auf eine Extraseite
+%      kommt oder nicht, \cs{@title} wird mit \cs{sectfont} gesetzt,
+%      wobei die Größe neuerdings danach eingestellt wird}
+%    \changes{v2.4l}{1997/02/06}{symbolische Fußnoten und
+%      Fußnotensymbolbreiten von 0\,pt zur besseren Zentrierung des
+%      Autors sind auch bei Titelseiten angebracht}
+%    \changes{v2.8p}{2001/09/22}{\cs{titlefont} an Stelle von
+%      \cs{sectfont}}
+%    \begin{macrocode}
+\if@titlepage
+  \newcommand*\maketitle[1][1]{%
+    \begin{titlepage}
+      \setcounter{page}{#1}%
+      \let\footnotesize\small
+      \let\footnoterule\relax
+      \let\footnote\thanks
+      \renewcommand*\thefootnote{\@fnsymbol\c@footnote}%
+      \let\@oldmakefnmark\@makefnmark
+      \renewcommand*{\@makefnmark}{\rlap\@oldmakefnmark}%
+      \ifx\@extratitle\@empty \else
+        \noindent\@extratitle\next@tpage\cleardoublepage
+        \thispagestyle{empty}%
+      \fi
+      \ifx\@titlehead\@empty \else
+        \noindent\begin{minipage}[t]{\textwidth}%
+        \@titlehead
+        \end{minipage}\par
+      \fi
+      \null\vfill
+      \begin{center}
+        \ifx\@subject\@empty \else
+          {\subject@font \@subject \par}%
+          \vskip 3em
+        \fi
+        {\titlefont\huge \@title\par}%
+        \vskip 3em
+        {\Large \lineskip 0.75em
+          \begin{tabular}[t]{c}
+            \@author
+          \end{tabular}\par
+        }%
+        \vskip 1.5em
+        {\Large \@date \par}%
+        \vskip \z@ \@plus3fill
+        {\Large \@publishers \par}%
+        \vskip 3em
+      \end{center}\par
+      \@thanks
+      \vfill\null
+      \if@twoside\next@tpage
+        \noindent\begin{minipage}[t]{\textwidth}
+          \@uppertitleback
+        \end{minipage}\par
+        \vfill
+        \noindent\begin{minipage}[b]{\textwidth}
+          \@lowertitleback
+        \end{minipage}
+      \fi
+      \ifx\@dedication\@empty \else
+        \next@tpage\null\vfill
+        {\centering \Large \@dedication \par}%
+        \vskip \z@ \@plus3fill
+        \if@twoside \next@tpage\cleardoublepage \fi
+      \fi
+    \end{titlepage}
+    \setcounter{footnote}{0}%
+%    \end{macrocode}
+%    \changes{v2.3g}{1996/01/14}{Verwendung von \cs{global}\cs{let}
+%      statt \cs{gdef}, um Speicher zu sparen}
+%    \changes{v2.3g}{1996/01/14}{\cs{@date} und \cs{title}
+%      u.\,ä. ebenfalls löschen, um Speicher zu sparen}
+%    \begin{macrocode}
+    \global\let\thanks\relax
+    \global\let\maketitle\relax
+    \global\let\@thanks\@empty
+    \global\let\@author\@empty
+    \global\let\@date\@empty
+    \global\let\@title\@empty
+    \global\let\@extratitle\@empty
+    \global\let\@titlehead\@empty
+    \global\let\@subject\@empty
+    \global\let\@publishers\@empty
+    \global\let\@uppertitleback\@empty
+    \global\let\@lowertitleback\@empty
+    \global\let\@dedication\@empty
+    \global\let\author\relax
+    \global\let\title\relax
+    \global\let\extratitle\relax
+    \global\let\titlehead\relax
+    \global\let\subject\relax
+    \global\let\publishers\relax
+    \global\let\uppertitleback\relax
+    \global\let\lowertitleback\relax
+    \global\let\dedication\relax
+    \global\let\date\relax
+    \global\let\and\relax
+  }
+\else
+%    \end{macrocode}
+%    \changes{v2.3a}{1995/07/08}{Verwendung von \cs{@makefnmark} in
+%      \cs{@makefntext}}
+%    \changes{v2.3a}{1995/07/08}{Definition von \cs{@makefnmark} und
+%      \cs{@makefntext} unabhängig von math}
+%    \changes{v2.3e}{1995/08/30}{optionales Argument bei der
+%      einseitigen Version erlauben und ignorieren}
+%    \changes{v2.3g}{1996/01/14}{mehrfach \cs{null} bei
+%      \cs{next@tpage} ergänzt}
+%    \changes{v2.4l}{1997/02/06}{es ist nicht mehr notwendig
+%      \cs{\@makefntext} umzudefinieren, stattdessen wird nur
+%      \cs{\@makefnmark} umdefiniert}
+%    \changes{v2.8d}{2001/07/05}{\cs{titlepagestyle} statt
+%      \texttt{plain}}
+%    \begin{macrocode}
+  \newcommand*\maketitle[1][1]{\par
+    \@tempcnta=#1\relax\ifnum\@tempcnta=1\else
+      \ClassWarning{\KOMAClassName}{%
+        Optional argument of \string\maketitle\space ignored
+        at\MessageBreak
+        notitlepage-mode%
+      }%
+    \fi
+    \begingroup
+      \renewcommand*\thefootnote{\@fnsymbol\c@footnote}%
+      \let\@oldmakefnmark\@makefnmark
+      \renewcommand*{\@makefnmark}{\rlap\@oldmakefnmark}
+      \if@twocolumn
+        \ifnum \col@number=\@ne
+          \@maketitle
+        \else
+          \twocolumn[\@maketitle]%
+        \fi
+      \else
+        \newpage
+        \global\@topnum\z@
+        \@maketitle
+      \fi
+      \thispagestyle{\titlepagestyle}\@thanks
+    \endgroup
+    \setcounter{footnote}{0}%
+    \let\thanks\relax
+    \let\maketitle\relax
+    \let\@maketitle\relax
+%    \end{macrocode}
+%    \changes{v2.3g}{1996/01/14}{Verwendung von \cs{global}\cs{let}
+%      statt \cs{gdef}, um Speicher zu sparen}
+%    \changes{v2.3g}{1996/01/14}{\cs{@date} und \cs{title}
+%      u.\,ä. ebenfalls löschen, um Speicher zu sparen}
+%    \begin{macrocode}
+    \global\let\@thanks\@empty
+    \global\let\@author\@empty
+    \global\let\@date\@empty
+    \global\let\@title\@empty
+    \global\let\@extratitle\@empty
+    \global\let\@titlehead\@empty
+    \global\let\@subject\@empty
+    \global\let\@publishers\@empty
+    \global\let\@uppertitleback\@empty
+    \global\let\@lowertitleback\@empty
+    \global\let\@dedication\@empty
+    \global\let\author\relax
+    \global\let\title\relax
+    \global\let\extratitle\relax
+    \global\let\titlehead\relax
+    \global\let\subject\relax
+    \global\let\publishers\relax
+    \global\let\uppertitleback\relax
+    \global\let\lowertitleback\relax
+    \global\let\dedication\relax
+    \global\let\date\relax
+    \global\let\and\relax
+  }
+\fi
+%    \end{macrocode}
+%  \begin{macro}{\@maketitle}
+% Damit wird im Fall der Titelseite die eigentliche Arbeit geleistet.
+%    \begin{macrocode}
+\newcommand*{\@maketitle}{%
+  \clearpage
+  \let\footnote\thanks
+  \ifx\@extratitle\@empty \else
+    \noindent\@extratitle \next@tpage \if@twoside \null\next@tpage \fi
+  \fi
+  \ifx\@titlehead\@empty \else
+    \noindent\begin{minipage}[t]{\textwidth}
+      \@titlehead
+    \end{minipage}\par
+  \fi
+  \null
+  \vskip 2em%
+  \begin{center}%
+    \ifx\@subject\@empty \else
+      {\subject@font \@subject \par}
+      \vskip 1.5em
+    \fi
+    {\titlefont\huge \@title \par}%
+    \vskip 1.5em%
+    {\Large
+      \lineskip .5em%
+      \begin{tabular}[t]{c}
+        \@author
+      \end{tabular}\par
+    }%
+    \vskip 1em%
+    {\Large \@date \par}%
+    \vskip \z@ \@plus 1em
+    {\Large \@publishers \par}
+    \ifx\@dedication\@empty \else
+      \vskip 2em
+      {\Large \@dedication \par}
+    \fi
+  \end{center}%
+  \par
+  \vskip 2em
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%
+%  \begin{macro}{\titlefont}
+%    \changes{v2.8p}{2001/09/22}{neu}
+% Wie oben zu sehen ist, wird in der Titelei ein eigenes Schriftmakro
+% verwendet. Dieses ist als internes Makro zu verstehen. Der Anwender
+% sollte stattdessen auf das entsprechende Element zugreifen (siehe
+% unten).
+%  \begin{macro}{\subject@font}
+%    \changes{v2.8q}{2002/01/14}{neu (intern)}
+%    \changes{v3.0}{2002/06/26}{jetzt auch bei \textsf{scrbook},
+%      \textsf{scrreprt} und \textsf{scrartcl}}
+% Ebenso verhält es sich mit den \emph{Subject} im Titel. Hier ist
+% aber von vornherein ein internes Makro definiert.
+%    \begin{macrocode}
+\newcommand*\titlefont{\sectfont}
+\newcommand*{\subject@font}{\normalfont\normalcolor\bfseries\Large}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%
+%
+%  \begin{macro}{\scr@fnt@title}
+%    \changes{v2.8o}{2001/09/14}{neues Element \texttt{title}}
+%  \begin{macro}{\scr@fnt@subject}
+%    \changes{v2.8q}{2002/01/14}{neues Element \texttt{subject}}
+%    \changes{v3.0}{2002/06/26}{jetzt auch bei \textsf{scrbook},
+%      \textsf{scrreprt} und \textsf{scrartcl}}
+% Die beiden Elemente, deren Schrift geändert werden kann.
+%    \begin{macrocode}
+\newcommand*{\scr@fnt@title}{\titlefont}
+\newcommand*{\scr@fnt@subject}{\subject@font}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%
+%
+%  \begin{environment}{abstract}
+% \textsf{scrartcl} und \textsf{scrreprt} bieten die Möglichkeit einer
+% Zusammenfassung, eines sogenannten \emph{Abstracts}. Wenn eine
+% Titelseite verlangt wurde, wird auch die Zusammenfassung auf eine
+% eigene Seite gesetzt. \textsf{scrbook} kennt keine Zusammenfassung
+% dieser Art. In Büchern werden Zusammenfassungen üblicherweise mit
+% Kapitelcharakter gesetzt.
+% \iffalse
+%<*article|report>
+% \fi
+%    \changes{v2.3a}{1995/07/08}{\cs{@endparpenalty} zur Verhinderung
+%      eines Seitenumbruchs nach dem Abstract-Kopf eingefügt}
+%    \changes{v2.3g}{1996/01/14}{\cs{@beginparpenalty} zur
+%      Verhinderung eines Seitenumbruchs vor dem Abstract-Kopf
+%      eingefügt}
+%    \changes{v2.7a}{2001/01/04}{statt \cs{section*} wird nun
+%      \cs{addsec*} verwendet, damit die Kolumnentitel korrekt
+%      behandelt werden}
+%    \begin{macrocode}
+\if@titlepage
+  \newenvironment{abstract}{%
+    \titlepage
+    \null\vfil
+    \@beginparpenalty\@lowpenalty
+    \if@abstrt
+      \begin{center}
+        \normalfont\sectfont\nobreak\abstractname
+        \@endparpenalty\@M
+      \end{center}
+    \fi
+  }{%
+    \par\vfil\null\endtitlepage
+  }
+\else
+  \newenvironment{abstract}{%
+    \if@twocolumn\if@abstrt
+        \addsec*{\abstractname}
+      \fi
+    \else
+      \if@abstrt
+        \small
+        \begin{center}
+          {\normalfont\sectfont\nobreak\abstractname
+            \vspace{-.5em}\vspace{\z@}}%
+        \end{center}
+      \fi
+      \quotation
+    \fi
+  }{%
+    \if@twocolumn\else\endquotation\fi
+  }
+\fi
+%    \end{macrocode}
+% \iffalse
+%</article|report>
+% \fi
+%  \end{environment}
+%
+%
+% \subsection{Umgebung für die Titelseite}
+%
+%  \begin{environment}{titlepage}
+% Die Titelseite bedarf ebenfalls einer gesonderter Umgebung. Beim
+% zweispaltigen Layout soll die Titelseite z.\,B. einspaltig gedruckt
+% werden.
+%    \begin{macrocode}
+\newenvironment{titlepage}{%
+%<report|book>  \cleardoublepage
+  \if@twocolumn
+    \@restonecoltrue\onecolumn
+  \else
+    \@restonecolfalse\newpage
+  \fi
+  \thispagestyle{empty}%
+  \if@compatibility
+    \setcounter{page}{0}%
+  \fi
+}{%
+  \if@restonecol\twocolumn \else \newpage \fi
+}
+%    \end{macrocode}
+%  \end{environment}
+%
+%
+% \iffalse
+%</body>
+% \fi
+%
+%
+% \Finale
+%
+\endinput
+%
+% end of file `scrktitl.dtx'
+%%% Local Variables:
+%%% mode: latex
+%%% mode: font-lock
+%%% TeX-master: t
+%%% End:

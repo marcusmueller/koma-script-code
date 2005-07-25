@@ -1,0 +1,865 @@
+% \CheckSum{640}
+% \iffalse meta-comment
+% ======================================================================
+% scrkbase.dtx
+% Copyright (c) Markus Kohm, 2002
+%
+% This file is part of the LaTeX2e KOMA-Script-Bundle
+%
+% This file can be redistributed and/or modified under the terms
+% of the LaTeX Project Public License Version 1.0 distributed 
+% together with this file. See LEGAL.TXT or LEGALDE.TXT.
+% ----------------------------------------------------------------------
+% scrkbase.dtx
+% Copyright (c) Markus Kohm, 2002
+%
+% Diese Datei ist Teil des LaTeX2e KOMA-Script-Pakets.
+%
+% Diese Datei kann nach den Regeln der LaTeX Project Public
+% Licence Version 1.0, wie sie zusammen mit dieser Datei verteilt
+% wird, weiterverbreitet und/oder modifiziert werden. Siehe dazu
+% auch LEGAL.TXT oder LEGALDE.TXT.
+% ======================================================================
+% \fi
+% \iffalse
+%%% From File: scrkbase.dtx
+%<*driver>
+% \fi
+\ProvidesFile{scrkbase.dtx}[2004/07/20 v1.0 KOMA-Script (keyval use)]
+% \iffalse
+%</driver>
+%<package&option>\ProvidesPackage{scrkbase}[%
+%<package&option>  \KOMAScriptVersion\space package (basics and keyval use)]
+%<*driver>
+\documentclass{scrdoc}
+\usepackage[english,german]{babel}
+\usepackage[latin1]{inputenc}
+\CodelineIndex
+\RecordChanges
+\GetFileInfo{scrkbase.dtx}
+\title{\KOMAScript{} \partname\ \texttt{\filename}%
+  \footnote{Dies ist Version \fileversion\ von Datei
+    \texttt{\filename}.}}
+\date{\filedate}
+\author{Markus Kohm}
+
+\begin{document}
+  \maketitle
+  \tableofcontents
+  \DocInput{\filename}
+\end{document}
+%</driver>
+% \fi
+%
+% \selectlanguage{german}
+%
+% \changes{v1.0}{2002/07/06}{Beginn der ersten Version}
+%
+% \section{Grundlegenden \KOMAScript-Erweiterungen}
+%
+% Neue Versionen von \KOMAScript{} machen zunehmend Gebrauch vom
+% \textsf{keyval}-Paket. Das \textsf{keyval}-Paket ist Bestandteil des
+% \textsf{graphics}-Pakets und muss als solches auf allen
+% \TeX-Systemen mit \LaTeX{} enthalten sein. Es genügt jedoch in
+% einigen Punkten nicht den Anforderungen von \KOMAScript{}. Deshalb
+% werden hier Erweiterungen vorgenommen, die von \KOMAScript-Klassen
+% und \KOMAScript-Paketen verwendet werden können.
+%
+% Darüber hinaus werden immer mehr Teile von \KOMAScript{} von mehr
+% als einem Paket oder von Paketen und Klassen verwendet. Diese
+% grundlegenden Dinge wurden daher in ein eigenes Paket,
+% \textsl{scrkbase}, ausgegliedert. Dadurch werden die Pakete und
+% Klassen selbst kleiner und die können trotzdem unabhängig
+% voneinander verwendet werden. Selbstverständlich kann man dieses
+% Paket auch ohne den Rest von \KOMAScript{} zum Einsatz bringen.
+%
+% \StopEventually{\PrintIndex\PrintChanges}
+%
+% \iffalse
+%<*option>
+% \fi
+%
+% \subsection{Optionen}
+% Derzeit gibt es keine Optionen in diesem Bereich.
+%
+% \iffalse
+%</option>
+%<*load>
+% \fi
+%
+% \subsection{Laden des Pakets}
+% Wer das Paket lädt, tut das allerdings in der Regel sogar bereits
+% vor der Definition der Optionen mit:
+%    \begin{macrocode}
+\RequirePackage{scrkbase}[\KOMAScriptVersion]
+%    \end{macrocode}
+%
+% \iffalse
+%</load>
+%<*body>
+% \fi
+%
+% \subsection{Laden von \textsf{keyval}}
+%
+% Die Überschrift ist reine Tiefstapelei. Hier wird nicht nur das
+% Paket geladen, was ruckzuck mit:
+%    \begin{macrocode}
+\RequirePackage{keyval}
+%    \end{macrocode}
+% erledigt ist.
+%
+% Im Anschluss an das Laden des Pakets werden auch noch diverse
+% Makros des Pakets umdefiniert. Diese Umdefinitionen wurden von mir
+% für das Paket vorgeschlagen, sind bisher\footnote{2002-07-06} aber
+% nicht realisiert (siehe dazu die \LaTeX{} Bugreport Database).
+%
+% Um Probleme zu vermeiden, wird jeweils getestet, dass die
+% Originaldefinition nicht inzwischen geändert wurde. Das bläht zwar
+% den Code auf, ist aber besser so.
+%
+%  \begin{macro}{\KV@split}
+% Dieses Makro nimmt die Aufteilung in Schlüsselname und Argument
+% vor. Außerdem ruft es dann die Schlüsseldefinition auf oder gibt bei
+% fehlendem Schlüssel einen Fehler aus. Zunächst wird die Definition
+% getestet. Das geht aufgrund des Aufbaus nicht direkt mit
+% \cs{CheckCommand}. Aber es geht mit einem internen Makro, das auch
+% von \cs{CheckCommand} verwendet wird.
+%    \begin{macrocode}
+\begingroup
+  \def\@tempa#1=#2=#3\relax{%
+    \KV@@sp@def\@tempa{#1}%
+    \ifx\@tempa\@empty\else
+      \expandafter\let\expandafter\@tempc
+        \csname\KV@prefix\@tempa\endcsname
+      \ifx\@tempc\relax
+        \KV@errx
+         {\@tempa\space undefined}%
+      \else
+        \ifx\@empty#3\@empty
+          \KV@default
+        \else
+          \KV@@sp@def\@tempb{#2}%
+          \expandafter\@tempc\expandafter{\@tempb}\relax
+        \fi
+      \fi
+    \fi}
+  \@check@eq\KV@split\@tempa
+\endgroup
+%    \end{macrocode}
+% Dann wird es umdefiniert, wobei erstmal alles wie zuvor bleibt:
+%    \begin{macrocode}
+\def\KV@split#1=#2=#3\relax{%
+  \KV@@sp@def\@tempa{#1}%
+  \ifx\@tempa\@empty\else
+    \expandafter\let\expandafter\@tempc
+      \csname\KV@prefix\@tempa\endcsname
+    \ifx\@tempc\relax
+%    \end{macrocode}
+% Bis wir zum Fehlerfall kommen. Hier erlauben wir jedem Paket seine
+% eigenen Fehlermeldungen:
+%    \begin{macrocode}
+      \scr@KV@errx{\@tempa}%
+%    \end{macrocode}
+% Danach wieder wie gehabt:
+%    \begin{macrocode}
+    \else
+      \ifx\@empty#3\@empty
+        \KV@default
+      \else
+        \KV@@sp@def\@tempb{#2}%
+        \expandafter\@tempc\expandafter{\@tempb}\relax
+      \fi
+    \fi
+  \fi}
+%    \end{macrocode}
+%  \end{macro}
+%
+%  \begin{macro}{\KV@default}
+% Dieses Makro ruft den Default-Wert ab oder gibt einen Fehler
+% aus. Zunächst wieder der Test. Diesmal aber direkt mit
+% \cs{CheckCommand}:
+%    \begin{macrocode}
+\CheckCommand*{\KV@default}{%
+  \expandafter\let\expandafter\@tempb
+    \csname\KV@prefix\@tempa @default\endcsname
+  \ifx\@tempb\relax
+    \KV@err{No value specified for \@tempa}%
+  \else
+    \@tempb\relax
+  \fi}
+%    \end{macrocode}
+% Danach wird wieder umdefiniert, wobei wieder nur die
+% Fehlergeschichte geändert wird:
+%    \begin{macrocode}
+\renewcommand*{\KV@default}{%
+  \expandafter\let\expandafter\@tempb
+    \csname\KV@prefix\@tempa @default\endcsname
+  \ifx\@tempb\relax
+    \scr@KV@err{\@tempa}%
+  \else
+    \@tempb\relax
+  \fi}
+%    \end{macrocode}
+%  \end{macro}
+%
+%    \begin{macro}{\scr@KV@errx}
+%    \begin{macro}{\scr@KV@err}
+% Jetzt brauchen wir natürlich die Makros zur Fehlerausgabe. Dabei
+% kann für jeden Schlüsselkennung jeweils eine eigene Fehlermeldung für
+% fehlende Schlüssel und fehlenden Defaultwert definiert
+% werden. Fehlende Schlüssel werden mit \cs{KV@\meta{Kennung}@nokey}
+% gemeldet, fehlende Defaultwerte mit \cs{KV@\meta{Kennung}@noval}.
+% Sind entsprechende Makros nicht definiert, erfolgt die Meldung auf
+% herkömmlichem Weg.
+%    \begin{macrocode}
+\newcommand*{\scr@KV@errx}[1]{%
+  \expandafter\ifx\csname\KV@prefix nokey\endcsname\relax
+    \KV@errx{#1\space undefined}%
+  \else
+    \csname\KV@prefix nokey\endcsname{#1}%
+  \fi
+}
+\newcommand*{\scr@KV@err}[1]{%
+  \expandafter\ifx\csname\KV@prefix noval\endcsname\relax
+    \KV@err{No value specified for #1}%
+  \else
+    \csname\KV@prefix noval\endcsname{#1}%
+  \fi
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%
+% Das waren alle Änderungen.
+%
+%
+% \subsection{Häufig benötigte Befehle}
+%
+%  \begin{macro}{\if@atdocument}
+%    \changes{v3.0}{2002/12/05}{neuer Schalter}
+%  \begin{macro}{\@atdocumenttrue}
+%  \begin{macro}{\@atdocumentfalse}
+% Dieser Schalter wird bei \cs{begin}\texttt{\{document\}} wahr. Er
+% wird von \KOMAScript{} für Befehle verwendet, die sich
+% unterschiedlich verhalten, je nachdem, ob sie in der Präambel oder
+% danach aufgerufen werden.
+%    \begin{macrocode}
+\newif\if@atdocument
+\AtBeginDocument{\@atdocumenttrue}
+\@onlypreamble\@atdocumentrue
+\@onlypreamble\@atdocumentfalse
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%
+%  \begin{macro}{\ifundefined}
+%    \changes{v3.0}{2002/08/21}{neu}
+% Dieses Makro arbeitet wie \cs{@ifundefined}, definiert dabei aber
+% ein undefiniertes Makro nicht als \cs{relax}.
+%    \begin{macrocode}
+\newcommand{\ifundefined}[1]{%
+  \begingroup\expandafter\expandafter\expandafter\endgroup
+  \expandafter\ifx\csname #1\endcsname\relax
+    \expandafter\@firstoftwo
+  \else
+    \expandafter\@secondoftwo
+  \fi
+}
+%    \end{macrocode}
+%  \end{macro}
+%
+%  \begin{macro}{\ifnotundefined}
+%    \changes{v3.0}{2002/08/21}{neu}
+% Dieses Makro arbeitet genau umgekehrt zu \cs{ifundefined}. Manchmal
+% ist es ganz nützlich, auch das zu haben. Dieses Makro heißt nicht
+% \cs{ifdefined}, weil \eTeX\ bereits ein solches Primitiv bietet.
+%    \begin{macrocode}
+\newcommand{\ifnotundefined}[1]{%
+  \begingroup\expandafter\expandafter\expandafter\endgroup
+  \expandafter\ifx\csname #1\endcsname\relax
+    \expandafter\@secondoftwo
+  \else
+    \expandafter\@firstoftwo
+  \fi
+}
+%    \end{macrocode}
+%  \end{macro}
+%
+%  \begin{macro}{\ifstr}
+%    \changes{v3.0}{2004/07/20}{if- und then-Teil werden nicht gefressen}
+% Dieses Makro vergleicht zwei Tokenfolgen. Eigentlich müsste es also
+% eher \cs{ifequal} oder ähnlich heißen.
+%    \begin{macrocode}
+\newcommand\ifstr[2]{%
+  \begingroup\edef\@tempa{#1}\edef\@tempb{#2}%
+  \ifx\@tempa\@tempb
+    \endgroup\expandafter\@firstoftwo
+  \else
+    \endgroup\expandafter\@secondoftwo
+  \fi
+}
+%    \end{macrocode}
+%  \end{macro}
+%
+%
+%  \begin{macro}{\let@as@internal@defined}
+%    \changes{v3.0}{2002/08/19}{neu (intern)}
+% Dieses Makro wird intern verwendet, um dokumentierte Makros mit der
+% Definition von internen Makros zu versehen, falls sie nicht bereits
+% definiert sind. Der Name des dokumentierten Makros wird als
+% Parameter übergeben. Dies wird gleich benötigt.
+%    \begin{macrocode}
+\newcommand*{\let@as@internal@defined}[1]{
+  \@ifundefined{#1}{%
+    \begingroup
+      \expandafter\def\expandafter\@tempa
+        \expandafter{\csname scr@#1\endcsname}
+      \expandafter\def\expandafter\@tempb
+        \expandafter{\csname #1\endcsname}
+    \expandafter\expandafter\expandafter\endgroup
+    \expandafter\expandafter\expandafter\let\expandafter\@tempb\@tempa
+  }{%
+    \PackageInfo{%
+      scrkbase%
+    }{%
+      \expandafter\string\csname #1\endcsname\space already
+      defined.\MessageBreak
+      If \expandafter\string\csname #1\endcsname\space does not behave
+      like\MessageBreak
+      it was described at the KOMA-Script manual, try to\MessageBreak
+      load `scrkbase.sty' earlier or find out at which\MessageBreak
+      package or class \expandafter\string\csname #1\endcsname\space
+      was defined before\@gobble
+    }%
+  }%
+}
+%    \end{macrocode}
+%  \end{macro}
+%
+%  \begin{macro}{\ifpdftex}
+%    \changes{v3.0}{2002/08/19}{neu}
+%  \begin{macro}{\scr@ifpdftex}
+%    \changes{v3.0}{2002/08/19}{neu (intern)}
+% If-then-else-Konstrukt, um zu testen, ob pdf\TeX{} verwendet wird.
+%    \begin{macrocode}
+\newcommand{\scr@ifpdftex}{\ifnotundefined{pdftexversion}}
+\let@as@internal@defined{ifpdftex}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%
+%  \begin{macro}{\ifvtex}
+%    \changes{v3.0}{2002/08/19}{neu}
+%  \begin{macro}{\scr@ifvtex}
+%    \changes{v3.0}{2002/08/19}{neu}
+% If-then-else-Konstrukt, um zu testen, ob V\TeX{} verwendet wird.
+%    \begin{macrocode}
+\newcommand{\scr@ifvtex}{\ifnotundefined{VTeXversion}}
+\let@as@internal@defined{ifvtex}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%
+%  \begin{macro}{\ifpdfoutput}
+%    \changes{v2.7g}{2001/04/17}{neu}
+%    \changes{v2.8q}{2001/10/19}{\cs{pdfoutput} wird nicht mehr zu
+%      \cs{relax}, wenn zuvor undefiniert}
+%    \changes{v2.8q}{2001/10/19}{darf bereits definiert sein}
+%    \changes{v2.8q}{2001/10/19}{Verwendung von \cs{scr@ifpdfoutput}}
+%  \begin{macro}{\scr@ifpdfoutput}
+%    \changes{v2.8q}{2001/10/19}{neu (intern)}
+%    \changes{v2.8q}{2001/11/13}{funktioniert}
+%    \changes{v3.0}{2002/08/21}{berücksichtigt V\TeX}
+%    \changes{v3.0}{2004/07/20}{Expandierbarkeit verbessert}
+% If-then-else-Konstrukt, um abhängig davon, ob als \texttt{pdf}
+% ausgegeben wird oder nicht, Befehle auszuführen. Dieses Makro wird
+% für die Deklaration der Option \texttt{pagesize} benötigt.
+%    \begin{macrocode}
+\newcommand{\scr@ifpdfoutput}{%
+  \ifundefined{pdfoutput}{%
+    \ifundefined{OpMode}{%
+      \expandafter\@secondoftwo%
+    }{%
+      \ifnum\OpMode=1
+        \expandafter\@firstoftwo
+      \else
+        \expandafter\@secondoftwo
+      \fi
+    }%
+  }{%
+    \ifnum\pdfoutput>0 
+      \expandafter\@firstoftwo
+    \else
+      \expandafter\@secondoftwo
+    \fi
+  }%
+}%
+\let@as@internal@defined{ifpdfoutput}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%
+%  \begin{macro}{\ifpsoutput}
+%    \changes{v3.0}{2002/08/21}{neu}
+%  \begin{macro}{\scr@ifpsoutput}
+%    \changes{v3.0}{2002/08/21}{neu (intern)}
+%    \changes{v3.0}{2004/07/20}{Expandierbarkeit verbessert}
+% If-then-else-Konstrukt, um abhängig davon, ob früher oder später
+% \texttt{ps} ausgegeben wird oder nicht, Befehle auszuführen.
+%    \begin{macrocode}
+\newcommand*{\scr@ifpsoutput}{%
+  \ifnotundefined{if@dvips}{%
+    \if@dvips 
+      \expandafter\@firstoftwo
+    \else 
+      \expandafter\@secondoftwo
+    \fi
+  }{%
+    \ifnotundefined{OpMode}{%
+      \ifnum\OpMode=2
+        \expandafter\@firstoftwo
+      \else
+        \expandafter\@secondoftwo
+      \fi
+    }{%
+      \expandafter\@secondoftwo
+    }%
+  }%
+}
+\let@as@internal@defined{ifpsoutput}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%
+%  \begin{macro}{\ifdvioutput}
+%    \changes{v3.0}{2002/08/21}{neu}
+%  \begin{macro}{\scr@ifdvioutput}
+%    \changes{v3.0}{2002/08/21}{neu (intern)}
+%    \changes{v3.0}{2004/07/20}{Expandierbarkeit verbessert}
+% If-then-else-Konstrukt, um abhängig davon, ob \texttt{dvi}
+% ausgegeben wird oder nicht, Befehle auszuführen.
+%    \begin{macrocode}
+\newcommand*{\scr@ifdvioutput}{%
+  \ifundefined{pdfoutput}{%
+    \ifundefined{OpMode}{%
+      \expandafter\@firstoftwo
+    }{%
+      \ifnum\OpMode=0
+        \expandafter\@firstoftwo
+      \else
+        \expandafter\@secondoftwo
+      \fi
+    }%
+  }{%
+    \ifnum\pdfoutput=0
+      \expandafter\@firstoftwo
+    \else
+      \expandafter\@secondoftwo
+    \fi
+  }%
+}
+\let@as@internal@defined{ifdvioutput}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%
+%
+% \subsection{Abarbeitung von Optionen}
+%
+%  \begin{macro}{\DeclareKeyValOption}
+% Dieses Makro deklariert alle bisher definierten Schlüssel eines
+% Bereichs (erste Argument) als Optionen. Das optionale Argument
+% erlaubt außerdem die Deklaration einer
+% \cs{DeclareOption*}-Auswertung. \cs{DeclareOption*} darf nicht
+% zusammen mit dieser Anweisung verwendet werden. Diese Anweisung darf
+% je Paket oder Klasse nur einmal verwendet werden.
+%    \begin{macrocode}
+\newcommand*{\DeclareKeyValOption}[2][%
+  \ifx\@currext\@clsextension\OptionNotUsed\else\@unkownoptionerror\fi
+]{%
+  \DeclareOption*{
+    \expandafter\let\expandafter\@KV@saved@nokey
+    \csname KV@#2@nokey\endcsname
+    \@namedef{KV@#2@nokey}{#1\@gobble}%
+    \@expandtwoargs\setkeys{#2}\CurrentOption
+    \expandafter\let\csname KV@#2@nokey\endcsname\@KV@saved@nokey
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%  \begin{macro}{\ProcessKeyValOptions}
+% Alternativ dazu, alle bisher definierten Schlüssel eines Bereichs
+% (1. Argument) als Option zu deklarieren, können auch die Schlüssel eines
+% Bereichs als Option interpretiert werden. Dies scheint nur oberflächlich
+% dieselbe Funktionalität zu sein. Es spielt jedoch bezüglich der
+% Verarbeitungsreihenfolge eine Rolle. Außerdem hat dieses alternative
+% Vorgehen keinen Einfluss auf \cs{DeclareOption*}.
+%
+%  \begin{macro}{\Pr@cessL@calKeyValOptions}
+% Zunächst ein Hilfsmakro um alle lokalen Optionen abzuarbeiten.
+%    \begin{macrocode}
+\newcommand*{\Pr@cessL@calKeyValOptions}[1]{%
+  \edef\@curroptions{\@ptionlist{\@currname.\@currext}}%
+  \ifx\@curroptions\@empty\else
+    \expandafter\let\expandafter\@KV@saved@nokey\csname KV@#1@nokey\endcsname
+    \@namedef{KV@#1@nokey}{\in@false\@gobble}%
+    \@for\CurrentOption:=\@curroptions\do{%
+      \ifx\CurrentOption\@empty\else
+        \in@true\@expandtwoargs\setkeys{#1}\CurrentOption
+        \ifin@
+%    \end{macrocode}
+% Bei Aufruf aus einer Klasse, ist diese Option ggf. aus der Liste der
+% unbenutzten globalen Option zu löschen. Bei Paketen hingegen aus der Liste
+% der Paketoptionen
+%    \begin{macrocode}
+          \ifx\@currext\@clsextension
+            \@expandtwoargs\@removeelement\CurrentOption
+            \@unusedoptionlist\@unusedoptionlist
+          \else
+            \@expandtwoargs\@removeelement\CurrentOption
+            \@curroptions\@curroptions
+          \fi
+        \fi
+      \fi
+    }%
+    \let\CurrentOption\@empty
+%    \end{macrocode}
+% Bei Paketen muss die Liste der Paketoptionen noch neu gesetzt werden.
+%    \begin{macrocode}
+    \ifx\@currext\@clsextension\else
+      \expandafter\let\csname opt@\@currname.\@currext\endcsname\@curroptions
+    \fi
+    \expandafter\let\csname KV@#1@nokey\endcsname\@KV@saved@nokey
+  \fi
+}
+%    \end{macrocode}
+%  \end{macro}
+%
+%  \begin{macro}{\Pr@cessGl@balKeyValOptions}
+% Wenn diese Hilfsmakro von einem Paket aufgerufen wird, versucht es alle
+% Klassenoptionen als Schlüssel eines Bereichs (Argument 1)
+% auszuwerten. Diese Anweisung darf mehrfach verwendet werden.
+%    \begin{macrocode}
+\newcommand*{\Pr@cessGl@balKeyValOptions}[1]{%
+  \ifx\@currext\@clsextension\else
+    \expandafter\let\expandafter\@KV@saved@nokey
+    \csname KV@#1@nokey\endcsname
+    \@namedef{KV@#1@nokey}{\in@false\@gobble}%
+    \@for\CurrentOption:=\@classoptionslist\do{%
+      \ifx\CurrentOption\@empty\else
+        \in@true\@expandtwoargs\setkeys{#1}\CurrentOption
+        \ifin@
+          \@expandtwoargs\@removeelement\CurrentOption
+          \@unusedoptionlist\@unusedoptionlist
+        \fi
+      \fi
+    }%
+    \let\CurrentOption\@empty
+    \expandafter\let\csname KV@#1@nokey\endcsname\@KV@saved@nokey
+  \fi
+}
+%    \end{macrocode}
+%  \end{macro}
+%
+% Insgesamt werden zunächst die globalen und dann die lokalen Optionen
+% bearbeitet. 
+%    \begin{macrocode}
+\newcommand*{\ProcessKeyValOptions}[1]{%
+  \Pr@cessGl@balKeyValOptions{#1}%
+  \Pr@cessL@calKeyValOptions{#1}%
+}
+%    \end{macrocode}
+% Es wird empfohlen \cs{ProcessKeyValOptions} \emph{vor}
+% \cs{ProcessOptions} oder \cs{ProcessOptions*} aufzurufen.
+%  \end{macro}
+%
+%  \begin{macro}{\ProcessAllOptions}
+%  \begin{macro}{\@Pr@cessAll@pti@ns}
+%  \begin{macro}{\Pr@cessAll@pti@ns}
+% Da der Anwender bekanntlich faul ist hier ein Makro, das sowohl für normale
+% Optionen als auch Schlüsseloptionen arbeitet. Dabei werden Schlüsseloptionen
+% zuerst abgearbeitet. Die Sternvariante verwendet die Sternvariante von
+% \cs{ProcessOptions}. Im Gegensatz zu \cs{ProcessOptions} wird hier kein
+% abschließendes \cs{relax} benötigt, weil ein zwingendes Argument vorhanden
+% ist (der Bereich).
+%    \begin{macrocode}
+\newcommand*{\ProcessAllOptions}{%
+  \@ifstar\@Pr@cessAll@pti@ns\Pr@cessAll@pti@ns
+}
+\newcommand*{\@Pr@cessAll@pti@ns}[1]{%
+  \ProcessKeyValOptions{#1}\ProcessOptions*
+}
+\newcommand*{\Pr@cessAll@pti@ns}[1]{%
+  \ProcessKeyValOptions{#1}\ProcessOptions\relax
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%
+%
+% \subsection{Definition von KOMA-\textsf{keyval}-Schlüsseln}
+%
+% Üblicherweise verwendet \KOMAScript{} für alle
+% \textsf{keyval}-Schlüssel die gleiche Bereichskennung
+% "`\texttt{KOMA}"'. Dadurch ist es möglich, dass Pakete die Schlüssel
+% der Klassen umdefinieren und dass jeder Teil von \KOMAScript{} die
+% Schlüssel jedes anderen Teils ausführen kann -- sobald sie definiert
+% sind.
+%
+%  \begin{macro}{\KOMA@key}
+% Einzig, um etwas Tipparbeit zu sparen, wird ein abkürzendes Makro
+% definiert:
+%    \begin{macrocode}
+\newcommand*{\KOMA@key}{\define@key{KOMA}}
+%    \end{macrocode}
+%  \end{macro}
+%
+%  \begin{macro}{KOMAoptions}
+% Es werden Schlüssel verwendet. Auch dies ist nur ein abkürzendes Makro:
+%    \begin{macrocode}
+\newcommand*{\KOMAoptions}[1]{%
+  \setkeys{KOMA}{#1}%
+}
+%    \end{macrocode}
+%  \end{macro}
+%
+%  \begin{option}{nokey}
+% Dies ist in Wirklichkeit kein Schlüssel, sondern eine Fehlermeldung
+% für nicht definierte Schlüssel. Er kann jedoch wie ein Schlüssel
+% definiert und auch so verwendet werden.
+%    \begin{macrocode}
+\KOMA@key{nokey}{%
+  \PackageError{%
+    scrkeyval%
+  }{%
+    unknown KOMA option `#1'%
+  }{%
+    You've tried to use the KOMA option `#1'.\MessageBreak 
+    But there is no KOMA option with that name.\MessageBreak 
+    See the manual of KOMA-Script for information about known KOMA
+    options.%
+  }%
+}%
+%    \end{macrocode}
+%  \end{option}
+%
+%  \begin{option}{noval}
+% Dies ist in Wirklichkeit kein Schlüssel, sondern eine Fehlermeldung
+% für das Fehlen eines Wertes bei der Verwendung eines Schlüssels ohne
+% Defaultwert. Er kann jedoch wie ein Schlüssel definiert und auch so
+% verwendet werden.
+%    \begin{macrocode}
+\KOMA@key{noval}{%
+  \PackageError{%
+    scrkbase%
+  }{%
+    KOMA option `#1' needs a value%
+  }{%
+    You've tried to use the KOMA option `#1' without a
+    value.\MessageBreak 
+    But this option has no default value, so you have to set a
+    value.\MessageBreak
+    See the manual of KOMA-Script for information about the option and
+    all known\MessageBreak
+    values.%
+  }%
+}%
+%    \end{macrocode}
+%  \end{option}
+%
+%  \begin{macro}{\KOMA@unknown@keyval}
+% Dieses Makro berichtet über Fehler wegen unbekannter Wertübergabe an
+% einen Schlüssel. Das erste Argument ist der Schlüssel, das zweite
+% der Wert und das dritte die Liste der möglichen Werte.
+%    \begin{macrocode}
+\newcommand*{\KOMA@unknown@keyval}[3]{%
+  \PackageError{%
+    scrkbase%
+  }{%
+    KOMA option `#1' has no value `#2'%
+  }{%
+    You've tried to set option `#1' to value `#2'.\MessageBreak
+    But allowed values are only:\MessageBreak
+    #3.\MessageBreak
+    See the KOMA-Script manual for more information.%
+  }%
+}
+%    \end{macrocode}
+%  \end{macro}
+%
+%  \begin{macro}{\KOMA@ifkey}
+% Dieses Makro definiert einen Schlüssel, der einen Schalter an Hand des
+% Wertes setzt. Als Werte sind "`\texttt{true}"', "`\texttt{false}"',
+% "`\texttt{on}"', "`\texttt{off}"', "`\texttt{yes}"' und
+% "`\texttt{no}"' erlaubt. Der Default-Wert für den Schalter ist
+% grundsätzlich "`false"', so dass der Default-Wert für die Verwendung
+% des Schküssels grundsätzlich "`true"' ist. Das erste Argument ist
+% der Name des Schlüssels, der zweite ist der Name des Schalters. 
+%    \begin{macrocode}
+\newcommand*{\KOMA@ifkey}[2]{%
+  \@ifundefined{if#2}{%
+    \expandafter\newif\csname if#2\endcsname
+  }{}%
+  \KOMA@key{#1}[true]{\KOMA@set@ifkey{#1}{#2}{##1}}%
+}
+%    \end{macrocode}
+%  \begin{macro}{\KOMA@set@ifkey}
+% Die eigentliche Arbeit bei der ganzen Sache wird von diesem internen
+% Makro erledigt. Dabei wird der Name des Schlüssels zu Argument 1, der
+% Name des Schalters zu Argument 2 und der Wert des Schlüssels wird
+% Argument 3.
+%    \begin{macrocode}
+\newcommand*{\KOMA@set@ifkey}[3]{%
+  \ifstr{#3}{true}{\@nameuse{#2true}}{%
+    \ifstr{#3}{on}{\@nameuse{#2true}}{%
+      \ifstr{#3}{yes}{\@nameuse{#2true}}{%
+        \ifstr{#3}{false}{\@nameuse{#2false}}{%
+          \ifstr{#3}{off}{\@nameuse{#2false}}{%
+            \ifstr{#3}{no}{\@nameuse{#2false}}{%
+              \KOMA@unknown@keyval{#1}{#3}{%
+                `true', `on', `yes', `false', `off', `no'%
+              }%
+            }%
+          }%
+        }%
+      }%
+    }%
+  }%
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%
+%  \begin{macro}{\KOMA@ncmdkey}
+% Ein ähnliches Makro definiert einen Schlüssel, der ein nummerisches
+% Makro auf einen bestimmten Wert setzt. Dabei können auch
+% verschiedene symbolische Werte auf denselben nummerischen Wert
+% abgebildet werden. Das erste Argument ist obligatorisch und der Name
+% des Schlüssels. Das zweite Argument ist optional und der Defaultwert
+% für den Schlüssel. Das dritte Argument ist obligatorisch und der
+% Name des Makros, das definiert werden soll. Der Defaultwert dafür
+% ist 0. Das vierte Argument ist obligatorisch und die Liste der
+% symbolischen und nummerischen Wert. Die Liste hat die Form: 
+% \{\emph{Symbol}\}\{\emph{Wert}\},\{\emph{Symbol}\}\{\emph{Wert}\}\dots
+%  \begin{macro}{\KOMA@@ncmdkey}
+% Da nicht das erste, sondern das zweite Argument optional ist, wird
+% ein Hilfsmakro benötigt.
+%    \begin{macrocode}
+\newcommand*{\KOMA@ncmdkey}[1]{%
+  \@ifnextchar [%]
+    {\KOMA@@ncmdkey{#1}}{\KOMA@@ncmdkey{#1}[]}%
+}
+\newcommand*{\KOMA@@ncmdkey}{}
+\def\KOMA@@ncmdkey#1[#2]#3#4{%
+  \ifx\relax#2\relax\else
+    \@namedef{KV@KOMA@#1@default\expandafter}\expandafter{%
+      \csname KV@KOMA@#1\endcsname{#2}%
+    }%
+  \fi
+  \@ifundefined{#3}{\@namedef{#3}{0}}%
+  \KOMA@key{#1}{\KOMA@set@ncmdkey{#1}{#3}{#4}{##1}}%
+}
+%    \end{macrocode}
+%  \begin{macro}{\KOMA@set@ncmdkey}
+% Die eigentliche Arbeit dabei wird von diesem Makro erledigt. Dabei
+% wird der Name des Schlüssels zu Argument 1, der Name des Makros,
+% das definiert werden soll zu Argument 2, die Liste zu Argument 3 und
+% der Wert, auf den gesetzt werden soll, zu Argument 4.
+%    \begin{macrocode}
+\newcommand*{\KOMA@set@ncmdkey}[4]{%
+  \begingroup
+    \edef\@searched{#4}%
+    \let\@tempa=\@empty
+    \let\@tempb=\@empty
+    \@tempswafalse
+    \@for\@valuelist:=#3\do{%
+      \if@tempswa\else
+        \edef\@tempc{\expandafter\@firstoftwo\@valuelist}%
+        \edef\@tempa{\@tempa\@tempb`\@tempc'}%
+        \edef\@tempb{, }%
+        \ifx\@tempc\@searched
+          \@tempswatrue
+          \edef\@tempa{\expandafter\@secondoftwo\@valuelist}%
+        \fi
+      \fi
+    }%
+    \if@tempswa
+      \edef\@tempa{\endgroup
+        \noexpand\@namedef{#2}{\@tempa}%
+      }%
+    \else
+      \KOMA@unknown@keyval{#1}{#4}{\@tempa}%
+      \let\@tempa=\endgroup
+    \fi
+  \@tempa
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%
+%  \begin{macro}{\KOMA@DeclareObsoleteOption}
+% Mit Hilfe dieses Makros kann eine Option definiert werden, die
+% eigentlich obsolete ist. Statt dieser Option wird dann ein Schlüssel
+% verwendet. Das erste Argument ist optional und muss dann entweder
+% \cs{PackageInfo}, \cs{PackageInfoNoLine}, \cs{PackageWarning} oder
+% \cs{PackageWarningNoLine} sein. Das zweite Argument ist der Name der
+% Option. Das dritte Argument ist das Setzen des gewünschten Schlüssels.
+%    \begin{macrocode}
+\newcommand*{\KOMA@DeclareObsoleteOption}[3][\@gobbletwo]{%
+  \DeclareOption{#2}{\KOMA@UseObsolete{option}{#1}{#2}{#3}}%
+}
+%    \end{macrocode}
+%  \begin{macro}{\KOMA@UseObsolete}
+% Die eigentliche Arbeit wird von diesem Makro erledigt. Ob es sich um
+% eine Option oder eine Anweisung handelt wird in Argument 1
+% übergeben. Alle anderen Argumente schließen sich daran an.
+%    \begin{macrocode}
+\newcommand*{\KOMA@UseObsolete}[4]{%
+  #2{%
+    scrkbase%
+  }{%
+    You've used the obsolete #1 `#3'.\MessageBreak
+    \protect\KOMAoptions{#4} will be used instead.\MessageBreak
+    You should do this change too%
+  }%
+  \KOMAoptions{#4}%
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%
+%  \begin{macro}{\KOMA@newobsoletecommand}
+% Mit Hilfe dieses Makros kann ein Makro definiert werden, das
+% eigentlich obsolete ist. Das Makro verwendet dann schlicht einen
+% Schlüssel. Das erste Argument ist optional und muss dann entweder
+% \cs{PackageInfo}, \cs{PackageInfoNoLine}, \cs{PackageWarning} oder
+% \cs{PackageWarningNoLine} sein. Das zweite Argument ist das Makro.
+% Das dritte Argument ist das Setzen des gewünschten Schlüssels. Das
+% definierte Makro selbst hat Schaltercharakter, ist also nicht
+% \cs{long} und versteht auch keine Argumente.
+%    \begin{macrocode}
+\newcommand*{\KOMA@newobsoletecommand}[3][\@gobbletwo]{%
+  \newcommand*{#2}{\KOMA@UseObsolete{command}{#1}{\string#2}{#3}}%
+}
+%    \end{macrocode}
+%  \end{macro}
+%
+%
+% \iffalse
+%</body>
+% \fi
+%
+% \Finale
+%
+\endinput
+%
+% end of file `scrkbase.dtx'
+%%% Local Variables:
+%%% mode: latex
+%%% mode: font-lock
+%%% TeX-master: t
+%%% End:
