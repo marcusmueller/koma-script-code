@@ -1,0 +1,402 @@
+% \CheckSum{204}
+% \iffalse meta-comment
+% ======================================================================
+% scrkfont.dtx
+% Copyright (c) Markus Kohm, 2002
+%
+% This file is part of the LaTeX2e KOMA-Script-Bundle
+%
+% This file can be redistributed and/or modified under the terms
+% of the LaTeX Project Public License Version 1.0 distributed 
+% together with this file. See LEGAL.TXT or LEGALDE.TXT.
+% ----------------------------------------------------------------------
+% scrkfont.dtx
+% Copyright (c) Markus Kohm, 2002
+%
+% Diese Datei ist Teil des LaTeX2e KOMA-Script-Pakets.
+%
+% Diese Datei kann nach den Regeln der LaTeX Project Public
+% Licence Version 1.0, wie sie zusammen mit dieser Datei verteilt
+% wird, weiterverbreitet und/oder modifiziert werden. Siehe dazu
+% auch LEGAL.TXT oder LEGALDE.TXT.
+% ======================================================================
+% \fi
+% \iffalse
+%%% From File: scrkfont.dtx
+%<*driver>
+% \fi
+\ProvidesFile{scrkfont.dtx}[2004/07/21 v3.0 KOMA-Script (font selection)]
+% \iffalse
+\documentclass[halfparskip-]{scrdoc}
+\usepackage[english,german]{babel}
+\usepackage[latin1]{inputenc}
+\CodelineIndex
+\RecordChanges
+\GetFileInfo{scrkfont.dtx}
+\title{\KOMAScript{} \partname\ \texttt{\filename}%
+  \footnote{Dies ist Version \fileversion\ von Datei \texttt{\filename}.}}
+\date{\filedate}
+\author{Markus Kohm}
+
+\begin{document}
+  \maketitle
+  \tableofcontents
+  \DocInput{\filename}
+\end{document}
+%</driver>
+% \fi
+%
+% \selectlanguage{german}
+%
+% \changes{v3.0}{2002/06/25}{%
+%   erste Version aus der Aufteilung von \texttt{scrclass.dtx}}
+%
+% \section{Schriftauswahl}
+%
+% Dieser Bereich befasst sich mit allem, was zur Schriftauswahl
+% gehört. Die einzelnen Elemente, für die eine Schriftauswahl möglich
+% ist, sind jedoch in den Dateien definiert, in denen diese Elemente
+% auftreten.
+%
+% \StopEventually{\PrintIndex\PrintChanges}
+%
+% \iffalse
+%<*option>
+% \fi
+%
+%
+% \subsection{Option zur Auswahl der Größe der Grundschrift}
+%
+%  \begin{option}{10pt}
+%  \begin{option}{11pt}
+%  \begin{option}{12pt}
+% Diese Optionen existieren nicht mehr als explizite Optionen, sondern
+% werden in \texttt{scrtarea.dtx} über \cs{DeclareOption*}
+% ausgewertet.
+%  \begin{macro}{\@ptsize}
+% Wir definieren \cs{@ptsize} als Grundschriftgrößee minus 10\,pt.
+% Hier wird die Standardeinstellung 11\,pt gewählt.
+%    \begin{macrocode}
+\newcommand*\@ptsize{1}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{option}
+%  \end{option}
+%  \end{option}
+%
+%
+%
+% \iffalse
+%</option>
+%<*body>
+% \fi
+%
+% \subsection{Einlesen der Schriftgrößendatei}
+%
+% \changes{v2.6}{2000/01/04}{Einlesen der Schriftgrößen-Options-Datei
+%   funktioniert nun mit diversen Größen}
+%
+% Dies\marginline{Geplant!} soll in einer zukünftigen Version von
+% \KOMAScript{} komplett überflüssig werden. Stattdessen werden
+% Standardeinstellung berechnet, wobei die Möglichkeit bestehen wird,
+% Abweichungen davon in einer Konfigurationsdatei abzulegen.
+%    \begin{macrocode}
+\@tempcnta=10
+\advance\@tempcnta by\@ptsize
+\xdef\@tempa{%
+%<!book>  size%
+%<book>  bk%
+  \the\@tempcnta.clo}
+\InputIfFileExists{\@tempa}{}{%
+%<*book>
+  \xdef\@tempb{size\the\@tempcnta.clo}%
+  \InputIfFileExists{\@tempb}{%
+    \ClassWarning{\KOMAClassName}{%
+      File `\@tempa' not found!\MessageBreak
+      Used `\@tempb' instead%
+    }%
+  }{%
+%</book>
+    \ClassError{\KOMAClassName}{%
+      File `\@tempa' not found!\MessageBreak
+      This error is fatal!%
+    }{%
+      To every fontsize you want to select by class
+      option,\MessageBreak
+      you need a corresponding
+%<book>       bk-class-option-file or\MessageBreak at least a
+      size-class-option-file declaring all\MessageBreak
+      the macros based on fontsize.\MessageBreak
+      Ask a wizzard for more information or use another
+      fontsize.\MessageBreak
+      You cannot continue!%
+    }%
+    \batchmode \csname @@end\endcsname \end
+%<book>  }%
+}
+%    \end{macrocode}
+% 
+%
+% \subsection{"`Alte"' Font-Auswahlbefehle}
+%
+%  \begin{macro}{\rm}
+%  \begin{macro}{\sf}
+%  \begin{macro}{\tt}
+%  \begin{macro}{\bf}
+%  \begin{macro}{\it}
+%  \begin{macro}{\sl}
+%  \begin{macro}{\sc}
+%  \begin{macro}{\sfb}
+%    \changes{v2.2c}{1995/05/25}{nicht mehr mathematisch}
+%    \changes{v2.3a}{1995/07/08}{keine Unterscheidung mehr für den
+%      Kompatibilitätsmodus}
+% Um die Umstellung von \LaTeX\ auf \LaTeXe\ zu erleichtern, gibt es
+% die alten Font-Auswahlbefehle \cs{rm}, \cs{sf}, \cs{tt}, \cs{bf},
+% \cs{it}, \cs{sl} und \cs{sc} auch in den Klassen. Es ist zu
+% beachten, dass diese Befehle hier nach dem alten
+% Fontauswahlverfahren arbeiten. Es werden also immer alle Parameter
+% zugleich geändert. Somit ist zu empfehlen, dass statt dieser Befehle
+% zukünftig in der Regel die neuen \cs{text\dots}-Befehle verwendet
+% werden.
+%
+% Der aus der \textsf{Script 2.0}-Familie bekannte Befehl \cs{sfb} ist
+% hier ebenfalls definiert.
+%    \begin{macrocode}
+\DeclareOldFontCommand{\rm}{\normalfont\rmfamily}{\mathrm}
+\DeclareOldFontCommand{\sf}{\normalfont\sffamily}{\mathsf}
+\DeclareOldFontCommand{\tt}{\normalfont\ttfamily}{\mathtt}
+\DeclareOldFontCommand{\bf}{\normalfont\bfseries}{\mathbf}
+\DeclareOldFontCommand{\it}{\normalfont\itshape}{\mathit}
+\DeclareOldFontCommand{\sl}{\normalfont\slshape}{\@nomath\sl}
+\DeclareOldFontCommand{\sc}{\normalfont\scshape}{\@nomath\sc}
+\DeclareOldFontCommand{\sfb}{\normalfont\sffamily\bfseries}{%
+  \@nomath\sfb}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%
+%  \begin{macro}{\cal}
+%    \changes{v2.3}{1995/06/25}{hier statt im \LaTeX-Kern}
+% Der Befehl ist in \LaTeX{} nicht mehr definiert. Deshalb wird er nun
+% neu und gleich robust deklariert. Dafür fällt \cs{pcal} weg.
+%    \changes{v2.3g}{1996/01/14}{überflüssige Klammerpaare entfernt}
+%  \begin{macro}{\mit}
+%    \changes{v2.3}{1995/06/25}{hier statt im \LaTeX-Kern}
+% Der Befehl ist in \LaTeX{} nicht mehr definiert. Deshalb wird er nun
+% neu und gleich robust deklariert. Dafür fällt \cs{pmit} weg.
+%   \changes{v2.3g}{1996/01/14}{überflüssige Klammerpaare entfernt}
+%
+% Die beiden Befehle \cs{cal} und \cs{mit} war bis zur \LaTeX-Version
+% vom 1.12.1994 patch level 3 noch im Kernal definiert. Jetzt sind die
+% beiden den Klassen überlassen. Hier ist die Definition aus den
+% Standard-classes übernommen.
+%    \begin{macrocode}
+\DeclareRobustCommand*{\cal}{\@fontswitch\relax\mathcal}
+\DeclareRobustCommand*{\mit}{\@fontswitch\relax\mathnormal}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%
+%
+% \subsection{Setzen der Schrift eines Elements}
+%
+%  \begin{macro}{\setkomafont}
+%    \changes{v2.8o}{2001/09/14}{neu}
+% Mit Hilfe dieses Makros kann die Schriftart von
+% \KOMAScript-Elementen gesetzt werden.
+%    \begin{macrocode}
+\newcommand*{\setkomafont}[2]{%
+  \@ifundefined{scr@fnt@#1}{%
+    \@ifundefined{scr@fnt@instead@#1}{%
+      \ClassError{\KOMAClassName}{%
+        font of element `#1' can't be set}{%
+        You've told me to redefine the font selection of the
+        element,\MessageBreak%
+        but either no such element is known by
+        KOMA-Script\MessageBreak%
+        or the element does not use a special font selection%
+      }%
+    }{%
+      \ClassError{\KOMAClassName}{%
+        font of element `#1' can't be set%
+      }{%
+        You've told me to redefine the font selection of the
+        element,\MessageBreak%
+        but the element does not use a special font
+        selection.\MessageBeak%
+        The font of `#1' may be changed with element `\csname
+        scr@fnt@instead@#1\endcsname'%
+      }%
+    }%
+  }{%
+    \expandafter\expandafter\expandafter\renewcommand
+    \csname scr@fnt@#1\endcsname{#2}%
+    \@ifundefined{scr@fnt@wrn@#1}{}{%
+      \ClassWarning{\KOMAClassName}{%
+        \csname scr@fnt@wrn@#1\endcsname{#1}%
+      }%
+    }%
+  }%
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \begin{macro}{\addtokomafont}
+%    \changes{v2.8p}{2001/09/22}{neu}
+% Dieses Makro funktioniert fast wie obiges, allerdings fügt es der
+% vorhandenen Definition etwas an.
+%  \begin{macro}{\l@addto@macro}
+%    \changes{v2.8p}{2001/09/22}{neu (intern)}
+% Damit dies lokal möglich ist, wird eine lokal arbeitende Variante
+% von \cs{g@addto@macro} benötigt, wie sie hier vorgestellt wird.
+%    \begin{macrocode}
+\newcommand{\l@addto@macro}[2]{%
+  \begingroup%
+    \toks@\expandafter{#1#2}%
+    \edef\@tempa{\endgroup\def\noexpand#1{\the\toks@}}%
+  \@tempa
+}
+%    \end{macrocode}
+%  \end{macro}
+%    \begin{macrocode}
+\newcommand*{\addtokomafont}[2]{%
+  \@ifundefined{scr@fnt@#1}{%
+    \@ifundefined{scr@fnt@instead@#1}{%
+      \ClassError{\KOMAClassName}{%
+        font of element `#1' can't be extended%
+      }{%
+        You've told me to extend the font selection of the
+        element,\MessageBreak
+        but either no such element is known by
+        KOMA-Script\MessageBreak
+        or the element does not use a special font selection%
+      }%
+    }{%
+      \ClassError{\KOMAClassName}{%
+        font of element `#1' can't be extended%
+      }{%
+        You've told me to extend the font selection of the
+        element,\MessageBreak
+        but the element does not use a special font
+        selection.\MessageBeak
+        The font of `#1' may be changed with element `\csname
+        scr@fnt@instead@#1\endcsname'%
+      }%
+    }%
+  }{%
+    \expandafter\expandafter\expandafter\l@addto@macro
+    \csname scr@fnt@#1\endcsname{#2}%
+    \@ifundefined{scr@fnt@wrn@#1}{}{%
+      \ClassWarning{\KOMAClassName}{%
+        \csname scr@fnt@wrn@#1\endcsname{#1}%
+      }%
+    }%
+  }%
+}
+%    \end{macrocode}
+%  \end{macro}
+%
+%  \begin{macro}{\usekomafont}
+%    \changes{v2.8p}{2001/09/28}{neu}
+% Mit Hilfe dieses Makros kann auf die Schriftart von
+% \KOMAScript-Elementen umgeschaltet werden.
+%    \begin{macrocode}
+\newcommand*{\usekomafont}[1]{%
+  \@ifundefined{scr@fnt@#1}{%
+    \@ifundefined{scr@fnt@instead@#1}{%
+      \ClassError{\KOMAClassName}{%
+        font of element `#1' can't be used%
+      }{%
+        You've told me to use the font selection of the
+        element,\MessageBreak
+        but either no such element is known by
+        KOMA-Script\MessageBreak
+        or the element does not use a special font selection%
+      }%
+    }{%
+      \ClassWarning{\KOMAClassName}{%
+        You've told me to use the font selection of the
+        element,\MessageBreak
+        but the element does not use a special font
+        selection. The\MessageBeak
+        The font of `#1' may be selected with element `\csname
+        scr@fnt@instead@#1\endcsname'.\MessageBreak
+        I fix this using font of `\csname
+        scr@fnt@instead@#1\endcsname'%
+      }%
+    }%
+    \@nameuse{scr@fnt@instead@#1}%
+  }{%
+    \@nameuse{scr@fnt@#1}%
+  }%
+}
+%    \end{macrocode}
+%  \end{macro}
+%
+% Um dann ein Element zu definieren, definiert man zunächst ein
+% Makro, das die Schriftart enthält. Dann definiert man
+% \cs{scr@fnt@\emph{Elementname}}. Wobei der Inhalt dieses Makros das
+% Makro ist, das die Schriftart speichert. Damit ist das Element
+% definiert. Soll ein Element durch ein anderes Element gesteuert
+% werden, so definiert man stattdessen
+% \cs{scr@fnt@instead@\emph{Elementname}}, wobei der Inhalt des Makros
+% dann der Name jenes anderen Elements ist. Soll beim Ändern der
+% Schrift eines Elements eine zusätzliche Warnung ausgegeben werden,
+% so kann der Text dieser Warnung in
+% \cs{scr@fnt@wrn@\emph{Elementname}} abgelegt werden. Also alles
+% eigentlich ganz einfach. Damit es noch einfacher wird, ein paar 
+% Hilfsmakros:
+%
+%  \begin{macro}{\newkomafont}
+%    \changes{v3.0}{2004/07/21}{neu}
+% Mit \cs{newkomafont} wird ein neues Element definiert. Das erste optionale
+% Argument ist dabei die optionale Warnung. Ist dieses nicht gesetzt oder
+% \cs{relax}, so wird keine Warnung definiert. Das erste obligatorische
+% Argument ist der Name des Elements. Als letztes folgt die Voreinstellung für
+% die Schrift dieses Elements. Als Fontmakro wird übrigens
+% \cs{@\emph{Elementname}font} definiert.
+%    \begin{macrocode}
+\newcommand*{\newkomafont}[3][\relax]{%
+  \expandafter\newcommand\expandafter*\csname @#2font\endcsname{#3}%
+  \expandafter\newcommand\expandafter*\csname scr@fnt@#2\endcsname{%
+    \csname @#2font\endcsname%
+  }%
+  \ifx\relax#1\relax\else
+    \expandafter\newcommand\expandafter*\csname scr@fnt@wrn@#2\endcsname{#1}%
+  \fi
+}
+%    \end{macrocode}
+%  \begin{macro}{\aliaskomafont}
+%    \changes{v3.0}{2004/07/21}{neu}
+% Mit \cs{aliaskomafont} wird hingegen einfach ein Alias definiert. Dieser
+% Befehlt kennt zwei Argumente: der Name des Elements und der Names des
+% Elements, das stattdessen verwendet werden soll.
+%    \begin{macrocode}
+\newcommand*{\aliadkomafont}[2]{%
+  \expandafter\newcommand\expandafter*\csname scr@fnt@instead@#1\endcsname{%
+    #2%
+  }%
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%
+% \iffalse
+%</body>
+% \fi
+%
+% \Finale
+%
+\endinput
+%
+% end of file `scrkfont.dtx'
+%%% Local Variables:
+%%% mode: latex
+%%% mode: font-lock
+%%% TeX-master: t
+%%% End:

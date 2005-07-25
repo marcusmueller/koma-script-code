@@ -1,0 +1,270 @@
+% \CheckSum{108}
+% \iffalse meta-comment
+% ======================================================================
+% scrkidx.dtx
+% Copyright (c) Markus Kohm, 2002
+%
+% This file is part of the LaTeX2e KOMA-Script-Bundle
+%
+% This file can be redistributed and/or modified under the terms
+% of the LaTeX Project Public License Version 1.0 distributed 
+% together with this file. See LEGAL.TXT or LEGALDE.TXT.
+% ----------------------------------------------------------------------
+% scrkidx.dtx
+% Copyright (c) Markus Kohm, 2002
+%
+% Diese Datei ist Teil des LaTeX2e KOMA-Script-Pakets.
+%
+% Diese Datei kann nach den Regeln der LaTeX Project Public
+% Licence Version 1.0, wie sie zusammen mit dieser Datei verteilt
+% wird, weiterverbreitet und/oder modifiziert werden. Siehe dazu
+% auch LEGAL.TXT oder LEGALDE.TXT.
+% ======================================================================
+% \fi
+% \iffalse
+%%% From File: scrkidx.dtx
+%<*driver>
+% \fi
+\ProvidesFile{scrkidx.dtx}[2002/07/01 v3.0 KOMA-Script (index)]
+% \iffalse
+\documentclass[halfparskip-]{scrdoc}
+\usepackage[english,german]{babel}
+\usepackage[latin1]{inputenc}
+\CodelineIndex
+\RecordChanges
+\GetFileInfo{scrkidx.dtx}
+\title{\KOMAScript{} \partname\ \texttt{\filename}%
+  \footnote{Dies ist Version \fileversion\ von Datei \texttt{\filename}.}}
+\date{\filedate}
+\author{Markus Kohm}
+
+\begin{document}
+  \maketitle
+  \tableofcontents
+  \DocInput{\filename}
+\end{document}
+%</driver>
+% \fi
+%
+% \selectlanguage{german}
+%
+% \changes{v3.0}{2002/07/01}{%
+%   erste Version aus der Aufteilung von \texttt{scrclass.dtx}}
+%
+% \section{Index}
+%
+% Der Index unterscheidet sich bei \KOMAScript{} scheinbar nicht
+% wesentlich von dem, was die Standardklassen zu bieten haben. In
+% Wirklichkeit sind die Unterschiede jedoch erheblich.
+%
+% \StopEventually{\PrintIndex\PrintChanges}
+%
+% \iffalse
+%<*option>
+% \fi
+%
+% \subsection{Optionen für den Index}
+%
+%  \begin{option}{idxtotoc}
+%    \changes{v2.3h}{1995/01/21}{neue Option}
+% Die Option sorgt dafür, dass der Index auch im Inhaltsverzeichnis
+% erscheint.
+%  \begin{macro}{\idx@heading}
+% Dazu wird das interne Makro \cs{idx@heading} umdefiniert, über das 
+% die Überschrift gesetzt und der Kolumnentitel angepasst wird.
+%    \changes{v2.4c}{1996/04/04}{Kolumnentitel werden nun korrekt
+%      behandelt}
+%    \changes{v2.4g}{1996/11/04}{Index auch bei \textsf{scrartcl}
+%      wieder zweispaltig}
+%    \changes{v2.6c}{2000/06/10}{im Index kann nach der Überschrift
+%      eine Präambel gesetzt werden}
+%    \changes{v2.7a}{2001/01/04}{für \textsf{scrbook} und
+%      \textsf{scrreprt} die Link-Erzeugung mit \texttt{hyperref}
+%      verbessert}
+%    \changes{v2.7j}{2001/05/27}{Setzen der Präambel in die
+%      \texttt{theindex}-Umgebung verschoben}
+%    \changes{v2.9l}{2003/01/19}{\cs{if@twoside} durch
+%      \cs{if@openright} ersetzt}
+% An dieser Stelle muss dafür gesorgt werden, dass im Falle von
+% \textsf{scrbook} und \textsf{scrreprt} das Makro \cs{@schapter}
+% verwendet wird. Damit dies hier möglich ist mussten tiefreifendere
+% Änderungen am \LaTeX-Kernel bzw. am Gliederungsbefehl \cs{chapter}
+% vorgenommen werden.
+%
+% Die ursprüngliche Definition sah so aus:
+% \begin{verbatim}
+% \renewcommand*\idx@heading{%
+%   \if@twoside\cleardoublepage\else\clearpage\fi%
+%   \@mkboth{\indexname}{\indexname}%
+% %<report|book>   \addcontentsline{toc}{chapter}{\indexname}%
+%   \twocolumn[%
+% %<article>   \addsec
+% %<report|book>    \@makeschapterhead
+%     {\indexname}\index@preamble]%
+% }
+% \end{verbatim}\vspace{-\baselineskip}
+% Die neue Definition wurde wie folgt geändert:
+%    \begin{macrocode}
+\DeclareOption{idxtotoc}{%
+  \AtEndOfClass{%
+    \renewcommand*\idx@heading{%
+%<report|book>      \if@openright\cleardoublepage\else\clearpage\fi
+%<article>      \twocolumn[\addsec{\indexname}]%
+%<report|book>      \twocolumn[\addchap{\indexname}]%
+      \@mkboth{\indexname}{\indexname}%
+    }%
+  }%
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{option}
+%
+%
+% \iffalse
+%</option>
+%<*body>
+% \fi
+%
+% \subsection{Definitionen für den Index}
+%
+%  \begin{macro}{\index@preamble}
+%    \changes{v2.6c}{2000/06/10}{neu (intern)}
+%  \begin{macro}{\setindexpreamble}
+%    \changes{v2.6c}{2000/06/10}{neu}
+%    \changes{v2.6d}{2000/07/20}{Befehl funktioniert nachdem \cs{let}
+%      durch \cs{newcommand*} ersetzt wurde}
+%    \changes{v3.0}{2002/07/01}{\cs{let} und \cs{def}}
+% Analog zu \cs{bibpreamble} kann \cs{index@preamble} vom Benutzer mit
+% \cs{setindexpreamble} auf einen Text gesetzt werden, der nach der
+% Indexüberschrift eingefügt wird. Hier wird ein echtes internes Makro
+% verwendet, da nicht auf Kompatibilität geachtet werden muss.
+%    \begin{macrocode}
+\newcommand*{\index@preamble}{}
+\let\index@preamble=\relax
+\newcommand{\setindexpreamble}[1]{\def\index@preamble{#1}}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%
+%  \begin{macro}{\idx@heading}
+%    \changes{v2.3h}{1995/01/21}{neu (intern)}
+%    \changes{v2.4c}{1995/04/04}{Kolumnentitel werden nun korrekt
+%      behandelt}
+%    \changes{v2.4g}{1996/11/04}{Index auch bei \texttt{scrartcl}
+%      wieder zweispaltig}
+%    \changes{v2.6c}{2000/06/10}{Verwendung von \cs{index@preamble}
+%      eingefügt}
+%    \changes{v2.7j}{2001/05/27}{Setzen der Präambel in die
+%      \texttt{theindex}-Umgebung verschoben}
+%    \changes{v2.9l}{2003/01/19}{\cs{if@twoside} durch
+%      \cs{if@openright} ersetzt}
+% Befehl zum Setzen der Überschrift des Indexes.
+% Bis Version 2.7a sah diese Definition so aus:
+% \begin{verbatim}
+% \newcommand*{\idx@heading}{%
+%   \if@twoside\cleardoublepage\else\clearpage\fi%
+%   \@mkboth{\indexname}{\indexname}%
+%   \twocolumn[%
+% %<article>  \section*%
+% %<report|book>  \@makeschapterhead%
+%     {\indexname}\index@preamble]
+% }
+% \end{verbatim}\vspace{-\baselineskip}
+% Dagegen ist grundsätzlich nichts zu sagen. Allerdings gibt es seit
+% Version 2.7b die neue Methode der Kapitel-Präambel, die extra
+% eingeführt wurde, um die \textsf{hyperref}-Links -- insbesondere
+% den des Index -- zumindest bei Verwendung von \texttt{hpdftex.def}
+% zu verbessern. Deshalb wurde die Implementierung entsprechend
+% abgeändert. Außerdem wurde das Setzen der Präambel aus
+% Konsistenzgründen in Version 2.7j übereinstimmten mit der
+% \texttt{thebibliography}-Umgebung in die \texttt{theindex}-Umgebung
+% verschoben.
+%    \begin{macrocode}
+\newcommand*{\idx@heading}{%
+%<report|book>  \if@openright\cleardoublepage\else\clearpage\fi%
+%<article>  \twocolumn[\section*{\indexname}]%
+%<report|book>  \twocolumn[\chapter*{\indexname}]%
+  \@mkboth{\indexname}{\indexname}%
+}
+%    \end{macrocode}
+%  \end{macro}
+%
+%  \begin{environment}{theindex}
+%    \changes{v2.8d}{2001/07/05}{\cs{indexpagestyle} statt
+%      \texttt{plain}}
+%    \changes{v2.3h}{1995/01/21}{Verwendung von \cs{idx@heading}}
+%    \changes{v2.7j}{2001/05/27}{Setzen der Präambel in die
+%      \texttt{theindex}-Umgebung verschoben}
+% Der Index ist wie üblich definiert.
+%    \begin{macrocode}
+\newenvironment{theindex}{%
+  \if@twocolumn
+    \@restonecolfalse
+  \else
+    \@restonecoltrue
+  \fi
+  \columnseprule \z@
+  \columnsep 35\p@
+%<book|report>  \setchapterpreamble{\index@preamble}%
+  \idx@heading%
+%<article>  \index@preamble\par\nobreak
+  \thispagestyle{\indexpagestyle}\parindent\z@
+  \setlength{\parskip}{\z@ \@plus .3\p@}%
+  \setlength{\parfillskip}{\z@ \@plus 1fil}%
+  \let\item\@idxitem
+}{%
+  \if@restonecol\onecolumn\else\clearpage\fi
+}
+%    \end{macrocode}
+%  \begin{macro}{\@idxitem}
+% Hier haben wird den Anfang eines Eintrags in den Index
+%  \begin{macro}{\subitem}
+%    \changes{v2.3g}{1996/01/14}{Verwendung von \cs{@idxitem} spart
+%      Speicher}
+%  \begin{macro}{\subsubitem}
+%    \changes{v2.3g}{1996/01/14}{Verwendung von \cs{@idxitem} spart
+%      Speicher}
+%  \begin{macro}{\indexspace}
+% und ebenso Unter- und Unteruntereinträge sowie ein vertikaler
+% Abstand.
+%    \begin{macrocode}
+\newcommand*\@idxitem{\par\hangindent 40\p@}
+%    \begin{macrocode}
+\newcommand*\subitem{\@idxitem \hspace*{20\p@}}
+\newcommand*\subsubitem{\@idxitem \hspace*{30\p@}}
+\newcommand*\indexspace{%
+  \par \vskip 10\p@ \@plus5\p@ \@minus3\p@\relax
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{environment}
+%
+%
+% \subsection{Standardbezeichner}
+%
+%  \begin{macro}{\indexname}
+% Names des Index:
+%    \begin{macrocode}
+\newcommand*\indexname{Index}
+%    \end{macrocode}
+%  \end{macro}
+%
+%
+% \iffalse
+%</body>
+% \fi
+%
+%
+% \Finale
+%
+\endinput
+%
+% end of file `scrkidx.dtx'
+%%% Local Variables:
+%%% mode: latex
+%%% mode: font-lock
+%%% TeX-master: t
+%%% End:

@@ -1,0 +1,564 @@
+% \CheckSum{252}
+% \iffalse meta-comment
+% ======================================================================
+% scrkliof.dtx
+% Copyright (c) Markus Kohm, 2002
+%
+% This file is part of the LaTeX2e KOMA-Script-Bundle
+%
+% This file can be redistributed and/or modified under the terms
+% of the LaTeX Project Public License Version 1.0 distributed 
+% together with this file. See LEGAL.TXT or LEGALDE.TXT.
+% ----------------------------------------------------------------------
+% scrkliof.dtx
+% Copyright (c) Markus Kohm, 2002
+%
+% Diese Datei ist Teil des LaTeX2e KOMA-Script-Pakets.
+%
+% Diese Datei kann nach den Regeln der LaTeX Project Public
+% Licence Version 1.0, wie sie zusammen mit dieser Datei verteilt
+% wird, weiterverbreitet und/oder modifiziert werden. Siehe dazu
+% auch LEGAL.TXT oder LEGALDE.TXT.
+% ======================================================================
+% \fi
+% \iffalse
+%%% From File: scrkliof.dtx
+%<*driver>
+% \fi
+\ProvidesFile{scrkliof.dtx}[2002/06/28 v3.0 KOMA-Script (lists of)]
+% \iffalse
+\documentclass[halfparskip-]{scrdoc}
+\usepackage[english,german]{babel}
+\usepackage[latin1]{inputenc}
+\CodelineIndex
+\RecordChanges
+\GetFileInfo{scrkliof.dtx}
+\title{\KOMAScript{} \partname\ \texttt{\filename}%
+  \footnote{Dies ist Version \fileversion\ von Datei \texttt{\filename}.}}
+\date{\filedate}
+\author{Markus Kohm}
+
+\begin{document}
+  \maketitle
+  \tableofcontents
+  \DocInput{\filename}
+\end{document}
+%</driver>
+% \fi
+%
+% \selectlanguage{german}
+%
+% \changes{v3.0}{2002/06/28}{%
+%   erste Version aus der Aufteilung von \texttt{scrclass.dtx}}
+%
+% \section{Verzeichnisse}
+%
+% \LaTeX{} Klassen bieten eine ganze Reihe von Verzeichnissen. Thema
+% dieses Abschnitts sind die Verzeichnisse der
+% Gleitumgebungen und das Inhaltsverzeichnis. \KOMAScript{} bietet
+% selbst das Verzeichnis der Gleittabellen und der Abbildungen. Es
+% unterstützt außerdem die Verzeichnisse der mit dem \textsf{float}
+% Paket angelegten Gleitumgebungen.
+%
+% \StopEventually{\PrintIndex\PrintChanges}
+%
+%
+% \iffalse
+%<*option>
+% \fi
+%
+% \subsection{Optionen für das Inhaltsverzeichnis}
+%
+%  \begin{option}{tocleft}
+%    \changes{v2.8q}{2001/11/14}{neue Option}
+%  \begin{option}{tocindent}
+%    \changes{v2.8q}{2001/11/14}{neue Option}
+% Optionen für zwei unterschiedliche Darstellungen des
+% Inhaltsverzeichnisses. Die Variante \texttt{tocindent} ist die
+% altbekannte Variante. Bei \texttt{tocleft} hingegen wird eine
+% tabellenartige Form verwendet, bei der die Nummern, Texte und
+% Seitenzahlen jeweils untereinander stehen. Der für die Nummern
+% benötigte Platz wird dabei automatisch ermittelt.
+%  \begin{macro}{\if@tocleft}
+%    \changes{v2.8q}{2001/11/14}{neuer Schalter}
+%  \begin{macro}{\@toclefttrue}
+%  \begin{macro}{\@tocleftfalse}
+% Die Wahl der Darstellungsart wird in einem Schalter gespeichert.
+%    \begin{macrocode}
+\newif\if@tocleft
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%    \begin{macrocode}
+\DeclareOption{tocleft}{\@toclefttrue}
+\DeclareOption{tocindent}{\@tocleftfalse}
+%    \end{macrocode}
+%  \end{option}
+%  \end{option}
+%
+%
+% \subsection{Optionen für die Gleitumgebungen}
+%
+%  \begin{option}{liststotoc}
+%    \changes{v2.3h}{1995/01/21}{neue Option}
+%    \changes{v2.8b}{2001/06/26}{Verwendung von \cs{float@headings}}
+%    \changes{v2.4a}{1996/03/13}{\cs{listtabelname} durch
+%      \cs{listtablename} ersetzt}
+%    \changes{v2.8g}{2001/07/18}{\cs{float@headings} umbenannt in
+%      \cs{float@listhead}} 
+% Die Option sorgt dafür, dass die Verzeichnisse der Gleitumgebungen
+% im Inhalsverzeichnis aufgeführt werden. Dazu muss nur
+% \cs{float@listhead} umdefiniert werden.
+%  \begin{macro}{\float@listhead}
+%    \begin{macrocode}
+\DeclareOption{liststotoc}{%
+  \AtEndOfClass{%
+    \renewcommand*{\float@listhead}[1]{%
+%<article>      \addsec{#1}
+%<report|book>      \addchap{#1}
+      \@mkboth{#1}{#1}%
+      \if@dynlist
+        \newcommand*{\scr@starttoc}{}%
+        \let\scr@starttoc=\@starttoc
+        \renewcommand*{\@starttoc}[1]{%
+          \before@starttoc{##1}\scr@starttoc{##1}\after@starttoc{##1}}%
+      \fi
+    }%
+  }%
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{option}
+%
+%  \begin{option}{liststotocnumbered}
+%    \changes{v2.8q}{2002/04/08}{dem langjährigen Druck nachgegeben}
+%    \changes{v2.9p}{2003/07/07}{Nummerierung im Kolumnentitel}
+% Die Option sorgt dafür, dass die Verzeichnisse der Gleitumgebungen
+% nummerierte Kapitel/Abschnitte werden. Dazu muss nur
+% \cs{float@listhead} umdefiniert werden. Ich halte diese Option
+% selbst für wenig sinnvoll.
+%  \begin{macro}{\float@listhead}
+%    \begin{macrocode}
+\DeclareOption{liststotocnumbered}{%
+  \AtEndOfClass{%
+    \renewcommand*{\float@listhead}[1]{%
+%<article>      \section{#1}
+%<report|book>      \chapter{#1}
+%<article>      \@mkboth{\sectionmarkformat #1}{\sectionmarkformat #1}%
+%<report|book>      \@mkboth{\chaptermarkformat #1}{\chaptermarkformat #1}%
+      \if@dynlist
+        \newcommand*{\scr@starttoc}{}%
+        \let\scr@starttoc=\@starttoc
+        \renewcommand*{\@starttoc}[1]{%
+          \before@starttoc{##1}\scr@starttoc{##1}\after@starttoc{##1}}%
+      \fi
+    }%
+  }%
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{option}
+%
+%
+%  \begin{option}{listsleft}
+%    \changes{v2.8q}{2001/11/14}{neue Option}
+%  \begin{option}{listsindent}
+%    \changes{v2.8q}{2001/11/14}{neue Option}
+% Optionen für zwei unterschiedliche Darstellungen der Verzeichnisses
+% von Gleitumgebungen. Die Variante \texttt{listindent} ist die
+% altbekannte Variante mit einem festen Einzug der Nummer. Bei
+% \texttt{listleft} hingegen wird der für die Nummern benötigte Platz
+% automatisch ermittelt.
+%  \begin{macro}{\if@dynlist}
+%    \changes{v2.8q}{2001/11/14}{neuer Schalter}
+%  \begin{macro}{\@dynlisttrue}
+%  \begin{macro}{\@dynlistfalse}
+% Die Wahl der Darstellungsart wird in einem Schalter gespeichert.
+%    \begin{macrocode}
+\newif\if@dynlist
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%    \begin{macrocode}
+\DeclareOption{listsleft}{\@dynlisttrue}
+\DeclareOption{listsindent}{\@dynlistfalse}
+%    \end{macrocode}
+%  \end{option}
+%  \end{option}
+%
+%
+% \iffalse
+%</option>
+%<*body>
+% \fi
+%
+% \subsection{Definitionen für alle Verzeichnisse}
+%
+% Einige Definitionen werden von unterschiedlichen Verzeichnissen
+% verwendet. Diese sind hier zu finden.
+%
+%  \begin{macro}{\numberline}
+%    \changes{v2.3c}{1995/08/06}{\cs{numberline} umdefiniert}
+% Dieses Makro wird indirekt im Inhaltsverzeichnis verwendet und muss
+% umdefiniert werden, um Duden, 20.~Auflage, Regel~5 und Regel~6 zu
+% implementieren.
+%    \begin{macrocode}
+\renewcommand*{\numberline}[1]{%
+  \hb@xt@\@tempdima{#1\autodot\hfil}}
+%    \end{macrocode}
+%  \end{macro}
+%
+%  \begin{macro}{\@pnumwidth}
+%  \begin{macro}{\@tocrmarg}
+%  \begin{macro}{\@dotsep}
+% Einige Makros für die Formatierung der Verzeichniseinträge:
+% \begin{description}
+% \item[\cs{@pnumwidth}] ist der Platz für die Seitenzahl.
+% \item[\cs{@tocrmarg}] ist der rechte Rand bei mehrzeiligen
+%   Verzeichniseinträgen. Dieser wird hier größer als \cs{@pnumwidth}
+%   gewählt.
+% \item[\cs{\@dotsep}] ist der Abstand zwischen den einzelnen
+%   Punkten.
+% \end{description}
+%    \begin{macrocode}
+\newcommand*\@pnumwidth{1.55em}
+\newcommand*\@tocrmarg {2.55em}
+\newcommand*\@dotsep{4.5}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%
+%  \begin{macro}{\before@starttoc}
+%    \changes{v2.8q}{2001/11/14}{neu (intern)}
+% Dieses Makro führt im Falle von \texttt{tocleft} oder
+% \texttt{listsleft} am Anfang eines Verzeichnisses alle notwendigen
+% Änderungen durch, um das Verzeichnis entsprechend zu handhaben.
+%  \begin{macro}{\scr@dottedtocline}
+%    \changes{v2.9k}{2003/01/03}{auch das dritte Argument wird ge"andert}
+%  \begin{macro}{\scr@numberline}
+%  \begin{macro}{\last@l@number}
+% Dafür werden ein paar Hilfsmakros benötigt, die vorsichtshalber
+% global vordefiniert werden.
+%    \begin{macrocode}
+\newcommand*{\scr@dottedtocline}{}
+\newcommand*{\scr@numberline}{}
+\newcommand*{\last@l@number}{}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \begin{macro}{\@l@number}
+%    \changes{v2.8q}{2001/11/14}{neu (intern)}
+% In diesem Makro wird während der Erstellung eines Verzeichnisses
+% Inhaltsverzeichnisses die aktuelle Breite der Nummer gespeichert.
+%  \begin{macro}{\set@l@number}
+%    \changes{v2.8q}{2001/11/14}{neu (intern)}
+% Dieses Makro ist dafür verantwortlich, dass zum einen \cs{@tempdima}
+% für den Aufruf von \cs{numberline} auf den richtigen Wert gesetzt
+% wird, zum anderen wird die aktuelle größte Breite der Nummer hier
+% angepasst.
+%    \begin{macrocode}
+\newcommand*{\@l@number}{}
+\newcommand*{\set@l@number}[1]{%
+  \settowidth{\@tempdima}{#1\enskip}%
+  \ifdim\@tempdima >\@l@number
+    \xdef\@l@number{\the\@tempdima}%
+  \fi%
+  \ifdim\@tempdima >\last@l@number \else
+    \setlength{\@tempdima}{\last@l@number}%
+  \fi%
+  }
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+% Kommen wir endlich zu \cs{before@starttoc}:
+%    \begin{macrocode}
+\newcommand*{\before@starttoc}[1]{
+  \let\scr@dottedtocline=\@dottedtocline
+  \renewcommand*{\@dottedtocline}[3]{%
+    \scr@dottedtocline{##1}{\z@}{\last@l@number}}%
+  \let\scr@numberline=\numberline
+  \renewcommand*{\numberline}[1]{%
+    \set@l@number{##1}\scr@numberline{##1}}%
+  \gdef\@l@number{\z@}%
+  \@ifundefined{#1@l@number}{%
+    \def\last@l@number{2em}%
+  }{%
+    \expandafter\let\expandafter\last@l@number
+    \expandafter=\csname#1@l@number\endcsname
+  }%
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \begin{macro}{\after@starttoc}
+%    \changes{v2.8q}{2001/11/14}{neu (intern)}
+% Dieses Makro schreibt am Ende den entsprechenden Eintrag in die
+% \texttt{aux}-Datei.
+%    \begin{macrocode}
+\newcommand*{\after@starttoc}[1]{%
+  \protected@write\@auxout{}{%
+    \string\gdef\expandafter\string\csname#1@l@number\endcsname{%
+      \@l@number}}%
+  }
+%    \end{macrocode}
+%  \end{macro}
+%
+%
+% \subsection{Definitionen für das Inhaltsverzeichnis}
+%
+%  \begin{macro}{\contentsname}
+% Der Name des Verzeichnisses.
+%    \begin{macrocode}
+\newcommand*\contentsname{Contents}
+%    \end{macrocode}
+%  \end{macro}
+%
+%  \begin{Counter}{tocdepth}
+% Der Zähler gibt an, bis zu welcher Gliederungebene Einträge in das
+% Inhaltsverzeichnis aufgenommen werden. Da \textsf{scrartcl} eine
+% Ebene tiefer beginnt, wird auch eine Ebene tiefer eingetragen. Damit
+% finden sich -- abgesehen von \cs{part} -- immer drei Ebenen im
+% Inhaltsverzeichnis.
+%    \begin{macrocode}
+%<book|report>\setcounter{tocdepth}{2}
+%<article>\setcounter{tocdepth}{3}
+%    \end{macrocode}
+%  \end{Counter}
+%
+%  \begin{macro}{\toc@heading}
+%    \changes{v2.3h}{1995/01/21}{neu (intern)}
+%    \changes{v3.0}{2002/06/28}{auch für \textsf{scrreprt} und
+%      \textsf{scrbook}}
+% Befehl, zum Setzen der Überschrift des
+% Inhaltsverzeichnisses. Eigentlich ist das überflüssig, weil es nur
+% einmal verwendet wird. Aus Gründen der Konsistenz mit den anderen
+% Verzeichnissen machen wir das hier aber genauso.
+%    \begin{macrocode}
+\newcommand*\toc@heading{%
+%<article>  \section*{\contentsname}%
+%<book|report>  \chapter*{\contentsname}%
+  \@mkboth{\contentsname}{\contentsname}%
+}
+%    \end{macrocode}
+%  \end{macro}
+%
+%  \begin{macro}{\toc@l@number}
+%    \changes{v2.8q}{2001/11/14}{neu}
+% Dieses Makro wird innerhalb von \cs{tableofcontents} über
+% \cs{before@starttoc} und \cs{after@starttoc} in der
+% \texttt{aux}-Datei global definiert. Aus Sicherheitsgründen wird es
+% hier global vordefiniert.
+%    \begin{macrocode}
+\newcommand*{\toc@l@number}{}
+%    \end{macrocode}
+%  \end{macro}
+%
+%  \begin{macro}{\tableofcontents}
+%    \changes{v2.3h}{1995/01/21}{Verwendung von \cs{toc@heading}}
+%    \changes{v2.8l}{2001/08/16}{Gruppe eingefügt und \cs{parskip} auf
+%      0 gesetzt}
+%    \changes{v2.8q}{2001/11/13}{\cs{@parskipfalse}%
+%      \cs{@parskip@indent}}
+%    \changes{v2.8q}{2001/11/14}{\cs{if@tocleft} bearbeiten}
+%    \changes{v3.0}{2002/06/28}{\textsf{article} beachtet ebenfalls
+%      \texttt{tocleft}}
+%    \changes{v3.0}{2004/11/05}{\cs{@parskipfalse} und \cs{@parskip@indent}
+%      ersetzt}
+% Die Ausgabe des Inhaltsverzeichnisses.
+%    \begin{macrocode}
+\newcommand*{\tableofcontents}{%
+  \begingroup
+%<*report|book>
+    \if@twocolumn
+      \@restonecoltrue\onecolumn
+    \else
+      \@restonecolfalse
+    \fi
+%</report|book>
+    \toc@heading%
+    \setparsizes{\z@}{\z@}{\z@\@plus 1fil}\par@updaterelative
+    \if@tocleft\before@starttoc{toc}\fi
+    \@starttoc{toc}%
+    \if@tocleft\after@starttoc{toc}\fi
+%<*report|book>
+    \if@restonecol\twocolumn\fi
+%</report|book>
+  \endgroup
+}
+%    \end{macrocode}
+%  \end{macro}
+%
+%
+% \subsection{Definitionen für die Verzeichnisse der
+%   Gleitumgebungen}
+%
+%  \begin{macro}{\float@listhead}
+%    \changes{v2.8b}{2001/06/26}{neu (für alle Paketautoren)}
+%    \changes{v2.8g}{2001/07/18}{\cs{float@headings} umbenannt in
+%      \cs{float@listhead}}
+% In Absprache mit Anselm Lingnau, dem Autor des Pakets
+% \textsf{float}, wird ab Version 2.8b \cs{float@headings} zum Setzen
+% des Kolumnentitels bei den Verzeichnissen verwendet, die
+% \textsf{float} für neu definierte floats zur Verfügung stellt. Dabei
+% definiert \textsf{float} die Anweisung nur, wenn sie nicht bereits
+% existiert. Die Zusammenarbeit wird dadurch verbessert. Da Anselm
+% sich in letzter Minute entschlossen hat, das Makro
+% \cs{float@listhead} zu nennen, wurde dies in Version 2.8g angepasst.
+%    \begin{macrocode}
+\newcommand*{\float@listhead}[1]{%
+%<article>  \section*{#1}%
+%<report|book>  \chapter*{#1}%
+  \@mkboth{#1}{#1}%
+%    \end{macrocode}
+%    \changes{v2.8q}{2001/11/14}{dynamische Anpassung an die Nummer}
+% Dies ist der passende Ort, um die Breite, die für die Nummer des
+% Gleitobjekts benötigt wird zu ermitteln und anzupassen, falls dies
+% geünscht wird. Dazu findet eine lokale Umdefinierung von
+% \cs{@starttoc} statt. Die Umdefinierung ist deshalb lokal, weil alle
+% mir bekannten Verzeichnisse von Gleitobjekten innerhalb einer Gruppe
+% ausgegeben werden.
+%    \begin{macrocode}
+  \if@dynlist%
+    \newcommand*{\scr@starttoc}{}%
+    \let\scr@starttoc=\@starttoc
+    \renewcommand*{\@starttoc}[1]{%
+      \before@starttoc{##1}\scr@starttoc{##1}\after@starttoc{##1}%
+    }%
+  \fi
+}
+%    \end{macrocode}
+%  \end{macro}
+%
+%  \begin{macro}{\listfigurename}
+%  \begin{macro}{\listtablename}
+% Die Namen der Verzeichnisse.
+%    \begin{macrocode}
+\newcommand*\listfigurename{List of Figures}
+\newcommand*\listtablename{List of Tables}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%
+%  \begin{macro}{\lof@heading}
+%    \changes{v2.3h}{1995/01/21}{neu (intern)}
+%    \changes{v2.4d}{1996/04/11}{\cs{addsec} durch \cs{section*}
+%      ersetzt}
+%    \changes{v2.8b}{2001/06/26}{Verwendung von \cs{float@headings}}
+%    \changes{v2.8g}{2001/07/18}{\cs{float@headings} umbenannt in
+%      \cs{float@listhead}}
+% Befehl, zum Setzen der Überschrift des Abbildungsverzeichnisses.
+%    \begin{macrocode}
+\newcommand*\lof@heading{\float@listhead{\listfigurename}}
+%    \end{macrocode}
+%  \end{macro}
+%
+%  \begin{macro}{\listoffigures}
+%    \changes{v2.3h}{1995/01/21}{Verwendung von \cs{lof@heading}}
+%    \changes{v2.4k}{1996/12/13}{\cs{lof@heading} nicht nur bei
+%      \textsf{scrartcl}}
+%    \changes{v2.8l}{2001/08/16}{Gruppe eingefügt und \cs{parskip} auf
+%      0 gesetzt}
+%    \changes{v2.8q}{2001/11/13}{\cs{@parskipfalse}%
+%      \cs{@parskip@indent}}
+%    \changes{v3.0}{2004/11/05}{\cs{@parskipfalse} und \cs{@parskip@indent}
+%      ersetzt}
+% Die Ausgabe des Abbildungsverzeichnisses.
+%    \begin{macrocode}
+\newcommand*\listoffigures{%
+  \begingroup%
+%<*report|book>
+    \if@twocolumn
+      \@restonecoltrue\onecolumn
+    \else
+      \@restonecolfalse
+    \fi
+%</report|book>
+    \lof@heading%
+    \setparsizes{0}{0}{\z@\@plus 1fil}\par@updaterelative
+    \@starttoc{lof}%
+%<*report|book>
+    \if@restonecol\twocolumn\fi
+%</report|book>
+  \endgroup
+}
+%    \end{macrocode}
+%
+%  \begin{macro}{\l@figure}
+% Befehl zur Formatierung eines Verzeichniseintrags.
+%    \begin{macrocode}
+\newcommand*\l@figure{\@dottedtocline{1}{1.5em}{2.3em}}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%
+%  \begin{macro}{\lot@heading}
+%    \changes{v2.3h}{1995/01/21}{neu (intern)}
+%    \changes{v2.4a}{1996/03/13}{\cs{listtabelname} durch
+%      \cs{listtablename} ersetzt}
+%    \changes{v2.8b}{2001/06/26}{Verwendung von \cs{float@headings}}
+%    \changes{v2.8g}{2001/07/18}{\cs{float@headings} umbenannt in
+%      \cs{float@listhead}} 
+% Befehl zum Setzen der Überschrift des Tabellenverzeichnisses.
+%    \begin{macrocode}
+\newcommand*\lot@heading{\float@listhead{\listtablename}}
+%    \end{macrocode}
+%  \end{macro}
+%
+%  \begin{macro}{\listoftables}
+%    \changes{v2.3h}{1995/01/21}{Verwendung von \cs{lot@heading}}
+%    \changes{v2.4k}{1996/12/13}{\cs{lot@heading} nicht nur bei
+%      \textsf{scrartcl}}
+%    \changes{v2.8l}{2001/08/16}{Gruppe eingefügt und \cs{parskip} auf
+%      0 gesetzt}
+%    \changes{v2.8q}{2001/11/13}{\cs{@parskipfalse}%
+%      \cs{@parskip@indent}}
+%    \changes{v3.0}{2004/11/05}{\cs{@parskipfalse} und \cs{@parskip@indent}
+%      ersetzt}
+% Die Ausgabe des Tabellenverzeichnisses.
+%    \begin{macrocode}
+\newcommand*\listoftables{%
+  \begingroup
+%<*report|book>
+    \if@twocolumn
+      \@restonecoltrue\onecolumn
+    \else
+      \@restonecolfalse
+    \fi
+%</report|book>
+    \lot@heading
+    \setparsizes{0}{0}{\z@\@plus 1fil}\par@updaterelative
+    \@starttoc{lot}%
+%<*report|book>
+    \if@restonecol\twocolumn\fi
+%</report|book>
+  \endgroup
+}
+%    \end{macrocode}
+%
+%  \begin{macro}{\l@table}
+% Befehl zur Formatierung eines Verzeichniseintrags.
+%    \begin{macrocode}
+\let\l@table\l@figure
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%
+%
+% \iffalse
+%</body>
+% \fi
+%
+%
+% \Finale
+%
+\endinput
+%
+% end of file `scrkliof.dtx'
+%%% Local Variables:
+%%% mode: latex
+%%% mode: font-lock
+%%% TeX-master: t
+%%% End:

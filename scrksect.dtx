@@ -1,0 +1,1993 @@
+% \CheckSum{1445}
+% \iffalse meta-comment
+% ======================================================================
+% scrksect.dtx
+% Copyright (c) Markus Kohm, 2002-2005
+%
+% This file is part of the LaTeX2e KOMA-Script-Bundle
+%
+% This file can be redistributed and/or modified under the terms
+% of the LaTeX Project Public License Version 1.0 distributed 
+% together with this file. See LEGAL.TXT or LEGALDE.TXT.
+% ----------------------------------------------------------------------
+% scrksect.dtx
+% Copyright (c) Markus Kohm, 2002-2005
+%
+% Diese Datei ist Teil des LaTeX2e KOMA-Script-Pakets.
+%
+% Diese Datei kann nach den Regeln der LaTeX Project Public
+% Licence Version 1.0, wie sie zusammen mit dieser Datei verteilt
+% wird, weiterverbreitet und/oder modifiziert werden. Siehe dazu
+% auch LEGAL.TXT oder LEGALDE.TXT.
+% ======================================================================
+% \fi
+% \iffalse
+%%% From File: scrksect.dtx
+%<*driver>
+% \fi
+\ProvidesFile{scrksect.dtx}[2005/01/03 v3.0 KOMA-Script (sectioning)]
+% \iffalse
+\documentclass[halfparskip-]{scrdoc}
+\usepackage[english,german]{babel}
+\usepackage[latin1]{inputenc}
+\CodelineIndex
+\RecordChanges
+\GetFileInfo{scrksect.dtx}
+\title{\KOMAScript{} \partname\ \texttt{\filename}%
+  \footnote{Dies ist Version \fileversion\ von Datei
+    \texttt{\filename}.}}
+\date{\filedate}
+\author{Markus Kohm}
+
+\begin{document}
+  \maketitle
+  \tableofcontents
+  \DocInput{\filename}
+\end{document}
+%</driver>
+% \fi
+%
+% \selectlanguage{german}
+%
+% \changes{v3.0}{2002/06/26}{%
+%   erste Version aus der Aufteilung von \texttt{scrclass.dtx}}
+%
+% \section{Gliederung}
+%
+% Zur Gliederung gehören neben den üblichen Gliederungsbefehlen
+% \cs{chapter} \dots \cs{subparagraph} auch alle Optionen und Befehle,
+% die diese Gliederung beeinflussen. Eingeschränkt gehören auch die
+% Befehle dazu, die Inhaltsverzeichniseinträge zu den
+% Gliederungsbefehlen erzeugen oder unmittelbar formatieren. Diese
+% Entscheidung wurde getroffen, weil die Zusammengehörigkeit eher hier
+% gesehen wird, als bei den Verzeichnissen selbst.
+%
+% \StopEventually{\PrintIndex\PrintChanges}
+%
+% \iffalse
+%<*option>
+% \fi
+% \subsection{Optionen für die Gliederung}
+%
+%  \begin{option}{openright}
+%  \begin{option}{openany}
+% \iffalse
+%<*book|report>
+% \fi
+% Bei \textsf{scrreprt} und \textsf{scrbook} kann per Option
+% eingestellt werden, ob Kapitel nur auf rechten Seiten beginnen
+% dürfen oder auf jeder Seite.
+%  \begin{macro}{\if@openright}
+%  \begin{macro}{\@openrighttrue}
+%  \begin{macro}{\@openrightfalse}
+% Der Zustand wird dann in einem Schalter gespeichert.
+%    \begin{macrocode}
+\newif\if@openright
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%    \begin{macrocode}
+\DeclareOption{openright}{\@openrighttrue}
+\DeclareOption{openany}{\@openrightfalse}
+%    \end{macrocode}
+% \iffalse
+%</book|report>
+% \fi
+%  \end{option}
+%  \end{option}
+%
+%
+%  \begin{option}{pointednumbers}
+%    \changes{v2.3h}{1995/01/19}{neue Option}
+%    \changes{v2.4g}{1996/11/04}{die Option heißt nun wirklich so,
+%      bei \texttt{pointednumber} wird explizit ein Fehler gemeldet}
+%    \changes{v2.4g}{1996/11/04}{\cs{@altsecnumformatfalse} wird
+%      direkt auf \cs{@altsecnumformattrue} gesetzt}
+%  \begin{option}{pointlessnumbers}
+%    \changes{v2.3h}{1995/01/19}{neue Option}
+%    \changes{v2.4g}{1996/11/04}{die Option heißt nun wirklich so,
+%      bei \texttt{pointlessnumber} wird explizit ein Fehler gemeldet}
+%    \changes{v2.4g}{1996/11/04}{\cs{@altsecnumformattrue} wird direkt
+%      auf \cs{@altsecnumformatfalse} gesetzt}
+% Normalerweise wird automatisch entschieden, ob Nummern mit einem
+% Punkt enden müssen oder nicht. Um dies abzuschalten, muss nur der
+% gewünschte Zustand eingeschaltet und die Umschaltmöglichkeit
+% entfernt werden. Dies kann jedoch erst am Ende der Klasse
+% geschehen.
+%    \begin{macrocode}
+\DeclareOption{pointednumbers}{%
+  \AtEndOfClass{\@altsecnumformattrue
+    \global\let\@altsecnumformatfalse\@altsecnumformattrue}%
+}
+\DeclareOption{pointednumber}{%
+  \AtEndOfClass{\@altsecnumformattrue
+    \global\let\@altsecnumformatfalse\@altsecnumformattrue}%
+  \ClassError{\KOMAClassName}{%
+    undefined option `pointednumber' instead of `pointednumbers'%
+  }{%
+    You've used the class-option `pointednumber'.\MessageBreak
+    This name was an implementation-error at versions from 2.3h till
+    2.4f.\MessageBreak
+    The correct name is `pointednumbers'.
+    Change this at your document.\MessageBreak
+    If you'll continue, the option `pointednumbers' will be used%
+  }%
+}
+\DeclareOption{pointlessnumbers}{%
+  \AtEndOfClass{\@altsecnumformatfalse
+    \global\let\@altsecnumformattrue\@altsecnumformatfalse}%
+}
+\DeclareOption{pointlessnumber}{%
+  \AtEndOfClass{\@altsecnumformatfalse
+    \global\let\@altsecnumformattrue\@altsecnumformatfalse}%
+  \ClassError{\KOMAClassName}{%
+    undefined option `pointlessnumber' instead of `pointlessnumbers'%
+  }{%
+    You've used the class-option `pointlessnumber'.\MessageBreak
+    This name was an implementation-error at versions from 2.3h till
+    2.4f.\MessageBreak
+    The correct name is `pointlessnumbers'.
+    Change this at your document.\MessageBreak
+    If you'll continue, the option `pointlessnumbers' will be used%
+  }%
+}
+%    \end{macrocode}
+% Übrigens weiß ich, wie blödsinnig die Namen der Optionen sind. Aber
+% das ist nun nicht mehr zu ändern.
+%  \end{option}
+%  \end{option}
+%
+%
+%  \begin{option}{bigheadings}
+%    \changes{v2.3h}{1996/01/20}{neue Option}
+%    \changes{v2.4g}{1996/11/04}{die Option heißt nun wirklich so; bei
+%      Verwendung des alten, falschen Namens wird ein Fehler
+%      ausgegeben}
+%  \begin{macro}{\@bigheadings}
+%  \begin{option}{normalheadings}
+%    \changes{v2.3h}{1996/01/20}{neue Option}
+%    \changes{v2.4g}{1996/11/04}{die Option heißt nun wirklich so; bei
+%      Verwendung des alten, falschen Namens wird ein Fehler
+%      ausgegeben}
+%  \begin{macro}{\@normalheadings}
+%  \begin{option}{smallheadings}
+%    \changes{v2.3h}{1996/01/20}{neue Option}
+%    \changes{v2.4g}{1996/11/04}{die Option heißt nun wirklich so; bei
+%      Verwendung des alten, falschen Namens wird ein Fehler
+%      ausgegeben}
+%  \begin{macro}{\@smallheadings}
+% Es kann zwischen verschiedenen Überschriftgrößen umgeschaltet
+% werden, wobei die ursprüngliche Größe als groß gilt und 
+% voreingestellt wird.
+%    \changes{v2.3h}{1996/01/20}{Größse von \cs{chapter} um eine Stufe
+%      verringert}
+%    \changes{v2.3h}{1996/01/20}{Verwendung von
+%      \cs{chapterheadstartvskip} und \cs{chapterheadendvskip} an
+%      Stelle von festen vertikalen Abständen am Anfang und am Ende
+%      eines Kapitels}
+%    \changes{v2.7c}{2000/01/19}{vertikale Abstände nach der
+%      Kapitelüberschrift geringfügig verändert und mit Leim versehen,
+%      um mit \cs{flushbottom} zu besseren Ergebnissen zu gelangen}  
+%    \begin{macrocode}
+\newcommand\@bigheadings{%
+  \AtEndOfClass{%
+%<*book|report>
+    \renewcommand*{\chapterheadstartvskip}{%
+      \vspace*{2.3\baselineskip}%
+    }%
+    \renewcommand*{\chapterheadendvskip}{%
+      \vspace{1.725\baselineskip
+        \@plus .115\baselineskip \@minus .192\baselineskip}%
+    }%
+%</book|report>
+    \let\size@part\Huge
+    \let\size@partnumber\huge
+%<book|report>    \let\size@chapter\huge
+    \let\size@section\Large
+    \let\size@subsection\large
+    \let\size@subsubsection\normalsize
+    \let\size@paragraph\normalsize
+    \let\size@subparagraph\normalsize
+  }%
+}
+\DeclareOption{bigheadings}{\@bigheadings}
+\DeclareOption{bigheading}{%
+  \@bigheadings
+  \ClassError{\KOMAClassName}{%
+    undefined option `bigheading' instead of `bigheadings'%
+  }{%
+    You've used the old option name `bigheading'!\MessageBreak
+    The correct name of the option is `bigheadings'.\MessageBreak
+    The old name was an implementation error from\MessageBreak
+    version 2.3h till 2.4f.\MessageBreak
+    You should change this at your document!\MessageBreak
+    If you'll continue, option `bigheadings' will be used%
+  }%
+}
+\newcommand\@normalheadings{%
+  \AtEndOfClass{%
+%<*book|report>
+    \renewcommand*{\chapterheadstartvskip}{%
+      \vspace*{2\baselineskip}%
+    }%
+    \renewcommand*{\chapterheadendvskip}{%
+      \vspace{1.5\baselineskip
+        \@plus .1\baselineskip \@minus .167\baselineskip}%
+    }%
+%</book|report>
+    \let\size@part\huge
+    \let\size@partnumber\huge
+%<*book|report>
+    \let\size@chapter\LARGE
+    \let\size@section\Large
+    \let\size@subsection\large
+%</book|report>
+%<*article>
+    \let\size@section\large
+    \let\size@subsection\normalsize
+%</article>
+    \let\size@subsubsection\normalsize
+    \let\size@paragraph\normalsize
+    \let\size@subparagraph\normalsize
+  }%
+}
+\DeclareOption{normalheadings}{\@normalheadings}
+\DeclareOption{normalheading}{%
+  \@normalheadings
+  \ClassError{\KOMAClassName}{%
+    undefined option `normalheading' instead of `normalheadings'%
+  }{%
+    You've used the old option name `normalheading'!\MessageBreak
+    The correct name of the option is `normalheadings'.\MessageBreak
+    The old name was an implementation error from\MessageBreak
+    version 2.3h till 2.4f.\MessageBreak
+    You should change this at your document!\MessageBreak
+    If you'll continue, option `normalheadings' will be used%
+  }%
+}
+\newcommand\@smallheadings{%
+  \AtEndOfClass{
+%<*book|report>
+    \renewcommand*{\chapterheadstartvskip}{%
+      \vspace*{1.8\baselineskip}%
+    }%
+    \renewcommand*{\chapterheadendvskip}{%
+      \vspace{1.35\baselineskip
+        \@plus 0.09\baselineskip \@minus .15\baselineskip}%
+    }%
+%</book|report>
+    \let\size@part\LARGE
+    \let\size@partnumber\LARGE
+%<*book|report>
+    \let\size@chapter\Large
+    \let\size@section\large
+%</book|report>
+%<*article>
+    \let\size@section\normalsize
+%</article>
+    \let\size@subsection\normalsize
+    \let\size@subsubsection\normalsize
+    \let\size@paragraph\normalsize
+    \let\size@subparagraph\normalsize
+  }%
+}
+\DeclareOption{smallheadings}{\@smallheadings}
+\DeclareOption{smallheading}{%
+  \@smallheadings
+  \ClassError{\KOMAClassName}{%
+    undefined option `smallheading' instead of `smallheadings'%
+  }{%
+    You've used the old option name `smallheading'!\MessageBreak
+    The correct name of the option is `smallheadings'.\MessageBreak
+    The old name was an implementation error from\MessageBreak
+    version 2.3h till 2.4f.\MessageBreak
+    You should change this at your document!\MessageBreak
+    If you'll continue, option `smallheadings' will be used%
+  }%
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{option}
+%  \end{macro}
+%  \end{option}
+%  \end{macro}
+%  \end{option}
+%
+%
+%  \begin{option}{chapterprefix}
+%    \changes{v2.8}{2001/06/15}{neue Option}
+%  \begin{option}{nochapterprefix}
+%    \changes{v2.8}{2001/06/15}{neue Option}
+% \iffalse
+%<*book|report>
+% \fi
+% Normalerweise verwenden \textsf{scrbook} und \textsf{scrreprt} nicht
+% die enorm großen Überschriften von \textsf{book} und
+% \textsf{report}, die mit einem Absatz "`Kapitel \emph{Nummer}"'
+% beginnen. Mit der Option \texttt{chapterprefix} kann dies jetzt
+% wieder aktiviert werden. Die Option, zur Deaktivierung heißt
+% entsprechend \textsf{nochapterprefix}. 
+%  \begin{macro}{\if@chapterprefix}
+%  \begin{macro}{\@chapterprefixtrue}
+%  \begin{macro}{\@chapterprefixfalse}
+% Um für Spezialanwendungen auch innerhalb des Dokuments eine
+% Umschaltung zu ermöglichen bzw. für die Optionen
+% \texttt{appendixprefix} und \texttt{noappendixprefix} erfolgt die
+% Umschaltung durch einen Schalter.
+%    \begin{macrocode}
+\newif\if@chapterprefix
+\DeclareOption{chapterprefix}{\@chapterprefixtrue}
+\DeclareOption{nochapterprefix}{\@chapterprefixfalse}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+% \iffalse
+%</book|report>
+% \fi
+%  \end{option}
+%  \end{option}
+%
+%
+%  \begin{option}{appendixprefix}
+%    \changes{v2.8}{2001/06/15}{neue Option}
+%  \begin{option}{noappendixprefix}
+%    \changes{v2.8}{2001/06/15}{neue Option}
+% \iffalse
+%<*book|report>
+% \fi
+% Will man abweichend von den Optionen \texttt{chapterprefix} und
+% \texttt{nochapterprefix} die großen Überschriften für den Anhang
+% aktivieren oder deaktivieren, so kann man das mit dieser Option
+% erreichen. Allerdings setzt diese keinen Schalter, sondern ein
+% Zusatzmakro, das auch für andere Zwecke genutzt werden
+% kann. Übrigens ist keine der beiden Optionen die Voreinstellung!
+%    \begin{macrocode}
+\DeclareOption{appendixprefix}{%
+  \def\appendixmore{\@chapterprefixtrue}%
+}
+\DeclareOption{noappendixprefix}{%
+  \def\appendixmore{\@chapterprefixfalse}%
+}
+%    \end{macrocode}
+% \iffalse
+%</book|report>
+% \fi
+%  \end{option}
+%  \end{option}
+%
+%
+% \iffalse
+%</option>
+%<*body>
+% \fi
+%
+%
+% \subsection{Grobeinteilung von Büchern}
+% \iffalse
+%<*book>
+% \fi
+%
+%  \begin{macro}{\if@mainmatter}
+%  \begin{macro}{\@mainmattertrue}
+%  \begin{macro}{\@mainmatterfalse}
+%    \changes{v2.3a}{1995/07/08}{\cs{if@mainmatter} Anforderung
+%      verschoben}
+% Über diesen Schalter wird bei Buchklassen festgelegt, ob wir uns im
+% Hauptteil des Dokuments befinden oder nicht. Die eigentliche
+% Umschaltung geschieht mit Hilfe der Befehle \cs{frontmatter},
+% \cs{mainmatter}, \cs{backmatter}. Ohne Umschaltung befinden wir uns
+% bereits im Hauptteil.
+%    \begin{macrocode}
+\newif\if@mainmatter\@mainmattertrue
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%
+%  \begin{macro}{\frontmatter}
+%    \changes{v2.4e}{1996/07/02}{Option \texttt{openany} beachten}
+%    \changes{v2.5h}{1999/12/29}{Option \texttt{twoside} beachten}
+% Der Vorspann enthält bei Büchern oftmals Inhaltsverzeichnis, Vorwort
+% und dergleichen und wird mit kleinen römischen Seitenzahlen
+% versehen.
+%    \begin{macrocode}
+\newcommand*\frontmatter{%
+  \if@twoside\cleardoublepage\else\clearpage\fi
+  \@mainmatterfalse\pagenumbering{roman}%
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \begin{macro}{\mainmatter}
+%    \changes{v2.4e}{1996/07/02}{Option \texttt{openany} beachten}
+%    \changes{v2.5h}{1999/12/29}{Option \texttt{twoside} beachten}
+% Der Hauptteil ist das Fleisch der Bücher.
+%    \begin{macrocode}
+\newcommand*\mainmatter{%
+  \if@twoside\cleardoublepage\else\clearpage\fi
+  \@mainmattertrue\pagenumbering{arabic}%
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \begin{macro}{\backmatter}
+% Auch wenn nicht ganz einzusehen ist, warum das anders sein soll,
+% wird hier nicht nach der Option \texttt{twoside}, sondern nach
+% \texttt{openright} unterschieden.
+%    \begin{macrocode}
+\newcommand*\backmatter{%
+  \if@openright\cleardoublepage\else\clearpage\fi\@mainmatterfalse
+}
+%    \end{macrocode}
+%  \end{macro}
+% \iffalse
+%</book>
+% \fi
+%
+%
+% \subsection{Anhang}
+%  \begin{macro}{\appendix}
+% Wird der Anhang aktiviert, so werden Kapitel zukünftig mit Buchstaben
+% nummeriert.
+%    \changes{v2.2d}{1995/05/28}{\textsf{scrartcl} benötigt keinen
+%      Zähler für \cs{chapter}}
+%    \changes{v2.3c}{1995/08/06}{alternative Nummerierung bei
+%      Verwendung eines Anhangs}
+%    \changes{v2.8}{2001/06/15}{\cs{appendixmore} wird beachtet}
+%    \changes{v2.8e}{2001/07/10}{\cs{@altsecnumformattrue} wird nicht
+%      länger ausgeführt}
+%    \changes{v2.8o}{2001/09/19}{\cs{par} eingefügt}
+%  \begin{macro}{\appendixmore}
+% \cs{appendixmore} kann als \emph{hook} verwendet werden.
+%    \begin{macrocode}
+\newcommand*\appendix{\par%
+%<*article>
+  \setcounter{section}{0}%
+  \setcounter{subsection}{0}%
+  \renewcommand*\thesection{\@Alph\c@section}%
+%</article>
+%<*report|book>
+  \setcounter{chapter}{0}%
+  \setcounter{section}{0}%
+  \renewcommand*\@chapapp{\appendixname}%
+  \renewcommand*\thechapter{\@Alph\c@chapter}%
+%</report|book>
+  \@ifundefined{appendixmore}{}{\appendixmore}%
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%
+%
+% \subsection{Definitionen für Seitenstile}
+%
+%  \begin{macro}{\chaptermark}
+% Da \cs{chapter} nicht mit Hilfe von \cs{@startsection} definiert
+% wird, wird auch \cs{chaptermark} nicht automatisch definiert. Es
+% wird aber in den Seitenstilen benötigt bzw. umdefiniert. Also hier
+% vorsorglich eine Dummy-Definition:
+%    \begin{macrocode}
+%<book|report>\newcommand*\chaptermark[1]{}
+%    \end{macrocode}
+%  \end{macro}
+%
+%
+% \subsection{Der Automatismus für den Punkt in der Nummerierung}
+%
+% Nach Duden 20.~Auflage, Regel~5 wird in der Gliederung kein Punkt
+% gesetzt, wenn diese rein mit arabischen Zahlen erfolgt. Nach Regel~6
+% folgt jedoch ein Punkt, wenn die Gliederung auch römische Zahlen
+% oder Großbuchstaben enthält. Aus Konsistenzgründen muss der Punkt in
+% diesem Fall immer gesetzt werden. \KOMAScript{} bietet dafür einen
+% Automatismus.
+%
+%  \begin{macro}{\if@altsecnumformat}
+%    \changes{v2.3c}{1995/08/06}{neuer Schalter}
+%  \begin{macro}{\@altsecnumformattrue}
+%  \begin{macro}{\@altsecnumformatfalse}
+% Dieses Schalter wird für die Umschaltung auf Duden-Regel~6 bei der
+% Numerierung benötigt.
+%  \begin{macro}{\if@autodot}
+%    \changes{v2.8e}{2001/07/10}{neuer Schalter}
+%  \begin{macro}{\@autodottrue}
+%  \begin{macro}{\@autodotfalse}
+% Damit die Umschaltung auch wieder zurück auf Regel~5 automatisch
+% erfolgen kann, wird ein zweiter Schalter benötigt.
+%    \begin{macrocode}
+\newif\if@altsecnumformat\@altsecnumformatfalse
+\newif\if@autodot\@autodotfalse
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \begin{macro}{\@maybeautodot}
+%    \changes{v2.8e}{2001/07/10}{neu (intern)}
+% Ob der automatische Punkt aktiviert werden muss, wird aufgrund der
+% Darstellung eines Zählers entschieden. Diese wird dem Makro als
+% Argument übergeben (\cs{thepart}, \cs{thechapter} etc.). Durch
+% Verwendung einer Gruppe, werden alle Definitionen lokal gehalten.
+%    \begin{macrocode}
+\newcommand{\@maybeautodot}[1]{\if@autodot\else\begingroup%
+  \expandafter\@@maybeautodot #1\@stop\endgroup\fi
+}
+%    \end{macrocode}
+%  \begin{macro}{\@@maybeautodot}
+%    \changes{v2.8e}{2001/07/10}{neu (intern)}
+% Die expandierte Darstellung wird dann auf Darstellungsbefehle für
+% Zähler gescannt.
+%    \begin{macrocode}
+\newcommand*{\@@maybeautodot}[1]{%
+  \ifx #1\@stop\let\@@maybeautodot\relax
+  \else
+    \ifx #1\Alph \aftergroup\@autodottrue\fi
+    \ifx #1\alph \aftergroup\@autodottrue\fi
+    \ifx #1\Roman \aftergroup\@autodottrue\fi
+    \ifx #1\roman \aftergroup\@autodottrue\fi
+    \ifx #1\@Alph \aftergroup\@autodottrue\fi
+    \ifx #1\@alph \aftergroup\@autodottrue\fi
+    \ifx #1\@Roman \aftergroup\@autodottrue\fi
+    \ifx #1\@roman \aftergroup\@autodottrue\fi
+    \ifx #1\romannumeral \aftergroup\@autodottrue\fi
+  \fi
+  \@@maybeautodot
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \begin{macro}{\scr@sect}
+%  \begin{macro}{\@sect}
+% Damit auch alle mit \cs{@startsection} definierten Gliederungsebenen
+% bei der Entscheidung berücksichtigt werden, muss ein internes Makro
+% des \LaTeX-Kerns erweitert werden. Für die Ebenen \cs{part} und
+% \cs{chapter} wird der Test direkt in der Definition der Befehle
+% erledigt.
+%    \begin{macrocode}
+\let\scr@sect\@sect
+\renewcommand*{\@sect}[1]{\stepcounter{#1}%
+  \expandafter\@maybeautodot\csname the#1\endcsname
+  \addtocounter{#1}{-1}\scr@sect{#1}%
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+% Dabei soll die Umstellung beim zweiten TeX-Lauf bereits am Anfang
+% aktiv sein. Deshalb wird die Information am Ende in die aux-Datei
+% geschrieben.
+% \changes{v2.9k}{2003/01/12}{es wird direkt in \cs{@mainaux} geschrieben}
+% \changes{v3.0}{2004/01/15}{es wird erst unmittelbar vor dem Schließen der
+%   Haupt-aux-Datei in diese geschrieben}
+%    \begin{macrocode}
+\BeforeClosingMainAux{%
+  \if@autodot\if@filesw\write\@mainaux{%
+      \string\global\string\@altsecnumformattrue}%
+  \fi\fi}
+%    \end{macrocode}
+%
+%  \begin{macro}{\autodot}
+%    \changes{v2.7}{2001/01/03}{neu}
+% Dieses Makro setzt dann den Punkt nach Bedarf.
+%    \begin{macrocode}
+\newcommand*\autodot{\if@altsecnumformat.\fi}
+%    \end{macrocode}
+%  \end{macro}
+%
+%
+% \subsection{Zähler für die Gliederungsebenen}
+%
+%  \begin{Counter}{secnumdepth}
+% Dieser Zähler gibt an, bis zu welcher Ebene die
+% Gliederungsüberschriften nummeriert werden.
+%    \begin{macrocode}
+%<book|report>\setcounter{secnumdepth}{2}
+%<article>\setcounter{secnumdepth}{3}
+%    \end{macrocode}
+%  \end{Counter}
+%
+%  \begin{Counter}{part}
+%  \begin{macro}{\thepart}
+%  \begin{macro}{\partformat}
+%    \changes{v2.3c}{1995/08/06}{Duden Regel 6}
+%    \changes{v2.5f}{1999/02/14}{überflüssiges Leerzeichen am Ende
+%      entfernt}
+%    \changes{v2.7h}{2001/04/22}{verlorenen Backslash in \cs{autodot}
+%      wieder eingefügt}
+%  \begin{Counter}{chapter}
+%  \begin{macro}{\thechapter}
+%  \begin{macro}{\chapterformat}
+%    \changes{v2.3c}{1995/08/06}{Duden Regel 6}
+%    \changes{v2.7}{2000/01/03}{einfaches Leerzeichen durch
+%      \cs{enskip} ersetzt}
+%    \changes{v2.8}{2001/06/15}{\cs{chapappifprefix} eingefügt}
+%    \changes{v2.8o}{2001/09/19}{\cs{chapappifchapterprefix} statt
+%      \cs{chapappifprefix}} 
+%  \begin{macro}{\chaptermarkformat}
+%    \changes{v2.3a}{1995/07/08}{Leerraum nach der Kapitelnummer
+%      erhöht}
+%    \changes{v2.3c}{1995/08/06}{Duden Regel 6}
+%    \changes{v2.8}{2001/06/15}{\cs{chapappifprefix} eingefügt}
+%    \changes{v2.8o}{2001/09/19}{\cs{chapappifchapterprefix} statt
+%      \cs{chapappifprefix}}
+%  \begin{Counter}{section}
+%  \begin{macro}{\thesection}
+%  \begin{macro}{\sectionmarkformat}
+%    \changes{v2.3a}{1995/07/08}{Leerraum nach der Kapitelnummer
+%      erhöht}
+%    \changes{v2.3c}{1995/08/06}{Duden Regel 6}
+%  \begin{Counter}{subsection}
+%  \begin{macro}{\thesubsection}
+%  \begin{macro}{\subsectionmarkformat}
+%    \changes{v2.3a}{1995/07/08}{Leerraum nach der Kapitelnummer
+%      erhöht}
+%    \changes{v2.3c}{1995/08/06}{Duden Regel 6}
+%  \begin{Counter}{subsubsection}
+%  \begin{macro}{\thesubsubsection}
+%  \begin{Counter}{paragraph}
+%  \begin{macro}{\theparagraph}
+%  \begin{Counter}{subparagraph}
+%  \begin{macro}{\thesubparagraph}
+% Jede Gliederungsebene benötigt einen Zähler für die
+% Gliederungsnummer und eine Darstellung des Zählers
+% (\cs{the\dots}). Desweiteren wird eine Formatierung des Zählers in
+% den Gliederungsüberschriften (\texttt{\bslash\dots format}) und eine
+% Formatierung des Zählers in der Kopfzeile 
+% (\texttt{\bslash\dots markformat}) benötigt.
+%    \begin{macrocode}
+\newcounter{part}
+\renewcommand*{\thepart}{\@Roman\c@part}
+\newcommand*{\partformat}{\partname~\thepart\autodot}
+%<*book|report>
+\newcounter{chapter}
+\renewcommand*{\thechapter}{\@arabic\c@chapter}
+\newcommand*{\chapterformat}{%
+  \chapappifchapterprefix{\ }\thechapter\autodot\enskip
+}
+\newcommand*\chaptermarkformat{\chapappifchapterprefix{\ }%
+  \thechapter\autodot\enskip}
+\newcounter{section}[chapter]
+\renewcommand*\thesection{\thechapter.\@arabic\c@section}
+\newcommand*\sectionmarkformat{\thesection\autodot\enskip}
+%</book|report>
+%<*article>
+\newcounter{section}
+\renewcommand*{\thesection}{\@arabic\c@section}
+\newcommand*\sectionmarkformat{\thesection\autodot\enskip}
+%</article>
+\newcounter{subsection}[section]
+\renewcommand*{\thesubsection}{\thesection.\@arabic\c@subsection}
+%<*article>
+\newcommand*\subsectionmarkformat{\thesubsection\autodot\enskip}
+%</article>
+\newcounter{subsubsection}[subsection]
+\renewcommand*{\thesubsubsection}{%
+  \thesubsection.\@arabic\c@subsubsection
+}
+\newcounter{paragraph}[subsubsection]
+\renewcommand*{\theparagraph}{\thesubsubsection.\@arabic\c@paragraph}
+\newcounter{subparagraph}[paragraph]
+\renewcommand*{\thesubparagraph}{%
+  \theparagraph.\@arabic\c@subparagraph
+}
+%    \end{macrocode}
+%  \begin{macro}{\@seccntformat}
+%    \changes{v2.3c}{1995/08/06}{CJK erweitert}
+%    \changes{v2.9p}{2004/01/07}{\cs{protect} eingef"ugt}
+%  \begin{macro}{\othersectionlevelsformat}
+%    \changes{v2.7}{2000/01/03}{neu}
+%    \changes{v2.7}{2000/01/03}{\cs{quad} durch \cs{enskip} ersetzt}
+%    \changes{v2.7i}{2001/05/17}{\cs{let} durch \cs{def} ersetzt}
+% Bei den Ebenen ab \cs{section} erfolgt die Formatierung der
+% Gliederungnummer in der Überschrift mit einer gemeinsamen
+% Anweisung. Die interne Anweisung \cs{@seccntformat} wird dabei von
+% \LaTeX-Kern verwendet und muss umdefiniert werden, um eine
+% entsprechende Anweisung auf Anwenderebene verfügbar zu haben.
+%    \begin{macrocode}
+\newcommand*{\othersectionlevelsformat}[1]{%
+  \csname the#1\endcsname\autodot\enskip}
+\renewcommand*{\@seccntformat}{\protect\othersectionlevelsformat}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{Counter}
+%  \end{macro}
+%  \end{Counter}
+%  \end{macro}
+%  \end{Counter}
+%  \end{macro}
+%  \end{macro}
+%  \end{Counter}
+%  \end{macro}
+%  \end{macro}
+%  \end{Counter}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{Counter}
+%  \end{macro}
+%  \end{macro}
+%  \end{Counter}
+%
+%
+% \changes{v2.8e}{2001/07/10}{\cs{@thepart} entfernt}
+% \changes{v2.8e}{2001/07/10}{\cs{@maybeasf} entfernt}
+%
+%
+% \subsection{Namen für die Gliederung}
+%
+%  \begin{macro}{\partname}
+%  \begin{macro}{\chaptername}
+%  \begin{macro}{\abstractname}
+% Diese Makros enthalten die Namen der Gliederungsebenen \cs{part} und
+% \cs{chapter}, sowie den Namen der Zusammenfassung:
+%    \begin{macrocode}
+\newcommand*\partname{Part}
+%<book|report>\newcommand*\chaptername{Chapter}
+%<report|article>\newcommand*\abstractname{Abstract}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%
+%  \begin{macro}{\appendixname}
+% Der Name des Anhangs.
+%    \begin{macrocode}
+\newcommand*\appendixname{Appendix}
+%    \end{macrocode}
+%  \end{macro}
+%
+% \iffalse
+%<*book|report>
+% \fi
+%  \begin{macro}{\chapappifprefix}
+%    \changes{v2.8}{2001/06/15}{neu}
+%    \changes{v2.8o}{2001/09/19}{obsolet}
+%  \begin{macro}{\chapappifchapterprefix}
+%    \changes{v2.8o}{2001/09/19}{neu}
+%    \changes{v2.8o}{2001/09/19}{Argument ist nicht optional}
+%  \begin{macro}{\chapapp}
+%    \changes{v2.8}{2001/06/15}{neu}
+% Das in \cs{chapterformat} verwendete Makro
+% \cs{chapappifchapterprefix} setzt abhängig von \cs{if@chapterprefix}
+% noch das Makro \cs{chapapp} gefolgt vom obliatorischen Argument.
+% \cs{chapapp} macht \cs{@chapapp} auf Anwenderebene verfügbar. Der
+% Vorteil des neuen \cs{chapappifchapterprefix} gegenüber dem alten
+% \cs{chapappifprefix} ist, dass nun beim Umdefinieren von
+% \cs{chapterformat} und \cs{chaptermarkformat} wieder
+% \cs{renewcommand} verwendet werden kann und beim Umschalten in den
+% Anhang die Kopfzeile korrekt ist, weil das Makro nun nicht mehr
+% geschützt ist, sondern direkt expandiert. 
+%    \begin{macrocode}
+\newcommand*{\chapappifprefix}[1][]{%
+  \ClassWarning{\KOMAClassName}{%
+    Please don't use obsolete command
+    \string\chapappifprefix.\MessageBreak
+    The new command \string\chapappifchapterprefix\space has
+    an\MessageBreak
+    obligatory instead of an optional argument. Use that\MessageBreak
+    new command%
+  }%
+  \if@chapterprefix\chapapp#1\fi
+}
+\newcommand*{\chapappifchapterprefix}[1]{%
+  \if@chapterprefix\chapapp#1\fi
+}
+\newcommand*{\chapapp}{\@chapapp}
+%    \end{macrocode}
+%  \begin{macro}{\@chapapp}
+% Dieses Makro enthält den Kapitelname (\cs{chaptername}), der sich im
+% Anhang üblicherweise ändert (\cs{appendixname}).
+%    \begin{macrocode}
+\newcommand*\@chapapp{\chaptername}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+% \iffalse
+%</book|report>
+% \fi
+%
+% \subsection{Die Gliederungsbefehle}
+%
+% \changes{v2.3h}{1996/01/20}{Größenbefehle in den Überschriften
+%   variabilisiert}
+%
+%  \begin{macro}{\part}
+%    \changes{v2.1c}{1995/01/17}{Zeichenkette "`markboth"' durch
+%      Befehl \cs{markboth} ersetzt}
+%    \changes{v2.2c}{1995/05/25}{Part-Ausgabe auf CJK umgestellt}
+%    \changes{v2.3c}{1995/08/06}{alternative Numerierung bei römischer
+%      Part-Numerierung}
+%    \changes{v2.3d}{1995/08/19}{alternative Numerierung korrigiert}
+%    \changes{v2.3g}{1996/01/14}{\cs{hbox} durch \cs{null} ersetzt}
+%    \changes{v2.8d}{2001/07/05}{\cs{partpagestyle} statt
+%      \texttt{plain}}
+%    \changes{v2.8p}{2001/09/27}{Präambel über der Überschrift
+%      hinzugefügt}
+%    \changes{v2.8q}{2002/02/28}{\cs{nobreak} nach \cs{sectfont}
+%      behebt einen Bug im color Paket}
+%  \begin{macro}{\@part}
+%    \changes{v2.4b}{1996/03/29}{\cs{size@partnumer} durch
+%      \cs{size@partnumber} ersetzt}
+%    \changes{v2.4n}{1997/05/28}{für \textsf{scrartcl} \cs{markboth}
+%      zum Löschen der Kolumnentitel durch \cs{sectionmark} ersetzt}
+%    \changes{v2.5e}{1998/07/17}{\cs{numberline} verwendet, damit die
+%      reservierte Part-Nummern-Breite in \cs{l@part} auch wirklich
+%      verwendet wird}
+%    \changes{v2.8e}{2001/07/10}{\cs{@maybeautodot} wird aufgerufen}
+%    \changes{v2.8p}{2001/09/22}{\cs{sectfont} wird nun vor
+%      \cs{size@part} und \cs{size@partnumber} aufgerufen} 
+%    \changes{v2.8q}{2001/11/13}{\cs{@parskipfalse}\cs{@parskip@indent}} 
+%    \changes{v3.0}{2002/08/13}{\cs{centering} und \cs{@parskipfalse}%
+%      \cs{@parskip@indent} vertauscht}
+%    \changes{v3.0}{2004/11/05}{\cs{@parskipfalse} und }
+%    \changes{v3.0}{2004/11/05}{\cs{@parskipfalse} und \cs{@parskip@indent}
+%      ersetzt}
+%  \begin{macro}{\@spart}
+%    \changes{v2.4n}{1997/05/28}{in der Sternvariante \cs{chaptermark}
+%      bzw. \cs{sectionmark} eingefügt, um die Kolumnentitel zu
+%      löschen}
+%    \changes{v2.6a}{2000/01/20}{zum Löschen der Kolumnentitel wird
+%      nun \cs{@mkboth} verwendet}
+%    \changes{v2.8q}{2001/11/13}{\cs{@parskipfalse}\cs{@parskip@indent}}
+%    \changes{v3.0}{2002/08/13}{\cs{centering} und
+%      \cs{@parskipfalse}\cs{@parskip@indent} vertauscht}
+%    \changes{v3.0}{2004/11/05}{\cs{@parskipfalse} und \cs{@parskip@indent}
+%      ersetzt}
+%  \begin{macro}{\@endpart}
+%    \changes{v2.3g}{1996/01/14}{\cs{@endpart} wird für
+%      \textsf{scrartcl} nicht mehr definiert}
+%    \changes{v2.4e}{1996/07/02}{Option \texttt{openany} beachten}
+%    \changes{v2.6c}{2000/06/10}{\cs{@endpart} fügt nur noch in
+%       beidseitigen Dokumenten bei Verwendung von openright eine
+%       Leerseite ein}
+%    \changes{v2.8p}{2001/09/27}{\cs{vbox} eingefügt}
+%    \changes{v2.8p}{2001/09/27}{\cs{use@preamble} ersetzt
+%      \cs{@part@preamble}}
+% Der Gliederungsfehl \cs{part} wird wie in den Standardklassen mit
+% Hilfe mehrere Hilfsmakros definiert. Wesentliche Unterschiede zu den
+% Standardklassen existieren nicht, jedoch sind Schriftgröße,
+% Schriftart u.\,ä. flexibler gehalten. Außerdem gibt es die
+% Möglichkeit von Präambeln. \emph{Achtung: Die Präambel vor der
+% \cs{part}-Überschrift kann ohne Warnung über den oberen Rand
+% hinaus reichen!}
+%    \begin{macrocode}
+%<*article>
+\newcommand\part{\par
+  \addvspace{4ex}%
+  \@afterindentfalse
+  \secdef\@part\@spart
+}
+%</article>
+%<*report|book>
+\newcommand\part{\if@openright\cleardoublepage\else\clearpage\fi
+  \thispagestyle{\partpagestyle}%
+  \if@twocolumn
+    \onecolumn
+    \@tempswatrue
+  \else
+    \@tempswafalse
+  \fi
+  \null\vfil%
+  \vbox to\z@{\vss\use@preamble{part@o}\strut\par}%
+  \vskip-\baselineskip\nobreak%
+  \secdef\@part\@spart
+}
+%</report|book>
+\newcommand*{\@part}{}
+\def\@part[#1]#2{%
+%<article>  \ifnum \c@secnumdepth >\m@ne
+%<report|book>  \ifnum \c@secnumdepth >-2\relax
+    \refstepcounter{part}%
+    \@maybeautodot\thepart%
+    \addcontentsline{toc}{part}{\protect\numberline{\thepart}#1}%
+  \else
+    \addcontentsline{toc}{part}{#1}%
+  \fi
+  \begingroup
+    \setparsizes{\z@}{\z@}{\z@\@plus 1fil}\par@updaterelative
+%<article>    \raggedright
+%<report|book>    \centering
+    \interlinepenalty \@M
+    \normalfont\sectfont\nobreak
+%<article>    \ifnum \c@secnumdepth >\m@ne
+%<book|report>    \ifnum \c@secnumdepth >-2\relax
+      \size@partnumber\partformat
+      \par
+%<article>      \nobreak
+%<book|report>      \vskip 20\p@
+    \fi
+    \size@part #2\strut%
+    \partmark{#1}\par
+  \endgroup
+%<*article>
+  \nobreak
+  \vskip 3ex
+  \@afterheading
+%</article>
+%<book|report>  \@endpart
+}
+\newcommand*{\@spart}[1]{%
+  \begingroup
+    \setparsizes{\z@}{\z@}{\z@\@plus 1fil}\par@updaterelative
+%<article>    \raggedright
+%<book|report>    \centering
+    \interlinepenalty \@M
+    \normalfont
+    \sectfont\nobreak\size@part #1\strut\@mkboth{}{}\par
+  \endgroup
+%<*article>
+  \nobreak
+  \vskip 3ex
+  \@afterheading
+%</article>
+%<book|report>  \@endpart
+}
+%<*book|report>
+\newcommand*{\@endpart}{\vbox to\z@{\use@preamble{part@u}\vss}%
+  \vfil\newpage
+  \if@twoside\if@openright
+      \null%
+      \thispagestyle{empty}%
+      \newpage
+  \fi\fi
+  \if@tempswa
+    \twocolumn
+  \fi
+}
+%</book|report>
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%
+%
+%  \begin{macro}{\addpart}
+%    \changes{v2.8c}{2001/06/29}{neu}
+%    \changes{v2.8d}{2001/07/05}{\cs{partpagestyle} statt
+%      \texttt{plain}}
+%  \begin{macro}{\@addpart}
+%    \changes{v2.8c}{2001/06/29}{neu (intern)}
+%    \changes{v2.8l}{2001/08/17}{erst eintragen, dann ausgeben}
+%    \changes{v3.0}{2004/07/20}{kann Kolumnentitel erzeugen}
+%  \begin{macro}{\@saddpart}
+%    \changes{v2.8c}{2001/06/29}{neu (intern)}
+%    \begin{macrocode}
+\newcommand\addpart{%
+%<*article>
+  \par
+  \addvspace{4ex}%
+  \@afterindentfalse
+%</article>
+%<*report|book>
+  \if@openright\cleardoublepage\else\clearpage\fi
+  \thispagestyle{\partpagestyle}%
+  \if@twocolumn
+    \onecolumn
+    \@tempswatrue
+  \else
+    \@tempswafalse
+  \fi
+  \null\vfil
+%</report|book>
+  \secdef\@addpart\@saddpart
+}
+\newcommand*{\@addpart}{}
+\def\@addpart[#1]#2{\addcontentsline{toc}{part}{#1}\@spart{#2}%
+  \ifx\partmark\@gobble\else\@mkboth{#1}{}\fi
+}
+\newcommand*{\@saddpart}{}
+\def\@saddpart#1{\@spart{#1}}
+%    \end{macrocode}
+%  \begin{macro}{\partmark}
+%    \changes{v2.9r}{2004/07/20}{neu (für \textsf{scrpage2})}
+%    \begin{macrocode}
+\newcommand*{\partmark}{}
+\let\partmark\@gobble
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%
+%
+% \iffalse
+%<*report|book>
+% \fi
+%  \begin{macro}{\chapter}
+%    \changes{v2.8d}{2001/07/05}{\cs{chapterpagestyle} statt
+%      \texttt{plain}}
+%  \begin{macro}{\@chapter}
+%    \changes{v2.8e}{2001/07/10}{\cs{@maybeautodot} wird aufgerufen}
+%    \changes{v2.8g}{2001/07/18}{per \cs{float@addtolists} wird nun
+%      auch ein vertikaler Abstand in Listen des \texttt{float}-Pakets
+%      eingebaut}
+%  \begin{macro}{\@makechapterhead}
+%    \changes{v2.7b}{2001/01/05}{Kapitel können grundsätzlich mit
+%      einer Präambel versehen werden}
+%    \changes{v2.8p}{2001/09/25}{es gibt verschiedene Arten von
+%      Präambeln}
+%  \begin{macro}{\@@makechapterhead}
+%    \changes{v2.8p}{2001/09/25}{neu (intern)}
+%    \changes{v2.8q}{2002/04/18}{\cs{raggedsection} wird bei Option
+%      \texttt{chapterprefix} auch auf den Präfix angewendet}
+%    \changes{v2.9p}{2003/06/28}{\cs{parfillskip} auf \cs{fill} gesetzt}
+% Der Gliederungsfehl \cs{chapter}, der nur in den Klassen
+% \textsf{scrbook} und \textsf{scrreprt} vorhanden ist, wird wie in
+% den Standardklassen mit Hilfe mehrere Hilfsmakros definiert.
+%  \begin{macro}{\if@at@twocolumn}
+%    \changes{v2.7b}{2001/01/05}{neu (intern)}
+%  \begin{macro}{\scr@topnewpage}
+%    \changes{v2.7b}{2001/01/05}{neu (intern)}
+%    \changes{v2.8q}{2001/11/27}{fehlende Klammern ergänzt}
+%  \begin{macro}{\@topnewpage}
+%    \changes{v2.7b}{2001/01/05}{neu (\LaTeX{} intern)}
+%    \changes{v2.7g}{2001/04/17}{vergessenes \cs{long} ergänzt}
+% Interessant ist dabei die Erweiterung, daß jedes Kapitel mit einer
+% Präambel versehen werden kann. Diese wird im zweispaltigen Satz wie
+% die Überschrift selbst einspaltig gesetzt. Intern wird dies für
+% die Preambel des Index und der Bibliography verwendet. Dabei
+% entsteht aber wiederum das Problem, dass der Indexkopf innerhalb von
+% \cs{twocolumn} ausgegeben wird andererseits aber innerhalb von
+% \cs{chapter} das Makro \cs{@topnewpage} verwendet wird. Damit würde
+% dann also \cs{@topnewpage} innerhalb von \cs{@topnewpage}
+% aufgerufen. Das ist jedoch nicht erlaubt. Als muss der Aufruf von
+% \cs{@topnewpage} in \cs{@chapter} und \cs{@schapter} verhindert
+% werden, wenn wir uns bereits in \cs{@topnewpage} befinden. Eine
+% Möglichkeit dafür wäre, einen Schalter in den Index-Kopf
+% einzubauen. Ich wähle hingegen die Methode, \cs{@topnewpage}
+% entsprechend umzudefinieren. Damit kann dann auch der Anwender
+% \cs{@chapter} innerhalb des optionalen Arguments von \cs{twocolumn}
+% verwenden. Ein Schalter wird allerdings trotzdem gebraucht.
+%    \begin{macrocode}
+\newif\if@at@twocolumn
+\newcommand*\scr@topnewpage{}
+\let\scr@topnewpage\@topnewpage
+\long\def\@topnewpage[#1]{%
+  \@at@twocolumntrue\scr@topnewpage[{#1}]\@at@twocolumnfalse
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \begin{macro}{\use@chapter@o@preamble}
+% Das Makro wird benötigt, weil das Setzen der oberen Präambel etwas
+% mehr Aufwand bedeutet. Die Anweisung spart Platz, da sie zweimal
+% verwendet wird.
+%    \begin{macrocode}
+\newcommand*{\use@chapter@o@preamble}{%
+  {\settoheight{\@tempdima}{\vbox{\chapterheadstartvskip}}%
+    \settodepth{\@tempdimb}{\vbox{\chapterheadstartvskip}}%
+    \addtolength{\@tempdima}{\@tempdimb}%
+    \setbox0\vbox{\use@preamble{chapter@o}%
+      \vskip-\parskip}% 
+    \setlength{\@tempdimb}{\ht0}%
+    \addtolength{\@tempdimb}{\dp0}%
+    \vbox to \z@{%
+      \vbox to \@tempdima{\vfill\box0}%
+      \vskip-\@tempdima%
+      }%
+    \ifdim \@tempdimb>\@tempdima%
+      \addtolength{\@tempdimb}{-\@tempdima}%
+      \ClassWarning{\KOMAClassName}{%
+        preamble before chapter is \the\@tempdimb\space too
+        high.\MessageBreak
+        To avoid the overfull \string\vbox\space you may
+        redefine\MessageBreak
+        \string\chapterheadstartvskip\space at the preamble of
+        your\MessageBreak
+        document. You may also change
+        \string\setchapterpreamble\MessageBreak 
+        before the command, which generates the message
+        about\MessageBreak
+        an overfull \string\vbox
+        }%
+    \fi%
+    }
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \begin{macro}{\chapterheadstartvskip}
+%  \begin{macro}{\chapterheadendvskip}
+% Mit diesen Anweisungen wird üblicherweise der Abstand zwischen
+% oberem Rand des Textbereichs und der Überschrift bzw. der Abstand
+% zwischen der Überschrift und dem Text des Kapitels gesetzt. Man kann
+% die Anweisungen aber zusätzlich auch für andere Zwecke
+% missbrauchen. Das ist der Grund warum diese Makros keine Längen,
+% sondern komplette Anweisungen enthalten. In der Voreinstellung
+% enthalten sie jedoch gar nichts. Die tatsächlichen Werte werden
+% durch die Optionen festgelegt.
+%    \begin{macrocode}
+\newcommand*{\chapterheadstartvskip}{}
+\newcommand*{\chapterheadendvskip}{}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+% Zurück zur Kapiteldefinition:
+%    \begin{macrocode}
+\newcommand\chapter{\if@openright\cleardoublepage\else\clearpage\fi
+  \thispagestyle{\chapterpagestyle}%
+  \global\@topnum\z@
+  \@afterindentfalse
+  \secdef\@chapter\@schapter
+}
+%    \end{macrocode}
+% Die Variante ohne Stern:
+%    \begin{macrocode}
+\newcommand*{\@chapter}{}
+\def\@chapter[#1]#2{\ifnum \c@secnumdepth >\m@ne
+%<book>    \if@mainmatter
+      \refstepcounter{chapter}%
+      \@maybeautodot\thechapter
+      \typeout{\@chapapp\space\thechapter.}%
+      \addcontentsline{toc}{chapter}%
+      {\protect\numberline{\thechapter}#1}%
+%<book>    \else
+%<book>      \addcontentsline{toc}{chapter}{#1}%
+%<book>    \fi
+    \else
+      \addcontentsline{toc}{chapter}{#1}%
+    \fi
+    \chaptermark{#1}%
+    \addtocontents{lof}{\protect\addvspace{10\p@}}%
+    \addtocontents{lot}{\protect\addvspace{10\p@}}%
+    \@ifundefined{float@addtolists}{}{%
+      \float@addtolists{\protect\addvspace{10\p@}}%
+    }%
+    \if@twocolumn
+      \if@at@twocolumn
+        \@makechapterhead{#2}%
+      \else
+        \@topnewpage[\@makechapterhead{#2}]%
+      \fi
+    \else
+      \@makechapterhead{#2}%
+    \@afterheading
+  \fi
+}
+\newcommand*{\@makechapterhead}[1]{%
+  \use@chapter@o@preamble
+  \@@makechapterhead{#1}%
+  \use@preamble{chapter@u}\nobreak
+}
+\newcommand*{\@@makechapterhead}[1]{\chapterheadstartvskip
+  {\normalfont\sectfont\size@chapter
+    \setlength{\parindent}{\z@}\setlength{\parfillskip}{\fill}%
+    \if@chapterprefix
+      \let\@tempa\raggedsection
+    \else
+      \let\@tempa\@hangfrom
+    \fi
+    \@tempa{\ifnum \c@secnumdepth >\m@ne%
+%<book>      \if@mainmatter 
+        \chapterformat
+%<book>        \fi
+      \fi
+    }%
+    \if@chapterprefix\par\nobreak\vskip.5\baselineskip\fi
+    {\raggedsection \interlinepenalty \@M #1\par}%
+    \nobreak\chapterheadendvskip
+  }%
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%
+%  \begin{macro}{\@schapter}
+%  \begin{macro}{\@makeschapterhead}
+%    \changes{v2.7b}{2001/01/05}{Kapitel können grundsätzlich mit
+%      einer Präambel versehen werden}
+%  \begin{macro}{\@@makeschapterhead}
+%    \changes{v2.8p}{2001/09/25}{neu (intern)}
+%    \changes{v2.9p}{2003/06/28}{\cs{parfillskip} auf \cs{fill} gesetzt}
+%    \changes{v2.9q}{2004/03/24}{Klammerung an \cs{@@makechapterhead}
+%      angepasst}
+% Die Sternvariante, die um Einiges einfacher ausfällt.
+%    \begin{macrocode}
+\newcommand*{\@schapter}[1]{%
+  \if@twocolumn
+    \if@at@twocolumn
+      \@makeschapterhead{#1}%
+    \else
+      \@topnewpage[\@makeschapterhead{#1}]%
+    \fi
+  \else
+    \@makeschapterhead{#1}%
+    \@afterheading
+  \fi
+}
+\newcommand*{\@@makeschapterhead}[1]{%
+  \chapterheadstartvskip%
+  {\normalfont\sectfont\size@chapter
+    \setlength{\parindent}{\z@}\setlength{\parfillskip}{\fill}%
+    \raggedsection \interlinepenalty \@M #1\par}%
+  \nobreak\chapterheadendvskip%
+}
+\newcommand*{\@makeschapterhead}[1]{%
+  \use@chapter@o@preamble
+  \@@makeschapterhead{#1}%
+  \use@preamble{chapter@u}\nobreak
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%
+%  \begin{macro}{\addchap}
+%    \changes{v2.0e}{1994/08/10}{\cs{sectdef} durch \cs{secdef}
+%      ersetzt}
+%    \changes{v2.0e}{1994/08/10}{\cs{addcontensline} durch
+%      \cs{addcontentsline} ersetzt}
+%    \changes{v2.0e}{1994/08/10}{\cs{@makechapterhead} durch
+%      \cs{@makeschapterhead} ersetzt}
+%    \changes{v2.0e}{1994/08/10}{\cs{afterheadings} durch
+%      \cs{@afterheading} ersetzt}
+%    \changes{v2.1a}{1994/10/29}{Argument von \cs{chaptermark}
+%      entfernt bei \textsf{scrbook}}
+%    \changes{v2.0e}{1994/10/12}{mehrfach \cs{markboth} durch
+%      \cs{sectionmark} ersetzt}
+%    \changes{v2.2b}{1995/03/20}{\cs{chaptermark} durch \cs{@mkboth}
+%      ersetzt}
+%    \changes{v2.8d}{2001/07/05}{\cs{chapterpagestyle} statt
+%      \texttt{plain}}
+% \KOMAScript{} bietet in \textsf{scrbook} und \textsf{scrreprt} den
+% zusätzlichen Gliederungsbefehl \cs{addchap}. Es handelt sich dabei
+% um einen mit \cs{chapter*} vergleichbaren Befehl, bei dem jedoch der
+% Kolumnentitel korrigiert wird und ein Eintrag ins Inhaltsverzeichnis
+% erfolgt (nicht in der Stern-Variante). 
+%
+% Die Definition von \cs{addcap} sah bis zu Version 2.7 so aus:
+% \begin{verbatim}
+% \newcommand\addchap{\if@openright\cleardoublepage\else\clearpage\fi
+%                     \thispagestyle{plain}%
+%                     \global\@topnum\z@
+%                     \@afterindentfalse
+%                     \secdef\@addchap\@saddchap}
+% \def\@addchap[#1]#2{\typeout{#2}
+%                     \addcontentsline{toc}{chapter}{#1}
+%                     \if@twoside\@mkboth{#1}{}\else\@mkboth{}{#1}\fi
+%                     \addtocontents{lof}{\protect\addvspace{10\p@}}%
+%                     \addtocontents{lot}{\protect\addvspace{10\p@}}%
+%                     \if@twocolumn
+%                          \@topnewpage[\@makeschapterhead{#2}]%
+%                     \else
+%                          \@makeschapterhead{#2}%
+%                          \@afterheading
+%                     \fi}
+% \def\@saddchap#1{\@mkboth{}{}
+%                  \if@twocolumn
+%                       \@topnewpage[\@makeschapterhead{#1}]%
+%                  \else
+%                       \@makeschapterhead{#1}%
+%                       \@afterheading
+%                  \fi}
+% \end{verbatim}\vspace{-\baselineskip}
+% Dies führte jedoch zu Problemen im Zusammenhang mit
+% \textsf{hyperref}, da hierbei keine korrekten Links erzeugt
+% werden. Mit dem \texttt{hypertex}-Treiber von \textsf{hyperref}
+% bis Version 6.71a werden auch in der neuen Implementierung keine
+% korrekten Links erzeugt. Dies ist jedoch ein Bug in jenem
+% Treiber. Mit neuen Versionen tritt das Problem nicht mehr auf.
+% Deshalb wurde der Code wie folgt vereinfacht. Von wesentlicher
+% Bedeutung ist dabei der Aufruf von \cs{chapter*}, da in
+% \texttt{hpdftex.def} das interne Makro \cs{@schapter} so umdefiniert
+% wird, dass ein korrekter Link erzeugt wird.
+%  \begin{macro}{\@addchap}
+%  \begin{macro}{\@saddchap}
+%    \begin{macrocode}
+\newcommand\addchap{\if@openright\cleardoublepage\else\clearpage\fi
+  \thispagestyle{\chapterpagestyle}%
+  \global\@topnum\z@
+  \@afterindentfalse
+  \secdef\@addchap\@saddchap%
+}
+\newcommand*{\@addchap}{}
+\def\@addchap[#1]#2{\@schapter{#2}%
+  \addcontentsline{toc}{chapter}{#1}%
+  \if@twoside\@mkboth{#1}{}\else\@mkboth{}{#1}\fi
+}
+\newcommand*{\@saddchap}[1]{\@schapter{#1}\@mkboth{}{}}
+%    \end{macrocode}
+% \iffalse
+%<*book>
+% \fi
+% In \texttt{hyperref} bis Version 6.71a ist ein dicker Bug. In
+% verschiedenen \texttt{def}-Dateien wird dort das \emph{interne}
+% \KOMAScript-Makro \cs{@addchap} umdefiniert, ohne sicherzustellen,
+% dass das Makro auch noch so aussieht, wie man das erwartet hat. Die
+% sauberste Lösung wäre sicher gewesen dort \cs{@addchap} nur zu
+% ergänzen, so wie man das auch bei \cs{@schapter} gemacht hatte. Ab
+% Version 6.71b ist dieser Bug behoben. Damit ich nicht eines Fehlers
+% verdächtigt werde, wird ggf. eine entsprechende Meldung ausgegeben.
+%    \changes{v2.7e}{2001/04/16}{fehlende, schließende Klammer
+%      ergänzt}
+%    \changes{v2.7f}{2001/04/17}{fehlendes Klammerpaar ergänzt}
+%    \changes{v2.8q}{2001/11/17}{\cs{AfterPackage} zur Überprüfung der
+%      \textsf{hyperref}-Version verwendet}
+%    \begin{macrocode}
+\AfterPackage{hyperref}{%
+  \@ifpackagelater{hyperref}{2001/02/19}{}{%
+    \ClassWarningNoLine{\KOMAClassName}{%
+      You are using an old version of hyperref package!\MessageBreak%
+      This version has a buggy hack at many drivers\MessageBreak%
+      causing \string\addchap\space to behave strange.\MessageBreak%
+      Please update hyperref to at least version
+      6.71b}}}
+%    \end{macrocode}
+% \iffalse
+%</book>
+% \fi
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+% \iffalse
+%</report|book>
+% \fi
+%
+%  \begin{macro}{\addsec}
+%    \changes{v2.0e}{1994/10/12}{mehrfach \cs{markboth} durch
+%      \cs{sectionmark} ersetzt}
+%    \changes{v2.2b}{1995/03/20}{\cs{sectionmark} durch \cs{@mkboth}
+%      ersetzt}
+%    \changes{v2.3h}{1995/01/21}{jetzt auch bei \textsf{scrbook} und
+%      \textsf{scrreprt}}
+%    \changes{v2.4g}{1996/11/04}{\cs{section*} vorgezogen, damit
+%      dadurch provozierte Seitenumbrüche im Inhaltsverzeichnis
+%      berücksichtigt werden}
+%    \changes{v2.5d}{1998/01/03}{\cs{@mkboth} bedingt durch
+%      \cs{markright} ersetzt}
+%    \changes{v2.7a}{2001/01/04}{\cs{addsec} für eine bessere
+%      Unterstützung von \textsf{hyperref} geändert}
+%  \begin{macro}{\@addsec}
+%  \begin{macro}{\@saddsec}
+% \KOMAScript{} bietet in allen drei Hauptklassen den zusätzlichen
+% Gliederungsbefehl \cs{addsec}. Es handelt sich dabei um einen mit
+% \cs{section*} vergleichbaren Befehl, bei dem jedoch der
+% Kolumnentitel korrigiert wird und ein Eintrag ins Inhaltsverzeichnis
+% erfolgt (nicht in der Stern-Variante).
+%    \begin{macrocode}
+\newcommand*\addsec{\secdef\@addsec\@saddsec}
+\newcommand*{\@addsec}{}
+\def\@addsec[#1]#2{\section*{#2}\addcontentsline{toc}{section}{#1}
+%<article>  \if@twoside \@mkboth{#1}{}\else \@mkboth{#1}{#1}\fi
+%<report|book>  \if@twoside\ifx\@mkboth\markboth\markright{#1}\fi\fi
+}
+\newcommand*{\@saddsec}[1]{\section*{#1}\@mkboth{}{}}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%
+%  \begin{macro}{\section}
+%    \changes{v2.8p}{2001/09/22}{\cs{sectfont} wird nun vor
+%      \cs{size@section} aufgerufen}
+%    \changes{v2.8q}{2002/02/28}{\cs{nobreak} nach \cs{sectfont}
+%      behebt einen Bug im color Paket}
+%  \begin{macro}{\subsection}
+%    \changes{v2.8p}{2001/09/22}{\cs{sectfont} wird nun vor
+%      \cs{size@subsection} aufgerufen}
+%    \changes{v2.8q}{2002/02/28}{\cs{nobreak} nach \cs{sectfont}
+%      behebt einen Bug im color Paket}
+%  \begin{macro}{\subsubsection}
+%    \changes{v2.3d}{1995/08/19}{wird bei \texttt{scrartcl} nun
+%      ebenfalls numeriert und ins Inhaltsverzeichnis geschrieben}
+%    \changes{v2.8p}{2001/09/22}{\cs{sectfont} wird nun vor
+%      \cs{size@subsubsection} aufgerufen}
+%    \changes{v2.8q}{2002/02/28}{\cs{nobreak} nach \cs{sectfont}
+%      behebt einen Bug im color Paket}
+%  \begin{macro}{\paragraph}
+%    \changes{v2.8p}{2001/09/22}{\cs{sectfont} wird nun vor
+%      \cs{size@paragraph} aufgerufen}
+%    \changes{v2.8q}{2002/02/28}{\cs{nobreak} nach \cs{sectfont}
+%      behebt einen Bug im color Paket}
+%  \begin{macro}{\subparagraph}
+%    \changes{v2.8p}{2001/09/22}{\cs{sectfont} wird nun vor
+%      \cs{size@subparagraph} aufgerufen}
+%    \changes{v2.8q}{2002/02/28}{\cs{nobreak} nach \cs{sectfont}
+%      behebt einen Bug im color Paket}
+% Die Standardgliederungsbefehle \cs{section} bis \cs{subparagraph}
+% sind mit der im Kernel dafür vorgesehenen Schnittstelle
+% definiert. Im Unterschied zu den Standardklassen erfolgt die
+% Formatierung jedoch in \cs{raggedsection} und die Ausgabe in der
+% Schriftart \cs{sectfont}. Außerdem sind die Größen veränderbar. In
+% letzter Konsequenz sollten hier eigentlich auch die Abstände
+% variabilisiert werden. Vielleicht in einer späteren Version.
+%    \begin{macrocode}
+\newcommand\section{\@startsection{section}{1}{\z@}%
+  {-3.5ex \@plus -1ex \@minus -.2ex}%
+  {2.3ex \@plus.2ex}%
+  {\raggedsection\normalfont\sectfont\nobreak\size@section\nobreak}%
+}
+\newcommand\subsection{\@startsection{subsection}{2}{\z@}%
+  {-3.25ex\@plus -1ex \@minus -.2ex}%
+  {1.5ex \@plus .2ex}%
+  {\raggedsection\normalfont\sectfont\nobreak\size@subsection\nobreak
+  }%
+}
+\newcommand\subsubsection{\@startsection{subsubsection}{3}{\z@}%
+  {-3.25ex\@plus -1ex \@minus -.2ex}%
+  {1.5ex \@plus .2ex}%
+  {\raggedsection\normalfont\sectfont\nobreak\size@subsubsection
+    \nobreak
+  }%
+}
+\newcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
+  {3.25ex \@plus1ex \@minus.2ex}%
+  {-1em}%
+  {\raggedsection\normalfont\sectfont\nobreak\size@paragraph\nobreak}%
+}
+\newcommand\subparagraph{\@startsection{subparagraph}{5}{\parindent}%
+  {3.25ex \@plus1ex \@minus .2ex}%
+  {-1em}%
+  {\raggedsection\normalfont\sectfont\nobreak\size@subparagraph
+    \nobreak
+  }%
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \begin{macro}{minisec}
+%    \changes{v2.8q}{2002/02/28}{\cs{nobreak} nach \cs{sectfont}
+%      behebt einen Bug im color Paket}
+%    \changes{v2.9o}{2003/01/31}{\cs{nobreak} nach dem Gruppenende
+%      behebt einen Bug im color Paket}
+% In \KOMAScript{} gibt es diese zusätzliche Gliederungsebene, die
+% immer ohne Nummer und ihne Eintrag ins Inhaltsverzeichnis erfolgt.
+%    \begin{macrocode}
+\newcommand\minisec[1]{\@afterindentfalse \vskip 1.5ex
+  {\parindent \z@
+    \raggedsection\normalfont\sectfont\nobreak#1\par\nobreak}\nobreak%
+  \@afterheading
+}
+%    \end{macrocode}
+%  \end{macro}
+%
+%
+% \subsection{Schrift und Formatierung}
+%
+%  \begin{macro}{\sectionragged}
+%    \changes{v2.3h}{1996/01/20}{Überschriften werden
+%      \cs{raggedsection} gesetzt}
+%    \changes{v2.3h}{1996/01/20}{\cs{raggedsection} ist als
+%      \cs{raggedright} voreingestellt}
+% Dieses Makro gibt an, wie die Überschriften formatiert
+% werden. Voreingestellt ist linksbündig.
+%    \begin{macrocode}
+\newcommand*{\raggedsection}{}
+\let\raggedsection\raggedright
+%    \end{macrocode}
+%  \end{macro}
+%
+%  \begin{macro}{\sectfont}
+%    \changes{v2.8c}{2001/06/29}{\cs{normalcolor} eingefügt}
+% Dies Schriftart nicht nur für die Gliederungsbefehle. Dieses Makro
+% ist als intern zu betrachten. Der Anwender sollte stattdessen das
+% entsprtechende Fontelement verwenden.
+%    \begin{macrocode}
+\newcommand*\sectfont{\normalcolor\sffamily\bfseries}
+%    \end{macrocode}
+%  \end{macro}
+%
+%  \begin{macro}{\size@part}
+%    \changes{v2.8o}{2001/09/14}{neu (intern)}
+%  \begin{macro}{\size@partnumber}
+%    \changes{v2.8o}{2001/09/14}{neu (intern)}
+%  \begin{macro}{\size@chapter}
+%    \changes{v2.8o}{2001/09/14}{neu (intern)}
+%  \begin{macro}{\size@section}
+%    \changes{v2.8o}{2001/09/14}{neu (intern)}
+%  \begin{macro}{\size@subsection}
+%    \changes{v2.8o}{2001/09/14}{neu (intern)}
+%  \begin{macro}{\size@subsubsection}
+%    \changes{v2.8o}{2001/09/14}{neu (intern)}
+%  \begin{macro}{\size@paragraph}
+%    \changes{v2.8o}{2001/09/14}{neu (intern)}
+%  \begin{macro}{\size@subparagraph}
+%    \changes{v2.8o}{2001/09/14}{neu (intern)}
+% Diese Makros werden intern von den Elementen benötigt (siehe unten).
+%    \begin{macrocode}
+\newcommand*{\size@part}{}
+\newcommand*{\size@partnumber}{}
+%<book|report>\newcommand*{\size@chapter}{}
+\newcommand*{\size@section}{}
+\newcommand*{\size@subsection}{}
+\newcommand*{\size@subsubsection}{}
+\newcommand*{\size@paragraph}{}
+\newcommand*{\size@subparagraph}{}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%
+%  \begin{macro}{\scr@fnt@sectioning}
+%    \changes{v2.8o}{2001/09/14}{neues Element \texttt{sectioning}}
+%  \begin{macro}{\scr@fnt@part}
+%    \changes{v2.8p}{2001/09/23}{neues Element \texttt{part}}
+%  \begin{macro}{\scr@fnt@partnumber}
+%    \changes{v2.8p}{2001/09/23}{neues Element \texttt{partnumber}}
+%  \begin{macro}{\scr@fnt@chapter}
+%    \changes{v2.8o}{2001/09/14}{neues Element \texttt{chapter}}
+%  \begin{macro}{\scr@fnt@section}
+%    \changes{v2.8o}{2001/09/14}{neues Element \texttt{section}}
+%  \begin{macro}{\scr@fnt@subsection}
+%    \changes{v2.8o}{2001/09/14}{neues Element \texttt{subsection}}
+%  \begin{macro}{\scr@fnt@subsubsection}
+%    \changes{v2.8o}{2001/09/14}{neues Element \texttt{subsubsection}}
+%  \begin{macro}{\scr@fnt@paragraph}
+%    \changes{v2.8o}{2001/09/14}{neues Element \texttt{paragraph}}
+%  \begin{macro}{\scr@fnt@subparagraph}
+%    \changes{v2.8o}{2001/09/14}{neues Element \texttt{subparagraph}}
+%  \begin{macro}{\scr@fnt@instead@minisec}
+%    \changes{v2.8o}{2001/09/14}{neuer Ersatz für das Element
+%      \texttt{minisec}}
+% Definition der Elemente der Gliederung, deren Schrift geändert
+% werden kann:
+%    \begin{macrocode}
+\newcommand*{\scr@fnt@sectioning}{\sectfont}
+\newcommand*{\scr@fnt@part}{\size@part}
+\newcommand*{\scr@fnt@partnumber}{\size@partnumber}
+%<book|report>\newcommand*{\scr@fnt@chapter}{\size@chapter}
+\newcommand*{\scr@fnt@section}{\size@section}
+\newcommand*{\scr@fnt@subsection}{\size@subsection}
+\newcommand*{\scr@fnt@subsubsection}{\size@subsubsection}
+\newcommand*{\scr@fnt@paragraph}{\size@paragraph}
+\newcommand*{\scr@fnt@subparagraph}{\size@subparagraph}
+\newcommand*{\scr@fnt@instead@minisec}{sectioning}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%
+%
+% \subsection{Definitionen für Präambeln}
+%
+% \iffalse
+%<*report|book>
+% \fi
+% Bei den \KOMAScript-Klassen \textsf{scrbook} und \textsf{scrreprt}
+% können \cs{part} und \cs{chapter} mit Präambeln versehen werden. Es
+% wird gleichzeitig eine Präambel über und unter der jeweiligen
+% Überschrift unterstützt.
+%
+%  \begin{macro}{\use@preamble}
+%    \changes{v2.8p}{2001/09/25}{neu (intern)}
+% Dieses Makro dient allgemein zum Setzen einer Präambel (für
+% Gliederungsüberschriften), wenn eine solche definiert ist. Als
+% Argument wird der Name der Präambel übergeben, an den automatisch
+% \texttt{@preamble} angehängt wird. Zum Schluss wird die gespeicherte
+% Präambel gelöscht.
+%    \begin{macrocode}
+\newcommand*{\use@preamble}[1]{%
+  \@ifundefined{#1@preamble}{}{%
+    \@nameuse{#1@preamble}%
+    \global\expandafter\let\csname#1@preamble\endcsname=\relax
+  }%
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \begin{macro}{\set@preamble}
+%    \changes{v2.8p}{2001/09/25}{neu (intern)}
+% Das Makro \cs{set@preamble} dient allgemein der Defintion einer
+% Präambel (für Gliederungsüberschriften). Als Argument wird der
+% Name der Gliederungsebene übergeben. Danach folgt ein optionales
+% Argument, das die Position der Präambel angibt. Darauf folgt ein
+% weiteres optionales Argument, das die Breite der Präambel
+% angibt. Ist nur ein optionales Argument angegeben, so ist es die
+% Position. Es folgt ein obligatorisches Argument mit dem Inhalt der
+% Präambel. Die Definition der Präambel erfolgt global.
+%  \begin{macro}{\set@@preamble}
+%    \changes{v2.8p}{2001/09/25}{neu (intern)}
+%  \begin{macro}{\set@@@preamble}
+%    \changes{v2.8p}{2001/09/25}{neu (intern)}
+%  \begin{macro}{\set@@@@preamble}
+%    \changes{v2.8p}{2001/09/25}{neu (intern)}
+%    \changes{v2.8q}{2001/11/27}{fehlende Klammern ergänzt}
+% Da mehrere optionale Argumente nach einem obligatorischen Argument
+% auszuwerten sind, werden diverse Hilfsmakros benötigt.
+%    \begin{macrocode}
+\newcommand*{\set@preamble}[1]{%
+%    \end{macrocode}
+% Zunächst wird das erste optionale Argument gesucht.
+%    \begin{macrocode}
+  \@ifnextchar [%]
+  {\set@@preamble{#1}}{\set@@@preamble{#1}[][\hsize]}%
+}
+\newcommand*{\set@@preamble}{}
+\def\set@@preamble#1[#2]{%
+%    \end{macrocode}
+% Wenn ein optionales Argument existiert, kann es auch ein zweites
+% geben. Wenn nicht, wird mit der Voreinstellung gearbeitet.
+%    \begin{macrocode}
+  \@ifnextchar [%]
+  {\set@@@preamble{#1}[{#2}]}{\set@@@preamble{#1}[{#2}][\hsize]}%
+}
+\newcommand{\set@@@preamble}{}
+\long\def\set@@@preamble#1[#2][#3]#4{%
+%    \end{macrocode}
+% Dies ist das Hauptmakro, das die eigentliche Arbeit macht. Es muss
+% \cs{long} definiert werden, da die Präambel auch aus mehreren
+% Absätzen bestehen kann.
+%
+% Zunächst wird das Positionsargument ausgewertet. Dies geschieht mit
+% lokalen Hilfsmakros und einer Schleife. Zur Funktion der Schleife
+% siehe im dokumentierten \LaTeX-Kern.
+%    \begin{macrocode}
+  \begingroup
+    \def\prmbl@pos{#2}\let\prmbl@hpos\relax\let\prmbl@vpos\relax
+    \expandafter \@tfor \expandafter \@tempa
+      \expandafter :\expandafter =\prmbl@pos
+    \do{%
+      \if \@tempa l%
+        \set@preamble@hpos{0}{#2}%
+      \fi%
+      \if \@tempa c%
+        \set@preamble@hpos{1}{#2}%
+      \fi%
+      \if \@tempa r%
+        \set@preamble@hpos{2}{#2}%
+      \fi%
+      \if \@tempa u%
+        \set@preamble@vpos{0}{#2}%
+      \fi%
+      \if \@tempa o%
+        \set@preamble@vpos{1}{#2}%
+      \fi%
+    }%
+%    \end{macrocode}
+% Wurde keine horizontale oder vertikale Ausrichtung definiert, so
+% wird nun der Standardwert dafür eingesetzt.
+%    \begin{macrocode}
+    \@ifundefined{prmbl@hpos}{\def\prmbl@hpos{0}}{}%
+    \@ifundefined{prmbl@vpos}{\def\prmbl@vpos{0}}{}%
+%    \end{macrocode}
+% Nun sind die Positionen ermittelt und es werden abhängig davon
+% entsprechende Päambelmakros definiert. 
+%    \begin{macrocode}
+    \ifcase\prmbl@hpos
+%    \end{macrocode}
+% Zunächst links unten und oben:
+%    \begin{macrocode}
+      \ifcase\prmbl@vpos
+        \set@@@@preamble{#1@u}{t}{#3}{}{\hfil}{#4}%
+      \else
+        \set@@@@preamble{#1@o}{b}{#3}{}{\hfil}{#4}%
+      \fi
+    \or
+%    \end{macrocode}
+% Dann zentriert unten und oben:
+%    \begin{macrocode}
+      \ifcase\prmbl@vpos
+        \set@@@@preamble{#1@u}{t}{#3}{\hfil}{\hfil}{#4}%
+      \else
+        \set@@@@preamble{#1@o}{b}{#3}{\hfil}{\hfil}{#4}%
+      \fi
+    \else
+%    \end{macrocode}
+% Zum Schluss rechts und oben:
+%    \begin{macrocode}
+      \ifcase\prmbl@vpos
+        \set@@@@preamble{#1@u}{t}{#3}{\hfil}{}{#4}%
+      \else
+        \set@@@@preamble{#1@o}{b}{#3}{\hfil}{}{#4}%
+      \fi
+    \fi
+  \endgroup
+}
+%    \end{macrocode}
+% Es folgt das Makro, mit dem die Definition tatsächlich
+% stattfindet. Das erste Argument ist der Name der Präambel, das
+% zweite die Positionsoption für die verwendete \cs{parbox}, das
+% dritte ist die Breite der \cs{parbox}, dann zwei Argumente mit der
+% horizontalen Ausrichtung vor und nach der \cs{parbox} und das
+% sechste Agument ist schließlich der Inhalt der \cs{parbox}.
+%    \begin{macrocode}
+\newcommand{\set@@@@preamble}[6]{%
+  \expandafter\gdef\csname #1@preamble\endcsname{%
+    \hbox to\hsize{#4\parbox[{#2}]{#3}{#6\par}#5\par}%
+  }%
+}
+%    \end{macrocode}
+%
+%  \begin{macro}{\set@preamble@hpos}
+%    \changes{v2.8q}{2001/09/25}{neu (intern)}
+% Eines der Hilfsmakros dient dazu, die horizontale Position der
+% Präambel einzustellen, falls dies nicht bereits erfolgt ist. Ist es
+% bereits nicht über"-einstimmend erfolgt, wird ein Fehler
+% ausgegeben. Dieses Makro ist extrem intern und funktioniert nur im
+% Kontext vor \cs{set@preamble}.
+%    \begin{macrocode}
+\newcommand*{\set@preamble@hpos}[2]{%
+  \@ifundefined{prbml@hpos}{%
+    \def\prmbl@hpos{#1}%
+  }{%
+    \ifnum \prmbl@hpos=0\relax\else%
+      \ClassError{\KOMAClassName}{%
+        inconsistent hpos options%
+      }{%
+        You said `#2' as position option. But you have
+        to\MessageBreak
+        use only one from `l', `r' or `c' not two of
+        these.\MessageBreak
+        If you'll continue only first hpos option will be
+        used%
+      }%
+    \fi
+  }%
+}
+%    \end{macrocode}
+%  \end{macro}%\iffalse\set@preamble@hpos\fi
+%  \begin{macro}{\set@preamble@vpos}
+%    \changes{v2.8q}{2001/09/25}{neu (intern)}
+% Das Hilfsmakro für die vertikale Position funktioniert in gleicher
+% Weise.
+%    \begin{macrocode}
+\newcommand*{\set@preamble@vpos}[2]{%
+  \@ifundefined{prbml@vpos}{%
+    \def\prmbl@vpos{#1}%
+  }{%
+    \ifnum \prmbl@vpos=0\relax\else%
+      \ClassError{\KOMAClassName}{%
+        inconsistent vpos options%
+      }{%
+        You said `#2' as position option. But you have
+        to\MessageBreak
+        use only one from `o' or `u' not two of
+        these.\MessageBreak
+        If you'll continue only first vpos option will be
+        used%
+      }%
+    \fi
+  }%
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%
+%  \begin{macro}{\setchapterpreamble}
+%    \changes{v2.7b}{2001/01/05}{neu}
+%    \changes{v2.8p}{2001/09/25}{Verwendung von \cs{set@preamble}}
+%  \begin{macro}{\chapter@u@preamble}
+%    \changes{v2.8p}{2001/09/25}{neu (intern)}
+%    \changes{v2.8p}{2001/09/25}{Ersatz für \cs{chapter@preamble}}
+%  \begin{macro}{\chapter@o@preamble}
+%    \changes{v2.8p}{2001/09/25}{neu (intern)}
+% Diese Makros werden benötigt, um die Kapitel-Präambel zu setzen
+% bzw. zu speichern.
+%    \begin{macrocode}
+\newcommand*{\setchapterpreamble}{\set@preamble{chapter}}
+\newcommand*{\chapter@u@preamble}{}
+\let\chapter@u@preamble\relax
+\newcommand*{\chapter@o@preamble}{}
+\let\chapter@o@preamble\relax
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%
+%  \begin{macro}{\setpartpreamble}
+%    \changes{v2.8f}{2001/07/12}{neu}
+%    \changes{v2.8p}{2001/09/27}{Verwendung von \cs{use@preamble}}
+%  \begin{macro}{\part@preamble@u}
+%    \changes{v2.8p}{2001/09/27}{neu (intern)}
+%    \changes{v2.8p}{2001/09/27}{Ersatz für \cs{part@preamble}}
+%  \begin{macro}{\part@preamble@o}
+%    \changes{v2.8p}{2001/09/27}{neu (intern)}
+% Analog zu den Kapitel gibt es Befehle für eine Teil-Präambel.
+%    \begin{macrocode}
+\newcommand*{\setpartpreamble}{\set@preamble{part}}
+\newcommand*{\part@preamble@u}{}
+\let\part@preamble@u\relax
+\newcommand*{\part@preamble@o}{}
+\let\part@preamble@o\relax
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+% \iffalse
+%</report|book>
+% \fi
+%
+% 
+% \subsection{Einträge ins Inhaltsverzeichnis}
+%
+% Die Gliederungsbefehle schreiben auch Einträge ins
+% Inhaltsverzeichnis, die dort ebenfalls formatiert werden müssen.
+%
+%  \begin{macro}{\l@part}
+% Der Eintrag für \cs{part}:
+%    \begin{macrocode}
+\newcommand*\l@part[2]{%
+  \ifnum \c@tocdepth >-2\relax
+%<article>    \addpenalty{\@secpenalty}%
+%<book|report>    \addpenalty{-\@highpenalty}%
+    \addvspace{2.25em \@plus\p@}%
+%    \end{macrocode}
+%    \changes{v2.5e}{1998/07/17}{geänderte part-Formatierung ragte in
+%      den linken Rand}
+%    \changes{v2.9k}{2003/01/02}{Anpassung an Option \texttt{tocleft}}
+%    \begin{macrocode}
+    \setlength{\@tempdima}{2em}%
+    \if@tocleft
+      \ifx\toc@l@number\@empty\else
+        \setlength\@tempdima{0\toc@l@number}%
+      \fi
+    \fi
+    \begingroup
+      \parindent \z@ \rightskip \@pnumwidth
+      \parfillskip -\@pnumwidth
+%    \end{macrocode}
+%    \changes{v2.5c}{1997/11/25}{Formatierung bei Zeilenumbruch im
+%      part-Eintrag korrigiert}
+%    \changes{v2.5e}{1998/07/17}{beinhaltet \cs{sectfont} eine
+%      Größenangabe, so wird diese überschrieben} 
+%    \begin{macrocode}
+      \leavevmode\sectfont\large
+      \advance\leftskip\@tempdima
+      \hskip -\leftskip
+      #1\nobreak\hfil \nobreak\hb@xt@\@pnumwidth{\hss #2}\par
+%<*article>
+      \if@compatibility
+        \global\@nobreaktrue
+%    \end{macrocode}
+%    \changes{v2.3g}{1996/01/14}{fehlendes Kommentarzeichen ergänzt}
+%    \begin{macrocode}
+        \everypar{\global\@nobreakfalse\everypar{}}%
+      \else
+%</article>
+        \penalty\@highpenalty
+%<article>       \fi
+    \endgroup
+  \fi
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \begin{macro}{\l@chapter}
+%    \changes{v2.9k}{2003/01/02}{Anpassung an Option \texttt{tocleft}}
+% \iffalse
+%<*report|book>
+% \fi
+% Kapiteleinträge gibt es natürlich nicht bei \textsf{scrartcl}.
+%    \begin{macrocode}
+\newcommand*\l@chapter[2]{%
+  \ifnum \c@tocdepth >\m@ne
+    \addpenalty{-\@highpenalty}%
+    \vskip 1.0em \@plus\p@
+    \setlength\@tempdima{1.5em}%
+    \if@tocleft
+      \ifx\toc@l@number\@empty\else
+        \setlength\@tempdima{0\toc@l@number}%
+      \fi
+    \fi
+    \begingroup
+      \parindent \z@ \rightskip \@pnumwidth
+      \parfillskip -\@pnumwidth
+      \leavevmode \sectfont
+      \advance\leftskip\@tempdima
+      \hskip -\leftskip
+      #1\nobreak\hfil \nobreak\hb@xt@\@pnumwidth{\hss #2}\par
+      \penalty\@highpenalty
+    \endgroup
+  \fi
+}
+%    \end{macrocode}
+% \iffalse
+%</report|book>
+% \fi
+%  \end{macro}
+%  \begin{macro}{\l@section}
+%    \changes{v2.9k}{2003/01/02}{Anpassung an Option \texttt{tocleft}}
+% Bei der Artikel-Klasse folgt die Formatierung für
+% \cs{section}-Einträge, an Stelle der Einträge für \cs{chapter}
+% der Buch- oder der Bericht-Klasse. Bei diesen handelt es sich hier
+% stattdessen um eine normale Ebene.
+%    \begin{macrocode}
+%<*article>
+\newcommand*\l@section[2]{%
+  \ifnum \c@tocdepth >\z@
+    \addpenalty{\@secpenalty}%
+    \addvspace{1.0em \@plus\p@}%
+    \setlength\@tempdima{1.5em}%
+     \if@tocleft
+      \ifx\toc@l@number\@empty\else
+        \setlength\@tempdima{0\toc@l@number}%
+      \fi
+    \fi
+   \begingroup
+      \parindent \z@ \rightskip \@pnumwidth
+      \parfillskip -\@pnumwidth
+      \leavevmode \sectfont
+      \advance\leftskip\@tempdima
+      \hskip -\leftskip
+      #1\nobreak\hfil \nobreak\hb@xt@\@pnumwidth{\hss #2}\par
+    \endgroup
+  \fi
+}
+%</article>
+%<*report|book>
+\newcommand*\l@section{\@dottedtocline{1}{1.5em}{2.3em}}
+%</report|book>
+%    \end{macrocode}
+%  \end{macro}
+%  \begin{macro}{\l@subsection}
+%  \begin{macro}{\l@subsubsection}
+%  \begin{macro}{\l@paragraph}
+%  \begin{macro}{\l@subparagraph}
+% Die übrigen Ebenen werden normal behandelt.
+%    \begin{macrocode}
+%<*article>
+\newcommand*\l@subsection{\@dottedtocline{2}{1.5em}{2.3em}}
+\newcommand*\l@subsubsection{\@dottedtocline{3}{3.8em}{3.2em}}
+\newcommand*\l@paragraph{\@dottedtocline{4}{7.0em}{4.1em}}
+\newcommand*\l@subparagraph{\@dottedtocline{5}{10em}{5em}}
+%</article>
+%<*report|book>
+\newcommand*\l@subsection{\@dottedtocline{2}{3.8em}{3.2em}}
+\newcommand*\l@subsubsection{\@dottedtocline{3}{7.0em}{4.1em}}
+\newcommand*\l@paragraph{\@dottedtocline{4}{10em}{5em}}
+\newcommand*\l@subparagraph{\@dottedtocline{5}{12em}{6em}}
+%</report|book>
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%
+%
+% \iffalse
+%</body>
+% \fi
+%
+%
+% \Finale
+%
+\endinput
+%
+% end of file `scrksect.dtx'
+%%% Local Variables:
+%%% mode: doctex
+%%% TeX-master: t
+%%% End:

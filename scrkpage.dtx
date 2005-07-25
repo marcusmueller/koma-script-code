@@ -1,0 +1,583 @@
+% \CheckSum{508}
+% \iffalse meta-comment
+% ======================================================================
+% scrkpage.dtx
+% Copyright (c) Markus Kohm, 2002-2004
+%
+% This file is part of the LaTeX2e KOMA-Script-Bundle
+%
+% This file can be redistributed and/or modified under the terms
+% of the LaTeX Project Public License Version 1.0 distributed 
+% together with this file. See LEGAL.TXT or LEGALDE.TXT.
+% ----------------------------------------------------------------------
+% scrkpage.dtx
+% Copyright (c) Markus Kohm, 2002-2004
+%
+% Diese Datei ist Teil des LaTeX2e KOMA-Script-Pakets.
+%
+% Diese Datei kann nach den Regeln der LaTeX Project Public
+% Licence Version 1.0, wie sie zusammen mit dieser Datei verteilt
+% wird, weiterverbreitet und/oder modifiziert werden. Siehe dazu
+% auch LEGAL.TXT oder LEGALDE.TXT.
+% ======================================================================
+% \fi
+% \iffalse
+%%% From File: scrkpage.dtx
+%<*driver>
+% \fi
+\ProvidesFile{scrkpage.dtx}[2002/07/01 v3.0 KOMA-Script (page style)]
+% \iffalse
+\documentclass[halfparskip-]{scrdoc}
+\usepackage[english,german]{babel}
+\usepackage[latin1]{inputenc}
+\CodelineIndex
+\RecordChanges
+\GetFileInfo{scrkpage.dtx}
+\title{\KOMAScript{} \partname\ \texttt{\filename}%
+  \footnote{Dies ist Version \fileversion\ von Datei \texttt{\filename}.}}
+\date{\filedate}
+\author{Markus Kohm}
+
+\begin{document}
+  \maketitle
+  \tableofcontents
+  \DocInput{\filename}
+\end{document}
+%</driver>
+% \fi
+%
+% \selectlanguage{german}
+%
+% \changes{v3.0}{2002/06/25}{%
+%   erste Version aus der Aufteilung von \texttt{scrclass.dtx}}
+%
+% \section{Seitenstil}
+%
+% Neben den Definitionen zum Seitenstil in dieser Datei gibt es auch
+% noch das Paket \textsf{scrpage2} (siehe \texttt{scrpage.dtx}). 
+% Es\marginline{Geplant!} ist deshalb davon auszugehen, dass zukünftig die
+% Definitionen hier komplett durch \textsf{scrpage2} ersetzt werden und
+% \textsf{scrpage2} von den \KOMAScript-Klassen direkt geladen wird.
+%
+% \StopEventually{\PrintIndex\PrintChanges}
+%
+% \subsection{Optionen für die Trennlinien in Kopf und Fuß}
+%
+% \iffalse
+%<*option>
+% \fi
+%
+%  \begin{option}{headsepline}
+%  \begin{option}{headnosepline}
+% Der Kopfteil kann mit einer Linie vom Textbereich getrennt werden.
+%  \begin{macro}{\if@hsl}
+%  \begin{macro}{\@hsltrue}
+%  \begin{macro}{\@hslfalse}
+% Die Entscheidung wird in einem Schalter gespeichert.
+%    \begin{macrocode}
+\newif\if@hsl
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+% Gleichzeitig wird dem \textsf{typearea}-Paket mitgeteilt, dass der
+% Kopf zum Textbereich zu rechnen ist. Dies geschieht allerdings in
+% umgekehrter Richtung nicht. Die Optionen sind also nicht
+% symmetrisch.
+%    \begin{macrocode}
+\KOMA@key{headsepline}[true]{%
+  \KOMA@set@ifkey{headsepline}{@hsl}{#1}%
+  \@ifpackageloaded{typearea}{%
+    \KOMAoptions{headinclude=#1}%
+  }{%
+    \PassOptionsToPackage{typearea}{headinclude=#1}%
+  }%
+}
+\KOMA@DeclareObsoleteOption[\PackageInfo]{headnosepline}{headsepline=false}
+%    \end{macrocode}
+%  \end{option}
+%  \end{option}
+%
+%
+%  \begin{option}{footsepline}
+%    \changes{v2.0e}{1994/08/14}{bei \cs{PassOptionsToPackage} fehlte
+%      die Paket-Angabe}
+%  \begin{option}{footnosepline}
+% Der Fußteil kann mit einer Linie vom Textbereich getrennt werden.
+%  \begin{macro}{\if@fsl}
+%  \begin{macro}{\@fsltrue}
+%  \begin{macro}{\@fslfalse}
+% Die Entscheidung wird in einem Schalter gespeichert.
+%    \begin{macrocode}
+\newif\if@fsl
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+% Gleichzeitig wird dem \texttt{typearea}-Paket mitgeteilt, dass der
+% Fuß zum Textbereich zu rechnen ist. Auch hier sind die Optionen
+% nicht symmetrisch.
+%    \begin{macrocode}
+%    \begin{macrocode}
+\KOMA@key{footsepline}[true]{%
+  \KOMA@set@ifkey{footsepline}{@fsl}{#1}%
+  \@ifpackageloaded{typearea}{%
+    \KOMAoptions{footinclude=#1}%
+  }{%
+    \PassOptionsToPackage{typearea}{footinclude=#1}%
+  }%
+}
+\KOMA@DeclareObsoleteOption[\PackageInfo]{footnosepline}{footsepline=false}
+%    \end{macrocode}
+%  \end{option}
+%  \end{option}
+%
+% In früheren Versionen wurde noch die Option \texttt{mpinclude} von
+% den Klassen ausgewertet. Dies geschieht jetzt nur noch in
+% \textsf{typearea}. Von den Klassen wird dann ggf. auf den dort
+% definierten Schalter zugegriffen. Dieses Vorgehen ist deshalb
+% sinnvoll, weil die Klassen ausnahmslos das \textsf{typearea}-Paket
+% laden.
+%
+%
+% \subsection{Optionen und Anweisungen für leere Seiten}
+%
+%  \begin{option}{cleardoublepage}
+%    \changes{v3.0}{2004/08/24}{neuer Schalter}
+%  \begin{option}{cleardoubleempty}
+%    \changes{v2.8a}{2001/06/18}{neue Option}
+%  \begin{option}{cleardoubleplain}
+%    \changes{v2.8a}{2001/06/18}{neue Option}
+%  \begin{option}{cleardoublestandard}
+%    \changes{v2.8a}{2001/06/18}{neue Option}
+%    \changes{v2.8q}{2001/11/06}{\cs{cleardoublestandardpage} statt
+%      \cs{cleardoublestandard}}
+%  \begin{macro}{\cleardoublestandardpage}
+%    \changes{v2.8a}{2001/06/18}{neu}
+%  \begin{macro}{\cleardoubleusingstyle}
+%    \changes{v3.0}{2004/08/24}{neue Anweisung}
+%  \begin{macro}{\cleardoubleemptypage}
+%    \changes{v2.8a}{2001/06/18}{neu}
+%  \begin{macro}{\cleardoubleplainpage}
+%    \changes{v2.8a}{2001/06/18}{neu}
+% Bei Verwendung von \texttt{twoside} und \texttt{openright} bei den
+% Klassen \textsf{scrbook} und \textsf{scrreprt} wird bei \cs{chapter}
+% implizit \cs{cleardoublepage} ausgeführt. Das führt ggf. 
+% normalerweise zu einer linken Seite, auf der noch der Kolumnentitel
+% des vorherigen Kapitels und eine Seitenzahl steht. Häufig wird
+% stattdessen nur eine Seitenzahl oder auch gar nichts gewünscht. Es
+% soll also der Seitenstil \texttt{plain} oder \texttt{empty}
+% verwendet werden. Dies wird mit den Optionen ermöglicht. Dazu
+% werden auch gleich neue Makros definiert:
+%    \begin{macrocode}
+\KOMA@key{cleardoublepage}{%
+  \begingroup%
+    \def\@tempc{%
+      \endgroup%
+      \KOMA@unkown@keyval{cleardoublepage}{#1}{%
+        'current' or any defined pagestyle e.g. 'empty','plain'}%
+    }%
+    \ifstr{#1}{current}{%
+      \let\cleardoublepage\cleardoublestandardpage
+    }{%
+      \ifnotundefined{ps@#1}{%
+        \def\@tempc{\endgroup%
+          \def\cleardoublepage{\cleardoublepageusingstyle{#1}}%
+        }%
+      }{}%
+    }%
+  \@tempc
+}
+\newcommand*{\cleardoublestandardpage}{}
+\let\cleardoublestandardpage\cleardoublepage
+\newcommand*{\cleardoublepageusingstyle}[1]{\clearpage
+  {\thispagestyle{#1}\cleardoublestandardpage}}
+\newcommand*{\cleardoubleemptypage}{\cleardoublepageusingstyle{empty}}
+\newcommand*{\cleardoubleplainpage}{\cleardoublepageusingstyle{plain}}
+\KOMA@DeclareObsoleteOption[\PackageInfo]{cleardoubleempty}{%
+  cleardoublepage=empty%
+}
+\KOMA@DeclareObsoleteOption[\PackageInfo]{cleardoubleplain}{%
+  cleardoublepage=plain%
+}
+\KOMA@DeclareObsoleteOption[\PackageInfo]{cleardoublestandard}{%
+  cleardoublepage=standard%
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{option}
+%  \end{option}
+%  \end{option}
+%  \end{option}
+%
+%
+% \iffalse
+%</option>
+%<*body>
+% \fi
+%
+%
+% \subsection{Befehle für den Kompatibilitätsmodus}
+%
+%  \begin{macro}{\headincludeon}
+%    \changes{v3.0}{2004/07/21}{ersatzlos gestrichen}
+%  \begin{macro}{\headincludeoff}
+%    \changes{v3.0}{2004/07/21}{ersatzlos gestrichen}
+%  \begin{macro}{\headseplineon}
+%    \changes{v3.0}{2004/07/21}{ersatzlos gestrichen}
+%  \begin{macro}{\headseplineoff}
+%    \changes{v3.0}{2004/07/21}{ersatzlos gestrichen}
+%  \begin{macro}{\footincludeon}
+%    \changes{v3.0}{2004/07/21}{ersatzlos gestrichen}
+%  \begin{macro}{\footincludeoff}
+%    \changes{v3.0}{2004/07/21}{ersatzlos gestrichen}
+%  \begin{macro}{\footseplineon}
+%    \changes{v3.0}{2004/07/21}{ersatzlos gestrichen}
+%  \begin{macro}{\footseplineoff}
+%    \changes{v3.0}{2004/07/21}{ersatzlos gestrichen}
+% Da die \KOMAScript-Klassen ohnehin nicht mehr auf Kompatibilität zu
+% \textsf{Script~2.0} überprüft werden, wurde der Kompatibilitätsmodus
+% ersatzlos gestrichen. Dazu gehören nach über zehn Jahren nun auch diese
+% Anweisungen. Ehemals waren sie wie folgt definiert:
+% \begin{verbatim}
+% \if@compatibility
+%   \newcommand*\headincludeon{\@hincltrue}
+%   \newcommand*\headincludeoff{\@hinclfalse}
+%   \newcommand*\headseplineon{\@hsltrue \@hincltrue}
+%   \newcommand*\headseplineoff{\@hslfalse \@hinclfalse}
+%   \newcommand*\footincludeon{\@fincltrue}
+%   \newcommand*\footincludeoff{\@finclfalse}
+%   \newcommand*\footseplineon{\@fsltrue \@fincltrue}
+%   \newcommand*\footseplineoff{\@fslfalse \@finclfalse}
+% \fi
+% \end{verbatim}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%
+%
+% \subsection{Definition der Standardseitenstile}
+%
+% \changes{v2.0e}{1994/08/10}{bei \textsf{scrbook} gibt es kein
+%   einseitiges Layout}
+% \changes{v2.3a}{1995/07/08}{da bei \textsf{book} seit Version 1.2v
+%   die Option oneside wieder ein einseitiges Layout erzeugt, dieses
+%   wieder eingebaut}
+%
+%  \begin{macro}{\ps@plain}
+%  \begin{macro}{\ps@myheadings}
+%  \begin{macro}{\ps@headings}
+% Es wird das Aussehen der Kopf- und Fußzeilen für die
+% Standardseitenstile \texttt{empty}, \texttt{plain},
+% \texttt{headings} und \texttt{myheadings} festgelegt. Diese sind
+% außerdem abhängig davon, ob es sich um einseitiges oder beidseitiges
+% Layout handelt.
+%
+% Im Gegensatz zu den Seitenstilen der Standardklassen steht die
+% Seitennummer beim \KOMAScript{} Paket immer in der Fußzeile.
+% Außerdem sind Trennlinien zwischen Kopf- und Textbereich sowie
+% zwischen Text- und Fußbereich möglich.
+%
+% Die Kopfzeile wird auch nicht mehr in Großbuchstaben gewandelt.
+%
+%    \changes{v2.2a}{1995/02/07}{bei \textsf{scrbook} und
+%      \textsf{scrreprt} Punkt hinter der section-Nummer entfernt}
+%    \changes{v2.2c}{1995/05/25}{Punkt hinter der Kapitelnummer in der
+%      Kopfzeile entfernt}
+%    \changes{v2.2c}{1995/05/25}{Nummern in der Kopfzeile auf CJK
+%      umgestellt}
+%    \changes{v2.4f}{1996/10/08}{\cs{strut} in der Kopfzeile
+%      eingefügt}
+%  \begin{macro}{\set@tempdima@hw}
+%    \changes{v2.8q}{2002/03/28}{neu (intern)}
+% Um nicht ständig das Gleiche schreiben zu müssen wird hier ein
+% internes Makro verwendet.
+%    \begin{macrocode}
+\newcommand*{\set@tempdima@hw}{%
+  \setlength{\@tempdima}{\textwidth}%
+  \if@mincl
+    \addtolength{\@tempdima}{\marginparsep}%
+    \addtolength{\@tempdima}{\marginparwidth}%
+  \fi
+}
+%    \end{macrocode}
+%  \end{macro}
+%
+%  \begin{macro}{\pnumfont}
+%    \changes{v2.8c}{2001/06/29}{\cs{normalcolor} eingefügt}
+%  \begin{macro}{\headfont}
+%    \changes{v2.8c}{2001/06/29}{\cs{normalcolor} eingefügt}
+% Kopf- und Fußzeile sowie die Seitennummer werden in einer speziellen
+% Schriftart gesetzt. Die beiden Makros hier sind jedoch als interne
+% Makros zu betrachten.
+%    \begin{macrocode}
+\newcommand*\pnumfont{\normalfont\normalcolor}
+\newcommand*\headfont{\normalfont\normalcolor\slshape}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \begin{macro}{\scr@fnt@pagination}
+%    \changes{v2.8o}{2001/09/14}{neues Element \texttt{pagination}}
+%  \begin{macro}{\scr@fnt@pagehead}
+%    \changes{v2.8o}{2001/09/14}{neues Element \texttt{pagehead}}
+%  \begin{macro}{\scr@fnt@wrn@pagehead}
+%    \changes{v2.8o}{2001/09/14}{neue Warnung für Element
+%      \texttt{pagehead}}
+%  \begin{macro}{\scr@fnt@pagefoot}
+%    \changes{v2.8o}{2001/09/14}{neues Element \texttt{pagefoot}}
+%  \begin{macro}{\scr@fnt@wrn@pagefoot}
+%    \changes{v2.8o}{2001/09/14}{neue Warnung für Element
+%      \texttt{pagefoot}}
+% Hier werden die Elemente definiert, deren Schriftart dann geändert
+% werden kann.
+%    \begin{macrocode}
+\newcommand*{\scr@fnt@pagenumber}{\pnumfont}
+\let\scr@fnt@pagination=\scr@fnt@pagenumber
+\newcommand*{\scr@fnt@pagehead}{\headfont}
+\newcommand*{\scr@fnt@wrn@pagehead}[1]{%
+  font selection of elements `pagehead' and `pagefoot'\MessageBreak
+  changed, because you wanted to change font selection\MessageBreak
+  of element `#1'%
+}
+\let\scr@fnt@pagefoot=\scr@fnt@pagehead
+\let\scr@fnt@wrn@pagefoot=\scr@fnt@wrn@pagehead
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%
+% Zurück zur Definition der Seitenstile:
+%    \begin{macrocode}
+\if@twoside
+  \renewcommand*{\ps@plain}{\let\@mkboth\@gobbletwo
+    \renewcommand*{\@evenhead}{}%
+    \renewcommand*{\@oddhead}{}%
+    \renewcommand*{\@evenfoot}{%
+      \set@tempdima@hw\hss\hb@xt@ \@tempdima{\vbox{%
+          \if@fsl \hrule \vskip 3\p@ \fi
+          \hb@xt@ \@tempdima{{\pnumfont\thepage\hfil}}}}}%
+    \renewcommand*{\@oddfoot}{%
+      \set@tempdima@hw\hb@xt@ \@tempdima{\vbox{%
+          \if@fsl \hrule \vskip 3\p@ \fi
+          \hb@xt@ \@tempdima{{\pnumfont\hfil\thepage}}}}\hss}%
+  }%
+  \newcommand*{\ps@headings}{\let\@mkboth\markboth
+    \renewcommand*{\@evenhead}{%
+      \set@tempdima@hw\hss\hb@xt@ \@tempdima{\vbox{%
+          \hb@xt@ \@tempdima{{\headfont\strut\leftmark\hfil}}%
+          \if@hsl \vskip 1.5\p@ \hrule \fi}}}%
+    \renewcommand*{\@oddhead}{%
+      \set@tempdima@hw\hb@xt@ \@tempdima{\vbox{%
+          \hb@xt@ \@tempdima{{\headfont\hfil\strut\rightmark}}%
+          \if@hsl \vskip 1.5\p@ \hrule \fi}}\hss}%
+    \renewcommand*{\@evenfoot}{%
+      \set@tempdima@hw\hss\hb@xt@ \@tempdima{\vbox{%
+          \if@fsl \hrule \vskip 3\p@ \fi
+          \hb@xt@ \@tempdima{{\pnumfont\thepage\hfil}}}}}%
+    \renewcommand*{\@oddfoot}{%
+      \set@tempdima@hw\hb@xt@ \@tempdima{\vbox{%
+          \if@fsl \hrule \vskip 3\p@ \fi
+          \hb@xt@ \@tempdima{{\pnumfont\hfil\thepage}}}}\hss}%
+%<*article>
+    \renewcommand*{\sectionmark}[1]{%
+      \markboth{\ifnum \c@secnumdepth >\z@%
+          \sectionmarkformat\fi ##1}{}}%
+    \renewcommand*{\subsectionmark}[1]{%
+      \markright{\ifnum \c@secnumdepth >\@ne%
+          \subsectionmarkformat\fi ##1}}%
+%</article>
+%<*report|book>
+    \renewcommand*{\chaptermark}[1]{%
+      \markboth{\ifnum \c@secnumdepth >\m@ne
+%<book>          \if@mainmatter
+            \chaptermarkformat
+%<book>          \fi
+        \fi
+        ##1}{}%
+    }%
+    \renewcommand*{\sectionmark}[1]{%
+      \markright{\ifnum \c@secnumdepth >\z@
+          \sectionmarkformat\fi
+        ##1}}%
+%</report|book>
+  }%
+  \newcommand*{\ps@myheadings}{\let\@mkboth\@gobbletwo
+    \renewcommand*{\@evenhead}{%
+      \set@tempdima@hw\hss\hb@xt@ \@tempdima{\vbox{%
+          \hb@xt@ \@tempdima{{\headfont\strut\leftmark\hfil}}%
+          \if@hsl \vskip 1.5\p@ \hrule \fi}}}%
+    \renewcommand*{\@oddhead}{%
+      \set@tempdima@hw\hb@xt@ \@tempdima{\vbox{%
+          \hb@xt@ \@tempdima{{\headfont\hfil\strut\rightmark}}%
+          \if@hsl \vskip 1.5\p@ \hrule \fi}}\hss}%
+    \renewcommand*{\@evenfoot}{%
+      \set@tempdima@hw\hss\hb@xt@ \@tempdima{\vbox{%
+          \if@fsl \hrule \vskip 3\p@ \fi
+          \hb@xt@ \@tempdima{{\pnumfont\thepage\hfil}}}}}%
+    \renewcommand*{\@oddfoot}{%
+      \set@tempdima@hw\hb@xt@ \@tempdima{\vbox{%
+          \if@fsl \hrule \vskip 3\p@ \fi
+          \hb@xt@ \@tempdima{{\pnumfont\hfil\thepage}}}}\hss}%
+%<!article>    \renewcommand*{\chaptermark}[1]{}%
+%<article>    \renewcommand*{\subsectionmark}[1]{}%
+    \renewcommand*{\sectionmark}[1]{}%
+  }
+\else
+  \renewcommand*{\ps@plain}{\let\@mkboth\@gobbletwo
+    \renewcommand*{\@evenhead}{}%
+    \renewcommand*{\@oddhead}{}%
+    \renewcommand*{\@evenfoot}{}%
+    \renewcommand*{\@oddfoot}{%
+      \set@tempdima@hw\hb@xt@ \@tempdima{\vbox{%
+          \if@fsl \hrule \vskip 3\p@ \fi
+          \hb@xt@ \@tempdima{{\pnumfont\hfil\thepage\hfil}}}}\hss}%
+  }
+  \newcommand*{\ps@headings}{\let\@mkboth\markboth
+    \renewcommand*{\@evenhead}{}%
+    \renewcommand*{\@oddhead}{%
+      \set@tempdima@hw\hb@xt@ \@tempdima{\vbox{%
+          \hb@xt@ \@tempdima{{\headfont\hfil\strut\rightmark\hfil}}
+          \if@hsl \vskip 1.5\p@ \hrule \fi}}\hss}%
+    \renewcommand*{\@evenfoot}{}%
+    \renewcommand*{\@oddfoot}{%
+      \set@tempdima@hw\hb@xt@ \@tempdima{\vbox{%
+          \if@fsl \hrule \vskip 3\p@ \fi
+          \hb@xt@ \@tempdima{{\pnumfont\hfil\thepage\hfil}}}\hss}}%
+%<*article>
+%    \end{macrocode}
+%    \changes{v2.1b}{1994/12/31}{im einseitigen Seitenstil
+%      \cs{markboth} durch \cs{markright} ersetzt}
+%     \changes{v2.2a}{1995/02/07}{im einseitigen Seitenstil
+%       bei \textsf{scrartcl} und \texttt{oneside} \cs{subsectionmark}
+%       eingefügt}
+%     \changes{v2.2a}{1995/02/07}{im einseitigen Seitenstil bei
+%       \textsf{scrreprt} und \texttt{oneside} \cs{sectionmark}
+%       eingefügt}
+%    \begin{macrocode}
+    \renewcommand*{\subsectionmark}[1]{}%
+    \renewcommand*{\sectionmark}[1]{%
+      \markright{\ifnum \c@secnumdepth >\z@\sectionmarkformat\fi
+        ##1}}%
+%</article>
+%    \end{macrocode}
+%    \changes{v2.0e}{1994/08/17}{im einseitigen Seitenstil
+%      \cs{markboth} durch \cs{markright} ersetzt} 
+%    \begin{macrocode}
+%<*report|book>
+    \renewcommand*{\sectionmark}[1]{}%
+    \renewcommand*{\chaptermark}[1]{%
+      \markright{\ifnum \c@secnumdepth >\m@ne
+%<book>          \if@mainmatter
+            \chaptermarkformat
+%<book>          \fi
+        \fi
+        ##1}}%
+%</report|book>
+  }
+  \newcommand*{\ps@myheadings}{\let\@mkboth\@gobbletwo
+    \renewcommand*{\@evenhead}{}%
+    \renewcommand*{\@oddhead}{%
+      \set@tempdima@hw\hb@xt@ \@tempdima{\vbox{%
+          \hb@xt@ \@tempdima{{\headfont\hfil\strut\rightmark\hfil}}%
+          \if@hsl \vskip 1.5\p@ \hrule \fi}}\hss}%
+    \renewcommand*{\@evenfoot}{}%
+    \renewcommand*{\@oddfoot}{%
+      \set@tempdima@hw\hb@xt@ \@tempdima{\vbox{%
+          \if@fsl \hrule \vskip 3\p@ \fi
+          \hb@xt@ \@tempdima{{\pnumfont\hfil\thepage\hfil}}}}\hss}%
+%<article>    \renewcommand*{\subsectionmark}[1]{}%
+%<!article>    \renewcommand*{\chaptermark}[1]{}%
+    \renewcommand*{\sectionmark}[1]{}%
+  }
+\fi
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%
+%
+% \subsection{Festlegung des Seitenstils auf besonderen Seiten}
+%
+%  \begin{macro}{\titlepagestyle}
+%    \changes{v2.8d}{2001/07/05}{neu}
+%  \begin{macro}{\partpagestyle}
+%    \changes{v2.8d}{2001/07/05}{neu}
+%  \begin{macro}{\chapterpagestyle}
+%    \changes{v2.8d}{2001/07/05}{neu}
+%  \begin{macro}{\indexpagestyle}
+%    \changes{v2.8d}{2001/07/05}{neu}
+% Auf verschiedenen Seiten wird automatisch mit \cs{thispagestyle} auf
+% einen anderen Seitenstil umgeschaltet. Welcher das ist, ist in
+% diesem Makros abgelegt und kann bei Bedarf geändert werden. 
+% Voreingestellt ist der in früheren Versionen fest verdrahtete
+% Seitenstil \texttt{plain}. 
+%    \begin{macrocode}
+\newcommand*{\titlepagestyle}{plain}
+\newcommand*{\partpagestyle}{plain}
+%<book|report>\newcommand*{\chapterpagestyle}{plain}
+\newcommand*{\indexpagestyle}{plain}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%
+%
+% \subsection{Standardeinstellungen}
+%
+% Der voreingestellte Seitenstil hängt von der verwendeten Klasse ab:
+%    \begin{macrocode}
+%<report|article>\pagestyle{plain}
+%<book>\pagestyle{headings}
+%    \end{macrocode}
+% Die Nummerierung erfolgt hingegen immer mit arabischen Zahlen:
+%    \begin{macrocode}
+\pagenumbering{arabic}
+%    \end{macrocode}
+%
+% Im zweiseitigen Satz wird die letzte Zeile bündig gesetzt, im
+% einseitigen jedoch nicht:
+%    \begin{macrocode}
+\if@twoside
+  \flushbottom
+\else
+  \raggedbottom
+\fi
+%    \end{macrocode}
+% Im zweispaltigen Satz wird \cs{sloppy} verwendet und die letzte
+% Zeile jeweils bündig gesetzt.
+%    \begin{macrocode}
+\if@twocolumn
+  \twocolumn
+  \sloppy
+  \flushbottom
+\else
+  \onecolumn
+\fi
+%    \end{macrocode}
+%
+%
+% \iffalse
+%</body>
+% \fi
+%
+% \Finale
+%
+\endinput
+%
+% end of file `scrkpage.dtx'
+%%% Local Variables:
+%%% mode: latex
+%%% mode: font-lock
+%%% TeX-master: t
+%%% End:

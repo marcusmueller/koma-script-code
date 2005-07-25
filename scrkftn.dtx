@@ -1,0 +1,253 @@
+% \CheckSum{111}
+% \iffalse meta-comment
+% ======================================================================
+% scrkftn.dtx
+% Copyright (c) Markus Kohm, 2002
+%
+% This file is part of the LaTeX2e KOMA-Script-Bundle
+%
+% This file can be redistributed and/or modified under the terms
+% of the LaTeX Project Public License Version 1.0 distributed 
+% together with this file. See LEGAL.TXT or LEGALDE.TXT.
+% ----------------------------------------------------------------------
+% scrkftn.dtx
+% Copyright (c) Markus Kohm, 2002
+%
+% Diese Datei ist Teil des LaTeX2e KOMA-Script-Pakets.
+%
+% Diese Datei kann nach den Regeln der LaTeX Project Public
+% Licence Version 1.0, wie sie zusammen mit dieser Datei verteilt
+% wird, weiterverbreitet und/oder modifiziert werden. Siehe dazu
+% auch LEGAL.TXT oder LEGALDE.TXT.
+% ======================================================================
+% \fi
+% \iffalse
+%%% From File: scrkftn.dtx
+%<*driver>
+% \fi
+\ProvidesFile{scrkftn.dtx}[2002/07/11 v3.0 KOMA-Script (footnotes)]
+% \iffalse
+\documentclass[halfparskip-]{scrdoc}
+\usepackage[english,german]{babel}
+\usepackage[latin1]{inputenc}
+\CodelineIndex
+\RecordChanges
+\GetFileInfo{scrkftn.dtx}
+\title{\KOMAScript{} \partname\ \texttt{\filename}%
+  \footnote{Dies ist Version \fileversion\ von Datei
+    \texttt{\filename}.}}
+\date{\filedate}
+\author{Markus Kohm}
+
+\begin{document}
+  \maketitle
+  \tableofcontents
+  \DocInput{\filename}
+\end{document}
+%</driver>
+% \fi
+%
+% \selectlanguage{german}
+%
+% \changes{v3.0}{2002/07/01}{%
+%   erste Version aus der Aufteilung von \texttt{scrclass.dtx}}
+%
+% \section{Fuﬂnoten}
+%
+% Die Fuﬂnotengestaltung in \KOMAScript{} basiert auf einem Hinweis
+% aus dem dokumentierten \LaTeX-Kern.
+%
+% \StopEventually{\PrintIndex\PrintChanges}
+%
+% \iffalse
+%<*option>
+% \fi
+%
+% \subsection{Option}
+% Die Fuﬂnoten werden nicht unmittelbar von Optionen beeinflusst.
+%
+%
+% \iffalse
+%</option>
+%<*body>
+% \fi
+%
+% \subsection{Definitionen f¸r Fuﬂnoten}
+%
+%  \begin{macro}{\footnoterule}
+%    \changes{v2.3a}{1995/07/08}{\cs{@width} verwendet}
+%    \changes{v2.8q}{2002/02/06}{\cs{raggedbottom}-Verbesserung
+%      eingef¸gt}
+%    \changes{v3.0}{2002/01/07}{\texttt{.05fil} statt
+%      \texttt{.005fil}}
+% Im Fall, dass \cs{raggedbottom} verwendet wird, die Fuﬂnotenlinie
+% nach unten gedr¸ckt. Dies funktioniert nur dann nicht, wenn
+% Abbildungen oder Tabellen mit der Option "`\texttt{b}"' an das Ende
+% der Seite gesetzt werden. \cs{raggedbottom} wird daran erkannt, dass
+% \cs{@textbottom} nicht \cs{relax} ist. Das kann nat¸rlich auch
+% einmal schief gehen, ist dann aber auch nicht ganz so tragisch.
+%    \begin{macrocode}
+\renewcommand*\footnoterule{%
+  \kern-3\p@
+  \ifx\@textbottom\relax\else\vskip \z@ \@plus.05fil\fi
+  \hrule\@width.4\columnwidth
+  \kern 2.6\p@}
+%    \end{macrocode}
+%  \end{macro}
+%
+%  \begin{Counter}{footnote}
+% Der Fuﬂnotenz‰hler wird mit \cs{chapter} zur¸ckgesetzt, die Fuﬂnoten
+% werden also kapitelweise nummeriert.
+%    \begin{macrocode}
+%<book|report>\@addtoreset{footnote}{chapter}
+%    \end{macrocode}
+%  \end{Counter}
+%
+%  \begin{macro}{\deffootnote}
+%    \changes{v2.4l}{1997/02/06}{neu}
+%    \changes{v3.0}{2002/07/09}{Absatzeinzug korrigiert}
+%    \changes{v2.9l}{2003/01/28}{\cs{edef}\cs{@tempa} ersetzt}
+%    \changes{v2.9q}{2004/01/31}{\cs{ftn@font} erlaubt aus Gr"unden der
+%      Kompatibilit‰t mit dem \textsl{footnote} Paket kein Argument mehr}
+% Dieses Makro zur Definition der Gestalt von Fuﬂnoten erlaubt einen
+% optionalen und erwartet drei weitere Parameter. Der erste, optionale
+% gibt den Einzug der ersten Zeile des Fuﬂnotentextes vom linken Rand
+% an. Die Fuﬂnotenmarkierungen werden rechtsb¸ndig in diesen Einzug
+% gesetzt. Der zweite, also erste nicht optionale Parameter gibt den
+% Einzug jeder weiteren Zeile des Fuﬂnotentextes vom linken Rand
+% an. Fehlt der optionale Parameter so ist er gleich diesem. Der
+% dritte, also zweite nicht optionale Parameter gibt den zus‰tzlichen
+% Einzug jedes weiteren Absatzes einer Fuﬂnote an. Der letzte
+% Parameter schlieﬂlich bestimmt die Ausgabe der Fuﬂnotenmarkierung in
+% der Fuﬂnote. Diese wird zus‰tzlich in eine \cs{hbox} gesetzt.
+%    \begin{macrocode}
+\newcommand\deffootnote[4][]{%
+  \long\def\@makefntext##1{%
+    \setlength{\@tempdimc}{#3}%
+    \def\@tempa{#1}\ifx\@tempa\@empty
+      \@setpar{\@@par
+        \@tempdima = \hsize
+        \addtolength{\@tempdima}{-#2}%
+        \parshape \@ne #2 \@tempdima}%
+    \else
+      \addtolength{\@tempdimc}{#2}%
+      \addtolength{\@tempdimc}{-#1}%
+      \@setpar{\@@par
+        \@tempdima = \hsize
+        \addtolength{\@tempdima}{-#1}%
+        \@tempdimb = \hsize
+        \addtolength{\@tempdimb}{-#2}%
+        \parshape \tw@ #1 \@tempdima #2 \@tempdimb
+      }%
+    \fi
+    \par
+    \parindent\@tempdimc\noindent
+    \ftn@font\hbox to \z@{\hss\@@makefnmark}##1%
+  }%
+%    \end{macrocode}
+%  \begin{macro}{\@@makefnmark}
+%    \changes{v2.4l}{1997/02/06}{neu}
+% Makro zum Setzen der Fuﬂnotenmarkierung in der Fuﬂnote:
+%    \begin{macrocode}
+  \def\@@makefnmark{\hbox{\ftnm@font{#4}}}%
+%    \end{macrocode}
+%  \end{macro}
+%    \begin{macrocode}
+}
+%    \end{macrocode}
+%  \end{macro}
+%
+%  \begin{macro}{\ftn@font}
+%    \changes{v2.8q}{2001/11/16}{neu (intern)}
+%  \begin{macro}{\scr@fnt@footnote}
+%    \changes{v2.8q}{2001/11/16}{neues Element \texttt{footnote}}
+%  \begin{macro}{\ftnm@font}
+%    \changes{v2.8q}{2001/11/16}{neu (intern)}
+%  \begin{macro}{\scr@fnt@footnotenumber}
+%    \changes{v2.8q}{2001/11/16}{neues Element
+%      \texttt{footnotenumber}}
+%  \begin{macro}{\scr@fnt@footnotenlabel}
+%    \changes{v2.8q}{2001/11/16}{neues Element \texttt{footnotelabel}}
+%  \begin{macro}{\scr@fnt@instead@footnotetext}
+%    \changes{v2.8q}{2001/11/16}{neuer Ersatz f¸r Element
+%    \texttt{footnotetext}}
+% Das erste Element gibt die Schrift an, in der die Fuﬂnote gesetzt
+% wird. Davon abweichend kann mit dem zweiten Element die Schriftart
+% f¸r die Fuﬂnotennummer getrennt angegeben werden. Aufgrund der
+% Definition kann auch ein Makro verwendet werden, das ein Argument
+% erwartet.
+%    \begin{macrocode}
+\newcommand*{\ftn@font}{\normalfont}
+\newcommand*{\scr@fnt@footnote}{\ftn@font}
+\newcommand*{\ftnm@font}{}
+\newcommand*{\scr@fnt@footnotenumber}{\ftnm@font}
+\newcommand*{\scr@fnt@footnotelabel}{\ftnm@font}
+\newcommand*{\scr@fnt@instead@footnotetext}{footnote}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%
+%  \begin{macro}{\deffootnotemark}
+%    \changes{v2.4l}{1997/02/06}{neu}
+% Makro zur Definition der Fuﬂnotenmarkierung im Text:
+%    \begin{macrocode}
+\newcommand*\deffootnotemark[1]{%
+  \def\@makefnmark{\hbox{\ftntm@font{#1}}}%
+}
+%    \end{macrocode}
+%
+%  \begin{macro}{\ftntm@font}
+%    \changes{v2.8q}{2001/11/16}{neu (intern)}
+%  \begin{macro}{\scr@fnt@footnotereference}
+%    \changes{v2.8q}{2001/11/16}{neues Element
+%      \texttt{footnotereference}}
+%  \begin{macro}{\scr@fnt@footnoteref}
+%    \changes{v2.8q}{2001/11/16}{neues Element \texttt{footnoteref}}
+% Dies ist die Schriftart der Fuﬂnotenreferenz im Text. Auch hier kann
+% ggf. ein Makro verwendet werden, das ein Argument erwartet.
+%    \begin{macrocode}
+\newcommand*{\ftntm@font}{}
+\newcommand*{\scr@fnt@footnotereference}{\ftntm@font}
+\newcommand*{\scr@fnt@footnoteref}{\ftntm@font}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%
+%  \begin{macro}{\thefootnotemark}
+%    \changes{v2.4l}{1997/02/06}{neu}
+% Makro, damit \cs{@thefnmark} auf Anwenderebene verf¸gbar wird:
+%    \begin{macrocode}
+\newcommand*{\thefootnotemark}{\@thefnmark}
+%    \end{macrocode}
+%  \end{macro}
+%
+% \changes{v2.4l}{1997/02/06}{Verwendung der neuen Makros zur
+%   Fuﬂnotengestaltgebung}
+%  \begin{macro}{\@makefnmark}
+%    \begin{macrocode}
+\deffootnote[1em]{1.5em}{1em}{\textsuperscript{\thefootnotemark}}
+\deffootnotemark{\textsuperscript{\thefootnotemark}}
+%    \end{macrocode}
+%  \end{macro}
+%
+%
+% \iffalse
+%</body>
+% \fi
+%
+% \Finale
+%
+\endinput
+%
+% end of file `scrkftn.dtx'
+%%% Local Variables:
+%%% mode: latex
+%%% mode: font-lock
+%%% TeX-master: t
+%%% End:
