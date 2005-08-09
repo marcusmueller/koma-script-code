@@ -73,7 +73,7 @@
 % these options will be processed by |\LoadClassWithOptions| below.
 %    \begin{macrocode}
 \ExecuteOptions{pagereftolabel,lessindexnotes}
-\PassOptionsToClass{bibtotoc,idxtotoc}{scrguide}
+\PassOptionsToClass{bibtotoc,idxtotoc,tablecaptionabove}{scrguide}
 \ProcessOptions\relax
 %    \end{macrocode}
 %
@@ -879,7 +879,7 @@ KOMAScript \endcsname
 \AtBeginDocument{%
   \setbibpreamble{\GuideBibPreamble\bigskip}%
   \selectbiblanguage{\languagename}%
-  \bibliographystyle{scrguide}%
+  \bibliographystyle{babalpha-fl}%
   \renewcommand*{\@openbib@code}{%
     \setlength{\parsep}{0pt}%
     \renewcommand*{\btxauthorcolon}[1]{:\par}%
