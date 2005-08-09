@@ -71,7 +71,7 @@ MAKE_FILES	= Makefile Makefile.latexinit Makefile.guide
 # ----------------------------------------------------------------------
 MISC_SRC	= $(MAKE_FILES)
 
-DOC_SRC		= scrguide.cls scrguide.ist scrguide.bst \
+DOC_SRC		= scrguide.cls scrguide.ist \
 	          guide.tex guide.bib plength.dtx
 
 DIST_SRC	= $(MISC_SRC) $(DOC_SRC)
