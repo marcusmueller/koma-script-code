@@ -917,7 +917,8 @@ KOMAScript \endcsname
 %   Print one part of the multi part index.
 %    \begin{macrocode}
   \newcommand*{\printmultiindex}[3][]{%
-    \def\indexname{#2}%
+    \begingroup
+      \def\indexname{#2}%
 %    \end{macrocode}
 % \begin{macro}{\CrossIndex}
 %   Produce a reference from one index to another. The macro |\UseIndex| tells
@@ -928,17 +929,19 @@ KOMAScript \endcsname
 %   preamble of one part of the multi part index only. Because of this, it's
 %   defined here only.
 %    \begin{macrocode}
-    \newcommand*{\CrossIndex}[3]{%
-      \Index{#1=\UseIndex{#2}\protect#1>#3=\UseIndex{#2}\SeeSign\protect#3}%
-    }%
+      \newcommand*{\CrossIndex}[3]{%
+        \Index{##1=\UseIndex{##2}\protect##1>##3=\UseIndex{##2}\SeeSign
+          \protect##3}%
+      }%
 %    \end{macrocode}
 % \end{macro}
 %    \begin{macrocode}
-    \ifx\relax#1\relax\let\index@preamble=\relax
-    \else\def\index@preamble{#1}%
-    \fi
-    \label{idx:#3}%
-    \@input@{\jobname-#3.ind}%
+      \ifx\relax#1\relax\let\index@preamble=\relax
+      \else\def\index@preamble{#1}%
+      \fi
+      \label{idx:#3}%
+      \@input@{\jobname-#3.ind}%
+    \endgroup
   }
 %    \end{macrocode}
 % \begin{environment}{theindex}
@@ -1214,7 +1217,7 @@ KOMAScript \endcsname
     \expandafter\newcommand\expandafter*%
     \csname Index#2\endcsname[2][indexother]{%
       \Index[##1]{##2 (#1)=\UseIndex{gen}#4{##2} (\protect #1)}%
-      \Index[##1]{#1=\UseIndex{gen}\protect#1>##2=\UseIndex{gen}#4{##2}}%
+      \Index[##1]{#2=\UseIndex{gen}\protect#1>##2=\UseIndex{gen}#4{##2}}%
       \IndexSeeAt[#1]{##2}{#3}{gen}{\GuidegenIndex}{#4}%
     }%
   \fi
