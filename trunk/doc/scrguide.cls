@@ -28,12 +28,10 @@
 % jedoch fast immer hinterher.
 % ======================================================================
 %
-% $Id: scrguide.cls,v 1.10 2005/05/18 08:40:56 mjk Exp $
-%
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2005/05/13 v0.9 internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2005/08/10 v0.9 internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -317,6 +315,8 @@
 % \begin{macro}{\Counter}
 % \begin{macro}{\Length}
 % \begin{macro}{\PLength}
+% \begin{macro}{\FloatStyle}
+% \begin{macro}{\Pagestyle}
 % \begin{macro}{\Variable}
 % \begin{macro}{\FontElement}
 % \begin{macro}{\PName}
@@ -346,6 +346,8 @@
 %    \begin{macrocode}
 \DeclareRobustCommand*{\Macro}[1]{\mbox{\texttt{\char`\\#1}}}
 \DeclareRobustCommand*{\Option}[1]{\mbox{\texttt{#1}}}
+\DeclareRobustCommand*{\FloatStyle}[1]{\mbox{\texttt{#1}}}
+\DeclareRobustCommand*{\Pagestyle}[1]{\mbox{\texttt{#1}}}
 \DeclareRobustCommand*{\Environment}[1]{\mbox{\texttt{#1}}}
 \DeclareRobustCommand*{\Counter}[1]{\mbox{\texttt{#1}}}
 \DeclareRobustCommand*{\Length}[1]{\mbox{\texttt{\char`\\#1}}}
@@ -365,6 +367,8 @@
     )}}
 \DeclareRobustCommand*{\PParameter}[1]{\texttt{\{#1\}}}
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -438,6 +442,22 @@
 % \end{macro}
 %
 %
+% \section{Identification}
+%
+% \begin{macro}{\labelbase}
+%    \begin{macrocode}
+\newcommand*{\labelbase}[1]{%
+  \renewcommand*{\label@base}{#1}%
+  \label{cha:#1}%
+}
+%    \end{macrocode}
+% \begin{macro}{\label@base}
+%    \begin{macrocode}
+\newcommand*{\label@base}{unknown}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
 % \section{Special Environments}
 %
 % \begin{environment}{Declaration}
@@ -446,6 +466,44 @@
 %     to also write labels.}
 %    \begin{macrocode}
 \newenvironment{Declaration}{%
+%    \end{macrocode}
+% \begin{macro}{\new@element}
+%   Help macro to define new Declaration elements.
+%    \begin{macrocode}
+  \newcommand*{\new@element}[1]{%
+    \expandafter\newcommand\expandafter*\csname X##1\endcsname{}%
+    \expandafter\let\csname X##1\expandafter\endcsname
+    \csname ##1\endcsname
+    \expandafter\newcommand\expandafter*\csname new##1\endcsname[1]{%
+      \begingroup
+        \let\ensuremath\@firstofone
+        \let\textit\@firstofone
+        \lowercase{\def\@tempa{##1}}%
+        \pdfstringdef\@tempb{\label@base.\@tempa.####1}%
+        \xdef\@currentHref{\@tempb}%
+        \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
+        \label{desc:\label@base.\@tempa.####1}%
+      \endgroup
+      \csname X##1\endcsname{####1}\ignorespaces
+    }%
+    \expandafter\let\csname ##1\expandafter\endcsname\csname new##1\endcsname
+  }%
+%    \end{macrocode}
+% \begin{macro}{\newOption}
+% \begin{macro}{\newMacro}
+%    \begin{macrocode}
+  \new@element{Option}%
+  \new@element{Macro}%
+  \new@element{Environment}%
+  \new@element{Counter}%
+  \new@element{FloatStyle}%
+  \new@element{PLength}%
+  \new@element{Variable}%
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%    \begin{macrocode}
   \par\small\addvspace{2\baselineskip plus .5\baselineskip}%
   \vspace{-\baselineskip}%
   \noindent\hspace{-1em}%
