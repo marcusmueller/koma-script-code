@@ -115,7 +115,47 @@
     }%
     \newcommand*{\iffree}{\@firstoftwo}%
     \usepackage{lmodern}%
-    \typearea[current]{last}%
+    \@twosidefalse\@openrightfalse
+    \RequirePackage{geometry}%
+    \geometry{papersize={140mm,210mm},%
+      includehead,includemp,reversemp,marginparwidth=2em,%
+      vmargin={2mm,4mm},hmargin=2mm}%
+    \RequirePackage{xcolor}%
+    \RequirePackage{scrpage2}%
+    \clearscrheadfoot
+    \ohead{\rule[-\dp\strutbox]{0pt}{\headheight}\headmark\hspace{2mm}}%
+    \ihead[{\colorbox{yellow!50}{\makebox[\linewidth][l]{%
+            \rule[-\dp\strutbox]{0pt}{\headheight}%
+            \makebox[2em][r]\pagemark}}}]%
+      {\colorbox{yellow!50}{\makebox[\linewidth][l]{%
+            \rule[-\dp\strutbox]{0pt}{\headheight}%
+            \makebox[2em][r]\pagemark}}}%
+    \renewcommand*{\headfont}{\normalfont\sffamily}%
+    \setkomafont{pagenumber}{}%
+    \renewcommand*{\chaptermark}[1]{%
+      \markboth\chaptermarkformat\chaptermarkformat}%
+    \renewcommand*{\chaptermarkformat}{\chapapp~\thechapter\autodot}%
+    \renewcommand*{\chapterformat}{}%
+    \renewcommand*{\chapterpagestyle}{scrheadings}%
+    \setlength{\@tempdimc}{\oddsidemargin}%
+    \addtolength{\@tempdimc}{1in}%
+    \setheadwidth[-\@tempdimc]{paper}%
+    \pagestyle{scrheadings}%
+    \hypersetup{colorlinks}%
+    \let\orig@maketitle\maketitle
+    \def\maketitle{%
+      \begingroup
+        \@twosidetrue
+        \let\cleardoublepage\clearpage
+        \addtolength{\oddsidemargin}{\evensidemargin}%
+        \setlength{\evensidemargin}{.5\oddsidemargin}%
+        \setlength{\oddsidemargin}{\evensidemargin}%
+        \orig@maketitle\relax
+      \endgroup
+    }%
+    \renewcommand*{\chapterheadstartvskip}{}%
+    \raggedbottom
+    \sloppy
   }%
 }
 %    \end{macrocode}
