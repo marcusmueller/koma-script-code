@@ -48,10 +48,11 @@ endif
 
 default: default_local
 
-clean:	# nothing to do
+clean:	 clean_local
 
 # Load variable definitions
 include $(BASEDIR)Makefile.baseinit
+include Makefile.latexinit
 
 # Temporary folder, used to create distribution.
 # Same folder with postfix "-maintain" will be used to create maintain-
@@ -112,3 +113,6 @@ distclean_local:
 
 maintainclean_local:
 	$(make_recursive)
+
+edit:
+	$(EDITOR) guide.tex
