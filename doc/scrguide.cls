@@ -848,7 +848,8 @@
 %    \begin{macrocode}
 \lstset{basicstyle=\ttfamily,%
   aboveskip=.5\baselineskip,%
-  belowskip=.5\baselineskip%
+  belowskip=.5\baselineskip,%
+  columns=fullflexible% fix for buggy version of LM fonts
 }
 %    \end{macrocode}
 %
