@@ -54,7 +54,7 @@ TEX_CHAPTERS    = introduction.tex typearea.tex \
 
 TEX_SRC		= guide-$(LANGUAGELONG).tex $(TEX_CHAPTERS)
 
-MISC_SRC	= $(MAKE_FILES)
+MISC_SRC	= $(MAKE_FILES) htmlsetup
 
 DIST_SRC	= $(MISC_SRC) $(TEX_SRC)
 
@@ -66,7 +66,7 @@ MAINTAIN_FILES	= $(MAINTAIN_SRC)
 
 # ----------------------------------------------------------------------
 # local rules
-default_local: $(GUIDENAME).pdf
+default_local: $(GUIDENAME).pdf $(GUIDENAME).html
 
 clean_local:
 	$(RM) *.aux *.bbl *.blg *.glo *.idx *.ilg *.ind *.log *.lot \
@@ -135,6 +135,9 @@ define latex
 	done
 	$(SMV) guide.pdf $@
 endef
+
+$(GUIDENAME).html: guide.aux
+	$(GENHTMLINDEX) $(addsuffix .aux,$(basename $(TEX_CHAPTERS))) >$@
 
 $(GUIDENAME).pdf: $(DOCDIR)scrguide.cls $(DOCDIR)guide.tex $(GENERATED_SRC)\
 		  guide.aux guide.bbl $(BIBTEX_SRC) \
