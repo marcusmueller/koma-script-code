@@ -118,9 +118,9 @@ endif
 # file rules
 
 CKSUMFILES = $(DOCDIR)plength.dtx $(DOCDIR)guide.tex $(DOCDIR)scrguide.cls \
-	     $(BIBTEX_SRC) $(MAKEINDEXSTYLE) \
+	     $(BIBTEX_SRC) $(MAKEINDEXSTYLE) $(MAKECHANGESTYLE) \
 	     guide.aux guide.ind guide.idx guide.bbl guide.toc guide.lot \
-	     guide.out \
+	     guide.out guide.chn guide.glo \
 	     $(foreach file,$(TEX_CHAPTERS),$(basename $(file)).aux)
 
 define latex
@@ -129,8 +129,9 @@ define latex
 	  $(CKSUM) $(CKSUMFILES) > guide.md5 \
 	  && $(PDFLATEX) guide.tex \
 	  && ( $(BIBTEX) guide || [ $$? -le $(BIBTEXNOERROR) ] || exit 1 ) \
-	  && $(MAKEINDEX) -o guide.ind guide.idx  \
+	  && $(MAKEINDEX) guide.ind guide.idx  \
 	  && $(INDEXPOSTOP) guide \
+	  && $(MAKECHANGE) guide.chn guide.glo \
 	  || exit 1;\
 	done
 	$(SMV) guide.pdf $@
@@ -142,6 +143,7 @@ $(GUIDENAME).html: guide.aux
 $(GUIDENAME).pdf: $(DOCDIR)scrguide.cls $(DOCDIR)guide.tex $(GENERATED_SRC)\
 		  guide.aux guide.bbl $(BIBTEX_SRC) \
 	          $(MAKEINDEXSTYLE) guide.ind guide.idx \
+		  $(MAKECHANGESTYLE) guide.chn guide.glo \
 	          $(TEX_SRC)
 	$(latex)
 
@@ -151,14 +153,19 @@ plenDIN.mps: $(plenDIN_SRC)
 
 $(plenDIN_SRC): $(DOCDIR)plength.dtx
 	$(PDFLATEX) $<
+	$(INDEXPOSTOP) guide \
 
 guide.ind: guide.idx
-	$(MAKEINDEX) -o $@ $<
+	$(MAKEINDEX) $@ $<
+	$(INDEXPOSTOP) guide
+
+guide.chn: guide.glo
+	$(MAKECHANGE) $@ $<
 
 guide.bbl: $(BIBTEX_SRC) guide.aux
 	$(BIBTEX) guide || test $$? -le $(BIBTEXNOERROR)
 
-guide.idx guide.aux: ../guide.tex $(TEX_SRC)
+guide.glo guide.idx guide.aux: ../guide.tex $(TEX_SRC)
 	$(PDFLATEX) guide.tex
 
 # ----------------------------------------------------------------------
