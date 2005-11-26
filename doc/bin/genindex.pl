@@ -79,7 +79,7 @@ while ( <IDX> ) {
 # we must have a general index
 if ( !$indfile{"gen"} ) {
     print "  Open new index $indexbase-gen.ind\n" ;
-    open ( $indfile{"gen"}, ">indexbase-gen.ind" ) ||
+    open ( $indfile{"gen"}, ">$indexbase-gen.ind" ) ||
 	die "Cannot open $indexbase-gen.ind for writing\n";
 }
 
@@ -94,7 +94,7 @@ while ( defined( ( $line = <IDX> ) )
     $line = "";
 }
 # copy also \indexsection-line
-printtoallind( "$line" );
+printtoallind( "$line" ) if ( $line );
 
 # step 2: read complete \indexsection, \indexspace, \item, \subitem or
 # \subsubitem and process it (= copy it to destination index files)
