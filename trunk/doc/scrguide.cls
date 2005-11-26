@@ -31,7 +31,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2005/08/10 v0.9 internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2005/11/26 v0.9 internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -181,7 +181,7 @@
       dependency file `\jobname-\language.tex' was not found.\MessageBreak
       This may result in a lot of errors and warnings, if you'll continue}%
   }%
-  \expandafter\addto\csname captions\languagename\endcsname
+  \expandafter\addto\csname extras\languagename\endcsname
   \GuideLanguageExtensions\GuideLanguageExtensions
 }
 %    \end{macrocode}
@@ -632,7 +632,7 @@
 %
 % There are some example visualizations used only by Jens-Uwe.\footnote{TODO:
 %   All these should be merged with \texttt{ShowOutputBox}.}
-
+%
 % \begin{environment}{XmpTopPage}
 %   Output of the top of a page.
 %    \begin{macrocode}
@@ -871,7 +871,7 @@ KOMAScript \endcsname
 % \end{macro}
 %
 % \begin{macro}{\url@}
-%   Redefine to make \texttt{CTAN://} be an aliad for
+%   Redefine to make \texttt{CTAN://} be an alias for
 %   \texttt{ftp://|\GuideCTANserver|/tex-archive/}.
 %    \begin{macrocode}
 \def\url@#1{\expandafter\url@@#1\@nil}
