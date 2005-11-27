@@ -1,0 +1,3550 @@
+% ============================================================================
+% scrlttr2.tex
+% Copyright (c) Markus Kohm, 2002-2005
+%
+% This file is part of the LaTeX2e KOMA-Script-Bundle
+%
+% This file can be redistributed and/or modified under the terms
+% of the LaTeX Project Public License Version 1.0 distributed
+% together with this file. See LEGAL.TXT or LEGALDE.TXT.
+% ----------------------------------------------------------------------------
+% scrlttr2.tex
+% Copyright (c) Markus Kohm, 2002-2005
+%
+% Diese Datei ist Teil des LaTeX2e KOMA-Script-Pakets.
+%
+% Diese Datei kann nach den Regeln der LaTeX Project Public
+% Licence Version 1.0, wie sie zusammen mit dieser Datei verteilt
+% wird, weiterverbreitet und/oder modifiziert werden. Siehe dazu
+% auch LEGAL.TXT oder LEGALDE.TXT.
+% ============================================================================
+%
+% Chapter about scrlttr2 of the KOMA-Script guide
+% Maintained by Markus Kohm
+%
+% ----------------------------------------------------------------------
+%
+% Kapitel über scrlttr2 in der KOMA-Script-Anleitung
+% Verwaltet von Markus Kohm
+%
+% ============================================================================
+
+\ProvidesFile{scrlttr2.tex}[2005/08/10 KOMA-Script guide (chapter: scrlttr2)]
+% Date of translated german file: 2003-02-13
+
+% TODO: See TODO notes below
+
+\chapter{The New Letter Class \Class{scrlttr2}}
+\labelbase{scrlttr2}
+
+\BeginIndex{Class}{scrlttr2}\BeginIndex{}{Letters}%
+\begin{Explain}
+Since the June 2002 release, \KOMAScript{} contains a completely
+rewritten letter class\ChangedAt{v2.8q}{\Class{scrlttr2}}. Although part
+of the code is identical to the classes from \autoref{cha:maincls},
+letters are quite different from articles, reports, books, and such.
+That alone justifies a separate chapter about the letter class. But
+there is another reason for a chapter on \Class{scrlttr2}. The class has
+been redeveloped from scratch. And the user interface differs from every
+other class the author knows. You can dispute the sense or nonsense of
+that new usage concept. The author just thinks that this new user
+interface offers some advantages.
+
+\section{Looking Back on the Old Letter Class}
+\label{sec:scrlttr2.scrlettr}
+
+With the June 2002 release the old letter class
+\Class{scrlettr}\IndexClass{scrlettr} becomes obsolete. It should better
+not be used for new letters. There is no development on the old
+letter class anymore, and support is very restricted.
+However, if you really need the documentation of the old letter class,
+you can still find it in the file \File{scrlettr.dtx}, but only in
+German. You can run it through \LaTeX{} some times, like that:
+\begin{lstlisting}
+  latex scrlettr.dtx
+  latex scrlettr.dtx
+  latex scrlettr.dtx
+\end{lstlisting}
+You get the file \File{scrlettr.dvi} containing the old German manual.
+
+To facilitate the transition to the new class, there is a compatibility
+option. In general, the complete functionality still remains in the new class.
+Without that compatibility option, the user interface and the defaults will be
+different. More detail on this option is provided in
+\autoref{sec:scrlttr2.options} and \autoref{sec:scrlttr2.fromscrlettr}.
+\end{Explain}
+
+\section{Options}
+\label{sec:scrlttr2.options}
+
+The letter class \Class{scrlttr2} uses the package
+\Package{keyval}\IndexPackage{keyval} to handle options. This is part of
+the \Package{graphics} package (see \cite{package:graphics}). Since
+\Package{graphics} is part of the \emph{required} section of \LaTeX, it
+should be found in every \LaTeX{} distribution. Should your \TeX{}
+distribution contain \LaTeX, but not the packages \Package{graphics}
+and \Package{keyval}, please complain to your \TeX{} distributor. If you
+want to use \Class{scrlttr2}, you will have to install the
+\Package{graphics} package yourself in that case.
+
+\begin{Explain}
+  The special feature of the \Package{keyval} package is the possibility to
+  accompany options by values. You do not only need a lot less options, but
+  maybe even fewer optional arguments. You will see that when discussing the
+  \Environment{letter} environment in \autoref{sec:scrlttr2.addressee},
+  \autopageref{desc:scrlttr2.environment.letter}. The class will automatically
+  load the \Package{keyval} package. If you need to supply options to the
+  \Package{keyval} package, you should use the \Macro{PassOptionsToPackage}
+  command before \Macro{documentclass}.
+\end{Explain}
+
+\subsection{Defining Options Later}
+\label{sec:scrlttr2.options.late}
+
+This section anticipates a feature of the new letter class. The meaning
+of this feature will not become clear until the structure of a document
+with more than one letter inside and another feature of \Class{scrlttr2}
+will be understood. But to keep the number of forward references low, it
+is reasonable to describe them this early.
+
+\begin{Declaration}
+  \Macro{KOMAoptions}\Parameter{option list}
+\end{Declaration}
+\BeginIndex{Cmd}{KOMAoptions}%
+The possibility to change many options after loading the class is a
+special feature of the \Class{scrlttr2} class. The \Macro{KOMAoptions}
+command serves this purpose, taking options and their values as
+arguments. You can list multiple options, separated by commas, like in
+the optional argument of \Macro{documentclass}. If an option is only
+available when loading the class, i.\,e.\ as an optional argument to
+\Macro{documentclass}, there will be an explicit remark in the option's
+description.
+
+\begin{Explain}
+If you set an option to an illegal value within the \PName{option
+list}, \LaTeX{} will stop and show an error message. By entering
+``\texttt{h}'' you will get an explanation that will also list possible
+values for that particular option.
+\end{Explain}
+%
+\EndIndex{Cmd}{KOMAoptions}%
+
+\subsection{Page Layout Options}
+\label{sec:scrlttr2.typeareaOptions}
+
+In contrast to the old \Class{scrlettr} class, but in correspondence
+with the other \KOMAScript{} classes, the \Class{scrlttr2} class refers
+to the \Package{typearea} package for the construction of the page
+layout (see \autoref{cha:typearea}). The package will be loaded
+by the class automatically, and the class controls the package. The
+necessary options will be explained in this section.
+
+\begin{Declaration}
+  \Option{paper}=\PName{format}
+\end{Declaration}
+\BeginIndex{Option}{paper}%
+This option defines the paper format. Theoretically, all paper formats
+the \Package{typearea} package knows about are supported. But you have
+to leave out the suffix \PValue{paper} when entering a value. So, for
+letter format you would use the value \PValue{letter}. The formats of
+the ISO A, B, C, and D series must be entered with small letters, e.,g.
+\PValue{a4} for ISO A4. See also \autoref{sec:typearea.paperTypes}.
+
+\begin{Explain}
+Although every paper size supported by \Package{typearea} can be used,
+several formats may result in unexpected results on the first page of
+a letter by now. That is not a matter of the class concept, but there
+exist only parameter sets for ISO A4 at this time. Unfortunately, there
+are no general rules to define the placement of the address field and
+similar for an arbitrary paper size. But it is possible to define
+additional parameter sets. See \autoref{sec:lcoFile} for more
+information.
+
+\end{Explain}
+%
+\EndIndex{Option}{paper}%
+
+\begin{Declaration}
+  \Option{BCOR}=\PName{length}\\
+  \Option{DIV}=\PName{value}\\
+  \Option{headlines}=\PName{count}
+\end{Declaration}
+\BeginIndex{Option}{BCOR}%
+\BeginIndex{Option}{DIV}%
+\BeginIndex{Option}{headlines}%
+The options for the divisor, the binding correction\Index{binding correction},
+and the number of headlines will be translated directly into the corresponding
+options of the \Package{typearea} package.  If the options are set using
+\Macro{KOMAoptions} and not as class options, the \Macro{typearea} command
+from the \Package{typearea} package will be used instead.  See
+\autoref{sec:typearea.options}, \autopageref{desc:typearea.macro.typearea}.
+%
+\EndIndex{Option}{BCOR}%
+\EndIndex{Option}{DIV}%
+\EndIndex{Option}{headlines}%
+
+\begin{Declaration}
+  \Option{enlargefirstpage}
+\end{Declaration}
+\BeginIndex{Option}{enlargefirstpage}%
+As described later in this chapter, the first page of a letter always
+uses a different page layout. The \Class{scrlttr2} class provides a
+mechanism to calculate height and vertical alignment of head and foot
+of the first page independently of the following pages. If, as a
+result, the foot of the first page would reach into the text area,
+this text area would automatically be made smaller using the
+\Macro{enlargethispage}\IndexCmd{enlargethispage} macro. On the other
+hand, if the text area should become larger, supposed the foot on the
+first page allows that, you could use this option. At best, some more
+text would fit on the first page. See also the description of pseudo
+length \PLength{firstfootvpos} at \autoref{sec:scrlttr2.firstFoot},
+\autopageref{desc:scrlttr2.plength.firstfootvpos}.
+This option can take the standard values for simple switches, as
+listed in \autoref{tab:scrlttr2.simpleSwitchValues},
+\autopageref{tab:scrlttr2.simpleSwitchValues}. Default is
+\PValue{false}.
+%
+\EndIndex{Option}{enlargefirstpage}%
+
+\begin{table}
+  \centering
+  \begin{tabular}{ll}
+    Value & Description \\\hline\\[-1.75ex]
+    \PValue{true} & activates the option \\
+    \PValue{on}   & activates the option \\
+    \PValue{false}& deactivates the option \\
+    \PValue{off}  & deactivates the option \\
+  \end{tabular}
+  \caption{Standard values for simple switches in \Class{scrlttr2}}
+  \label{tab:scrlttr2.simpleSwitchValues}
+\end{table}
+
+\subsection{Other Layout Options}
+\label{sec:scrlttr2.layout}
+
+In this subsection, you will find all options that have influence on
+the layout in general, except page layout. Strictly speaking, all page
+layout options (see~\ref{sec:scrlttr2.typeareaOptions}) are also layout
+options, and vice versa for some of them.
+
+\begin{Declaration}
+  \Option{twoside}
+\end{Declaration}%
+\BeginIndex{Option}{oneside}%
+From the author's point of view, double-sided letters do not make much
+sense. Therefore, the option \Option{twoside} only partially switches to
+double-sided layout. You get the possibility to have different margins
+on left and right pages, but it is not used. So this option really means
+\emph{activate the possibilities of a double-sided document, but stay
+        with the one-sided layout as far and as long as possible.}
+This option can take the standard values for simple switches, as listed
+in \autoref{tab:scrlttr2.simpleSwitchValues},
+\autopageref{tab:scrlttr2.simpleSwitchValues}. Default is
+\PValue{false}.
+%
+\EndIndex{Option}{twoside}%
+
+By the way, double-sided letters are not supported, because they seem
+unreasonable.
+
+\begin{Declaration}
+  \Option{cleardoublepage}=\PName{style}
+\end{Declaration}
+\BeginIndex{Option}{cleardoublepage}%
+If you want pages inserted by the \Macro{cleardoublepage} command to
+just contain a page number in head and foot or to be empty, this can be
+accomplished with this option. There are three different styles
+supported that are listed at \autoref{tab:scrlttr2.cleardoublepage}. Default
+is \PValue{standard}.
+
+\begin{table}
+  \caption[{Possible values of option \Option{cleardoublepage} with
+    \Class{scrlttr2}}]{Possible values of option \Option{cleardoublepage} for
+    selection of page style of empty left pages with \Class{scrlttr2}}
+  \label{tab:scrlttr2.cleardoublepage}
+  \begin{desctabular}
+    \pventry{empty}{switches to page style\Index{page style}
+        \PValue{empty}\IndexPagestyle{empty} for inserted pages}%
+    \pventry{plain}{switches to page style
+        \PValue{plain}\IndexPagestyle{plain} for inserted pages}
+    \pventry{standard}{keeps the current page style for inserted pages}
+  \end{desctabular}
+\end{table}
+%
+\EndIndex{Option}{cleardoublepage}%
+
+\begin{Declaration}
+  \Option{headsepline}\\
+  \Option{footsepline}
+\end{Declaration}
+\BeginIndex{Option}{headsepline}%
+\BeginIndex{Option}{footsepline}%
+These two options insert a separator line below the head or above the
+foot, resp., on consecutive pages. In the lingo of this manual, all
+pages of a letter except the first one are consecutive pages. 
+This option can take the standard values for simple switches, as listed
+in \autoref{tab:scrlttr2.simpleSwitchValues},
+\autopageref{tab:scrlttr2.simpleSwitchValues}. Default is
+\PValue{false}. If one of the options is used without value, like in the
+declaration above, this evaluates as \PValue{true}, so the separator
+line will be activated. When used as a \Macro{documentclass} option, the
+\Package{typearea} package will be called with the option
+\Option{headinclude} or \Option{footinclude}, resp.\ 
+(see~\ref{sec:typearea.options}).
+%
+\EndIndex{Option}{headsepline}%
+\EndIndex{Option}{footsepline}%
+
+\begin{Declaration}
+  \Option{mpinclude}\\
+  \Option{mpexclude}
+\end{Declaration}
+\BeginIndex{Option}{mpinclude}%
+\BeginIndex{Option}{mpexclude}%
+These two options of the \Package{typearea} package should not be used
+with the \Class{scrlttr2} class, because the first page in particular
+does not take this option into account. To anticipate any complaints, a
+warning will be issued when this option is used. If you feel adventurous
+you could try how these options, especially \Option{mpinclude}, interact
+with other class options.
+%
+\EndIndex{Option}{mpinclude}% \EndIndex{Option}{mpexclude}%
+
+\begin{Declaration}
+  \Option{pagenumber}=\PName{position}
+\end{Declaration}
+\BeginIndex{Option}{pagenumber}%
+This option defines if and where a page number will be placed on
+consecutive pages. All pages without a letter-head are consecutive
+pages. This option effects the page layouts\Index{page layout}
+\PValue{headings} and \PValue{plain}. It also effects the default page
+styles of the \Package{scrpage2} package, if set before loading the
+package (see \autoref{cha:scrpage}). It can take values only
+influencing horizontal, only vertical, or both positions. Possible value
+are shown in \autoref{tab:scrlttr2.pagenumber}. Default is \PValue{botcenter}.
+
+\begin{table}
+  \caption[{Possible values of option \Option{pagenumber} with
+    \Class{scrlttr2}}]{Possible values of option \Option{pagenumber} for the
+    position of the page number at page styles \PValue{headings} and
+    \PValue{plain} with \Class{scrlttr2}}
+ \label{tab:scrlttr2.pagenumber}
+  \begin{desctabular}
+    \entry{\PValue{bot}, \PValue{foot}}{%
+      page number in foot, horizontal position not changed}%
+    \entry{\PValue{botcenter}, \PValue{botcentered}, \PValue{botmittle},
+      \PValue{footcenter}, \PValue{footcentered}, \PValue{footmiddle}}{%
+      page number in foot, centered}%
+    \entry{\PValue{botleft}, \PValue{footleft}}{%
+      page number in foot, left justified}%
+    \entry{\PValue{botright}, \PValue{footright}}{%
+      page number in foot, right justified}%
+    \entry{\PValue{center}, \PValue{centered}, \PValue{middle}}{%
+      page number centered horizontally, vertical position not changed}%
+    \entry{\PValue{false}, \PValue{no}, \PValue{off}}{%
+      no page number}%
+    \entry{\PValue{head}, \PValue{top}}{%
+      page number in head, horizontal position not changed}%
+    \entry{\PValue{headcenter}, \PValue{headcentered}, \PValue{headmiddle},
+      \PValue{topcenter}, \PValue{topcentered}, \PValue{topmiddle}}{%
+      page number in head, centered}%
+    \entry{\PValue{headleft}, \PValue{topleft}}{%
+      page number in head, left justified}%
+    \entry{\PValue{headright}, \PValue{topright}}{%
+      page number in head, right justified}%
+    \entry{\PValue{left}}{%
+      page number left, vertical position not changed}%
+    \entry{\PValue{right}}{%
+      page number right, vertical position not changed}%
+  \end{desctabular}
+\end{table}
+%
+\EndIndex{Option}{pagenumber}%
+
+\begin{Declaration}
+  \Option{parskip}=\PName{value}
+\end{Declaration}%
+\BeginIndex{Option}{parskip}%
+\begin{Explain}%
+Especially in letters you often encounter paragraphs marked not with
+indentation of the first line, but with a vertical skip between them. It
+is a matter of tradition. Apparently it has been easier for a secretary
+to operate the carriage return lever twice than setting an indentation
+using a tab stop or the space bar. Correct justification is almost
+impossible using a typewriter, so letters are traditionally typeset
+unjustified.
+
+However, typographers like Jan Tschichold take the view that letters,
+written using means of modern typesetting, should take advantage of
+their possibilities like other documents do. Under these circumstances,
+letters should also be typeset using paragraph indentation and
+justification. The author of \Class{scrlttr2} shares this point of view,
+but nevertheless refrains from imposing to many restrictions upon the
+user.
+\end{Explain}
+
+As as reaction to many serious requests, \Class{scrlttr2} offers the
+possibility to mark paragraphs not only by indentation of the first
+line, but alternatively by vertical skip. You can choose between full or
+half a line of vertical space. When using paragraph spacing, it seems
+often useful to keep the last line of a paragraph shorter, so that
+paragraph recognition will be eased. All these features are controlled
+by different values for the \Option{parskip} option shown at
+\autoref{tab:scrlttr2.parskip}. Default is \PValue{false}.
+
+\begin{table}
+  \caption[{Possible values of option \Option{parskip} with
+    \Class{scrlttr2}}]{Possible values of option \Option{parskip} to select
+    the paragraph mark with \Class{scrlttr2}}
+  \label{tab:scrlttr2.parskip}
+  \begin{desctabular}
+    \entry{\PValue{false}, \PValue{off}}{%
+      paragraph indentation instead of vertical space; the last line of a
+      paragraph may be arbitrarily filled}%
+    \entry{\PValue{full}, \PValue{on}, \PValue{true}}{%
+      one line vertical space between paragraphs; there must be at least
+      1\Unit{em} free space in the last line of a paragraph}%
+    \pventry{full*}{one line vertical space between paragraphs; there must be
+      at least a quarter of a line free space at the end of a paragraph}%
+    \pventry{full+}{one line vertical space between paragraphs; there must be
+      at least a third of a line free space at the end of a paragraph}%
+    \pventry{full-}{one line vertical space between paragraphs; the last line
+      of a paragraph may be arbitrarily filled}%
+    \pventry{half}{half a line vertical space between paragraphs; there must
+      be at least 1\Unit{em} free space in the last line of a paragraph}%
+    \pventry{half*}{half a line vertical space between paragraphs; there must
+      be at least a quarter of a line free space at the end of a paragraph}%
+    \pventry{half+}{half a line vertical space between paragraphs; there must
+      be at least a third of a line free space at the end of a paragraph}%
+    \pventry{half-}{one line vertical space between paragraphs}%
+  \end{desctabular}
+\end{table}
+%
+\EndIndex{Option}{parskip}%
+
+\subsection{Font Options}
+\label{sec:scrlttr2.fontOptions}
+
+Fonts options are any options with influence on the size of the base
+font or of fonts for letter parts. In theory, options affecting the font
+type would also count as font options. At present there is only one
+option for font size in \Class{scrlttr2}.
+
+\begin{Declaration}
+  \Option{fontsize}=\PName{size}
+\end{Declaration}
+\BeginIndex{Option}{fontsize}%
+In the main classes, you choose the font size\Index{font size} for the
+document using the \Option{10pt}, \Option{12pt}, etc. options. In the
+\Class{scrlttr2} class, the desired \PName{size} is set using the
+\Option{fontsize} option. The functionality is the same. This option can
+only be used with \Macro{documentclass}, not with \Macro{KOMAoptions}.
+Default is \PValue{12pt}.
+%
+\EndIndex{Option}{fontsize}%
+
+\subsection{Options for Letter-Head and Address}
+\label{sec:scrlttr2.headoptions}
+
+The \Class{scrlttr2} class offers lots of extensions for the design of
+the letter-head.  There are also options for address formatting,
+extending the possibilities of the standard letter class, although these
+features could already be found in the now obsolete \Class{scrlettr}
+class.
+
+\begin{Declaration}
+  \Option{fromalign}
+\end{Declaration}
+\BeginIndex{Option}{fromalign}%
+This option defines the placement of the from address in the letter-head
+of the first page. At the same time, this option serves as a switch to
+activate or deactivate the extended letter-head options. If these
+extensions are deactivated, some other options will have no effect. This
+will be noted with the respecting options. Possible values for
+\Option{fromalign} are shown at \autoref{tab:scrlttr2.fromalign}. Default is
+\PValue{left}.
+
+\begin{table}
+  \caption[{Possible values of option \Option{fromalign} with
+    \Class{scrlttr2}}]{Possible values of option \Option{fromalign} for
+    setting the position of the from address at the letter head with
+    \Class{scrlttr2}}
+  \label{tab:scrlttr2.fromalign}
+  \begin{desctabular}
+    \entry{\PValue{center}, \PValue{centered}, \PValue{middle}}{%
+      return address centered; an optional logo will be on top of the extended
+      return address; letter-head extensions will be activated}%
+    \entry{\PValue{false}, \PValue{no}, \PValue{off}}{%
+      standard design will be used for the return address; the letter-head
+      extensions are deactivated}%
+    \entry{\PValue{left}}{%
+      left justified return address; an optional logo will be right justified;
+      letter-head extensions will be activated}%
+    \entry{\PValue{right}}{%
+      right justified return address; an optional logo will be left justified;
+      letter-head extensions will be activated}%
+  \end{desctabular}
+\end{table}
+%
+\EndIndex{Option}{fromalign}%
+
+\begin{Declaration}
+  \Option{fromrule}
+\end{Declaration}
+\BeginIndex{Option}{fromrule}%
+This option is part of the letter-head extensions (see option
+\Option{fromalign} above). It allows you to place a horizontal line within the
+return address. The possible values are shown at
+\autoref{tab:scrlttr2.fromrule}. Default is \PValue{false}. You can not
+activate more than one line at a time.
+
+\begin{table}
+  \caption[{Possible values of option \Option{fromrule} with
+    \Class{scrlttr2}}]{Possible values of option \Option{fromrule} for the
+    position of the rule at the from address with
+    \Class{scrlttr2}}
+  \label{tab:scrlttr2.fromrule}
+  \begin{desctabular}
+  \entry{\PValue{afteraddress}, \PValue{below}, \PValue{on}, \PValue{true},
+    \PValue{yes}}{%
+    rule below the return address}%
+  \entry{\PValue{aftername}}{%
+    rule right below the sender's name}%
+  \entry{\PValue{false}, \PValue{no}, \PValue{off}}{%
+    no rule}%
+  \end{desctabular}
+\end{table}
+%
+\EndIndex{Option}{fromrule}%
+
+\begin{Declaration}
+  \Option{fromphone}
+\end{Declaration}
+\BeginIndex{Option}{fromphone}%
+This option is part of the letter-head extensions (see option
+\Option{fromalign} above). It defines whether the phone number will be part of
+the return address.  This option can take the standard values for simple
+switches, as listed in \autoref{tab:scrlttr2.simpleSwitchValues},
+\autopageref{tab:scrlttr2.simpleSwitchValues}. Default is \PValue{false}.
+%
+\EndIndex{Option}{fromphone}%
+
+\begin{Declaration}
+  \Option{fromfax}
+\end{Declaration}
+\BeginIndex{Option}{fromfax}%
+This option is part of the letter-head extensions (see option
+\Option{fromalign} above). It defines whether the facsimile number will be
+part of the return address.  This option can take the standard values for
+simple switches, as listed in \autoref{tab:scrlttr2.simpleSwitchValues},
+\autopageref{tab:scrlttr2.simpleSwitchValues}. Default is \PValue{false}.
+%
+\EndIndex{Option}{fromfax}%
+
+\begin{Declaration}
+  \Option{fromemail}
+\end{Declaration}
+\BeginIndex{Option}{fromemail}%
+This option is part of the letter-head extensions (see option
+\Option{fromalign} above). It defines whether the
+email address will be part of the return address.  This option can take
+the standard values for simple switches, as listed in
+\autoref{tab:scrlttr2.simpleSwitchValues},
+\autopageref{tab:scrlttr2.simpleSwitchValues}. Default is \PValue{false}.
+%
+\EndIndex{Option}{fromemail}%
+
+\begin{Declaration}
+  \Option{fromurl}
+\end{Declaration}
+\BeginIndex{Option}{fromurl}%
+This option is part of the letter-head extensions (see option
+\Option{fromalign} above). It defines whether the
+URL will be part of the return address.  This option can take
+the standard values for simple switches, as listed in
+\autoref{tab:scrlttr2.simpleSwitchValues},
+\autopageref{tab:scrlttr2.simpleSwitchValues}. Default is \PValue{false}.
+%
+\EndIndex{Option}{fromurl}%
+
+\begin{Declaration}
+  \Option{fromlogo}
+\end{Declaration}
+\BeginIndex{Option}{fromlogo}%
+This option is part of the letter-head extensions (see option
+\Option{fromalign} above). It defines whether the
+logo will be part of the return address.  This option can take
+the standard values for simple switches, as listed in
+\autoref{tab:scrlttr2.simpleSwitchValues},
+\autopageref{tab:scrlttr2.simpleSwitchValues}. Default is \PValue{false}.
+%
+\EndIndex{Option}{fromlogo}%
+
+\begin{Declaration}
+  \Option{addrfield}
+\end{Declaration}
+\BeginIndex{Option}{addrfield}%
+This option defines whether an address field will be set. Default is to
+use the address field. This option can take the standard values for
+simple switches, as listed in
+\autoref{tab:scrlttr2.simpleSwitchValues},
+\autopageref{tab:scrlttr2.simpleSwitchValues}. Default is \PValue{true}.
+%
+\EndIndex{Option}{addrfield}%
+
+\begin{Declaration}
+  \Option{backaddress}
+\end{Declaration}
+\BeginIndex{Option}{backaddress}%
+This option defines whether a return address for window envelopes will
+be set. Default is to use the return address. If the address field is
+suppressed (see option \Option{addrfield}), there will be no return
+address either. This option can take the standard values for simple
+switches, as listed in \autoref{tab:scrlttr2.simpleSwitchValues},
+\autopageref{tab:scrlttr2.simpleSwitchValues}.
+Default is \PValue{true}.
+%
+\EndIndex{Option}{backaddress}%
+
+\begin{Declaration}
+  \Option{subject}
+\end{Declaration}
+\BeginIndex{Option}{subject}%
+This option serves two purposes: First, you can choose if your subject should
+have a title, given by the \PName{subject} variable (see
+\autoref{tab:scrlttr2.subjectTerm},
+\autopageref{tab:scrlttr2.subjectTerm}). Second, you can choose if the subject
+should be set before or after the opening. Possible values for this option
+are shown at \autoref{tab:scrlttr2.subject}. Defaults are
+\PValue{beforeopening} and \PValue{untitled}.
+
+\begin{table}
+  \caption[{Possible values of option \Option{subject} with
+    \Class{scrlttr2}}]{Possible values of option \Option{subject} for the
+    position of the subject with
+    \Class{scrlttr2}}
+  \label{tab:scrlttr2.subject}
+  \begin{desctabular}
+    \pventry{afteropening}{set subject after opening}%
+    \pventry{beforeopening}{set subject before opening}%
+    \pventry{titled}{add title to subject}%
+    \pventry{untitled}{do not add title to subject}%
+  \end{desctabular}
+\end{table}
+%
+\EndIndex{Option}{subject}%
+
+\begin{Declaration}
+  \Option{locfield}
+\end{Declaration}
+\BeginIndex{Option}{locfield}%
+\Class{scrlttr2} places a field with additional sender attributes next
+to the address field. This can be used for bank accounts or similar.
+Depending on the \Option{fromalign} option, it will also be used for the
+sender logo. The width of this field may be defined within an \File{lco}
+file (see \autoref{sec:lcoFile}). If the width is set to 0 in that
+file, then the \Option{locfield} option can toggle between two presets
+for the field width. See the explanation on the \Variable{locwidth}
+pseudo length in \autoref{sec:scrlttr2.locationField},
+\autopageref{desc:scrlttr2.plength.locwidth}. Possible
+values for this option are shown at \autoref{tab:scrlttr2.locfield}. Default
+is \PValue{narrow}.
+
+\begin{table}
+  \caption[{Possible values of option \Option{locfield} with
+    \Class{scrlttr2}}]{Possible values of option \Option{locfield} for setting
+    the width of the field with additional sender attributes with
+    \Class{scrlttr2}}
+  \label{tab:scrlttr2.locfield}
+  \begin{desctabular}
+    \pventry{narrow}{small sender supplement field}%
+    \pventry{wide}{large sender supplement field}%
+  \end{desctabular}
+\end{table}
+%
+\EndIndex{Option}{locfield}%
+
+\begin{Declaration}
+  \Option{foldmarks}
+\end{Declaration}
+\BeginIndex{Option}{foldmarks}%
+This option activates fold marks for two or three panel folding of the
+letter. The exact placement of the fold marks for three panel letter fold
+depends on user settings or the \File{lco} file, resp.\ (see
+\autoref{sec:lcoFile}). The folding need not result in equal sized
+parts. This option can take the standard values for simple switches, as
+listed in \autoref{tab:scrlttr2.simpleSwitchValues},
+\autopageref{tab:scrlttr2.simpleSwitchValues}. Default is
+\PValue{true}, which implies setting the fold marks.
+%
+\EndIndex{Option}{foldmarks}%
+
+\begin{Declaration}
+  \Option{numericaldate}
+\end{Declaration}
+\BeginIndex{Option}{numericaldate}%
+This option toggles between the standard, language-dependent date
+presentation and a short, numerical one. \KOMAScript{} does not
+provide the standard presentation. It should be defined by packages
+like \Package{german}\IndexPackage{german},
+\Package{babel}\IndexPackage{babel}, or
+\Package{isodate}\IndexPackage{isodate}. The short, numerical
+presentation will be produced by \Class{scrlttr2} itself. This option
+can take the standard values for simple switches, as listed in
+\autoref{tab:scrlttr2.simpleSwitchValues},
+\autopageref{tab:scrlttr2.simpleSwitchValues}. Default is
+\PValue{false}, which results in standard date presentation. In the
+now obsolete \Class{scrlettr} class, this was achieved using the
+\Option{orgdate} option, but with opposite results.
+%
+\EndIndex{Option}{numericaldate}%
+
+\begin{Declaration}
+  \Option{refline}
+\end{Declaration}
+\BeginIndex{Option}{refline}%
+With the \Class{scrlttr2} class, the head, foot, address, and 
+sender attributes may extend beyond the normal type area to the left
+and to the right. This option defines if that also applies to the
+reference line. Normally, the reference line contains at least the date,
+but it can hold additional data. Possible values for this option are shown at
+\autoref{tab:scrlttr2.refline}. Default is \PValue{narrow}.
+
+\begin{table}
+  \caption[{Possible value of option \Option{refline} with
+    \Class{scrlttr2}}]{Possible value of option \Option{refline} for setting
+    the width of the reference line with
+    \Class{scrlttr2}}
+  \label{tab:scrlttr2.refline}
+  \begin{desctabular}
+    \pventry{narrow}{reference line restricted to type area}%
+    \pventry{wide}{reference line corresponds to address and sender
+      attributes}%
+  \end{desctabular}
+\end{table}
+%
+\EndIndex{Option}{refline}%
+
+\subsection{Format Options}
+\label{sec:scrlttr2.formatingOptions}
+
+Format options are those, which influence form or format of the 
+output and do not belong to another section. You might also call them
+the \emph{miscellaneous options}.
+
+\begin{Declaration}
+  \Option{draft}
+\end{Declaration}
+\BeginIndex{Option}{draft}%
+This option toggles between the final\Index{final version} and the
+draft\Index{draft version} version of a document. In particular,
+enabling the \Option{draft} option activates little black boxes that
+will be drawn at the end of overfull lines. For the unpracticed eye,
+these boxes ease the identification of paragraphs that need manual
+improvement. When the \Option{draft} option is disabled, there will be
+no such boxes. This option can take the standard values for simple
+switches, as listed in \autoref{tab:scrlttr2.simpleSwitchValues},
+\autopageref{tab:scrlttr2.simpleSwitchValues}.
+Default is \PValue{false}, as usual. But I strongly recommend enabling
+the \Option{draft} option when designing a letter, as for every other
+document.
+%
+\EndIndex{Option}{draft}%
+
+\subsection{The Letter Class Option Files}
+\label{sec:lcoFile}
+
+\BeginIndex{}{lco=\File{lco}}%
+Normally, you would not redefine parameters like the distance between
+the address field and the top edge of the paper every time you write a
+letter. Instead, you would reuse a whole set of parameters for certain
+occasions. It will be much the same for the letter-head and foot used on
+the first page. Therefore, it is reasonable to save these settings in a
+separate file. For this purpose, the \Class{scrlttr2} class offers the
+\File{lco} files. The \File{lco} suffix is an abbreviation for
+\emph{\emph{l}etter \emph{c}lass \emph{o}ption}.
+
+In an \File{lco} file you can use all commands available to the document
+at the time the \File{lco} file is loaded.  Additionally, it can contain
+internal commands available to package writers. For \Class{scrlttr2},
+these are in particular the commands \Macro{@newplength}, \Macro{@setplength},
+\Macro{@addtoplength} and \Macro{addtolengthplength} (see
+\autoref{sec:scrlttr2.pseudoLength}).
+
+There are already some \File{lco} files included in the \KOMAScript{}
+distribution. The \File{DIN.lco}, \File{DINmtext.lco}, \File{SNleft.lco}, and
+\File{SN.lco} files serve to adjust \KOMAScript{} to different layout
+standards. They are well suited as templates for your own parameter sets. The
+\File{KOMAold.lco} file, however, serves to improve compatibility with the old
+letter class \Class{scrlettr}.  Because it contains internal commands not open
+to package writers, you should not use them as a template for your own
+\File{lco} files. You can find a list of predefined \File{lco} files in
+\autoref{tab:lcoFiles}, \autopageref{tab:lcoFiles}.
+
+\begin{Explain}
+If you have defined a parameter set for a letter standard not yet
+supported by \KOMAScript{}, you are explicitly invited to send this
+parameter set to the \KOMAScript{} support address. Please do not forget
+to include the permission for distribution under the \KOMAScript{}
+license (see the \File{LEGAL.TXT} file). If you know the necessary
+metrics for an unsupported letter standard, but are not able to write a
+corresponding \File{lco} file yourself, you can also contact me. You
+will find current addresses in the latest volume of the
+\KOMAScript\textsf{-News} or in \autoref{sec:introduction.authors}.
+\end{Explain}
+
+\begin{Declaration}
+  \Macro{LoadLetterOption}\Parameter{name}
+\end{Declaration}
+\BeginIndex{Cmd}{LoadLetterOption}%
+Usually, the \File{lco} files will be loaded by the
+\Macro{documentclass} command. You enter the name of the \File{lco} file
+without suffix as an option. The \File{lco} file will be loaded right
+after the class file.
+
+But it is also possible to load an \File{lco} file later, or even from
+within another \File{lco} file. This can be done with the
+\Macro{LoadLetterOption} command, which gets the \PName{name} of the
+\File{lco} file without suffix as a parameter.
+\begin{Example}
+You write a document containing several letters. Most of them should
+comply with the German DIN standard. So you start with:
+\begin{lstlisting}
+  \documentclass{scrlttr2}
+\end{lstlisting}
+But one letter should use the \File{DINmtext} variant, with the address
+field placed more to the top, which results in more text fitting on the
+first page. The folding will be modified so that the address field still
+matches the address window in a DIN~C6/5 envelope. 
+You can achieve this as follows:
+\begin{lstlisting}
+  \begin{letter}{Markus Kohm\\
+      Fichtenstra\ss e 63\\68535 Edingen-Neckarhausen}
+    \LoadLetterOption{DINmtext}
+    \opening{Hello,}
+\end{lstlisting}
+Since construction of the page does not start before the
+\Macro{opening}, it is sufficient to load the \File{lco} file before the
+\Macro{opening} command. In particular, this need not be done before
+\Macro{begin}\PParameter{letter}. So the changes made by loading the
+\File{lco} file are local to the corresponding letter.
+\end{Example}
+
+\begin{Explain}
+If an \File{lco} file is loaded via \Macro{documentclass}, it may
+nevertheless take the name of an option, provided it is an option that
+does not take an argument. However, it would be possible to give the
+name \File{fromalign=left.lco} to an \File{lco} file. It will get
+loaded every time the \Macro{documentclass} option \Option{fromalign}
+is used with the value \PValue{left}. Admittedly, this is quite
+academic. Of course you can use this feature only if your operating and
+file system support this kind of file names. Otherwise you have to
+choose another file name and add the corresponding option, if
+needed.
+\end{Explain}
+
+\begin{Example}
+  You do not want to enter your sender address every time, so you
+  create an \File{lco} file with the necessary data, like this:
+\begin{lstlisting}
+  \ProvidesFile{mkohm.lco}[2002/02/25 letter class option]
+  \setkomavar{fromname}{Markus Kohm}
+  \setkomavar{fromaddress}{Fichtenstra\ss e 63\\
+                           68535 Edingen-Neckarhausen}
+\end{lstlisting}
+  Please note that the German sharp s, ``\ss'', was entered using the
+  \TeX{} macro \Macro{ss}, because right after \Macro{documentclass}
+  no packages for input encoding, for example
+  \Macro{usepackage}\PValue{[latin1]}\PParameter{inputenc} for Unix or
+  \Macro{usepackage}\PValue{[ansinew]}\PParameter{inputenc} for
+  Windows, and no language packages, like
+  \Macro{usepackage}\PParameter{ngerman}\IndexPackage{ngerman} for the
+  new German orthography, are loaded.
+  
+  But if you would always use the same input encoding, you could also
+  include it into your \File{lco} file. This would look like this:
+\begin{lstlisting}
+  \ProvidesFile{mkohm.lco}[2002/02/25 letter class option]
+  \RequirePackage[latin1]{inputenc}
+  \setkomavar{fromname}{Markus Kohm}
+  \setkomavar{fromaddress}{Fichtenstraße 63\\
+                           68535 Edingen-Neckarhausen}
+\end{lstlisting}
+  There is one problem with this usage: you cannot load this
+  \File{lco} file later in your document. If you want to have letters
+  with different senders in one document, you should refrain from
+  loading packages in your \File{lco} file.
+  
+  Let us further assume that I always typeset letters using the preset
+  \File{KOMAold}. Then I could add the following line to my
+  \File{mkohm.lco} file:
+\begin{lstlisting}
+  \LoadLetterOption{KOMAold}
+\end{lstlisting}
+  
+  Anyway, now you can preset my sender address using
+\begin{lstlisting}
+  \documentclass[mkohm]{scrlttr2}
+\end{lstlisting}
+\end{Example}
+
+In \autoref{tab:lcoFiles}, \autopageref{tab:lcoFiles} you find a list of all
+predefined \File{lco} files. If you use a printer that has large unprintable
+areas on the left or right side, you might have problems with the
+\Option{SN}\IndexOption{SN} option. The Swiss standard SN~101\,130 defines the
+address field to be placed 8\,mm from the right paper edge, so the headline
+and the sender attributes will be set with the same small distance to the
+paper edge. This also applies to the reference line when using the
+\Option{refline}\PValue{=wide} option (see
+\autoref{sec:scrlttr2.headoptions},
+\autopageref{desc:scrlttr2.option.refline}). If you have this kind of problem, create
+your own \File{lco} file that loads \Option{SN} first and then changes
+\PLength{toaddrhpos}\IndexPLength{toaddrhpos} (see
+\autoref{sec:scrlttr2.addressee},
+\autopageref{desc:scrlttr2.plength.toaddrvpos}) to a smaller value. Please also reduce
+\PLength{toaddrwidth} accordingly.
+%
+\EndIndex{Cmd}{LoadLetterOption}%
+
+\begin{table}
+\centering
+\caption{The predefined \File{lco} files}
+\begin{tabular}{lp{.7\textwidth}}
+  \toprule
+  \File{lco} file & Description and features \\
+  \midrule
+  \Option{DIN}\IndexOption[indexmain]{DIN}%
+                & parameter set for letters on A4 size paper,
+                  complying with German standard DIN~676;
+                  suitable for window envelopes in the sizes C4, C5, C6,
+                  and C6/5 (C6 long).\\
+  \Option{DINmtext}\IndexOption[indexmain]{DINmtext}%
+                & parameter set for letters on A4 size paper,
+                  complying with DIN~676, but using an alternate layout
+                  with more text on the first page;
+                  only suitable for window envelopes in the sizes C6 and
+                  C6/5 (C6 long).\\
+  \Option{KOMAold}\IndexOption[indexmain]{KOMAold}%
+                & parameter set for letters on A4 size paper using a
+                  layout close to the now obsolete \Class{scrlettr}
+                  letter class; suitable for window envelopes in the sizes
+                  C4, C5, C6, and C6/5 (C6 long);
+                  some additional commands to improve compatibility with
+                  obsolete \Class{scrlettr} commands are defined;
+                  \Class{scrlttr2} may behave slightly different when
+                  used with this \File{lco} file than with the other
+                  \File{lco} files.\\
+  \Option{SN}\IndexOption[indexmain]{SN}%
+                & parameter set for Swiss letters with address field on
+                  the right side, according to SN~010\,130; suitable for
+                  Swiss window envelopes in the sizes C4, C5, C6, and
+                  C6/5 (C6 long).\\
+  \Option{SNleft}\IndexOption[indexmain]{SNleft}%
+                & parameter set for Swiss letters with address field on 
+                  the left side;
+                  suitable for Swiss window envelopes with window on the
+                  left side in the sizes C4, C5, C6, and C6/5 (C6 long).
+                  \\
+  \bottomrule
+\end{tabular}
+\label{tab:lcoFiles}
+\end{table}
+
+\begin{Explain}
+\begin{Declaration}
+  \Macro{LetterOptionNeedsPapersize}%
+    \Parameter{option name}\Parameter{paper size}
+\end{Declaration}
+\BeginIndex{Cmd}{LetterOptionNeedsPapersize}
+As mentioned in \autoref{sec:scrlttr2.typeareaOptions}, there are
+only parameter sets and \File{lco} files for A4 sized paper. But in
+every \File{lco} file distributed with \KOMAScript{} you will find a
+\Macro{LetterOptionNeedsPapersize} command so that you will be warned
+when using another \PName{paper size}. The first argument is the name of
+the \File{lco} file without the ``\File{.lco}'' suffix. Second argument
+is the paper size the \File{lco} file is designed for.
+
+If several \File{lco} files are loaded, the 
+\Macro{LetterOptionNeedsPapersize} command can be contained in each of
+them, but the \Macro{opening}
+command will only check the last given \PName{paper size}. As shown in
+the following example, an experienced user can thus easily write
+\File{lco} files with parameter sets for other paper sizes. If you do
+not plan to set up \File{lco} files yourself, you may just forget about
+this option and skip the example.
+
+\begin{Example}
+Supposed you use A5 sized paper in normal, i.\,e.\ upright or
+portrait, orientation for your letters. We further assume that you want
+to put them into standard C6 window envelopes. Then, the position of the
+address field would be the same as for a DIN standard letter on A4 sized
+paper. The main difference is that A5 paper needs only one fold. So you
+want to disable the upper and lower fold marks. The easiest way to
+achieve this is to place the marks outside the paper area.
+\begin{lstlisting}
+  \ProvidesFile{paper=a5.lco}[2002/05/02 letter class option]
+  \LetterOptionNeedsPapersize{paper=a5}{a5}
+  \@setplength{tfoldmarkvpos}{\paperheight}
+  \@setplength{bfoldmarkvpos}{\paperheight}
+\end{lstlisting}
+Besides, the placement of the foot must be adjusted. It is left to the
+reader to find an appropriate value. When using such an \File{lco} file,
+you must only take care that other \File{lco} file options, like
+\File{SN}, are declared before the paper size, i.\,e.\ before loading
+``\File{paper=a5.lco}''. This seems too complicated? Only before you
+used it the first time. Anyway, how often do you write letters not using
+your standard format?
+\end{Example}
+%
+\EndIndex{Cmd}{LetterOptionNeedsPapersize}
+\end{Explain}
+
+By the way, the \File{DIN} \File{lco} file will always be loaded as the
+first \File{lco} file. This ensures that all pseudo lengths will have
+more or less reasonable default values.
+
+Please note that it is not possible to use \Macro{PassOptionsToPackage}
+to pass options to packages from within an \File{lco} file that have
+already been loaded by the class. Normally, this only applies to the
+\Package{typearea}, \Package{scrlfile}, and \Package{keyval} packages.
+%
+\EndIndex{}{lco=\File{lco}}%
+
+\section{General Document Properties}
+\label{sec:scrlttr2.general}
+
+Some document properties aren't assigned to a certain part of the
+document such as the letter-head or the letter body. Several of
+these properties have already been mentioned in
+\autoref{sec:scrlttr2.options}.
+
+
+\subsection{Font Selection}
+\label{sec:scrlttr2.font}
+
+\BeginIndex{}{font style}\BeginIndex{}{font size}%
+\begin{Explain}
+Commands for defining, extending and querying the font of a specific
+element can be found~\ref{sec:maincls.font}. These commands work exactly
+the same in \Class{scrlttr2}. The elements which can be influenced in
+this way are listed in \autoref{tab:scrlttr2.elementsWithoutText}.
+%
+\begin{table}
+  \centering%
+  \caption{Alphabetical list of the elements, whose font can be
+   changed in \Class{scrlttr2} using the commands \Macro{setkomafont} and
+    \Macro{addtokomafont}}
+  \begin{desctabular}
+    \feentry{backaddress}{%
+      return address for a window envelope}%
+    \feentry{descriptionlabel}{%
+      label, i.e. the optional argument of \Macro{item}, in a
+      \Environment{description} environment}%
+    \feentry{fromaddress}{%
+      sender's address in the letter-head}%
+    \feentry{fromname}{%
+      sender's address in the letter-head if different from
+      \FontElement{fromaddress}}%
+    \feentry{pagefoot}{%
+      in most cases the footer, sometimes the header of a page}%
+    \feentry{pagehead}{%
+      in most cases the header, sometimes the footer of page}%
+    \feentry{pagenumber}{%
+      page number in the footer or header which is inserted with
+      \Macro{pagemark}}%
+    \feentry{subject}{%
+      subject in the opening of the letter}%
+    \feentry{title}{%
+      headline in the opening of the letter}%
+  \end{desctabular}
+  \label{tab:scrlttr2.elementsWithoutText}
+\end{table}
+\end{Explain}
+%
+\EndIndex{}{font style}\EndIndex{}{font size}%
+
+
+\subsection{Page Style}
+\label{sec:scrlttr2.pageStyle} One of the general properties of a
+document is the page style. Please refer also the
+\autoref{sec:maincls.pageStyle} and \autoref{cha:scrpage}.
+
+\begin{Declaration}
+\Macro{pagestyle}\PParameter{empty}\\
+\XMacro{pagestyle}\PParameter{plain}\\
+\XMacro{pagestyle}\PParameter{headings}\\
+\XMacro{pagestyle}\PParameter{myheadings}\\
+\XMacro{thispagestyle}\Parameter{local page style}
+\end{Declaration}
+\BeginIndex{Cmd}{pagestyle}%
+\BeginIndex{Cmd}{thispagestyle}%
+\BeginIndex{Pagestyle}{empty}%
+\BeginIndex{Pagestyle}{plain}%
+\BeginIndex{Pagestyle}{headings}%
+\BeginIndex{Pagestyle}{myheadings}%
+In letters written with \Class{scrlttr2} there are four different
+page styles.
+\begin{description}
+\item[empty] is the page style, in which the header and footer of
+  subsequent pages (all pages apart from the first) are completely
+  empty. This page style is also used for the first page, because
+  header and footer of this page are set using the macro
+  \Macro{opening}.
+  
+\item[plain] is the page style with only page numbers in the header or
+  footer on subsequent pages. The placement of these page numbers is
+  determined by the option \Option{pagenumber} (see
+  \autoref{sec:scrlttr2.layout}).
+
+\item[headings] is the page style for automatic page headings of
+  subsequent pages. The inserted marks are the sender's name from the
+  variable \Variable{fromname}\IndexVariable{fromname} and the subject
+  from the variable \Variable{subject}\IndexVariable{subject} (see
+  \autoref{sec:scrlttr2.firstHead} and
+  \autoref{sec;scrlttr2.titleSubject}). At which position these
+  marks and the page numbers are placed depends on the option
+  \Option{pagenumber} (see \autoref{sec:scrlttr2.layout}).  Apart
+  from that, the author can change these marks after \Macro{opening}
+  manually.
+\item[myheadings] is the page style for manual page headings of
+  subsequent pages. This is very similar to \PValue{headings}, but
+  here the marks are set by the author using the commands
+  \Macro{markboth}\IndexCmd{markboth} and
+  \Macro{markright}\Index{markright}.
+\end{description}
+
+Page styles are also influenced by the option
+\Option{headsepline}\IndexOption{headsepline} or
+\Option{footsepline}\IndexOption{footsepline} (see
+\autoref{sec:scrlttr2.layout}). The page style beginning with
+the current page is switched with \Macro{pagestyle}. In contrast,
+\Macro{thispagestyle} changes only the page style of the current
+page. The letter class itself uses
+\Macro{thispagestyle}\PParameter{empty} within
+\Macro{opening}\IndexCmd{opening} for the first page of the
+letter.
+%
+\EndIndex{Cmd}{pagestyle}%
+\EndIndex{Cmd}{thispagestyle}%
+\EndIndex{Pagestyle}{empty}%
+\EndIndex{Pagestyle}{plain}%
+\EndIndex{Pagestyle}{headings}%
+\EndIndex{Pagestyle}{myheadings}%
+
+\BeginIndex[indexother]{}{font style}%
+For changing the font style of headers or footers you should use the
+user interface described in \autoref{sec:maincls.font}.  For
+header and footer the same element is used which you can name either
+\FontElement{pagehead}\IndexFontElement{pagehead} or
+\FontElement{pagefoot}\IndexFontElement{pagefoot}. The element for the
+page number within the header or footer is named
+\FontElement{pagenumber}\IndexFontElement{pagenumber}.  Default
+settings are listed in \autoref{tab:maincls.defaultFontsHeadFoot},
+\autopageref{tab:maincls.defaultFontsHeadFoot}.
+Please have also a look at the example in
+\autoref{sec:maincls.pageStyle},
+\autopageref{sec:maincls.pageStyle.example}.
+%
+\EndIndex[indexother]{}{font style}%
+
+\begin{Declaration}
+  \Macro{clearpage}\\
+  \Macro{cleardoublepage}\\
+  \Macro{cleardoublestandardpage}\\
+  \Macro{cleardoubleplainpage}\\
+  \Macro{cleardoubleemptypage}
+\end{Declaration}%
+\BeginIndex{Cmd}{clearpage}%
+\BeginIndex{Cmd}{cleardoublepage}%
+\BeginIndex{Cmd}{cleardoublestandardpage}%
+\BeginIndex{Cmd}{cleardoubleplainpage}%
+\BeginIndex{Cmd}{cleardoubleemptypage}%
+Please refer to \autoref{sec:maincls.pageStyle},
+\autopageref{desc:maincls.macro.clearpage}. The function
+of \Macro{cleardoublepage} in \Class{scrlttr2} depends on the
+option \Option{cleardoublepage} which is described in more detail
+in \autoref{sec:scrlttr2.layout},
+\autopageref{desc:scrlttr2.option.cleardoublepage}.
+%
+\EndIndex{Cmd}{clearpage}%
+\EndIndex{Cmd}{cleardoublepage}%
+\EndIndex{Cmd}{cleardoublestandardpage}%
+\EndIndex{Cmd}{cleardoubleplainpage}%
+\EndIndex{Cmd}{cleardoubleemptypage}%
+
+
+
+\subsection{Variables}
+\label{sec:scrlttr2.variables}
+
+\BeginIndex{}{Variables}%
+Apart from options, commands, environments, counters and lengths
+additional elements have already been introduced in \KOMAScript{}.
+A typical property of an element is the font style and the option
+to change it (see \autoref{sec:maincls.font}). At this point
+we now are going  to introduce variables. Variables have a name by
+which they are called and they have a content. The content of a
+variable can be set independently from time and location of the
+actual usage. The main difference between a command and a variable
+is that a command usually triggers an action whereas a variable
+only consist of plain text. Furthermore a variable can have an
+additional description, which can be set and issued.
+
+This section only gives a short introduction to the term variable.
+The following examples have no special meaning. More detailed
+examples can be found in the explanation of predefined variables
+of the letter class in the following sections. An overview of all
+variables is given in \autoref{tab:scrlttr2.variables}.
+
+\begin{desctable}
+  \caption{Alphabetical list of all supported variables in
+    \Class{scrlttr2}\label{tab:scrlttr2.variables}}\\
+  \Endfirsthead
+  \caption[]{Alphabetical list of all supported variables in
+    \Class{scrlttr2} (\emph{pursuit})}\\
+  \Endhead%
+  \standardfoot%
+  \ventry{backaddress}{return address for window envelopes
+    (\autoref{sec:scrlttr2.addressee}, 
+     \autopageref{desc:scrlttr2.variable.backaddress})}%
+  \ventry{backaddressseparator}{separator within the return address
+    (\autoref{sec:scrlttr2.addressee}, 
+     \autopageref{desc:scrlttr2.variable.backaddressseparator})}%
+  \ventry{ccseparator}{separator between title of additional addressees and
+    additional addressees
+    (\autoref{sec:scrlttr2.afterClosing}, 
+     \autopageref{desc:scrlttr2.variable.ccseparator})}%
+  \ventry{customer}{customer number
+    (\autoref{sec:scrlttr2.refLine}, 
+     \autopageref{desc:scrlttr2.variable.customer})}%
+  \ventry{date}{date
+    (\autoref{sec:scrlttr2.refLine}, 
+     \autopageref{desc:scrlttr2.variable.date})}%
+  \ventry{emailseparator}{separator between e-mail name and e-mail address
+    (\autoref{sec:scrlttr2.firstHead}, 
+     \autopageref{desc:scrlttr2.variable.emailseparator})}%
+  \ventry{enclseparator}{separator between title of enclosure and enclosures
+    (\autoref{sec:scrlttr2.afterClosing}, 
+     \autopageref{desc:scrlttr2.variable.enclseparator})}%
+  \ventry{faxseparator}{separator between title of fax and fax number
+    (\autoref{sec:scrlttr2.firstHead}, 
+     \autopageref{desc:scrlttr2.variable.faxseparator})}%
+  \ventry{fromaddress}{sender's address without its name
+    (\autoref{sec:scrlttr2.firstHead}, 
+     \autopageref{desc:scrlttr2.variable.fromaddress})}%
+  \ventry{frombank}{sender's bank account
+    (\autoref{sec:scrlttr2.other}, 
+     \autopageref{desc:scrlttr2.variable.frombank})}%
+  \ventry{fromemail}{sender's e-mail
+    (\autoref{sec:scrlttr2.firstHead}, 
+     \autopageref{desc:scrlttr2.variable.fromemail})}%
+  \ventry{fromfax}{sender's fax number
+    (\autoref{sec:scrlttr2.firstHead}, 
+     \autopageref{desc:scrlttr2.variable.fromfax})}%
+  \ventry{fromlogo}{commands for inserting the sender's logo
+    (\autoref{sec:scrlttr2.firstHead}, 
+     \autopageref{desc:scrlttr2.variable.fromlogo})}%
+  \ventry{fromname}{complete name of the sender
+    (\autoref{sec:scrlttr2.firstHead}, 
+     \autopageref{desc:scrlttr2.variable.fromname})}%
+  \ventry{fromphone}{sender's telephone number
+    (\autoref{sec:scrlttr2.firstHead}, 
+     \autopageref{desc:scrlttr2.variable.fromphone})}%
+  \ventry{fromurl}{one url of the sender
+    (\autoref{sec:scrlttr2.firstHead}, 
+     \autopageref{desc:scrlttr2.variable.fromurl})}%
+  \ventry{invoice}{invoice number
+    (\autoref{sec:scrlttr2.refLine}, 
+     \autopageref{desc:scrlttr2.variable.invoice})}%
+  \ventry{location}{more details of the sender
+    (\autoref{sec:scrlttr2.locationField}, 
+     \autopageref{desc:scrlttr2.variable.location})}%
+  \ventry{myref}{ sender's reference
+    (\autoref{sec:scrlttr2.refLine}, 
+     \autopageref{desc:scrlttr2.variable.myref})}%
+  \ventry{place}{place
+    (\autoref{sec:scrlttr2.refLine}, 
+     \autopageref{desc:scrlttr2.variable.place})}%
+  \ventry{placeseparator}{separator between place and date
+    (\autoref{sec:scrlttr2.refLine}, 
+     \autopageref{desc:scrlttr2.variable.placeseparator})}%
+  \ventry{phoneseparator}{separator between title of telephone and telephone
+    number
+    (\autoref{sec:scrlttr2.firstHead}, 
+     \autopageref{desc:scrlttr2.variable.phoneseparator})}%
+  \ventry{signature}{signature beneath the ending of the letter
+    (\autoref{sec:scrlttr2.closing}, 
+     \autopageref{desc:scrlttr2.variable.signature})}%
+  \ventry{specialmail}{special mail
+    (\autoref{sec:scrlttr2.addressee}, 
+     \autopageref{desc:scrlttr2.variable.specialmail})}%
+  \ventry{subject}{subject
+    (\autoref{sec:scrlttr2.titleSubject}, 
+     \autopageref{desc:scrlttr2.variable.subject})}%
+  \ventry{subjectseparator}{separator between title of subject and subject
+    (\autoref{sec:scrlttr2.titleSubject}, 
+     \autopageref{desc:scrlttr2.variable.subjectseparator})}%
+  \ventry{title}{letter title
+    (\autoref{sec:scrlttr2.titleSubject}, 
+     \autopageref{desc:scrlttr2.variable.title})}%
+  \ventry{toname}{complete name of addressee
+    (\autoref{sec:scrlttr2.addressee}, 
+     \autopageref{desc:scrlttr2.variable.toname})}%
+  \ventry{toaddress}{address of addressee without its name
+    (\autoref{sec:scrlttr2.addressee}, 
+     \autopageref{desc:scrlttr2.variable.toaddress})}%
+  \ventry{yourmail}{date of addressee's mail
+    (\autoref{sec:scrlttr2.refLine}, 
+     \autopageref{desc:scrlttr2.variable.yourmail})}%
+  \ventry{yourref}{addressee's reference
+    (\autoref{sec:scrlttr2.refLine}, 
+     \autopageref{desc:scrlttr2.variable.yourref})}%
+\end{desctable}
+
+\begin{Declaration}
+  \Macro{newkomavar}\OParameter{description}\Parameter{name}\\
+  \Macro{newkomavar*}\OParameter{description}\Parameter{name}\\
+  \Macro{addtoreffields}\Parameter{name}
+\end{Declaration}
+\BeginIndex{Cmd}{newkomavar}\BeginIndex{Cmd}{newkomavar*}%
+\BeginIndex{Cmd}{addtoreffields}%
+With \Macro{newkomavar} a new variable is defined. This variable
+is addressed via \PName{name}. As an option you can define a
+\PName{description} for the variable \PName{name}. Using the
+command \Macro{addtoreffields} you can add the variable
+\PName{name} to the reference fields (see
+\autoref{sec:scrlttr2.refLine}). The \PName{description} and
+the content of the variable are added at the end of the reference
+fields. The starred version \Macro{newkomavar*} is similar to the
+one without star with a subsequent call of the command
+\Macro{addtoreffields}. Thus, the starred version automatically
+adds the variable to the reference fields.
+\begin{Example}
+  Suppose you need an additional field for a direct dialling. You
+  can define this field either with
+\begin{lstlisting}
+  \newkomavar[Direct dialling]{myphone}
+  \addtoreffields{myphone}
+\end{lstlisting}
+  or more concise with
+\begin{lstlisting}
+  \newkomavar*[direct dialling]{myphone}
+\end{lstlisting}
+
+\end{Example}
+When you define a variable for the reference fields you should
+always give them a description.
+%
+\EndIndex{Cmd}{newkomavar}\EndIndex{Cmd}{newkomavar*}%
+\EndIndex{Cmd}{addtoreffields}%
+
+
+\begin{Declaration}
+  \Macro{setkomavar}%
+    \Parameter{name}\OParameter{description}\Parameter{content}\\
+  \Macro{setkomavar*}\Parameter{name}\Parameter{description}
+\end{Declaration}
+\BeginIndex{Cmd}{setkomavar}\BeginIndex{Cmd}{setkomavar*}%
+With the command \Macro{setkomavar} you determine the
+\PName{content} of the variable \PName{name}. Using an optional
+argument you can at the same time  change  the \PName{description}
+of the variable. In contrast, \Macro{setkomavar*} can only set the
+\PName{description} of the variable \PName{name}.
+\begin{Example}
+  Suppose you have defined a direct dialling as mentioned above
+  and you now want to set the content. You write:
+\begin{lstlisting}
+  \setkomavar{myphone}{-\,11}
+\end{lstlisting}
+  In addition, you want to replace the term ``direct dialling''
+  with ``Connexion''. Thus you add the description
+\begin{lstlisting}
+  \setkomavar*{myphone}{Connexion}
+\end{lstlisting}
+  or you can put both in one command:
+\begin{lstlisting}
+  \setkomavar{myphone}[Connexion]{-\,11}
+\end{lstlisting}
+\end{Example}
+By the way: You may delete the content of a variable using an empty
+\PName{content} argument. You can also delete the description using an
+empty \PName{description} argument.
+\begin{Example}
+  Suppose you have defined a direct dialling as mentioned above and
+  you now don't want a description to be set. You write:
+\begin{lstlisting}
+  \setkomavar*{myphone}{}
+\end{lstlisting}
+  You can combine this with the definition of the content:
+\begin{lstlisting}
+  \setkomavar{myphone}[]{-\,11}
+\end{lstlisting}
+  So you may setup the content and delete the description using only
+  one command.
+\end{Example}
+%
+\EndIndex{Cmd}{setkomavar}\EndIndex{Cmd}{setkomavar*}%
+
+
+\begin{Declaration}
+  \Macro{usekomavar}\OParameter{command}\Parameter{name}\\
+  \Macro{usekomavar*}\OParameter{command}\Parameter{name}
+\end{Declaration}
+\BeginIndex{Cmd}{usekomavar}\BeginIndex{Cmd}{usekomavar*}%
+In\ChangedAt{v2.9i}{\Class{scrlttr2}} some cases it is necessary that
+the user can access the content or the description of a variable. This
+is specially important when you have defined a variable which is not
+added to the reference fields. Using the command \Macro{usekomavar} you
+have access to the content of the variable \PName{name} whereas the
+starred version \Macro{usekomavar*} gives you the description.
+
+\begin{Explain}
+  The commands \Macro{usekomavar} and \Macro{usekomavar*} are, similar
+  to all commands where a starred version or an optional argument
+  exists, not fully expandable. Nevertheless if used within
+  \Macro{markboth}\IndexCmd{markboth},
+  \Macro{markright}\IndexCmd{markright} or similar commands you
+  needn't insert a \Macro{protect}\IndexCmd{protect} before using
+  them.  Of course this is also true in \Package{scrpage2} for
+  \Macro{markleft}\IndexCmd{markleft}. But they couldn't be used at
+  commands like \Macro{MakeUppercase}\IndexCmd{MakeUppercase}.
+  \Macro{MakeUppercase}\PParameter{\Macro{usekomavar}\Parameter{name}}
+  would result in \Macro{usekomavar}\Parameter{NAME}. To avoid this
+  problem you may use commands like \Macro{MakeUppercase} as optional
+  argument of \Macro{usekomavar} or \Macro{usekomavar*}. So you'll get
+  the upper case content of a variable using
+  \Macro{usekomavar}\PValue{[\Macro{MakeUppercase}]}\Parameter{name}.
+\end{Explain}
+%
+\EndIndex{Cmd}{usekomavar}\EndIndex{Cmd}{usekomavar*}%
+%
+\EndIndex{}{variables}
+
+\begin{Declaration}
+  \Macro{ifkomavarempty}\Parameter{name}\Parameter{true}\Parameter{false}\\
+  \Macro{ifkomavarempty*}\Parameter{name}\Parameter{true}\Parameter{false}
+\end{Declaration}
+\BeginIndex{Cmd}{ifkomavarempty}%
+With\ChangedAt{v2.9i}{\Class{scrlttr2}} these commands you may check
+wether or not the expanded contents or description of a variable is
+empty. The \PName{true} argument will be executed if the contents or
+description is empty. Otherwise the \PName{false} argument will be
+executed. The variant with star sign handles the description of a
+variable, the variant without star the contents.
+
+\begin{Explain}
+  Maybe it is important to know, that the contents or description of
+  the variable will be expanded using \Macro{edef}. If this results in
+  spaces or unexpandable macros like \Macro{relax}, it is not
+  empty. This is even true, if the use of the variable would not
+  result in any output.
+  
+  Both variants of the command must not be used at the argument of
+  \Macro{MakeUppercase}\IndexCmd{MakeUppercase} or commands, which
+  have similar effects to their arguments. See the description of
+  \Macro{usekomavar} above for more information about using commands
+  like \Macro{usekomavar} or \Macro{ifkomavarempty} at the argument of
+  \Macro{MakeUppercase}. But they are robust enough to be used at the
+  argument of e.g.  \Macro{markboth} or \Macro{footnote}.
+\end{Explain}
+
+
+\subsection{The Pseudo Lengths}
+\label{sec:scrlttr2.pseudoLength}
+
+\begin{Explain}
+  \TeX{} works with a fixed number of registers. There are registers
+  for tokens, for boxes, for counters, for skips and for dimensions.
+  Overall there are 256 for each of them. For \LaTeX{} lengths, which
+  are addressed with \Macro{newlength} skip registers are used. If all
+  of these registers are in use you can not define additional lengths.
+  The letter class \Class{scrlttr2} only for the first page would use
+  up more than 20 of such registers. \LaTeX{} itself already uses 40
+  of these registers. The \Package{typearea} package needs some of
+  them too. Thus approximately a quarter of the precious registers is
+  already in use. That's the reason why lengths specific to letters in
+  \Class{scrlttr2} are defined with macros instead of lengths. The
+  drawback of this is that computations withs macros is somewhat more
+  complicated than with real lengths.
+\end{Explain}
+
+A list of all pseudo length at \Class{scrlttr2} is shown at
+\autoref{tab:scrlttr2.pseudoLength} from
+\autopageref{tab:scrlttr2.pseudoLength}. The meaning is shown at
+\autoref{fig:scrlttr2.pseudoLength}.
+
+% TODO: Translate this
+\begin{figure}
+  \centering
+  \includegraphics{plenDIN}
+  \caption{Schematische Darstellung der Pseudolängen für den Briefbogen}
+  \label{fig:scrlttr2.pseudoLength}
+\end{figure}
+
+% TODO: Translate this
+\begin{desctable}
+  \caption{Von der Klasse \Class{scrlttr2} verwendete Pseudolängen%
+    \label{tab:scrlttr2.pseudoLength}}\\
+  \Endfirsthead %
+  \caption[]{Von der Klasse \Class{scrlttr2} verwendete Pseudolängen
+    (\emph{Fortsetzung})}\\%
+  \Endhead%
+  \standardfoot%
+  \pentry{foldmarkhpos}{%
+    Abstand der Faltmarken von der linken Kante des Papiers
+    (\autoref{sec:scrlttr2.other},
+    \autopageref{desc:scrlttr2.plength.foldmarkhpos})}%
+  \pentry{tfoldmarkvpos}{%
+    Abstand der oberen Faltmarke von der oberen Kande des Papiers
+    (\autoref{sec:scrlttr2.other},
+    \autopageref{desc:scrlttr2.plength.tfoldmarkvpos})}%
+  \pentry{bfoldmarkvpos}{%
+    Abstand der unteren Faltmarke von der oberen Kante des Papiers
+    (\autoref{sec:scrlttr2.other},
+    \autopageref{desc:scrlttr2.plength.bfoldmarkvpos})}%
+  \pentry{firstheadvpos}{%
+    Abstand des Briefkopfes von der oberen Kante des Papiers
+    (\autoref{sec:scrlttr2.firstHead},
+    \autopageref{desc:scrlttr2.plength.firstheadvpos})}%
+  \pentry{firstheadwidth}{%
+    Breite des Briefkopfes, wobei dieser relativ zur Papierbreite zentriert
+    wird (\autoref{sec:scrlttr2.firstHead},
+    \autopageref{desc:scrlttr2.plength.firstheadwidth})}%
+  \pentry{fromrulewidth}{%
+    Länge einer optionalen horizontalen Linie im Briefkopf
+    (\autoref{sec:scrlttr2.firstHead},
+    \autopageref{desc:scrlttr2.plength.fromrulewidth})}%
+  \pentry{toaddrvpos}{%
+    Abstand des Anschriftfeldes von der oberen Kante des Papiers
+    (\autoref{sec:scrlttr2.addressee},
+    \autopageref{desc:scrlttr2.plength.toaddrvpos})}%
+  \pentry{toaddrhpos}{%
+    Abstand des Anschriftfeldes von der linken Papierkante, falls der Wert
+    positiv ist, oder negativer Abstand des Anschriftfeldes von der rechten
+    Papierkante, falls der Wert negativ ist (\autoref{sec:scrlttr2.addressee},
+    \autopageref{desc:scrlttr2.plength.toaddrhpos})}%
+  \pentry{toaddrindent}{%
+    linker Einzug der Anschrift innerhalb des Anschriftfeldes
+    (\autoref{sec:scrlttr2.addressee},
+    \autopageref{desc:scrlttr2.plength.toaddrindent})}%
+  \pentry{toaddrwidth}{%
+    Breite des Anschriftfeldes (\autoref{sec:scrlttr2.addressee},
+    \autopageref{desc:scrlttr2.plength.toaddrwidth})}%
+  \pentry{toaddrheight}{%
+    Höhe des Anschriftfeldes (\autoref{sec:scrlttr2.addressee},
+    \autopageref{desc:scrlttr2.plength.toaddrheight})}%
+  \pentry{backaddrheight}{%
+    Höhe der Rücksendeadresse am oberen Rand des Anschriftfeldes
+    (\autoref{sec:scrlttr2.addressee},
+    \autopageref{desc:scrlttr2.plength.backaddrheight})}%
+  \pentry{specialmailindent}{%
+    linker Einzug der Versandart innerhalb des Anschriftfeldes
+    (\autoref{sec:scrlttr2.addressee},
+    \autopageref{desc:scrlttr2.plength.specialmailindent})}%
+  \pentry{specialmailrightindent}{%
+    rechter Einzug der Versandart innerhalb des Anschriftfeldes
+    (\autoref{sec:scrlttr2.addressee},
+    \autopageref{desc:scrlttr2.plength.specialmailrightindent})}%
+  \pentry{locwidth}{%
+    Breite des Feldes für die Absenderergänzung, wobei bei einem Wert von 0
+    die Breite automatisch aufgrund der in \autoref{sec:scrlttr2.headoptions}
+    beschriebenen Option \Option{locfield} berechnet wird
+    (\autoref{sec:scrlttr2.locationField},
+    \autopageref{desc:scrlttr2.plength.locwidth})}%
+  \pentry{refvpos}{%
+    Abstand der Geschäftszeile von der oberen Kante des Papiers
+    (\autoref{sec:scrlttr2.refLine},
+    \autopageref{desc:scrlttr2.plength.refvpos})}%
+  \pentry{refwidth}{%
+    Breite der Geschäftszeile    
+    (\autoref{sec:scrlttr2.refLine},
+    \autopageref{desc:scrlttr2.plength.refwidth})}%
+  \pentry{refhpos}{%
+    Abstand der Geschäftszeile von der linken Papierkante, wobei bei einem
+    Wert von 0 automatisch relativ zur Papierbreite zentriert wird
+    (\autoref{sec:scrlttr2.refLine},
+    \autopageref{desc:scrlttr2.plength.refhpos})}%
+  \pentry{refaftervskip}{%
+    vertikaler Abstand nach der Geschäftszeile
+    (\autoref{sec:scrlttr2.refLine},
+    \autopageref{desc:scrlttr2.plength.refaftervskip})}%
+  \pentry{sigbeforevskip}{%
+    vertikaler Abstand zwischen Gruß und Signatur
+    (\autoref{sec:scrlttr2.closing},
+    \autopageref{desc:scrlttr2.plength.sigbeforevskip})}%
+  \pentry{sigindent}{%
+    Einzug der Signatur gegenüber dem Textkörper
+    (\autoref{sec:scrlttr2.closing},
+    \autopageref{desc:scrlttr2.plength.sigindent})}%
+  \pentry{firstfootvpos}{%
+    Abstand des Brief"|fußes von der oberen Kante des Papiers
+    (\autoref{sec:scrlttr2.firstFoot},
+    \autopageref{desc:scrlttr2.plength.firstfootvpos})}%
+  \pentry{firstfootwidth}{%
+    Breite des Brief"|fußes, der automatisch innerhalb der Papierbreite
+    zentriert wird 
+    (\autoref{sec:scrlttr2.firstFoot},
+    \autopageref{desc:scrlttr2.plength.firstfootwidth})}%
+\end{desctable}
+
+
+\begin{Declaration}
+  \Macro{@newplength}\Parameter{name}
+\end{Declaration}
+\BeginIndex{Cmd}{@newplength}%
+This command defines an new pseudo length. This new pseudo length
+can clearly identified with its \PName{name}. It is made sure that
+every \PName{name} can only be given once.
+
+Since the user in general doesn't define its own pseudo lengths it
+is not intended as a user command. Thus, it can not be used within
+a document, but for example within a \File{lco} file.
+%
+\EndIndex{Cmd}{@newplength}%
+
+\begin{Declaration}
+  \Macro{useplength}\Parameter{name}
+\end{Declaration}
+\BeginIndex{Cmd}{useplength}%
+Using this command you can access the value of the pseudo length
+with the given \PName{name}. This is the only user command in
+connection with pseudo lengths. Of course this command can also be
+used with a \File{lco} file.
+%
+\EndIndex{Cmd}{useplength}%
+
+\begin{Declaration}
+  \Macro{setlengthtoplength}%
+    \OParameter{factor}\Parameter{length}\Parameter{pseudo length}\\
+  \Macro{addtolengthplength}%
+    \OParameter{factor}\Parameter{length}\Parameter{pseudo length}
+\end{Declaration}
+\BeginIndex{Cmd}{setlengthtoplength}%
+\BeginIndex{Cmd}{addtolengthplength}%
+\begin{Explain}%
+While you can combine a length with a factor this is not possible
+with pseudo lengths. Suppose you have a length \Macro{test} with
+the value 2\Unit{pt}, then \texttt{3\Macro{test}} gives you the
+value 6\Unit{pt}. Using pseudo lengths instead
+\texttt{3\Macro{useplength}\PParameter{test}} would give you
+32\Unit{pt}. This is especially annoying if you want a real
+\PName{length} assign the value of a \PName{pseudo length}.
+\end{Explain}
+Using the command \Macro{setlengthtoplength} you can assign a
+multiple of a \PName{pseudo length} to a real \PName{length}.
+Instead of putting the \PName{factor} in front of the
+\PName{pseudo length} it is given as an optional argument. You
+should also use this command when you want to assign a negative
+value of a \PName{pseudo length} to a \PName{length}. In this case
+you can either use a minus sign or \PValue{-1} as the
+\PName{factor}. The command \Macro{addtolengthplength} works very
+similar to that. It adds a multiple of \PName{pseudo length} to
+\PName{length}.
+%
+\EndIndex{Cmd}{setlengthtoplength}%
+\EndIndex{Cmd}{addtolengthplength}%
+
+\begin{Declaration}
+  \Macro{@setplength}%
+    \OParameter{factor}\Parameter{pseudo length}\Parameter{value}\\
+  \Macro{@addtoplength}%
+    \OParameter{factor}\Parameter{pseudo length}\Parameter{value}
+\end{Declaration}
+\BeginIndex{Cmd}{@setplength}%
+\BeginIndex{Cmd}{@addtoplength}%
+Using the command \Macro{@setplength} you assign a multiple of a
+\PName{value} to a \PName{pseudo length}. The \PName{factor} is
+given as an optional argument.
+The command \Macro{@addtoplength}
+adds the \PName{value} to a \PName{pseudo length}. For assigning
+or adding the multiple of \PName{pseudo length} to another pseudo
+length the command \Macro{useplength} is used within \PName{value}.
+To substract the value of a \PName{pseudo length} from another
+\PName{pseudo length} a minus sign or \PValue{-1} as
+\PName{factor} is used.
+
+Since the user in general doesn't define its own pseudo lengths it
+is not intended as a user command. Thus, it can not be used within
+a document, but for example within a \File{lco} file.
+%
+\EndIndex{Cmd}{@setplength}%
+\EndIndex{Cmd}{@addtoplength}%
+
+
+
+\subsection{The General Structure of a Letter Document}
+\label{sec:scrlttr2.document}
+
+The general structure of a letter document differs somewhat from
+the structure of a normal document. Whereas a book document in
+general contains only one book, a letter document can contain
+several letters. As illustrated in
+\autoref{fig:scrlttr2.document} a letter document consists of a
+preamble, the individual letters and the closing.
+
+The preamble comprises all settings that in general concern all
+letters. Most of them can be overwritten in the settings of the
+individual letters. The only setting which can not be changed within a
+single letter is the font size (see option \Option{fontsize} in
+\autoref{sec:scrlttr2.fontOptions},
+\autopageref{desc:scrlttr2.option.fontsize})).  General settings such as the
+loading of packages and the setting of options should be placed before
+\Macro{begin}\PParameter{document} only. All settings that comprise
+the setting of variables or other text features should be done after
+\Macro{begin}\PParameter{document}. This is particularly recommend
+when the \Package{babel} package\IndexPackage{babel} (see
+\cite{package:babel}) is used or language dependend variables of
+\Class{scrlttr2} are to be changed.
+
+The closing usually consists only of the standard closing for the
+end of a document. Of course you can also insert additional
+comments at this point.
+
+\begin{figure}
+\centering\small\setlength{\fboxsep}{1.5ex}
+\fbox{\parbox{.667\linewidth}{\raggedright%
+    \Macro{documentclass}\OParameter{\dots}\PParameter{scrlttr2}\\
+    \dots\\
+    {\centering\emph{Settings for all letters}\\}
+    \dots\\
+    \Macro{begin}\PParameter{document}\\
+    \dots\\
+    {\centering\emph{Settings for all letters}\\}
+    \dots\\
+  }}\\
+\fbox{\parbox{.667\linewidth}{\raggedright%
+    \Macro{begin}\PParameter{letter}\Parameter{addressee}\\
+    \dots\\
+    {\centering\emph{Content of the individual letter}\\}
+    \dots\\
+    \Macro{end}\PParameter{letter}\\
+  }}\\
+\parbox{.667\linewidth}{\raggedright\vspace{-.5ex}\vdots\vspace{1ex}}\\
+\fbox{\parbox{.667\linewidth}{\raggedright%
+    \Macro{end}\PParameter{document}\\
+  }}\\
+\caption{General structure of a letter document with several
+individual letters (the structure of a single letter is shown in
+ \autoref{fig:scrlttr2.letter})}
+\label{fig:scrlttr2.document}
+\vspace{2\abovecaptionskip}
+\fbox{\parbox{.667\linewidth}{\raggedright%
+    \Macro{begin}\PParameter{letter}%
+      \OParameter{Optionen}\Parameter{addressee}\\
+    \dots\\
+    {\centering\emph{Settings for this letter}\\}
+    \dots\\
+    \Macro{opening}\Parameter{opening}\\
+  }}\\
+\fbox{\parbox{.667\linewidth}{\raggedright%
+    \dots\\
+    {\centering\emph{letter text}\\}
+    \dots\\
+  }}\\
+\fbox{\parbox{.667\linewidth}{\raggedright%
+    \Macro{closing}\Parameter{closing}\\
+    \Macro{ps}\\
+    \dots\\
+    {\centering\emph{postscript}\\}
+    \dots\\
+    \Macro{encl}\Parameter{enclosures}\\
+    \Macro{cc}\Parameter{additional addressees}\\
+    \Macro{end}\PParameter{letter}\\
+  }}\\
+\caption{General structure of a single letter within a letter
+document (see also \autoref{fig:scrlttr2.document})}
+\label{fig:scrlttr2.letter}
+\end{figure}
+
+As shown in \autoref{fig:scrlttr2.letter} every single letter
+itself consists of an introduction, the letter body and the
+closing. In the introduction all settings for only this letter are
+defined. It is important that this introduction always ends with
+\Macro{opening}. Similarily the closing starts with
+\Macro{closing}. If needed both arguments \PName{opening} and
+\PName{closing} can be left empty. Nevertheless both commands have
+to be used and must have an argument.
+
+\begin{Explain}
+There are further settings that can be changed between the
+individual letters. These settings have an effect on all
+subsequent letters. For reasons of maintainability of your letter
+documents it is not recommended to use further general settings
+with limited validity between the letters.
+\end{Explain}
+
+As already mentioned you can use all settings in the preamble of a
+letter document in the preamble of the individual letters apart
+from the font size. Therefore you will not find more detailed
+explanations for the possible settings at this point. Please refer
+to \autoref{sec:scrlttr2.startLetter}.
+
+
+\section{The Letter Declaration}
+\label{sec:scrlttr2.startLetter}
+
+The letter declaration gives all settings for the letter itself as well
+as for the first page of the body. The first page consists of more than just the
+prelims of the letter; it consists of several different parts.
+
+\subsection{The Letter-Head}
+\label{sec:scrlttr2.firstHead}
+
+The term letter-head here refers to all of the sender's data
+and is printed above the addressee's address. It usually is expected to
+have all this set via the pagestyle setting. The earlier version of letterclass
+\Class{scrlettr} worked that way. But with \Class{scrlttr2}, the letter-head has gotten
+independent of the pagestyle setting and is run by the command \Macro{opening}.
+% Fuellmaterial
+\iftrue
+The position of the letter-head is absolute and independent of the type
+area. In fact the first page of a letter, that page that holds the letter-head,
+is set by \PValue{empty}.
+\fi
+% Ende des Fuellmaterials
+
+\begin{Declaration}
+  \PLength{firstheadvpos}
+\end{Declaration}
+\BeginIndex{PLength}{firstheadvpos}%
+The pseudolength \PLength{firstheadvpos} gives the distance between the top of
+the sheet and the letter-head. This value is set differently in the predefined
+\File{lco}-files. A typical value is 8\Unit{mm}.
+%
+\EndIndex{PLength}{firstheadvpos}
+
+\begin{Declaration}
+  \PLength{firstheadwidth}
+\end{Declaration}
+\BeginIndex{PLength}{firstheadwidth}%
+The pseudolength \PLength{firstheadwidth} gives the width of the
+letter-head. This value is set differently in the predefined
+\File{lco}-files. While this value usually depends on the paperwidth and the
+distance between the left side of the sheet and the address' field, it was
+the type area width in \Option{KOMAold}.
+%
+\EndIndex{PLength}{firstheadwidth}%
+
+\begin{Declaration}
+  \Variable{fromname}\\
+  \Variable{fromaddress}\\
+  \Variable{fromphone}\\
+  \Variable{fromfax}\\
+  \Variable{fromemail}\\
+  \Variable{fromurl}\\
+  \Variable{fromlogo}
+\end{Declaration}
+\BeginIndex{Variable}{fromname}%
+\BeginIndex{Variable}{fromaddress}%
+\BeginIndex{Variable}{fromphone}%
+\BeginIndex{Variable}{fromfax}%
+\BeginIndex{Variable}{fromemail}%
+\BeginIndex{Variable}{fromurl}%
+\BeginIndex{Variable}{fromlogo}%
+%
+These variables give all statements concerning the sender necessary to create
+the letter-head. Which variable will be used to build the letter-head in the
+end can be chosen by use of the letter-head extensions (see option
+\Option{fromalign} in \autoref{sec:scrlttr2.headoptions},
+\autopageref{desc:scrlttr2.option.fromalign}) and the options
+given there. The variables \Variable{fromname}, and \Variable{fromaddress},
+and \Variable{fromlogo} will be set in the letter-head without their label;
+the variables \Variable{fromphone}, \Variable{fromfax}, \Variable{fromemail}
+and \Variable{fromurl} will be set with it's label. The labels are taken from
+\autoref{tab:scrlttr2.fromTerm},
+\autopageref{tab:scrlttr2.fromTerm}.
+%
+\begin{table}
+  \centering
+  \caption{The sender's predefined labels for the letter head}
+  \begin{desctabular}[1.8em]
+    \ventry{fromemail}{\Macro{usekomavar*}\PParameter{emailseparator}%
+      \Macro{usekomavar}\PParameter{emailseparator}}%
+    \ventry{fromfax}{\Macro{usekomavar*}\PParameter{faxseparator}
+      \Macro{usekomavar}\PParameter{faxseparator}}%
+    \ventry{fromname}{\Macro{headfromname}}
+    \ventry{fromphone}{\Macro{usekomavar*}\PParameter{phoneseparator}%
+      \Macro{usekomavar}\PParameter{phoneseparator}}%
+    \ventry{fromurl}{\Macro{usekomavar*}\PParameter{urlseparator}%
+      \Macro{usekomavar}\PParameter{urlseparator}}%
+  \end{desctabular}
+\label{tab:scrlttr2.fromTerm}
+\end{table}
+
+An important hint concerns the sender's address. Within the sender's address,
+parts such as Street, P.O.~Box, State, Country etc, are separated with a 
+double backslash. Depending on how the sender's address is used this double
+backslash will be interpreted differently and therefore not strictly as a line
+break. Paragraphs, vertical distances and the like usually aren't allowed within
+the sender's address declaration. One has to have very good knowledge of
+\Class{scrlttr2} to use things like those mentioned above, intelligently.
+
+It's possible, by the way, to load an external picture to use it as a logo. In
+this case then put the content of \Variable{fromlogo} to a
+\Macro{includegraphics}-command. The corresponding package (see
+\cite{package:graphics}) of course has to be given with the letter declaration
+(see \autoref{sec:scrlttr2.document}).
+%
+\EndIndex{Variable}{fromname}%
+\EndIndex{Variable}{fromaddress}%
+\EndIndex{Variable}{fromphone}%
+\EndIndex{Variable}{fromfax}%
+\EndIndex{Variable}{fromemail}%
+\EndIndex{Variable}{fromurl}%
+\EndIndex{Variable}{fromlogo}%
+
+\begin{Declaration}
+  \Variable{phoneseparator}\\
+  \Variable{faxseparator}\\
+  \Variable{emailseparator}\\
+  \Variable{urlseparator}
+\end{Declaration}
+\BeginIndex{Variable}{phoneseparator}%
+\BeginIndex{Variable}{faxseparator}%
+\BeginIndex{Variable}{emailseparator}%
+\BeginIndex{Variable}{urlseparator}%
+With these variables, hyphens are defined. If applicable they are used with the
+sender's data in the letter-head (see \autoref{tab:scrlttr2.fromTerm}). As
+a feature, they are labeled and used in the sender's details
+of the letter-head. To look up the predefined labels 
+and their contents, see \autoref{tab:scrlttr2.fromSeperator}.
+%
+% table moved in following paragraph (JUM) >>>
+%
+\EndIndex{Variable}{phoneseparator}%
+\EndIndex{Variable}{faxseparator}%
+\EndIndex{Variable}{emailseparator}%
+\EndIndex{Variable}{urlseparator}%
+
+
+\begin{Declaration}
+  \Macro{firsthead}\Parameter{construction}
+\end{Declaration}
+\BeginIndex{Cmd}{firsthead}%
+Mostly \Class{scrlttr2} and its variables offer enough possibilities to create
+a letter-head. In very rare situations one may wish to have more freedom to
+create. In those situations one will have to do without predefined
+letter-heads, which could have been chosen via options. Instead one is to
+create freely. Therefore one has to define the preferred \PName{construction}
+with the command \Macro{firsthead}. Within \Macro{firsthead} and with the help
+of the \Macro{parbox}-command (see \cite{latex:usrguide}) one can set several
+boxes side by side or one underneath the other. An advanced user will thus be
+able to create a letter-head on his own. And doing this of course the
+\PName{construct} may use varibles with the help of \Macro{usekomavar}.
+%
+% <<< table of previous paragraph
+\begin{table}
+  \centering
+  \caption{predefined labels and contents of hyphens for sender's datas in the
+    letter-head}
+  \begin{tabular}{lll}
+    \toprule
+    name                      & label & content \\
+    \midrule
+    \Variable{emailseparator} & \Macro{emailname} & \texttt{:\~} \\
+    \Variable{faxseparator}   & \Macro{faxname}   & \texttt{:\~} \\
+    \Variable{phoneseparator} & \Macro{phonename} & \texttt{:\~} \\
+    \Variable{urlseparator}   & \Macro{wwwname}   & \texttt{:\~} \\
+    \bottomrule
+  \end{tabular}
+  \label{tab:scrlttr2.fromSeperator}
+\end{table}
+%
+\EndIndex{Cmd}{firsthead}%
+
+
+\subsection{The Footer}
+\label{sec:scrlttr2.firstFoot}
+As the first page holds a letter-head of its own it holds a footer
+of its own too. And, same as with the letter-head, it will be printed independent of the
+pagestyle settings but with the use of \Macro{opening}.
+
+\begin{Declaration}
+  \PLength{firstfootvpos}
+\end{Declaration}
+\BeginIndex{PLength}{firstfootvpos}%
+%
+This pseudolength gives the distance between the footer and the upper
+border of the sheet. This value is set different in the predefined
+\File{lco}-files. Also it takes care of preventing text jutting into the
+footer area. If needed, it can help to shorten the textheight on the first page
+using \Macro{enlargethispage}.
+Likewise and if it is needed the textheight can
+be extended with help of the option \Option{enlargefirstpage}. This way, the
+distance between text area and the first page's footer can be reduced to
+the value \Length{footskip}. See also \autoref{sec:scrlttr2.typeareaOptions},
+\autopageref{desc:scrlttr2.option.enlargefirstpage}.
+%
+\EndIndex{PLength}{firstfootvpos}%
+
+
+\begin{Declaration}
+  \PLength{firstfootwidth}
+\end{Declaration}
+\BeginIndex{PLength}{firstfootwidth}%
+This pseudolength gives the width of the letter's firstpage footer. The
+value is set in dependency of the pseudolength \PLength{firstheadwidth} in the
+\File{lco}-files.
+%
+\EndIndex{PLength}{firstfootwidth}%
+
+
+\begin{Declaration}
+  \Macro{firstfoot}\Parameter{construction}
+\end{Declaration}
+\BeginIndex{Cmd}{firstfoot}%
+The first page's footer is preset to empty. But with the
+\Macro{firstfoot} command it is possible to give definitions the same
+way as with defining the letter-head with \Macro{firsthead}.
+\begin{Example}
+  As the first page's footer, you may want to set the content of the variable
+  \Variable{bank} (the bank account). The double backslash shall be exchanged
+  with a comma at the same time:
+\begin{lstlisting}
+  \firstfoot{%
+    \parbox[b]{\linewidth}{%
+      \centering\def\\{, }\usekomavar{frombank}%
+    }%
+  }
+\end{lstlisting}
+  For the hyphen you might define a varible of your own if you like. Consider
+  that has been left to the reader as an exercise.
+  
+  Nowadays it has become very common to create a proper footer to have
+  some balance to the letter-head. This can be done like this:
+\begin{lstlisting}
+  \firstfoot{%
+    \parbox[t]{\textwidth}{\footnotesize
+      \begin{tabular}[t]{l@{}}%
+        \multicolumn{1}{@{}l@{}}{partners:}\\
+        Jim Smith\\
+        Russ Mayer
+      \end{tabular}%
+      \hfill
+      \begin{tabular}[t]{l@{}}%
+        \multicolumn{1}{@{}l@{}}{Manager:}\\
+        Jane Fonda\\[1ex]
+        \multicolumn{1}{@{}l@{}}{Court Of Jurisdiction:}\\
+        Great Plains
+      \end{tabular}%
+      \ifkomavarempty{frombank}{}{%
+        \hfill
+        \begin{tabular}[t]{l@{}}%
+          \multicolumn{1}{@{}l@{}}{\usekomavar*{frombank}:}\\
+          \usekomavar{frombank}
+        \end{tabular}%
+        }%
+      }%
+    }
+\end{lstlisting}
+  This example, by the way, came from Torsten Kr\"uger. With
+\begin{lstlisting}
+  \setkomavar{frombank}{Account No. 12\,345\,678\\
+                        at Citibank\\
+                        bank code no: 876\,543\,21}
+\end{lstlisting}
+    the bank account can be set accordingly. If the footer will have a
+  height like that it might happen that you have to shift its position. You
+  do this with the pseudolength
+  \PLength{firstfootvpos}\IndexPLength{firstfootvpos}, which is described
+  above in this section.
+\end{Example}
+%
+\EndIndex{Cmd}{firstfoot}%
+
+
+\subsection{The Address}
+\label{sec:scrlttr2.addressee}
+The term address here usually refers to name and address of the addressee. But
+there are extensions. The first extension is the way of distribution
+e.g. ``special mail''. If window envelopes are used the return address is
+another extension since it has to show up within the envelope's window. The
+address immediately follows beneath the letter-head.
+
+\begin{Declaration}
+  \PLength{toaddrvpos}\\
+  \PLength{toaddrhpos}
+\end{Declaration}
+\BeginIndex{PLength}{toaddrvpos}%
+\BeginIndex{PLength}{toaddrhpos}%
+These pseudolengths give the distance between address window of a window
+envelope and the upper and left border of the sheet. They are set different in
+the predefined \File{lco}-files. The smallest value is \PLength{toaddrvpos} at
+\Option{DINmtext}. It can happen easily that the letter-head juts into the
+address window field. Whether the address window field will be set at all
+depends on giving the option \Option{addrfield} (see
+\autoref{sec:scrlttr2.headoptions}).
+%
+\EndIndex{PLength}{toaddrhpos}%
+\EndIndex{PLength}{toaddrvpos}%
+
+
+\begin{Declaration}
+  \PLength{toaddrwidth}
+\end{Declaration}
+\BeginIndex{PLength}{toaddrwidth}%
+This pseudolength gives the width of the address window. It is set
+differently in the predefined \File{lco}-files according to the different
+standards that exist. Typically it is something between 70\Unit{mm} and
+100\Unit{mm}.
+%
+\EndIndex{PLength}{toaddrwidth}%
+
+
+\begin{Declaration}
+  \PLength{toaddrindent}
+\end{Declaration}
+\BeginIndex{PLength}{toaddrindent}%
+Sometimes it is wanted that the address isn't set exactly at the beginning
+of the left border of the address window, but a little indented to the
+right. The value of the indentiation can be set with the pseudolength
+\PLength{toaddrindent}. But typically it is 0\Unit{pt}.
+%
+\EndIndex{PLength}{toaddrindent}%
+
+
+\begin{Declaration}
+  \Variable{backaddress}\\
+  \Variable{backaddressseparator}\\
+  \PLength{backaddrheight}
+\end{Declaration}
+\BeginIndex{Variable}{backaddress}\BeginIndex{Variable}{backaddressseparator}%
+\BeginIndex{PLength}{backaddrheight}%
+The sender's address often is printed in one line with small letters above the
+address if window envelopes are used. This line, called return address, is
+separated by a horizontal line, and usually build automaticly of the variables
+\Variable{fromname} und \Variable{fromaddress}. Double backslashes set within
+this return address will be exchanged by the settings of the variable
+\Variable{backaddressseparator}. Predefined here is a comma with a whitespace.
+The height this return address field can take is defined with the pseudolength
+\PLength{backaddrheight}. The value typically is 5\Unit{mm} and set in the
+predefined \File{lco}-files. If the return address line is to be set or not
+depends on putting the options \Option{addrfield} and \Option{backaddress} in
+the letter declarations (see \autoref{sec:scrlttr2.headoptions},
+\autopageref{desc:scrlttr2.option.addrfield}).
+%
+\EndIndex{PLength}{backaddrheight}%
+\EndIndex{Variable}{backaddress}\EndIndex{Variable}{backaddressseparator}%
+
+
+\begin{Declaration}
+  \Variable{specialmail}\\
+  \PLength{specialmailindent}\\
+  \PLength{specialmailrightindent}
+\end{Declaration}
+\BeginIndex{Variable}{specialmail}%
+\BeginIndex{PLength}{specialmailindent}%
+\BeginIndex{PLength}{specialmailrightindent}%
+Between the return address and addressee, the distribution like
+specialmail can be set optionally.
+It's set then if \Variable{specialmail} has a value.
+The both pseudolengths \PLength{specialmailindent} and
+\PLength{specialmailrightindent} determine the alignment.
+They determine the left and right indentation.
+The predefined \File{lco}-files have \PLength{specialmailindent}
+set as the elastic value \Macro{fill}, while the pseudolength \PLength{specialmailrightindent}
+is set to 1\Unit{em}. Thus distribution term is set 1\Unit{em} off the
+right border of the address window.
+%
+\EndIndex{PLength}{specialmailindent}%
+\EndIndex{PLength}{specialmailrightindent}%
+\EndIndex{Variable}{specialmail}%
+
+
+\begin{Declaration}
+  \Variable{toname}\\
+  \Variable{toaddress}
+\end{Declaration}
+\BeginIndex{Variable}{toname}%
+\BeginIndex{Variable}{toaddress}%
+These two variables that give name and address of the addressee usually aren't
+set directly by the user. Instead \Class{scrlttr2} takes it directly off the
+\PName{addressee}-argument of the
+\Environment{letter}-environment\IndexEnv{letter}. See also the hint about the
+sender's address in \autoref{sec:scrlttr2.firstHead},
+\autopageref{desc:scrlttr2.variable.fromname}.
+%
+\EndIndex{Variable}{toname}%
+\EndIndex{Variable}{toaddress}%
+
+
+\begin{Declaration}
+  \Environment{letter}\OParameter{options}\Parameter{address}
+\end{Declaration}
+\BeginIndex{Env}{letter}%
+The letter environment is but one key point of the letter class. Especially
+with \Class{scrlttr2} it is possible to run the letter environment with
+additional \PName{options}. They will be run according to the
+\Macro{KOMAoptions}-commands. \PName{address} will be given to the letter
+environment as an obligatory parameter. Here the double backslash works as a
+hyphen between parts of \PName{address}. Those parts then are printed as
+single lines. The double backslashes here shouldn't be understood as
+strict line break commands. Paragraphs, vertical space, etc., aren't accepted
+within the address. They can lead to unexpected effects and error messages.
+By the way it is the same way with the standard letter class.
+The~\Environment{letter}-environment itself doesn't start the letter. The
+letter is started with the \Macro{opening}-command.
+\EndIndex{Env}{letter}%
+
+
+\begin{Declaration}
+  \Macro{AtBeginLetter}\Parameter{command}
+\end{Declaration}
+\BeginIndex{Cmd}{AtBeginLetter}%
+It is possible with \LaTeX{} to process additional \PName{commands}
+while running the \LaTeX{}-process at determined times.
+For that matter, the \Macro{AtBeginDocument} or \Macro{AtEndOfClass}
+exist; those points along the processing of \LaTeX{} are called \emph{hooks}.
+The class \Class{scrlttr2} adds another hook to this, that can be used with
+\Macro{AtBeginLetter}. Originally those hooks are made for package or class
+authors, which can be understood by the fact that the descriptions for those
+hooks aren't documented in \cite{latex:usrguide}, but in
+\cite{latex:clsguide}. With the letter class there could come some useful
+applications for \Macro{AtBeginLetter} as the following example may show:
+%
+\begin{Example}
+  Given one has to set more letters than just one with one document and uses
+  commands within the letter to set a form. The numbers of the questions in
+  that form should be generated automatically with the help of a counter. Since, in
+  contrary to the page numbering, that counter is not known by
+  \Class{scrlttr2}, it wouldn't be reset at each start of a new letter.
+  Given each form holds ten questions, then question 1 would not be question 1
+  in the fifth letter, but instead number 41. The solution is in having
+  \Class{scrlttr2} reset this counter at the beginning of each new letter:
+\begin{lstlisting}
+  \newcounter{Question}
+  \newcommand{\Question}[1]{%
+    \refstepcounter{Question}\par
+    \@hangfrom{\makebox[2em][r]{\theQuestion:~}}{#1}}
+  \AtBeginLetter{\setcounter{Question}{0}}
+\end{lstlisting}
+  This way question~1 remains question~1, even in the 1001st letter. Of course
+  definitions like those mentioned above need to be given either braced (see
+  \cite{DANTE:FAQ}) in the declaration of the letter (see
+  \autoref{sec:scrlttr2.document} and
+  \autoref{fig:scrlttr2.document},
+  \autopageref{fig:scrlttr2.document}) with \Macro{makeatletter} and
+  \Macro{makeatother}, or loaded as package of one's own, or as
+  \File{lco}-file (see \autoref{sec:lcoFile}).
+\end{Example}
+%
+\EndIndex{Cmd}{AtBeginLetter}%
+
+
+\subsection{The Sender's Extensions}
+\label{sec:scrlttr2.locationField}
+
+Often, especially with business letters, the space for letter-head or pagefoot
+seems to be too tight to put all you want to have set. To give more details
+about the sender, often the space right beside the addressee's field is
+used. In this manual this field is called \emph{sender's extension}
+
+
+\begin{Declaration}
+  \PLength{locwidth}
+\end{Declaration}
+\BeginIndex{PLength}{locwidth}%
+This pseudolength \PLength{locwidth} declares the width of the sender's
+extensions. Its value is set typically 0\Unit{pt} in the predefined
+\File{lco}-files. This value takes on a special position. It does not mean
+that the sender's extension has no width. Instead it's actual width is set
+with the \Macro{opening} when paperwidth, address window width, and distance
+between left border of the sheet and address window is given. With it the
+option \Option{locfield} (see \autoref{sec:scrlttr2.headoptions},
+\autopageref{desc:scrlttr2.option.locfield}) is
+taken into account.
+%
+\EndIndex{PLength}{locwidth}
+
+
+\begin{Declaration}
+  \Variable{location}
+\end{Declaration}
+\BeginIndex{Variable}{location}%
+The content of the sender's extension is determined by the variable
+\Variable{location}. To set this variable's content it's allowed to use
+formatting commands like \Macro{raggedright}. One has to consider that
+depending on the use of the options \Option{fromalign} and \Option{fromlogo},
+a part of the space for the sender's extension may be in use already (see
+\autoref{sec:scrlttr2.headoptions},
+\autopageref{desc:scrlttr2.option.fromalign} and
+\autopageref{desc:scrlttr2.option.fromlogo}).
+%
+\begin{Example}
+  Given you like to put the names of your partners, manager, or court of
+  jurisdiction with the sender's extension, you can do this like:
+\begin{lstlisting}
+  \KOMAoptions{locfield=wide}
+  \setkomavar{location}{\raggedright
+    \textbf{Partners:}\\
+    \quad Hugo Mayer\\
+    \quad Bernd MÃ¼ller\\[1ex]
+    \textbf{Manager:}\\
+    \quad Liselotte Mayer\\[1ex]
+    \textbf{Court of jurisdiction:}\\
+    \quad Washington, DC
+  }
+\end{lstlisting}
+  The option \Option{locfield=wide} is set to make the details fit in
+  horizontally. Sender details like those mentioned in the above example,
+  can be given together with the common sender address with your own
+  \File{lco}-file.
+\end{Example}
+%
+\EndIndex{Variable}{location}%
+
+
+\subsection{The Business Line}
+\label{sec:scrlttr2.refLine}
+
+Especially with business letters, a line can be found that gives initials, dial
+code, customer number, invoice number, or a reference to a previous letter.
+In this manual this line is called \emph{business line}. The business line can
+consist of more than just one line and is set only if one of those variables
+mentioned above is given. Only those fields will be set that are given. To set
+a seemingly empty field, one needs to give as value at least a white space or
+\Macro{null}. If you want to have your letter without a business line, then
+just the variable \Variable{date} will be set instead.
+
+
+\begin{Declaration}
+  \PLength{refvpos}
+\end{Declaration}
+\BeginIndex{PLength}{refvpos}%
+This pseudolength gives the distance between the upper border of the sheet
+and the business line. It's value is set differently in the predefined
+\File{lco}-files. Typical values are between 80{,}5\Unit{mm} and
+98{,}5\Unit{mm}.
+%
+\EndIndex{PLength}{refvpos}%
+
+
+\begin{Declaration}
+  \PLength{refwidth}
+\end{Declaration}
+\BeginIndex{PLength}{refwidth}%
+This pseudolength gives the width that is available for the business line.
+The value is set typically to 0\Unit{pt} in the predefined \File{lco}-files.
+This value has a special meaning. In no way does it determine that there is
+no available width for the business line. Instead this value means that the
+width will be calculated with the \Macro{opening}. Thus the calculated width
+depends on the determination of the options \Option{refline} (see
+\autoref{sec:scrlttr2.headoptions},
+\autopageref{desc:scrlttr2.option.refline}).
+%
+\EndIndex{PLength}{refwidth}%
+
+
+\begin{Declaration}
+  \PLength{refaftervskip}
+\end{Declaration}
+\BeginIndex{PLength}{refaftervskip}%
+This pseudolength gives the vertical space that has to be inserted beneath
+the business line. The value is set in the predefined \File{lco}-files. It
+effects directly the textheight of the first page. A typical value is
+something between one and two lines.
+%
+\EndIndex{PLength}{refaftervskip}%
+
+
+\begin{Declaration}
+  \Variable{place}\\
+  \Variable{placeseparator}
+\end{Declaration}
+\BeginIndex{Variable}{place}%
+\BeginIndex{Variable}{placeseparator}%
+As said before in the introduction of this paragraph, the business line can be
+left out. This happens if all variables of the business line are empty with
+the exception of the variable for the date. In this case, the content of
+\Variable{place} and \Variable{placeseparator} will be set, followed by the
+content of \Variable{date}. The predefined content of the
+\Variable{placeseparator} is a comma followed by a white space. If this
+variable \Variable{place} has no value then the hyphen remains unset also.
+The predefined subject of \Variable{date} is \Macro{today} and depends on the
+setting of the option \Option{numericaldate} (see
+\autoref{sec:scrlttr2.headoptions}).
+%
+\EndIndex{Variable}{place}%
+\EndIndex{Variable}{placeseparator}%
+
+
+\begin{Declaration}
+  \Variable{yourref}\\
+  \Variable{yourmail}\\
+  \Variable{myref}\\
+  \Variable{customer}\\
+  \Variable{invoice} \\
+  \Variable{date}
+\end{Declaration}
+\BeginIndex{Variable}{yourref}%
+\BeginIndex{Variable}{yourmail}%
+\BeginIndex{Variable}{myref}%
+\BeginIndex{Variable}{customer}%
+\BeginIndex{Variable}{invoice}%
+\BeginIndex{Variable}{date}%
+These variables are typical for business line fields. To find out about their
+meaning, see table ~\ref{tab:scrlttr2.variables} on
+\autopageref{tab:scrlttr2.variables}. Each variable covers a predefined label
+that can be seen at \autoref{tab:scrlttr2.reflineTerm}. The field width that
+belongs to each variable, adjusts itself automatically to its label and
+content.
+%
+\begin{table}
+  \centering
+  \caption{predefined labels of the business line's typical variables. The
+    content of the makros depend on language.}
+  \begin{tabular}{lll}
+    \toprule
+    name                & label  & in english \\
+    \midrule
+    \Variable{yourref}  & \Macro{yourrefname}  & Your reference \\
+    \Variable{yourmail} & \Macro{yourmailname} & Your letter from \\
+    \Variable{myref}    & \Macro{myrefname}    & Our reference \\
+    \Variable{customer} & \Macro{customername} & Customer No.: \\
+    \Variable{invoice}  & \Macro{invoicename}  & Invoice No.: \\
+    \Variable{date}     & \Macro{datename}     & date \\
+    \bottomrule
+  \end{tabular}
+  \label{tab:scrlttr2.reflineTerm}
+\end{table}
+%
+\EndIndex{Variable}{yourref}%
+\EndIndex{Variable}{yourmail}%
+\EndIndex{Variable}{myref}%
+\EndIndex{Variable}{customer}%
+\EndIndex{Variable}{invoice}%
+\EndIndex{Variable}{date}%
+
+
+
+\subsection{The Title and the Subject Line}
+\label{sec;scrlttr2.titleSubject}
+Business letters most often carry a subject line. The subject line indicates
+in short of what that letter is about. Usually the subject should be short and
+precise and not run across several lines. The letter may also carry a title.
+Titles find usage with unregular letters like an Invoice or a Reminder.
+
+
+\begin{Declaration}
+  \Variable{title}
+\end{Declaration}
+\BeginIndex{Variable}{title}%
+With \Class{scrlttr2} a letter can carry an additional title. The title
+becomes centered and set with letter size \Macro{LARGE} right
+after and beneath the business line.
+The predefined font setup for this element
+(\Macro{normalcolor}\Macro{sffamily}\Macro{bfseries}) can be changed with
+help of the interface described in \autoref{sec:maincls.font}. Font size
+declarations are allowed.
+\begin{Example}
+  Given you are to write a reminder. Thus you put the title:
+\begin{lstlisting}
+  \setkomavar{title}{Reminder}
+\end{lstlisting}
+  This way the addressee will recognize a reminder as such.
+\end{Example}
+%
+\EndIndex{Variable}{title}
+
+
+\begin{Declaration}
+  \Variable{subject}\\
+  \Variable{subjectseparator}
+\end{Declaration}
+\BeginIndex{Variable}{subject}%
+\BeginIndex{Variable}{subjectseparator}%
+In case a subject should be set then you have to determine the variable
+\Variable{subject} fit. Depending on what the option \Option{subject} is set
+to a label can be put in front of the subject issue; also the vertical
+position of the subject issue can be changed (see
+\autoref{sec:scrlttr2.headoptions},
+\autopageref{desc:scrlttr2.option.subject}). To see the predetermined labels
+look at \autoref{tab:scrlttr2.subjectTerm}. The predefined value of
+\Variable{subjectseparator} is a colon followed by a white space.
+%
+\begin{table}
+  \centering
+  \caption{Predefined Labels Of The Subject's Variables.}
+  \begin{tabular}{lll}
+    \toprule
+    name               & label \\
+    \midrule
+    \Variable{subject} & \Macro{usekomavar*}\PParameter{subjectseparator}%
+                         \texttt{\%} \\ 
+                       & \texttt{\quad}%
+                         \Macro{usekomavar}\PParameter{subjectseparator} \\
+    \Variable{subjectseparator} & \Macro{subjectname} \\
+    \bottomrule
+  \end{tabular}
+  \label{tab:scrlttr2.subjectTerm}
+\end{table}
+
+The subject line is set in a separate type face. To change this use
+the user interface described in \autoref{sec:maincls.font}. For
+the element \FontElement{subject}\IndexFontElement{subject} the
+predetermined type face in \Class{scrlttr2} is
+\Macro{normalfont}\Macro{normalcolor}\Macro{bfseries}.
+\begin{Example}
+  Given you are a board member and want to write a letter to another member of
+  that board about a few internals of the organization. You want to
+  clarify with your subject line what this letter is all about, but without
+  labeling it thus. You can do this that way:
+\begin{lstlisting}
+  \setkomavar{subject}[Subject ]{%
+    organization's internals}
+\end{lstlisting}
+  or easier:
+\begin{lstlisting}
+  \setkomavar{subject}[]{%
+    about organization's internals}
+\end{lstlisting}
+  More than just that you may want to have set the subject line not only bold but
+  also with sans serif types:
+\begin{lstlisting}
+  \addtokomafont{subject}{\sffamily}
+\end{lstlisting}
+  As you can see, it's really easy to solve this problem.
+\end{Example}
+%
+\EndIndex{Variable}{subject}%
+\EndIndex{Variable}{subjectseparator}%
+
+
+\subsection{Further Issues}
+In this paragraph variables and settings are listed which couldn't be assigned
+to any other paragraph of the letter declaration but somehow belong to this
+chapter.
+
+\begin{Declaration}
+  \PLength{tfoldmarkvpos}\\
+  \PLength{bfoldmarkvpos}
+\end{Declaration}
+\BeginIndex{PLength}{tfoldmarkvpos}%
+\BeginIndex{PLength}{bfoldmarkvpos}%
+The letterclass \Class{scrlttr2} all in all has 3 fold marks. The one in the
+middle serves to halve the paper and is therefore printed always in the middle
+of paperheight. The position of the upper fold mark, seen from the upper
+sheet's border, is determined by the pseudolength \PLength{tfoldmarkvpos}; the
+lower one is determined by the pseudolength \PLength{bfoldmarkvpos}. All three
+fold marks do not serve to exactly fold to a standard 3 panel letter
+fold. Instead the idea is to have the paper folded so that the address
+field is seen in the window of a window envelope. The settings therefore are
+different in the predefined \File{lco}-files. A special case is
+\Option{DINmtext}. In this case the envelope format C6/5 (also called
+``C6~long'') is necessary. Letters produced in this format aren't compatible
+with neither format C~5 nor C~4.
+%
+\EndIndex{PLength}{tfoldmarkvpos}%
+\EndIndex{PLength}{bfoldmarkvpos}%
+
+
+\begin{Declaration}
+  \PLength{foldmarkhpos}
+\end{Declaration}
+\BeginIndex{PLength}{foldmarkhpos}%
+This pseudolength gives the distance between all of the three fold marks
+and the sheet's left border. Usually it's 3{,}5\Unit{mm}. In case you work
+with a printer with a broader unprintable left margin this value can be
+changed in your own \File{lco}-file. The length of the upper and lower
+fold mark is the same and 4\Unit{mm} long. The thickness of all three is
+2\Unit{pt}. At the moment there are no plans to change this value. If the fold
+marks will be set at all depends on the option \Option{foldmarks} (see
+\autoref{sec:scrlttr2.headoptions},
+\autopageref{desc:scrlttr2.option.foldmarks}).
+%
+\EndIndex{PLength}{foldmarkhpos}%
+
+
+\begin{Declaration}
+  \Variable{frombank}
+\end{Declaration}
+\BeginIndex{Variable}{frombank}%
+This variable at the moment takes on a special position. Not in use internally
+up to this moment it can come into usage if one e.g. wants to have set his
+bank account within the sender's extension field or the footer. 
+%
+\EndIndex{Variable}{frombank}%
+
+
+\begin{Declaration}
+  \Macro{nexthead}\Parameter{construction}\\
+  \Macro{nextfoot}\Parameter{construction}
+\end{Declaration}
+\BeginIndex{Cmd}{nexthead}%
+\BeginIndex{Cmd}{nextfoot}%
+The possibilities that are offered with variables and options in
+\Class{scrlttr2} should be good enough in most of the cases to create
+letter-heads and foots for those pages that follow the first letter page. This
+even more since you can additionally change the sender's statements with
+\Macro{markboth} and \Macro{markright} that \Class{scrlttr2} uses to create
+the letter head. With the term ``follow up pages'' in this manual all pages
+are meant excepted the first letter page. The commands
+\Macro{markboth}\IndexCmd{markboth} and \Macro{markright}\IndexCmd{markright}
+can be used all together with pagestyle\Index{page style}
+\PValue{myheadings}\IndexPagestyle{myheadings}. If the package
+\Package{scrpage2}\IndexPackage{scrpage2} is used this, of course, is valid
+also for pagestyle \PValue{scrheadings}\IndexPagestyle{scrheadings}. Then too
+the command \Macro{markleft}\IndexCmd{markleft} is available.
+
+At times one wants to have more freedom with creating letter head or foot of
+the follow up pages. Then one has to let go of the possibilities of predefined
+letter heads or foots, that could have been chosen via option. Instead one is
+free to create it just the way one wants to have them set. Therefore one is to
+create the desired \PName{construction} with use of the command
+\Macro{nexthead} or \Macro{nextfoot} respectively. Within \Macro{nexthead} und
+\Macro{nextfoot} for example you can have several boxes side by side or one
+beneath the other by use of \Macro{parbox}-command (see
+\cite{latex:usrguide}). With this a more advanced user should have no problems
+with creating letter heads of foots of his own.  With \PName{construction} of
+course you can make use of the variables of \Macro{usekomavar} too.
+%
+\EndIndex{Cmd}{nexthead}%
+\EndIndex{Cmd}{nextfoot}%
+
+
+
+\section{The Text}
+\label{sec:scrlttr2.text}
+
+In contrast to an article, a report or a book the letter has
+no chapter or section structure.
+Even float environments with tables and figure are unusual.
+Therefore a letter has no table of contents, lists of 
+figures and tables, index, bibliography, glossary or other things.
+The letter texts  mainly consist of an opening and the main
+text. Thereupon follows the signature, a postscript
+and different listings.
+
+
+\subsection{The Opening}
+\label{sec:scrlttr2.opening}
+
+\begin{Explain}
+In the early days of computer generated letters the programs didn't
+have many capabilities, therefore the letters seldom had
+an opening.
+Today the capabilities have been enhanced. Thus personal
+openings are very common, even in mass-production
+advertising letters.
+\end{Explain}
+
+\begin{Declaration}
+  \Macro{opening}\Parameter{opening}
+\end{Declaration}
+\BeginIndex{Cmd}{opening}%
+This is the most important command in \Class{scrlttr2}.
+For the user it seems that only the opening will be typeset,
+but the command also typesets the folding marks, headings, 
+address field, subject, the page foot and others.
+That means: without \Macro{opening} there is no letter.
+%
+\EndIndex{Cmd}{opening}%
+
+\subsection{Footnotes}
+\label{sec:scrlttr2.footnotes}
+
+In letters footnotes should be used more sparingly than in normal
+documents. However, \Class{scrlttr2} is equipped with all
+mechanisms mentioned in \autoref{sec:maincls.footnotes} for
+the main document classes. Therefore it will not be discussed
+here again.
+
+\subsection{Lists}
+\label{sec:scrlttr2.lists}
+
+Lists have the same validity in letters as in normal documents.
+Thus \Class{scrlttr2} provides the same possibilities
+as mentioned in \autoref{sec:maincls.lists} for the
+main document classes.
+
+\subsection{Margin Notes}
+\label{sec:scrlttr2.marginNotes}
+
+Margin notes are quite uncommon in letters. Therefore the
+option \Option{mpinclude}  is not supported by \Class{scrlttr2}.
+However, \Class{scrlttr2} is equipped with all
+mechanisms mentioned in \autoref{sec:maincls.marginNotes} for
+the main document classes. Therefore it will not be discussed
+here again.
+
+\subsection{Text Emphasis}
+\label{sec:scrlttr2.emphasis}
+
+The distinction of text has the same importance in letters as in
+other documents. Thus the same rules apply that means: emphasize
+text sparingly. Even letters should be readable and a letter
+where each word is typeset in an other font is indeed unreadable.
+
+The class \Class{scrlttr2} is equipped with all
+mechanisms mentioned in \autoref{sec:maincls.emphasis} for
+the main document classes. Therefore it will not be discussed
+here again.
+
+\section{The Closing Part}
+\label{sec:scrlttr2.backend}
+
+A letter always ends with a closing phrase.
+Even computer generated letters without signature
+have this phrase.
+Sometimes this is a sentence like ``This letter has been
+generated automatically.''.
+Sometimes a sentence like this will even be used as signature.
+Thereupon can follow a postscript and some listings.
+
+\subsection{Closing}
+\label{sec:scrlttr2.closing}
+
+The closing consists of three parts. Besides the closing phrase
+there are a hand-written inscription and the signature, an explanation
+for the inscription.
+
+\begin{Declaration}
+  \Variable{signature}
+\end{Declaration}
+\BeginIndex{Variable}{signature}%
+The variable \Variable{signature} includes an explanation 
+for the inscription. Their content is pre-defined as
+\Macro{usekomavar}\PParameter{fromname}.
+The explanation can consist of multiple lines. The lines
+should be separated by a double backslash. Paragraphs
+in the explanation are not permitted.
+%
+\EndIndex{Variable}{signature}%
+
+\begin{Declaration}
+  \Macro{closing}\Parameter{closing phrase}
+\end{Declaration}
+\BeginIndex{Cmd}{closing}%
+The command \Macro{closing} does not only typeset the
+closing phrase, but moreover it typesets the phrase followed
+by a vertical space and the content of the variable \Variable{signature}.
+The closing phrase can consists of multiple lines, but
+paragraphs are not permitted.
+%
+\EndIndex{Cmd}{closing}%
+
+
+\begin{Declaration}
+  \PLength{sigindent}\\
+  \PLength{sigbeforevskip}\\
+  \Macro{raggedsignature}
+\end{Declaration}
+\BeginIndex{PLength}{sigindent}%
+\BeginIndex{PLength}{sigbeforevskip}%
+\BeginIndex{Cmd}{raggedsignature}%
+Closing phrase, inscription and signature will be typeset
+in a box. The width of the box is determined by the length
+of the longest line of the closing phrase or signature.
+
+The box will be typeset with indentation of the length
+in pseudo-length \PLength{sigindent}. In the default
+\File{lco} file this length is set to 0\Unit{mm}.
+
+The command \Macro{raggedsignature} defines the alignment
+inside the box. In the default \File{lco} file the command
+is either defined as \Macro{centering} (all besides \Option{KOMAold})
+or \Macro{raggedright} (\Option{KOMAold}).
+In order to get flushright or flushleft alignment inside the box
+the command can be redefined in the same way as 
+\Macro{raggedsection} (see \autoref{sec:maincls.structure},
+\autopageref{desc:maincls.macro.raggedsection}).
+
+Between closing phrase and signature a vertical space is
+inserted. The height of this space is defined in the pseudo-length
+\PLength{sigbeforevskip}. It defaults to 2 lines.
+In this space you can write your inscription.
+\begin{Example}
+  You are writing as directorate of a society a letter
+  to all members.
+  Moreover you want in one respect elucidate that you are writing
+  in the name of the board of directors and on the other hand
+  you want indicate your position in the board of directors.  
+\begin{lstlisting}
+  \setkomavar{signature}{John McEnvy\\
+   {\small (Vize-President ``The Other Society'')}}
+  \closing{Regards\\
+    (for the board of directors)}
+\end{lstlisting}
+  Certainly you can set the variable \Variable{signature}
+  in your private \File{lco} file.
+  Usally you should prefer to define the variable in the
+  letter preamble.
+\end{Example}
+%
+\EndIndex{PLength}{sigindent}%
+\EndIndex{PLength}{sigbeforevskip}%
+\EndIndex{Cmd}{raggedsignature}%
+
+\subsection{Postscript, Carbon Copy and Enclosures}
+\label{sec:scrlttr2.afterClosing}
+
+After the closing can follow some other statements.
+Besides the postscript there are the distribution list
+of carbon copies and the reference to enclosures.
+ 
+\begin{Explain}%
+\begin{Declaration}
+  \Macro{ps}
+\end{Declaration}%
+\BeginIndex{Cmd}{ps}%
+In the time when letters were written by hand it was quite usual
+to use a postscript because this was the only way to add
+information which one had forget to mention in the main part of
+the letter. Of course, in letters written with \LaTeX{} you can
+insert additional lines easily. Nevertheless, it is still popular
+to use the postscript. It gives a good possibility to underline
+again the most important or sometimes the less important things of
+this letter.
+%
+\end{Explain}
+This instruction just switches to the postscript.  Therefore a new paragraph
+begins and a vertical distance\,---\,usually below the signature\,---\,is
+inserted.  The command \Macro{ps} is followed by normal text. If you want the
+postscript to be introduced with the acronym "PS:" you have to type the
+acronym inside the command. By the way, this acronym is been written without a
+full stop. The acronym is neither be typeset automatically nor optionally by
+the class \Class{scrlttr2}.
+%
+\EndIndex{Cmd}{ps}
+
+
+\begin{Declaration}
+  \Macro{cc}\Parameter{distribution list}\\
+  \Variable{ccseparator}
+\end{Declaration}
+\BeginIndex{Cmd}{cc}%
+\BeginIndex{Variable}{ccseparator}%
+With the command \Macro{cc} it is possible to typeset a
+\PName{distribution list}.
+The command gets the \PName{distribution list} as argument.
+If the content of the variable \Variable{ccseparator}
+isn't empty then the name and the content of the variable
+is inserted prior to \PName{distribution list}.
+In this case the \PName{distribution list} will be indented
+appropriately.
+It is a good idea to set the \PName{distribution list}
+\Macro{raggedright} and to separate the lines by a double backslash.       
+\begin{Example}
+You want to indicate that your letter is adressed to all members of a
+society and to the board of directors:
+\begin{lstlisting}
+   \cc{%
+     the board of directors\\
+     all society members\\
+\end{lstlisting}
+  Write this instruction below the \Macro{closing}-instruction
+  from the previous example or below a possible postscript.
+\end{Example}
+A vertical space is inserted automatically before the distribution
+list.
+%
+\EndIndex{Cmd}{cc}%
+\EndIndex{Variable}{ccseparator}%
+
+
+\begin{Declaration}
+  \Macro{encl}\Parameter{enclosures}\\
+  \Variable{enclseparator}
+\end{Declaration}
+\BeginIndex{Cmd}{encl}%
+\BeginIndex{Variable}{enclseparator}%
+\PName{Enclosures} have the same structure as the distribution list.
+There is just a single difference, the enclosures starts with 
+the name and the content of the variable \Variable{enclseparator}.
+%
+\EndIndex{Cmd}{encl}%
+\EndIndex{Variable}{enclseparator}%
+
+
+\section{Language Support}
+\label{sec:scrlttr2.languages}
+
+The document class \Class{scrlttr2} supports many languages.  These
+are German \PValue{ngerman} (\PValue{german} for old German
+orthography), \PValue{austrian} for Austrian, English
+(\PValue{english} without specification whether American or British
+should be used, \PValue{american} and \PValue{USenglish} for American,
+\PValue{british} and \PValue{UKenglish} for British), French, Italian,
+Spanish, Dutch and Croatian.
+
+\subsection{Language Selection}
+\label{sec:scrlttr2.switchLanguage}
+\Index[indexmain]{language selection}
+
+If the package \Package{babel}\IndexPackage{babel} is used one can
+switch between languages with the command
+\Macro{selectlanguage}\Parameter{language}.  Other packages like
+\Package{german}\IndexPackage{german} and
+\Package{ngerman}\IndexPackage{ngerman} also define this command.  As
+a rule the language selection takes place when such a package is
+loaded.
+
+There is one thing more to mention about language packages.  The
+package \Package{french}\IndexPackage{french} re-defines not only the
+terms of \autoref{sec:scrlttr2.languageTerms}.  The package even
+re-defines the command \Macro{opening}, since it assumes that the
+definition of the standard \Class{letter} is used.  Therefore the
+package \Package{french} spoils the definition of the \Class{scrlttr2}
+class. I think this is a fault of the \Package{french} package.
+
+If one utilizes the \Package{babel}\IndexPackage{babel} package in
+order to switch to language \PValue{french} and the package
+\Package{french}\IndexPackage{french} is installed too, then the same
+problems occur since \Package{babel} employs definitions from the
+\Package{french} package.  If the package \Package{french} is not
+installed then there are no problems.
+
+Additionally there is no problem if for \Package{babel} instead of
+\PValue{french} other languages like \PValue{acadian},
+\PValue{canadien}, \PValue{francais} or \PValue{frenchb} are chosen.
+Therefore I recommend
+\Macro{usepackage}\PValue{[frenchb]}\PParameter{babel} in order to
+select french.
+
+Other languages can cause these problems too. Currently there are no
+problems known with the \Package{babel} package for the german
+language and the various english language selections. 
+
+\iftrue
+% You may use this paragraphs to improve page break:
+Most \Package{babel} features at \Package{babel} or original
+language definition files of \Package{babel} (e.g. \File{frenchb.ldf}),
+which may cause problems with other packages or classes, can be
+switched off. This is a great advantage of babel. So if you have a
+problem, try to switch of such features or ask the authors of
+\Package{babel}.
+
+There are no problems known using the
+\Package{german}\IndexPackage{german} or
+\Package{ngerman}\IndexPackage{ngerman} package for german selection
+with old or new orthography.
+\fi
+ 
+\begin{Declaration}
+  \Macro{captionsenglish}\\
+  \Macro{captionsUSenglish}\\
+  \Macro{captionsamerican}\\
+  \Macro{captionsbritish}\\
+  \Macro{captionsUKenglish}\\
+  \Macro{captionsgerman}\\
+  \Macro{captionsngerman}\\
+  \Macro{captionsaustrian}\\
+  \Macro{captionsfrench}\\
+  \Macro{captionsitalian}\\
+  \Macro{captionsspanish}\\
+  \Macro{captionsdutch}\\
+  \Macro{captionscroatian}
+\end{Declaration}
+\BeginIndex{Cmd}{captionsenglish}\BeginIndex{Cmd}{captionsUSenglish}
+\BeginIndex{Cmd}{captionsamerican}\BeginIndex{Cmd}{captionsbritish}
+\BeginIndex{Cmd}{captionsUKenglish}\BeginIndex{Cmd}{captionsgerman}
+\BeginIndex{Cmd}{captionsngerman}
+\BeginIndex{Cmd}{captionsaustrian}\BeginIndex{Cmd}{captionsfrench}
+\BeginIndex{Cmd}{captionsitalian}\BeginIndex{Cmd}{captionsspanish}
+\BeginIndex{Cmd}{captionsdutch}\BeginIndex{Cmd}{captionscroatian} If
+one switches the language then using these commands the language-terms
+from \autoref{sec:scrlttr2.languageTerms} are re-defined.
+If the used language selection scheme does not support this
+then the commands above can be used directly.
+%
+\EndIndex{Cmd}{captionsenglish}\EndIndex{Cmd}{captionsUSenglish}
+\EndIndex{Cmd}{captionsamerican}\EndIndex{Cmd}{captionsbritish}
+\EndIndex{Cmd}{captionsUKenglish}\EndIndex{Cmd}{captionsgerman}
+\EndIndex{Cmd}{captionsngerman}
+\EndIndex{Cmd}{captionsaustrian}\EndIndex{Cmd}{captionsfrench}
+\EndIndex{Cmd}{captionsitalian}\EndIndex{Cmd}{captionsspanish}
+\EndIndex{Cmd}{captionsdutch}\EndIndex{Cmd}{captionscroatian}
+ 
+
+\begin{Declaration}
+  \Macro{dateenglish}\\
+  \Macro{dateUSenglish}\\
+  \Macro{dateamerican}\\
+  \Macro{datebritish}\\
+  \Macro{dateUKenglish}\\
+  \Macro{dategerman}\\
+  \Macro{datengerman}\\
+  \Macro{dateaustrian}\\
+  \Macro{datefrench}\\
+  \Macro{dateitalian}\\
+  \Macro{datespanish}\\
+  \Macro{datedutch}\\
+  \Macro{datecroatian}\\
+  \Macro{datefinnish}
+\end{Declaration}
+\BeginIndex{Cmd}{dateenglish}\BeginIndex{Cmd}{dateUSenglish}
+\BeginIndex{Cmd}{dateamerican}\BeginIndex{Cmd}{datebritish}
+\BeginIndex{Cmd}{dateUKenglish}\BeginIndex{Cmd}{dategerman}
+\BeginIndex{Cmd}{datengerman}
+\BeginIndex{Cmd}{dateaustrian}\BeginIndex{Cmd}{datefrench}
+\BeginIndex{Cmd}{dateitalian}\BeginIndex{Cmd}{datespanish}
+\BeginIndex{Cmd}{datedutch}\BeginIndex{Cmd}{datecroatian}%
+\BeginIndex{Cmd}{datefinnish}%
+The date\Index{Date} in its numerical representation
+(see option \Option{numericaldate} in
+\autoref{sec:scrlttr2.headoptions}) will be written depending
+on the selected language. Some examples can be found in
+\autoref{tab:date}.
+%
+\EndIndex{Cmd}{dateenglish}\EndIndex{Cmd}{dateUSenglish}
+\EndIndex{Cmd}{dateamerican}\EndIndex{Cmd}{datebritish}
+\EndIndex{Cmd}{dateUKenglish}\EndIndex{Cmd}{dategerman}
+\EndIndex{Cmd}{datengerman}
+\EndIndex{Cmd}{dateaustrian}\EndIndex{Cmd}{datefrench}
+\EndIndex{Cmd}{dateitalian}\EndIndex{Cmd}{datespanish}
+\EndIndex{Cmd}{datedutch}\EndIndex{Cmd}{datecroatian}%
+\EndIndex{Cmd}{datefinnish}%
+
+\begin{table}[t]
+  \centering
+  \caption{Language-dependent forms of the date}
+  \begin{tabular}{ll}
+    \toprule
+    Command & Date example \\
+    \midrule
+    \Macro{dateenglish}   & 1/12/1993\\
+    \Macro{dateUSenglish} & 12/1/1993\\
+    \Macro{dateamerican}  & 12/1/1993\\
+    \Macro{datebritish}   & 1/12/1993\\
+    \Macro{dateUKenglish} & 1/12/1993\\
+    \Macro{dategerman}    & 1.\,12.\,1993\\
+    \Macro{datengerman}   & 1.\,12.\,1993\\
+    \Macro{dateaustrian}  & 1.\,12.\,1993\\
+    \Macro{datefrench}    & 1.\,12.\,1993\\
+    \Macro{dateitalian}   & 1.\,12.\,1993\\
+    \Macro{datespanish}   & 1.\,12.\,1993\\
+    \Macro{datedutch}     & 1.\,12.\,1993\\
+    \Macro{datecroatian}  & 1.\,12.\,1993.\\
+    \Macro{datefinnish }  & 1.\,12.\,1993.\\
+    \bottomrule
+  \end{tabular}
+  \label{tab:date}
+\end{table}
+%
+
+
+\subsection{Language-Dependent Terms}%
+\label{sec:scrlttr2.languageTerms}%
+\Index[indexmain]{language-dependent terms}%
+\Index[indexmain]{terms, language-dependent}
+
+As usual in \LaTeX{}, the language-dependent terms are defined
+by commands. These commands are re-defined when one switches
+the language.
+
+\begin{Declaration}
+  \Macro{yourrefname}\\
+  \Macro{yourmailname}\\
+  \Macro{myrefname}\\
+  \Macro{customername}\\
+  \Macro{invoicename}\\
+  \Macro{subjectname}\\
+  \Macro{ccname}\\
+  \Macro{enclname}\\
+  \Macro{headtoname}\\
+  \Macro{headfromname}\\
+  \Macro{datename}\\
+  \Macro{pagename}\\
+  \Macro{phonename}\\
+  \Macro{faxname}\\
+  \Macro{emailname}\\
+  \Macro{wwwname}\\
+  \Macro{bankname}
+\end{Declaration}
+\BeginIndex{Cmd}{yourrefname}\BeginIndex{Cmd}{yourmailname}
+\BeginIndex{Cmd}{myrefname}
+\BeginIndex{Cmd}{customername}\BeginIndex{Cmd}{invoicename}
+\BeginIndex{Cmd}{subjectname}
+\BeginIndex{Cmd}{ccname}\BeginIndex{Cmd}{enclname}
+\BeginIndex{Cmd}{headtoname}\BeginIndex{Cmd}{headfromname}
+\BeginIndex{Cmd}{datename}\BeginIndex{Cmd}{pagename}
+\BeginIndex{Cmd}{phonename}\BeginIndex{Cmd}{faxname}
+\BeginIndex{Cmd}{emailname}\BeginIndex{Cmd}{wwwname}
+\BeginIndex{Cmd}{bankname} The commands above contain the
+language-dependent terms. These definitions can be modified in
+order to support a new language or for private cutomization.
+How this can be done is described in
+\autoref{sec:scrlttr2.defLanguageTerms}.
+The definitions become active at \Macro{begin}\PParameter{document}.
+Therefore they are not available in the \LaTeX{} preamble.
+Thus they even can not be re-defined there.
+In \autoref{tab:scrlttr2.languageTerms} the default settings
+for \Option{english} and \Option{ngerman} can be found.
+%
+\EndIndex{Cmd}{yourrefname}\EndIndex{Cmd}{yourmailname}
+\EndIndex{Cmd}{myrefname}
+\EndIndex{Cmd}{customername}\EndIndex{Cmd}{invoicename}
+\EndIndex{Cmd}{subjectname}
+\EndIndex{Cmd}{ccname}\EndIndex{Cmd}{enclname}
+\EndIndex{Cmd}{headtoname}\EndIndex{Cmd}{headfromname}
+\EndIndex{Cmd}{datename}\EndIndex{Cmd}{pagename}
+\EndIndex{Cmd}{phonename}\EndIndex{Cmd}{faxname}
+\EndIndex{Cmd}{emailname}\EndIndex{Cmd}{wwwname}
+\EndIndex{Cmd}{bankname}
+
+\begin{table}[!t]
+  \begin{minipage}{\textwidth}
+  \centering
+  \caption{Default settings for languages \Option{english}
+    and \Option{ngerman}}
+  \begin{tabular}{lll}
+    \toprule
+    Command         & \Option{english} & \Option{ngerman} \\
+    \midrule
+    \Macro{bankname}     & Bank account   & Bankverbindung \\
+    \Macro{ccname}\footnotemark[1]       & cc             & Kopien an \\
+    \Macro{customername} & Customer no.   & Kundennummer \\
+    \Macro{datename}     & Date           & Datum \\
+    \Macro{emailname}    & Email          & E-Mail \\
+    \Macro{enclname}\footnotemark[1]     & encl           & Anlagen \\
+    \Macro{faxname}      & Fax            & Fax \\
+    \Macro{headfromname} & From           & Von \\
+    \Macro{headtoname}\footnotemark[1]   & To             & An \\
+    \Macro{invoicename}  & Invoice no.    & Rechnungsnummer \\
+    \Macro{myrefname}    & Our ref.       & Unser Zeichen \\
+    \Macro{pagename}\footnotemark[1]     & Page           & Seite \\
+    \Macro{phonename}    & Phone          & Telefon \\
+    \Macro{subjectname}  & Subject        & Betrifft \\
+    \Macro{wwwname}      & Url            & URL \\
+    \Macro{yourmailname} & Your letter of & Ihr Schreiben vom\\
+    \Macro{yourrefname}  & Your ref.      & Ihr Zeichen \\
+    \bottomrule
+  \end{tabular}
+  \label{tab:scrlttr2.languageTerms}
+  \deffootnote{1em}{1em}{\textsuperscript{1}}%
+  \footnotetext[1000]{Normally these terms are defined by language packages
+    like \Package{babel}. At this case they are not redefined by
+    \Class{scrlttr2} and may differ from the table above.}
+  \end{minipage}
+\end{table}
+%
+
+\subsection{Defining Language Terms}
+\label{sec:scrlttr2.defLanguageTerms}
+\Index[indexmain]{language definition}
+\begin{Explain}
+  Normally one has to change or define the language terms of
+  \autoref{sec:scrlttr2.switchLanguage} in a way that additionally
+  to the available terms even the new or re-defined terms are
+  defined. Some packages like \Package{german}\IndexPackage{german} or
+  \Package{ngerman}\IndexPackage{ngerman} re-define those settings
+  when they are loaded. These packages re-define the definitions in a
+  way that spoils all previous private settings. That is also the
+  reason, why \Class{scrlttr2} delays its own changes with
+  \Macro{AtBeginDocument} until
+  \Macro{begin}\PParameter{document}. The user can also use
+  \Macro{AtBeginDocument} or re-define the language terms after
+  \Macro{begin}\PParameter{document}. The class \Class{scrlttr2}
+  provides some commands for defining language terms.
+\end{Explain}
+
+\begin{Declaration}
+  \Macro{providecaptionname}%
+    \Parameter{language}\Parameter{term}\Parameter{definition}\\
+  \Macro{newcaptionname}%
+    \Parameter{language}\Parameter{term}\Parameter{definition}\\
+  \Macro{renewcaptionname}%
+    \Parameter{language}\Parameter{term}\Parameter{definition}
+\end{Declaration}
+\BeginIndex{Cmd}{providecaptionname}%
+\BeginIndex{Cmd}{newcaptionname}%
+\BeginIndex{Cmd}{renewcaptionname}%
+Using one of the commands above the user can assign
+a \PName{definition} for a \PName{language} to a \PName{term} .
+The \PName{term} is always a command. The commands differ
+dependent from whether a \PName{term} is already define
+in \PName{language} or not.
+
+If \PName{language} is not defined then \Macro{providecaptionname}
+writes only a message in the log-file. This happens only
+once for each language.
+If \PName{language} is defined but \PName{term} isn't defined
+yet, then it will be defined using \PName{definition}.
+The \PName{term} will not be re-defined if the \PName{language}
+already has a definition. Instaed a log-message will be written.
+
+The command \Macro{newcaptionname} has a slightly different behaviour.
+If the \PName{language} is not yet defined then a new language
+command (see \autoref{sec:scrlttr2.switchLanguage})
+will be created and a log-message will be written.
+If \PName{term} is not yet defined in \PName{language} then
+it will be defined with \PName{definition}.
+If \PName{term} already exists in \PName{language} then this
+results in an error message.
+
+The command \Macro{renewcaptionname} requires an existing
+definition of \PName{term} in \PName{language}.
+In this case \PName{term} for \PName{language} will be re-defined
+according to \PName{definition}. If neither \PName{language}
+nor \PName{term} exist or \PName{term} is unknown in a defined
+language then a error message will be given.
+
+The class \Class{scrlttr2} itself employs \Macro{providecaptionname}
+in order to define the commands in
+\autoref{sec:scrlttr2.languageTerms}.
+\begin{Example}
+  If you prefer ``Your message of'' instead of ``Your letter of''
+  you have to re-define the definition of \Macro{yourmailname}.
+\begin{lstlisting}
+  \renewcaptionname{english}{\yourmailname}{%
+    Your message of}
+\end{lstlisting}
+  
+  Since only available terms can be re-defined you have to
+  delay the command until \Macro{begin}\PParameter{document}
+  using \Macro{AtBeginDocument}.
+  Furthermore you will get an error message if there is no
+  package used that defines a language selection command
+  for \PName{english}.
+\end{Example}
+%
+\EndIndex{Cmd}{providecaptionname}%
+\EndIndex{Cmd}{newcaptionname}%
+\EndIndex{Cmd}{renewcaptionname}%
+
+\section{Address Files and Circular Letters}
+\label{sec:scrlttr2.addressFile}
+
+When people write circular letters they mostly dislike to
+type the many addresses.
+The class \Class{scrlttr2} and its predecessor \Class{scrlettr} 
+as well provide basic support for it.
+Currently there are plans for a much enhanced support.
+
+\typeout{^^J--- Ignore underfull and overfull \string\hbox:}%
+\begin{Declaration}
+  \Macro{adrentry}\Parameter{Lastname}\Parameter{Firstname}%
+  \Parameter{Address}\Parameter{Telephone}\Parameter{F1}\Parameter{F2}%
+  \Parameter{Comment}\Parameter{Key}
+\end{Declaration}%
+\typeout{^^J--- Don't ignore underfull and overfull \string\hbox:}
+\BeginIndex{Cmd}{adrentry}
+\label{decl:adrentry}
+
+The class \Class{scrlttr2} supports to use address files.
+These address files contain address entries.
+Each entry is an \Macro{adrentry} command with eight parameters as 
+can be seen above.
+The file extension of the address file has to be \File{.adr}.
+\begin{lstlisting}
+  \adrentry{McEnvy}
+           {Flann}
+           {Main Street 1\\ Glasgow}
+           {123 4567}
+           {male}
+           {}
+           {niggard}
+           {FLANN}
+\end{lstlisting}
+The 5\textsuperscript{th} and 6\textsuperscript{th} element, \PValue{F1} and
+\PValue{F2}, can be used freely, for example for the gender, the academic
+grade, the birthday or the date the person has joined a society.  The last
+parameter \PName{Key} should only consist of uppercase letters in order to not
+interfere with other \TeX{} or \LaTeX{} commands.
+
+\begin{Example}
+  Mr.\,McEnvy is one of your most important business partners,
+  but every day you get a reclamation from him.
+  Before long you don't want to bother typing his boring
+  address again and again.
+  Here \Class{scrlttr2} can help.
+  All your business partners have an entry in your
+  \File{partners.adr} address file.
+  If you now have to answer Mr.\,McEnvy again, then you
+  can save typing as can be seen below:
+\begin{lstlisting}
+  \input{partners.adr}
+  \begin{letter}{\FLANN}
+    Your today's reclamation  ...
+  \end{letter}
+\end{lstlisting}
+  Your \TeX{} system must be configured to have access to your
+  address file. Without access the \Macro{input} command results
+  in an error. You can either put your address file where you
+  are running \LaTeX{} or configure your system to find
+  the file in a special directory.
+\end{Example}
+%
+\EndIndex{Cmd}{adrentry}
+
+\typeout{^^J--- Ignore underfull and overfull \string\hbox:}%
+\begin{Declaration}
+  \Macro{addrentry}\Parameter{Lastname}\Parameter{Firstname}%
+  \Parameter{Address}\Parameter{Telephone}\Parameter{F1}\Parameter{F2}%
+  \Parameter{F3}\Parameter{F4}\Parameter{Key}
+\end{Declaration}%
+\typeout{^^J--- Dont't ignore underfull and overfull \string\hbox:}
+\BeginIndex{Cmd}{addrentry}%
+Over the years people objected that the \Macro{adrentry} has only
+two free parameters. Since \TeX{} supports at maximum nine
+parameters per command, there now exists a new command called
+\Macro{addrentry}, note the additional ``d''.
+This command supports four freely definable parameters, that
+means one parameter more than \Macro{adrentry}, since the comment
+parameter has been replaced with the fourth free parameter.
+The numbers of parameters is the only difference between
+both commands. Thus you can mix both entry types in
+one address file.
+
+There are some packages which can employ \File{adr} files.
+For example \Package{adrconv} by Axel Kielhorn can be used
+to create address lists from \File{adr} files.
+But it has currently no support for command \Macro{addrentry}.
+The only choice is to extent the package yourself.
+%
+\EndIndex{Cmd}{addrentry}
+
+Besides the simple acccess to addresses the address files can
+be easily used in order to write circular letters.
+Thus there is no complicated data-base system and its connection
+to \TeX{} required.
+%
+\begin{Example}
+  Suppose you are member of a society and want write a invitation
+  for the next general meeting to all members.
+\begin{lstlisting}
+  \documentclass{scrlttr2}
+    \begin{document}
+    \renewcommand*{\adrentry}[8]{
+      \begin{letter}{#2 #1\\#3}
+        \opening{Dear members,}
+        our next general meeting will be on monday
+        August 12, 2002. The following topics are ...
+        \closing{Regards,}
+      \end{letter}
+    }
+    \input{members.adr}
+    \end{document}
+\end{lstlisting}
+  If the address file contains \Macro{addrentry} statements
+  too, then even an additional definition for \Macro{addrentry}
+  is required.
+\begin{lstlisting}
+    \renewcommand*{\addrentry}[9]{
+      \begin{letter}{#2 #1\\#3}
+        \opening{Dear members,}
+        our next general meeting will be on monday
+        August 12, 2002. The topics of the meeting are ...
+        \closing{Regards,}
+      \end{letter}
+    }
+\end{lstlisting}
+  In this simple example the extra freely definable parameter
+  is not used.
+\end{Example}
+
+With some additional programming one can let the contents
+depend on the address data. For this the free parameters
+can be used.
+
+\begin{Example}
+  Suppose the fifth parameter of the \Macro{adrentry} command
+  contains the gender of a member (\PValue{m/f}).
+  The sixth parameter contains what member subscribtion
+  has still not been discharged by the member.
+  If you would like to write a more personal reminder
+  then the next example can help you.
+\begin{lstlisting}
+  \renewcommand*{\adrentry}[8]{
+    \ifcase #6
+    % #6 greater than 0?
+    % this selects all members with open subscription
+    \else
+      \begin{letter}{#2 #1\\#3}
+        \if #5m \opening{Dear Mr.\,#2,} \fi
+        \if #5f \opening{Dear Mrs.\,#2,} \fi
+
+        Unfortunately we have to remind you that you have
+        still not paid the member subscription for this
+        year.
+
+        Please remit EUR #6 to the account of the society.
+       \closing{Regards,}
+      \end{letter}
+     \fi
+  }
+\end{lstlisting}
+\end{Example}
+As you can see the letter text can be made more personal
+depending on attributes of the letter's addressee.
+The number of attributes is only restricted by number of the
+two free parameters of the \Macro{adrentry} command or
+four free parameters of the \Macro{addrentry} command.
+
+\begin{Declaration}
+  \Macro{adrchar}\Parameter{initial letter}\\
+  \Macro{addrchar}\Parameter{initial letter}
+\end{Declaration}
+\BeginIndex{Cmd}{adrchar}\BeginIndex{Cmd}{addrchar}
+\Index[indexmain]{address list}\Index[indexmain]{telephone list}%
+As already mentioned above it is possible to create address
+and telephone lists using \File{adr} files.
+For that the additional package \Package{adrconv}-Paket by
+Axel Kielhorn (see \cite{package:adrconv}) is needed.
+This package contains interactive \LaTeX{} documents
+which help to create those lists.
+
+The address files have to be sorted already in order to
+get sorted lists. It is recommended to sort and separate the
+entries by the initial letter of \PName{Lastname}.
+As a seperator the commands \Macro{adrchar} and \Macro{addrchar}
+can be used. These commands will be ignored if the address files
+are utilized in \Class{scrlettr2}.
+%
+\begin{Example}
+  Suppose the following address file:
+\begin{lstlisting}
+  \adrchar{A}
+  \adrentry{Angel}{Gabriel}
+           {Cloud 3\\12345 Heaven's Realm}
+           {000\,01\,02\,03}{}{}{archangel}{GABRIEL}
+  \adrentry{Angel}{Michael}
+           {Cloud 3a\\12345 Heaven's Realm}
+           {000\,01\,02\,04}{}{}{archangel}{MICHAEL}
+  \adrchar{K}
+  \adrentry{Kohm}{Markus}
+           {Fichtenstra\ss e 63\\68535 Edingen-Neckarhausen}
+           {+49~62\,03~1\,??\,??}{}{}{no angel at all}
+           {KOMA}
+\end{lstlisting}
+  This address file can be treated with \File{adrdir.tex} of the
+  \Package{adrconv} package \cite{package:adrconv}.
+  The result should look like this:
+  \begin{center}
+    \setlength{\unitlength}{1mm}
+    \begin{picture}(80,57)
+      \put(0,57){\line(1,0){80}}
+      \put(0,3){\line(0,1){54}}
+      \put(80,3){\line(0,1){54}}
+      \thicklines
+      \put(10,42){\line(1,0){60}}
+      \put(70,45){\makebox(0,0)[r]{\textsf{\textbf{A}}}}
+      \put(10,23){\makebox(0,20)[l]{\parbox{5cm}{\raggedright
+            \textsc{Angel}, Gabriel\\\quad\small Cloud 3\\
+            \quad 12345 Heaven's Realm\\
+            \quad (archangel)}}}
+      \put(70,23){\makebox(0,20)[r]{\parbox{2cm}{\raggedright~\\
+            \small~\\\textsc{gabriel}\\000\,01\,02\,03}}}
+      \put(10,4){\makebox(0,20)[l]{\parbox{5cm}{\raggedright
+            \textsc{Angel}, Michael\\\quad\small Cloud 3a\\
+            \quad 12345 Heaven'S Realm\\
+            \quad (archangel)}}}
+      \put(70,4){\makebox(0,20)[r]{\parbox{2cm}{\raggedright~\\
+            \small~\\\textsc{michael}\\000\,01\,02\,04}}}
+      \qbezier(0,3)(10,6)(40,3)\qbezier(40,3)(60,0)(80,3)
+    \end{picture}
+  \end{center}
+  The letter in the page heading is created by the 
+  \Macro{adrchar} command, see the definition in \File{adrdir.tex}.
+\end{Example}
+More about the \Package{adrconv} package can be found in its
+documentation. There you should even find informations if
+the version of \Package{adrconv} supports already the
+\Macro{addrentry} and \Macro{addrchar} commands.
+Former versions only know the commands \Macro{adrentry} and
+\Macro{adrchar}.
+%
+\EndIndex{Cmd}{adrchar}\EndIndex{Cmd}{addrchar}%
+
+
+\section{From \Class{scrlettr} to \Class{scrlttr2}}
+\label{sec:scrlttr2.fromscrlettr}
+
+The first step in the conversion of an old letter written with
+the \Class{scrlettr} class is to load the appropriate
+\File{lco} file using option \Option{KOMAold} at
+\Macro{documentclass}.
+Thereupon most commands of the old class should work.
+But you will encounter some differences in the output, since
+the page layout of both classes is not the same.
+The reason is that the calculation of the type-area in \Class{scrlettr}
+has some minor bugs. For example the position of the folding marks
+used to depend on the height of the page heading, which again has
+dependence to the font size. That was an unambiguous design fault.
+
+There is no compatibility regarding the defined lengths
+in \Class{scrlettr}.
+If one has changed the page layout of \Class{scrlettr}
+then those statements have to be deleted or commented out.
+In some cases the modification of length can cause
+an error, since this length is not defined anymore. 
+You should delete or comment these modifications as well.
+
+The old letter example:
+\begin{lstlisting}
+  \documentclass[10pt,KOMAold]{scrlttr2}
+  \name{\KOMAScript{} team}
+  \address{Class Alley 1\\12345 \LaTeX{} City}
+  \signature{Your \KOMAScript{} team}
+  \begin{document}
+    \begin{letter}{\KOMAScript{} users\\
+                   Everywhere\\world-wide}
+      \opening{Dear \KOMAScript{} users,}
+      the  \KOMAScript{} team is proud to annouce...
+      \closing{Happy \TeX{}ing}
+    \end{letter}
+  \end{document}
+\end{lstlisting}
+works as expected only by option \Option{KOMAold}.
+
+
+The next step is that the layout of the old letter will
+not be used anymore, but the old commands should still
+be available.
+If for example one wants the layout of \Option{DIN}
+then this option can be given in \Macro{documentclass},
+but is has to be specified \emph{after} the option
+\Option{KOMAold}.
+
+\begin{lstlisting}
+  \documentclass[10pt,KOMAold,DIN]{scrlttr2}
+  \name{\KOMAScript{} team}
+  \address{Class Alley 1\\12345 \LaTeX{} City}
+  \signature{Your \KOMAScript{} team}
+  \begin{document}
+    \begin{letter}{\KOMAScript{} users\\
+                   Everywhere\\world-wide}
+      \opening{Dear \KOMAScript{} users,}
+      the \KOMAScript{} team is proud to annouce...
+      \closing{Happy \TeX{}ing}
+    \end{letter}
+  \end{document}
+\end{lstlisting}
+Using more options this way you have further influence on the
+layout, but a more inherent change is really recommended.
+
+That is to replace all old commands with its new representations
+and omit the option \Option{KOMAold}.
+It can help to read the contents of \File{KOMAold.lco}.
+In that file the old commands are defined using the new ones.
+
+\begin{lstlisting}
+  \documentclass{scrlttr2}
+  \setkomavar{fromname}{\KOMAScript{} team}
+  \setkomavar{fromaddress}{Class Alley 1\\
+                           12345 \LaTeX{} City}
+  \setkomavar{signature}{Your \KOMAScript{} team}
+  \let\raggedsignature=\raggedright
+  \begin{document}
+    \begin{letter}{\KOMAScript{} users\\
+                   Everywhere\\
+                   world-wide}
+      \opening{Dear \KOMAScript{} users,}
+      the \KOMAScript{} team is proud to annouce...
+      \closing{Happy \TeX{}ing}
+    \end{letter}
+  \end{document}
+\end{lstlisting}
+This example shows also the possibility to change the
+alignment of the signature by re-defining the command
+\Macro{raggedsignature}.
+This is recommended if the width of the real signature
+is greater than the signature-definition of the command 
+\Macro{setkomavar}\PParameter{signature}\PParameter{\dots}.
+%
+\EndIndex{Class}{scrlttr2}\EndIndex{}{Letters}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../guide"
+%%% End: 

@@ -1,0 +1,219 @@
+% ============================================================================
+% scraddr.tex
+% Copyright (c) Markus Kohm, 2001-2005
+%
+% This file is part of the LaTeX2e KOMA-Script-Bundle
+%
+% This file can be redistributed and/or modified under the terms
+% of the LaTeX Project Public License Version 1.0 distributed
+% together with this file. See LEGAL.TXT or LEGALDE.TXT.
+% ----------------------------------------------------------------------------
+% scraddr.tex
+% Copyright (c) Markus Kohm, 2001-2005
+%
+% Diese Datei ist Teil des LaTeX2e KOMA-Script-Pakets.
+%
+% Diese Datei kann nach den Regeln der LaTeX Project Public
+% Licence Version 1.0, wie sie zusammen mit dieser Datei verteilt
+% wird, weiterverbreitet und/oder modifiziert werden. Siehe dazu
+% auch LEGAL.TXT oder LEGALDE.TXT.
+% ============================================================================
+%
+% Chapter about scraddr of the KOMA-Script guide
+% Maintained by Jens-Uwe Morawski (with help from Markus Kohm)
+%
+% ----------------------------------------------------------------------
+%
+% Kapitel über scraddr in der KOMA-Script-Anleitung
+% Verwaltet von Jens-Uwe Morawski (mit Unterstützung von Markus Kohm)
+%
+% ======================================================================
+
+\ProvidesFile{scraddr.tex}[2005/11/27 KOMA-Script guide (chapter: scraddr)]
+% Date of translated german file: 2002/10/15
+
+\chapter{Access to Address Files with \Package{scraddr}}%
+\labelbase{scraddr}%
+\BeginIndex{Package}{scraddr}
+
+\section{Overview}\label{sec:scraddr.overview}
+The package \Package{scraddr} is a small extension to
+the \KOMAScript{} letter class.
+Its aim is to make access to the data of address files
+more flexible and easier.
+Basically the package implements a new loading mechanism
+for address files, which contain address entries of the kind
+described in the previous chapter.
+
+\begin{Declaration}
+\Macro{InputAddressFile}\Parameter{file name}
+\end{Declaration}%
+\BeginIndex{Cmd}{InputAddressFile}%
+%
+The command \Macro{InputAddressFile} reads the content
+of the address file, given as its parameter.
+If the file does not exist the command returns an
+error message.
+
+For every entry in the address file the command generates a
+set of macros for accessing the data. 
+First a short reminder of how an address entry is structured.
+
+\begin{Declaration}%
+  \Macro{adrentry}\Parameter{Lastname}\Parameter{Firstname}%
+  \Parameter{Address}\Parameter{Telephone}\Parameter{F1}\Parameter{F2}%
+  \Parameter{Comment}\Parameter{Key}\\
+  \Macro{addrentry}\Parameter{Lastname}\Parameter{Firstname}%
+  \Parameter{Address}\Parameter{Telephone}\Parameter{F1}\Parameter{F2}%
+  \Parameter{F3}\Parameter{F4}\Parameter{Key}
+\end{Declaration}%
+The last parameter is the identifier of an entry, thus the
+\PName{Key} has to be unique and not blank.  If the file contains more
+than one entry with the same \PName{Key} value, the last occurrence
+will be used.  The \PName{Key} should only be composed of letters.
+\begin{Declaration}
+\Macro{Name}\Parameter{Key}\\
+\Macro{FirstName}\Parameter{Key}\\
+\Macro{LastName}\Parameter{Key}\\
+\Macro{Address}\Parameter{Key}\\
+\Macro{Telephone}\Parameter{Key}\\
+\Macro{FreeI}\Parameter{Key}\\
+\Macro{FreeII}\Parameter{Key}\\
+\Macro{Comment}\Parameter{Key}\\
+\Macro{FreeIII}\Parameter{Key}\\
+\Macro{FreeIV}\Parameter{Key}
+\end{Declaration}%
+\BeginIndex{Cmd}{Name}\BeginIndex{Cmd}{FirstName}\BeginIndex{Cmd}{LastName}%
+\BeginIndex{Cmd}{Address}\BeginIndex{Cmd}{Telephone}\BeginIndex{Cmd}{FreeI}%
+\BeginIndex{Cmd}{FreeII}\BeginIndex{Cmd}{FreeIII}\BeginIndex{Cmd}{FreeIV}%
+\BeginIndex{Cmd}{Comment}%
+%
+These commands give access to data of your address file.
+The parameter \PName{Key} is the same as in the
+\Macro{adrentry} or \Macro{addrentry} command.
+In the address of letters often both, first-name and
+last-name, are required.
+The command \Macro{Name}\PParameter{Key} is an abridgement for
+\Macro{FirstName}\PParameter{Key} \Macro{LastName}\PParameter{Key}.
+
+\EndIndex{Cmd}{InputAddressFile}%
+\EndIndex{Cmd}{Name}\EndIndex{Cmd}{FirstName}\EndIndex{Cmd}{LastName}%
+\EndIndex{Cmd}{Address}\EndIndex{Cmd}{Telephone}\EndIndex{Cmd}{FreeI}%
+\EndIndex{Cmd}{FreeII}\EndIndex{Cmd}{FreeIII}\EndIndex{Cmd}{FreeIV}%
+\EndIndex{Cmd}{Comment}%
+
+\section{Usage}\label{sec:scraddr.usage}
+
+First of all, we need an address file with valid address entries.
+In this example the file has the name \emph{lotr.adr} and contains
+the following entries.
+\begin{lstlisting}
+  \addrentry{Baggins}{Frodo}%
+            {The Hill\\ Bag End/Hobbiton in the Shire}{}%
+            {Bilbo Baggins}{pipe-weed}%
+            {the Ring-bearer}{Bilbo's heir}{FRODO}
+  \adrentry{Gamgee}{Samwise}%
+            {Bagshot Row 3\\Hobbiton in the Shire}{}%
+            {Rosie Cotton}{taters}%
+            {the Ring-bearer's faithful servant}{SAM}
+  \adrentry{Bombadil}{Tom}%
+            {The Old Forest}{}%
+            {Goldberry}{trill queer songs}%
+            {The Master of Wood, Water and Hill}{TOM}
+\end{lstlisting}
+
+The 4\textsuperscript{th} parameter, the telephone number, has been left
+blank. If you know the story behind these addresses you
+will agree that a telephone number makes no sense here.
+The command \Macro{InputAddressFile} is used to load
+the address file shown above.
+\begin{lstlisting}
+  \InputAddressFile{lotr}
+\end{lstlisting}
+
+
+With the help of the commands introduced in this chapter
+we can now write a letter to the old \textsc{Tom Bombadil}.
+In this letter we ask him, if he can remember two
+fellow-travelers from Elder Days.
+\begin{lstlisting}
+  \begin{letter}{\Name{TOM}\\\Address{TOM}}
+     \opening{Dear \FirstName{TOM} \LastName{TOM},}
+     
+      or \FreeIII{TOM}, how your delightful \FreeI{TOM} calls
+      you.
+      Can you remember Mr.\,\LastName{FRODO},
+      strictly speaking \Name{FRODO}, since there was
+      Mr.\,\FreeI{FRODO} too.
+      He was \Comment{FRODO} in the Third Age
+      and \FreeIV{FRODO}
+      \Name{SAM}, \Comment{SAM}, has attended him.
+      
+      Their pasions were very wordly.
+      \FirstName{FRODO} enjoyed to smoke \FreeII{FRODO}, 
+      his attendant has appreciate a good meal with
+      \FreeII{SAM}.
+
+      Do you remember? Certainly Mithrandir has told you much
+      about their deeds and adventures .
+    \closing{``O spring-time and summer-time
+                and spring again after!\\
+               O wind on the waterfall,
+                and the leaves' laughter!''}
+  \end{letter}
+\end{lstlisting}
+The 5\textsuperscript{th} and 6\textsuperscript{th} parameter of the
+\Macro{adrentry} or \Macro{adrentry} command are for free use.  They are
+accessible with the commands \Macro{FreeI} and \Macro{FreeII}.  In this
+example the 5\textsuperscript{th} parameter contains the name of a person who
+is the most important in the life of the entry's person, the
+6\textsuperscript{th} contains the person's passion.  The
+7\textsuperscript{th} parameter is a comment or in general also a free
+parameter. The commands \Macro{Comment} or \Macro{FreeIII} give access to the
+data. Using \Macro{FreeIV} is only valid for \Macro{addrentry} entries; for
+\Macro{adrentry} entries it results in a warning.
+\EndIndex{Package}{scraddr}
+
+\section{Package Warning Options}
+
+As mentioned above the command \Macro{FreeIV} leads
+to a fault if it is used for \Macro{adrentry} entries.
+
+Therefore \Package{scraddr} supports package options
+in order to give the user the possibility to
+choose how the package should react in such situation.
+It is possible to choose different settings between
+\emph{ignore} and \emph{rupture} of the \LaTeX{} run.
+
+\begin{Declaration}
+\Option{adrFreeIVempty}\\
+\Option{adrFreeIVshow}\\
+\Option{adrFreeIVwarn}\\
+\Option{adrFreeIVstop}
+\end{Declaration}
+%
+\BeginIndex{Option}{adrFreeIVempty}\BeginIndex{Option}{adrFreeIVshow}
+\BeginIndex{Option}{adrFreeIVwarn}\BeginIndex{Option}{adrFreeIVstop}
+%
+One of these options can be given in the optional argument
+of the \Macro{usepackage} command. The default setting is
+\Option{adrFreeIVshow}.
+
+\begin{labeling}[\,--]{\Option{adrFreeIVempty}}
+\item[\Option{adrFreeIVempty}] 
+        the command \Macro{FreeIV} will be ignored
+\item[\Option{adrFreeIVshow}] 
+        ``(entry FreeIV undefined at \PName{Key})'' will be
+        written as warning in the text
+\item[\Option{adrFreeIVwarn}]
+        writes a warning in the log-file
+\item[\Option{adrFreeIVstop}]
+        the \LaTeX{} run will be interrupted with an error message
+\end{labeling}
+\EndIndex{Option}{adrFreeIVempty}\EndIndex{Option}{adrFreeIVshow}
+\EndIndex{Option}{adrFreeIVwarn}\EndIndex{Option}{adrFreeIVstop}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../guide"
+%%% End: 

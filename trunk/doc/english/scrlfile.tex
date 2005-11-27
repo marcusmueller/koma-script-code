@@ -1,0 +1,294 @@
+% ============================================================================
+% scrlfile.tex
+% Copyright (c) Markus Kohm, 2001-2005
+%
+% This file is part of the LaTeX2e KOMA-Script-Bundle
+%
+% This file can be redistributed and/or modified under the terms
+% of the LaTeX Project Public License Version 1.0 distributed
+% together with this file. See LEGAL.TXT or LEGALDE.TXT.
+% ----------------------------------------------------------------------------
+% scrlfile.tex
+% Copyright (c) Markus Kohm, 2001-2005
+%
+% Diese Datei ist Teil des LaTeX2e KOMA-Script-Pakets.
+%
+% Diese Datei kann nach den Regeln der LaTeX Project Public
+% Licence Version 1.0, wie sie zusammen mit dieser Datei verteilt
+% wird, weiterverbreitet und/oder modifiziert werden. Siehe dazu
+% auch LEGAL.TXT oder LEGALDE.TXT.
+% ============================================================================
+%
+% Chapter about scrlfile of the KOMA-Script guide
+% Maintained by Markus Kohm
+%
+% ----------------------------------------------------------------------------
+%
+% Kapitel über scrlfile in der KOMA-Script-Anleitung
+% Verwaltet von Markus Kohm
+%
+% ============================================================================
+
+\ProvidesFile{scrlfile.tex}[2005/11/27 KOMA-Script guide (chapter: scrlfile)]
+% Date of translated german file: 2005/08/10
+
+\chapter{Control Package Dependencies with \Package{scrlfile}}
+\labelbase{scrlfile}
+
+\BeginIndex{Package}{scrlfile}
+
+\begin{Explain}
+  The introduction of \LaTeXe{} in 1994 brought many changes in the handling
+  with \LaTeX-extensions.  Today the package author has many macros in order
+  to determine if another package or class is employed and whether specific
+  options are used.  The author can load other packages or can specify options
+  in the the case the package is loaded later.  This has led to the
+  expectation that the order of package-loading will be not important.  But
+  this hope has not been fulfilled.
+\end{Explain}
+
+\section{About Package Dependencies}
+\label{sec:scrlfile.dependency}
+\begin{Explain}
+  Often different packages define or redefine one macro again and again.  In
+  such a case the order of package-loading becomes very important.  For the
+  user this is sometimes difficult to understand the behaviour and in some
+  cases the user wants only react on the loading of a package. This is also
+  not really simple.
+
+  Assuming the simple example that loads the package \Package{longtable} with
+  a \KOMAScript{} document-class employed.  The \Package{longtable} package
+  defines table captions suitable for the standard classes, but the captions
+  are totally unsuitable for documents using \KOMAScript{} and thus the
+  provided configuration commands have no influence.  In order to solve this
+  problem the commands which are responsible for the table captions of the
+  \Package{longtable} package have to be re-defined. But at the moment when
+  the \Package{longtable} is loaded the \KOMAScript{} class is already
+  processed.
+
+  The only chance for \KOMAScript{} was to delay the re-definition until the
+  begin of the document with help of the macro \Macro{AtBeginDocument}.  If
+  the user wants to change the definitions too, it is recommended to do this
+  in the preamble of the document.  But this is impossible since later at
+  \Macro{begin}\PParameter{document} \KOMAScript will again overwrite the
+  user-definition with its own.  Therefore the user has to delay his
+  definition with \Macro{AtBeginDocument} as well.
+  
+  However, \KOMAScript{} shouldn't delay the re-definition until
+  \Macro{begin}\PParameter{document}.  It would be enough to delay until the
+  package \Package{longtable} has been loaded. But unfortunately the basic
+  \LaTeX{} does not define appropriate commands. The package
+  \Package{scrlfile} provides redress here.
+  
+  Likewise, it might be conceivable that before a package is loaded one would
+  like to save the definition of a macro in a help-macro, in order to restore
+  its meaning after the package has been loaded. The package
+  \Package{scrlfile} allows this too.
+  
+  The employment of \Package{scrlfile} is not limited to package dependencies
+  only.  Even dependencies with any other file can be attended.  For example
+  the user can be warned if the not uncritical file \File{french.ldf} has been
+  loaded.
+  
+  Though the package is particularly interesting for package authors, there
+  are of course applications for normal \LaTeX{} users too.  Therefore this
+  chapter gives and explains examples for both groups of users.
+\end{Explain}
+
+
+\section{Actions Prior and After Loading}
+\label{sec:scrlfile.macros}
+
+\begin{Declaration}
+  \Macro{BeforeFile}\Parameter{file}\Parameter{instructions}\\
+  \Macro{AfterFile}\Parameter{file}\Parameter{instructions}
+\end{Declaration}%
+\BeginIndex{Cmd}{BeforeFile}%
+\BeginIndex{Cmd}{AfterFile}%
+The macro \Macro{BeforeFile} enables to execute \PName{instructions}
+the next time the \PName{file} is loaded.
+In the same way works \Macro{AfterFile}, but here the
+\PName{instructions} will be executed after the \PName{file}
+has been loaded.
+If \PName{file} will never be loaded then the \PName{instructions}
+will never be executed.
+
+\begin{Explain}
+  In order to implement those features \Package{scrlfile}
+  re-defines the well known \LaTeX{} command
+  \Macro{InputIfFileExists}.
+  If this macro has not the expected definition \Package{scrlfile}
+  gives a warning.
+  This is for the case that in future \LaTeX{} versions
+  the macro can have a different definition or an other package
+  has already re-defined it.
+  
+  The command \Macro{InputIfFileExists} is used 
+  everytime \LaTeX{} has to load a file.
+  This is independent from whether the actual command was \Macro{LoadClass},
+  \Macro{documentclass}, \Macro{usepackage}, \Macro{RequiresPackage},
+  or \Macro{include}. Exclusively the command
+\begin{lstlisting}
+  \input foo
+\end{lstlisting}
+  loads the file \texttt{foo} without to utilize
+  \Macro{InputIfFileExists}. Therefore one should always use
+\begin{lstlisting}
+  \input{foo}
+\end{lstlisting}
+  instead. Notice the parentheses surrounding the file name!
+\end{Explain}
+%
+\EndIndex{Cmd}{BeforeFile}%
+\EndIndex{Cmd}{AfterFile}%
+
+\begin{Declaration}
+  \Macro{BeforeClass}\Parameter{class}\Parameter{instructions}\\
+  \Macro{BeforePackage}\Parameter{package}\Parameter{instructions}
+\end{Declaration}%
+\BeginIndex{Cmd}{BeforeClass}%
+\BeginIndex{Cmd}{BeforePackage}%
+These both commands work the same way as \Macro{BeforeFile}.
+The only difference is that the document class \PName{class}
+and the \LaTeX{} package \PName{package} are specified
+with their names and not with their file names.
+That means the file extensions \File{.cls} and \File{.sty}
+can be omitted.
+%
+\EndIndex{Cmd}{BeforeClass}%
+\EndIndex{Cmd}{BeforePackage}%
+
+\begin{Declaration}
+  \Macro{AfterClass}\Parameter{class}\Parameter{instructions}\\
+  \Macro{AfterClass*}\Parameter{class}\Parameter{instructions}\\
+  \Macro{AfterPackage}\Parameter{package}\Parameter{instructions}\\
+  \Macro{AfterPackage*}\Parameter{package}\Parameter{instructions}
+\end{Declaration}%
+\BeginIndex{Cmd}{AfterClass}%
+\BeginIndex{Cmd}{AfterClass*}%
+\BeginIndex{Cmd}{AfterPackage}%
+\BeginIndex{Cmd}{AfterPackage*}%
+The commands \Macro{AfterClass} und \Macro{AfterPackage} 
+work the same way as \Macro{AfterFile}.
+The only difference is that the document class \PName{class}
+and the \LaTeX{} package \PName{package} are specified
+with their names and not with their file names.
+That means the file extensions \File{.cls} and \File{.sty}
+can be omitted.
+The starred versions execute the \PName{instructions} not
+only next time the class or package is loaded, but also
+immediately if the class or package has been loaded already.
+%
+\EndIndex{Cmd}{AfterClass}%
+\EndIndex{Cmd}{AfterClass*}%
+\EndIndex{Cmd}{AfterPackage}%
+\EndIndex{Cmd}{AfterPackage*}%
+
+\begin{Example}
+  In the following an example for class and package authors
+  shall be given.
+  It shows how \KOMAScript{} itself employs the new commands.
+  The class \Class{scrbook} contains:
+\begin{lstlisting}
+\AfterPackage{hyperref}{%
+  \@ifpackagelater{hyperref}{2001/02/19}{}{%
+    \ClassWarningNoLine{scrbook}{%
+      You are using an old version of hyperref package!%
+      \MessageBreak%
+      This version has a buggy hack at many drivers%
+      \MessageBreak%
+      causing \string\addchap\space to behave strange.%
+      \MessageBreak%
+      Please update hyperref to at least version
+      6.71b}}}
+\end{lstlisting}
+  Old versions of the \Package{hyperref} package re-define
+  a macro of the \Class{scrbook} class in a way that does not
+  work with newer \KOMAScript{} versions.
+  New versions of \Package{hyperref} neglect these changes
+  if a new \KOMAScript{} version is detected.
+  For the case that \Package{hyperref} is loaded the code
+  in \Class{scrbook} verifies that a appropriate
+  \Package{hyperref} version is used.   If not the command gives
+  a warning.
+
+  At other places in three \KOMAScript{} classes following can be found:
+\begin{lstlisting}
+  \AfterPackage{caption2}{%
+    \renewcommand*{\setcapindent}{%
+\end{lstlisting}
+  Next the package \Package{caption2} has been loaded, and only
+  if the package has been loaded really, \KOMAScript{} re-defines
+  its own command \Macro{setcapindent}.
+  The exact code of the definition is not important.
+  It should only be noted that \Package{caption2} claims the
+  control over the \Macro{caption} macro.
+  Thus the normal definition of the \Macro{setcapindent} macro
+  would not work as expected.
+  The re-definition improves the collaboration with \Package{caption2}.
+
+  There are of course useful examples for normal \LaTeX{} user too.
+  Suppose a document that should be availbale as PS file, using
+  LaTeX{} and dvips, and as PDF file, using pdf\LaTeX.
+  The document should contain hyper-links.
+  In the List of Tables there are entries longer than one line.
+  This is not a problem for the pdf\LaTeX{} way, since here
+  hyper-links can run across multiple lines.  
+  But if a \Package{hyperref} driver for dvips or
+  hyper\TeX{} is used then this is not possible.
+  In this case one wants that for the \Package{hyperref} setup
+  the \Option{linktocpage} is used.
+  
+  The decision what \Package{hyperref} driver has to be used
+  happens automatically via \File{hyperref.cfg}.
+  The file has for example the content below.
+\begin{lstlisting}
+  \ProvidesFile{hyperref.cfg}
+  \@ifundefined{pdfoutput}{\ExecuteOptions{dvips}}
+                          {\ExecuteOptions{pdftex}}
+  \endinput
+\end{lstlisting}
+
+  All following is now the task of \Macro{AfterFile}.
+\begin{lstlisting}
+  \documentclass{article}
+  \usepackage{scrlfile}
+  \AfterFile{hdvips.def}{\hypersetup{linktocpage}}
+  \AfterFile{hypertex.def}{\hypersetup{linktocpage}}
+  \usepackage{hyperref}
+  \begin{document}
+  \listoffigures
+  \clearpage
+  \begin{figure}
+    \caption{This is an example for a long figure caption,
+      but even though it does not employ the optional
+         caption argument that would allow to write
+         a short caption in the List of Figures.}
+  \end{figure}
+  \end{document}
+\end{lstlisting}
+  If now \Package{hyperref} drivers \Option{hypertex} or
+  \Option{dvips} are used then the useful \Package{hyperref} option
+  \Option{linktocpage} will be set.
+  In the pdf\LaTeX{} case the option will not be set, since
+  in that case an other \Package{hyperref} driver \File{hpdftex.def}
+  will be used. That means neither \File{hdvips.def} nor
+  \File{hypertex.def} will be loaded.
+\end{Example}
+
+\begin{Explain}
+  Furthermore the loading of package \Package{scrlfile}
+  and the \Macro{AfterFile} statement can be written
+  in the private \File{hyperref.cfg}.
+  But then instead of \Macro{usepackage} the macro
+  \Macro{RequiresPackage} ought be used, see \cite{latex:clsguide}.
+  The new lines have to be inserted directly after 
+  \Macro{ProvidesFile} line, thus prior to the execution
+  of the options \Option{dvips} or \Option{pdftex}.
+\end{Explain}%
+\EndIndex{Package}{scrlfile}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../guide"
+%%% End: 
