@@ -1,0 +1,1381 @@
+% ============================================================================
+% scrpage2.tex
+% Copyright (c) Markus Kohm, 2001-2005
+%
+% This file is part of the LaTeX2e KOMA-Script-Bundle
+%
+% This file can be redistributed and/or modified under the terms
+% of the LaTeX Project Public License Version 1.0 distributed
+% together with this file. See LEGAL.TXT or LEGALDE.TXT.
+% ----------------------------------------------------------------------------
+% scrpage2.tex
+% Copyright (c) Markus Kohm, 2001-2005
+%
+% Diese Datei ist Teil des LaTeX2e KOMA-Script-Pakets.
+%
+% Diese Datei kann nach den Regeln der LaTeX Project Public
+% Licence Version 1.0, wie sie zusammen mit dieser Datei verteilt
+% wird, weiterverbreitet und/oder modifiziert werden. Siehe dazu
+% auch LEGAL.TXT oder LEGALDE.TXT.
+% ============================================================================
+%
+% Chapter about scrpage2 of the KOMA-Script guide
+% Maintained by Jens-Uwe Morawski (and sometimes Markus Kohm)
+%
+% ----------------------------------------------------------------------
+%
+% Kapitel über scrpage2 in der KOMA-Script-Anleitung
+% Verwaltet von Jens-Uwe Morawski (unterstützt von Markus Kohm)
+%
+% ============================================================================
+
+\ProvidesFile{scrpage2.tex}[2005/11/27 KOMA-Script guide (chapter:scrpage2)]
+% date of translated german file: 2004/08/10
+
+\chapter{Adapt Head and Foot with \Package{scrpage2}}
+\labelbase{scrpage}
+
+%
+\BeginIndex{Package}{scrpage2}%
+%
+In \autoref{cha:typearea} this guide referenced a package
+to customise the head and foot lines of a document.
+This package \Package{scrpage2}, the successor of \Package{scrpage},
+enables the user to create versatile head and foot layouts with
+less effort, due to a simple but powerful user interface. While
+\Package{scrpage} is obsolete since 2001, this documentation only describes
+\Package{scrpage2}.
+
+\begin{Explain}
+  The package's focus is its good integration into the whole
+  \KOMAScript{}-bundle, thus it extents the base functionality of
+  \KOMAScript{} perfectly.  It is very flexible in either its layout and
+  usage, compared to other packages often to be seen like
+  \Package{fancyhdr}\cite{package:fancyhdr}.  You don't need to use
+  \Package{scrpage2} with \KOMAScript{}, the package can be used in any other
+  document-class environment.
+\end{Explain}
+
+
+\section{Basic Functionality}\label{sec:scrpage.basics}
+
+\begin{Explain}% Introduction to headings
+  \LaTeX{}'s head and foot mechanism is a little complicated, thus a
+  brief view in its depth is needed.
+  Basically the \LaTeX{} kernel defines the chief page styles
+  \PValue{empty} and \PValue{plain}.
+  The latter writes only a page number in the foot, in contrast
+  using \PValue{empty} results in blank head and foot.
+  Besides, many document classes provide the style
+  \PValue{headings}, which allows more complex style settings.
+  The \PValue{headings} style often has a subvariant, the
+  \emph{my}-variant. In contrast to the \PValue{headings} style
+  the \PValue{myheadings} switches off the automatic update
+  of the running head, thus it is the users task keeping headings
+  in sync with the current document content.
+  A more detailed discription can be found in
+  \autoref{sec:maincls.pageStyle}.
+  
+  Another important note is that some \LaTeX{} commands
+  switch to the pagestyle \PValue{plain} for the current page,
+  independent from what pagestyle was choosen by the author,
+  consequently the document needs an appropriate 
+  \PValue{plain} pagestyle.
+  
+  Therefore \Package{scrpage2} defines its own \PValue{plain}
+  and \PValue{headings} page styles, named \PValue{scrplain}
+  and \PValue{scrheadings}.
+  The manual activation of \PValue{scrplain} is not necessary,
+  since the activation of \PValue{scrheadings} takes care of it
+  automatically.
+  Only if one wants to use his own page style in combination
+  with \PValue{scrplain}, the page style \PValue{scrplain} has to
+  be activated first, i.e. \Macro{pagestyle}\Parameter{scrplain}%
+  \Macro{pagestyle}\Parameter{personalPagestyle}.
+\end{Explain}
+  
+The original \PValue{headings} page style of the document class is available
+as \PValue{useheadings}. This re-definition is required since
+\Package{scrpage2} uses another way to deal with automatic and manual
+headings. This way is more flexible and allows configurations usually
+difficult to implement for unexperienced users. The required commands to work
+with the \Package{scrpage2} implementation are introduced at the end of
+\autoref{sec:scrpage.basics.buildIn} and the begin of
+\autoref{sec:scrpage.basics.mark}.
+
+\subsection{Predefined Page Styles}\label{sec:scrpage.basics.buildIn}
+% \lehead ...
+% scrheadings
+% \headmark \pagemark 
+
+\begin{Declaration}
+  \PValue{scrheadings}\\
+  \PValue{scrplain}
+\end{Declaration}%
+\BeginIndex{Pagestyle}{scrheadings}\BeginIndex{Pagestyle}{scrplain}%
+\Index{page style}%
+%
+Package \Package{scrpage2} delivers an own pagestyle, named
+\PValue{scrheadings}.
+The command \Macro{pagestyle}\PParameter{scrheadings} activates
+this page style, likewise
+after activation an appropriate \PValue{plain} pagestyle
+is available.
+In this case \emph{appropriate} meens that the \PValue{plain}
+page style is also configureable by the commands introduced in
+\autoref{sec:scrpage.basics.format}, which, for example,
+configure the head and foot width.
+Neither the activation of \PValue{scrheadings} nor \PValue{scrplain}
+influences the mode of manual or automatic headings,
+see \autoref{sec:scrpage.basics.mark}.
+
+\begin{Declaration}
+  \Macro{lehead}%
+    \OParameter{scrplain-left-even}\Parameter{scrheadings-left-even}\\
+  \Macro{cehead}%
+    \OParameter{scrplain-concentric-even}\Parameter{scrheadings-concentric-even}\\
+  \Macro{rehead}%
+    \OParameter{scrplain-right-even}\Parameter{scrheadings-right-even}\\
+  \Macro{lefoot}%
+    \OParameter{scrplain-left-even}\Parameter{scrheadings-left-even}\\
+  \Macro{cefoot}%
+    \OParameter{scrplain-concentric-even}\Parameter{scrheadings-concentric-even}\\
+  \Macro{refoot}%
+    \OParameter{scrplain-right-even}\Parameter{scrheadings-right-even}\\
+  \Macro{lohead}%
+    \OParameter{scrplain-left-odd}\Parameter{scrheadings-left-odd}\\
+  \Macro{cohead}%
+    \OParameter{scrplain-concentric-odd}\Parameter{scrheadings-concentric-odd}\\
+  \Macro{rohead}%
+    \OParameter{scrplain-right-odd}\Parameter{scrheadings-right-odd}\\
+  \Macro{lofoot}%
+    \OParameter{scrplain-left-odd}\Parameter{scrheadings-left-odd}\\
+  \Macro{cofoot}%
+    \OParameter{scrplain-concentric-odd}\Parameter{scrheadings-concentric-odd}\\
+  \Macro{rofoot}%
+    \OParameter{scrplain-right-odd}\Parameter{scrheadings-right-odd}\\
+  \Macro{ihead}%
+    \OParameter{scrplain-inside}\Parameter{scrheadings-inside}\\
+  \Macro{chead}%
+    \OParameter{scrplain-concentric}\Parameter{scrheadings-concentric}\\
+  \Macro{ohead}%
+    \OParameter{scrplain-outside}\Parameter{scrheadings-outside}\\
+  \Macro{ifoot}%
+    \OParameter{scrplain-inside}\Parameter{scrheadings-inside}\\
+  \Macro{cfoot}%
+    \OParameter{scrplain-concentric}\Parameter{scrheadings-concentric}\\
+  \Macro{ofoot}%
+    \OParameter{scrplain-outside}\Parameter{scrheadings-outside}
+\end{Declaration}%
+\BeginIndex{Cmd}{lehead}\BeginIndex{Cmd}{cehead}\BeginIndex{Cmd}{rehead}%
+\BeginIndex{Cmd}{ihead}\BeginIndex{Cmd}{chead}\BeginIndex{Cmd}{ohead}%
+\BeginIndex{Cmd}{lohead}\BeginIndex{Cmd}{cohead}\BeginIndex{Cmd}{rohead}%
+\BeginIndex{Cmd}{lefoot}\BeginIndex{Cmd}{cefoot}\BeginIndex{Cmd}{refoot}%
+\BeginIndex{Cmd}{ifoot}\BeginIndex{Cmd}{cfoot}\BeginIndex{Cmd}{rfoot}%
+\BeginIndex{Cmd}{lofoot}\BeginIndex{Cmd}{cofoot}\BeginIndex{Cmd}{rofoot}%
+%
+The page styles include three boxes either in head and foot.
+The commands modifying the content of these boxes can be seen
+in \autoref{fig:scrpage.leheadetall}.
+Commands in the middle column modify the boxes content on both the odd
+and even pages.
+
+\begin{figure}
+  \centering
+  \setlength{\unitlength}{1mm}\begin{picture}(100,65)(0,10)\small
+    \put(0,12){\dashbox{2}(40,56){even page}}
+    \put(60,12){\dashbox{2}(40,56){odd page}}
+                                % items top left
+    \put(1,63){\framebox(8,4){~}}
+    \put(16,63){\framebox(8,4){~}}
+    \put(31,63){\framebox(8,4){~}}
+                                % items top right
+    \put(61,63){\framebox(8,4){~}}
+    \put(76,63){\framebox(8,4){~}}
+    \put(91,63){\framebox(8,4){~}}
+                                % items bottom left
+    \put(1,13){\framebox(8,4){~}}
+    \put(16,13){\framebox(8,4){~}}
+    \put(31,13){\framebox(8,4){~}}
+                                % items bottom right
+    \put(61,13){\framebox(8,4){~}}
+    \put(76,13){\framebox(8,4){~}}
+    \put(91,13){\framebox(8,4){~}}
+                                % commands and arrow
+                                % for twoside
+                                % 
+    \put(50,65){\makebox(0,0){\Macro{ihead}}}
+    \put(44,65){\vector(-1,0){4}}\put(56,65){\vector(1,0){4}}
+    \put(50,58){\makebox(0,0){\Macro{chead}}}
+    \put(44,58){\line(-1,0){24}}\put(56,58){\line(1,0){24}}
+    \put(20,58){\vector(0,1){4}}\put(80,58){\vector(0,1){4}}
+    \put(50,51){\makebox(0,0){\Macro{ohead}}}
+    \put(44,51){\line(-1,0){40}}\put(56,51){\line(1,0){40}}
+    \put(4,51){\vector(0,1){11}}\put(96,51){\vector(0,1){11}}
+                                %
+    \put(50,15){\makebox(0,0){\Macro{ifoot}}}
+    \put(56,15){\vector(1,0){4}}\put(44,15){\vector(-1,0){4}}
+    \put(50,22){\makebox(0,0){\Macro{cfoot}}}
+    \put(44,22){\line(-1,0){24}}\put(56,22){\line(1,0){24}}
+    \put(20,22){\vector(0,-1){4}}\put(80,22){\vector(0,-1){4}}
+    \put(50,29){\makebox(0,0){\Macro{ofoot}}}
+    \put(44,29){\line(-1,0){40}}\put(56,29){\line(1,0){40}}
+    \put(4,29){\vector(0,-1){11}}\put(96,29){\vector(0,-1){11}}
+                                % commands for oneside
+    \put(5,69){\makebox(0,0)[b]{\Macro{lehead}}}
+    \put(20,69){\makebox(0,0)[b]{\Macro{cehead}}}
+    \put(35,69){\makebox(0,0)[b]{\Macro{rehead}}}
+                                %
+    \put(65,69){\makebox(0,0)[b]{\Macro{lohead}}}
+    \put(80,69){\makebox(0,0)[b]{\Macro{cohead}}}
+    \put(95,69){\makebox(0,0)[b]{\Macro{rohead}}}
+                                %
+    \put(5,11){\makebox(0,0)[t]{\Macro{lefoot}}}
+    \put(20,11){\makebox(0,0)[t]{\Macro{cefoot}}}
+    \put(35,11){\makebox(0,0)[t]{\Macro{refoot}}}
+                                %
+    \put(65,11){\makebox(0,0)[t]{\Macro{lofoot}}}
+    \put(80,11){\makebox(0,0)[t]{\Macro{cofoot}}}
+    \put(95,11){\makebox(0,0)[t]{\Macro{rofoot}}}
+  \end{picture}
+  \caption[Commands for modification of
+    \Package{scrpage2}-pagestyles elements]%
+    {Commands for modification of pagestyles \PValue{scrheadings} and
+      \PValue{scrplain} and their association to head and foot elements}
+  \label{fig:scrpage.leheadetall}
+\end{figure}
+
+\begin{Example}
+If one wants the page number be placed in the middle of the
+foot, then following can be used:
+\begin{lstlisting}
+  \cfoot{\pagemark}
+\end{lstlisting}
+The next example shows how to place both running head and
+page number in the head; the running head inside and the page number
+outside.
+\begin{lstlisting}
+  \ohead{\pagemark}
+  \ihead{\headmark}
+  \cfoot{}
+\end{lstlisting}
+The command \Macro{cfoot}\PParameter{} is only required in order
+to empty the item in middle of the foot,
+which normally contains the page number.
+\end{Example}
+
+Using the commands which are associated with only one item
+allows more advanced settings.
+
+\begin{Example}
+Assuming one has the order to write an annual report for his
+company, he could use commands like this:
+\begin{lstlisting}
+  \ohead{\pagemark}
+  \rehead{Annual Report 2001}
+  \lohead{\headmark}
+  \cefoot{TheCompanyName Inc.}
+  \cofoot{Department: Development}
+\end{lstlisting}
+In order to keep in sync the data in the foot with the content
+of the document, the foot has to be updated using \Macro{cofoot}
+when a new department is discussed in the report.
+\end{Example}
+
+As mentioned above, there is an \PValue{plain}-pagestyle which corresponds to
+\PValue{scrheadings}. Since it should also be possible to adapt this style,
+the commands support an optional argument. Thus the contents of the
+appropriate field of the \PValue{plain}-pagestyle can be modified.
+
+\begin{Example}
+The position of the page number for the pagestyle \PValue{scrheadings}
+can be declared as follows:
+\begin{lstlisting}
+  \cfoot[\pagemark]{}
+  \ohead[]{\pagemark}
+\end{lstlisting}
+When now the command \Macro{chapter}, after it has started a new page,
+switches to the \PValue{plain}-pagestyle, then the page number
+is centered in the foot.
+\end{Example}
+%
+\EndIndex{Pagestyle}{scrheadings}\EndIndex{Pagestyle}{scrplain}%
+
+\begin{Declaration}
+  \Macro{clearscrheadings}\\
+  \Macro{clearscrplain}\\
+  \Macro{clearscrheadfoot}
+\end{Declaration}%
+\BeginIndex{Cmd}{clearscrheadings}%
+\BeginIndex{Cmd}{clearscrplain}%
+\BeginIndex{Cmd}{clearscrheadfoot}%
+If one wants to redefine both the page style \PValue{scrheadings}
+and the \PValue{plain} page style, frequently one must delete 
+some already occupied page items. Since one fills all items
+rarely with new contents, in most cases several
+instruction with empty parameters are necessary.
+With the help of these three instructions the deletion is fast and
+thoroughly possible.
+While \Macro{clearscrheadings} only deletes all fields of the 
+page style \PValue{scrheadings} and \Macro{clearscrplain} deletes
+all fields of the appropriate \PValue{plain} page style,
+\Macro{clearscrheadfoot} sets all fields of both page styles on
+empty contents.
+
+\begin{Example}
+  If one wants to reset the page style to the default \KOMAScript{} settings,
+  independent from the actual configuration, only these three commands are
+  sufficient.
+\begin{lstlisting}
+  \clearscrheadfoot
+  \ohead{\headmark}
+  \ofoot[\pagemark]{\pagemark}
+\end{lstlisting}
+  Without the commands \Macro{clearscrheadfoot}, \Macro{clearscrheadings} and
+  \Macro{clearscrplain} 6 commands with 9 empty arguments are required.
+\begin{lstlisting}
+  \ihead[]{}
+  \chead[]{}
+  \ohead[]{\headmark}
+  \ifoot[]{}
+  \cfoot[]{}
+  \ofoot[\pagemark]{\pagemark}
+\end{lstlisting}
+  Of course, assuming a special configuration some of them can
+  be dropped.%
+\end{Example}%
+%
+\EndIndex{Cmd}{clearscrheadings}%
+\EndIndex{Cmd}{clearscrplain}%
+\EndIndex{Cmd}{clearscrheadfoot}%
+%
+\EndIndex{Cmd}{lehead}\EndIndex{Cmd}{cehead}\EndIndex{Cmd}{rehead}%
+\EndIndex{Cmd}{ihead}\EndIndex{Cmd}{chead}\EndIndex{Cmd}{ohead}%
+\EndIndex{Cmd}{lohead}\EndIndex{Cmd}{cohead}\EndIndex{Cmd}{rohead}%
+\EndIndex{Cmd}{lefoot}\EndIndex{Cmd}{cefoot}\EndIndex{Cmd}{refoot}%
+\EndIndex{Cmd}{ifoot}\EndIndex{Cmd}{cfoot}\EndIndex{Cmd}{rfoot}%
+\EndIndex{Cmd}{lofoot}\EndIndex{Cmd}{cofoot}\EndIndex{Cmd}{rofoot}%
+
+In previous examples two commands already have been used, which 
+haven't been introduced yet. Now, the description of these
+commands shall follow.
+
+\begin{Declaration}
+  \Macro{leftmark}\\
+  \Macro{rightmark}
+\end{Declaration}%
+\BeginIndex{Cmd}{leftmark}\BeginIndex{Cmd}{rightmark}%
+These two instructions make it possible to access the running headlines,
+which are normally meant for the left or for the right page. These two
+instruction are not made available by scrpage or scrpage2, but directly
+by the \LaTeX{} kernel. If in this section running headline of the
+left side or the right page are mentioned,
+then the contents of \Macro{leftmark} or \Macro{rightmark}
+is meant.
+%
+\EndIndex{Cmd}{leftmark}\EndIndex{Cmd}{rightmark}%
+
+\BeginIndex{Cmd}{headmark}
+\begin{Declaration}
+\Macro{headmark}
+\end{Declaration}%
+This command gives access to the content of running heads.
+In contrast to \Macro{leftmark} and \Macro{rightmark}, one
+need not regard the proper assignment to left or right page.
+\EndIndex{Cmd}{headmark}
+
+\BeginIndex{Cmd}{pagemark}
+\begin{Declaration}
+\Macro{pagemark}
+\end{Declaration}%
+This command returns the formatted page number. The formatting can be
+controlled by \Macro{pnumfont} introduced in
+\autoref{sec:scrpage.basics.format}, \autopageref{desc:scrpage.macro.pnumfont}
+or by \Macro{setkomafont} if a newer version \KOMAScript{} is used, see
+\autoref{sec:maincls.font}.
+% the last describtion \setkomafont ... is only fill-text
+\EndIndex{Cmd}{pagemark}
+
+\BeginIndex{Cmd}{pagestyle}\BeginIndex{Pagestyle}{useheadings}
+\begin{Declaration}
+\Option{useheadings}
+\end{Declaration}%
+The package \Package{scrpage2} is meant primarily for the fact that the supplied
+styles are used or own styles are defined. However it can be necessary
+to shift back also to the style provided by the document class.
+It would be obvious to do this with \Macro{pagestyle}\PParameter{headings},
+but this has however the disadvantage that commands
+\Macro{automark} and \Macro{manualmark} discussed in the following
+do not function as expected.
+For this reason one should shift back to the original styles using
+\Macro{pagestyle}\PParameter{useheadings}.
+Such a switching has then no effect on it whether one
+operates with manual or automatic running headlines.
+%
+\EndIndex{Cmd}{pagestyle}\EndIndex{Pagestyle}{useheadings}
+
+\subsection{Manual and Automatic Headings}
+\label{sec:scrpage.basics.mark}
+% \automark \manualmark
+%
+Usually there is a \emph{my}-version of the \PValue{headings}-style.  If such
+a style is active, then the running headlines are updated no longer
+automatically.  With \Package{scrpage2} another path is taken. Whether the
+running headlines are living or not, determines the instructions
+\Macro{automark} and \Macro{manualmark}.  The default can be also already
+influenced while the loading of the package with the options \Option{automark}
+and \Option{manualmark}, see \autoref{sec:scrpage.basics.options},
+\autopageref{desc:scrpage.option.automark}.
+
+\BeginIndex{Cmd}{manualmark}
+\begin{Declaration}
+\Macro{manualmark}
+\end{Declaration}%
+As the name already clarifies, \Macro{manualmark} switches off the updating
+of the running headlines. It is left to the user to provide for
+updating or for contents of the running headlines.
+For that purpose the instructions \Macro{markboth}\IndexCmd{markboth}
+und \Macro{markright}\IndexCmd{markright} are available.
+\EndIndex{Cmd}{manualmark}
+
+\BeginIndex{Cmd}{automark}
+\begin{Declaration}
+  \Macro{automark}\OParameter{right page}\Parameter{left page}
+\end{Declaration}%
+The macro \Macro{automark} however activates the automatic updating.
+For the two parameters the designations of the document level
+are to be used, whose title in appropriate place is to appear.
+Valid values for the parameters are:
+\PValue{part}\ChangedAt{2.2}{\Package{scrpage2}}, \PValue{chapter},
+\PValue{section}, \PValue{subsection}, \PValue{subsubsection},
+\PValue{paragraph}, \PValue{subparagraph}.
+For most of the classes usage of \PValue{part} will not produce
+the expected results. So far only \KOMAScript\ classes from version~2.9s
+up are known to support this value.
+
+The optional argument \PName{right page} is meant understandably only for
+two-sided documents.
+In the one-sided case you should normally not use it.
+With the help of the option \Option{autooneside} one can also adjust
+that the optional argument in one-sided mode is ignored automatically,
+see \autoref{sec:scrpage.basics.options},
+\autopageref{desc:scrpage.option.autooneside}.
+%
+\begin{Example}
+Assuming that the document uses a \emph{book} class,
+which topmost section level is \emph{chapter},
+then after a preceding \Macro{manualmark}
+\begin{lstlisting}
+  \automark[section]{chapter}
+\end{lstlisting}
+restores the original behaviour.
+If one prefers one of the lower section levels in running head
+following can be used.
+\begin{lstlisting}
+  \automark[subsection]{section}
+\end{lstlisting}
+How useful the last declaration is, everybody has to decide
+for oneself.
+\end{Example}
+
+\begin{Explain}
+The data of the headings is set by the command
+\Macro{markboth}\IndexCmd{markboth} for the top-most
+section levels, for the lower levels
+\Macro{markright}\IndexCmd{markright} or
+\Macro{markleft}\IndexCmd{markleft} are used.
+These commands are called indirectly by the sectioning commands.
+The macro \Macro{markleft} is provided by the package
+\Package{scrpage2}.
+Its definition is similar to \Macro{markright} originating from
+the \LaTeX{} kernel.
+Although \Macro{markleft} is not defined as an internal command,
+the direct use is not recommended.
+\end{Explain}
+\EndIndex{Cmd}{automark}
+
+
+\subsection{Formatting of Heading and Footing}
+\label{sec:scrpage.basics.format}
+% \headfont \pnumfont
+% \setheadwidth \setfootwidth
+% \set(head|foot)(top|sep|bot)line
+In the previous paragraph it concerned mainly contentwise things. Is
+not sufficient naturally, in order to satisfy the formative
+ambitions. Therefore it is to turn in this paragraph exclusive therefore.
+%
+\BeginIndex{Cmd}{headfont}\BeginIndex{Cmd}{pnumfont}
+\begin{Declaration}
+\Macro{headfont}\\
+\Macro{pnumfont}
+\end{Declaration}%
+The command \Macro{headfont} contains the commands
+which determine the formatting of head and foot lines.
+The style of the page number defines the command
+\Macro{pnumfont}.
+\begin{Example}
+If, for example, one wants the head and foot to be typeset in bold
+sans-serif and the page number in a slanted style, then it can be
+used the configuration:
+\begin{lstlisting}
+  \renewcommand{\headfont}{\normalfont\sffamily\bfseries}
+  \renewcommand{\pnumfont}{\normalfont\rmfamily\slshape}
+\end{lstlisting}
+\end{Example}
+\EndIndex{Cmd}{headfont}\EndIndex{Cmd}{pnumfont}
+%
+Since version 2.8p of the \KOMAScript{} classes a new
+configuration scheme is implemented.
+If \Package{scrpage2} is used together with these classes then
+it is recommended to setup font attributes the way described
+in \autoref{sec:maincls.font}.
+\begin{Example}
+This interfaces implements the command \Macro{setkomafont}
+in order to configure the font attributes.
+The previous definition can then be written as:
+\begin{lstlisting}
+  \setkomafont{pagehead}\normalfont\sffamily\bfseries}
+  \setkomafont{pagenumber}{\normalfont\rmfamily\slshape}
+\end{lstlisting}
+\end{Example}
+
+\BeginIndex{Cmd}{setheadwidth}\BeginIndex{Cmd}{setfootwidth}
+\begin{Declaration}
+\Macro{setheadwidth}\OParameter{shift}\Parameter{width}\\
+\Macro{setfootwidth}\OParameter{shift}\Parameter{width}
+\end{Declaration}%
+Normally the widths of heading and footing line
+correspond to the width of the text body.
+The commands \Macro{setheadwidth} and \Macro{setfootwidth} enable the
+user to adapt in a simple manner the widths to his needs.
+The mandatory argument \PName{width} takes up the value for the width
+of the page head or foot,
+\PName{shift} is a longitudinal dimension for the shift of the
+appropriate item toward the outside page edge.
+
+For the most common situations the mandatory argument \PName{width}
+accepts the following symbolic values:
+\begin{labeling}[\,--]{\PValue{textwithmarginpar}}
+\item[\PValue{paper}] the width of the paper
+\item[\PValue{page}] the width of the page
+\item[\PValue{text}] the width of the text body
+\item[\PValue{textwithmarginpar}] the width of the text body including margin.
+\item[\PValue{head}] the current head width
+\item[\PValue{foot}] the current foot width
+\end{labeling}
+The difference between \PValue{paper} and \PValue{page} is, that
+\PValue{page} means the width of the paper less the binding correction.
+This only applies if the package \Package{typearea}\IndexPackage{typearea}
+is used (see \autoref{cha:typearea}).
+Without \Package{typearea} both values are equal.
+
+\begin{Example}
+The layout of the \emph{\LaTeX\,Companion}, the head-line projects
+into the margin, can be obtained with:
+\begin{lstlisting}
+  \setheadwidth[0pt]{textwithmarginpar}
+\end{lstlisting}
+%
+and looks on an odd page like this:
+%
+\begin{XmpTopPage}
+        \XmpHeading{10,25}{85}
+        \thinlines\XmpRule{10,23}{85}
+        \XmpSetText[\XmpTopText]{10,21}
+        \XmpMarginNote{83,11.8}
+\end{XmpTopPage}
+%
+If the foot-line shall have the same width and alignment, then
+two ways are possible. The first simply repeats the settings
+for the foot-line:
+\begin{lstlisting}
+  \setfootwidth[0pt]{textwithmarginpar}
+\end{lstlisting}
+%
+In the second way the symbolic value \PValue{head} is used, since the
+head has already the desired settings.
+\begin{lstlisting}
+  \setfootwidth[0pt]{head}
+\end{lstlisting}
+\end{Example}
+
+If no \PName{shift} is indicated,
+i.e. without the optional argument, then
+the heading or the foot appears symmetrically on the page arranged.
+A value for the \PName{shift} is determined automatically, which
+corresponds to the current page shape.
+%
+\begin{Example}
+According to the previous example the optional argument is abandoned:
+\begin{lstlisting}
+  \setheadwidth{textwithmarginpar}
+\end{lstlisting}
+%
+and looks on an odd page like this:
+%
+\begin{XmpTopPage}
+        \XmpHeading{5,25}{85}
+        \thinlines\XmpRule{5,23}{85}
+        \XmpSetText[\XmpTopText]{10,21}
+        \XmpMarginNote{83,11.8}
+\end{XmpTopPage}
+\end{Example}
+
+As to be seen, the heading is now shifted inward, while the
+heading width has not changed.
+The shift is calculated in a way that the configuration of the typearea
+become visible also here.
+%
+\EndIndex{Cmd}{setheadwidth}\EndIndex{Cmd}{setfootwidth}
+
+\BeginIndex{Cmd}{setheadtopline}\BeginIndex{Cmd}{setheadsepline}
+\BeginIndex{Cmd}{setfootseptline}\BeginIndex{Cmd}{setfootbotline}
+\begin{Declaration}
+\Macro{setheadtopline}\OParameter{length}\Parameter{thickness}\OParameter{commands}\\
+\Macro{setheadsepline}\OParameter{length}\Parameter{thickness}\OParameter{commands}\\
+\Macro{setfootsepline}\OParameter{length}\Parameter{thickness}\OParameter{commands}\\
+\Macro{setfootbotline}\OParameter{length}\Parameter{thickness}\OParameter{commands}
+\end{Declaration}%
+According to the configuration of head and foot there are
+commands to modify the lines above and below the head and foot.
+
+\begin{labeling}[\,--]{\Macro{setfootsepline}}
+\item[\Macro{setheadtopline}] configures the line above the head
+\item[\Macro{setheadsepline}] configures the line below the head
+\item[\Macro{setfootsepline}] configures the line above the foot
+\item[\Macro{setfootbotline}] configures the line below the foot
+\end{labeling}
+
+The mandatory argument \PName{thickness} determines,
+how strongly the line is drawn.
+The optional argument \PName{length} accepts the same symbolic values as
+\PName{width} with \Macro{setheadwidth}, as also a normal length expression.
+As long as in the document \PName{length} value was not assigned to the
+optional argument, the appropriate line length adapts automatically
+the width of the heading or the foot.
+
+Use \PValue{auto} in the length argument to restore this
+automatism for the length of a line.
+
+The\ChangedAt{2.2}{\Package{scrpage2}}
+optional argument \PName{commands} may be used to specify additional commands
+to be executed before the respective line is drawn.
+For example such commands could be used for changing the
+color\Index{header>color}\Index{footer>color}\Index{color>in
+  header}\Index{color>in footer} of that line.
+When using a \KOMAScript\ class you could also use
+\Macro{setkomafont}\IndexCmd{setkomafont} to specify commands
+for one of the elements
+\FontElement{headtopline}\IndexFontElement{headtopline},
+\FontElement{headsepline}\IndexFontElement{headsepline},
+\FontElement{footsepline}\IndexFontElement{footsepline},
+\FontElement{footbottomline}\IndexFontElement{footbottomline},
+\FontElement{footbotline}\IndexFontElement{footbotline}.
+These could be extended by adding \Macro{addtokomafont}\IndexCmd{addtokomafont}.
+See \autoref{sec:maincls.font} for details on the \Macro{setkomafont} and
+\Macro{addkomafont} commands.
+
+\begin{Declaration}
+\XMacro{setheadtopline}\OParameter{\upshape\PValue{auto}}\Parameter{\upshape\PValue{current}}\\
+\XMacro{setheadtopline}\OParameter{\upshape\PValue{auto}}\Parameter{}\\
+\XMacro{setheadtopline}\OParameter{\upshape\PValue{auto}}\Parameter{}\OParameter{}
+\end{Declaration}%
+The arguments shown here for the command \Macro{setheadtopline},
+are of course valid for the other three configuration commands, too.
+
+If the mandatory parameter has the value \PValue{current} or has been
+left empty then the line height is not changed.
+This may be used to modify the length of the line without changing its height.
+
+\PName{commands} is an optional argument, if omitted all command setting
+will remain active that might have been specified before, while using
+an empty \PName{commands} argument will revoke any previously valid
+commands.
+
+\begin{Example}
+If the head for example is to be contrasted by a strong line of 2\,pt
+above and a normal line of 0.4\,pt between head and body, it can be
+achieved with:
+\begin{lstlisting}
+  \setheadtopline{2pt}
+  \setheadsepline{.4pt}
+\end{lstlisting}
+%
+\begin{XmpTopPage}
+        \XmpHeading{10,25}{70}
+        \thinlines\XmpRule{10,23}{70}
+        \thicklines\XmpRule{10,28}{70}
+        \XmpSetText[\XmpTopText]{10,21}
+        \XmpMarginNote{83,11.8}
+\end{XmpTopPage}
+
+To specify that this line is to be drawn also e.\,g. in red color you
+would change the commands like this:
+\begin{lstlisting}
+  \setheadtopline{2pt}[\color{red}]
+  \setheadsepline{.4pt}[\color{red}]
+\end{lstlisting}
+In this sample as well as in the following one line color is activated
+by applying the syntax of the \Package{color}\IndexPackage{color} package,
+so this package must be loaded of course. Since \Package{scrpage2} comes
+without built-in color handling any package providing color support
+may be used.
+
+\KOMAScript\ classes also support the following way of color specification:
+\begin{lstlisting}
+  \setheadtopline{2pt}
+  \setheadsepline{.4pt}
+  \setkomafont{headtopline}[\color{red}]
+  \setkomafont{headsepline}[\color{red}]
+\end{lstlisting}
+
+The automatic adjustment of the head and foot width is illustrated
+in the following example:
+\begin{lstlisting}
+  \setfootbotline{2pt}
+  \setfootsepline[text]{.4pt}
+  \setfootwidth[0pt]{textwithmarginpar}
+\end{lstlisting}
+
+% \phantomsection for hyperref-\pageref-links jum-2001/11/24
+\phantomsection\label{page:scrpage.autoLineLength}
+\begin{XmpBotPage}
+        \XmpHeading{10,18}{85}
+        \thinlines\XmpRule{17,21}{70}
+        \thicklines\XmpRule{10,16}{85}
+        \XmpSetText[\XmpBotText]{10,33}
+        \XmpMarginNote{83,24}
+\end{XmpBotPage}
+\end{Example}
+
+Now not everybody will like the alignment of the line above
+the foot, instead one will expect the line left-aligned.
+This can only be achieved with a global package option, which
+will be described together with other package option
+in the next \autoref{sec:scrpage.basics.options}.
+\EndIndex{Cmd}{setheadtopline}\EndIndex{Cmd}{setheadsepline}
+\EndIndex{Cmd}{setfootseptline}\EndIndex{Cmd}{setfootbotline}
+
+\subsection{Package Options}\label{sec:scrpage.basics.options}
+% head(in|ex)clude foot(in|ex)clude --> typearea
+% headtopline headsepline footbotline footsepline (plain...)
+% komastyle standardstyle
+% markuppercase markusecase
+% automark manualmark
+
+\BeginIndex{Option}{headinclude}\BeginIndex{Option}{footinclude}
+\BeginIndex{Option}{headexclude}\BeginIndex{Option}{footexclude}
+\begin{Declaration}
+\Option{headinclude}\\
+\Option{headexclude}\\
+\Option{footinclude}\\
+\Option{footexclude}
+\end{Declaration}%
+These options intend whether the page-header or that page-footing
+are reckoned in with the page-body for the calculation of the type-area.
+The adjustments necessary by the use of these parameters
+are made by the package
+\Package{typearea} (see \autoref{sec:typearea.options}), if this
+package is loaded after \Package{scrpage2}.
+Important is here that on use of a \KOMAScript{} class
+these options must be indicated for the document class and not
+for \Package{scrpage2}, in order to obtain an effect.
+%
+\EndIndex{Option}{headinclude}\EndIndex{Option}{footinclude}
+\EndIndex{Option}{headexclude}\EndIndex{Option}{footexclude}
+
+\BeginIndex{Option}{headtopline}\BeginIndex{Option}{plainheadtopline}
+\BeginIndex{Option}{headsepline}\BeginIndex{Option}{plainheadsepline}
+\BeginIndex{Option}{footsepline}\BeginIndex{Option}{plainfootsepline}
+\BeginIndex{Option}{footbotline}\BeginIndex{Option}{plainfootbotline}
+\begin{Declaration}
+\Option{headtopline} und \Option{plainheadtopline}\\
+\Option{headsepline} und \Option{plainheadsepline}\\
+\Option{footsepline} und \Option{plainfootsepline}\\
+\Option{footbotline} und \Option{plainfootbotline}
+\end{Declaration}%
+A basic adjustment for the lines under and over heading and footing
+can be made with these options.
+These adjustments are considered then as default to all
+page styles defined with \Package{scrpage2}.
+If one of these options is used, then a line thickness
+is used by 0.4\,pt.
+
+Since there is an appropriate \PValue{plain}-style to the page style
+\PValue{scrheadings}, with the \Option{plain\dots}-options also the
+appropriate line of the plain style can be configured.
+These \Option{plain}-options work however only, even if the
+corresponding option without plain are activated.
+Thus \Option{plainheadtopline} shows no effect without the
+\Option{headtopline} option set.
+
+With these options it is to be noted that the appropriate page part,
+heading or footing, is reckoned in with the text-area
+for the calculation of the type-area in case a line has been activated.
+This means, if with \Option{headsepline} the separation-line 
+between heading and text is activated, then the packge \Package{typearea}
+calculates the type-area in such a way that the page-header
+is part of the text block automatically.
+
+The conditions for the options of the preceding paragraph, apply also to
+this automatism. That means that the package \Package{typearea}
+must be loaded to scrpage2, or that on use of a \KOMAScript{} class,
+the options \Option{headinclude} and \Option{footinclude}
+must be set explicitly with \Macro{documentclass} in order to
+transfer heading or footing line in the text-area.
+%
+\EndIndex{Option}{headtopline}\EndIndex{Option}{plainheadtopline}
+\EndIndex{Option}{headsepline}\EndIndex{Option}{plainheadsepline}
+\EndIndex{Option}{footsepline}\EndIndex{Option}{plainfootsepline}
+\EndIndex{Option}{footbotline}\EndIndex{Option}{plainfootbotline}
+
+\BeginIndex{Option}{ilines}%
+\BeginIndex{Option}{clines}%
+\BeginIndex{Option}{olines}%
+\Index{rule}\Index{line}%
+\begin{Declaration}
+\Option{ilines}\\
+\Option{clines}\\
+\Option{olines}
+\end{Declaration}%
+%
+The definition of the line lengths can lead to an
+undesired adjustment, since
+the line is centered in the heading or footing area.
+With the package options presented here, this specification can be
+modified for all page styles defined with \Package{scrpage2}.
+The option \Option{ilines} sets the adjustment in such a
+way that the lines align to the inside edge.
+The option \Option{clines} behaves like the standard adjustment and
+\Option{olines} aligns at the outside edge.
+
+\begin{Example}
+  The next example illustrates the influence of the
+  option \Option{ilines}. Please compare to the example for
+  \Macro{setfootsepline} on \autopageref{page:scrpage.autoLineLength}.
+\begin{lstlisting}
+  \usepackage[ilines]{scrpage2}
+  \setfootbotline{2pt}  
+  \setfootsepline[text]{.4pt}
+  \setfootwidth[0pt]{textwithmarginpar}
+\end{lstlisting}
+
+  Only the use of the option \Option{ilines} leads to the different
+  result shown below:
+\begin{XmpBotPage}
+        \XmpHeading{10,18}{85}
+        \thinlines\XmpRule{10,21}{70}
+        \thicklines\XmpRule{10,16}{85}
+        \XmpSetText[\XmpBotText]{10,33}
+        \XmpMarginNote{83,24}
+\end{XmpBotPage}
+  In contrast to the default configuration the separation line
+  between text and foot is now left-aligned not centered.%
+\end{Example}%
+\EndIndex{Option}{ilines}\EndIndex{Option}{clines}\EndIndex{Option}{olines}%
+
+% \phantomsection for hyperref-\pageref-links jum-2001/11/24
+\phantomsection\label{page:scrpage.automark}%
+\BeginIndex{Option}{automark}\BeginIndex{Option}{manualmark}
+\begin{Declaration}
+\Option{automark}\\
+\Option{manualmark}
+\end{Declaration}%
+These options set the adjustment at the beginning of the document
+whether automatic updating of the running headlines takes place.
+The option \Option{automark} switches the automatic updating on,
+\Option{manualmark} deactivates it.
+Without use of one of the two options the adjustment is preserved,
+which was valid while the loading of the package.
+%
+\begin{Example}
+  One loads the package \Package{scrpage2} directly after the document class
+  \Class{scrreprt} without any package options.
+\begin{lstlisting}
+  \documentclass{scrreprt}
+  \usepackage{scrpage2}
+\end{lstlisting}
+  Since the default page style of \Class{scrreprt} is \PValue{plain},
+  this page style is also active yet.
+  Futhermore \PValue{plain} means manual headings.
+  If one now activates the page style \PValue{scrheadings} with
+\begin{lstlisting}
+  \pagestyle{scrheadings}
+\end{lstlisting}
+  then the manual headings are always active. 
+
+  If one uses the document class \Class{scrbook} instead, then after:
+\begin{lstlisting}
+  \documentclass{scrbook}
+  \usepackage{scrpage2}
+\end{lstlisting}
+  the page style \PValue{headings} is active and the running headings
+  are updated automatically.
+  Switching to the page style \PValue{scrheadings} keeps this
+  setting present.
+  The marking-commands of \Class{scrbook} continue to be used.
+
+  However, the use of
+\begin{lstlisting}
+  \usepackage[automark]{scrpage2}
+\end{lstlisting}
+  activates the automatic update of the running heading independent
+  from the used document class.
+  The option does not effect the used page style \PValue{plain} of
+  the class \Class{scrreprt}.
+  The headings are not visible until the page style has been changed to
+  \PValue{scrheadings}\IndexPagestyle{scrheadings},
+  \PValue{useheadings} or another self-defined page style with headings.%
+\end{Example}%
+\EndIndex{Option}{automark}\EndIndex{Option}{manualmark}%
+
+\BeginIndex{Option}{autooneside}
+\begin{Declaration}
+  \Option{autooneside}
+\end{Declaration}%
+This option ensures that the optional parameter of
+\Macro{automark}\IndexCmd{automark} will be ignored automatically
+in one-side mode. See the explanation of the command
+\Macro{automark} in \autoref{sec:scrpage.basics.mark},
+\autopageref{desc:scrpage.macro.automark}.
+\EndIndex{Option}{autooneside}
+
+\BeginIndex{Option}{komastyle}\BeginIndex{Option}{standardstyle}
+\begin{Declaration}
+\Option{komastyle}\\
+\Option{standardstyle}
+\end{Declaration}%
+These options determine the kind of the pre-defined page style
+\PValue{scrheadings}.
+The option \Option{komastyle} takes up a configuration like
+the \KOMAScript{} classes.
+This is the default for \KOMAScript{} classes and can this way
+also be set for other classes.
+
+A configuration expected from the standard classes can be
+defined using option \Option{standardstyle}.
+Automatically the option \Option{markuppercase} will be
+activated, but only if option \Option{markusedcase} is not given.
+\EndIndex{Option}{komastyle}\EndIndex{Option}{standardstyle}
+
+\BeginIndex{Option}{markuppercase}\BeginIndex{Option}{markusedcase}
+\begin{Declaration}
+\Option{markuppercase}\\
+\Option{markusedcase}
+\end{Declaration}%
+The package \Package{scrpage2} has
+to modify internal commands, which are used by document structuring
+commands, in order to get the function of \Macro{automark} working.
+Since some classes, in contrast to the \KOMAScript{} classes,
+write the headings in uppercase letters, \Package{scrpage2}
+has to know how the used document class represents the headings.
+
+Option \Option{markuppercase} shows \Package{scrpage2} that
+the document class uses uppercase letters.
+If the document class does not represent the headings in
+uppercase letters the option \Option{markusedcase} should
+be given.
+These options are not suitable to force a representation, thus
+unexpected effects may occur, if the given option does not match
+the behaviour of the document class.
+\EndIndex{Option}{markuppercase}\EndIndex{Option}{markusedcase}
+
+\begin{Declaration}
+  \Option{nouppercase}
+\end{Declaration}%
+\BeginIndex{Option}{nouppercase}%
+In the previous paragraph about \Option{markuppercase} and
+\Option{markusedcase} it has been already stated that some
+document classes represent the running headings\Index{heading} in
+uppercase letters using the commands
+\Macro{MakeUppercase} or \Macro{uppercase}.
+Setting the option \Option{nouppercase} allows to disable these
+both commands.
+The option \Option{nouppercase} only is valid as long page styles
+defined by \Package{scrpage2} are used, including
+\PValue{scrheadings} and its appropriate \PValue{plain} page style.
+
+The applicated method is very brutal and can cause that desired
+changes of normal letters to uppercase letters
+\Index{uppercase letters} do not occur.
+Since these cases appear not frequently the option \Option{nouppercase}
+is a useful solution.
+
+\begin{Example}
+If a document uses the standard class \Class{book}\IndexClass{book},
+but the uppercase headings are not desired, then the preamble of
+the document could start with:
+\begin{lstlisting}
+  \documentclass{book}
+  \usepackage[nouppercase]{scrpage2}
+  \pagestyle{scrheadings}
+\end{lstlisting}
+  The selection of the page style \PValue{scrheadings} is necessary,
+  since otherwise the page style \PValue{headings} is active, which
+  does not respect the settings made by option \Option{nouppercase}.
+\end{Example}
+
+In some cases not only classes but also packages set the running
+headings in uppercase letters.
+Also in these cases the option \Option{nouppercase} should be able
+to switch back to the normal non-uppercase headings.
+\EndIndex{Option}{nouppercase}
+
+\section{Defining Own Page Styles}\label{sec:scrpage.UI}
+%
+% 
+\subsection{The Interface for Beginners}\label{sec:scrpage.UI.user}
+% \deftripstyle
+\BeginIndex{Cmd}{deftripstyle}\Index{page style}
+
+Now one would not always be bound only to the provided page styles,
+but moreover there will be the wish to define own page styles.
+Sometimes there will be a special need, since a specific
+\emph{Corporate Identity} requires the declaration of own page styles.
+The easiest way to deal with is:
+\begin{Declaration}
+\Macro{deftripstyle}\Parameter{name}%
+\OParameter{LO}\OParameter{LI}%
+\Parameter{HI}\Parameter{HC}\Parameter{HO}%
+\Parameter{FI}\Parameter{FC}\Parameter{FO}
+\end{Declaration}%
+The parameters have the following meaning:
+\begin{labeling}[\,--]{\PName{Name}}
+\item[\PName{name}] the name of the page style, in order to activate them
+        using the command \Macro{pagestyle}\Parameter{name}
+\item[\PName{LO}] the thickness of the outside lines,
+        i.e. the line above the head
+        and the line below the foot (optional)
+\item[\PName{LI}] the thickness of the separation lines,
+        i.e. the line below the head
+        and the line above the foot (optional)
+\item[\PName{HI}] contents of the inside box in the page head for two-side
+        layout or left for one-side layout
+\item[\PName{HC}] contents of the centered box in the page head
+\item[\PName{HO}] contents of the outside box in the page head for two-side
+        layout or right for one-side layout
+\item[\PName{FI}] contents of the inside box in the page foot for two-side
+        layout or left for one-side layout
+\item[\PName{FC}] contents of the centered box in the page foot
+\item[\PName{FO}] contents of the outside box in the page foot for two-side
+        layout or right for one-side layout
+\end{labeling}
+
+The command \Macro{deftripstyle} surely represents the simplest
+possibility of defining page styles.
+Unfortunately also restrictions are connected with since in a
+page range with one via deftripstyle defined page style
+no modification of the lines above and below heading and footing
+can take place.
+
+\begin{Example}
+Assuming a two-side layout, where the running headings are placed inside.
+Furthermore the document title, here "`Report"`, shall be placed outside
+in the head, the page number is centered in the foot.
+\begin{lstlisting}
+  \deftripstyle{TheReport}%
+                {\headmark}{}{Report}%
+                {}{\pagemark}{}
+\end{lstlisting}
+
+Shall moreover the lines above the head and below the foot be
+drawn with a thickness of 2\,pt and the text body be separated
+>from head and foot with 0.4\,pt lines, then the definition has to
+be extended.
+\begin{lstlisting}
+  \deftripstyle{TheReport}[2pt][.4pt]%
+                {\headmark}{}{Report}%
+                {}{\pagemark}{}
+\end{lstlisting}
+%
+\typeout{^^J--- Ignore underfull and overfull \string\hbox:}
+\begin{center}\setlength{\unitlength}{1mm}\begin{picture}(100,50)\scriptsize
+\thinlines
+\put(5,0){\line(0,1){50}}
+\put(55,0){\line(0,1){50}}
+\put(5,50){\line(1,0){40}}
+\put(55,50){\line(1,0){40}}
+%
+\thicklines
+\put(45,0){\line(0,1){50}}
+\put(95,0){\line(0,1){50}}
+\put(5,0,){\line(1,0){40}}
+\put(55,0){\line(1,0){40}}
+%
+\XmpHeading[Report\hfill 2. The Eye]{11,46}{30}
+\XmpHeading[2.1 Retina\hfill Report]{59,46}{30}
+\XmpHeading[\hfill 14\hfill]{11,6.5}{30}
+\XmpHeading[\hfill 15\hfill]{59,6.5}{30}
+\put(11,43){\makebox(0,0)[tl]{\parbox{30mm}{\tiny%
+        \textbf{2.1 Retina}\\
+        \XmpText[49]}}}
+\put(59,43){\makebox(0,0)[tl]{\parbox{30mm}{\tiny%
+        \XmpText[51]}}}
+%
+\thinlines
+\XmpRule{11,44.5}{30}\XmpRule{59,44.5}{30}
+\XmpRule{11,8}{30}\XmpRule{59,8}{30}
+\linethickness{1pt}
+\XmpRule{11,48}{30}\XmpRule{59,48}{30}
+\XmpRule{11,5}{30}\XmpRule{59,5}{30}
+\end{picture}\end{center}
+\typeout{^^J--- Don't ignore underfull and overfull \string\hbox:^^J}
+\end{Example}
+\EndIndex{Cmd}{deftripstyle}
+
+\subsection{The Interface for Experts}\label{sec:scrpage.UI.expert}
+% \defpagestyle \newpagestyle \providepagestyle \renewpagestyle
+\BeginIndex{Cmd}{defpagestyle}\BeginIndex{Cmd}{newpagestyle}
+\BeginIndex{Cmd}{renewpagestyle}\BeginIndex{Cmd}{providepagestyle}
+\Index{page style}
+Simple page styles, how they can be defined with \Macro{deftripstyle},
+are rare according to experience.
+Either a professor requires that the thesis looks in
+such a way like its own, and who wants to contradict
+it seriously, or a company would like that the half
+financial department emerges in the page footing.
+No problem, the solution is:
+%
+\begin{Declaration}
+\Macro{defpagestyle}\Parameter{name}\Parameter{head-definition}\Parameter{foot-definition}\\
+\Macro{newpagestyle}\Parameter{name}\Parameter{head-definition}\Parameter{foot-definition}\\
+\Macro{renewpagestyle}\Parameter{name}\Parameter{head-definition}\Parameter{foot-definition}\\
+\Macro{providepagestyle}\Parameter{name}\Parameter{head-definition}\Parameter{foot-definition}
+\end{Declaration}%
+These four commands give full access to the capabilities of
+\Package{scrpage2} according to define page styles.
+Their structure is indentical, they differ only the manner of working.
+
+\begin{labeling}[\,--]{\Macro{providepagestyle}}
+\item[\Macro{defpagestyle}] defines always a new pagestyle.
+If a page style with this name already exists it will be overwritten.
+\item[\Macro{newpagestyle}] defines a new pagestyle.
+If a page style with this name already exists a error message will be given.
+\item[\Macro{renewpagestyle}] redefines a pagestyle.
+If apage style with this name does not exist a error message will be given.
+\item[\Macro{providepagestyle}] defines a new pagestyle,
+but only if there is no page style with that name already present.
+\end{labeling}
+
+The syntax of the four commands is explained on command
+\Macro{defpagestyle} examplary.
+\begin{labeling}[\,--]{\PName{head definition}}
+\item[\PName{name}] the name of the page style for
+        \Macro{pagestyle}\Parameter{name}
+\item[\PName{head-definition}]  the declaration of the heading consisting
+        of five element; elements in round parenthesis are optional:\\
+\AParameter{ALL,ALT}\Parameter{EP}\Parameter{OP}\Parameter{OS}\AParameter{BLL,BLT}
+\item[\PName{foot-definition}]  the declaration of the footing consisting
+        of five element; elements in round parenthesis are optional:\\  
+\AParameter{ALL,ALT}\Parameter{EP}\Parameter{OP}\Parameter{OS}\AParameter{BLL,BLT}
+\end{labeling}
+
+It can be seen, that head and foot declaration are identical.
+The parameters have the following meaning:
+\begin{labeling}[\,--]{\PName{OLD}}
+\item[\PName{ALL}] above line length: (head = outside, foot = separation line)
+\item[\PName{ALT}] above line thickness
+\item[\PName{EP}]  definition for \emph{even} pages
+\item[\PName{OP}]  definition for \emph{odd} pages
+\item[\PName{OS}]  definition for \emph{one-side} layout
+\item[\PName{BLL}] below line length: (head = separation line, foot = outside)
+\item[\PName{BLT}] below line thickness
+\end{labeling}
+If the optional line-parameters are omitted, then the line behaviour keeps
+configurable by the commands introduced in
+\autoref{sec:scrpage.basics.format},
+\autopageref{desc:scrpage.macro.setheadtopline}.
+
+The three elements \PName{EP}, \PName{OP} and \PName{OS} are boxes with
+the width of page head or foot respectively.
+The definition occur on the left side in the box, thus the space between
+two text elements has to be stretched using \Macro{hfill}, in order to
+write the first text element on the left edge \emph{and} the second text
+element on the right edge.
+%
+\begin{lstlisting}
+  {\headmark\hfill\pagemark}
+\end{lstlisting}
+
+If one would like a third text-element centered in the box, then an
+extended definition must be used.
+The commands \Macro{rlap} and \Macro{llap} simply write the given
+arguments, but for \LaTeX{} they take no horizontal space.
+Only this way the middle text is really centered.
+%
+\begin{lstlisting}
+  {\rlap{\headmark}\hfill centered text\hfill\llap{\pagemark}}
+\end{lstlisting}
+
+This and more examples of the expert's interface and other commands
+provided by \Package{scpage2} follow now in the final example.
+
+\begin{Example}
+This examples uses the document class \Class{scrbook}, which
+means that the default page layout is two-side.
+While the loading of the package \Package{scrpage2} the
+options \Option{automark} and \Option{headsepline} are
+given.
+The first switches on the automatic update of running
+headings, the second determines that a separation line between
+head and text-body is drawn in the \PValue{scrheadings} page style.
+
+\begin{lstlisting}
+  \documentclass{scrbook}
+  \usepackage[automark,headsepline]{scrpage2}
+\end{lstlisting}
+
+The expert's interface is used to define two page styles.
+The page style \PValue{withoutLines} does not define any 
+line parameters.
+The second page style \PValue{withLines} defines
+a line thicknes of 1\,pt for the line above the head
+and 0\,pt for the separation-line between head and text.
+
+\begin{lstlisting}
+  \defpagestyle{withoutLines}{%
+    {Example\hfill\headmark}{\headmark\hfill without lines}
+    {\rlap{Example}\hfill\headmark\hfill%
+     \llap{without lines}}
+  }{%
+    {\pagemark\hfill}{\hfill\pagemark}
+    {\hfill\pagemark\hfill}
+  }
+\end{lstlisting}
+
+\begin{lstlisting}
+  \defpagestyle{withLines}{%
+    (\textwidth,1pt)
+    {with lines\hfill\headmark}{\headmark\hfill with lines}
+    {\rlap{\KOMAScript}\hfill \headmark\hfill%
+     \llap{with lines}}
+    (0pt,0pt)
+  }{%
+    (\textwidth,.4pt)
+    {\pagemark\hfill}{\hfill\pagemark}
+    {\hfill\pagemark\hfill}
+    (\textwidth,1pt)
+  }
+\end{lstlisting}
+
+At the document's begin the page style \PValue{scrheadings}
+is choosen.
+The command \Macro{chapter} starts a new chapter and sets
+automatically the page style for this page to \PValue{plain}.
+
+The command \Macro{chead} shows how running headings can
+be represented even on a \PValue{plain} page.
+Running headings on chapter start-pages are not usual,
+since in this case the page looses its emphasis-character.
+Basically it is more important to show that a new
+chapter starts here than that a section of this page has
+a special title.
+
+\begin{Explain}% not important, only to enhance the paragraph breaking
+Instead of \Macro{leftmark} one would expect
+the use of \Macro{rightmark} in the parameter
+of \Macro{chead}, since the chapter starts on an even
+page. But, because of internal \LaTeX{} definitions,
+this does not work. It only returns an empty string.
+\end{Explain}
+\begin{lstlisting}
+  \begin{document}
+  \pagestyle{scrheadings}
+  \chapter{Thermodynamics}
+  
+  \chead[\leftmark]{}
+  
+  \section{Main Laws}
+  Every system has an extensive condition unit called
+  Energy. In a closed system the energy is constant.
+\end{lstlisting}
+
+\begin{XmpTopPage}
+        \XmpHeading[\hfill\textsl{1. Thermodynamics}\hfill]{10,27}{70}
+        \put(10,17){\normalsize\textbf{\sffamily 1.Thermodynamics}}
+        \put(10,12){\textbf{\sffamily 1.1 Main Laws}}
+        \XmpSetText[%
+        Every System has an extensive condition unit]{10,9}
+\end{XmpTopPage}
+
+After starting a new page the page style \PValue{scrheadings}
+is active and thus the separation line below the heading is
+visible.
+\begin{lstlisting}
+  There is a condition unit of a system, called entropy,
+  which temporal alteration consits of entropy stream
+  and entropy generation.
+\end{lstlisting}
+\begin{XmpTopPage}
+        \XmpHeading[\textsl{1. Thermodynamics}\hfill]{20,27}{70}
+        \thinlines\XmpRule{20,25}{70}
+        \XmpSetText[%
+          There is a condition unit of a system, called entropy,
+          which temporal alteration consits of entropy stream
+          and entropy generation.]{20,20}
+\end{XmpTopPage}
+
+After switching to the next page, the automatic update of the
+running headings is disabled using \Macro{manualmark}.
+The page style \PValue{withoutLines} becomes active.
+Since no line parameters are given in the definition of this
+page style, the default configuration is used, which draws
+a separation line between head and text-body.
+\begin{XmpTopPage}
+        \XmpHeading[\slshape Energy Conversion\hfill without lines]{10,27}{70}
+        \thinlines\XmpRule{10,25}{70}
+        \XmpSetText[%
+        \textbf{\sffamily 1.2 Exergy and Anergy}\\
+        While the transition of a system to an equilibrium state
+  with its environment the maximum work gainable is called
+  exergy.]{10,21}
+\end{XmpTopPage}
+
+\begin{lstlisting}
+  \manualmark
+  \pagestyle{withoutLines}
+  \section{Exergy and Anergy}\markright{Energy Conversion}
+  While the transition of a system to an equilibrium state
+  with its environment the maximum work gainable is called
+  exergy.
+\end{lstlisting}
+
+At the next page of the document the page style \PValue{withLines}
+is activated.
+The line settings of its definition are taken in account and the
+lines are drawn accordingly.
+\begin{lstlisting}
+  \pagestyle{mitLinien}
+  \renewcommand{\headfont}{\itshape\bfseries}
+  The portion of an energy not conversable in exergie
+  is named anergy \Var{B}.
+  \[ B = U + T (S_1 - S_u) - p (V_1 - V_u)\] 
+  \end{document}
+\end{lstlisting}
+\begin{XmpTopPage}
+        \XmpHeading[\itshape\bfseries with lines\hfill 1. Thermodynamics]{20,27}{70}
+        \thicklines\XmpRule{20,29}{70}
+        \XmpSetText[%
+        The portion of an energy not conversable in exergie
+        is named anergy $B$. 
+  \[ B = U + T (S_1 - S_u) - p (V_1 - V_u)\] ]{20,20}
+\end{XmpTopPage}
+\end{Example}
+\EndIndex{Cmd}{defpagestyle}\EndIndex{Cmd}{newpagestyle}
+\EndIndex{Cmd}{renewpagestyle}\EndIndex{Cmd}{providepagestyle}
+
+\subsection{Managing Page Styles}\label{sec:scrpage.UI.cfgFile}
+% scrpage.cfg
+\BeginIndex{File}{scrpage.cfg}
+Before long the work with different page styles will establish a
+common set of employed page styles, depending on taste and tasks.
+In order to make the management of page styles easier,
+\Package{scrpage2} reads after initialisation the file \File{scrpage.cfg}.
+This file can contain a set of user-defined page styles, which
+many projects can share.
+\EndIndex{File}{scrpage.cfg}
+\EndIndex{Package}{scrpage2}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: ../guide"
+%%% End: 

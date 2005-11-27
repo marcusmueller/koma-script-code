@@ -25,7 +25,7 @@ BASEDIR	= ../
 
 # ----------------------------------------------------------------------
 # All directories with Makefiles
-SUBDIRS = german
+SUBDIRS = german english
 
 # ----------------------------------------------------------------------
 # Default rules
