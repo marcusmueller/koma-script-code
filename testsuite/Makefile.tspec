@@ -125,22 +125,35 @@
 # ----------------------------------------------------------------------
 
 # Where's the base directory?
-ifndef BASEDIR
-BASEDIR = ../../
-endif
+BASEDIR ?= $(PWD)/../../
 
 # Include the basic rule
 include $(BASEDIR)Makefile.baseinit
 
-TESTLOG ?= $(BASEDIR)testsuite/testsuite.log
+ifdef TESTLOG
+      LOG = >>$(TESTLOG)
+else
+      LOG = ''
+endif
+BINDIR  ?= $(BASEDIR)testsuite/bin
 
+ALLCLEANFILES ?= *.dvi *.pdf *.log
 
-.PHONY: init test
+.PHONY: init test clean allclean
+
+$(warning $(BASEDIR))
+$(warning $(BINDIR))
 
 init:
-	$(SECHO) "rule init needs to be implemented!" >&2
-	exit 1
+	PATH="$(BINDIR):$(PATH)" \
+	  $(BINDIR)/dotest true $(BASEDIR) *.tspec $(LOG)
 
 test:
-	$(SECHO) "rule test needs to be implemented!" >&2
-	exit 1
+	PATH="$(BINDIR):$(PATH)" \
+	  $(BINDIR)/dotest false $(BASEDIR) *.tspec $(LOG)
+
+clean:
+	$(RMDIR) .tmp
+
+allclean: clean
+	$(RM) $(ALLCLEANFILES)

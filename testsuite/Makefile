@@ -21,15 +21,16 @@
 
 # ----------------------------------------------------------------------
 # Directory with basics
-BASEDIR := ../$(BASEDIR)
-TESTLOG := $(PWD)/testsuite.log
-export TESTLOG
+BASEDIR ?= $(PWD)/../
+TESTLOG = $(BASEDIR)testsuite/testsuite.log
+BINDIR = $(BASEDIR)testsuite/bin
+export TESTLOG BASEDIR BINDIR
 
 # Load variable definitions
 include $(BASEDIR)Makefile.baseinit
 
 # Setup or load .PHONY
-.PHONY: testlist
+.PHONY: testlist clean_local maintainclean_local testtest testinit
 
 -include Makefile.phony
 
@@ -38,19 +39,41 @@ include $(BASEDIR)Makefile.baseinit
 #       This tspec file may be empty or may contain informations about
 #       generation of the Makefile for the test. See Makefile.tspec for
 #       more informations about this.
-testdirs = $(dir $(wildcard */*.tspec))
+testdirs := $(patsubst %/,%,$(dir $(wildcard */*.tspec)))
 ifneq ($(testdirs),)
-    testdirsinit := $(foreach testdir,$(testdirs),$testdir-init)
+    testdirsinit := $(foreach testdir,$(testdirs),$(testdir)-init)
 endif
 
+define make_recursive
+	for dir in $(testdirs); do \
+	    $(MAKE) -C $$dir $@ || exit $$?; \
+	done
+endef
+
 # The rules
-all: 	testlist
+all: 	testinit testtest
+
+testtest: testlist
 	$(SRM)   $(TESTLOG)
 	$(SECHO) " # Logfile of test run at $(ISODATE)" > $(TESTLOG)
 	$(SECHO) " # Note: The first column of each line indicates wether the test was" >> $(TESTLOG)
 	$(SECHO) " # successfull or not.  If there is a line with something else but a space at" >> $(TESTLOG)
 	$(SECHO) " # the first column, a test was not succsessfull." >> $(TESTLOG)
 	$(MAKE) alltests
+
+clean_local: testlist
+	$(MAKE) clean
+
+clean:
+	$(RM) testsuite.log
+	$(make_recursive)
+
+maintainclean_local: testlist
+	$(MAKE) allclean
+
+allclean:
+	$(RM) Makefile.dep Makefile.phony
+	$(make_recursive)
 
 testinit: testlist
 	$(MAKE) allinits
@@ -63,7 +86,7 @@ Makefile.phony: $(testdirs)/*
 	$(SECHO) '#   make testlist' >> Makefile.phony
 	$(SECHO) '# to recreate this file.' >> Makefile.phony
 	$(SECHO) >> Makefile.phony
-	$(SECHO) ".PHONY: all testinit allinits alltests \\" >> Makefile.phony
+	$(SECHO) ".PHONY: all testinit allinits alltests clean_local maintainclean_local clean allclean\\" >> Makefile.phony
 ifneq ($(testdirs),)
 	$(SECHO) "        $(testdirs) \\" >> Makefile.phony
 	$(SECHO) "        $(testdirsinit)" >> Makefile.phony
@@ -81,7 +104,7 @@ ifneq ($(testdirs),)
 	$(SECHO) '	$(MAKE) -C $$@ test' >> Makefile.dep
 	$(SECHO) >> Makefile.dep
 	$(SECHO) "$(testdirsinit):" >> Makefile.dep
-	$(SECHO) '       $(MAKE) -C $$(@:-init=) init' >> Makefile.dep
+	$(SECHO) '	$(MAKE) -C $$(@:-init=) init' >> Makefile.dep
 endif
 
 allinits: $(testdirsinit)

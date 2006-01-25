@@ -21,7 +21,7 @@
 
 # ----------------------------------------------------------------------
 # Directory with basics
-BASEDIR	= ../../
+BASEDIR	?= $(PWD)/../../
 DOCDIR = $(BASEDIR)doc/
 # language
 LANGUAGE         = german
