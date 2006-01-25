@@ -1,0 +1,102 @@
+#!/bin/sh
+# ======================================================================
+# dvicmp
+# Copyright (c) Markus Kohm, 2002-2006
+#
+# This file is part of the LaTeX2e KOMA-Script-Bundle
+#
+# This file can be redistributed and/or modified under the terms
+# of the LaTeX Project Public License Version 1.0 distributed
+# together with this file. See LEGAL.TXT or LEGALDE.TXT.
+#
+# This bundle is written specialy for use at german-language. So the
+# main documentation is german. There is also a english documentation,
+# but this is NOT up-to-date.
+# ----------------------------------------------------------------------
+# dvicmp
+# Copyright (c) Markus Kohm, 2002-2006
+#
+# Diese Datei ist Teil des LaTeX2e KOMA-Script-Pakets.
+#
+# Diese Datei kann nach den Regeln der LaTeX Project Public
+# Licence Version 1.0, wie sie zusammen mit dieser Datei verteilt
+# wird, weiterverbreitet und/oder modifiziert werden. Siehe dazu
+# auch LEGAL.TXT oder LEGALDE.TXT.
+#
+# Dieses Paket ist fuer den deutschen Sprachraum konzipiert. Daher ist
+# auch diese Anleitung komplett in Deutsch. Zwar existiert auch eine
+# englische Version der Anleitung, diese hinkt der deutschen Anleitung
+# jedoch fast immer hinterher.
+# ======================================================================
+
+error() {
+    echo $2 >&2
+    exit $1
+}
+
+pageoptions=''
+printoption='-dPrinted=false'
+
+pnum=0
+while [ $# -gt 0 ]; do
+    if [ $pnum -eq 0 ]; then
+	firstin=$1
+    elif [ $pnum -eq 1 ]; then
+	secondin=$1
+    else
+	error 2 "$0: unexpected parameter \`$1'!"
+    fi
+    pnum=$((++pnum))
+    shift
+done
+
+[ $pnum -eq 2 ] || error 2 "$0: missing parameter!"
+
+firstbase=`basename ${firstin%.dvi}`
+
+dvipng -q -Q1 -o ${firstbase}-\%03d.png ${firstin} >/dev/null || \
+    error 2 "Error ${firstin}: Cannot create page images!"
+
+secondbase=`basename ${secondin%.dvi}`
+
+dvipng -q -Q1 -o ${secondbase}-\%03d.png ${secondin} >/dev/null || \
+    error 1 "Error ${secondin}: Cannot create page images!"
+
+differ=false
+for first in ${firstbase}-[0-9][0-9][0-9].png; do
+    if [ -f $first ]; then
+	page=${first#${firstbase}-}
+	page=${page%.png}
+	second=${secondbase}-${page}.png
+	if [ -f $second ]; then
+	    diffbase=${first%.png}-diff
+	    composite -compose difference ${first} ${second} ${diffbase}.rgb
+	    size=`du -ab ${diffbase}.rgb | cut -f 1`
+	    if ! cmp -n $size -s /dev/zero ${diffbase}.rgb; then
+		differ=true
+		echo "! ${firstin}, ${secondin}: differ at page $page."
+		composite -compose difference ${first} ${second} ${diffbase}.png
+	    fi
+	    rm ${diffbase}.rgb ${first} ${second}
+	else
+	    differ=true
+	    echo "- ${firstin}, ${secondin}: missing page $page."
+	fi
+    else
+	error 2 "$0 internal error: No input image generated!"
+    fi
+done
+
+for second in ${secondbase}-[0-9][0-9][0-9].png; do
+    if [ -f $second ]; then
+	differ=true
+	page=${second#${secondbase}-}
+	page=${page%.png}
+	echo "+ ${firstin}, ${secondin}: additional page $page."
+    fi
+done
+
+$differ || echo "  ${firstin}, ${secondin}: all the same."
+
+$differ && exit 3
+exit 0
