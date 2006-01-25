@@ -1,0 +1,147 @@
+#!/bin/sh
+# ======================================================================
+# dotest
+# Copyright (c) Markus Kohm, 2002-2006
+#
+# This file is part of the LaTeX2e KOMA-Script-Bundle
+#
+# This file can be redistributed and/or modified under the terms
+# of the LaTeX Project Public License Version 1.0 distributed
+# together with this file. See LEGAL.TXT or LEGALDE.TXT.
+#
+# This bundle is written specialy for use at german-language. So the
+# main documentation is german. There is also a english documentation,
+# but this is NOT up-to-date.
+# ----------------------------------------------------------------------
+# dotest
+# Copyright (c) Markus Kohm, 2002-2006
+#
+# Diese Datei ist Teil des LaTeX2e KOMA-Script-Pakets.
+#
+# Diese Datei kann nach den Regeln der LaTeX Project Public
+# Licence Version 1.0, wie sie zusammen mit dieser Datei verteilt
+# wird, weiterverbreitet und/oder modifiziert werden. Siehe dazu
+# auch LEGAL.TXT oder LEGALDE.TXT.
+#
+# Dieses Paket ist fuer den deutschen Sprachraum konzipiert. Daher ist
+# auch diese Anleitung komplett in Deutsch. Zwar existiert auch eine
+# englische Version der Anleitung, diese hinkt der deutschen Anleitung
+# jedoch fast immer hinterher.
+# ======================================================================
+
+error() {
+    echo $2 >&2
+    exit $1
+}
+
+KTEXINPUTS=`kpsewhich -progname=latex -var-value=TEXINPUTS`
+
+nopt=0
+optinit=false
+while [ $# -gt 0 ]; do
+    if [ $nopt -eq 0 ]; then
+	optinit=$1
+    elif [ $nopt -eq 1 ]; then
+	basedir="$1"
+    elif [ $nopt -eq 2 ]; then
+	tspec="$1"
+    else
+	error 2 "$0: Unexpected parameter \`$1'!"
+    fi
+    nopt=$((++nopt))
+    shift
+done
+
+[ $nopt -eq 0 ] && error 2 "$0: parameter <init> expected!"
+[ $nopt -eq 1 ] && error 2 "$0: parameter <basedir> expected!"
+[ $nopt -eq 2 ] && error 2 "$0: parameter <tspec file> expected!"
+
+dirname=`dirname $tspec`
+[ ${dirname} == '.' ] && dirname=$PWD
+
+retval=0
+
+typetest() {
+    local aflag aname aruns ainfo nline
+    aflag="$1"
+    aname="$2"
+    aruns="$3"
+    ainfo="$4"
+    nline="$5"
+    TEXINPUTS="$KTEXINPUTS"
+    case $aflag in
+	N|n) # do nothing
+	    $optinit && return
+	    ;;
+	I|i) # ignore
+	    ;;
+	X|x) # extend TEXINPUTS
+	    if $optinit; then
+		TEXINPUTS="${basedir}:${KTEXINPUTS}"
+	    fi
+	    ;;
+	*)  # unkown flag
+	    error 2 "$tspec: Syntax error at line ${nline} (unknown flag \`${aflag}')!"
+	    ;;
+    esac
+    $optinit || TEXINPUTS="${basedir}:${KTEXINPUTS}"
+    TEXINPUTS="${dirname}:$TEXINPUTS"
+    export TEXINPUTS
+    rm -rf .tmp
+    mkdir .tmp || error 2 "$0: Cannot create directory .tmp!"
+    cd .tmp || error 2 "$0: Cannot switch to directory .tmp!"
+    while [ $((aruns--)) -gt 0 ]; do
+	if ! latex -interaction=batchmode ${aname} >/dev/null; then
+	    $optinit && error 1 "$tspec: Init of line ${nline} (TYPE ${aname}) failed!"
+	    [ $retval -eq 1 ] || [ $retval -eq 2 ] || retval=3
+	    echo "! ${aname}: latex run failed!"
+	    return $retval
+	fi
+    done
+    if dviselect.sh "$ainfo" ${aname%.tex}.dvi ${aname%.tex}.test.dvi; then
+	if $optinit; then
+	    cp -f ${aname%.tex}.test.dvi ../${aname%.tex}.dvi
+	    cd ..
+	    rm -rf .tmp
+	else
+	    dvitypecmp ../${aname%.tex}.dvi ${aname%.tex}.test.dvi
+	    nr=$?
+	    cd ..
+	    if [ $nr -eq 1 ] || [ $nr -eq 2 ]; then
+		retval=$nr
+		exit $retval
+	    elif [ $nr -eq 3 ]; then
+		[ $retval -eq 1 ] || [ $retval -eq 2 ] || retval=$nr
+	    else
+		rm -rf .tmp
+	    fi
+	fi
+    else
+	retval=2
+	exit $retval
+    fi
+    return $retval
+}
+
+readtspec() {
+    local atype aflag aname aruns ainfo nline
+    nline=1
+    while read atype aflag aname aruns ainfo; do
+	case $atype in
+	    '') # empty line
+		;;
+	    \#*) # comment
+		;;
+	    TYPE) # type test
+		typetest "$aflag" "$aname" "$aruns" "$ainfo"
+		;;
+	    *) # error
+		error 2 "$tspec: syntax error at line ${nline} (unknown test type \`$atype')!"
+		;;
+	esac
+	nline=$((++nline))
+    done
+}
+
+readtspec < $tspec
+exit $retval
