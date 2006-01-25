@@ -21,7 +21,8 @@
 
 # ----------------------------------------------------------------------
 # Directory with basics
-BASEDIR	= ../
+BASEDIR	?= $(PWD)/../
+export BASEDIR
 
 # ----------------------------------------------------------------------
 # All directories with Makefiles
