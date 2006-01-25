@@ -86,7 +86,7 @@ Makefile.phony: $(testdirs)/*
 	$(SECHO) '#   make testlist' >> Makefile.phony
 	$(SECHO) '# to recreate this file.' >> Makefile.phony
 	$(SECHO) >> Makefile.phony
-	$(SECHO) ".PHONY: all testinit allinits alltests clean_local maintainclean_local clean allclean\\" >> Makefile.phony
+	$(SECHO) ".PHONY: all testtest testinit allinits alltests clean_local maintainclean_local clean allclean\\" >> Makefile.phony
 ifneq ($(testdirs),)
 	$(SECHO) "        $(testdirs) \\" >> Makefile.phony
 	$(SECHO) "        $(testdirsinit)" >> Makefile.phony
