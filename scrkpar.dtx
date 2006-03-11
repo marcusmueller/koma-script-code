@@ -1,4 +1,4 @@
-% \CheckSum{424}
+% \CheckSum{481}
 % \iffalse meta-comment
 % ======================================================================
 % scrkpar.dtx
@@ -41,7 +41,7 @@
 %%% From File: scrkpar.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkpar.dtx}[2006/03/08 v3.0 KOMA-Script (paragraphs)]
+\ProvidesFile{scrkpar.dtx}[2006/03/11 v3.0 KOMA-Script (paragraphs)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,german]{babel}
@@ -152,22 +152,31 @@
 %
 %  \begin{option}{parskip}
 %    \changes{v2.8i}{2001/07/22}{neue Option}
+%    \changes{v3.0}{2006/03/11}{primäre \textsf{keyval}-Option}
 %  \begin{option}{parskip-}
 %    \changes{v2.8l}{2001/08/16}{neue Option}
+%    \changes{v3.0}{2006/03/11}{obsolet}
 %  \begin{option}{parskip+}
 %    \changes{v2.8i}{2001/07/22}{neue Option}
+%    \changes{v3.0}{2006/03/11}{obsolet}
 %  \begin{option}{parskip*}
 %    \changes{v2.8i}{2001/07/22}{neue Option}
+%    \changes{v3.0}{2006/03/11}{obsolet}
 %  \begin{option}{halfparskip}
 %    \changes{v2.8i}{2001/07/22}{neue Option}
+%    \changes{v3.0}{2006/03/11}{obsolet}
 %  \begin{option}{halfparskip-}
 %    \changes{v2.8l}{2001/08/16}{neue Option}
+%    \changes{v3.0}{2006/03/11}{obsolet}
 %  \begin{option}{halfparskip+}
 %    \changes{v2.8i}{2001/07/22}{neue Option}
+%    \changes{v3.0}{2006/03/11}{obsolet}
 %  \begin{option}{halfparskip*}
 %    \changes{v2.8i}{2001/07/22}{neue Option}
+%    \changes{v3.0}{2006/03/11}{obsolet}
 %  \begin{option}{parindent}
 %    \changes{v2.8i}{2001/07/22}{neue Option}
+%    \changes{v3.0}{2006/03/11}{obsolet}
 % Diese neun Optionen steuern die Umschaltung zwischen den Modi. Dabei
 % schalten alle \texttt{parskip}-Optionen einen Absatzabstand ein,
 % wohingegen die \texttt{parindent}-Option den Absatzeinzug
@@ -196,42 +205,84 @@
 %  \end{macro}
 %  \end{macro}
 %  \end{macro}
+%
+% Neu bei \KOMAScript-3 ist, dass die Optionen wie bei \textsf{scrlttr2} über
+% eine eingzige \textsf{keyval} gesetzt werden können.
 %    \begin{macrocode}
-\DeclareOption{parskip}{%
-  \setparsizes{\z@}{\baselineskip \@plus .1\baselineskip}{%
-    1em \@plus 1fil}%
+\KOMA@key{parskip}[true]{%
+  \begingroup
+    \KOMA@set@ncmdkey{parskip}{@tempa}{%
+      {false}{0},{off}{0},{no}{0},%
+      {full-}{1},%
+      {half-}{2},%
+      {full}{3},{true}{3},{on}{3},{yes}{3},%
+      {half}{4},%
+      {full+}{5},%
+      {half+}{6},%
+      {full*}{7},%
+      {half*}{8},%
+      {relative}{9},%
+      {absolute}{10},%
+    }{#1}%
+    \ifcase\number\@tempa% 0
+      \endgroup
+      \setparsizes{1em}{\z@ \@plus \p@}{\z@ \@plus 1fil}%
+    \or% 1
+      \endgroup
+      \setparsizes{\z@}{\baselineskip \@plus .1\baselineskip}{%
+        \z@ \@plus 1fil}%
+    \or% 2
+      \endgroup
+      \setparsizes{\z@}{.5\baselineskip \@plus .5\baselineskip}{%
+        \z@ \@plus 1fil}%
+    \or%3
+      \endgroup
+      \setparsizes{\z@}{\baselineskip \@plus .1\baselineskip}{%
+        1em \@plus 1fil}%
+    \or%4
+      \endgroup
+      \setparsizes{\z@}{.5\baselineskip \@plus .5\baselineskip}{%
+        1em \@plus 1fil}%
+    \or%5
+      \endgroup
+      \setparsizes{\z@}{\baselineskip \@plus .1\baselineskip}{%
+        .3333\linewidth\@plus 1fil}%
+    \or%6
+      \endgroup
+      \setparsizes{\z@}{.5\baselineskip \@plus .5\baselineskip}{%
+        .3333\linewidth \@plus 1fil}%
+    \or%7
+      \endgroup
+      \setparsizes{\z@}{\baselineskip \@plus .1\baselineskip}{%
+        .25\linewidth \@plus 1fil}%
+    \or%8
+      \endgroup
+      \setparsizes{\z@}{.5\baselineskip \@plus .5\baselineskip}{%
+        .25\linewidth \@plus 1fil}%
+    \or%9
+      \endgroup
+      \ifx\par@update\default@par@update
+        \let\par@update\par@update@relative
+      \fi
+      \let\default@par@update=\par@update@relative
+    \or%10
+      \endgroup
+      \ifx\par@update\default@par@update
+        \let\par@update\par@update@relative
+      \fi
+      \let\default@par@update=\relax
+    \else% sonst
+      \endgroup
+  \fi
 }
-\DeclareOption{parskip-}{%
-  \setparsizes{\z@}{\baselineskip \@plus .1\baselineskip}{%
-    \z@ \@plus 1fil}%
-}
-\DeclareOption{parskip+}{%
-  \setparsizes{\z@}{\baselineskip \@plus .1\baselineskip}{%
-    .3333\linewidth\@plus 1fil}%
-}
-\DeclareOption{parskip*}{%
-  \setparsizes{\z@}{\baselineskip \@plus .1\baselineskip}{%
-    .25\linewidth \@plus 1fil}%
-}
-\DeclareOption{halfparskip}{%
-  \setparsizes{\z@}{.5\baselineskip \@plus .5\baselineskip}{%
-    1em \@plus 1fil}%
-}
-\DeclareOption{halfparskip-}{%
-  \setparsizes{\z@}{.5\baselineskip \@plus .5\baselineskip}{%
-    \z@ \@plus 1fil}%
-}
-\DeclareOption{halfparskip+}{%
-  \setparsizes{\z@}{.5\baselineskip \@plus .5\baselineskip}{%
-    .3333\linewidth \@plus 1fil}%
-}
-\DeclareOption{halfparskip*}{%
-  \setparsizes{\z@}{.5\baselineskip \@plus .5\baselineskip}{%
-    .25\linewidth \@plus 1fil}%
-}
-\DeclareOption{parindent}{%
-  \setparsizes{1em}{\z@ \@plus \p@}{\z@ \@plus 1fil}%
-}
+\KOMA@DeclareObsoleteOption[\PackageInfo]{parskip-}{parskip=full-}
+\KOMA@DeclareObsoleteOption[\PackageInfo]{parskip+}{parskip=full+}
+\KOMA@DeclareObsoleteOption[\PackageInfo]{parskip*}{parskip=full*}
+\KOMA@DeclareObsoleteOption[\PackageInfo]{halfparskip}{parskip=half}
+\KOMA@DeclareObsoleteOption[\PackageInfo]{halfparskip-}{parskip=half-}
+\KOMA@DeclareObsoleteOption[\PackageInfo]{halfparskip+}{parskip=half+}
+\KOMA@DeclareObsoleteOption[\PackageInfo]{halfparskip*}{parskip=half*}
+\KOMA@DeclareObsoleteOption[\PackageInfo]{parindent}{parskip=false}
 %    \end{macrocode}
 %  \end{option}
 %  \end{option}
