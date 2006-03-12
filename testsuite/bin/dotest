@@ -69,13 +69,14 @@ dirname=`dirname $tspec`
 retval=0
 
 latexrun() {
-    local latex aflag aname aruns ainfo nline
+    local latex aflag aname aruns ainfo nline errorflag
     latex="$1"
-    aflag="$2"
-    aname="$3"
-    aruns="$4"
-    ainfo="$5"
-    nline="$6"
+    errorflag="$2"
+    aflag="$3"
+    aname="$4"
+    aruns="$5"
+    ainfo="$6"
+    nline="$7"
     TEXINPUTS="$KTEXINPUTS"
     case $aflag in
 	N|n) # do nothing
@@ -98,8 +99,17 @@ latexrun() {
     rm -rf .tmp
     mkdir .tmp || error 2 "$0: Cannot create directory .tmp!"
     cd .tmp || error 2 "$0: Cannot switch to directory .tmp!"
+    input='\newif\ifINITTESTRUN\INITTESTRUNfalse\input'
+    $optinit && input='\newif\ifINITTESTRUN\INITTESTRUNtrue\input'
     while [ $((aruns--)) -gt 0 ]; do
-	if ! $latex -interaction=batchmode ${aname} >/dev/null; then
+	if $errorflag; then
+	    if $latex -interaction=batchmode $input ${aname} >/dev/null; then
+		$optinit && error 1 "$tspec: Init of line ${nline} (TAPE ${aname}) falied!"
+		[ $retval -eq 1 ] || [ $retval -eq 2 ] || retval=3
+		echo "! ${aname}: $latex run failed!"
+		return $retval
+	    fi
+	elif ! $latex -interaction=batchmode $input ${aname} >/dev/null; then
 	    $optinit && error 1 "$tspec: Init of line ${nline} (TYPE ${aname}) failed!"
 	    [ $retval -eq 1 ] || [ $retval -eq 2 ] || retval=3
 	    echo "! ${aname}: $latex run failed!"
@@ -116,7 +126,8 @@ pdftest() {
     aruns="$3"
     ainfo="$4"
     nline="$5"
-    if latexrun pdflatex "$@"; then
+    $optinit && [ "x$aflag" = "xN" -o "x$aflag" = "xn" ] && return $retval
+    if latexrun pdflatex false "$@"; then
 	if pdfselect.sh "$ainfo" ${aname%.tex}.pdf ${aname%.tex}.test.pdf; then
 	    if $optinit; then
 		cp -f ${aname%.tex}.test.pdf ../${aname%.tex}.pdf
@@ -150,7 +161,8 @@ dvitest() {
     aruns="$3"
     ainfo="$4"
     nline="$5"
-    if latexrun latex "$@"; then
+    $optinit && [ "x$aflag" = "xN" -o "x$aflag" = "xn" ] && return $retval
+    if latexrun latex false "$@"; then
 	if dviselect.sh "$ainfo" ${aname%.tex}.dvi ${aname%.tex}.test.dvi; then
 	    if $optinit; then
 		cp -f ${aname%.tex}.test.dvi ../${aname%.tex}.dvi
@@ -184,7 +196,8 @@ pstest() {
     aruns="$3"
     ainfo="$4"
     nline="$5"
-    if latexrun latex "$@"; then
+    $optinit && [ "x$aflag" = "xN" -o "x$aflag" = "xn" ] && return $retval
+    if latexrun latex false "$@"; then
 	if dviselect.sh "$ainfo" ${aname%.tex}.dvi ${aname%.tex}.test.dvi; then
 	    if dvips ${aname%.tex}.test.dvi -o ${aname%.tex}.test.ps; then
 		if $optinit; then
@@ -224,7 +237,8 @@ typetest() {
     aruns="$3"
     ainfo="$4"
     nline="$5"
-    if latexrun latex "$@"; then
+    $optinit && [ "x$aflag" = "xN" -o "x$aflag" = "xn" ] && return $retval
+    if latexrun latex false "$@"; then
 	if dviselect.sh "$ainfo" ${aname%.tex}.dvi ${aname%.tex}.test.dvi; then
 	    if $optinit; then
 		cp -f ${aname%.tex}.test.dvi ../${aname%.tex}.dvi
@@ -232,6 +246,98 @@ typetest() {
 		rm -rf .tmp
 	    else
 		dvitypecmp ../${aname%.tex}.dvi ${aname%.tex}.test.dvi
+		nr=$?
+		cd ..
+		if [ $nr -eq 1 ] || [ $nr -eq 2 ]; then
+		    retval=$nr
+		    exit $retval
+		elif [ $nr -eq 3 ]; then
+		    [ $retval -eq 1 ] || [ $retval -eq 2 ] || retval=$nr
+		else
+		    rm -rf .tmp
+		fi
+	    fi
+	else
+	    retval=2
+	    exit $retval
+	fi
+    fi
+    return $retval
+}
+
+dvilogtest() {
+    local aflag aname aruns ainfo nline
+    aflag="$1"
+    aname="$2"
+    aruns="$3"
+    ainfo="$4"
+    nline="$5"
+    errorflag=false
+    cmpflag=false
+    case $ainfo in
+	ERROR|ERROR\ *|*\ ERROR|*\ ERROR\ *)
+	    errorflag=true
+	    ;;
+	CMP|CMP\ *|*\ CMP|*\ CMP\ *)
+	    cmpflag=true
+	    ;;
+    esac
+    $optinit && [ "x$aflag" = "xN" -o "x$aflag" = "xn" ] && return $retval
+    if latexrun latex $errorflag "$@"; then
+	if logselect.pl ${aname%.tex}.log ${aname%.tex}.test.log; then
+	    if $optinit; then
+		cp -f ${aname%.tex}.test.log ../${aname%.tex}.log
+		cd ..
+		rm -rf .tmp
+	    else
+		if $cmpflag; then
+		    logcmp ../${aname%.tex}.log ${aname%.tex}.test.log
+		fi
+		nr=$?
+		cd ..
+		if [ $nr -eq 1 ] || [ $nr -eq 2 ]; then
+		    retval=$nr
+		    exit $retval
+		elif [ $nr -eq 3 ]; then
+		    [ $retval -eq 1 ] || [ $retval -eq 2 ] || retval=$nr
+		else
+		    rm -rf .tmp
+		fi
+	    fi
+	else
+	    retval=2
+	    exit $retval
+	fi
+    fi
+    return $retval
+}
+
+pdflogtest() {
+    local aflag aname aruns ainfo nline
+    aflag="$1"
+    aname="$2"
+    aruns="$3"
+    ainfo="$4"
+    nline="$5"
+    errorflag=false
+    cmpflag=false
+    case $ainfo in
+	ERROR|ERROR\ *|*\ ERROR|*\ ERROR\ *)
+	    errorflag=true
+	    ;;
+	CMP|CMP\ *|*\ CMP|*\ CMP\ *)
+	    cmpflag=true
+	    ;;
+    esac
+    $optinit && [ "x$aflag" = "xN" -o "x$aflag" = "xn" ] && return $retval
+    if latexrun pdflatex $errorflag "$@"; then
+	if logselect.pl ${aname%.tex}.log ${aname%.tex}.test.log; then
+	    if $optinit; then
+		cp -f ${aname%.tex}.test.log ../${aname%.tex}.log
+		cd ..
+		rm -rf .tmp
+	    else
+		logcmp ../${aname%.tex}.log ${aname%.tex}.test.log
 		nr=$?
 		cd ..
 		if [ $nr -eq 1 ] || [ $nr -eq 2 ]; then
@@ -271,6 +377,12 @@ readtspec() {
 		;;
 	    TYPE) # type test
 		typetest "$aflag" "$aname" "$aruns" "$ainfo"
+		;;
+	    LOG|DVILOG) # DVILOG test
+		dvilogtest "$aflag" "$aname" "$aruns" "$ainfo"
+		;;
+	    PDFLOG) # PDFLOG test
+		pdflogtest "$aflag" "$aname" "$aruns" "$ainfo"
 		;;
 	    *) # error
 		error 2 "$tspec: syntax error at line ${nline} (unknown test type \`$atype')!"
