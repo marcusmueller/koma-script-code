@@ -1,4 +1,4 @@
-% \CheckSum{508}
+% \CheckSum{597}
 % \iffalse meta-comment
 % ======================================================================
 % scrkpage.dtx
@@ -41,7 +41,7 @@
 %%% From File: scrkpage.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkpage.dtx}[2002/07/01 v3.0 KOMA-Script (page style)]
+\ProvidesFile{scrkpage.dtx}[2006/03/15 v3.0 KOMA-Script (page style)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,german]{babel}
@@ -340,8 +340,8 @@
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
-%  \begin{macro}{\scr@fnt@pagination}
-%    \changes{v2.8o}{2001/09/14}{neues Element \texttt{pagination}}
+%  \begin{macro}{\scr@fnt@pagenumber}
+%    \changes{v2.8o}{2001/09/14}{neues Element \texttt{pagenumber}}
 %  \begin{macro}{\scr@fnt@pagehead}
 %    \changes{v2.8o}{2001/09/14}{neues Element \texttt{pagehead}}
 %  \begin{macro}{\scr@fnt@wrn@pagehead}
@@ -372,20 +372,34 @@
 %  \end{macro}
 %  \end{macro}
 %
-% Zurück zur Definition der Seitenstile:
+% \begin{macro}{\pagemark}
+%   \changes{v3.0}{2006/03/15}{nun für alle Klassen}
+%   Das ist die Seitenmarke, die nun für alle Klassen verwendet wird. Damit
+%   wird es leichter, \textsf{fancyhdr} statt \textsf{scrpage2} zu verwenden.
 %    \begin{macrocode}
+\newcommand*{\pagemark}{{\usekomafont{pagenumber}%
+%<letter>    \pagename\ %
+    \thepage}}
+%    \end{macrocode}
+% \end{macro}
+%
+% Zurück zur Definition der Seitenstile. Hier gibt es erhebliche Unterschiede
+% zwischen der Briefklasse und den anderen Klassen. Das beginnt schon damit,
+% dass es spezielle Stile für doppelseitige Briefe nicht gibt.
+%    \begin{macrocode}
+%<*!letter>
 \if@twoside
-  \renewcommand*{\ps@plain}{\let\@mkboth\@gobbletwo
+  \renewcommand*{\ps@plain}{%
     \renewcommand*{\@evenhead}{}%
     \renewcommand*{\@oddhead}{}%
     \renewcommand*{\@evenfoot}{%
       \set@tempdima@hw\hss\hb@xt@ \@tempdima{\vbox{%
           \if@fsl \hrule \vskip 3\p@ \fi
-          \hb@xt@ \@tempdima{{\pnumfont\thepage\hfil}}}}}%
+          \hb@xt@ \@tempdima{{\pagemark\hfil}}}}}%
     \renewcommand*{\@oddfoot}{%
       \set@tempdima@hw\hb@xt@ \@tempdima{\vbox{%
           \if@fsl \hrule \vskip 3\p@ \fi
-          \hb@xt@ \@tempdima{{\pnumfont\hfil\thepage}}}}\hss}%
+          \hb@xt@ \@tempdima{{\hfil\pagemark}}}}\hss}%
   }%
   \newcommand*{\ps@headings}{\let\@mkboth\markboth
     \renewcommand*{\@evenhead}{%
@@ -399,11 +413,11 @@
     \renewcommand*{\@evenfoot}{%
       \set@tempdima@hw\hss\hb@xt@ \@tempdima{\vbox{%
           \if@fsl \hrule \vskip 3\p@ \fi
-          \hb@xt@ \@tempdima{{\pnumfont\thepage\hfil}}}}}%
+          \hb@xt@ \@tempdima{{\pagemark\hfil}}}}}%
     \renewcommand*{\@oddfoot}{%
       \set@tempdima@hw\hb@xt@ \@tempdima{\vbox{%
           \if@fsl \hrule \vskip 3\p@ \fi
-          \hb@xt@ \@tempdima{{\pnumfont\hfil\thepage}}}}\hss}%
+          \hb@xt@ \@tempdima{{\hfil\pagemark}}}}\hss}%
 %<*article>
     \renewcommand*{\sectionmark}[1]{%
       \markboth{\ifnum \c@secnumdepth >\z@%
@@ -439,36 +453,98 @@
     \renewcommand*{\@evenfoot}{%
       \set@tempdima@hw\hss\hb@xt@ \@tempdima{\vbox{%
           \if@fsl \hrule \vskip 3\p@ \fi
-          \hb@xt@ \@tempdima{{\pnumfont\thepage\hfil}}}}}%
+          \hb@xt@ \@tempdima{{\pagemark\hfil}}}}}%
     \renewcommand*{\@oddfoot}{%
       \set@tempdima@hw\hb@xt@ \@tempdima{\vbox{%
           \if@fsl \hrule \vskip 3\p@ \fi
-          \hb@xt@ \@tempdima{{\pnumfont\hfil\thepage}}}}\hss}%
+          \hb@xt@ \@tempdima{{\hfil\pagemark}}}}\hss}%
 %<!article>    \renewcommand*{\chaptermark}[1]{}%
 %<article>    \renewcommand*{\subsectionmark}[1]{}%
     \renewcommand*{\sectionmark}[1]{}%
   }
 \else
-  \renewcommand*{\ps@plain}{\let\@mkboth\@gobbletwo
-    \renewcommand*{\@evenhead}{}%
-    \renewcommand*{\@oddhead}{}%
-    \renewcommand*{\@evenfoot}{}%
+%</!letter>
+  \renewcommand*{\ps@plain}{%
+    \renewcommand*{\@oddhead}{%
+%<*letter>
+      \vbox{\vbox{\hsize=\textwidth\hbox to\textwidth{%
+            \parbox[b]{\textwidth}{\strut
+              \ifnum\@pageat>-1
+                \ifnum\@pageat<3
+                  \ifcase\@pageat\raggedright\or\centering\or\raggedleft\fi
+                  \pagemark
+                \else
+                  \hfill
+                \fi
+              \else
+                \hfill
+              \fi
+            }%
+          }%
+          \if@hsl\kern1pt\rule{\textwidth}{.4pt}\fi
+        }%
+      }%
+%</letter>
+    }%
+    \let\@evenhead\@oddhead%
     \renewcommand*{\@oddfoot}{%
+%<*letter>
+      \parbox[t]{\textwidth}{%
+        \if@fsl
+          {%
+            \raggedright%
+            \vskip-\baselineskip\vskip.4pt
+            \hrulefill\\
+          }%
+        \fi
+        \ifnum\@pageat>2
+          \ifcase\@pageat\or\or\or\raggedright\or\centering\or\raggedleft\fi
+          \strut\pagemark
+        \else
+          \hfill
+        \fi
+      }%
+%</letter>
+%<*!letter>
       \set@tempdima@hw\hb@xt@ \@tempdima{\vbox{%
           \if@fsl \hrule \vskip 3\p@ \fi
-          \hb@xt@ \@tempdima{{\pnumfont\hfil\thepage\hfil}}}}\hss}%
+          \hb@xt@ \@tempdima{{\hfil\pagemark\hfil}}}}\hss}%
+%</!letter>
+    }%
+    \let\@evenfoot\@oddfoot
   }
   \newcommand*{\ps@headings}{\let\@mkboth\markboth
-    \renewcommand*{\@evenhead}{}%
     \renewcommand*{\@oddhead}{%
+%<*letter>
+      \vbox{%
+        \vbox{\hsize=\textwidth\hbox to\textwidth{\headfont\@nexthead}}%
+        \if@hsl\kern1pt\rule{\textwidth}{.4pt}\fi%
+      }%
+%</letter>
+%<*!letter>
       \set@tempdima@hw\hb@xt@ \@tempdima{\vbox{%
           \hb@xt@ \@tempdima{{\headfont\hfil\strut\rightmark\hfil}}
-          \if@hsl \vskip 1.5\p@ \hrule \fi}}\hss}%
-    \renewcommand*{\@evenfoot}{}%
+          \if@hsl \vskip 1.5\p@ \hrule \fi}}\hss
+%</!letter>
+    }%
+    \let\@evenhead\@oddhead
     \renewcommand*{\@oddfoot}{%
+%<*letter>
+      \parbox[t]{\textwidth}{%
+        \if@fsl
+          {%
+            \raggedright%
+            \vskip-\baselineskip\vskip.4pt
+            \hrulefill\\
+            }%
+        \fi
+        \vbox{\hsize=\textwidth\hbox to\textwidth{\headfont\@nextfoot}}%
+      }%
+%</letter>
+%<*!letter>
       \set@tempdima@hw\hb@xt@ \@tempdima{\vbox{%
           \if@fsl \hrule \vskip 3\p@ \fi
-          \hb@xt@ \@tempdima{{\pnumfont\hfil\thepage\hfil}}}\hss}}%
+          \hb@xt@ \@tempdima{{\hfil\pagemark\hfil}}}\hss}}%
 %<*article>
 %    \end{macrocode}
 %    \changes{v2.1b}{1994/12/31}{im einseitigen Seitenstil
@@ -499,8 +575,13 @@
         \fi
         ##1}}%
 %</report|book>
+%</!letter>
+    \let\@evenfoot\@oddfoot
   }
-  \newcommand*{\ps@myheadings}{\let\@mkboth\@gobbletwo
+  \newcommand*{\ps@myheadings}{%
+%<letter>    \ps@headings
+    \let\@mkboth\@gobbletwo
+%<*!letter>
     \renewcommand*{\@evenhead}{}%
     \renewcommand*{\@oddhead}{%
       \set@tempdima@hw\hb@xt@ \@tempdima{\vbox{%
@@ -510,12 +591,13 @@
     \renewcommand*{\@oddfoot}{%
       \set@tempdima@hw\hb@xt@ \@tempdima{\vbox{%
           \if@fsl \hrule \vskip 3\p@ \fi
-          \hb@xt@ \@tempdima{{\pnumfont\hfil\thepage\hfil}}}}\hss}%
+          \hb@xt@ \@tempdima{{\hfil\pagemark\hfil}}}}\hss}%
 %<article>    \renewcommand*{\subsectionmark}[1]{}%
 %<!article>    \renewcommand*{\chaptermark}[1]{}%
     \renewcommand*{\sectionmark}[1]{}%
+%</!letter>
   }
-\fi
+%<!letter>\fi
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
@@ -523,6 +605,11 @@
 %
 %
 % \subsection{Festlegung des Seitenstils auf besonderen Seiten}
+%
+% So etwas gibt es derzeit nicht für Briefe.
+% \iffalse
+%<*!letter>
+% \fi
 %
 %  \begin{macro}{\titlepagestyle}
 %    \changes{v2.8d}{2001/07/05}{neu}
@@ -548,12 +635,15 @@
 %  \end{macro}
 %  \end{macro}
 %
+% \iffalse
+%</!letter>
+% \fi
 %
 % \subsection{Standardeinstellungen}
 %
 % Der voreingestellte Seitenstil hängt von der verwendeten Klasse ab:
 %    \begin{macrocode}
-%<report|article>\pagestyle{plain}
+%<report|article|letter>\pagestyle{plain}
 %<book>\pagestyle{headings}
 %    \end{macrocode}
 % Die Nummerierung erfolgt hingegen immer mit arabischen Zahlen:
@@ -562,24 +652,28 @@
 %    \end{macrocode}
 %
 % Im zweiseitigen Satz wird die letzte Zeile bündig gesetzt, im
-% einseitigen jedoch nicht:
+% einseitigen und bei Briefen generell jedoch nicht:
 %    \begin{macrocode}
+%<*!letter>
 \if@twoside
   \flushbottom
 \else
+%</!letter>
   \raggedbottom
-\fi
+%<!letter>\fi
 %    \end{macrocode}
 % Im zweispaltigen Satz wird \cs{sloppy} verwendet und die letzte
-% Zeile jeweils bündig gesetzt.
+% Zeile jeweils bündig gesetzt. Briefe sind einspaltig.
 %    \begin{macrocode}
+%<*!letter>
 \if@twocolumn
   \twocolumn
   \sloppy
   \flushbottom
 \else
+%</!letter>
   \onecolumn
-\fi
+%<!letter>\fi
 %    \end{macrocode}
 %
 %
@@ -593,7 +687,6 @@
 %
 % end of file `scrkpage.dtx'
 %%% Local Variables:
-%%% mode: latex
-%%% mode: font-lock
+%%% mode: doctex
 %%% TeX-master: t
 %%% End:
