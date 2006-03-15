@@ -84,7 +84,7 @@
 
 \preamble
 
-Copyright (c) 1994-2002
+Copyright (c) 1994-2006
 Markus Kohm and any individual authors listed elsewhere in this file.
 
 This file was generated from file(s) of the KOMA-Script bundle.
