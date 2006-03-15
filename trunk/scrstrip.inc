@@ -92,23 +92,23 @@ This file was generated from file(s) of the KOMA-Script bundle.
 
 It may be distributed under the conditions of the 
 LaTeX Project Public License in the version distributed together
-with KOMA-Script, see file `LEGAL.TXT' or `LEGALDE.TXT'.
+with KOMA-Script, see file `lppl.txt' or `lppl-de.txt'.
 
 This file may only be distributed together with a copy of the
 KOMA-Script bundle.  You may however distribute the 
 KOMA-Script bundle without all such generated files.  See also
-`LEGAL.TXT' or `LEGALDE.TXT' for additional information.
+`lppl.txt' or `lppl-de.txt' for additional information.
 
 The list of files belonging to KOMA-Script distribution is given in
-the file `liesmich.txt' and the file `readme.txt'.  See also
-`LEGAL.TXT' or `LEGALDE.TXT' for additional information.
+the file `manifest.txt'.  See also `lppl.txt' or `lppl-de.txt' for 
+additional information.
 
 If this file is a beta version, you are not allowed to distribute it.
 
 English and German manuals are part of KOMA-Script bundle. 
 ----------------------------------------------------------
 
-See `liesmich.txt' or `readme.txt'.
+See `README'.
 
 The KOMA-Script bundle (but maybe not this file) was based upon the
 LaTeX2.09 Script family created by Frank Neukam 1993 and the LaTeX2e
