@@ -64,8 +64,8 @@
       \Msg{* through LaTeX after finishing the installation.}
       \Msg{*}
     \fi
-    \Msg{* You will find the manual reading `readme.txt' (English),}
-    \Msg{* `liesmich.txt' (German) or `koma-script.pdf'.}
+    \Msg{* You will find the manual reading `README' (English),}
+    \Msg{* or `koma-script.pdf'.}
     \Msg{*}
     \Msg{* Happy TeXing}
   \fi
@@ -77,6 +77,5 @@
 
 %%% Local Variables:
 %%% mode: latex
-%%% mode: font-lock
 %%% TeX-master: f
 %%% End:
