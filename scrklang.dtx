@@ -1,4 +1,4 @@
-% \CheckSum{154}
+% \CheckSum{1026}
 % \iffalse meta-comment
 % ======================================================================
 % scrklang.dtx
@@ -82,7 +82,46 @@
 % \fi
 %
 % \subsection{Option}
-% Das ganze ist nicht von Optionen abhängig!
+% Für Briefe gibt es die Möglichkeit, zwischen symbolischem und numerischem
+% Datum umzuschalten.
+%
+% \iffalse
+%<*letter>
+% \fi
+%
+% \begin{option}{numericaldate}
+%   \changes{v2.8q}{2001/10/07}{Neue Option (an Stelle von
+%     \texttt{scrdate} und \texttt{orgdate})}
+% Es kann zwischen dem Originaldatum, das beispielsweise von
+% \texttt{german.sty} definiert wird, und dem \texttt{scrlttr2}-Datum
+% gewählt werden. Natürlich gibt es diese Optionen nur bei Briefen.
+% \begin{macro}{\if@orgdate}
+% \begin{macro}{\@orgdatetrue}
+% \begin{macro}{\@orgdatefalse}
+% Die Einstellung wird in einem Schalter gespeichert.
+%    \begin{macrocode}
+\newif\if@orgdate\@orgdatetrue
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% Dummerweise besitzt der alte Schalter genau die gegenteilige
+% Bedeutung der Option, deshalb muss der Schalter zweimal invertiert
+% werden.
+%    \begin{macrocode}
+\KOMA@key{numericaldate}[true]{%
+  \if@orgdate\@orgdatefalse\else\@orgdatetrue\fi
+  \KOMA@set@ifkey{numericaldate}{@orgdate}{#1}%
+  \if@orgdate\@orgdatefalse\else\@orgdatetrue\fi
+}
+\KOMA@DeclareObsoleteOption[\PackageInfo]{scrdate}{numericaldate=true}
+\KOMA@DeclareObsoleteOption[\PackageInfo]{orgdate}{numericaldate=false}
+%    \end{macrocode}
+% \end{option}
+%
+% \iffalse
+%</letter>
+% \fi
 %
 %
 % \iffalse
@@ -231,6 +270,530 @@
 %  \end{macro}
 %  \end{macro}
 %  \end{macro}
+%
+%
+% \subsection{Definitionen für ein nummerisches Datum}
+% Bei Briefen kann ein nummerisches oder ein symbolisches Datum verwendet
+% werden.
+%
+% \iffalse
+%<*letter>
+% \fi
+%
+% \begin{macro}{\g@addnumerical@date}
+% Dazu ist es notwendig, ggf. das bereits definierte symbolische Datum durch
+% ein nummerisches zu ergänzen.
+%    \begin{macrocode}
+\newcommand*{\g@addnumerical@date}[2]{%
+  \@ifundefined{date#1}{%
+    \ClassInfo{%
+      scrlttr2%
+    }{%
+      no date found for language `#1'\MessageBreak
+      --> skipped%
+      }%
+    }{%
+    \expandafter\g@addto@macro\csname date#1\endcsname{%
+      \let\sym@date=\today%
+      \def\num@date{#2}%
+      \def\today{\if@orgdate\sym@date\else\num@date\fi}%
+    }%
+  }%
+}
+%    \end{macrocode}
+%  \end{macro}
+%
+% \iffalse
+%</letter>
+% \fi
+%
+%
+% \subsection{Festlegungen für einzelne Sprachen}
+%
+% Es folgen nun für einzelne Sprachen konkrete Festlegungen, die für Briefe
+% benötigt werden.
+%
+% \iffalse
+%<*letter>
+% \fi
+%
+% \begin{macro}{\captionsenglish}
+% \begin{macro}{\dateenglish}
+% \begin{macro}{\captionsUSenglish}
+% \begin{macro}{\dateUSenglish}
+% \begin{macro}{\captionsamerican}
+% \begin{macro}{\dateamerican}
+%   \changes{v2.4c}{1997/11/25}{american identisch mit USenglish definiert} 
+% \begin{macro}{\captionsbritish}
+% \begin{macro}{\datebritish}
+%   \changes{v2.4c}{1997/11/25}{british identisch mit english definiert} 
+% \begin{macro}{\captionsUKenglish}
+% \begin{macro}{\dateUKenglish}
+%   \changes{v2.4c}{1997/11/25}{UKenglish identisch mit english definiert} 
+% \begin{macro}{\captionsgerman}
+% \begin{macro}{\dategerman}
+% \begin{macro}{\captionsngerman}
+% \begin{macro}{\datengerman}
+%   \changes{v2.5}{1999/09/08}{ngerman neu und identisch mit german}
+% \begin{macro}{\captionsaustrian}
+% \begin{macro}{\dateaustrian}
+% \begin{macro}{\captionsfrench}
+% \begin{macro}{\datefrench}
+% \begin{macro}{\captionsitalian}
+% \begin{macro}{\dateitalian}
+%   \changes{v2.3e}{1996/05/31}{Ich hoffe, dass das stimmt}
+% \begin{macro}{\captionsspanish}
+% \begin{macro}{\datespanish}
+%   \changes{v2.4c}{1997/11/25}{Ich hoffe, dass das stimmt}
+%   \changes{v2.4c}{1997/11/25}{Datumsumschaltung nicht mehr zwingend} 
+% \begin{macro}{\captionscroation}
+% \begin{macro}{\datecroatian}
+%   \changes{v2.8q}{2001/05/10}{Neu}
+% \begin{macro}{\captionsdutch}
+% \begin{macro}{\datedutch}
+%   \changes{v2.8q}{2002/02/01}{Neu}
+% \begin{macro}{\captionsfinnish}
+%   \changes{v2.9u}{2005/02/07}{Unterstützung für Finnisch (Dank Hannu
+%     Väisänen)}
+% \begin{macro}{\datefinnish}
+%   \changes{v2.9u}{2005/02/07}{Neu}
+% Weil es in früheren Versionen zu Problemen damit gekommen ist,
+% werden diese jedoch erst bei |\begin{document}| definiert. Dabei
+% wird |\providecaptionname| verwendet, so dass sie auch schon vor
+% |\begin{document}| mit |\newcaptionname| anderslautend definiert
+% werden können.
+% \begin{table}
+%   \centering
+%   \begin{tabular}{ll}
+%     Sprache & Spender \\\hline\\[-1.6ex]
+%     English & Frank Neukam, Michael Dewey, Markus Kohm \\
+%     Deutsch & Frank Neukam, Markus Kohm \\
+%     Französisch & Frank Neukam, Henk Jongbloets \\
+%     Italienisch & Simone Naldi \\
+%     Spanisch & Ralph J.\ Hangleiter, Alejandro L\'opez-Valencia\\
+%     Kroatisch & Branka Lon\v{c}arevi\'{c} \\
+%     Holländisch & Henk Jongbloets \\
+%     Finnisch & Hannu Väisänen \\
+%   \end{tabular}
+%   \caption{Liste der unterstützten Sprachen und der
+%     \emph{Sprachspender}}
+% \end{table}
+% Eine Besonderheit stellt die englische Sprache dar. Es wird
+% versucht, diese als Notersatz immer zu definieren.
+%    \begin{macrocode}
+\AtBeginDocument{%
+  \@ifundefined{captionsenglish}{\let\captionsenglish\@empty}{}%
+  \providecaptionname{english}\yourrefname{Your ref.}%
+  \providecaptionname{english}\yourmailname{Your letter of}%
+  \providecaptionname{english}\myrefname{Our ref.}%
+  \providecaptionname{english}\customername{Customer no.}%
+  \providecaptionname{english}\invoicename{Invoice no.}%
+  \providecaptionname{english}\subjectname{Subject}%
+  \providecaptionname{english}\ccname{cc}%
+  \providecaptionname{english}\enclname{encl}%
+  \providecaptionname{english}\headtoname{To}%
+  \providecaptionname{english}\headfromname{From}%
+  \providecaptionname{english}\datename{Date}%
+  \providecaptionname{english}\pagename{Page}%
+  \providecaptionname{english}\phonename{Phone}%
+  \providecaptionname{english}\faxname{Fax}%
+  \providecaptionname{english}\emailname{Email}%
+  \providecaptionname{english}\wwwname{Url}%
+  \providecaptionname{english}\bankname{Bank account}%
+  \g@addnumerical@date{english}{\number\day/\number\month/\number\year}%
+  \providecaptionname{USenglish}\yourrefname{Your ref.}%
+  \providecaptionname{USenglish}\yourmailname{Your letter of}%
+  \providecaptionname{USenglish}\myrefname{Our ref.}%
+  \providecaptionname{USenglish}\customername{Customer no.}%
+  \providecaptionname{USenglish}\invoicename{Invoice no.}%
+  \providecaptionname{USenglish}\subjectname{Subject}%
+  \providecaptionname{USenglish}\ccname{cc}%
+  \providecaptionname{USenglish}\enclname{encl}%
+  \providecaptionname{USenglish}\headtoname{To}%
+  \providecaptionname{USenglish}\headfromname{From}%
+  \providecaptionname{USenglish}\datename{Date}%
+  \providecaptionname{USenglish}\pagename{Page}%
+  \providecaptionname{USenglish}\phonename{Phone}%
+  \providecaptionname{USenglish}\faxname{Fax}%
+  \providecaptionname{USenglish}\emailname{Email}%
+  \providecaptionname{USenglish}\wwwname{Url}%
+  \providecaptionname{USenglish}\bankname{Bank account}%
+  \g@addnumerical@date{USenglish}{\number\month/\number\day/\number\year}%
+  \providecaptionname{american}\yourrefname{Your ref.}%
+  \providecaptionname{american}\yourmailname{Your letter of}%
+  \providecaptionname{american}\myrefname{Our ref.}%
+  \providecaptionname{american}\customername{Customer no.}%
+  \providecaptionname{american}\invoicename{Invoice no.}%
+  \providecaptionname{american}\subjectname{Subject}%
+  \providecaptionname{american}\ccname{cc}%
+  \providecaptionname{american}\enclname{encl}%
+  \providecaptionname{american}\headtoname{To}%
+  \providecaptionname{american}\headfromname{From}%
+  \providecaptionname{american}\datename{Date}%
+  \providecaptionname{american}\pagename{Page}%
+  \providecaptionname{american}\phonename{Phone}%
+  \providecaptionname{american}\faxname{Fax}%
+  \providecaptionname{american}\emailname{Email}%
+  \providecaptionname{american}\wwwname{Url}%
+  \providecaptionname{american}\bankname{Bank account}%
+  \g@addnumerical@date{american}{\number\month/\number\day/\number\year}%
+  \providecaptionname{british}\yourrefname{Your ref.}%
+  \providecaptionname{british}\yourmailname{Your letter of}%
+  \providecaptionname{british}\myrefname{Our ref.}%
+  \providecaptionname{british}\customername{Customer no.}%
+  \providecaptionname{british}\invoicename{Invoice no.}%
+  \providecaptionname{british}\subjectname{Subject}%
+  \providecaptionname{british}\ccname{cc}%
+  \providecaptionname{british}\enclname{encl}%
+  \providecaptionname{british}\headtoname{To}%
+  \providecaptionname{british}\headfromname{From}%
+  \providecaptionname{british}\datename{Date}%
+  \providecaptionname{british}\pagename{Page}%
+  \providecaptionname{british}\phonename{Phone}%
+  \providecaptionname{british}\faxname{Fax}%
+  \providecaptionname{british}\emailname{Email}%
+  \providecaptionname{british}\wwwname{Url}%
+  \providecaptionname{british}\bankname{Bank account}%
+  \g@addnumerical@date{british}{\number\day/\number\month/\number\year}%
+  \providecaptionname{UKenglish}\yourrefname{Your ref.}%
+  \providecaptionname{UKenglish}\yourmailname{Your letter of}%
+  \providecaptionname{UKenglish}\myrefname{Our ref.}%
+  \providecaptionname{UKenglish}\customername{Customer no.}%
+  \providecaptionname{UKenglish}\invoicename{Invoice no.}%
+  \providecaptionname{UKenglish}\subjectname{Subject}%
+  \providecaptionname{UKenglish}\ccname{cc}%
+  \providecaptionname{UKenglish}\enclname{encl}%
+  \providecaptionname{UKenglish}\headtoname{To}%
+  \providecaptionname{UKenglish}\headfromname{From}%
+  \providecaptionname{UKenglish}\datename{Date}%
+  \providecaptionname{UKenglish}\pagename{Page}%
+  \providecaptionname{UKenglish}\phonename{Phone}%
+  \providecaptionname{UKenglish}\faxname{Fax}%
+  \providecaptionname{UKenglish}\emailname{Email}%
+  \providecaptionname{UKenglish}\wwwname{Url}%
+  \providecaptionname{UKenglish}\bankname{Bank account}%
+  \g@addnumerical@date{UKenglish}{\number\day/\number\month/\number\year}%
+  \providecaptionname{german}\yourrefname{Ihr Zeichen}%
+  \providecaptionname{german}\yourmailname{Ihr Schreiben vom}%
+  \providecaptionname{german}\myrefname{Unser Zeichen}%
+  \providecaptionname{german}\customername{Kundennummer}%
+  \providecaptionname{german}\invoicename{Rechnungsnummer}%
+  \providecaptionname{german}\subjectname{Betrifft}%
+  \providecaptionname{german}\ccname{Kopien an}%
+  \providecaptionname{german}\enclname{Anlagen}%
+  \providecaptionname{german}\headtoname{An}%
+  \providecaptionname{german}\headfromname{Von}%
+  \providecaptionname{german}\datename{Datum}%
+  \providecaptionname{german}\pagename{Seite}%
+  \providecaptionname{german}\phonename{Telephon}%
+  \providecaptionname{german}\faxname{Fax}%
+  \providecaptionname{german}\emailname{E-Mail}%
+  \providecaptionname{german}\wwwname{URL}%
+  \providecaptionname{german}\bankname{Bankverbindung}%
+  \g@addnumerical@date{german}{\number\day.\,\number\month.\,\number\year}%
+  \providecaptionname{ngerman}\yourrefname{Ihr Zeichen}%
+  \providecaptionname{ngerman}\yourmailname{Ihr Schreiben vom}%
+  \providecaptionname{ngerman}\myrefname{Unser Zeichen}%
+  \providecaptionname{ngerman}\customername{Kundennummer}%
+  \providecaptionname{ngerman}\invoicename{Rechnungsnummer}%
+  \providecaptionname{ngerman}\subjectname{Betrifft}%
+  \providecaptionname{ngerman}\ccname{Kopien an}%
+  \providecaptionname{ngerman}\enclname{Anlagen}%
+  \providecaptionname{ngerman}\headtoname{An}%
+  \providecaptionname{ngerman}\headfromname{Von}%
+  \providecaptionname{ngerman}\datename{Datum}%
+  \providecaptionname{ngerman}\pagename{Seite}%
+  \providecaptionname{ngerman}\phonename{Telefon}%
+  \providecaptionname{ngerman}\faxname{Fax}%
+  \providecaptionname{ngerman}\emailname{E-Mail}%
+  \providecaptionname{ngerman}\wwwname{URL}%
+  \providecaptionname{ngerman}\bankname{Bankverbindung}%
+  \g@addnumerical@date{ngerman}{\number\day.\,\number\month.\,\number\year}%
+  \providecaptionname{austrian}\yourrefname{Ihr Zeichen}%
+  \providecaptionname{austrian}\yourmailname{Ihr Schreiben vom}%
+  \providecaptionname{austrian}\myrefname{Unser Zeichen}%
+  \providecaptionname{austrian}\customername{Kundennummer}%
+  \providecaptionname{austrian}\invoicename{Rechnungsnummer}%
+  \providecaptionname{austrian}\subjectname{Betrifft}%
+  \providecaptionname{austrian}\ccname{Kopien an}%
+  \providecaptionname{austrian}\enclname{Anlagen}%
+  \providecaptionname{austrian}\headtoname{An}%
+  \providecaptionname{austrian}\headfromname{Von}%
+  \providecaptionname{austrian}\datename{Datum}%
+  \providecaptionname{austrian}\pagename{Seite}%
+  \providecaptionname{austrian}\phonename{Telefon}%
+  \providecaptionname{austrian}\faxname{Fax}%
+  \providecaptionname{austrian}\emailname{E-Mail}%
+  \providecaptionname{austrian}\wwwname{URL}%
+  \providecaptionname{austrian}\bankname{Bankverbindung}%
+  \g@addnumerical@date{austrian}{\number\day.\,\number\month.\,\number\year}%
+  \providecaptionname{french}\yourrefname{Vos r\'ef\'erences}%
+  \providecaptionname{french}\yourmailname{Votre lettre du}%
+  \providecaptionname{french}\myrefname{Nos r\'ef\'erences}%
+  \providecaptionname{french}\customername{Num\'ero de client}%
+  \providecaptionname{french}\invoicename{Num\'ero de facture}%
+  \providecaptionname{french}\subjectname{Concernant}%
+  \providecaptionname{french}\ccname{Copie \`a}%
+  \providecaptionname{french}\enclname{Annexes}%
+  \providecaptionname{french}\headtoname{A}%
+  \providecaptionname{french}\headfromname{De}%
+  \providecaptionname{french}\datename{Date}%
+  \providecaptionname{french}\pagename{Page}%
+  \providecaptionname{french}\phonename{T\'el\'ephone}%
+  \providecaptionname{french}\faxname{T\'el\'efax}%
+  \providecaptionname{french}\emailname{E-mail}%
+  \providecaptionname{french}\wwwname{URL}%
+  \providecaptionname{french}\bankname{Compte en banque}%
+  \g@addnumerical@date{french}{\number\day.\,\number\month.\,\number\year}%
+  \providecaptionname{italian}\yourrefname{Vs./Rif.}% or Vostro Riferimento
+  \providecaptionname{italian}\yourmailname{Vs.~lettera del}% or Vostra
+                                                            % lettera del
+  \providecaptionname{italian}\myrefname{Ns./Rif.}% or Nostro Riferimento
+  \providecaptionname{italian}\customername{Nr.~cliente}% or Cliente num.
+  \providecaptionname{italian}\invoicename{Nr.~fattura}% or Fattura num.
+  \providecaptionname{italian}\subjectname{Oggetto}%
+  \providecaptionname{italian}\ccname{Per conoscenza}% or Copia a
+  \providecaptionname{italian}\enclname{Allegato}% or (plural) Allegati
+  \providecaptionname{italian}\headtoname{A}%
+  \providecaptionname{italian}\headfromname{Da}%
+  \providecaptionname{italian}\datename{Data}%
+  \providecaptionname{italian}\pagename{Pagina}%
+  \providecaptionname{italian}\phonename{Telefono}%
+  \providecaptionname{italian}\faxname{Fax}%
+  \providecaptionname{italian}\emailname{Email}%
+  \providecaptionname{italian}\wwwname{Sito Web}%
+  \providecaptionname{italian}\bankname{Conto bancario}%
+  \g@addnumerical@date{italian}{\number\day.\,\number\month.\,\number\year}%
+  \providecaptionname{spanish}\yourrefname{Su ref.}%
+  \providecaptionname{spanish}\yourmailname{Su carta de}%
+  \providecaptionname{spanish}\myrefname{Nuestra ref.}%
+  \providecaptionname{spanish}\customername{No. de cliente}%
+  \providecaptionname{spanish}\invoicename{No. de factura}%
+  \providecaptionname{spanish}\subjectname{Asunto}%
+  \providecaptionname{spanish}\ccname{Copias}%
+  \providecaptionname{spanish}\enclname{Adjunto}%
+  \providecaptionname{spanish}\headtoname{A}%
+  \providecaptionname{spanish}\headfromname{De}%
+  \providecaptionname{spanish}\datename{Fecha}%
+  \providecaptionname{spanish}\pagename{P\'agina}%
+  \providecaptionname{spanish}\phonename{Tel\'efono}%
+  \providecaptionname{spanish}\faxname{Fax}%
+  \providecaptionname{spanish}\emailname{Email}% or Correo electr\'onico
+  \providecaptionname{spanish}\wwwname{URL}% or P\`agina web
+  \providecaptionname{spanish}\bankname{Cuenta bancaria}%
+  \g@addnumerical@date{spanish}{\number\day.\,\number\month.\,\number\year}%
+  \providecaptionname{croatian}\yourrefname{Va\v{s} znak}%
+  \providecaptionname{croatian}\yourmailname{Va\v{s}e pismo od}%
+  \providecaptionname{croatian}\myrefname{Na\v{s} znak}%
+  \providecaptionname{croatian}\customername{Broj kupca}%
+  \providecaptionname{croatian}\invoicename{Broj fakture}%
+  \providecaptionname{croatian}\subjectname{Predmet}%
+  \providecaptionname{croatian}\ccname{Kopija}%
+  \providecaptionname{croatian}\enclname{Privitak}%
+  \providecaptionname{croatian}\headtoname{Prima}%
+  \providecaptionname{croatian}\headfromname{\v{S}alje}%
+  \providecaptionname{croatian}\datename{Nadnevak}%
+  \providecaptionname{croatian}\pagename{Stranica}%
+  \providecaptionname{croatian}\phonename{Telefon}% 
+  \providecaptionname{croatian}\faxname{Fax}% 
+  \providecaptionname{croatian}\emailname{E-Mail}%
+  \providecaptionname{croatian}\wwwname{URL}% 
+  \providecaptionname{croatian}\bankname{Bankovna veza}%
+  \g@addnumerical@date{croatian}{\number\day.\,\number\month.\,\number\year.}%
+  \providecaptionname{dutch}\yourrefname{Uw kenmerk}%
+  \providecaptionname{dutch}\yourmailname{Uw brief van}%
+  \providecaptionname{dutch}\myrefname{Ons kenmerk}%
+  \providecaptionname{dutch}\customername{Klant No.}%
+  \providecaptionname{dutch}\invoicename{Rekening No.}%
+  \providecaptionname{dutch}\subjectname{Onderwerp}%
+  \providecaptionname{dutch}\ccname{Kopie aan}%
+  \providecaptionname{dutch}\enclname{Bijlage(n)}%
+  \providecaptionname{dutch}\headtoname{Aan}%
+  \providecaptionname{dutch}\headfromname{Van}%
+  \providecaptionname{dutch}\datename{Datum}%
+  \providecaptionname{dutch}\pagename{Pagina}%
+  \providecaptionname{dutch}\phonename{Telefoon}%
+  \providecaptionname{dutch}\faxname{Fax}%
+  \providecaptionname{dutch}\emailname{E--mail}%
+  \providecaptionname{dutch}\wwwname{URL}%
+  \providecaptionname{dutch}\bankname{Bankrekening}%
+  \g@addnumerical@date{dutch}{\number\day.\,\number\month.\,\number\year}%
+  \providecaptionname{finnish}\yourrefname{Viitteenne}%
+  \providecaptionname{finnish}\yourmailname{Kirjeenne}%
+  \providecaptionname{finnish}\myrefname{Viitteemme}%
+  \providecaptionname{finnish}\customername{Asiakasnumero}%
+  \providecaptionname{finnish}\invoicename{Laskun numero}%
+  \providecaptionname{finnish}\subjectname{Asia}%
+  \providecaptionname{finnish}\ccname{Jakelu}%
+  \providecaptionname{finnish}\enclname{Liitteet}%
+  \providecaptionname{finnish}\headtoname{Vastaanottaja}%
+  \providecaptionname{finnish}\headfromname{L\"ahett\"aj\"a}%
+  \providecaptionname{finnish}\datename{P\"aiv\"a}%
+  \providecaptionname{finnish}\pagename{Sivu}%
+  \providecaptionname{finnish}\phonename{Puhelin}%
+  \providecaptionname{finnish}\faxname{Faksi}%
+  \providecaptionname{finnish}\emailname{S\"ahk\"oposti}%
+  \providecaptionname{finnish}\wwwname{URL}%
+  \providecaptionname{finnish}\bankname{Pankkitilin numero}%
+  \g@addnumerical@date{finnish}{\number\day.\number\month.\number\year}%
+%    \end{macrocode}
+% Zum Schluss findet noch die eigentliche Auswahl statt. Diese orientiert
+% sich nun an der Auswahl nach german.sty~2.5b und verwendet keine festen
+% Sprachzuordnungen mehr. Dafür sind nun keine Erweiterungen für andere
+% Sprachen mehr möglich.
+%   \changes{v2.2c}{1995/03/20}{Im Sprachenvergleich fehlten die "`="'
+%     hinter \cs{language}}
+%   \changes{v2.4c}{1997/11/25}{Sprachauswahl um american, british,
+%     UKenglish und spanish erweitert}
+%   \changes{v2.5}{1999/09/08}{Sprachauswahl um ngermen erweitert}
+%   \changes{v2.5b}{2000/01/20}{Reaktivierung der Sprache geschieht
+%     nun via \cs{languagename}, soweit dies möglich ist}
+%   \changes{v2.5e}{2000/07/14}{Workaround für Sprache nohyphenation
+%     durch Format mit Babel-Erweiterung aber kein Babel package
+%     geladen}
+%    \begin{macrocode}
+  \captionsenglish
+  \dateenglish
+%    \end{macrocode}
+%   \changes{v2.9i}{2002/09/04}{Workaround für den
+%     \texttt{hyphen.cfg}-Bug von Babel}
+% Wird die \texttt{hyphen.cfg} von Babel verwendet, wird aber das
+% \textsl{babel}-Paket nicht geladen, so ist \cs{languagename} häufig
+% nicht korrekt, so dass dann \cs{selectlanguage} mit
+% \cs{languagename} als Argument schief geht. Daher hier ein
+% Workaround für das Problem.
+%    \begin{macrocode}
+  \begingroup\expandafter\expandafter\expandafter\endgroup
+  \expandafter\ifx\csname date\languagename\endcsname\relax
+    \ClassWarningNoLine{%
+      scrlttr2%
+    }{%
+      \string\language\space is \the\language, \string\languagename\space is
+      `\languagename'\MessageBreak
+      but \expandafter\string\csname
+      date\languagename\endcsname\space not defined!\MessageBreak
+      This seems to be a bug at you're `hyphen.cfg'.\MessageBreak
+      I'l undefine \string\languagename\space to avoid errors%
+    }%
+    \let\languagename=\undefined
+  \fi
+  \ifx\languagename\undefined
+    \ClassWarningNoLine{scrlttr2}{\string\languagename\space not
+      defined, using \string\language.\MessageBreak
+      This may result in use of wrong language!\MessageBreak
+      You should use a compatible language
+      package\MessageBreak
+      (e.g. `Babel', `german', `ngerman', ...)}%
+    \ifx\l@american\undefined\else\ifnum\language=\l@american
+        \captionsamerican
+        \dateamerican
+    \fi\fi
+    \ifx\l@british\undefined\else\ifnum\language=\l@british
+        \captionsbritish
+        \datebritish
+    \fi\fi
+    \ifx\l@UKenglish\undefined\else\ifnum\language=\l@UKenglish
+        \captionsUKenglish
+        \dateUKenglish
+    \fi\fi
+    \ifx\l@USenglish\undefined\else\ifnum\language=\l@USenglish
+        \captionsUSenglish
+        \dateUSenglish
+    \fi\fi
+    \ifx\l@austrian\undefined\else\ifnum\language=\l@austrian
+        \captionsaustrian
+        \dateaustrian
+    \fi\fi
+    \ifx\l@german\undefined\else\ifnum\language=\l@german
+        \captionsgerman
+        \dategerman
+    \fi\fi
+    \ifx\l@ngerman\undefined\else\ifnum\language=\l@ngerman
+        \captionsngerman
+        \datengerman
+    \fi\fi
+    \ifx\l@french\undefined\else\ifnum\language=\l@french
+        \captionsfrench
+        \datefrench
+    \fi\fi
+    \ifx\l@italian\undefined\else\ifnum\language=\l@italian
+        \captionsitalian
+        \dateitalian
+    \fi\fi
+    \ifx\l@spanish\undefined\else\ifnum\language=\l@spanish
+        \captionsspanish
+        \datespanish
+    \fi\fi
+    \ifx\l@croatian\undefined\else\ifnum\language=\l@croatian
+        \captionscroatian
+        \datecroatian
+    \fi\fi
+    \ifx\l@dutch\undefined\else\ifnum\language=\l@dutch
+        \captionsdutch
+        \datedutch
+    \fi\fi
+  \else
+    \edef\@tempa{nohyphenation}%
+    \ifx\languagename\@tempa
+      \ClassWarningNoLine{%
+        scrlttr2%
+      }{%
+        You've selected language `\languagename'.\MessageBreak
+        Maybe your LaTeX format contains Babel extension\MessageBreak
+        but you have not selected a language using\MessageBreak
+        Babel package.\MessageBreak
+        Please select another language!\MessageBreak
+        Only as a workaround english captions and date\MessageBreak
+        will be used%
+      }%
+    \else
+      \expandafter\selectlanguage\expandafter{\languagename}%
+      \ClassInfo{%
+        scrlttr2%
+      }{%
+        used language is `\languagename'.\MessageBreak
+        Supported languages are `english', `UKenglish',\MessageBreak
+        `british', `american', `USenglish',\MessageBreak
+        `german', `ngerman', `austrian',\MessageBreak
+        `dutch', `italian', `spanish',\MessageBreak
+        `croatian', 'finnish'%
+      }%
+    \fi
+  \fi
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%
+% \iffalse
+%</letter>
+% \fi
 %
 %
 % \iffalse
