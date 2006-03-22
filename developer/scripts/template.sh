@@ -138,9 +138,9 @@ EOF
 \documentclass{scrdoc}
 EOF
     if $english; then
-        echo '\usepackage[german,english]{babel}'
+        echo '\usepackage[ngerman,english]{babel}'
     else
-        echo '\usepackage[english,german]{babel}'
+        echo '\usepackage[english,ngerman]{babel}'
         echo '\usepackage[latin1]{inputenc}'
     fi
     cat <<EOF
@@ -176,7 +176,7 @@ EOF
     if $english; then
         echo '% \selectlanguage{english}'
     else
-        echo '% \selectlanguage{german}'
+        echo '% \selectlanguage{ngerman}'
     fi
     echo '%'
     echo '% \changes{v'$fileversion'}{'`date +\%Y/\%m/\%d`'}{%'
