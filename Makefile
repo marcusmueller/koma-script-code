@@ -95,19 +95,25 @@ CLS_MAIN	= scrbook.cls \
 CLS_MAIN_DTX    = scrbeta.dtx \
 		  scrkbase.dtx \
 		  scrkbib.dtx \
+		  scrkcile.dtx \
+		  scrkcomp.dtx \
 		  scrkfloa.dtx \
 		  scrkfont.dtx \
 		  scrkftn.dtx \
 		  scrkidx.dtx \
 		  scrklang.dtx \
+		  scrklco.dtx \
 		  scrkliof.dtx \
 		  scrklist.dtx \
 		  scrkmisc.dtx \
+		  scrknpap.dtx \
 		  scrkpage.dtx \
 		  scrkpar.dtx \
+		  scrkplen.dtx \
 		  scrksect.dtx \
 		  scrktare.dtx \
 		  scrktitl.dtx \
+		  scrkvars.dtx \
 		  scrkvers.dtx \
 		  scrlfile.dtx \
 		  scrlogo.dtx
