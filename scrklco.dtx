@@ -1,0 +1,510 @@
+% \CheckSum{496}
+% \iffalse meta-comment
+% ======================================================================
+% scrklco.dtx
+% Copyright (c) Markus Kohm, 2006
+%
+% This file is part of the LaTeX2e KOMA-Script bundle.
+%
+% This work may be distributed and/or modified under the conditions of
+% the LaTeX Project Public License, version 1.3b of the license.
+% The latest version of this license is in
+%   http://www.latex-project.org/lppl.txt
+% and version 1.3b or later is part of all distributions of LaTeX
+% version 2005/12/01 and of this work.
+%
+% This work has the LPPL maintenance status "author-maintained".
+%
+% The Current Maintainer and author of this work is Markus Kohm.
+%
+% This work consists of all files listed in manifest.txt.
+% ----------------------------------------------------------------------
+% scrklco.dtx
+% Copyright (c) Markus Kohm, 2006
+%
+% Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
+% Version 1.3b.
+% Die neuste Version dieser Lizenz ist
+%   http://www.latex-project.org/lppl.txt
+% und Version 1.3b ist Teil aller Verteilungen von LaTeX
+% Version 2005/12/01 und dieses Werks.
+%
+% Dieses Werk hat den LPPL-Verwaltungs-Status "author-maintained"
+% (allein durch den Autor verwaltet).
+%
+% Der Aktuelle Verwalter und Autor dieses Werkes ist Markus Kohm.
+%
+% Dieses Werk besteht aus den in manifest.txt aufgefuehrten Dateien.
+% ======================================================================
+% \fi
+% \iffalse
+%%% From File: scrklco.dtx
+%<*driver>
+% \fi
+\ProvidesFile{scrklco.dtx}[2006/03/22 v3.0 KOMA-Script (letter class options)]
+% \iffalse
+\documentclass{scrdoc}
+\usepackage[english,ngerman]{babel}
+\usepackage[latin1]{inputenc}
+\CodelineIndex
+\RecordChanges
+\GetFileInfo{scrklco.dtx}
+\title{\KOMAScript{} \partname\ \texttt{\filename}%
+  \footnote{Dies ist Version \fileversion\ von Datei \texttt{\filename}.}}
+\date{\filedate}
+\author{Markus Kohm}
+
+\begin{document}
+  \maketitle
+  \tableofcontents
+  \DocInput{\filename}
+\end{document}
+%</driver>
+% \fi
+%
+% \selectlanguage{ngerman}
+%
+% \changes{v3.0}{2006/03/22}{%
+%   erste Version aus der Aufteilung von \textsf{scrclass.dtx}}
+%
+% \section{Optionendateien für Briefe}
+%
+% Bei der Briefklasse tritt eine Besonderheit ein. Hier ist es
+% möglich, spezielle \texttt{lco}-Dateien zu definieren, die über
+% Optionen geladen werden können. Die unterschiedlichen Brieftypen
+% sind ein Fall für solche \emph{\textbf{l}etter \textbf{c}lass
+% \textbf{o}ption} Dateien.
+%
+% \StopEventually{\PrintIndex\PrintChanges}
+%
+% \iffalse
+%<*letter>
+% \fi
+%
+% \iffalse
+%<*option>
+% \fi
+%
+% \subsection{Optionen für Letter-Class-Options}
+%
+% \begin{macro}{\lco@test}
+%   \changes{v3.0}{2006/03/22}{Neu}
+% Letter-Class-Optionen können auch für jede per |\documentclass| angegebene
+% keyval-Option oder sonstige scan-Option (das sind Optionen, die nicht per
+% |\DeclareOption| definiert wurden) geladen werden. Dabei wird die
+% Abarbeitung der Option nicht unterbrochen. Dazu wird dieses Makro in den
+% scan-Vorgang eingebaut
+%    \begin{macrocode}
+\newcommand*{\lco@test}{%
+  \IfFileExists{\CurrentOption.lco}{%
+    \let\scr@pti@nerr@r\@gobble
+    \expandafter\AtEndOfClass\expandafter{\expandafter\LoadLetterOption
+      \expandafter{\CurrentOption}}%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \iffalse
+%</option>
+%<*body>
+% \fi
+%
+% \subsection{Makros für Letter-Class-Options}
+%
+% \begin{macro}{\LoadLetterOption}
+%   \changes{v2.8q}{2001/10/08}{Neu}
+% Bei der neuen Briefklasse existiert eine Anweisung, mit der eine
+% \emph{\textbf{l}etter-\texttt{c}lass-\texttt{o}ption}-Datei geladen
+% werden kann. Das Laden wird mit entsprechender Information in der
+% \texttt{log}-Datei vermerkt. Damit in der Datei interne Makros
+% verwendet werden können, muss der catcode von "`@"' entsprechend
+% gesetzt sein. Damit der Befehl sowohl in der Präambel als auch in
+% weiteren Optionen-Dateien oder in der Klasse selbst verwendet werden
+% kann, muss der catcode am Ende wieder restauriert werden. Dabei muss
+% etwas trickreich gearbeitet werden, damit tatsächlich eine
+% Schachtelung möglich ist. So erfolgt die Umschaltung des catcodes
+% immer nur beim ersten Aufruf innerhalb einer Schachtel.
+%    \begin{macrocode}
+\newcommand*{\LoadLetterOption}[1]{%
+  \@ifundefined{@restore@catcode@level}%
+    {\let\@restore@catcode@level=\z@}{}%
+  \ifnum\@restore@catcode@level =\z@
+    \ifnum\catcode`\@=11
+      \let\@restore@catcode\relax
+    \else
+      \@tempcnta=\catcode`\@
+      \edef\@restore@catcode{%
+        \noexpand\catcode`\noexpand\@=\the\@tempcnta}%
+      \makeatletter
+    \fi
+  \fi
+  \@tempcnta=\@restore@catcode@level\relax
+  \advance\@tempcnta by \@ne\relax
+  \edef\@restore@catcode@level{\the\@tempcnta}%
+  \InputIfFileExists{#1.lco}{%
+    \ClassInfo{%
+      scrlttr2%
+      }{Letter-Class-Option `#1' loaded}%
+    }{%
+    \ClassError{%
+      scrlttr2%
+      }{%
+      Letter-Class-Option file `#1.lco' not found%
+      }{%
+      You've told me to load the Letter-Class-Option `#1'. So I have
+      to load\MessageBreak
+      the file `#1.lco'. But the file isn't available.}%
+    }%
+  \@tempcnta=\@restore@catcode@level\relax
+  \advance\@tempcnta by \m@ne\relax
+  \edef\@restore@catcode@level{\the\@tempcnta}%
+  \ifnum\@tempcnta =\z@
+    \@restore@catcode
+  \fi
+  }
+%    \end{macrocode} 
+% \end{macro}
+%
+% \begin{macro}{\LetterOptionNeedsPapersize}
+%   \changes{v2.8q}{2001/10/17}{Neu}
+% Es besteht die Möglichkeit, in \texttt{lco}-Dateien eine bestimmte
+% Papiergröße zu fordern. Dazu wird der Name der \texttt{lco}-Datei
+% und die geforderte Papiergröse als Parameter übergeben. Stimmt die
+% Papiergröße nicht überein, so wird bei \cs{opening} eine Warnung
+% ausgegeben.
+% \begin{macro}{\@PapersizeWarning}
+%   \changes{v2.8q}{2002/03/25}{Neu (intern)}
+% \begin{macro}{\@@PapersizeWarning}
+%   \changes{v2.8q}{2002/03/25}{Neu (intern)}
+% \begin{macro}{\LOPNP@size}
+%   \changes{v2.8q}{2002/03/25}{Neu (intern)}
+% \begin{macro}{\LOPNP@option}
+%   \changes{v2.8q}{2002/03/25}{Neu (intern)}
+% Zur einfacheren Realisierung wird mit vier internen Hilfsmakros
+% gearbeitet.
+%    \begin{macrocode}
+\newcommand*{\LOPNP@option}{}
+\newcommand*{\LOPNP@size}{}
+\newcommand*{\@PapersizeWarning}{%
+  \begingroup%
+    \edef\@tempc{\noexpand\@tempswatrue
+      \noexpand\ifdim\paperwidth=\the\paperwidth\noexpand\else
+      \noexpand\@tempswafalse\noexpand\fi
+      \noexpand\ifdim\paperheight=\the\paperheight\noexpand\else
+      \noexpand\@tempswafalse\noexpand\fi
+      \noexpand\@@PapersizeWarning
+      }  
+    \def\@tempb{letter}\ifx\LOPNP@size\@tempb%
+      \setlength{\paperheight}{11in}\setlength{\paperwidth}{8.5in}%
+    \else\def\@tempb{legal}\ifx\LOPNP@size\@tempb%
+      \setlength{\paperheight}{14in}\setlength{\paperwidth}{8.5in}%
+    \else\def\@tempb{executive}\ifx\LOPNP@size\@tempb%
+      \setlength{\paperheight}{10.5in}\setlength{\paperwidth}{7.25in}%
+    \else%
+      \def\ta@opt@err{%
+        \ClassError{%
+          scrlttr2%
+          }{papersize `\LOPNP@size' undefined}{%
+          You've told me to check for paper size
+          `\LOPNP@size'\MessageBreak
+          at letter option file `\LOPNP@option.lco',\MessageBreak
+          but this paper size is not supported.\MessageBreak
+          See the KOMA-Script manual for informations about known
+          paper sizes.}%
+        }%
+      \let\@headlines\ta@opt@err%
+      \expandafter\x@@paper\LOPNP@size paperpaper\x@@paper%
+    \fi\fi\fi
+    \@tempc
+  \endgroup%
+}
+\newcommand*{\@@PapersizeWarning}{%
+  \if@tempswa\else%
+  \ClassWarningNoLine{%
+    scrlttr2%
+    }{%
+    Letter option file `\LOPNP@option.lco'\MessageBreak
+    needs paper size `\LOPNP@size'.\MessageBreak
+    Current paper size is not `\LOPNP@size'!\MessageBreak
+    You should add `paper=\LOPNP@size' at the\MessageBreak
+    option list of \string\documentclass!\MessageBreak
+    Maybe you know what you are doing,\MessageBreak
+    so I do not change this myself}%
+  \fi
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%    \begin{macrocode}
+\newcommand*{\LetterOptionNeedsPapersize}[2]{%
+  \edef\LOPNP@size{#2}\edef\LOPNP@option{#1}%
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% Als Voreinstellung wird am Ende schon einmal die Datei \texttt{DIN.lco}
+% geladen.
+%    \begin{macrocode}
+\AtEndOfClass{\LoadLetterOption{DIN}}
+%    \end{macrocode}
+%
+% \iffalse
+%</body>
+% \fi
+%
+% \subsection{Die Letter-Class-Optionen}
+%
+% Die Letter-Class-Optionen selbst werden wie bereits erwähnt über Dateien
+% realisiert. In den vorgefertigen Dateien für unterschiedliche Arten von
+% Briefen werden in erster Linie Pseudo-Längen passend gesetzt. In einigen
+% Fällen werden aber auch zusätzlich Befehle umdefiniert.
+%
+% \iffalse
+%<*lco>
+% \fi
+%
+% Die Maße für einige Optionen wurden nicht von mir selbst recherchiert:
+% \begin{center}
+%   \begin{tabular}{ll}
+%   \texttt{lco}-Datei & Recherchiert von \\\hline\\[-1.6ex]
+%   DIN                & mir \\
+%   DINmtext           & mir \\
+%   KOMAold            & mir \\
+%   SNleft             & Roger Luethi \\
+%   SN                 & Roger Luethi \\
+%   \end{tabular}{ll}
+% \end{center}
+%
+% Zunächst wird geprüft, ob überhaupt die richtige Klasse geladen ist.
+%    \begin{macrocode}
+\@ifundefined{scr@fromname@var}{%
+  \GenericWarning{(%
+%<DIN>  DIN%
+%<DINmoretext> DINmtext%
+%<SN>  SN%
+%<SNold>  SNold%
+%<SwissLeft>  SNleft%
+%<KOMAold>  KOMAold%
+  .lco)\@spaces\@spaces\@spaces\@spaces\@spaces\@spaces}{%
+  Letter-class-option
+%<DIN>  DIN
+%<DINmoretext> DINmtext
+%<SN>  SN
+%<SNold>  SNold
+%<SwissLeft>  SNleft
+%<KOMAold>  KOMAold
+  Warning:\space
+  This letter class option file was made only\MessageBreak
+  to be used with KOMA-Script letter class\MessageBreak
+  `scrlttr2'. Use with other classes may result\MessageBreak
+  in a lot of errors\@gobble
+  }%
+}{}
+%    \end{macrocode}
+%
+% Dann wird geprüft, ob das richtige Papierformat vorhanden ist.
+%    \begin{macrocode}
+%<*DIN|DINmoretext|SN|SNold|SwissLeft|KOMAold>
+\LetterOptionNeedsPapersize{%
+%<DIN>  DIN%
+%<DINmoretext>  DINmtext%
+%<SN>  SN%
+%<SNold>  SNold%
+%<SwissLeft>  SNleft%
+%<KOMAold>  KOMAold%
+  }%
+  {a4}
+%</DIN|DINmoretext|SN|SNold|SwissLeft|KOMAold>
+%    \end{macrocode}
+%
+% Dann werden die Werte gesetzt.
+% \changes{v2.9u}{2005/03/05}{Der Fuß hat optional eine feste Position 16\,mm
+%   über der unteren Papierkante.}
+%    \begin{macrocode}
+\@setplength{foldmarkhpos}{3.5mm}
+%<DIN|SwissLeft|SN>\@setplength{tfoldmarkvpos}{105mm}
+%<DINmoretext>\@setplength{tfoldmarkvpos}{87mm}
+%<KOMAold>\@setplength{tfoldmarkvpos}{103.5mm}
+%<DIN|SwissLeft|SN>\@setplength{bfoldmarkvpos}{210mm}
+%<DINmoretext>\@setplength{bfoldmarkvpos}{192mm}
+%<KOMAold>\@setplength{bfoldmarkvpos}{202.5mm}
+%<DIN|SN>\@setplength{toaddrvpos}{45mm}
+%<DINmoretext>\@setplength{toaddrvpos}{27mm}
+%<SwissLeft>\@setplength{toaddrvpos}{35.5mm}
+%<KOMAold>\@setplength{toaddrvpos}{49mm}
+%<DIN|SN>\@setplength{refvpos}{98.5mm}
+%<DINmoretext>\@setplength{refvpos}{80.5mm}
+%<SwissLeft>\@setplength{refvpos}{89mm}
+%<KOMAold>\@setplength{refvpos}{89.5mm}
+%<!KOMAold>\@setplength{refaftervskip}{\baselineskip}
+%<KOMAold>\@setplength[2]{refaftervskip}{\baselineskip}
+%<DIN|DINmoretext|SwissLeft>\@setplength{toaddrhpos}{20mm}
+%<SN>\@setplength{toaddrhpos}{-8mm}
+%<KOMAold>\@setplength{toaddrhpos}{1in}
+%<KOMAold>\@addtoplength{toaddrhpos}{\oddsidemargin}
+%<DIN|DINmoretext>\@setplength{toaddrwidth}{85mm}
+%<SN>\@setplength{toaddrwidth}{90mm}
+%<SwissLeft>\@setplength{toaddrwidth}{100mm}
+%<KOMAold>\@setplength{toaddrwidth}{70mm}
+%<DIN|DINmoretext|SN|SwissLeft|KOMAold>\@setplength{toaddrheight}{40mm}
+\@setplength{toaddrindent}{\z@}
+\@setplength{specialmailindent}{\fill}
+\@setplength{specialmailrightindent}{1em}
+\@setplength{locwidth}{\z@}
+%<DIN|DINmoretext|SN|SwissLeft|KOMAold>\@setplength{backaddrheight}{5mm}
+%<DIN|DINmoretext|SN|SwissLeft>\@setplength{firstheadvpos}{8mm}
+%<KOMAold>\@setplength{firstheadvpos}{6mm}
+%<KOMAold>\@setplength{firstheadwidth}{\textwidth}
+%<*!KOMAold>
+\@setplength{firstheadwidth}{\paperwidth}
+\ifdim \useplength{toaddrhpos}>\z@
+  \@addtoplength[-2]{firstheadwidth}{\useplength{toaddrhpos}}
+\else
+  \@addtoplength[2]{firstheadwidth}{\useplength{toaddrhpos}}
+\fi
+%</!KOMAold>
+\@setplength{firstfootwidth}{\useplength{firstheadwidth}}
+%<KOMAold>\@setplength{firstfootvpos}{\paperheight}
+%<KOMAold>\@addtoplength{firstfootvpos}{-2cm}
+%<!KOMAold>\ifnum \scr@compatibility >\@nameuse{scr@v@2.9t}\relax
+%<!KOMAold>  \@setplength{firstfootvpos}{\paperheight}
+%<!KOMAold>  \@addtoplength{firstfootvpos}{-16mm}
+%<!KOMAold>\else
+%<!KOMAold>  \@setplength{firstfootvpos}{1in}
+%<!KOMAold>  \@addtoplength{firstfootvpos}{\topmargin}
+%<!KOMAold>  \@addtoplength{firstfootvpos}{\headheight}
+%<!KOMAold>  \@addtoplength{firstfootvpos}{\headsep}
+%<!KOMAold>  \@addtoplength{firstfootvpos}{\textheight}
+%<!KOMAold>  \@addtoplength{firstfootvpos}{\footskip}
+%<!KOMAold>\fi
+%    \end{macrocode}
+% Bei der Breite der Geschäftszeile brauchen wir wieder eine Sonderlösung,
+% damit die Option "`wide"' auch später noch gesetzt werden kann. Also
+% verwenden wir hier den Wert 0 als mit der Bedeutung "`ist bei \cs{opening}
+% zu berechnen.
+%    \begin{macrocode}
+\@setplength{refwidth}{0pt}
+\@setplength{sigindent}{0mm}
+\@setplength{sigbeforevskip}{2\baselineskip}
+%<!KOMAold>\let\raggedsignature=\centering
+%<KOMAold>\let\raggedsignature=\raggedright
+%<*DINmoretext>
+\renewcommand*{\@firsthead}{\noindent
+  \parbox[b]{\useplength{firstheadwidth}}{\centering%
+    \usekomafont{fromaddress}{%
+      \ifkomavarempty{fromname}{}{%
+        \usekomafont{fromname}%
+        {\ignorespaces\usekomavar{fromname}\\[-8pt]
+          \rule{\useplength{firstheadwidth}}{.4pt}\\
+          }%
+        }%
+      \ifkomavarempty{fromaddress}{}{%
+        \def\\{,\ \@ogobble}%
+        \ignorespaces\usekomavar{fromaddress}%
+        }%
+      }%
+    }%
+  }
+%</DINmoretext>
+%    \end{macrocode}
+%
+% Außerdem gibt es noch die Kompatibilitätseinstellungen, die ebenfalls von
+% \texttt{KOMAold} aktiviert werden.
+%    \begin{macrocode}
+%<*KOMAold>
+\def\yourref{\setkomavar{yourref}}
+\def\yourmail{\setkomavar{yourmail}}
+\def\myref{\setkomavar{myref}}
+\def\customer{\setkomavar{customer}}
+\def\invoice{\setkomavar{invoice}}
+\@ifundefined{scr@refitemi@var}{\newkomavar{refitemi}}{}
+\def\refitemi{\setkomavar{refitemi}}
+\def\refitemnamei{\setkomavar*{refitemi}}
+\@ifundefined{scr@refitemii@var}{\newkomavar{refitemii}}{}
+\def\refitemii{\setkomavar{refitemii}}
+\def\refitemnameii{\setkomavar*{refitemii}}
+\@ifundefined{scr@refitemiii@var}{\newkomavar{refitemiii}}{}
+\def\refitemiii{\setkomavar{refitemiii}}
+\def\refitemnameiii{\setkomavar*{refitemiii}}
+\l@addto@macro{\defaultreffields}{%
+  \addtoreffields{refitemi}%
+  \addtoreffields{refitemii}%
+  \addtoreffields{refitemiii}%
+  }
+\addtoreffields{refitemi}%
+\addtoreffields{refitemii}%
+\addtoreffields{refitemiii}%
+\def\toname{\usekomavar{toname}}
+\def\toaddress{\usekomavar{toaddress}}
+\@ifundefined{scr@branch@var}{\newkomavar{branch}}{}
+\def\branch{\setkomavar{branch}}
+\def\frombranch{\usekomavar{branch}}
+\def\signature{\setkomavar{signature}}
+\def\fromsig{\usekomavar{signature}}
+\def\name{\setkomavar{fromname}}
+\def\fromname{\usekomavar{fromname}}
+\def\address{\setkomavar{fromaddress}}
+\def\fromaddress{\usekomavar{fromaddress}}
+\def\location{\setkomavar{location}}
+\def\fromlocation{\usekomavar{location}}
+\def\backaddress{\setkomavar{backaddress}}
+\def\@tempa{%
+  \ifkomavarempty{fromname}{}{%
+    \strut\ignorespaces\usekomavar{fromname}%
+    \ifkomavarempty{fromaddress}{}{\\}}%
+  \ifkomavarempty{fromaddress}{}{%
+    \strut\ignorespaces\usekomavar{fromaddress}}%
+  }
+\ifx\@tempa\scr@backaddress@var%
+  \setkomavar{backaddress}{}
+\fi
+\def\frombackaddress{\usekomavar{backaddress}}
+\def\telephone{\setkomavar{fromphone}}
+\def\telephonenum{\usekomavar{fromphone}}
+\def\specialmail{\setkomavar{specialmail}}
+\def\@specialmail{\usekomavar{specialmail}}
+\def\title{\setkomavar{title}}
+\def\@title{\usekomavar{title}}
+\def\subject{\setkomavar{subject}}
+\def\@subject{\usekomavar{subject}}
+\def\place{\setkomavar{place}}
+\def\fromplace{\usekomavar{place}}
+\let\ccnameseparator=\scr@ccseparator@var
+\setkomavar{ccseparator}{\ccnameseparator}
+\let\enclnameseparator=\scr@enclseparator@var
+\setkomavar{enclseparator}{\enclnameseparator}
+\setkomafont{fromname}{\scshape}
+\def\foldmarkson{\@ObsoleteCommand{\foldmarkson}{foldmarks=on}}
+\def\foldmarksoff{\@ObsoleteCommand{\foldmarksoff}{foldmarks=off}}
+\def\addrfieldon{\@ObsoleteCommand{\addrfieldon}{addrfield=on}}
+\def\addrfieldoff{\@ObsoleteCommand{\addrfieldoff}{addrfield=off}}
+\def\subjecton{\@ObsoleteCommand{\subjecton}{subject=titled}}
+\def\subjectoff{\@ObsoleteCommand{\subjectoff}{subject=untitled}}
+\def\subjectafteron{%
+  \@ObsoleteCommand{\subjectafteron}{subject=afteropening}}
+\def\subjectafteroff{%
+  \@ObsoleteCommand{\subjectafteroff}{subject=beforeopening}}
+%</KOMAold>
+%    \end{macrocode}
+%
+% \iffalse
+%</lco>
+% \fi
+%
+% \iffalse
+%</letter>
+% \fi
+%
+% \Finale
+%
+\endinput
+%
+% end of file `scrklco.dtx'
+%%% Local Variables:
+%%% mode: doctex
+%%% TeX-master: t
+%%% End:
