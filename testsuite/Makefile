@@ -96,20 +96,21 @@ testinit: testlist
 
 testlist: Makefile.phony Makefile.dep
 
-Makefile.phony: $(testdirs)/*
+Makefile.phony:
 	$(SECHO) '# DO NOT CHANGE THIS FILE.' > Makefile.phony
 	$(SECHO) '# You may use:' >> Makefile.phony
 	$(SECHO) '#   make testlist' >> Makefile.phony
 	$(SECHO) '# to recreate this file.' >> Makefile.phony
 	$(SECHO) >> Makefile.phony
-	$(SECHO) ".PHONY: all testtest testinit allinits alltests clean_local maintainclean_local clean allclean\\" >> Makefile.phony
+	$(SECHO) ".PHONY: all testtest testinit allinits alltests clean_local maintainclean_local \\" >> Makefile.phony
+	$(SECHO) "        clean allclean \\" >> Makefile.phony
 ifneq ($(testdirs),)
 	$(SECHO) "        $(testdirs) \\" >> Makefile.phony
 	$(SECHO) "        $(testdirsinit)" >> Makefile.phony
 endif
 	$(SECHO) >> Makefile.phony
 
-Makefile.dep: $(testdirs)/*
+Makefile.dep:
 	$(SECHO) '# DO NOT CHANGE THIS FILE.' > Makefile.dep
 	$(SECHO) '# You may use:' >> Makefile.dep
 	$(SECHO) '#   make testlist' >> Makefile.dep
