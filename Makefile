@@ -88,9 +88,16 @@ INS_TEMPLATES	= scrstrip.inc \
 CLS_MAIN	= scrbook.cls \
 		  scrreprt.cls \
 		  scrartcl.cls \
+		  scrlttr2.cls \
 		  typearea.sty \
 		  scrlfile.sty \
-		  scrkbase.sty
+		  scrkbase.sty \
+		  scraddr.sty \
+	          DIN.lco \
+		  DINmtext.lco \
+		  SN.lco \
+	 	  SNleft.lco \
+		  KOMAold.lco
 
 CLS_MAIN_DTX    = scrbeta.dtx \
 		  scrkbase.dtx \
@@ -116,13 +123,14 @@ CLS_MAIN_DTX    = scrbeta.dtx \
 		  scrkvars.dtx \
 		  scrkvers.dtx \
 		  scrlfile.dtx \
+		  scraddr.dtx \
 		  scrlogo.dtx
 
 CLS_MAIN_DVI	= scrsource.dvi
 
 CLS_MAIN_INS	= scrmain.ins
 
-CLS_MAIN_SUBINS	= scrlfile.ins
+CLS_MAIN_SUBINS	= scrlfile.ins scraddr.ins
 
 CLS_MAIN_SRC	= $(CLS_MAIN_DTX) $(CLS_MAIN_INS) $(CLS_MAIN_SUBINS) \
 		  scrsource.tex
