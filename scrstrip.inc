@@ -76,9 +76,11 @@
 
 % ---------- some docstrip switchs -------------------------------------
 
-\keepsilent
-\askforoverwritetrue
-\ifx\askonceonly\undefined\else\askonceonly\fi
+\ifToplevel{%
+  \keepsilent
+  \askforoverwritetrue
+  \ifx\askonceonly\undefined\else\askonceonly\fi
+}
 
 % ---------- defining preambles ----------------------------------------
 
