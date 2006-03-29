@@ -93,6 +93,8 @@ CLS_MAIN	= scrbook.cls \
 		  scrlfile.sty \
 		  scrkbase.sty \
 		  scraddr.sty \
+		  scrpage.sty \
+		  scrpage2.sty \
 	          DIN.lco \
 		  DINmtext.lco \
 		  SN.lco \
@@ -124,6 +126,7 @@ CLS_MAIN_DTX    = scrbeta.dtx \
 		  scrkvers.dtx \
 		  scrlfile.dtx \
 		  scraddr.dtx \
+		  scrpage.dtx \
 		  scrlogo.dtx
 
 CLS_MAIN_DVI	= scrsource.dvi
