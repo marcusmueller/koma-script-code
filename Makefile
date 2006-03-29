@@ -89,6 +89,7 @@ CLS_MAIN	= scrbook.cls \
 		  scrreprt.cls \
 		  scrartcl.cls \
 		  scrlttr2.cls \
+	          scrlettr.cls \
 		  typearea.sty \
 		  scrlfile.sty \
 		  scrkbase.sty \
@@ -127,13 +128,14 @@ CLS_MAIN_DTX    = scrbeta.dtx \
 		  scrlfile.dtx \
 		  scraddr.dtx \
 		  scrpage.dtx \
+		  scrlettr.dtx \
 		  scrlogo.dtx
 
 CLS_MAIN_DVI	= scrsource.dvi
 
 CLS_MAIN_INS	= scrmain.ins
 
-CLS_MAIN_SUBINS	= scrlfile.ins scraddr.ins
+CLS_MAIN_SUBINS	= scrlfile.ins scraddr.ins scrlettr.ins
 
 CLS_MAIN_SRC	= $(CLS_MAIN_DTX) $(CLS_MAIN_INS) $(CLS_MAIN_SUBINS) \
 		  scrsource.tex
