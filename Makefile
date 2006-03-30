@@ -187,7 +187,7 @@ bindist: dist
 	$(CD) $(notdir $(DISTDIR)) && \
 	  $(MAKE) INSTALLTEXMF=$(PWD)/$(notdir $(DISTDIR))-bin install
 	$(RMDIR) $(notdir $(DISTDIR))
-	$(SRM) $(notdir $(DISTDIR))/ls-R
+	$(SRM) $(notdir $(DISTDIR))-bin/ls-R
 	$(INSTALL) README $(notdir $(DISTDIR))-bin
 	$(SRM) $(notdir $(DISTDIR))-bin.zip
 	$(CD) $(notdir $(DISTDIR))-bin && \
