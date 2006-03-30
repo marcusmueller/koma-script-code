@@ -192,6 +192,8 @@ bindist: dist
 	$(SRM) $(notdir $(DISTDIR))-bin.zip
 	$(CD) $(notdir $(DISTDIR))-bin && \
 	  $(ZIP) ../$(notdir $(DISTDIR))-bin.zip *
+	$(SRM) $(notdir $(DISTDIR)).tar.gz
+	$(RMDIR) $(notdir $(DISTDIR))-bin
 
 # ----------------------------------------------------------------------
 # local rules
