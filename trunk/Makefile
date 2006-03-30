@@ -131,11 +131,16 @@ CLS_MAIN_DTX    = scrbeta.dtx \
 		  scrlettr.dtx \
 		  scrlogo.dtx
 
+STATIC_DOC      = README \
+	          lppl.txt \
+	          lppl-de.txt \
+		  manifest.txt
+
 CLS_MAIN_DVI	= scrsource.dvi
 
 CLS_MAIN_INS	= scrmain.ins
 
-CLS_MAIN_SUBINS	= scrlfile.ins scraddr.ins scrlettr.ins
+CLS_MAIN_SUBINS	= scrlfile.ins scraddr.ins scrlettr.ins scrpage.ins
 
 CLS_MAIN_SRC	= $(CLS_MAIN_DTX) $(CLS_MAIN_INS) $(CLS_MAIN_SUBINS) \
 		  scrsource.tex
@@ -165,7 +170,7 @@ MISC_SRC	= $(INS_TEMPLATES) $(MAKE_FILES) \
 
 DIST_SRC	= $(MISC_SRC) $(CLS_SRC)
 
-DIST_FILES	= $(DIST_SRC)
+DIST_FILES	= $(DIST_SRC) $(STATIC_DOC)
 
 MAINTAIN_SRC    = $(DIST_SRC) missing.dtx .cvsignore
 
@@ -173,26 +178,48 @@ MAINTAIN_FILES  = $(MAINTAIN_SRC)
 # ----------------------------------------------------------------------
 
 # ----------------------------------------------------------------------
+# additional ruls
+bindist: dist
+	$(UNTARGZ) $(DISTDIR).tar.gz
+	$(CD) $(notdir $(DISTDIR)) && \
+	  $(MAKE)
+	$(MKDIR) $(notdir $(DISTDIR))-bin
+	$(CD) $(notdir $(DISTDIR)) && \
+	  $(MAKE) INSTALLTEXMF=$(PWD)/$(notdir $(DISTDIR))-bin install
+	$(RMDIR) $(notdir $(DISTDIR))
+	$(SRM) $(notdir $(DISTDIR))/ls-R
+	$(INSTALL) README $(notdir $(DISTDIR))-bin
+	$(SRM) $(notdir $(DISTDIR))-bin.zip
+	$(CD) $(notdir $(DISTDIR))-bin && \
+	  $(ZIP) ../$(notdir $(DISTDIR))-bin.zip *
+
+# ----------------------------------------------------------------------
 # local rules
 default_local: test_baseinit $(CLS_FILES)
 
-install_local: test_baseinit $(DIST_SRC) $(CLS_FILES)
-	@if ! $(MKDIR) $(INSTALLSRCDIR) || ! $(MKDIR) $(INSTALLCLSDIR); then \
+install_local: test_baseinit $(DIST_SRC) $(CLS_FILES) $(STATIC_DOC)
+	@if ! $(MKDIR) $(INSTALLSRCDIR) \
+	  || ! $(MKDIR) $(INSTALLCLSDIR) \
+	  || ! $(MKDIR) $(INSTALLDOCDIR) ; then \
 	    echo '--------------------------------------------------'; \
-	    echo '| Cannot install to' $(INSTALLSRCDIR) or $(INSTALLCLSDIR)!; \
+	    echo '| Cannot install to' $(INSTALLSRCDIR) or $(INSTALLCLSDIR) or $(INSTALLDOCDIR)!; \
 	    echo '| You should try:'; \
-	    echo '|     su -c "make install"'; \
+	    echo '|     sudo "make install"'; \
 	    echo '--------------------------------------------------'; \
 	    exit 1; \
 	fi
 	$(INSTALL) $(DIST_SRC) $(INSTALLSRCDIR)
 	$(INSTALL) $(CLS_FILES) $(INSTALLCLSDIR)
+	$(INSTALL) $(STATIC_DOC) $(INSTALLDOCDIR)
 	$(SECHO) ------------------------------------------------------------
 	$(SECHO) Installed files at $(INSTALLSRCDIR):
 	$(SECHO) $(DIST_SRC)
 	$(SECHO) ------------------------------------------------------------
 	$(SECHO) Installed files at $(INSTALLCLSDIR):
 	$(SECHO) $(CLS_FILES)
+	$(SECHO) ------------------------------------------------------------
+	$(SECHO) Installed files at $(INSTALLDOCDIR):
+	$(SECHO) $(STATIC_DOC)
 	$(SECHO) ------------------------------------------------------------
 
 uninstall_local:
@@ -215,6 +242,16 @@ uninstall_local:
 	    fi; \
 	else \
 	    echo "$(INSTALLCLSDIR) not found --> nothing to uninstall!"; \
+	fi
+	@if [ -d $(INSTALLDOCDIR) ]; then \
+	    $(RM) -v $(foreach file,$(STATIC_DOC),$(INSTALLDOCDIR)/$(file)); \
+	    if ls $(INSTALLDOCDIR) > /dev/null 2>&1; then \
+	        $(RMDIR) -v $(INSTALLDOCDIR); \
+	    else \
+	        echo "$(INSTALLDOCDIR) not empty!"; \
+	    fi; \
+	else \
+	    echo "$(INSTALLDOCDIR) not found --> nothing to uninstall!"; \
 	fi
 
 clean_local:
