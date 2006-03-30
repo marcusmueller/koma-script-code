@@ -80,6 +80,10 @@ endif
 ifdef MAINTAINDIR
 export MAINTAINDIR := $(MAINTAINDIR)/doc
 endif
+ifdef INSTALLSRCDIR
+export INSTALLSRCDIR := $(INSTALLSRCDIR)/doc
+endif
+
 # ----------------------------------------------------------------------
 
 # ----------------------------------------------------------------------
@@ -89,12 +93,16 @@ MAKE_FILES	= Makefile Makefile.latexinit Makefile.guide
 # ----------------------------------------------------------------------
 MISC_SRC	= $(MAKE_FILES)
 
-DOC_SRC		= scrguide.cls scrguide.ist \
+DOC_SRC		= scrguide.cls scrguide.ist scrguide.gst \
 	          guide.tex guide.bib plength.dtx
 
 DIST_SRC	= $(MISC_SRC) $(DOC_SRC)
 
 DIST_FILES	= $(DIST_SRC)
+
+BIN_DIR         = bin
+
+BIN_FILES       = $(BIN_DIR)/genhtmlidx.pl $(BIN_DIR)/genindex.pl
 
 MAINTAIN_FILES	= $(DIST_FILES)
 # ----------------------------------------------------------------------
@@ -104,10 +112,35 @@ MAINTAIN_FILES	= $(DIST_FILES)
 default_local:
 	$(make_recursive)
 
-install_local:
+install_local: $(DIST_FILES)
+	@if ! $(MKDIR) $(INSTALLSRCDIR) || \
+	    ! $(MKDIR) $(INSTALLSRCDIR)/$(BIN_DIR); then \
+	    echo '--------------------------------------------------'; \
+	    echo '| Cannot install to' $(INSTALLSRCDIR) or $(INSTALLSRCDIR)/$(BIN_DIR)!; \
+	    echo '| You should try:'; \
+	    echo '|     sudo "make install"'; \
+	    echo '--------------------------------------------------'; \
+	    exit 1; \
+	fi
+	$(INSTALL) $(DIST_SRC) $(INSTALLSRCDIR)
+	$(INSTALL) $(BIN_FILES) $(INSTALLSRCDIR)/$(BIN_DIR)
 	$(make_recursive)
+	$(SECHO) ------------------------------------------------------------
+	$(SECHO) Installed files at $(INSTALLSRCDIR):
+	$(SECHO) $(DIST_SRC)
+	$(SECHO) ------------------------------------------------------------
 
 uninstall_local:
+	@if [ -d $(INSTALLSRCDIR) ]; then \
+	    $(RM) -v $(foreach file,$(DIST_SRC),$(INSTALLSRCDIR)/$(file)); \
+	    if [ ls $(INSTALLSRCDIR) > /dev/null 2>&1; then \
+	        $(RMDIR) -v $(INSTALLSRCDIR); \
+	    else \
+	        echo "$(INSTALLSRCDIR) not empty!"; \
+	    fi; \
+	else \
+	    echo "$(INSTALLSRCDIR) not found --> nothing to uninstall!"; \
+	fi
 	$(make_recursive)
 
 clean_local:
@@ -116,13 +149,17 @@ clean_local:
 dist_local:
 	-$(RMDIR) $(DISTDIR)
 	$(MKDIR) $(DISTDIR)
+	$(MKDIR) $(DISTDIR)/$(BIN_DIR)
 	$(CP) $(DIST_FILES) $(DISTDIR)
+	$(CP) $(BIN_FILES) $(DISTDIR)/$(BIN_DIR)
 	$(make_recursive)
 
 maintain_local:
 	-$(RMDIR) $(MAINTAINDIR)
 	$(MKDIR) $(MAINTAINDIR)
+	$(MKDIR) $(MAINTAINDIR)/$(BIN_DIR)
 	$(CP) $(MAINTAIN_FILES) $(MAINTAINDIR)
+	$(CP) $(BIN_FILES) $(MAINTAINDIR)/$(BIN_DIR)
 	$(make_recursive)
 
 distclean_local:

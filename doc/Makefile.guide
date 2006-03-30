@@ -51,6 +51,9 @@ endif
 ifdef MAINTAINDIR
 export MAINTAINDIR := $(MAINTAINDIR)/$(LANGUAGE)
 endif
+ifdef INSTALLSRCDIR
+export INSTALLSRCDIR := $(INSTALLSRCDIR)/$(LANGUAGE)
+endif
 
 # ----------------------------------------------------------------------
 # List of all Makefiles
@@ -74,7 +77,9 @@ MISC_SRC	= $(MAKE_FILES) htmlsetup
 
 DIST_SRC	= $(MISC_SRC) $(TEX_SRC)
 
-DIST_FILES	= $(DIST_SRC)
+GUIDE_FILES     = $(GUIDENAME).pdf $(GUIDENAME).html
+
+DIST_FILES	= $(DIST_SRC) $(GUIDE_FILES)
 
 MAINTAIN_SRC	= $(DIST_SRC)
 
@@ -82,7 +87,7 @@ MAINTAIN_FILES	= $(MAINTAIN_SRC)
 
 # ----------------------------------------------------------------------
 # local rules
-default_local: $(GUIDENAME).pdf $(GUIDENAME).html
+default_local: $(GUIDE_FILES)
 
 clean_local:
 	$(RM) *.aux *.bbl *.blg *.glo *.idx *.ilg *.ind *.log *.lot \
@@ -97,11 +102,42 @@ maintainclean_local: distclean_local
 
 ifdef DISTDIR
 
-install_local: default_local
-	$(warning $@ should be defined!)
+install_local: $(DIST_FILES)
+	@if ! $(MKDIR) $(INSTALLSRCDIR) || \
+	    ! [ -d $(INSTALLDOCDIR) ]; then \
+	    echo '--------------------------------------------------'; \
+	    echo '| Cannot install to' $(INSTALLSRCDIR) or $(INSTALLDOCDIR)!; \
+	    echo '| You should try:'; \
+	    echo '|     sudo "make install"'; \
+	    echo '--------------------------------------------------'; \
+	    exit 1; \
+	fi
+	$(INSTALL) $(DIST_SRC) $(INSTALLSRCDIR)
+	$(INSTALL) $(GUIDE_FILES) $(INSTALLDOCDIR)
+	$(SECHO) ------------------------------------------------------------
+	$(SECHO) Installed files at $(INSTALLSRCDIR):
+	$(SECHO) $(DIST_SRC)
+	$(SECHO) ------------------------------------------------------------
+	$(SECHO) Installed files at $(INSTALLDOCDIR):
+	$(SECHO) $(GUIDE_FILES)
+	$(SECHO) ------------------------------------------------------------
 
 uninstall_local:
-	$(warning $@ should be defined!)
+	@if [ -d $(INSTALLSRCDIR) ]; then \
+	    $(RM) -v $(foreach file,$(DIST_SRC),$(INSTALLSRCDIR)/$(file)); \
+	    if [ ls $(INSTALLSRCDIR) > /dev/null 2>&1; then \
+	        $(RMDIR) -v $(INSTALLSRCDIR); \
+	    else \
+	        echo "$(INSTALLSRCDIR) not empty!"; \
+	    fi; \
+	else \
+	    echo "$(INSTALLSRCDIR) not found --> nothing to uninstall!"; \
+	fi
+	@if [ -d $(INSTALLDOCDIR) ]; then \
+	    $(RM) -v $(foreach file,$(GUIDE_FILES),$(INSTALLDOCDIR)/$(file)); \
+	else \
+	    echo "$(INSTALLDOCDIR) not found --> nothing to uninstall!"; \
+	fi
 
 dist_local:
 	-$(RMDIR) $(DISTDIR)
