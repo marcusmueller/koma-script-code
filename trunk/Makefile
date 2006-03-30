@@ -167,7 +167,7 @@ DIST_SRC	= $(MISC_SRC) $(CLS_SRC)
 
 DIST_FILES	= $(DIST_SRC)
 
-MAINTAIN_SRC    = $(DIST_SRC) template.sh missing.dtx .cvsignore
+MAINTAIN_SRC    = $(DIST_SRC) missing.dtx .cvsignore
 
 MAINTAIN_FILES  = $(MAINTAIN_SRC)
 # ----------------------------------------------------------------------
@@ -250,7 +250,7 @@ dist-zip_post:
 
 maintain_prior:
 	-$(RMDIR) $(MAINTAINDIR)
-	$(MKDIR) $(MAINTAINDISTDIR)
+	$(MKDIR) $(MAINTAINDIR)
 
 maintain_local:
 	$(CP) $(MAINTAIN_FILES) $(MAINTAINDIR)
