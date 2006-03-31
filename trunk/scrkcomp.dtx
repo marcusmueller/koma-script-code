@@ -1,4 +1,4 @@
-% \CheckSum{24}
+% \CheckSum{48}
 % \iffalse meta-comment
 % ======================================================================
 % scrkcomp.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkcomp.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkcomp.dtx}[2006/03/28 v2.95 KOMA-Script (compatibility)]
+\ProvidesFile{scrkcomp.dtx}[2006/03/31 v2.95 KOMA-Script (compatibility)]
 % \iffalse
 \documentclass{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -182,9 +182,43 @@
 %<*body>
 % \fi
 %
-% \subsection{Body}
-% Die komplette Funktionalität steckt in der Option.
+% \subsection{Kompatibilität mit früheren Versionen von \textsf{scrlttr2}}
+% In früheren Versionen von \textsf{scrlttr2} gab es weitere Befehle, die
+% eventuell von \texttt{lco}-Dateien oder Paketen verwendet werden.
+% Gemeldete Inkompatibitlitäten sind nach Möglichkeit zu lösen.
 %
+% \iffalse
+%<*letter>
+% \fi
+% \begin{macro}{\@setif}
+%   \changes{v2.8q}{2001/10/08}{Neu}
+%   \changes{v2.95}{2006/03/31}{Nur vor Version 2.95}
+% Dies war ein Makro, mit dem man einen Schalter über die symbolischen
+% Werte \texttt{true}, \texttt{false}, \texttt{on} und \texttt{off} setzen
+% kann. Das erste, optionale Argument war der Name des Schalters ohne Präfix
+% "`\texttt{if}"'. Das zweite Argument war der Name der Option und das dritte
+% der gewünschte Wert. War das optionale Argument nicht gesetzt oder leer, so
+% wurde der Optionenname mit einem vorangestellten "`\texttt{@}"' als Name des
+% Schalters verwendet. Dieses Makro wird nun mit Hilfe von \cs{KOMA@set@ifkey}
+% nachgebildet. Dadurch ist es nicht absolut fehlerkompatibel, das es nun mehr
+% Werte versteht als vorher.
+%    \begin{macrocode}
+\expandafter\ifnum \@nameuse{scr@v@2.95}>\scr@compatibility
+  \newcommand*{\@setif}[2][]{%
+    \begingroup
+      \edef\@tempa{#1}\ifx\@tempa\@empty
+        \def\@tempa{\KOMA@set@ifkey{#2}{@#2}}%
+      \else
+        \def\@tempa{\KOMA@set@ifkey{#2}{#1}}%
+      \fi
+    \expandafter\endgroup\@tempa
+  }%
+\fi
+%    \end{macrocode}
+% \end{macro}
+% \iffalse
+%</letter>
+% \fi
 %
 % \iffalse
 %</body>
