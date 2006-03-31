@@ -93,12 +93,20 @@ MAKE_FILES	= Makefile Makefile.latexinit Makefile.guide
 # ----------------------------------------------------------------------
 MISC_SRC	= $(MAKE_FILES)
 
+STATIC_DOC_SRC  = koma-script.html
+
+STATIC_DOC_LINKS= komascript.html komascr.html \
+		  scrbook.html scrreprt.html scrartcl.html scrlttr2.html \
+		  typearea.html scrpage2.html scraddr.html scrlfile.html
+
 DOC_SRC		= scrguide.cls scrguide.ist scrguide.gst \
 	          guide.tex guide.bib plength.dtx
 
+STATIC_DOC      = $(STATIC_DOC_SRC) $(STATIC_DOC_LINKS)
+
 DIST_SRC	= $(MISC_SRC) $(DOC_SRC)
 
-DIST_FILES	= $(DIST_SRC)
+DIST_FILES	= $(DIST_SRC) $(STATIC_DOC)
 
 BIN_DIR         = bin
 
@@ -109,14 +117,18 @@ MAINTAIN_FILES	= $(DIST_FILES)
 
 # ----------------------------------------------------------------------
 # local rules
-default_local:
+default_local: $(STATIC_DOC)
 	$(make_recursive)
+
+$(STATIC_DOC_LINKS): $(STATIC_DOC_SRC)
+	$(SYMLINK) $< $@
 
 install_local: $(DIST_FILES)
 	@if ! $(MKDIR) $(INSTALLSRCDIR) || \
-	    ! $(MKDIR) $(INSTALLSRCDIR)/$(BIN_DIR); then \
+	    ! $(MKDIR) $(INSTALLSRCDIR)/$(BIN_DIR) || \
+	    ! $(MKDIR) $(INSTALLDOCDIR) ; then \
 	    echo '--------------------------------------------------'; \
-	    echo '| Cannot install to' $(INSTALLSRCDIR) or $(INSTALLSRCDIR)/$(BIN_DIR)!; \
+	    echo '| Cannot install to' $(INSTALLSRCDIR) or $(INSTALLSRCDIR)/$(BIN_DIR) or $(INSTALLDOCDIR)!; \
 	    echo '| You should try:'; \
 	    echo '|     sudo "make install"'; \
 	    echo '--------------------------------------------------'; \
@@ -124,6 +136,7 @@ install_local: $(DIST_FILES)
 	fi
 	$(INSTALL) $(DIST_SRC) $(INSTALLSRCDIR)
 	$(INSTALL) $(BIN_FILES) $(INSTALLSRCDIR)/$(BIN_DIR)
+	$(INSTALL) $(STATIC_DOC) $(INSTALLDOCDIR)
 	$(make_recursive)
 	$(SECHO) ------------------------------------------------------------
 	$(SECHO) Installed files at $(INSTALLSRCDIR):
@@ -140,6 +153,11 @@ uninstall_local:
 	    fi; \
 	else \
 	    echo "$(INSTALLSRCDIR) not found --> nothing to uninstall!"; \
+	fi
+	@if [ -d $(INSTALLDOCDIR) ]; then \
+	    $(RM) -v $(foreach file,$(STATIC_DOC),$(INSTALLDOCDIR)/$(file)); \
+	else \
+	    echo "$(INSTALLDOCDIR) not found --> nothing to uninstall!"; \
 	fi
 	$(make_recursive)
 
