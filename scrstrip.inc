@@ -82,6 +82,57 @@
   \ifx\askonceonly\undefined\else\askonceonly\fi
 }
 
+% ---------- validity --------------------------------------------------
+\ifToplevel{%
+  \let\manifest\inFile
+  \Msg{* Testing validity of KOMA-Script distribution:}
+  \def\readloop{%
+    \ifeof\manifest\else
+      \read\manifest to \manifestfile\relax
+      \ifx\manifestfile\empty
+      \else
+        \openin\inputcheck \manifestfile\relax
+        \ifeof\inputcheck
+          \@addto\missingfiles{\comma\manifestfile}%
+          \def\comma{,^^J\noexpand\spaces}%
+        \fi
+        \closein\inputcheck
+      \fi
+      \expandafter\readloop
+    \fi
+  }%
+  \begingroup
+    \endlinechar=256
+    \let\missingfiles\empty
+    \let\comma\empty
+    \openin\manifest manifest.txt\relax
+    \readloop
+    \closein\manifest
+    \ifx\missingfiles\empty
+      \Msg{* KOMA-Script distribution seams to be valid.}%
+    \else
+      \edef\cmp{doc/scrguien.pdf\comma doc/scrguien.html\comma
+        doc/scrguide.pdf\comma doc/scrguide.html}%
+      \ifx\missingfiles\cmp
+        \Msg{* KOMA-Script distribution may be valid.}%
+        \Msg{* WARNING: Manuals not found but needed for a legal 
+          distribution!}%
+      \else
+        \def\spaces{\space\space\space\space\space}%
+        \edef\spaces{* \spaces\spaces\spaces}%
+        \Msg{* Missing files: \missingfiles.}%
+        \Msg{* This seams not to be a valid KOMA-Script distribution.}%
+        \Msg{* You should not try to install this!}%
+        \errhelp{You should ask your distributor for a valid and legal
+          KOMA-Script distribution.}%
+        \errmessage{Validity test of KOMA-Script distribution failed}%
+        \batchmode
+        \csname @@end\endcsname
+      \fi
+    \fi
+  \endgroup
+}
+
 % ---------- defining preambles ----------------------------------------
 
 \preamble
