@@ -135,6 +135,8 @@ CLS_MAIN_DTX    = scrbeta.dtx \
 		  scrlogo.dtx
 
 STATIC_DOC      = README \
+	          INSTALL.txt \
+		  INSTALLD.txt \
 	          lppl.txt \
 	          lppl-de.txt \
 		  manifest.txt
