@@ -105,9 +105,9 @@ DOC_SRC		= scrguide.cls scrguide.ist scrguide.gst \
 
 STATIC_DOC      = $(STATIC_DOC_SRC) $(STATIC_DOC_LINKS)
 
-DIST_SRC	= $(MISC_SRC) $(DOC_SRC)
+DIST_SRC	= $(MISC_SRC) $(DOC_SRC) $(STATIC_DOC_SRC)
 
-DIST_FILES	= $(DIST_SRC) $(STATIC_DOC)
+DIST_FILES	= $(DIST_SRC) $(STATIC_DOC_LINKS)
 
 BIN_DIR         = bin
 
@@ -136,6 +136,7 @@ install_local: $(DIST_FILES)
 	    exit 1; \
 	fi
 	$(INSTALL) $(DIST_SRC) $(INSTALLSRCDIR)
+	$(foreach file,$(STATIC_DOC),$(SYMLINK) ../../../../doc/latex/koma-script/$(file) $(INSTALLSRCDIR)/$(file);)
 	$(INSTALL) $(BIN_FILES) $(INSTALLSRCDIR)/$(BIN_DIR)
 	$(INSTALL) $(STATIC_DOC) $(INSTALLDOCDIR)
 	$(make_recursive)
@@ -143,6 +144,16 @@ install_local: $(DIST_FILES)
 	$(SECHO) Installed files at $(INSTALLSRCDIR):
 	$(SECHO) $(DIST_SRC)
 	$(SECHO) ------------------------------------------------------------
+	$(SECHO) Installed files at $(INSTALLSRCDIR)/$(BIN_DIR):
+	$(SECHO) $(BIN_FILES)
+	$(SECHO) ------------------------------------------------------------
+	$(SECHO) Installed files at $(INSTALLDOCDIR):
+	$(SECHO) $(STATIC_DOC)
+	$(SECHO) ------------------------------------------------------------
+	$(SECHO) Links at $(INSTALLSRCDIR):
+	$(SECHO) $(SATIC_DOC)
+	$(SECHO) ------------------------------------------------------------
+
 
 uninstall_local:
 	@if [ -d $(INSTALLSRCDIR) ]; then \
