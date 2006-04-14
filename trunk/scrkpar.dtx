@@ -1,4 +1,4 @@
-% \CheckSum{502}
+% \CheckSum{530}
 % \iffalse meta-comment
 % ======================================================================
 % scrkpar.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkpar.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkpar.dtx}[2006/03/28 v2.95 KOMA-Script (paragraphs)]
+\ProvidesFile{scrkpar.dtx}[2006/04/14 v2.95 KOMA-Script (paragraphs)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -365,9 +365,29 @@
 % Spätestens ab Version~3.0 soll die Möglichkeit bestehen, |\parskip|,
 % |\parindent| und |\parfillskip| mit der Schriftgröße automatisch
 % anzupassen. Dazu muss |\selectfont| entsprechend erweitert werden.
+%  \begin{macro}{\scr@selectfont}
+%    \changes{v2.95}{2006/04/14}{neue Erweiterung}
+%  \begin{macro}{\scr@new@selectfont}
+%    \changes{v2.95}{2006/04/14}{neue Erweiterung}
+% Damit das auch bei Verwendung des \textsf{everysel}-Pakets funktioniert,
+% wird hier zusätzliche Vorsorge getroffen.
 %    \begin{macrocode}
-\expandafter\g@addto@macro\csname selectfont \endcsname{\par@update}
+\newcommand*{\scr@selectfont}{}\let\scr@selectfont\selectfont
+\BeforePackage{everysel}{%
+  \ifx\selectfont\scr@new@selectfont\else
+    \ClassWarningNoLine{\KOMAClassName}{discard change of \string\selectfont}%
+  \fi
+  \let\selectfont\scr@selectfont
+}
+\AfterPackage{everysel}{%
+  \g@addto@macro\selectfont{\par@update}%
+  \let\scr@new@selectfont\selectfont
+}
+\g@addto@macro\selectfont{\par@update}
+\newcommand*{\scr@new@selectfont}{}\let\scr@new@selectfont\selectfont
 %    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
 %  \begin{macro}{\par@updaterelative}
 %    \changes{v2.95}{2004/11/05}{neues internes Macro}
 % Die eigentliche Änderung verbirgt sich in |\par@updaterelative|. Ggf. wird
