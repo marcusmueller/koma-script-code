@@ -48,8 +48,10 @@ eval 'exec perl -S $0 ${1+"$@"}'
 # ======================================================================
 
 use strict;
+use IO::Handle;
 use File::Find();
 use File::Spec;
+use File::Copy;
 use POSIX qw(strftime);
 
 my $opt_ignoretestsuite=1;
@@ -110,6 +112,11 @@ map {
     }
 } @allinfo;
 printtext(*NCH);
+
+flush NCH;
+
+copy($ChangeLogFile,\*NCH) or
+    die "Cannot append $ChangeLogFile to $NewChangeLogFile";
 
 close NCH;
 
@@ -191,12 +198,14 @@ sub wanted {
     }
     if ( $opt_ignoretestsuite &&
 	 ( ( $File::Find::name =~ /\/testsuite\// ) ||
-	   ( $File::Find::name =~ /\/testsuite$/ ) ) ) {
+	   ( $File::Find::name =~ /\/testsuite$/ ) ||
+	   ( $File::Find::name =~ /^testsuite\// ) ) ) {
 	return;
     }
     if ( $opt_ignoredeveloper &&
 	 ( ( $File::Find::name =~ /\/developer\// ) ||
-	   ( $File::Find::name =~ /\/developer$/ ) ) ) {
+	   ( $File::Find::name =~ /\/developer$/ ) ||
+	   ( $File::Find::name =~ /^developer\// ) ) ) {
 	return;
     }
 

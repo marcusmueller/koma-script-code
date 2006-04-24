@@ -203,6 +203,14 @@ bindist: dist
 
 # ----------------------------------------------------------------------
 # local rules
+
+ChangeLog:
+	$(warning Developers should generate ChangeLog manually using:)
+	$(SECHO) "  developer/script/genchangelog.pl ." >&2
+	$(SECHO) "  mv doc/ChangeLog.tmp doc/ChangeLog.svn" >&2
+	$(SECHO) "  cat ChangeLog.cvs doc/ChangeLog.svn > ChangeLog" >&2
+	@exit 1
+
 default_local: test_baseinit $(CLS_FILES)
 
 install_local: test_baseinit $(DIST_SRC) $(CLS_FILES) $(STATIC_DOC)
@@ -275,7 +283,7 @@ dist_prior:
 	-$(RMDIR) $(DISTDIR)
 	$(MKDIR) $(DISTDIR)
 
-dist_local:
+dist_local: $(DIST_FILES)
 	$(CP) $(DIST_FILES) $(DISTDIR)
 
 dist_post:
