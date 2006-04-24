@@ -44,7 +44,7 @@ eval 'exec perl -S $0 ${1+"$@"}'
 # ----------------------------------------------------------------------
 # Dieses perl-Script erzeugt mit Hilfe von `svn log' ein ChangeLog.svn.
 #
-# Verwendung: genindex.pl <ind-Datei>
+# Verwendung: genchangelog.pl <basedir>
 # ======================================================================
 
 use strict;
@@ -52,10 +52,16 @@ use File::Find();
 use File::Spec;
 use POSIX qw(strftime);
 
+my $opt_ignoretestsuite=1;
+my $opt_ignoredeveloper=1;
+my $opt_verbose=1;
 my $linelengthlimit=78;
 my $revrangeopt="";
 my @allinfo;
-my $basedir=shift;
+my $basedir=shift or
+    die 'Error: missing parameter <basedir>';
+$basedir =~ s/\/$//;
+
 my $ChangeLogFile=File::Spec->rel2abs(File::Spec->catfile($basedir,
 							  "doc",
 							  "ChangeLog.svn"));
@@ -83,21 +89,23 @@ my $linelength;
 
 map {
     my @info = @$_;
-    if ( $lastrev != $info[0] ) {
-	$lastrev=$info[0];
-	printtext(*NCH);
-	$text=$info[5];
-	print NCH "r$info[0] $info[2] $info[1]:\n\n";
-	print NCH "\t* $info[4]";
-	$linelength = 10 + length($info[4]);
-    } else {
-	if ( $linelength + 2 + length($info[4]) > $linelengthlimit - 2 ) {
-	    print NCH ",\n";
-	    print NCH "\t$info[4]";
-	    $linelength = 8 + length($info[4]);
+    if ( $info[4] ne "" ) {
+	if ( $lastrev != $info[0] ) {
+	    $lastrev=$info[0];
+	    printtext(*NCH);
+	    $text=$info[5];
+	    print NCH "r$info[0] $info[2] $info[1]:\n\n";
+	    print NCH "\t* $info[4]";
+	    $linelength = 10 + length($info[4]);
 	} else {
-	    print NCH ", $info[4]";
-	    $linelength += 2 + length($info[4]);
+	    if ( $linelength + 2 + length($info[4]) > $linelengthlimit - 2 ) {
+		print NCH ",\n";
+		print NCH "\t$info[4]";
+		$linelength = 8 + length($info[4]);
+	    } else {
+		print NCH ", $info[4]";
+		$linelength += 2 + length($info[4]);
+	    }
 	}
     }
 } @allinfo;
@@ -181,6 +189,19 @@ sub wanted {
 	$File::Find::name =~ /(\.(tmp|log|aux|toc|lof|lot|ind|idx|ilg|glo|chn|out|bbl|blg)|~)\z/ ) {
 	return;
     }
+    if ( $opt_ignoretestsuite &&
+	 ( ( $File::Find::name =~ /\/testsuite\// ) ||
+	   ( $File::Find::name =~ /\/testsuite$/ ) ) ) {
+	return;
+    }
+    if ( $opt_ignoredeveloper &&
+	 ( ( $File::Find::name =~ /\/developer\// ) ||
+	   ( $File::Find::name =~ /\/developer$/ ) ) ) {
+	return;
+    }
+
+    print "process: svn log $revrangeopt $File::Find::name\n" 
+	if $opt_verbose;
 
     $output=`svn log $revrangeopt $File::Find::name`;
 
@@ -203,15 +224,16 @@ sub wanted {
 	    my $name=$File::Find::name;
 	    if ( length($name) > length($basedir) ) {
 		$name=substr($name,length($basedir)+1);
+		$name .= '/' if ( -d "$basedir/$name" );
 	    } else {
-		$name="./";
+		$name="";
 	    }
 	    push @info,$name;
 	    $newrev=2;
 	} elsif ( $newrev == 2 ) {
 	    $newrev=3;
 	} elsif ( $newrev == 3 ) {
-	    if ( $data =~ /^s+/ or $data eq "" ) {
+	    if ( $data =~ /^\s+/ or $data eq "" ) {
 		$text .= "\n$data";
 	    } else {
 		if ( $text eq "" ) {
