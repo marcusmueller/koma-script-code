@@ -139,7 +139,8 @@ STATIC_DOC      = README \
 		  INSTALLD.txt \
 	          lppl.txt \
 	          lppl-de.txt \
-		  manifest.txt
+		  manifest.txt \
+		  komabug.tex
 
 CLS_MAIN_DVI	= scrsource.dvi
 
