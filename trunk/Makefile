@@ -209,7 +209,7 @@ ChangeLog:
 	$(warning Developers should generate ChangeLog manually using:)
 	$(SECHO) "  developer/scripts/genchangelog.pl ." >&2
 	$(SECHO) "  mv doc/ChangeLog.tmp doc/ChangeLog.svn" >&2
-	$(SECHO) "  cat ChangeLog.cvs doc/ChangeLog.svn > ChangeLog" >&2
+	$(SECHO) "  cat doc/ChangeLog.svn ChangeLog.cvs > ChangeLog" >&2
 	@exit 1
 
 default_local: test_baseinit $(CLS_FILES)
