@@ -190,12 +190,15 @@ bindist: dist
 	$(UNTARGZ) $(DISTDIR).tar.gz
 	$(CD) $(notdir $(DISTDIR)) && \
 	  $(MAKE)
-	$(MKDIR) $(notdir $(DISTDIR))-bin
+	$(MKDIR) $(notdir $(DISTDIR))-bin/komascript-texmf
 	$(CD) $(notdir $(DISTDIR)) && \
-	  $(MAKE) INSTALLTEXMF=$(PWD)/$(notdir $(DISTDIR))-bin install
+	  $(MAKE) INSTALLTEXMF=$(PWD)/$(notdir $(DISTDIR))-bin/komascript-texmf install
 	$(RMDIR) $(notdir $(DISTDIR))
-	$(SRM) $(notdir $(DISTDIR))-bin/ls-R
-	$(INSTALL) README $(notdir $(DISTDIR))-bin
+	$(SRM) $(notdir $(DISTDIR))-bin/komascript-texmf/ls-R
+	$(CD) $(notdir $(DISTDIR))-bin/komascript-texmf && \
+	  $(ZIP) ../komascript-texmf.zip *
+	$(RMDIR) $(notdir $(DISTDIR))-bin/komascript-texmf
+	$(INSTALL) README INSTALL.txt INSTALLD.txt $(notdir $(DISTDIR))-bin
 	$(SRM) $(notdir $(DISTDIR))-bin.zip
 	$(CD) $(notdir $(DISTDIR))-bin && \
 	  $(ZIP) ../$(notdir $(DISTDIR))-bin.zip *
