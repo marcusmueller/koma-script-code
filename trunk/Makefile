@@ -195,6 +195,7 @@ bindist: dist
 	  $(MAKE) INSTALLTEXMF=$(PWD)/$(notdir $(DISTDIR))-bin/komascript-texmf install
 	$(RMDIR) $(notdir $(DISTDIR))
 	$(SRM) $(notdir $(DISTDIR))-bin/komascript-texmf/ls-R
+	$(INSTALL) $(notdir $(DISTDIR))-bin/komascript-texmf/source/latex/koma-script/ChangeLog $(notdir $(DISTDIR))-bin
 	$(INSTALL) $(notdir $(DISTDIR))-bin/komascript-texmf/doc/latex/koma-script/scrgui* $(notdir $(DISTDIR))-bin
 	$(INSTALL) $(notdir $(DISTDIR))-bin/komascript-texmf/doc/latex/koma-script/*.txt $(notdir $(DISTDIR))-bin
 	$(INSTALL) $(notdir $(DISTDIR))-bin/komascript-texmf/doc/latex/koma-script/README $(notdir $(DISTDIR))-bin
