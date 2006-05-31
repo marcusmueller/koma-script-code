@@ -195,10 +195,14 @@ bindist: dist
 	  $(MAKE) INSTALLTEXMF=$(PWD)/$(notdir $(DISTDIR))-bin/komascript-texmf install
 	$(RMDIR) $(notdir $(DISTDIR))
 	$(SRM) $(notdir $(DISTDIR))-bin/komascript-texmf/ls-R
+	$(INSTALL) $(notdir $(DISTDIR))-bin/komascript-texmf/doc/latex/koma-script/scrgui* $(notdir $(DISTDIR))-bin
+	$(INSTALL) $(notdir $(DISTDIR))-bin/komascript-texmf/doc/latex/koma-script/*.txt $(notdir $(DISTDIR))-bin
+	$(INSTALL) $(notdir $(DISTDIR))-bin/komascript-texmf/doc/latex/koma-script/README $(notdir $(DISTDIR))-bin
+	$(INSTALL) $(notdir $(DISTDIR))-bin/komascript-texmf/doc/latex/koma-script/koma*.html $(notdir $(DISTDIR))-bin
+	$(GREP) 'CheckKOMAScriptVersion{' $(notdir $(DISTDIR))-bin/komascript-texmf/source/latex/koma-script/scrkvers.dtx | grep -o '2.*t' > $(notdir $(DISTDIR))-bin/VERSION
 	$(CD) $(notdir $(DISTDIR))-bin/komascript-texmf && \
-	  $(ZIP) ../komascript-texmf.zip *
+	  $(ZIP) ../komascript-texmf.zip source doc tex
 	$(RMDIR) $(notdir $(DISTDIR))-bin/komascript-texmf
-	$(INSTALL) README INSTALL.txt INSTALLD.txt $(notdir $(DISTDIR))-bin
 	$(SRM) $(notdir $(DISTDIR))-bin.zip
 	$(CD) $(notdir $(DISTDIR))-bin && \
 	  $(ZIP) ../$(notdir $(DISTDIR))-bin.zip *
