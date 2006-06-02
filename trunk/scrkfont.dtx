@@ -1,4 +1,4 @@
-% \CheckSum{251}
+% \CheckSum{258}
 % \iffalse meta-comment
 % ======================================================================
 % scrkfont.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkfont.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkfont.dtx}[2006/04/21 v2.95 KOMA-Script (font selection)]
+\ProvidesFile{scrkfont.dtx}[2006/06/02 v2.95 KOMA-Script (font selection)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -327,12 +327,23 @@
 %    \changes{v2.8p}{2001/09/22}{neu (intern)}
 % Damit dies lokal möglich ist, wird eine lokal arbeitende Variante
 % von \cs{g@addto@macro} benötigt, wie sie hier vorgestellt wird.
+%    \changes{v2.95}{2006/06/02}{korrigiert, damit es sich bezüglich
+%      Erweiterung um Makrodefinitonen mit Argumenten wie \cs{g@addto@macro}
+%      verhält}
 %    \begin{macrocode}
-\newcommand{\l@addto@macro}[2]{%
-  \begingroup%
-    \toks@\expandafter{#1#2}%
-    \edef\@tempa{\endgroup\def\noexpand#1{\the\toks@}}%
-  \@tempa
+\ifundefined{unexpanded}{%
+  \newcommand*{\g@addto@macro@temp}{}%
+  \newcommand{\l@addto@macro}[2]{%
+    \begingroup%
+      \toks@\expandafter{#1#2}%
+      \xdef\g@addto@macro@temp{\the\toks@}%
+    \endgroup
+    \let#1\g@addto@macro@temp
+  }%
+}{%
+  \newcommand{\l@addto@macro}[2]{%
+    \edef#1{\unexpanded\expandafter{#1#2}}%
+  }%
 }
 %    \end{macrocode}
 %  \end{macro}
