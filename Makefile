@@ -188,6 +188,9 @@ MAINTAIN_FILES  = $(MAINTAIN_SRC)
 # additional ruls
 bindist: dist
 	$(UNTARGZ) $(DISTDIR).tar.gz
+ifdef PREPARERELEASE
+	developer/scripts/preparerelease.sh 2 $(notdir $(DISTDIR))
+endif
 	$(CD) $(notdir $(DISTDIR)) && \
 	  $(MAKE)
 	$(MKDIR) $(notdir $(DISTDIR))-bin/komascript-texmf
@@ -289,6 +292,9 @@ maintainclean_local: clean_local
 	$(SRM) $(GENERATED)
 
 dist_prior:
+ifdef PREPARERELEASE
+	developer/scripts/preparerelease.sh 1
+endif
 	-$(RMDIR) $(DISTDIR)
 	$(MKDIR) $(DISTDIR)
 
