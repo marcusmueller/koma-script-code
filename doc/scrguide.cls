@@ -163,6 +163,7 @@
     \renewcommand*{\chapterheadstartvskip}{}%
     \raggedbottom
     \sloppy
+    \lstset{breaklines,prebreak=\mbox{$\hookleftarrow$}}%
   }%
 }
 %    \end{macrocode}
