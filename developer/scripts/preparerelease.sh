@@ -56,6 +56,39 @@ steptwo() {
     mv INSTALLD.tmp INSTALLD.txt
 
     versionpostfix=${version#* * }
+
+    cat > README <<EOF
+
+KOMA-Script $version
+Copyright (c) Markus Kohm <komascript(at)gmx.info>, 1994-2006
+
+--------------------------------------------------------------------
+EOF
+    [ "$versionpostfix" = "$version" ] || cat >> README <<EOF
+
+NOTE: These files are for beta testers and developers only.
+
+      YOU SHOULD ONLY TEST BUT NOT USE THEM!!!
+
+--------------------------------------------------------------------
+EOF
+
+    cat >> README <<EOF
+
+KOMA-Script is a versatile bundle of LaTeX2e document classes and
+packages.  It aims to be a replacement to the standard LaTeX2e
+classes.  KOMA-Script does not stop with the features known from the
+standard classes, but it extends the possibilities in order to
+provide the user an almost complete working environment.
+
+--------------------------------------------------------------------
+
+For installation see INSTALL.txt (english) or INSTALLD.txt
+(german, UTF-8).
+
+--------------------------------------------------------------------
+EOF
+
     [ "$versionpostfix" = "$version" ] || \
 	error "Cannot prepare for KOMA-Script $version!" \
 	      "You should change scrkvers.dtx before release!"
