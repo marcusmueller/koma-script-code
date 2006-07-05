@@ -56,7 +56,7 @@ steptwo() {
     mv INSTALLD.tmp INSTALLD.txt
 
     versionpostfix=${version#* * }
-    [ -z "$versionpostfix" ] || \
+    [ "$versionpostfix" = "$version" ] || \
 	error "Cannot prepare for KOMA-Script $version!" \
 	      "You should change scrkvers.dtx before release!"
 
