@@ -37,10 +37,9 @@ steptwo() {
     version=`grep 'CheckKOMAScriptVersion{' scrkvers.dtx | grep -o '2.*KOMA'`
     version=${version% KOMA}
 
-    for ins in *.ins; do
+    for ins in *.ins *.inc; do
 	sed -e 's/{trace,/{/g;s/\(\\let\\ifbeta=\\if\)true/\1false/' -i $ins
     done
-    sed -e 's/\(\\let\\ifbeta=\\if\)true/\1false/' -i scrstrip.inc
 
     grep '% ======================================================================' -A 10000 manifest.txt > manifest.tmp
     sed -e 's|\(CONTENTS OF THE KOMA-SCRIPT \)DEVELOPERS ONLY VERSION|\1RELEASE '"$version"'|' \
