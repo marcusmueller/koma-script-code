@@ -38,7 +38,7 @@ steptwo() {
     version=${version% KOMA}
 
     for ins in *.ins; do
-	sed -e 's/{trace,/{/g' -i $ins
+	sed -e 's/{trace,/{/g;s/\(\\let\\ifbeta=\\if\)true/\1false/' -i $ins
     done
     sed -e 's/\(\\let\\ifbeta=\\if\)true/\1false/' -i scrstrip.inc
 
