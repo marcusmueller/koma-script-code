@@ -1,4 +1,4 @@
-% \CheckSum{1006}
+% \CheckSum{1043}
 % \iffalse meta-comment
 % ======================================================================
 % scrkfloa.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkfloa.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkfloa.dtx}[2006/07/03 v2.95 KOMA-Script (floats)]
+\ProvidesFile{scrkfloa.dtx}[2006/07/13 v2.95a KOMA-Script (floats)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -914,6 +914,8 @@
 %    \changes{v2.8q}{2002/05/17}{Problem mit doppelten Fußnoten behoben}
 %    \changes{v2.95}{2004/01/30}{Korrekturen für vertikalen Abstand und
 %      \textsl{float}-Paket}
+%    \changes{v2.95a}{2006/07/13}{diverse Korrekturen für den vertikalen
+%      Abstand u.\,a. bei Verwendung des \textsl{color}-Pakets}
 %    \begin{macrocode}
 \newcommand{\@@makecaption}[3]{%
   \cap@margin
@@ -922,7 +924,8 @@
     \let\scr@tmp@footnotetext=\@footnotetext
     \let\@footnotetext=\@gobble
     \sbox\@tempboxa{%
-      {\capfont#1{{\caplabelfont#2\captionformat}}%
+      {\capfont\strut\ignorespaces
+        #1{{\caplabelfont#2\captionformat}}%
         #3}%
     }%
     \let\@footnotetext=\scr@tmp@footnotetext
@@ -935,8 +938,8 @@
   \begingroup%
     \setlength{\@tempdima}{\cap@width}%
     \ifdim \wd\@tempboxa >\@tempdima
-      \hb@xt@\hsize{\strut\cap@left
-      \vtop{\hsize=\cap@width
+      \hb@xt@\hsize{%
+        \setbox\@tempboxa\vbox{\hsize=\cap@width
 %    \end{macrocode}
 % Im Fall, dass nun also mehrzeilig gesetzt werden muss, ist zu
 % unterscheiden, ob wie bisher voll hängend gearbeitet werden soll
@@ -945,32 +948,43 @@
 % Größsenänderungen für den Titel Platz finden. Außerdem wird die
 % geänderte Parameterübergabe berücksichtigt.
 %    \begin{macrocode} 
-        \ifdofullc@p
-          {\capfont\@hangfrom{#1{{\caplabelfont#2\captionformat}}}%
-            {#3\par}}
+          \ifdofullc@p
+            {\capfont\@hangfrom{\strut\ignorespaces
+                #1{{\caplabelfont#2\captionformat}}}%
+              {#3\par}}%
 %    \end{macrocode}
 % Im zweiten Fall ist nun zu unterscheiden, ob nach dem Label ein
 % Umbruch erfolgen soll oder nicht. Dabei ist der Einzug zu beachten.
 % Ist der Einzug negativ, so findet ebenfalls ein Umbruch statt und
 % nur die erste Folgezeile wird eingezogen.
 %    \begin{macrocode} 
-        \else%
-          \ifdim\cap@indent<\z@
-            {\capfont#1{{\caplabelfont #2\captionformat\par}}%
-              \noindent\hspace*{-\cap@indent}#3\par}%
           \else%
-            \if@capbreak
-              {\capfont#1{{\caplabelfont #2\captionformat\par}}%
-                \noindent\@hangfrom{\hspace*{\cap@indent}}{#3\par}}
-            \else
-              {\capfont\@hangfrom{\hspace*{\cap@indent}}%
-                {\hspace{-\cap@indent}#1%
-                  {{\caplabelfont#2\captionformat}}#3\par}}%
+            \ifdim\cap@indent<\z@
+              {\capfont\strut\ignorespaces
+                #1{{\caplabelfont #2\captionformat\par}}%
+                \noindent\hspace*{-\cap@indent}#3\par}%
+            \else%
+              \if@capbreak
+                {\capfont\strut\ignorespaces
+                  #1{{\caplabelfont #2\captionformat\par}}%
+                  \noindent\@hangfrom{\hspace*{\cap@indent}}{#3\par}}%
+              \else
+                {\capfont\@hangfrom{\strut\hspace*{\cap@indent}}%
+                  {\hspace{-\cap@indent}\ignorespaces#1%
+                    {{\caplabelfont#2\captionformat}}#3\par}}%
+              \fi
             \fi
           \fi
-        \fi
+        }%
+        \setlength{\@tempdima}{\ht\@tempboxa}%
+        \addtolength{\@tempdima}{\dp\@tempboxa}%
+        \addtolength{\@tempdima}{-\ht\strutbox}%
+        \ht\@tempboxa\ht\strutbox
+        \dp\@tempboxa\@tempdima
+        \strut\cap@left
+        \box\@tempboxa
+        \cap@right\strut
       }%
-      \cap@right\strut}%
     \else
       \global \@minipagefalse
 %    \end{macrocode}
@@ -978,10 +992,11 @@
 % gesetzt. Im Prinzip ginge das auch direkt ohne erst eine Box zu erzeugen.
 %    \begin{macrocode}
       \sbox\@tempboxa{%
-        {\capfont#1{{\caplabelfont#2\captionformat}}%
+        {\capfont\strut\ignorespaces
+          #1{{\caplabelfont#2\captionformat}}%
           #3}%
       }%
-     \hb@xt@\hsize{\cap@left\box\@tempboxa\cap@right}%
+      \hb@xt@\hsize{\strut\cap@left\box\@tempboxa\cap@right\strut}%
     \fi
   \endgroup
 }
