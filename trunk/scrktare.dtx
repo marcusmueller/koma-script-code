@@ -1,4 +1,4 @@
-% \CheckSum{1541}
+% \CheckSum{1540}
 % \iffalse meta-comment
 % ======================================================================
 % scrktare.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrktare.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrktare.dtx}[2006/03/28 v2.95 KOMA-Script (type area)]
+\ProvidesFile{scrktare.dtx}[2006/07/20 v2.95a KOMA-Script (type area)]
 % \iffalse
 %</driver>
 %<package&identify>\ProvidesPackage{typearea}[%
@@ -1321,17 +1321,16 @@
 %      arithmetischen Überlauf bei sehr großen Schriften}  
 %    \changes{v2.8q}{2002/03/06}{\cs{normalfont} \cs{normalsize} 
 %      hinzugefügt}
+%    \changes{v2.95a}{2006/07/20}{Berechnung für große Schriften korrigiert}
 %    \begin{macrocode}
 \newcommand*\ta@temp@goodwidth{%
   \settowidth{\ta@temp}{\normalfont\normalsize 
     abcdefghijklmnopqrstuvwxyz}%
   \ifdim\ta@temp >200\p@
-    \divide\ta@temp by26
-    \multiply\ta@temp by3
+    \setlength{\ta@temp}{2.53846\ta@temp}%
     \settowidth{\@tempdima}{\normalfont\normalsize
       ABCDEFGHIJKLMNOPQRSTUVWXYZ}%
-    \divide\@tempdima by26
-    \multiply\@tempdima by3
+    \setlength{\@tempdima}{.11538\@tempdima}%
     \addtolength{\ta@temp}{\@tempdima}%
   \else
     \multiply\ta@temp by66
@@ -1490,9 +1489,13 @@
     \edef\@lastdiv{\the\ta@div}%
 %    \end{macrocode}
 % Bevor nun irgendeine Berechnung durchgeführt wird, muss ggf. eine
-% neue Seite begonnen werden.
+% neue Seite begonnen werden. Außerdem wird sichergestellt, dass die aktuelle
+% Schriftgröße die Grundschriftgröße ist und auch mit dem aktuellen
+% Durchschuss gerechnet wird.
+%    \changes{v2.95a}{2006/07/20}{Grundschriftgröße einstellen}
 %    \begin{macrocode}
     \if@atdocument\newpage\fi
+    \normalsize
 %    \end{macrocode}
 % Nun muss festgestellt werden, ob die Höhe des Kopfbereichs bereits
 % vorgegeben ist, oder ob diese selbst berechnet werden soll. Im Falle
