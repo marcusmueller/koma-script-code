@@ -1,4 +1,4 @@
-% \CheckSum{1444}
+% \CheckSum{1464}
 % \iffalse meta-comment
 % ======================================================================
 % scrksect.dtx
@@ -915,10 +915,36 @@
 % Möglichkeit von Präambeln. \emph{Achtung: Die Präambel vor der
 % \cs{part}-Überschrift kann ohne Warnung über den oberen Rand
 % hinaus reichen!}
+%  \begin{macro}{\partheadstartvskip}
+%    \changes{v2.95a}{2006/07/10}{neue Konfiguratonsmöglichkeit}
+%  \begin{macro}{\partheadmidvskip}
+%    \changes{v2.95a}{2006/07/10}{neue Konfiguratonsmöglichkeit}
+%  \begin{macro}{\partheadendvskip}
+%    \changes{v2.95a}{2006/07/10}{neue Konfiguratonsmöglichkeit}
+% Diese drei Makros werden verwendet, um den Abstand über in und unter der
+% Überschrift eines Teils zu definieren. Prinzipiell kann damit auch der
+% Umbruch zwischen Nummer und Text entfernt werden.
+%    \begin{macrocode}
+\newcommand*{\partheadstartvskip}{%
+%<article> \addvspace{4ex}%
+%<report|book>  \null\vfil
+}
+\newcommand*{\partheadmidvskip}{%
+  \par\nobreak
+%<book|report>  \vskip 20\p@
+}
+\newcommand*{\partheadendvskip}{%
+%<article>    \vskip 3ex
+%<report|book>  \vfil\newpage
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
 %    \begin{macrocode}
 %<*article>
 \newcommand\part{\par
-  \addvspace{4ex}%
+  \partheadstartvskip%
   \@afterindentfalse
   \secdef\@part\@spart
 }
@@ -932,7 +958,7 @@
   \else
     \@tempswafalse
   \fi
-  \null\vfil%
+  \partheadstartvskip
   \vbox to\z@{\vss\use@preamble{part@o}\strut\par}%
   \vskip-\baselineskip\nobreak%
   \secdef\@part\@spart
@@ -950,23 +976,20 @@
   \fi
   \begingroup
     \setparsizes{\z@}{\z@}{\z@\@plus 1fil}\par@updaterelative
-%<article>    \raggedright
-%<report|book>    \centering
+    \raggedpart
     \interlinepenalty \@M
     \normalfont\sectfont\nobreak
 %<article>    \ifnum \c@secnumdepth >\m@ne
 %<book|report>    \ifnum \c@secnumdepth >-2\relax
       \size@partnumber\partformat
-      \par
-%<article>      \nobreak
-%<book|report>      \vskip 20\p@
+      \partheadmidvskip
     \fi
     \size@part #2\strut%
     \partmark{#1}\par
   \endgroup
 %<*article>
   \nobreak
-  \vskip 3ex
+  \partheadendvskip
   \@afterheading
 %</article>
 %<book|report>  \@endpart
@@ -974,22 +997,21 @@
 \newcommand*{\@spart}[1]{%
   \begingroup
     \setparsizes{\z@}{\z@}{\z@\@plus 1fil}\par@updaterelative
-%<article>    \raggedright
-%<book|report>    \centering
+    \raggedpart
     \interlinepenalty \@M
     \normalfont
     \sectfont\nobreak\size@part #1\strut\@mkboth{}{}\par
   \endgroup
 %<*article>
   \nobreak
-  \vskip 3ex
+  \partheadendvskip
   \@afterheading
 %</article>
 %<book|report>  \@endpart
 }
 %<*book|report>
 \newcommand*{\@endpart}{\vbox to\z@{\use@preamble{part@u}\vss}%
-  \vfil\newpage
+  \partheadendvskip
   \if@twoside\if@openright
       \null%
       \thispagestyle{empty}%
@@ -1011,6 +1033,7 @@
 %    \changes{v2.8c}{2001/06/29}{neu}
 %    \changes{v2.8d}{2001/07/05}{\cs{partpagestyle} statt
 %      \texttt{plain}}
+%    \changes{v2.95a}{2006/07/10}{support of preamble added}
 %  \begin{macro}{\@addpart}
 %    \changes{v2.8c}{2001/06/29}{neu (intern)}
 %    \changes{v2.8l}{2001/08/17}{erst eintragen, dann ausgeben}
@@ -1021,7 +1044,7 @@
 \newcommand\addpart{%
 %<*article>
   \par
-  \addvspace{4ex}%
+  \partheadstartvskip%
   \@afterindentfalse
 %</article>
 %<*report|book>
@@ -1033,7 +1056,8 @@
   \else
     \@tempswafalse
   \fi
-  \null\vfil
+  \partheadstartvskip
+  \vbox to\z@{\vss\use@preamble{part@o}\strut\par}%
 %</report|book>
   \secdef\@addpart\@saddpart
 }
@@ -1041,8 +1065,7 @@
 \def\@addpart[#1]#2{\addcontentsline{toc}{part}{#1}\@spart{#2}%
   \ifx\partmark\@gobble\else\@mkboth{#1}{}\fi
 }
-\newcommand*{\@saddpart}{}
-\def\@saddpart#1{\@spart{#1}}
+\newcommand*{\@saddpart}{\@spart}
 %    \end{macrocode}
 %  \begin{macro}{\partmark}
 %    \changes{v2.9r}{2004/07/20}{neu (für \textsf{scrpage2})}
@@ -1523,6 +1546,18 @@
 %    \begin{macrocode}
 \newcommand*{\raggedsection}{}
 \let\raggedsection\raggedright
+%    \end{macrocode}
+%  \end{macro}
+%
+%  \begin{macro}{\raggedpart}
+%    \changes{v2.95a}{2006/07/10}{neue Konfigurationsmöglichkeit}
+% Die Ausrichtung der Überschrift von \cs{part} kann davon abweichend über
+% \cs{raggedpart} konfiguriert werden. Die Voreinstellung ist von der
+% Klasse abhängig.
+%    \begin{macrocode}
+\newcommand*{\raggedpart}{}
+%<article>\let\raggedpart\raggedsection
+%<report|book>\let\raggedpart\centering
 %    \end{macrocode}
 %  \end{macro}
 %
