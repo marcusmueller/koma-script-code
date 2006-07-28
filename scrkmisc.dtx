@@ -1,4 +1,4 @@
-% \CheckSum{196}
+% \CheckSum{182}
 % \iffalse meta-comment
 % ======================================================================
 % scrkmisc.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkmisc.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkmisc.dtx}[2006/03/28 v2.95 KOMA-Script (misc)]
+\ProvidesFile{scrkmisc.dtx}[2006/07/28 v2.95b KOMA-Script (misc)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -404,25 +404,11 @@
 %
 %  \begin{macro}{\new@tpo@label}
 %    \changes{v2.8q}{2001/11/22}{neu (intern)}
+%    \changes{v2.95b}{2006/07/28}{verwendet jetzt \cs{@newl@bel}}
 % Definition eines neuen \emph{true}-\emph{page}-\emph{odd} Labels.
 % Wird in der \texttt{aux}-Datei verwendet.
 %    \begin{macrocode}
-\newcommand*{\new@tpo@label}[2]{%
-  \expandafter\gdef\csname scr@tpo@#1\endcsname{#2}%
-}
-%    \end{macrocode}
-%  \end{macro}
-%
-%  \begin{macro}{\ref@tpo@label}
-%    \changes{v2.8q}{2001/11/22}{neu (intern)}
-% Dieses Makro referenziert ein \emph{true}-\emph{page}-\emph{odd}
-% Label. Ist das Label nicht definiert, so wird stattdessen der Wert
-% des Zählers \texttt{page} verwendet.
-%    \begin{macrocode}
-\newcommand*{\ref@tpo@label}[1]{%
-  \expandafter\ifx\csname scr@tpo@#1\endcsname\relax\value{page}%
-  \else\csname scr@tpo@#1\endcsname\fi
-}
+\newcommand*{\new@tpo@label}{\@newl@bel{tpo}}
 %    \end{macrocode}
 %  \end{macro}
 %
@@ -438,6 +424,7 @@
 %  \begin{macro}{\is@thispageodd}
 %    \changes{v2.8q}{2001/11/22}{neu (intern)}
 %    \changes{v2.9l}{2003/01/28}{renamed \cs{if@thispageodd}}
+%    \changes{v2.95b}{2006/07/28}{basiert nun auf \cs{@newl@bel}}
 % Dieses Makro macht die eigentliche Arbeit. Es funktioniert nicht wie
 % ein normales \cs{iffalse} oder \cs{iftrue}, denn es kann nicht
 % geschachtelt innerhalb anderer \cs{if\dots} \dots \cs{fi}
@@ -447,40 +434,28 @@
 % geschrieben wird und min. zwei \LaTeX-Läufe erfolgen.
 %    \begin{macrocode}
 \newcommand*{\is@thispageodd}{%
+  \@bsphack
   \begingroup
     \@tempcnta=\scr@tpo
     \advance\@tempcnta by\@ne
     \xdef\scr@tpo{\the\@tempcnta}%
-    \@bsphack
-    \protected@write\@auxout{}{%
-      \string\new@tpo@label{\scr@tpo}{\noexpand\the\value{page}}}%
-    \@esphack
-    \count@\ref@tpo@label{\scr@tpo}%
-    \ifodd\count@
+    \protected@write\@auxout{\let\arabic\relax}{%
+      \string\new@tpo@label{\scr@tpo}{\arabic{page}}}%
+    \expandafter\ifx\csname tpo@\scr@tpo\endcsname\relax
+      \protect\G@refundefinedtrue
+      \ClassWarning{\KOMAClassName}{%
+        odd/even page label number \scr@tpo\space undefined}%
+      \edef\@tempa{\the\value{page}}%
+    \else
+      \edef\@tempa{\csname tpo@\scr@tpo\endcsname}%
+    \fi
+    \ifodd\number\@tempa
       \aftergroup\thispagewasoddtrue
     \else
       \aftergroup\thispagewasoddfalse
     \fi
   \endgroup
-}
-%    \end{macrocode}
-% Damit wenigstens halbwegs getestet werden kann, ob ein neuer Lauf
-% durchgeführt werden muss, wird hier noch eine weitere Information
-% in die \texttt{aux}-Datei geschrieben und auch gleich der
-% entsprechende Test vorgenommen. Damit das wirklich ganz am Ende
-% geschieht, wird hier die Anweidung \cs{BeforeClosingMainAux} aus dem
-% \textsf{scrlfile}-Paket verwendet.
-%    \begin{macrocode}
-\BeforeClosingMainAux{%
-  \if@filesw\immediate\write\@auxout{%
-    \string\gdef\string\scr@tpo@lst{\scr@tpo}}%
-  \fi
-  \ifx\scr@tpo@lst\scr@tpo\else\ifnum \scr@tpo>0
-      \ClassWarningNoLine{\KOMAClassName}{%
-        Rerun to get odd- an even-page-stuff right%
-      }%
-    \fi
-  \fi
+  \@esphack
 }
 %    \end{macrocode}
 %  \end{macro}
