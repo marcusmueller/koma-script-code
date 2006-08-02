@@ -1,4 +1,4 @@
-% \CheckSum{1687}
+% \CheckSum{1716}
 % \iffalse meta-comment
 % ======================================================================
 % scrknpap.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrknpap.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrknpap.dtx}[2006/06/06 v2.95 KOMA-Script (note-paper)]
+\ProvidesFile{scrknpap.dtx}[2006/07/30 v2.96 KOMA-Script (note-paper)]
 % \iffalse
 \documentclass{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -301,10 +301,45 @@
 % \begin{macro}{\if@baddr}
 % \begin{macro}{\@baddrtrue}
 % \begin{macro}{\@baddrfalse}
-% Die Einstellung der Option wird in einem Schalter gespeichert.
+% \begin{macro}{\backaddr@format}
+%    \changes{v2.96}{2006/07/31}{neu (intern)}
+% Dieses Makro hat genau ein Argument und bestimmt die Form der
+% Rücksendeadresse. Voreingestellt ist Unterstreichung. Dies entspricht der
+% vor Version~2.96 festen Voreinstellung.
+%    \begin{macrocode}
+\newcommand{\backaddr@format}[1]{}
+\let\backaddr@format\underline
+%    \end{macrocode}
+% \end{macro}
+% Die Einstellung true/false der Option wird in einem Schalter gespeichert.
 %    \begin{macrocode}
 \newif\if@baddr\@baddrtrue
-\KOMA@ifkey{backaddress}{@baddr}
+\KOMA@key{backaddress}[true]{%
+  \begingroup
+    \KOMA@set@ncmdkey{backaddress}{@tempa}{%
+      {false}{0},{off}{0},{no}{0},%
+      {true}{1},{on}{1},{yes}{1},%
+      {underlined}{2},%
+      {plain}{3}%
+    }{#1}%
+    \ifcase\@tempa
+      \endgroup
+      \@baddrfalse
+    \or
+      \endgroup
+      \@baddrtrue
+    \or
+      \endgroup
+      \@baddrtrue
+      \let\backaddr@format\underline
+    \or
+      \endgroup
+      \@baddrtrue
+      \let\backaddr@format\@firstofone
+    \else
+      \endgroup
+    \fi
+}
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -1229,6 +1264,7 @@
 %   \changes{v2.8q}{2002/06/03}{Sonderbehandlung für Adressfeld rechts}
 %   \changes{v2.9o}{2003/02/20}{\cs{noindent} eingefügt bei
 %     \texttt{specialmail}}
+%   \changes{v2.96}{2006/07/31}{Benutzung von \cs{backaddr@format}}
 % Dasselbe gilt auch für das Adressfeld für Fensterumschläge. Die
 % Rücksendeadresse und die Briefart wird dabei unterstrichen.
 %    \begin{macrocode}
@@ -1266,7 +1302,7 @@
                 \ifkomavarempty{backaddress}{}{{%
                     \noindent%
                     \def\\{\usekomavar{backaddressseparator}\@ogobble}%
-                    \underline{\scriptsize\usekomafont{backaddress}%
+                    \backaddr@format{\scriptsize\usekomafont{backaddress}%
                       \usekomavar{backaddress}}}}%
               \fi
             }{backaddress}{backaddrheight}{\setkomavar}%
