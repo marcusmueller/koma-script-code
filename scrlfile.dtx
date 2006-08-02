@@ -1,4 +1,4 @@
-% \CheckSum{151}
+% \CheckSum{252}
 % \iffalse meta-comment
 % ======================================================================
 % scrlfile.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrlfile.dtx
 %<*driver|scrlfile|load>
 % \fi
-\def\scrlfileversion{2006/03/28 v2.95}
+\def\scrlfileversion{2006/07/19 v2.96}
 % \iffalse
 %</driver|scrlfile|load>
 %<*driver>
@@ -86,16 +86,18 @@
 \title{\KOMAScript{} \partname\ \texttt{\filename}%
   \thanks{This file is version \fileversion\ of file \texttt{\filename}.}}  
 \date{\filedate}
-\author{Markus Kohm\thanks{mailto:kohm@gmx.de}~\thanks{Description
-    part of the documentation was written by Jens-Uwe Morawski.}}
+\author{Markus Kohm\thanks{mailto:komascript@gmx.info}~\thanks{Parts of
+    description sections of the documentation where written by Jens-Uwe
+    Morawski.}}
 
 \begin{document}
   \maketitle
   \begin{abstract}
-  This package provides hooks before and after loading files, packages
-  or classes. It also provides a hook after the last \cs{clearpage} of
-  the document. It is inteded to be used by package and class authors
-  but may also be used by \LaTeX{} users.
+    This package provides hooks before and after loading files, packages or
+    classes. It also provides a hook after the last \cs{clearpage} of the
+    document. It allowes to replace files, packages and classes by other
+    files, packages and classes. It is inteded to be used by package and class
+    authors but may also be used by \LaTeX{} users.
   \end{abstract}
 
   \section{Legal Note}
@@ -104,10 +106,10 @@
   allowed to redistribute and/or modifie the files
   ``\texttt{scrlogo.dtx}'', ``\texttt{scrlfile.dtx}'' and
   ``\texttt{scrlfile.ins}'' under the conditions of \LaTeX{} Project
-  Public License, either version 1.2 of this license or (at your
+  Public License, either version 1.3b of this license or (at your
   option) any later version.  The latest version of this license is in
-  \mbox{http://www.latex-project.org/lppl.txt} and version 1.2 or
-  later is part of all distributions of \LaTeX{} version 1999/12/01 or
+  \mbox{http://www.latex-project.org/lppl.txt} and version 1.3b or
+  later is part of all distributions of \LaTeX{} version 2005/12/01 or
   later.  You are not allowed to distribute one of the three files
   ``\texttt{scrlogo.dtx}'', ``\texttt{scrlfile.dtx}'' and
   ``\texttt{scrlfile.ins}'' without the others but all these files
@@ -251,6 +253,94 @@
 % loaded, but also immediately if the class or package has been loaded
 % already.
 %
+% \DescribeMacro{\ReplaceInput}
+% The command \cs{ReplaceInput}\marg{name of file to be replaced}\marg{name of
+% replacement file} sets up an replacement. Whenever \LaTeX{} is told to input
+% the file with \meta{name of file to be replaced} it will input the file with
+% \meta{name of replacement file} instead. With this you may even teill \LaTeX
+% to input e.g. ``\texttt{\cs{jobname}.xua}'' instead of
+% ``\texttt{\cs{jobname.aux}}'' using:
+% \begin{verbatim}
+%   \ReplaceInput{\jobname.aux}{\jobname.xua}
+% \end{verbatim}\vspace{-\baselineskip}
+% If you replace a replacement file both, the first replaced file and the
+% replacement file will be replaced by the new replacement file. So
+% \begin{verbatim}
+%   \ReplaceInput{\jobname.aux}{\jobname.xua}
+%   \ReplaceInput{\jobname.xua}{\jobname.uxa}
+% \end{verbatim}\vspace{-\baselineskip}
+% will replace ``\texttt{\cs{jobname}.aux}'' and ``\texttt{\cs{jobname}.xua}''
+% by ``\texttt{\cs{jobname}.uxa}''. But ring replacement like
+% \begin{verbatim}
+%   \ReplaceInput{\jobname.aux}{\jobname.xua}
+%   \ReplaceInput{\jobname.xua}{\jobname.aux}
+% \end{verbatim}\vspace{-\baselineskip}
+% would result in an stack size error. So you cannot input an already replaced
+% file using \LaTeX{} commands.
+%
+% \DescribeMacro{\ReplaceClass}
+% \DescribeMacro{\ReplacePackage}
+% You should not replace a class or package using \cs{ReplaceInput}. If you do
+% so, you'll get errors because of not matching class names. But you may use
+% \cs{ReplaceClass}\marg{name of class to be replaced}\marg{name of
+% replacement class} and \cs{ReplacePackage}\marg{name of package to be
+% replaced}\marg{name of replacement package} instead. With this commands like
+% \cs{documentclass}\marg{name of class to be replaced} would work like
+% \cs{documentclass}\marg{name of replacement class}. Effected commands are
+% \cs{LoadClass}, \cs{LoadClassWithOptions}, \cs{documentclass},
+% \cs{RequirePackage}, \cs{RequirePackageWithOptions}, \cs{usepackage}.
+%
+% Note: The replacement class or package will be loaded with the same option
+% list the replaced class or package would have been. If you replace a
+% class or package with a class or package that does not know the options of
+% the replaced class or package, you may declare the missing options using
+% \cs{BeforeClass} and \cs{BeforePackage}.
+%
+% If you e.g. want to load package \texttt{newfoo} instead of package
+% \texttt{oldfoo} you may use:
+% \begin{verbatim}
+%   \ReplacePackage{oldfoo}{newfoo}
+% \end{verbatim}\vspace{-\baselineskip}
+% And if the old package had an option \texttt{oldopt} but the new package
+% does not you may use
+% \begin{verbatim}
+%   \BeforePackage{newfoo}{%
+%     \DeclareOption{oldopt}{%
+%       \PackageInfo{newfoo}{option ``oldopt'' not supported}%
+%     }%
+%   }
+% \end{verbatim}\vspace{-\baselineskip}
+% If new option \texttt{newopt} should be used instead of \texttt{oldopt} you
+% may use:
+% \begin{verbatim}
+%   \BeforePackage{newfoo}{%
+%     \DeclareOption{oldopt}{%
+%       \ExecuteOption{newopt}%
+%     }%
+%   }
+% \end{verbatim}\vspace{-\baselineskip}
+% You may also set new default options using:
+% \begin{verbatim}
+%   \BeforePackage{newfoo}{%
+%     \DeclareOption{oldopt}{%
+%       \ExecuteOption{newopt}%
+%     }%
+%     \PassOptionsToPackage{newdefoptA,newdefoptB}{newfoo}%
+%   }
+% \end{verbatim}\vspace{-\baselineskip}
+% or simply
+% \begin{verbatim}
+%   \BeforePackage{newfoo}{%
+%     \DeclareOption{oldopt}{%
+%       \ExecuteOption{newopt}%
+%     }%
+%   }
+%   \PassOptionsToPackage{newdefoptA,newdefoptB}{newfoo}%
+% \end{verbatim}\vspace{-\baselineskip}
+% 
+% Note: To replace classes you have to load \textsf{scrlfile} using
+% \cs{RequirePackage} before loading the class.
+%
 % \DescribeMacro{\BeforeClosingMainAux}
 % The command \cs{BeforeClosingMainAux}\marg{instructions}
 % works different from all the commands above. Is isn't a
@@ -322,6 +412,7 @@
 % \subsection{The macros}
 %
 %  \begin{macro}{\InputIfFileExists}
+%    \changes{v2.96}{2006/07/19}{replacement code added}
 % \LaTeX{} uses this macro for loading files with
 % \cs{input}\marg{filename}, \cs{include}, \cs{LoadClass},
 % \cs{LoadClassWithOptions}, \cs{documentclass}, \cs{documentstyle},
@@ -342,10 +433,123 @@
 % Now we can redefine the macro like described above:
 %    \begin{macrocode}
 \renewcommand{\InputIfFileExists}[2]{%
-  \IfFileExists{#1}{%
-    \scr@load@hook{before}{#1}%
-    #2\@addtofilelist{#1}\@@input \@filef@und
-    \scr@load@hook{after}{#1}}}
+  \begingroup\expandafter\expandafter\expandafter\endgroup
+  \expandafter\ifx\csname #1-@alias\endcsname\relax
+    \expandafter\@secondoftwo
+  \else
+    \scr@replacefile@msg{\csname #1-@alias\endcsname}{#1}%
+    \expandafter\@firstoftwo
+  \fi
+  {%
+    \expandafter\InputIfFileExists\expandafter{\csname
+      #1-@alias\endcsname}{#2}%
+  }%
+  {\IfFileExists{#1}{%
+      \scr@load@hook{before}{#1}%
+      #2\@addtofilelist{#1}%
+      \@@input \@filef@und
+      \scr@load@hook{after}{#1}%
+    }}%
+}
+%    \end{macrocode}
+%  \end{macro}
+%
+%  \begin{macro}{\@loadwithoptions}
+%    \changes{v2.96}{2006/07/19}{new redefinition}
+%  \begin{macro}{\scr@loadwithoption}
+%    \changes{v2.96}{2006/07/19}{new helper macro}
+% \LaTeX{} uses this macro for loading classes and packages using
+% \cs{LoadClassWithOptions} or \cs{RequirePackageWithOptions}. We simply say
+% now: if the class or package should be replaced by another, try it again
+% with the replacement name. The stack is used. This will result in an
+% error if the replacements are nested too deep. This should be, because it
+% will also result in an error using ring replacements.
+%    \begin{macrocode}
+\newcommand*{\scr@loadwithoptions}{}
+\let\scr@loadwithoptions\@loadwithoptions
+\renewcommand*{\@loadwithoptions}[3]{%
+  \begingroup\expandafter\expandafter\expandafter\endgroup
+  \expandafter\ifx\csname #3.#1-@aliasname\endcsname\relax
+    \scr@loadwithoptions{#1}{#2}{#3}%
+  \else
+    \scr@replacefile@msg{\csname #3.#1-@aliasname\endcsname.#1}{#3.#1}% 
+    \@loadwithoptions{#1}{#2}{\csname #3.#1-@aliasname\endcsname}%
+  \fi
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%
+%  \begin{macro}{\@onefilewithoption}
+%    \changes{v2.96}{2006/07/19}{new redefinition}
+%  \begin{macro}{\scr@onefilewithoption}
+%    \changes{v2.96}{2006/07/19}{new helper macro}
+% \LaTeX{} uses this macro for loading classes and packages using
+% \cs{LoadClass}, \cs{documentclass}, \cs{RequirePackage}, and
+% \cs{usepackage}. We simply say now: if the class or package should be
+% replaced by another, try it again with the replacement name. The stack is
+% used. This will result in an error if the replacements are nested too
+% deep. This should be, because it will also result in an error using ring
+% replacements.
+%    \begin{macrocode}
+\newcommand*{\scr@onefilewithoptions}{}
+\let\scr@onefilewithoptions\@onefilewithoptions
+\def\@onefilewithoptions#1[#2][#3]#4{%
+  \begingroup\expandafter\expandafter\expandafter\endgroup
+  \expandafter\ifx\csname #1.#4-@aliasname\endcsname\relax
+    \scr@onefilewithoptions{#1}[{#2}][{#3}]{#4}%
+  \else
+    \scr@replacefile@msg{\csname #1.#4-@aliasname\endcsname.#4}{#1.#4}%
+    \expandafter\@onefilewithoptions\expandafter{%
+      \csname #1.#4-@aliasname\endcsname
+    }[{#2}][{#3}]{#4}%
+  \fi
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%
+%  \begin{macro}{\ReplaceInput}
+%    \changes{v2.96}{2006/07/19}{new command}
+% Defining the replacement by definition of \cs{\#1-@alias}.
+%    \begin{macrocode}
+\newcommand*{\ReplaceFile}[2]{%
+  \expandafter\edef\csname #1-@alias\endcsname{#2}%
+}
+%    \end{macrocode}
+%  \end{macro}
+%
+%  \begin{macro}{\ReplacePackage}
+%    \changes{v2.96}{2006/07/19}{new command}
+%  \begin{macro}{\ReplaceClass}
+%    \changes{v2.96}{2006/07/19}{new command}
+%  \begin{macro}{\@replacefilewithext}
+%    \changes{v2.96}{2006/07/19}{new helper command}
+% Note that replacing a package or class will not replace the input of the
+% file of the package or class but only the input of package or class.
+%    \begin{macrocode}
+\newcommand*{\@replacefilewithext}[3]{%
+  \expandafter\edef\csname #1.#3-@aliasname\endcsname{#2}%
+}
+\newcommand*{\ReplacePackage}[2]{%
+  \@replacefilewithext{#1}{#2}\@pkgextension
+}
+\newcommand*{\ReplaceClass}[2]{%
+  \@replacefilewithext{#1}{#2}\@clsextension
+}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%
+%  \begin{macro}{\scr@replacefile@msg}
+%    \changes{v2.96}{2006/07/19}{new helper command}
+% Last but not least \textsf{scrlfile} will write a message to the log file at
+% every replacement.
+%    \begin{macrocode}
+\newcommand*{\scr@replacefile@msg}[2]{%
+  \PackageInfo{scrlfile}{inputting `#1' instead of `#2'}%
+}
 %    \end{macrocode}
 %  \end{macro}
 %
