@@ -163,7 +163,7 @@ else
 %   Equals        \=     Greater than  \>     Question mark \?
 %   Commercial at \@     Left bracket  \[     Backslash     \\\\
 %   Right bracket \]     Circumflex    \^     Underscore    \_
-%   Grave accent  \\`     Left brace    \{     Vertical bar  \|
+%   Grave accent  \\\`     Left brace    \{     Vertical bar  \|
 %   Right brace   \}     Tilde         \~}
 %
 % \iffalse
@@ -181,7 +181,7 @@ EOF
 EOF
 	echo '  ['`date +\%Y/\%m/\%d`' v'$fileversion' LaTeX2e KOMA-Script package (TEMPLATE)]'
 	echo '%</dtx|package|driver>'
-	echo '%<*driver>
+	echo '%<*driver>'
     else
 	cat <<EOF
 %<*driver>
@@ -216,22 +216,24 @@ EOF
     else
 	echo '\title{\KOMAScript{} \partname\ \texttt{\filename}%'
     fi
-  if $english; then
+    if $english; then
 cat <<EOF
   \footnote{This is version \fileversion\ of file \texttt{\filename}.}}
 EOF
-  else
-cat <<EOF
+    else
+        cat <<EOF
   \footnote{Dies ist Version \fileversion\ von Datei \texttt{\filename}.}}
 EOF
-  fi
-cat <<EOF
+    fi
+    cat <<EOF
 \date{\filedate}
 \author{Markus Kohm}
 
 \begin{document}
   \maketitle
-  \tableofcontents
+EOF
+    $packagefiles || echo '  \tableofcontents'
+    cat <<EOF
   \DocInput{\filename}
 \end{document}
 %</driver>
@@ -257,6 +259,7 @@ EOF
 % ADD ABSTRACT HERE
 % \end{abstract}
 %
+% \tableofcontents
 EOF
 	if $english; then
 	    echo '% \section{How to Use the Package}'
