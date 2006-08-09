@@ -253,7 +253,7 @@ EOF
 	fi
         cat <<EOF
 %
-% \begin{abstact}
+% \begin{abstract}
 % ADD ABSTRACT HERE
 % \end{abstract}
 %
