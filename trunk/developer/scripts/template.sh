@@ -209,9 +209,9 @@ EOF
     echo '\GetFileInfo{'"$1"'}'
     if $packagefile; then
 	if $english; then
-	    echo '\title{The \KOMAScript{} package \texttt{\filename}%'
+	    echo '\title{The \KOMAScript{} package \texttt{'$2'}%'
 	else
-	    echo '\title{Das \KOMAScript-Paket \texttt{\filename}%'
+	    echo '\title{Das \KOMAScript-Paket \texttt{'$2'}%'
 	fi
     else
 	echo '\title{\KOMAScript{} \partname\ \texttt{\filename}%'
