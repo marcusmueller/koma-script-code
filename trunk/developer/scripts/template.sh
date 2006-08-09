@@ -35,6 +35,7 @@ Options:
  -g     generates german template file (default)
  -h     shows this information and exit
  -i     generates .ins template file
+ -s     generate .dtx and .ins template for stand alone package
  -v     shows version information and exit
  -V VERSION
         sets fileversion of the generated file to VERSION (default: '$fileversion')
@@ -108,31 +109,85 @@ EOF
 % ---------- File generation -------------------------------------------
 
 \generate{\usepreamble\defaultpreamble
+EOF
+
+    if $packagefiles; then
+	cat <<EOF
+  \file{$2.sty}{%
+    \ifbeta\from{scrbeta.dtx}{package,$2}\fi
+    \from{$2.dtx}{package,$2}%
+EOF
+    else
+	cat <<EOF
   \file{CHANGETHIS.sty}{%
     \ifbeta\from{scrbeta.dtx}{class,package,lcofile,ONLYONEOFTHIS}\fi
     \from{$2.dtx}{options}%
     \from{$2.dtx}{main}%
+EOF
+    fi
+    cat <<EOF
     \from{scrlogo.dtx}{logo}%
   }%
 }
 
 % ---------- end of docstrip process -----------------------------------
 
-\def\idocfiles{}
+EOF
+    if $packagefiles; then
+	cat <<EOF
+\ifToplevel{%
+  \def\idocfiles{'$2.dtx'}%
+}
+EOF
+    else
+	echo '\def\idocfiles{}'
+    fi
+cat <<EOF
 \@@input scrstrop.inc
 
 EOF
 else
     cat <<EOF
 % \fi
+%
+% \CharacterTable
+%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%   Digits        \0\1\2\3\4\5\6\7\8\9
+%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%   Dollar        \\$     Percent       \%     Ampersand     \&
+%   Acute accent  \'     Left paren    \(     Right paren   \)
+%   Asterisk      \*     Plus          \+     Comma         \,
+%   Minus         \-     Point         \.     Solidus       \/
+%   Colon         \:     Semicolon     \;     Less than     \<
+%   Equals        \=     Greater than  \>     Question mark \?
+%   Commercial at \@     Left bracket  \[     Backslash     \\
+%   Right bracket \]     Circumflex    \^     Underscore    \_
+%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%   Right brace   \}     Tilde         \~}
+%
 % \iffalse
 EOF
     echo '%%% From File: '"$1"
-    cat <<EOF
+    if $packagefiles; then
+	cat <<EOF
+%<*dtx>
+\ProvidesFile{$1}
+%</dtx>
+%<package|driver>\NeedsTeXFormat{LaTeX2e}[1995/06/01]
+%<package>\ProvidesPackage{$2}
+%<driver>\ProvidesFile{$2.drv}
+%<*dtx|package|driver>
+EOF
+	echo '  ['`date +\%Y/\%m/\%d`' v'$fileversion' LaTeX2e KOMA-Script package (TEMPLATE)]'
+	echo '%</dtx|package|driver>'
+    else
+	cat <<EOF
 %<*driver>
 % \fi
 EOF
-    echo '\ProvidesFile{'"$1"'}['`date +\%Y/\%m/\%d`' v'$fileversion' KOMA-Script (TEMPLATE)]'
+	echo '\ProvidesFile{'"$1"'}['`date +\%Y/\%m/\%d`' v'$fileversion' KOMA-Script (TEMPLATE)]'
+    fi
     cat <<EOF
 % \iffalse
 \documentclass{scrdoc}
@@ -143,14 +198,23 @@ EOF
         echo '\usepackage[english,ngerman]{babel}'
         echo '\usepackage[latin1]{inputenc}'
     fi
+    if $packagefiles; then
+	echo '\usepackage{'"$2"'}'
+    fi
     cat <<EOF
 \CodelineIndex
 \RecordChanges
 EOF
     echo '\GetFileInfo{'"$1"'}'
-    cat <<EOF
-\title{\KOMAScript{} \partname\ \texttt{\filename}%
-EOF
+    if $packagefile; then
+	if $english; then
+	    echo '\title{The \KOMAScript{} package \texttt{\filename}%'
+	else
+	    echo '\title{Das \KOMAScript-Paket \texttt{\filename}%'
+	fi
+    else
+	echo '\title{\KOMAScript{} \partname\ \texttt{\filename}%'
+    fi
   if $english; then
 cat <<EOF
   \footnote{This is version \fileversion\ of file \texttt{\filename}.}}
@@ -180,40 +244,86 @@ EOF
     fi
     echo '%'
     echo '% \changes{v'$fileversion'}{'`date +\%Y/\%m/\%d`'}{%'
-    if $english; then
-        echo '%   first version after splitting \textsf{scrclass.dtx}}'
+    if $packagefiles; then
+	if $english; then
+	    echo '%   start of new package}'
+	else
+	    echo '%   Anfang des neuen Pakets}'
+	fi
+        cat <<EOF
+%
+% \begin{abstact}
+% ADD ABSTRACT HERE
+% \end{abstract}
+%
+EOF
+	if $english; then
+	    echo '% \section{How to Use the Package}'
+	else
+	    echo '% \section{Anwendung des Pakets}'
+	fi
     else
-        echo '%   erste Version aus der Aufteilung von \textsf{scrclass.dtx}}'
-    fi
-    cat <<EOF
+	if $english; then
+            echo '%   first version after splitting \textsf{scrclass.dtx}}'
+	else
+            echo '%   erste Version aus der Aufteilung von \textsf{scrclass.dtx}}'
+	fi
+	cat <<EOF
 %
 % \section{TEMPLATE}
+EOF
+    fi
+    cat <<EOF
 %
 % ADD SOME DESCRIPTIONS HERE
 %
 % \StopEventually{\PrintIndex\PrintChanges}
 %
+EOF
+    if $english; then
+	echo '% \section{Implementation}'
+    else
+	echo '% \section{Implementierung}'
+    fi
+    echo '%'
+    if ! $packagefiles; then
+	cat <<EOF
 % \iffalse
 %<*option>
 % \fi
 %
+EOF
+    fi
+    cat <<EOF
 % \subsection{Option}
 % ADD IMPLEMENTATION HERE
 %
 %
+EOF
+    if ! $packagefiles; then
+	cat <<EOF
 % \iffalse
 %</option>
 %<*body>
 % \fi
 %
+EOF
+    fi
+    cat <<EOF
 % \subsection{Body}
 % ADD IMPLEMENTATION HERE
 %
 %
+EOF
+    if ! $packagefiles; then
+	cat <<EOF
 % \iffalse
 %</body>
 % \fi
 %
+EOF
+    fi
+    cat <<EOF
 % \Finale
 %
 EOF
@@ -237,9 +347,10 @@ EOF
 
 english=false
 insfile=false
+packagefiles=false
 fileversion=3.0
 
-while getopts 'deghivV:' option;do
+while getopts 'deghisvV:' option;do
     case $option in
         \?) error 1 "";;
         d)  insfile=false;;
@@ -247,6 +358,7 @@ while getopts 'deghivV:' option;do
         g)  english=false;;
         h)  help; exit 0;;
         i)  insfile=true;;
+        s)  packagefiles=true;;
         V)  fileversion=${OPTARG};;
         v)  version; exit 0;;
     esac
@@ -259,17 +371,36 @@ else
     shift $OPTIND
     filename=${1:-"template.dtx"}
     basefilename=${filename%.*}
-    if $insfile; then
-        filename="$basefilename.ins"
-    else
-        filename="$basefilename.dtx"
+    if ! $packagefiles; then
+	if $insfile; then
+            filename="$basefilename.ins"
+	else
+            filename="$basefilename.dtx"
+	fi
     fi
 fi
 
-if [ -f $filename ]; then
-    echo $filename' already exists. You have to remove it first using e.g.' >&2
-    echo '  rm '$filename >&2
-    exit 1
+if $packagefiles; then
+    if [ -f "${basefilename}.ins" ]; then
+	echo ${basefilename}'.ins already exists. You have to remove it first using e.g.' >&2
+	echo '  rm '${basefilename}'.ins' >&2
+	exit 1
+    fi
+    if [ -f "${basefilename}.dtx" ]; then
+	echo ${basefilename}'.dtx already exists. You have to remove it first using e.g.' >&2
+	echo '  rm '${basefilename}'.dtx' >&2
+	exit 1
+    fi
+    insfile=true
+    generate "${basefilename}.ins" "$basefilename" > "${basefilename}.ins"
+    insfile=false
+    generate "${basefilename}.dtx" "$basefilename" > "${basefilename}.dtx"
 else
-    generate $filename $basefilename > $filename
+    if [ -f $filename ]; then
+	echo $filename' already exists. You have to remove it first using e.g.' >&2
+	echo '  rm '$filename >&2
+	exit 1
+    else
+	generate $filename $basefilename > $filename
+    fi
 fi
