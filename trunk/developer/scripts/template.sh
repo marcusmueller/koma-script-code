@@ -181,15 +181,16 @@ EOF
 EOF
 	echo '  ['`date +\%Y/\%m/\%d`' v'$fileversion' LaTeX2e KOMA-Script package (TEMPLATE)]'
 	echo '%</dtx|package|driver>'
+	echo '%<*driver>
     else
 	cat <<EOF
 %<*driver>
 % \fi
 EOF
 	echo '\ProvidesFile{'"$1"'}['`date +\%Y/\%m/\%d`' v'$fileversion' KOMA-Script (TEMPLATE)]'
+	echo '% \iffalse'
     fi
     cat <<EOF
-% \iffalse
 \documentclass{scrdoc}
 EOF
     if $english; then
