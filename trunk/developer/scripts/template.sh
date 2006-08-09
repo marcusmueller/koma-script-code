@@ -290,7 +290,14 @@ EOF
 	echo '% \section{Implementierung}'
     fi
     echo '%'
-    if ! $packagefiles; then
+    if $packagefiles; then
+	cat <<EOF
+% \iffalse
+%<*package>
+% \fi
+%
+EOF
+    else
 	cat <<EOF
 % \iffalse
 %<*option>
@@ -319,7 +326,14 @@ EOF
 %
 %
 EOF
-    if ! $packagefiles; then
+    if $packagefiles; then
+	cat <<EOF
+% \iffalse
+%</package>
+% \fi
+%
+EOF
+    else
 	cat <<EOF
 % \iffalse
 %</body>
