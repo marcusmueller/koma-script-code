@@ -1,4 +1,4 @@
-% \CheckSum{819}
+% \CheckSum{877}
 % \iffalse meta-comment
 % ======================================================================
 % scrkbase.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkbase.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkbase.dtx}[2006/03/29 v1.0 KOMA-Script (basics)]
+\ProvidesFile{scrkbase.dtx}[2006/08/12 v1.0a KOMA-Script (basics)]
 % \iffalse
 %</driver>
 %<package&option>\ProvidesPackage{scrkbase}[%
@@ -286,35 +286,113 @@
 %  \end{macro}
 %  \end{macro}
 %
-%  \begin{macro}{\ifundefined}
-%    \changes{v2.95}{2002/08/21}{neu}
-% Dieses Makro arbeitet wie \cs{@ifundefined}, definiert dabei aber
-% ein undefiniertes Makro nicht als \cs{relax}.
+%  \begin{macro}{\let@as@internal@defined}
+%    \changes{v2.95}{2002/08/19}{neu (intern)}
+%    \changes{v2.95c}{2008/08/12}{Warnung bei Umdefinierung}
+% Dieses Makro wird intern verwendet, um dokumentierte Makros mit der
+% Definition von internen Makros zu versehen, falls sie nicht bereits
+% definiert sind. Der Name des dokumentierten Makros wird als
+% Parameter übergeben. Dies wird gleich benötigt.
 %    \begin{macrocode}
-\newcommand{\ifundefined}[1]{%
-  \begingroup\expandafter\expandafter\expandafter\endgroup
-  \expandafter\ifx\csname #1\endcsname\relax
-    \expandafter\@firstoftwo
-  \else
-    \expandafter\@secondoftwo
-  \fi
+\newcommand*{\let@as@internal@defined}[1]{
+  \@ifundefined{#1}{%
+    \begingroup
+      \expandafter\def\expandafter\@tempa
+        \expandafter{\csname scr@#1\endcsname}
+      \expandafter\def\expandafter\@tempb
+        \expandafter{\csname #1\endcsname}
+    \expandafter\expandafter\expandafter\endgroup
+    \expandafter\expandafter\expandafter\let\expandafter\@tempb\@tempa
+    \if@atdocument\else
+      \g@addto@macro\document{%
+        \expandafter\ifx\csname #1\expandafter\endcsname
+        \csname scr@#1\endcsname
+        \else
+          \PackageWarning{scrkbase}{%
+            \expandafter\string\csname #1\endcsname\space was
+            redefined\MessageBreak
+            at the document preamble.\MessageBreak
+            If you did not redefine it by yourself, have a\MessageBreak
+            a look at the description of this command at\MessageBreak
+            the manual of every package you are using\@gobble
+          }%
+        \fi
+      }%
+    \fi
+  }{%
+    \PackageInfo{%
+      scrkbase%
+    }{%
+      \expandafter\string\csname #1\endcsname\space already
+      defined.\MessageBreak
+      If \expandafter\string\csname #1\endcsname\space does not behave
+      like\MessageBreak
+      it was described at the KOMA-Script manual, try to\MessageBreak
+      load `scrkbase.sty' earlier or find out at which\MessageBreak
+      package or class \expandafter\string\csname #1\endcsname\space
+      was defined before\@gobble
+    }%
+  }%
 }
 %    \end{macrocode}
 %  \end{macro}
 %
+%  \begin{macro}{\scr@ifundefined}
+%    \changes{v2.95c}{2006/08/12}{neu (intern)}
+%  \begin{macro}{\ifundefined}
+%    \changes{v2.95}{2002/08/21}{neu}
+%    \changes{v2.95c}{2006/08/12}{über interne Anweisung definiert}
+% Dieses Makro arbeitet wie \cs{@ifundefined}, definiert dabei aber
+% ein undefiniertes Makro nicht als \cs{relax}.
+%    \begin{macrocode}
+\begingroup\expandafter\expandafter\expandafter\endgroup
+\expandafter\ifx\csname ifcsname\endcsname
+  \newcommand{\scr@ifundefined}[1]{%
+    \ifcsname #1\endcsname
+      \expandafter\@secondoftwo
+    \else
+      \expandafter\@firstoftwo
+    \fi
+  }
+\else
+  \newcommand{\scr@ifundefined}[1]{%
+    \begingroup\expandafter\expandafter\expandafter\endgroup
+    \expandafter\ifx\csname #1\endcsname\relax
+      \expandafter\@firstoftwo
+    \else
+      \expandafter\@secondoftwo
+    \fi
+  }
+\fi
+\let@as@internal@defined{ifundefined}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%
 %  \begin{macro}{\ifnotundefined}
 %    \changes{v2.95}{2002/08/21}{neu}
+%    \changes{v2.95c}{2006/08/12}{nutzt \eTeX{} wenn möglich}
 % Dieses Makro arbeitet genau umgekehrt zu \cs{ifundefined}. Manchmal
 % ist es ganz nützlich, auch das zu haben. Dieses Makro heißt nicht
 % \cs{ifdefined}, weil \eTeX\ bereits ein solches Primitiv bietet.
 %    \begin{macrocode}
-\newcommand{\ifnotundefined}[1]{%
-  \begingroup\expandafter\expandafter\expandafter\endgroup
-  \expandafter\ifx\csname #1\endcsname\relax
-    \expandafter\@secondoftwo
-  \else
-    \expandafter\@firstoftwo
-  \fi
+\scr@ifundefined{ifcsname}{%
+  \newcommand{\ifnotundefined}[1]{%
+    \begingroup\expandafter\expandafter\expandafter\endgroup
+    \expandafter\ifx\csname #1\endcsname\relax
+      \expandafter\@secondoftwo
+    \else
+      \expandafter\@firstoftwo
+    \fi
+  }%
+}{%
+  \newcommand{\ifnotundefined}[1]{%
+    \ifcsname #1\endcsname
+      \expandafter\@firstoftwo
+    \else
+      \expandafter\@secondoftwo
+    \fi
+  }%
 }
 %    \end{macrocode}
 %  \end{macro}
@@ -486,40 +564,6 @@
 %  \end{macro}
 %
 %
-%  \begin{macro}{\let@as@internal@defined}
-%    \changes{v2.95}{2002/08/19}{neu (intern)}
-% Dieses Makro wird intern verwendet, um dokumentierte Makros mit der
-% Definition von internen Makros zu versehen, falls sie nicht bereits
-% definiert sind. Der Name des dokumentierten Makros wird als
-% Parameter übergeben. Dies wird gleich benötigt.
-%    \begin{macrocode}
-\newcommand*{\let@as@internal@defined}[1]{
-  \@ifundefined{#1}{%
-    \begingroup
-      \expandafter\def\expandafter\@tempa
-        \expandafter{\csname scr@#1\endcsname}
-      \expandafter\def\expandafter\@tempb
-        \expandafter{\csname #1\endcsname}
-    \expandafter\expandafter\expandafter\endgroup
-    \expandafter\expandafter\expandafter\let\expandafter\@tempb\@tempa
-  }{%
-    \PackageInfo{%
-      scrkbase%
-    }{%
-      \expandafter\string\csname #1\endcsname\space already
-      defined.\MessageBreak
-      If \expandafter\string\csname #1\endcsname\space does not behave
-      like\MessageBreak
-      it was described at the KOMA-Script manual, try to\MessageBreak
-      load `scrkbase.sty' earlier or find out at which\MessageBreak
-      package or class \expandafter\string\csname #1\endcsname\space
-      was defined before\@gobble
-    }%
-  }%
-}
-%    \end{macrocode}
-%  \end{macro}
-%
 %  \begin{macro}{\ifpdftex}
 %    \changes{v2.95}{2002/08/19}{neu}
 %  \begin{macro}{\scr@ifpdftex}
@@ -562,8 +606,8 @@
 % für die Deklaration der Option \texttt{pagesize} benötigt.
 %    \begin{macrocode}
 \newcommand{\scr@ifpdfoutput}{%
-  \ifundefined{pdfoutput}{%
-    \ifundefined{OpMode}{%
+  \scr@ifundefined{pdfoutput}{%
+    \scr@ifundefined{OpMode}{%
       \expandafter\@secondoftwo%
     }{%
       \ifnum\OpMode=1
@@ -626,8 +670,8 @@
 % ausgegeben wird oder nicht, Befehle auszuführen.
 %    \begin{macrocode}
 \newcommand*{\scr@ifdvioutput}{%
-  \ifundefined{pdfoutput}{%
-    \ifundefined{OpMode}{%
+  \scr@ifundefined{pdfoutput}{%
+    \scr@ifundefined{OpMode}{%
       \expandafter\@firstoftwo
     }{%
       \ifnum\OpMode=0
