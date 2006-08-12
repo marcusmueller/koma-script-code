@@ -1,4 +1,4 @@
-% \CheckSum{1540}
+% \CheckSum{1576}
 % \iffalse meta-comment
 % ======================================================================
 % scrktare.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrktare.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrktare.dtx}[2006/07/20 v2.95a KOMA-Script (type area)]
+\ProvidesFile{scrktare.dtx}[2006/08/12 v2.96 KOMA-Script (type area)]
 % \iffalse
 %</driver>
 %<package&identify>\ProvidesPackage{typearea}[%
@@ -180,7 +180,7 @@
 % Ab hier nun wieder Teile für Klassen und Paket:
 %    \begin{macrocode}
 %</package>
-%<*package|class>
+%<*class|package>
 %    \end{macrocode}
 %
 %  \begin{macro}{\@BCOR}
@@ -270,17 +270,8 @@
 %  \end{macro}
 %  \end{macro}
 %
-% Zur Abwechslung geht es mit einem Teil weiter, den es nur bei den
-% Klassen gibt:
+% Jetzt kommt ein Stück, das nur im Paket benötigt wird.
 %    \begin{macrocode}
-%</package|class>
-%<*class>
-%    \end{macrocode}
-%
-% Jetzt gibt es wieder etwas, was nur für \textsf{typearea} benötigt
-% wird.
-%    \begin{macrocode}
-%</class>
 %<*package>
 %    \end{macrocode}
 %
@@ -423,7 +414,6 @@
 % Jetzt wird es wieder für alle interessant:
 %    \begin{macrocode}
 %</package>
-%<*package|class>
 %    \end{macrocode}
 %
 % Zurück zur Mustererkennung. Diese ist tatsächlich etwas einfacher
@@ -479,12 +469,6 @@
 %    \end{macrocode}
 %  \end{macro}
 %
-% Vorerst das Ende der Gemeinsamkeiten.
-%    \begin{macrocode}
-%</package|class>
-%<*package>
-%    \end{macrocode}
-%
 %
 % \subsection{Optionen mit \textsf{keyval}}
 %
@@ -497,10 +481,13 @@
 % definiert, die bevorzugt zu verwenden ist.
 %    \begin{macrocode}
 \KOMA@key{headlines}{%
+%<*package>
   \begingroup
     \setlength{\@tempdima}{#1\baselineskip}%
   \endgroup
   \def\ta@hh{#1\baselineskip}%
+%</package>
+%<class>  \PassOptionsToPackage{headlines=#1}{typearea}%
 }
 %    \end{macrocode}
 %  \end{option}
@@ -517,10 +504,15 @@
 %  \begin{macro}{\@hinclfalse}
 %  Der Zustand selbst wird in einem Schalter gespeichert.
 %    \begin{macrocode}
+%<*package>
 \KOMA@ifkey{headinclude}{@hincl}
 \KOMA@DeclareObsoleteOption[\PackageInfo]{headexclude}{%
   headinclude=false%
 }
+%</package>
+%<*class>
+\KOMA@key{headinclude}[true]{\PassOptionsToPackage{headinclude=#1}{typearea}}
+%</class>
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
@@ -540,10 +532,15 @@
 %  \begin{macro}{\@finclfalse}
 % Der Zustand selbst wird in einem Schalter gespeichert.
 %    \begin{macrocode}
+%<*package>
 \KOMA@ifkey{footinclude}{@fincl}
 \KOMA@DeclareObsoleteOption[\PackageInfo]{footexclude}{%
   footinclude=false%
 }
+%</package>
+%<*class>
+\KOMA@key{footinclude}[true]{\PassOptionsToPackage{footinclude=#1}{typearea}}
+%</class>
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
@@ -569,10 +566,15 @@
 % Bei Verwendung dieser Option müssen größere DIV-Werte verwendet
 % werden. Siehe dazu weiter unten.
 %    \begin{macrocode}
+%<*package>
 \KOMA@ifkey{mpinclude}{@mincl}
 \KOMA@DeclareObsoleteOption[\PackageInfo]{mpexclude}{%
   mpinclude=false%
 }
+%</package>
+%<*class>
+\KOMA@key{mpinclude}[true]{\PassOptionsToPackage{mpinclude=#1}{typearea}}
+%</class>
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
@@ -589,15 +591,18 @@
 % Laden des Pakets absolut keinen Sinn ergeben!
 %    \begin{macrocode}
 \KOMA@key{BCOR}{%
+%<*package>
   \edef\@tempa{#1}\edef\@tempb{current}\ifx\@tempa\@tempb\else
     \setlength{\ta@bcor}{#1}%
   \fi
+%</package>
+%<class>  \PassOptionsToPackage{BCOR=#1}{typearea}%
 }
 %    \end{macrocode}
 % Wenn allerdings der Satzspiegel bereits berechnet ist, dann muss er
 % hier stattdessen neu berechnet werden.
 %    \begin{macrocode}
-\AtEndOfPackage{\KOMA@key{BCOR}{\typearea[{#1}]{last}}}
+%<package>\AtEndOfPackage{\KOMA@key{BCOR}{\typearea[{#1}]{last}}}
 %    \end{macrocode}
 %  \end{option}
 %
@@ -611,6 +616,7 @@
 % wenn diese beim Laden des Pakets absolut keinen Sinn ergeben!
 %    \begin{macrocode}
 \KOMA@key{DIV}[calc]{%
+%<*package>
   \edef\@tempa{#1}%
   \def\@tempb{last}\ifx\@tempa\@tempb\let\@tempa=\@lastdiv\fi
   \def\@tempb{current}\ifx\@tempa\@tempb\else
@@ -622,12 +628,14 @@
       \fi
     \fi
   \fi
+%</package>
+%<class>  \PassOptionsToPackage{DIV=#1}{typearea}%
 }
 %    \end{macrocode}
 % Wenn allerdings der Satzspiegel bereits berechnet ist, dann muss er
 % hier stattdessen neu berechnet werden.
 %    \begin{macrocode}
-\AtEndOfPackage{\KOMA@key{DIV}{\typearea[current]{#1}}}
+%<package>\AtEndOfPackage{\KOMA@key{DIV}{\typearea[current]{#1}}}
 %    \end{macrocode}
 %  \end{option}
 %
@@ -641,20 +649,16 @@
 %      reimplementiert}
 % Dann gibt es da noch zwei alte Sonderfälle.
 %    \begin{macrocode}
+%<*package>
 \KOMA@DeclareObsoleteOption[\PackageInfo]{DIVcalc}{DIV=calc}
 \KOMA@DeclareObsoleteOption[\PackageInfo]{DIVclassic}{DIV=classic}
+%</package>
 %    \end{macrocode}
 %  \end{option}
 %  \end{option}
 %
 %
 % \subsubsection{Sonstige Satzspiegel-Optionen}
-%
-% Ein Teil der weiteren Satzspiegeloptionen gibt es nur bei den Klassen:
-%    \begin{macrocode}
-%</package>
-%<*class>
-%    \end{macrocode}
 %
 % \begin{option}{oneside}
 % \begin{option}{twoside}
@@ -663,19 +667,12 @@
 \KOMA@key{twoside}[true]{%
   \KOMA@set@ifkey{twoside}{@twoside}{#1}%
   \if@twoside\@mparswitchtrue\else\@mparswitchfalse\fi%
-  \csname recalctypearea\endcsname
+%<package>  \csname recalctypearea\endcsname
 }
-\KOMA@DeclareObsoleteOption[\PackageInfo]{oneside}{twoside=false}
+%<package>\KOMA@DeclareObsoleteOption[\PackageInfo]{oneside}{twoside=false}
 %    \end{macrocode}
 % \end{option}
 % \end{option}
-%
-% Weitere Satzspiegeloptionen sind jedoch dem \textsf{typearea}-Paket
-% zuzuordnen:
-%    \begin{macrocode}
-%</class>
-%<*package>
-%    \end{macrocode}
 %
 %  \begin{option}{onecolumn}
 %    \changes{v2.95}{2002/12/04}{Option in das \textsf{typearea}-Paket
@@ -687,9 +684,9 @@
 %    \begin{macrocode}
 \KOMA@key{twocolumn}[true]{%
   \KOMA@set@ifkey{twocolumn}{@twocolumn}{#1}%
-  \csname recalctypearea\endcsname
+%<package>  \csname recalctypearea\endcsname
 }
-\KOMA@DeclareObsoleteOption[\PackageInfo]{onecolumn}{twocolumn=false}
+%<package>\KOMA@DeclareObsoleteOption[\PackageInfo]{onecolumn}{twocolumn=false}
 %    \end{macrocode}
 % \end{option}
 % \end{option}
@@ -720,6 +717,7 @@
 % \end{labeling}
 %    \begin{macrocode} 
 \KOMA@key{pagesize}[auto]{%
+%<*package>
   \begingroup
     \KOMA@set@ncmdkey{pagesize}{@tempa}{%
       {auto}{0},{automedia}{1},{dvips}{2},{pdftex}{3}%
@@ -741,8 +739,11 @@
       \set@pdftexpagesize
   \fi
   \edef\@pagesizelast{#1}%
+%</package>
+%<class>  \PassOptionsToPackage{pagesize=#1}{typearea}%
 }
 %    \end{macrocode}
+%
 %  \begin{macro}{\set@pdftexpagesize}
 %    \changes{v2.95}{2002/08/27}{neu (intern)}
 %  \begin{macro}{\set@dvipspagesize}
@@ -758,7 +759,8 @@
 %   bei ihrem Aufruf und insgesamt bei
 %   \texttt{\cs{begin}\{document\}}. 
 % \end{description}
-%    \begin{macrocode}
+%    \begin{macrocode}+
+%<*package>
 \newcommand{\set@pdftexpagesize}{%
   \AtBeginDocument{%
     \ifnotundefined{pdfpagewidth}{\pdfpagewidth=\paperwidth}{}%
@@ -813,6 +815,7 @@
     \ifnotundefined{mediaheight}{\mediaheight=\paperheight}{}%
   }%
 }
+%</package>
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
@@ -829,9 +832,11 @@
 % verwendet, weil die Verwendung von \texttt{pagesize=dvips} selbst
 % ebenfalls zu einer Warnung führen kann.
 %    \begin{macrocode}
+%<*package>
 \KOMA@DeclareObsoleteOption[\PackageWarning]{dvips}{%
   pagesize=dvips%
 }
+%</package>
 %    \end{macrocode}
 %  \end{option}
 %
@@ -841,9 +846,11 @@
 % Die Option ist obsolete und wird nun über die Option
 % \texttt{pagesize} implementiert.
 %    \begin{macrocode}
+%<*package>
 \KOMA@DeclareObsoleteOption[\PackageInfo]{pdftex}{%
   pagesize=pdftex%
 }
+%</package>
 %    \end{macrocode}
 %  \end{option}
 %
@@ -872,6 +879,7 @@
 % die übrigen Papiergrößenoptionen später noch per Mustererkennung
 % verarbeitet.
 %    \begin{macrocode}
+%<*package>
 \KOMA@DeclareObsoleteOption[\PackageInfo]{a4paper}{paper=a4}
 \KOMA@DeclareObsoleteOption[\PackageInfo]{a5paper}{paper=a5}
 \KOMA@DeclareObsoleteOption[\PackageInfo]{b5paper}{paper=b5}
@@ -880,6 +888,7 @@
 \KOMA@DeclareObsoleteOption[\PackageInfo]{executivepaper}{paper=executive}
 \KOMA@DeclareObsoleteOption[\PackageInfo]{landscape}{paper=landscape}
 \KOMA@DeclareObsoleteOption[\PackageInfo]{portrait}{paper=portrait}
+%</package>
 %    \end{macrocode}
 %  \end{option}
 %  \end{option}
@@ -899,6 +908,7 @@
 % "`\texttt{portrait}"' und "`\texttt{landscape}"' erlaubt.
 %    \begin{macrocode}
 \KOMA@key{paper}{%
+%<*package>
   \ifstr{#1}{landscape}{%
     \if@landscape\else
       \setlength{\@tempdima}{\paperwidth}%
@@ -951,6 +961,8 @@
       \fi
     }%
   }%
+%</package>
+%<class>  \PassOptionsToPackage{paper=#1}{typearea}%
 }
 %    \end{macrocode}
 %  \begin{macro}{\if@landscape}
@@ -959,7 +971,7 @@
 % In diesem Schalter wird gespeichert, ob Hoch- oder Breitformat
 % verwendet wird.
 %    \begin{macrocode}
-\newif\if@landscape
+%<package>\newif\if@landscape
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
@@ -973,19 +985,21 @@
 % Wenn ja, wird \cs{@tempa} mit dem ersten und \cs{@tempb} mit dem
 % zweiten Argument definiert.
 %    \begin{macrocode}
+%<*package>
 \newcommand*{\maybe@pair}{%
   \@ifnextchar (%
   {\@tempswatrue\maybe@@pair}{\@tempswafalse\gobble@till@scr@next}%
 }
 \newcommand*{\maybe@@pair}{}
 \def\@maybepair(#1,#2)\scr@next{\def\@tempa{#1}\def\@tempb{#2}}%
+%</package>
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
 %  \end{option}
 %
 %    \begin{macrocode}
-%</package>
+%</class|package>
 %    \end{macrocode}
 %
 %
@@ -1037,7 +1051,7 @@
 %   ergänzt.}
 %    \begin{macrocode}
 \KOMAoptions{headinclude=false,footinclude=false,paper=A4}
-\ProcessAllOptions{KOMA}
+\ProcessOptions\relax
 %    \end{macrocode}
 %
 %
@@ -1378,7 +1392,7 @@
     \fi
     \hsize=\columnwidth 
     \linewidth\hsize
-    \ifundefined{@pagesizelast}{}{\KOMAoptions{pagesize=\@pagesizelast}}%
+    \scr@ifundefined{@pagesizelast}{}{\KOMAoptions{pagesize=\@pagesizelast}}%
   }%
 }
 %    \end{macrocode}
@@ -1398,6 +1412,7 @@
 %      Liste}
 %    \changes{v2.8q}{2002/03/28}{Berücksichtigung der Option
 %      `mpinclude'}
+%    \changes{v2.96}{2006/08/11}{Schriftgröße muss nicht in ganzen pt sein}
 %    \begin{macrocode}
 \newcommand*{\ta@divfor}[1]{%
   \if@mincl
@@ -1409,21 +1424,31 @@
     \ta@div=2
   \else
     \xdef\@tempa{\ta@divlist{}}%
-    \ta@div=#1\relax
-    \@whilenum \ta@div >-9 \do {%
-      \ifx\@tempa\empty
-      \else \xdef\@tempa{\expandafter\@cdr\@tempa\@nil}\fi
-      \advance\ta@div by-1
-    }%
+    \@tempdima=#1pt
+    \addtolength{\@tempdima}{.5\p@}%
+    \divide\@tempdima by\p@
+    \setlength{\@tempdimb}{\@tempdima}%
+    \multiply\@tempdimb by\p@
+    \ifdim \@tempdimb=#1pt
+      \ta@div=#1\relax
+      \@whilenum \ta@div >-9 \do {%
+        \ifx\@tempa\empty
+        \else \xdef\@tempa{\expandafter\@cdr\@tempa\@nil}\fi
+        \advance\ta@div by-1
+      }%
+    \else
+      \let\@tempa\empty
+    \fi
     \ifx\@tempa\empty
 %    \end{macrocode}
 % Wenn keine Voreinstellung gefunden werden konnte, so wird immer
 % der Optimalwert berechnet. Mit einer Warnung wird darauf
 % hingewiesen.
 %    \begin{macrocode}
-      \ta@div=10 \advance\ta@div by#1
+      \setlength{\@tempdima}{#1\p@}%
+      \addtolength{\@tempdima}{10\p@}%
       \PackageWarningNoLine{typearea}{%
-        DIV for \the\ta@div pt and used papersize\MessageBreak
+        DIV for \the\@tempdima\space and used papersize\MessageBreak
         not defined!\MessageBreak
         Using DIV=\ta@divlistelse
       }%

@@ -1,4 +1,4 @@
-% \CheckSum{261}
+% \CheckSum{945}
 % \iffalse meta-comment
 % ======================================================================
 % scrkfont.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkfont.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkfont.dtx}[2006/07/30 v2.95b KOMA-Script (font selection)]
+\ProvidesFile{scrkfont.dtx}[2006/08/12 v2.96 KOMA-Script (font selection)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -107,13 +107,17 @@
 % werden in \texttt{scrtarea.dtx} über \cs{DeclareOption*}
 % ausgewertet.
 %  \begin{macro}{\@ptsize}
+%    \changes{2.96}{2006/08/11}{\cs{@ptsize} hat temporär eine andere
+%      Bedeutung}
 % Wir definieren \cs{@ptsize} als Grundschriftgrößee minus 10\,pt.
 % Hier wird die Standardeinstellung 11\,pt für alle Klassen außer der
-% Briefklasse gewählt.
+% Briefklasse gewählt. Bis zum Einstellen tatsächlichen Einstellen der
+% Schriftgröße wird in \cs{@ptsize} allerdings die tatsächliche Größe
+% angegeben, damit sich Rundungsfehler nicht so leicht summieren.
 %    \begin{macrocode}
 \newcommand*\@ptsize{%
-%<!letter>  1%
-%<letter>  2%
+%<!letter>  11%
+%<letter>  12%
 }
 %    \end{macrocode}
 %  \end{macro}
@@ -144,19 +148,19 @@
 %  \end{macro}
 %
 % \begin{option}{fontsize}
+%   \changes{v2.96}{2006/08/11}{Funktion komplett geändert}
 % Hier nun die Option, die tatsächlich verwendet wird. Es sei darauf
 % hingewiesen, dass damit auch Schriftgrößen wie \texttt{10.3pt} denkbar
 % wären.
 %    \begin{macrocode}
 \KOMA@key{fontsize}{%
-  \begingroup
-    \setlength{\@tempdima}{#1}%
-    \addtolength{\@tempdima}{-10\p@}%
-    \edef\@tempa{\endgroup\noexpand\renewcommand*\noexpand\@ptsize{%
-        \strip@pt\@tempdima}}%
-  \@tempa
+  \scr@ifundefined{changefontsizes}{%
+    \@defaultunits\@tempdima#1pt\relax\@nnil
+    \edef\@ptsize{#1}%
+  }{%
+    \changefontsizes{#1}%
+  }%
 }
-\@onlypreamble\KV@KOMA@fontsize
 %    \end{macrocode}
 % \end{option}
 %
@@ -172,43 +176,308 @@
 % \changes{v2.6}{2000/01/04}{Einlesen der Schriftgrößen-Options-Datei
 %   funktioniert nun mit diversen Größen}
 %
-% Dies\marginline{Geplant!} soll in einer zukünftigen Version von
-% \KOMAScript{} komplett überflüssig werden. Stattdessen werden
-% Standardeinstellung berechnet, wobei die Möglichkeit bestehen wird,
-% Abweichungen davon in einer Konfigurationsdatei abzulegen.
+% \begin{macro}{\changefontsizes}
+%   \changes{v2.96}{2006/08/11}{neue Anweisung (benötigt \eTeX)}
+% Diese Anweisung bietet berechnete Schriftgrößen als Fallbacklösung an. Das
+% optionale erste Argument ist dabei der Grundlinienabstand. Das zweite
+% Argument ist die gewünschte Grundschriftgröße.
 %    \begin{macrocode}
-\@tempcnta=10
-\advance\@tempcnta by\@ptsize
-\xdef\@tempa{%
-%<!book>  size%
-%<book>  bk%
-  \the\@tempcnta.clo}
-\InputIfFileExists{\@tempa}{}{%
-%<*book>
-  \xdef\@tempb{size\the\@tempcnta.clo}%
-  \InputIfFileExists{\@tempb}{%
-    \ClassWarning{\KOMAClassName}{%
-      File `\@tempa' not found!\MessageBreak
-      Used `\@tempb' instead%
-    }%
+\newcommand*{\changefontsizes}[2][1.2\@tempdima]{%
+  \ClassWarning{\KOMAClassName}{%
+    Using fallback calculation to setup font sizes\MessageBreak
+    for basic size `#2'}%
+  \@defaultunits\@tempdima#2pt\relax\@nnil
+  \setlength{\@tempdimc}{\@tempdima}%
+  \addtolength{\@tempdimc}{-10\p@}%
+  \edef\@ptsize{\strip@pt\@tempdimc}%
+  \@defaultunits\@tempdimb#1pt\relax\@nnil
+  \setlength{\@tempdimc}{\dimexpr (100\@tempdimb / \@tempdima * \p@)}%
+  \edef\@tempb{\the\@tempdimc}%
+  \setlength{\@tempdimc}{\@tempdima}%
+  \def\@tempa##1##2##3##4##5\@nnil{\def##1{##2.##3##4}}%
+  \expandafter\@tempa\expandafter\@tempb\@tempb\@nnil%
+  \setlength{\abovedisplayskip}{%
+    \@tempdima \@plus .25\@tempdima \@minus .58\@tempdima}%
+  \setlength{\abovedisplayshortskip}{\z@ \@plus .25\@tempdima}%
+  \setlength{\belowdisplayskip}{\abovedisplayskip}%
+  \setlength{\belowdisplayshortskip}{%
+    .55\@tempdima \@plus .3\@tempdima \@minus .25\@tempdima}%
+  \edef\normalsize{%
+    \noexpand\@setfontsize\noexpand\normalsize
+      {\the\@tempdima}{\the\@tempdimb}%
+    \abovedisplayskip \the\abovedisplayskip
+    \abovedisplayshortskip \the\abovedisplayshortskip
+    \belowdisplayskip \the\belowdisplayskip
+    \belowdisplayshortskip \the\belowdisplayshortskip
+    \let\noexpand\@listi\noexpand\@listI
+  }%
+  \setlength{\@tempdima}{0.9125\@tempdimc}%
+  \setlength{\@tempdimb}{\@tempb\@tempdima}%
+  \setlength{\abovedisplayskip}{%
+    \@tempdima \@plus .25\@tempdima \@minus .58\@tempdima}%
+  \setlength{\abovedisplayshortskip}{\z@ \@plus .25\@tempdima}%
+  \setlength{\belowdisplayskip}{\abovedisplayskip}%
+  \setlength{\belowdisplayshortskip}{%
+    .55\@tempdima \@plus .3\@tempdima \@minus .25\@tempdima}%
+  \edef\small{%
+    \noexpand\@setfontsize\noexpand\small
+      {\the\@tempdima}{\the\@tempdimb}%
+    \abovedisplayskip \the\abovedisplayskip
+    \abovedisplayshortskip \the\abovedisplayshortskip
+    \belowdisplayskip \the\belowdisplayskip
+    \belowdisplayshortskip \the\belowdisplayshortskip
+    \let\noexpand\@listi\noexpand\@listi@small
+  }%
+  \setlength{\@tempdima}{.83334\@tempdimc}%
+  \setlength{\@tempdimb}{\@tempb\@tempdima}%
+  \setlength{\abovedisplayskip}{%
+    \@tempdima \@plus .25\@tempdima \@minus .58\@tempdima}%
+  \setlength{\abovedisplayshortskip}{\z@ \@plus .25\@tempdima}%
+  \setlength{\belowdisplayskip}{\abovedisplayskip}%
+  \setlength{\belowdisplayshortskip}{%
+    .55\@tempdima \@plus .3\@tempdima \@minus .25\@tempdima}%
+  \edef\footnotesize{%
+    \noexpand\@setfontsize\noexpand\footnotesize
+      {\the\@tempdima}{\the\@tempdimb}%
+    \abovedisplayskip \the\abovedisplayskip
+    \abovedisplayshortskip \the\abovedisplayshortskip
+    \belowdisplayskip \the\belowdisplayskip
+    \belowdisplayshortskip \the\belowdisplayshortskip
+    \let\noexpand\@listi\noexpand\@listi@footnotesize
+  }%
+  \setlength{\@tempdima}{.66667\@tempdimc}%
+  \setlength{\@tempdimb}{\@tempb\@tempdima}%
+  \edef\scriptsize{%
+    \noexpand\@setfontsize\noexpand\scriptsize
+      {\the\@tempdima}{\the\@tempdimb}%
+  }%
+  \setlength{\@tempdima}{.5\@tempdimc}%
+  \setlength{\@tempdimb}{\@tempb\@tempdima}%
+  \edef\tiny{%
+    \noexpand\@setfontsize\noexpand\tiny
+      {\the\@tempdima}{\the\@tempdimb}%
+  }%
+  \setlength{\@tempdima}{1.2\@tempdimc}%
+  \setlength{\@tempdimb}{\@tempb\@tempdima}%
+  \edef\large{%
+    \noexpand\@setfontsize\noexpand\large
+      {\the\@tempdima}{\the\@tempdimb}%
+  }%
+  \setlength{\@tempdima}{1.44\@tempdimc}%
+  \setlength{\@tempdimb}{\@tempb\@tempdima}%
+  \edef\Large{%
+    \noexpand\@setfontsize\noexpand\Large
+      {\the\@tempdima}{\the\@tempdimb}%
+  }%
+  \setlength{\@tempdima}{1.728\@tempdimc}%
+  \setlength{\@tempdimb}{\@tempb\@tempdima}%
+  \edef\LARGE{%
+    \noexpand\@setfontsize\noexpand\LARGE
+      {\the\@tempdima}{\the\@tempdimb}%
+  }%
+  \setlength{\@tempdima}{2.074\@tempdimc}%
+  \setlength{\@tempdimb}{\@tempb\@tempdima}%
+  \edef\huge{%
+    \noexpand\@setfontsize\noexpand\huge
+      {\the\@tempdima}{\the\@tempdimb}%
+  }%
+  \setlength{\@tempdima}{2.488\@tempdimc}%
+  \setlength{\@tempdimb}{\@tempb\@tempdima}%
+  \edef\Huge{%
+    \noexpand\@setfontsize\noexpand\Huge
+      {\the\@tempdima}{\the\@tempdimb}%
+  }%
+  \normalsize
+  \setlength{\footnotesep}{.7\@tempdimc}%
+  \setlength{\skip\footins}{.9\@tempdimc \@plus .3333\@tempdimc \@minus
+    .6\@tempdimc}%
+  \setlength{\floatsep}{\@tempdimc \@plus .1667\@tempdimc \@minus
+    .3333\@tempdimc}%
+  \setlength{\textfloatsep}{1.6667\@tempdimc \@plus .1667\@tempdimc \@minus
+    .3333\@tempdimc}%
+  \setlength{\intextsep}{\@tempb\@tempdimc \@plus .3333\@tempdimc \@minus
+    .3333\@tempdimc}%
+  \setlength{\dblfloatsep}{\@tempb\@tempdimc \@plus .1667\@tempdimc \@minus
+    .3333\@tempdimc}%
+  \setlength{\dbltextfloatsep}{\textfloatsep}%
+  \setlength{\@fptop}{0\p@ \@plus 1fil}%
+  \setlength{\@fpsep}{.8333\@tempdimc \@plus 2fil}%
+  \setlength{\@fpbot}{\@fptop}%
+  \setlength{\@dblfptop}{0\p@ \@plus 1fil}%
+  \setlength{\@dblfpsep}{.8333\@tempdimc \@plus 2fil}%
+  \setlength{\@dblfpbot}{\@fptop}%
+  \setlength{\partopsep}{.25\@tempdimc \@plus .16667\@tempdimc \@minus
+    .16667\@tempdimc}%
+  \setlength{\topsep}{.8333\@tempdimc \@plus .3333\@tempdimc \@minus
+    .5\@tempdimc}%
+  \setlength{\parsep}{.4167\@tempdimc \@plus .2083\@tempdimc \@minus \p@}%
+  \@tempswafalse
+  \begingroup
+    \def\@list@extra{\aftergroup\@tempswatrue}%
+    \csname @listi\endcsname
+  \endgroup
+  \edef\@listi{\leftmargin\leftmargini
+    \topsep \the\topsep
+    \parsep \the\parsep
+    \itemsep \parsep
+    \if@tempswa\noexpand\@list@extra\fi
+  }%
+  \let\@listI\@listi
+  \setlength{\topsep}{.75\@tempdimc \@plus .25\@tempdimc \@minus
+    .41667\@tempdimc}%
+  \setlength{\parsep}{.375\@tempdimc \@plus .16667\@tempdimc \@minus \p@}%
+  \@tempswafalse
+  \begingroup
+    \def\@list@extra{\aftergroup\@tempswatrue}%
+    \csname @listi\endcsname
+  \endgroup
+  \edef\@listi@small{\leftmargin\leftmargini
+    \topsep \the\topsep
+    \parsep \the\parsep
+    \itemsep \parsep
+    \if@tempswa\noexpand\@list@extra\fi
+  }%
+  \setlength{\topsep}{.5\@tempdimc \@plus .16667\@tempdimc \@minus
+    .16667\@tempdimc}%
+  \setlength{\parsep}{.25\@tempdimc \@plus .16667\@tempdimc \@minus \p@}%
+  \@tempswafalse
+  \begingroup
+    \def\@list@extra{\aftergroup\@tempswatrue}%
+    \csname @listi\endcsname
+  \endgroup
+  \edef\@listi@footnotesize{\leftmargin\leftmargini
+    \topsep \the\topsep
+    \parsep \the\parsep
+    \itemsep \parsep
+    \if@tempswa\noexpand\@list@extra\fi
+  }%
+  \setlength{\topsep}{.4167\@tempdimc \@plus .2083\@tempdimc \@minus \p@}%
+  \setlength{\parsep}{.2083\@tempdimc \@plus \p@ \@minus \p@}%
+  \@tempswafalse
+  \begingroup
+    \def\@list@extra{\aftergroup\@tempswatrue}%
+    \csname @listii\endcsname
+  \endgroup
+  \edef\@listii{\leftmargin\leftmarginii
+    \labelwidth=\dimexpr \leftmargin-\labelsep
+    \topsep \the\topsep
+    \parsep \the\parsep
+    \itemsep \parsep
+    \if@tempswa\noexpand\@list@extra\fi
+  }%
+  \setlength{\topsep}{.2083\@tempdimc \@plus \p@ \@minus \p@}%
+  \setlength{\parsep}{\p@ \@plus\z@ \@minus\p@}%
+  \@tempswafalse
+  \begingroup
+    \def\@list@extra{\aftergroup\@tempswatrue}%
+    \csname @listiii\endcsname
+  \endgroup
+  \edef\@listiii{\leftmargin\leftmarginiii
+    \labelwidth=\dimexpr \leftmargin-\labelsep
+    \topsep \the\topsep
+    \parsep \z@
+    \partopsep \the\parsep
+    \itemsep \topsep
+    \if@tempswa\noexpand\@list@extra\fi
+  }%
+  \@tempswafalse
+  \begingroup
+    \def\@list@extra{\aftergroup\@tempswatrue}%
+    \csname @listiv\endcsname
+  \endgroup
+  \def\@listiv{\leftmargin\leftmarginiv
+    \labelwidth=\dimexpr \leftmargin-\labelsep
+    \if@tempswa\noexpand\@list@extra\fi
+  }%
+  \@tempswafalse
+  \begingroup
+    \def\@list@extra{\aftergroup\@tempswatrue}%
+    \csname @listv\endcsname
+  \endgroup
+  \def\@listv{\leftmargin\leftmarginv
+    \labelwidth=\dimexpr \leftmargin-\labelsep
+    \if@tempswa\noexpand\@list@extra\fi
+  }%
+  \@tempswafalse
+  \begingroup
+    \def\@list@extra{\aftergroup\@tempswatrue}%
+    \csname @listvi\endcsname
+  \endgroup
+  \def\@listvi{\leftmargin\leftmarginvi
+    \labelwidth=\dimexpr \leftmargin-\labelsep
+    \if@tempswa\noexpand\@list@extra\fi
+  }%
+  \@listi
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\@fontsizefilebase}
+%   \changes{v2.96}{2006/08/11}{neu (intern)}
+% Dieses Makro speichert den Präfix der primären
+% Schriftgrößenoptionsdateien. Es wird nur definiert, wenn es nicht bereits
+% definiert ist. Damit können Wrapperklassen komplett andere Größen vorgeben,
+% ohne mit \cs{ReplaceInput} arbeiten zu müssen.
+%    \begin{macrocode}
+\providecommand*{\@fontsizefilebase}{scrsize}
+%    \end{macrocode}
+% \end{macro}
+%
+% Zunächst wird die gewünschte Größe, die in \cs{@ptsize} abgelegt ist, als
+% Länge ermittelt. In \cs{@tempa} wird die ursprünglich gewünschte Größe
+% abgelegt, damit zwischen \texttt{10pt}, \texttt{10} und \texttt{10dd}
+% unterschieden werden kann. In \cs{@tempb} wird hingegen die Größe in pt
+% abgelegt, damit die Standard-Dateien verwendet werden können. Dann wird
+% \cs{@ptsize} schon einmal richtig eingestellt.
+%    \begin{macrocode}
+\expandafter\@defaultunits\expandafter\@tempdima\@ptsize pt\relax\@nnil
+\edef\@tempa{\@ptsize}%
+\setlength{\@tempdimb}{\@tempdima}%
+\edef\@tempb{\strip@pt\@tempdimb}%
+\addtolength{\@tempdimb}{-10\p@}%
+\edef\@ptsize{\strip@pt\@tempdimb}%
+%    \end{macrocode}
+% Jetzt wird zunächst versucht, ob eine Datei
+% "`\texttt{\cs{fontsizefilebase}\cs{@tempa}.clo}"' vorhanden ist, also eine,
+% bei der die ursprünliche Einheit im Namen angegeben ist. Wenn das der Fall
+% ist, wird diese verwendet. Wenn nicht wird das Ganze für \cs{@tempb} um die
+% Einheit pt erweitert wiederholt.
+%    \begin{macrocode}
+\InputIfFileExists{\@fontsizefilebase\@tempa.clo}{
+  \ClassInfo{\KOMAClassName}{%
+    File `\@fontsizefilebase\@tempa.clo' used to setup font sizes}%
+}{%
+  \InputIfFileExists{\@fontsizefilebase\@tempb pt.clo}{%
+    \ClassInfo{\KOMAClassName}{%
+      File `\@fontsizefilebase\@tempb pt.clo' used instead of\MessageBreak
+      file `\@fontsizefilebase\@tempa.clo' to setup font sizes}%
   }{%
-%</book>
-    \ClassError{\KOMAClassName}{%
-      File `\@tempa' not found!\MessageBreak
-      This error is fatal!%
+%    \end{macrocode}
+% Wurde bis hier noch keine Datei geladen, wird nun versucht, die
+% Größendateien der Standardklassen zu verwenden.
+%    \begin{macrocode}
+%<*book>
+    \InputIfFileExists{bk\@tempb.clo}{%
+      \ClassInfo{\KOMAClassName}{%
+        File `bk\@tempb.clo' used to setup font sizes}%
     }{%
-      To every fontsize you want to select by class
-      option,\MessageBreak
-      you need a corresponding
-%<book>       bk-class-option-file or\MessageBreak at least a
-      size-class-option-file declaring all\MessageBreak
-      the macros based on fontsize.\MessageBreak
-      Ask a wizzard for more information or use another
-      fontsize.\MessageBreak
-      You cannot continue!%
-    }%
-    \batchmode \csname @@end\endcsname \end
-%<book>  }%
+%</book>
+      \InputIfFileExists{size\@tempb.clo}{%
+        \ClassInfo{\KOMAClassName}{%
+          File `size\@tempb.clo' used to setup font sizes}%
+      }{%
+%    \end{macrocode}
+% Sind auch diese Dateien nicht vorhanden, so wird als Fallback eine
+% Berechnung der Schriftgrößen verwendet. Es sei darauf hingewiesen, dass
+% dabei auch \cs{@tempa}, \cs{@tempb} und \cs{@ptsize} neu gesetzt werden.
+%    \begin{macrocode}
+        \changefontsizes{\@tempa}%
+%    \end{macrocode}
+% Damit sollten nun die Schriftgrößen eingestellt sein.
+%    \begin{macrocode}
+      }%
+%<book>    }%
+  }%
 }
 %    \end{macrocode}
 % 
@@ -330,7 +599,7 @@
 %      Erweiterung um Makrodefinitonen mit Argumenten wie \cs{g@addto@macro}
 %      verhält}
 %    \begin{macrocode}
-\ifundefined{unexpanded}{%
+\scr@ifundefined{unexpanded}{%
   \newcommand*{\g@addto@macro@temp}{}%
   \newcommand{\l@addto@macro}[2]{%
     \begingroup%
