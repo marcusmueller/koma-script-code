@@ -1,4 +1,4 @@
-% \CheckSum{877}
+% \CheckSum{590}
 % \iffalse meta-comment
 % ======================================================================
 % scrkbase.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkbase.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkbase.dtx}[2006/08/12 v1.0a KOMA-Script (basics)]
+\ProvidesFile{scrkbase.dtx}[2006/08/18 v1.1 KOMA-Script (basics)]
 % \iffalse
 %</driver>
 %<package&option>\ProvidesPackage{scrkbase}[%
@@ -134,136 +134,11 @@
 %
 % \subsection{Laden von \textsf{keyval}}
 %
-% Die Überschrift ist reine Tiefstapelei. Hier wird nicht nur das
-% Paket geladen, was ruckzuck mit:
+% Hier wird nicht nur das Paket geladen, was ruckzuck mit:
 %    \begin{macrocode}
 \RequirePackage{keyval}
 %    \end{macrocode}
 % erledigt ist.
-%
-% Im Anschluss an das Laden des Pakets werden auch noch diverse
-% Makros des Pakets umdefiniert. Diese Umdefinitionen wurden von mir
-% für das Paket vorgeschlagen, sind bisher\footnote{2002-07-06} aber
-% nicht realisiert (siehe dazu die \LaTeX{} Bugreport Database).
-%
-% Um Probleme zu vermeiden, wird jeweils getestet, dass die
-% Originaldefinition nicht inzwischen geändert wurde. Das bläht zwar
-% den Code auf, ist aber besser so.
-%
-%  \begin{macro}{\KV@split}
-% Dieses Makro nimmt die Aufteilung in Schlüsselname und Argument
-% vor. Außerdem ruft es dann die Schlüsseldefinition auf oder gibt bei
-% fehlendem Schlüssel einen Fehler aus. Zunächst wird die Definition
-% getestet. Das geht aufgrund des Aufbaus nicht direkt mit
-% \cs{CheckCommand}. Aber es geht mit einem internen Makro, das auch
-% von \cs{CheckCommand} verwendet wird.
-%    \begin{macrocode}
-\begingroup
-  \def\@tempa#1=#2=#3\relax{%
-    \KV@@sp@def\@tempa{#1}%
-    \ifx\@tempa\@empty\else
-      \expandafter\let\expandafter\@tempc
-        \csname\KV@prefix\@tempa\endcsname
-      \ifx\@tempc\relax
-        \KV@errx
-         {\@tempa\space undefined}%
-      \else
-        \ifx\@empty#3\@empty
-          \KV@default
-        \else
-          \KV@@sp@def\@tempb{#2}%
-          \expandafter\@tempc\expandafter{\@tempb}\relax
-        \fi
-      \fi
-    \fi}
-  \@check@eq\KV@split\@tempa
-\endgroup
-%    \end{macrocode}
-% Dann wird es umdefiniert, wobei erstmal alles wie zuvor bleibt:
-%    \begin{macrocode}
-\def\KV@split#1=#2=#3\relax{%
-  \KV@@sp@def\@tempa{#1}%
-  \ifx\@tempa\@empty\else
-    \expandafter\let\expandafter\@tempc
-      \csname\KV@prefix\@tempa\endcsname
-    \ifx\@tempc\relax
-%    \end{macrocode}
-% Bis wir zum Fehlerfall kommen. Hier erlauben wir jedem Paket seine
-% eigenen Fehlermeldungen:
-%    \begin{macrocode}
-      \scr@KV@errx{\@tempa}%
-%    \end{macrocode}
-% Danach wieder wie gehabt:
-%    \begin{macrocode}
-    \else
-      \ifx\@empty#3\@empty
-        \KV@default
-      \else
-        \KV@@sp@def\@tempb{#2}%
-        \expandafter\@tempc\expandafter{\@tempb}\relax
-      \fi
-    \fi
-  \fi}
-%    \end{macrocode}
-%  \end{macro}
-%
-%  \begin{macro}{\KV@default}
-% Dieses Makro ruft den Default-Wert ab oder gibt einen Fehler
-% aus. Zunächst wieder der Test. Diesmal aber direkt mit
-% \cs{CheckCommand}:
-%    \begin{macrocode}
-\CheckCommand*{\KV@default}{%
-  \expandafter\let\expandafter\@tempb
-    \csname\KV@prefix\@tempa @default\endcsname
-  \ifx\@tempb\relax
-    \KV@err{No value specified for \@tempa}%
-  \else
-    \@tempb\relax
-  \fi}
-%    \end{macrocode}
-% Danach wird wieder umdefiniert, wobei wieder nur die
-% Fehlergeschichte geändert wird:
-%    \begin{macrocode}
-\renewcommand*{\KV@default}{%
-  \expandafter\let\expandafter\@tempb
-    \csname\KV@prefix\@tempa @default\endcsname
-  \ifx\@tempb\relax
-    \scr@KV@err{\@tempa}%
-  \else
-    \@tempb\relax
-  \fi}
-%    \end{macrocode}
-%  \end{macro}
-%
-%    \begin{macro}{\scr@KV@errx}
-%    \begin{macro}{\scr@KV@err}
-% Jetzt brauchen wir natürlich die Makros zur Fehlerausgabe. Dabei
-% kann für jeden Schlüsselkennung jeweils eine eigene Fehlermeldung für
-% fehlende Schlüssel und fehlenden Defaultwert definiert
-% werden. Fehlende Schlüssel werden mit \cs{KV@\meta{Kennung}@nokey}
-% gemeldet, fehlende Defaultwerte mit \cs{KV@\meta{Kennung}@noval}.
-% Sind entsprechende Makros nicht definiert, erfolgt die Meldung auf
-% herkömmlichem Weg.
-%    \begin{macrocode}
-\newcommand*{\scr@KV@errx}[1]{%
-  \expandafter\ifx\csname\KV@prefix nokey\endcsname\relax
-    \KV@errx{#1\space undefined}%
-  \else
-    \csname\KV@prefix nokey\endcsname{#1}%
-  \fi
-}
-\newcommand*{\scr@KV@err}[1]{%
-  \expandafter\ifx\csname\KV@prefix noval\endcsname\relax
-    \KV@err{No value specified for #1}%
-  \else
-    \csname\KV@prefix noval\endcsname{#1}%
-  \fi
-}
-%    \end{macrocode}
-%  \end{macro}
-%  \end{macro}
-%
-% Das waren alle Änderungen.
 %
 %
 % \subsection{Häufig benötigte Befehle}
@@ -707,126 +582,17 @@
 \newcommand*{\DeclareKeyValOption}[2][%
   \ifx\@currext\@clsextension\OptionNotUsed\else\@unkownoptionerror\fi
 ]{%
-  \DeclareOption*{
-    \expandafter\let\expandafter\@KV@saved@nokey
-    \csname KV@#2@nokey\endcsname
-    \@namedef{KV@#2@nokey}{#1\@gobble}%
-    \@expandtwoargs\setkeys{#2}\CurrentOption
-    \expandafter\let\csname KV@#2@nokey\endcsname\@KV@saved@nokey
+  \DeclareOption*{%
+    \def\@tempa##1=##2=##3\@nil{%
+      \scr@ifundefined{KV@#2@##1}{#1}{%
+        \@expandtwoargs\setkeys{#2}\CurrentOption
+      }%
+    }%
+    \expandafter\@tempa\CurrentOption==\@nil
   }%
 }
 %    \end{macrocode}
 % \end{macro}
-%
-%  \begin{macro}{\ProcessKeyValOptions}
-% Alternativ dazu, alle bisher definierten Schlüssel eines Bereichs
-% (1. Argument) als Option zu deklarieren, können auch die Schlüssel eines
-% Bereichs als Option interpretiert werden. Dies scheint nur oberflächlich
-% dieselbe Funktionalität zu sein. Es spielt jedoch bezüglich der
-% Verarbeitungsreihenfolge eine Rolle. Außerdem hat dieses alternative
-% Vorgehen keinen Einfluss auf \cs{DeclareOption*}.
-%
-%  \begin{macro}{\Pr@cessL@calKeyValOptions}
-% Zunächst ein Hilfsmakro um alle lokalen Optionen abzuarbeiten.
-%    \begin{macrocode}
-\newcommand*{\Pr@cessL@calKeyValOptions}[1]{%
-  \edef\@curroptions{\@ptionlist{\@currname.\@currext}}%
-  \ifx\@curroptions\@empty\else
-    \expandafter\let\expandafter\@KV@saved@nokey\csname KV@#1@nokey\endcsname
-    \@namedef{KV@#1@nokey}{\in@false\@gobble}%
-    \@for\CurrentOption:=\@curroptions\do{%
-      \ifx\CurrentOption\@empty\else
-        \in@true\@expandtwoargs\setkeys{#1}\CurrentOption
-        \ifin@
-%    \end{macrocode}
-% Bei Aufruf aus einer Klasse, ist diese Option ggf. aus der Liste der
-% unbenutzten globalen Option zu löschen. Bei Paketen hingegen aus der Liste
-% der Paketoptionen
-%    \begin{macrocode}
-          \ifx\@currext\@clsextension
-            \@expandtwoargs\@removeelement\CurrentOption
-            \@unusedoptionlist\@unusedoptionlist
-          \else
-            \@expandtwoargs\@removeelement\CurrentOption
-            \@curroptions\@curroptions
-          \fi
-        \fi
-      \fi
-    }%
-    \let\CurrentOption\@empty
-%    \end{macrocode}
-% Bei Paketen muss die Liste der Paketoptionen noch neu gesetzt werden.
-%    \begin{macrocode}
-    \ifx\@currext\@clsextension\else
-      \expandafter\let\csname opt@\@currname.\@currext\endcsname\@curroptions
-    \fi
-    \expandafter\let\csname KV@#1@nokey\endcsname\@KV@saved@nokey
-  \fi
-}
-%    \end{macrocode}
-%  \end{macro}
-%
-%  \begin{macro}{\Pr@cessGl@balKeyValOptions}
-% Wenn diese Hilfsmakro von einem Paket aufgerufen wird, versucht es alle
-% Klassenoptionen als Schlüssel eines Bereichs (Argument 1)
-% auszuwerten. Diese Anweisung darf mehrfach verwendet werden.
-%    \begin{macrocode}
-\newcommand*{\Pr@cessGl@balKeyValOptions}[1]{%
-  \ifx\@currext\@clsextension\else
-    \expandafter\let\expandafter\@KV@saved@nokey
-    \csname KV@#1@nokey\endcsname
-    \@namedef{KV@#1@nokey}{\in@false\@gobble}%
-    \@for\CurrentOption:=\@classoptionslist\do{%
-      \ifx\CurrentOption\@empty\else
-        \in@true\@expandtwoargs\setkeys{#1}\CurrentOption
-        \ifin@
-          \@expandtwoargs\@removeelement\CurrentOption
-          \@unusedoptionlist\@unusedoptionlist
-        \fi
-      \fi
-    }%
-    \let\CurrentOption\@empty
-    \expandafter\let\csname KV@#1@nokey\endcsname\@KV@saved@nokey
-  \fi
-}
-%    \end{macrocode}
-%  \end{macro}
-%
-% Insgesamt werden zunächst die globalen und dann die lokalen Optionen
-% bearbeitet. 
-%    \begin{macrocode}
-\newcommand*{\ProcessKeyValOptions}[1]{%
-  \Pr@cessGl@balKeyValOptions{#1}%
-  \Pr@cessL@calKeyValOptions{#1}%
-}
-%    \end{macrocode}
-% Es wird empfohlen \cs{ProcessKeyValOptions} \emph{vor}
-% \cs{ProcessOptions} oder \cs{ProcessOptions*} aufzurufen.
-%  \end{macro}
-%
-%  \begin{macro}{\ProcessAllOptions}
-%  \begin{macro}{\@Pr@cessAll@pti@ns}
-%  \begin{macro}{\Pr@cessAll@pti@ns}
-% Da der Anwender bekanntlich faul ist hier ein Makro, das sowohl für normale
-% Optionen als auch Schlüsseloptionen arbeitet. Dabei werden Schlüsseloptionen
-% zuerst abgearbeitet. Die Sternvariante verwendet die Sternvariante von
-% \cs{ProcessOptions}. Im Gegensatz zu \cs{ProcessOptions} wird hier kein
-% abschließendes \cs{relax} benötigt, weil ein zwingendes Argument vorhanden
-% ist (der Bereich).
-%    \begin{macrocode}
-\newcommand*{\ProcessAllOptions}{%
-  \@ifstar\@Pr@cessAll@pti@ns\Pr@cessAll@pti@ns
-}
-\newcommand*{\@Pr@cessAll@pti@ns}[1]{%
-  \ProcessKeyValOptions{#1}\ProcessOptions*
-}
-\newcommand*{\Pr@cessAll@pti@ns}[1]{%
-  \ProcessKeyValOptions{#1}\ProcessOptions\relax
-}
-%    \end{macrocode}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
 %
 %
 % \subsection{Definition von KOMA-\textsf{keyval}-Schlüsseln}
