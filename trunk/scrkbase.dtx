@@ -1,4 +1,4 @@
-% \CheckSum{598}
+% \CheckSum{630}
 % \iffalse meta-comment
 % ======================================================================
 % scrkbase.dtx
@@ -612,13 +612,37 @@
 %    \end{macrocode}
 %  \end{macro}
 %
-%  \begin{macro}{KOMAoptions}
-% Es werden Schlüssel verwendet. Auch dies ist nur ein abkürzendes Makro:
+%  \begin{macro}{\KOMAoptions}
+%    \changes{v2.96}{2006/08/20}{Neuer Hook nach den Optionen}
+%  \begin{macro}{\post@kopt@hook}
+%    \changes{v2.96}{2006/08/20}{Neuer Hook nach den Optionen}
+%  \begin{macro}{\AfterKOMAoptions}
+%    \changes{v2.96}{2006/08/20}{Neuer Hook nach den Optionen}
+% Es werden Schlüssel verwendet und ggf. danach noch Dinge ausgeführt.
 %    \begin{macrocode}
 \newcommand*{\KOMAoptions}[1]{%
+  \let\post@kopt@hook\@empty
   \setkeys{KOMA}{#1}%
+  \post@kopt@hook\let\post@kopt@hook\relax
+}
+\newcommand*{\post@kopt@hook}{}
+\let\post@kopt@hook\relax
+\newcommand*{\AfterKOMAoptions}{%
+  \ifx\post@kopt@hook\relax
+    \PackageWarning{scrkbase}{%
+      \string\AfterKOMAoptions\space can only be used inside a\MessageBreak
+      KOMA-Script option that is called using \space\KOMAoptions.\MessageBreak
+      Because if this, command will be ignored%
+    }%
+    \expandafter\@gobbletwo
+  \else
+    \expandafter\l@addto@macro
+  \fi
+  \post@kopt@hook
 }
 %    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
 %  \end{macro}
 %
 %  \begin{option}{nokey}
