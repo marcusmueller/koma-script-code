@@ -1,4 +1,4 @@
-% \CheckSum{590}
+% \CheckSum{598}
 % \iffalse meta-comment
 % ======================================================================
 % scrkbase.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkbase.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkbase.dtx}[2006/08/18 v1.1 KOMA-Script (basics)]
+\ProvidesFile{scrkbase.dtx}[2006/08/20 v1.1 KOMA-Script (basics)]
 % \iffalse
 %</driver>
 %<package&option>\ProvidesPackage{scrkbase}[%
@@ -797,17 +797,29 @@
 %  \end{macro}
 %
 %  \begin{macro}{\KOMA@DeclareObsoleteOption}
+%    \changes{v2.96}{2006/08/20}{\cs{CurrentOption wir geschützt}}
 % Mit Hilfe dieses Makros kann eine Option definiert werden, die
 % eigentlich obsolete ist. Statt dieser Option wird dann ein Schlüssel
 % verwendet. Das erste Argument ist optional und muss dann entweder
 % \cs{PackageInfo}, \cs{PackageInfoNoLine}, \cs{PackageWarning} oder
 % \cs{PackageWarningNoLine} sein. Das zweite Argument ist der Name der
 % Option. Das dritte Argument ist das Setzen des gewünschten Schlüssels.
+%  \begin{macro}{\scr@sr@co}
+%    \changes{v2.96}{2006/08/20}{neu (intern)}
+% Da das \texttt{xkeyval}-Paket leider \cs{CurrentOption} vernichtet, das aber
+% innerhalb von \cs{ProcessOptions} nach dem Ausführen der Option noch
+% benötigt wird, muss die Anweisung gesichert werden.
 %    \begin{macrocode}
+\newcommand*{\scr@sr@co}{}
 \newcommand*{\KOMA@DeclareObsoleteOption}[3][\@gobbletwo]{%
-  \DeclareOption{#2}{\KOMA@UseObsolete{option}{#1}{#2}{#3}}%
+  \DeclareOption{#2}{%
+    \let\scr@sr@co\CurrentOption
+    \KOMA@UseObsolete{option}{#1}{#2}{#3}%
+    \let\CurrentOption\scr@sr@co
+  }%
 }
 %    \end{macrocode}
+%  \end{macro}
 %  \begin{macro}{\KOMA@UseObsolete}
 % Die eigentliche Arbeit wird von diesem Makro erledigt. Ob es sich um
 % eine Option oder eine Anweisung handelt wird in Argument 1
