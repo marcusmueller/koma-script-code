@@ -1,4 +1,4 @@
-% \CheckSum{579}
+% \CheckSum{588}
 % \iffalse meta-comment
 % ======================================================================
 % scrktitl.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrktitl.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrktitl.dtx}[2002/06/28 v2.95 KOMA-Script (title pages)]
+\ProvidesFile{scrktitl.dtx}[2006/08/21 v2.95c KOMA-Script (title pages)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -106,7 +106,9 @@
 % \subsection{Optionen der Titelei}
 %
 %  \begin{option}{titlepage}
+%    \changes{v2.95c}{2006/08/21}{als \textsf{keyval}-Option}
 %  \begin{option}{notitlepage}
+%    \changes{v2.95c}{2006/08/21}{Option ist obsolet}
 % Es werden zei Arten von Titeln unterstützt. Da sind zum einen eigene
 % Titelseiten, zum anderen sogenannte Titelköpfe, also Titel, die nicht eine
 % eigene Seite erhalten, sondern am Anfang einer Seite stehen. Zwischen den
@@ -124,14 +126,18 @@
 %  \end{macro}
 %  \end{macro}
 %    \begin{macrocode}
-\DeclareOption{titlepage}{\@titlepagetrue}
-\DeclareOption{notitlepage}{\@titlepagefalse}
+\KOMA@ifkey{titlepage}{@titlepage}
+\KOMA@DeclareObsoleteOption[\ClassInfo]{notitlepage}{titlepage=false}
 %    \end{macrocode}
 %  \end{option}
 %  \end{option}
 %
+%  \begin{option}{abstract}
+%    \changes{v2.95c}{2006/08/21}{neue \textsf{keyval}-Option}
 %  \begin{option}{abstracton}
+%    \changes{v2.95c}{2006/08/21}{Option ist obsolet}
 %  \begin{option}{abstractoff}
+%    \changes{v2.95c}{2006/08/21}{Option ist obsolet}
 % Obwohl die Zusammenfassung nicht unbedingt auf einer Titelseite steht,
 % gehört sie doch zur Titelei und wird daher hier mit behandelt. Die
 % Zusammenfassung kann mit einem standardmäßigen Titel versehen werden. Der
@@ -149,16 +155,18 @@
 % Die Enscheidung, ob der Titel der Zusammenfassung gesetzt werden soll, wird
 % in einem Schalter gespeichert.
 %    \begin{macrocode}
-\newif\if@abstrt
+\newif\if@abstrt\@abstrtfalse
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
 %  \end{macro}
 %
 %    \begin{macrocode}
-\DeclareOption{abstracton}{\@abstrttrue}
-\DeclareOption{abstractoff}{\@abstrtfalse}
+\KOMA@ifkey{abstract}{@abstrt}
+\KOMA@DeclareObsoleteOption[\ClassInfo]{abstracton}{abstract=true}
+\KOMA@DeclareObsoleteOption[\ClassInfo]{abstractoff}{abstract=false}
 %    \end{macrocode}
+%  \end{option}
 %  \end{option}
 %  \end{option}
 % \iffalse
@@ -266,6 +274,7 @@
 %      Autors sind auch bei Titelseiten angebracht}
 %    \changes{v2.8p}{2001/09/22}{\cs{titlefont} an Stelle von
 %      \cs{sectfont}}
+%    \changes{v2.95c}{2006/08/21}{Absatzgrundeinstellungen}
 %    \begin{macrocode}
 \if@titlepage
   \newcommand*\maketitle[1][1]{%
@@ -281,8 +290,9 @@
         \noindent\@extratitle\next@tpage\cleardoublepage
         \thispagestyle{empty}%
       \fi
+      \setparsizes{\z@}{\z@}{\z@\@plus 1fil}\par@updaterelative
       \ifx\@titlehead\@empty \else
-        \noindent\begin{minipage}[t]{\textwidth}%
+        \begin{minipage}[t]{\textwidth}%
         \@titlehead
         \end{minipage}\par
       \fi
@@ -308,11 +318,11 @@
       \@thanks
       \vfill\null
       \if@twoside\next@tpage
-        \noindent\begin{minipage}[t]{\textwidth}
+        \begin{minipage}[t]{\textwidth}
           \@uppertitleback
         \end{minipage}\par
         \vfill
-        \noindent\begin{minipage}[b]{\textwidth}
+        \begin{minipage}[b]{\textwidth}
           \@lowertitleback
         \end{minipage}
       \fi
@@ -432,7 +442,8 @@
 \fi
 %    \end{macrocode}
 %  \begin{macro}{\@maketitle}
-% Damit wird im Fall der Titelseite die eigentliche Arbeit geleistet.
+%    \changes{v2.95c}{2006/08/21}{Absatzgrundeinstellungen}
+% Damit wird im Fall des Titelkopfes die eigentliche Arbeit geleistet.
 %    \begin{macrocode}
 \newcommand*{\@maketitle}{%
   \clearpage
@@ -440,8 +451,9 @@
   \ifx\@extratitle\@empty \else
     \noindent\@extratitle \next@tpage \if@twoside \null\next@tpage \fi
   \fi
+  \setparsizes{\z@}{\z@}{\z@\@plus 1fil}\par@updaterelative
   \ifx\@titlehead\@empty \else
-    \noindent\begin{minipage}[t]{\textwidth}
+    \begin{minipage}[t]{\textwidth}
       \@titlehead
     \end{minipage}\par
   \fi
