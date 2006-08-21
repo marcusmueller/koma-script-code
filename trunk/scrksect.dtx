@@ -1,4 +1,4 @@
-% \CheckSum{1465}
+% \CheckSum{1472}
 % \iffalse meta-comment
 % ======================================================================
 % scrksect.dtx
@@ -122,6 +122,8 @@
 % Der Zustand wird dann in einem Schalter gespeichert.
 %    \begin{macrocode}
 \newif\if@openright
+%<report>\@openrightfalse
+%<book>\@openrighttrue
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
@@ -345,6 +347,7 @@
     If you'll continue, option `smallheadings' will be used%
   }%
 }
+\@bigheadings
 %    \end{macrocode}
 %  \end{macro}
 %  \end{option}
@@ -356,8 +359,10 @@
 %
 %  \begin{option}{chapterprefix}
 %    \changes{v2.8}{2001/06/15}{neue Option}
+%    \changes{v2.95c}{2006/08/21}{als \textsf{keyval}-Option}
 %  \begin{option}{nochapterprefix}
 %    \changes{v2.8}{2001/06/15}{neue Option}
+%    \changes{v2.95c}{2006/08/21}{obsolete Option}
 % \iffalse
 %<*book|report>
 % \fi
@@ -375,9 +380,9 @@
 % \texttt{appendixprefix} und \texttt{noappendixprefix} erfolgt die
 % Umschaltung durch einen Schalter.
 %    \begin{macrocode}
-\newif\if@chapterprefix
-\DeclareOption{chapterprefix}{\@chapterprefixtrue}
-\DeclareOption{nochapterprefix}{\@chapterprefixfalse}
+\newif\if@chapterprefix\@chapterprefixfalse
+\KOMA@ifkey{chapterprefix}{@chapterprefix}
+\KOMA@DeclareObsoleteOption{nochapterprefix}{chapterprefix=false}
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
@@ -391,24 +396,29 @@
 %
 %  \begin{option}{appendixprefix}
 %    \changes{v2.8}{2001/06/15}{neue Option}
+%    \changes{v2.95c}{2006/08/21}{als \textsf{keyval}-Option}
 %  \begin{option}{noappendixprefix}
 %    \changes{v2.8}{2001/06/15}{neue Option}
+%    \changes{v2.95c}{2006/08/21}{obsolete Option}
 % \iffalse
 %<*book|report>
 % \fi
-% Will man abweichend von den Optionen \texttt{chapterprefix} und
-% \texttt{nochapterprefix} die großen Überschriften für den Anhang
-% aktivieren oder deaktivieren, so kann man das mit dieser Option
-% erreichen. Allerdings setzt diese keinen Schalter, sondern ein
-% Zusatzmakro, das auch für andere Zwecke genutzt werden
-% kann. Übrigens ist keine der beiden Optionen die Voreinstellung!
+% Will man abweichend von der Option \texttt{chapterprefix} die großen
+% Überschriften für den Anhang aktivieren oder deaktivieren, so kann man das
+% mit dieser Option erreichen. Allerdings setzt diese keinen Schalter, sondern
+% ein Zusatzmakro, das auch für andere Zwecke genutzt werden kann. Übrigens
+% ist keine der beiden Einstellungen die Voreinstellung!
 %    \begin{macrocode}
-\DeclareOption{appendixprefix}{%
-  \def\appendixmore{\@chapterprefixtrue}%
+\KOMA@key{appendixprefix}[true]{%
+  \KOMA@set@ifkey{appendixprefix}{@tempswa}{#1}%
+  \if@tempswa
+    \def\appendixmore{\@chapterprefixtrue}%
+  \else
+    \def\appendixmore{\@chapterprefixfalse}%
+  \fi
 }
-\DeclareOption{noappendixprefix}{%
-  \def\appendixmore{\@chapterprefixfalse}%
-}
+\KOMA@DeclareObsoleteOption[\ClassInfo]{noappendixprefix}{%
+  appendixprefix=false}
 %    \end{macrocode}
 % \iffalse
 %</book|report>
