@@ -1,4 +1,4 @@
-% \CheckSum{1576}
+% \CheckSum{1597}
 % \iffalse meta-comment
 % ======================================================================
 % scrktare.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrktare.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrktare.dtx}[2006/08/18 v2.96 KOMA-Script (type area)]
+\ProvidesFile{scrktare.dtx}[2006/08/21 v2.96 KOMA-Script (type area)]
 % \iffalse
 %</driver>
 %<package&identify>\ProvidesPackage{typearea}[%
@@ -1476,7 +1476,9 @@
 %      \texttt{default}, \texttt{calc}, \texttt{classic} werden
 %      verstanden} 
 %    \changes{v2.8q}{2001/11/06}{der Wert \texttt{last} wird
-%    verstanden}
+%      verstanden}
+%    \changes{v2.96}{2006/08/21}{Warnung, wenn \cs{typearea} innerhalb einer
+%      Gruppe verwendet wird}
 % Die symbolischen Werte für das obligatorische Argument von
 % \cs{typearea} haben folgende Bedeutung:
 % \begin{center}\begin{tabular}{lll}
@@ -1492,6 +1494,20 @@
 % \texttt{current}.
 %    \begin{macrocode}
 \newcommand*\typearea[2][\z@]{%
+  \scr@ifundefined{currentgrouptype}{}{%
+    \ifcase\currentgrouptype\else
+      \PackageWarning{typearea}{%
+        \string\typearea\space used at group level
+        \the\currentgrouplevel.\MessageBreak
+        Using \string\typearea\space inside any group, e.g.\MessageBreak
+        environments, math mode, boxes, etc. may result in\MessageBreak
+        many type setting problems. Because of this you\MessageBreak
+        should never do this. You should move the
+        \string\typearea\MessageBreak
+        outside all groups%
+      }%
+    \fi
+  }%
   \edef\@tempa{#1}\edef\@tempb{current}\ifx\@tempa\@tempb\else
     \setlength{\ta@bcor}{#1}%
   \fi
