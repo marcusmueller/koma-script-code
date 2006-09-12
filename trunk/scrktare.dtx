@@ -1,4 +1,4 @@
-% \CheckSum{1597}
+% \CheckSum{1618}
 % \iffalse meta-comment
 % ======================================================================
 % scrktare.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrktare.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrktare.dtx}[2006/08/21 v2.96 KOMA-Script (type area)]
+\ProvidesFile{scrktare.dtx}[2006/09/12 v2.96 KOMA-Script (type area)]
 % \iffalse
 %</driver>
 %<package&identify>\ProvidesPackage{typearea}[%
@@ -1287,7 +1287,14 @@
 %    \end{macrocode}
 % Als Sonderbedingung ist dann noch zu beachten, dass die Größse des
 % Textbereichs nicht zu einer vertikalen Aufweitung führt.
+%   \changes{v2.96}{2006/09/12}{\cs{topskip} wird gesetzt}
 %    \begin{macrocode}
+  \scr@ifundefined{@ptsize}{%
+    \topskip=\f@size\p@
+  }{%
+    \topskip=\@ptsize\p@
+    \advance\topskip by 10\p@
+  }%
   \textheight=\topskip
   \@whiledim\textheight <\ta@temp
   \do{\advance\textheight by\baselineskip}%
@@ -1582,7 +1589,7 @@
 %    \begin{macrocode}
     \ifnum\ta@div=\z@
       \@ifundefined{@ptsize}{%
-        \@tempdima=\f@size pt
+        \@tempdima=\f@size\p@
         \advance\@tempdima by.5pt
         \ta@div=\@tempdima
         \divide\ta@div by65536
@@ -1590,7 +1597,7 @@
         \xdef\@ptsize{\the\ta@div}%
         \PackageWarningNoLine{typearea}{%
           \string\@ptsize\space not defined!\MessageBreak
-          Fontsize ist \f@size.\MessageBreak
+          Fontsize is \f@size pt.\MessageBreak
           Defining \string\@ptsize\space to \@ptsize%
         }%
       }{}%
@@ -1895,9 +1902,10 @@
 % Bevor nun irgendeine Berechnung durchgeführt wird, muss ggf. eine
 % neue Seite begonnen werden.
 %    \begin{macrocode}
-    \if@atdocument\newpage\fi
+  \if@atdocument\newpage\fi
 %    \end{macrocode}
 % Erst dann folgt die eigentlich Berechnung:
+%   \changes{v2.96}{2006/09/12}{\cs{topskip} wird gesetzt}
 %    \begin{macrocode}
   \setlength{\textwidth}{#2}%
   \setlength{\textheight}{#3}%
@@ -1917,6 +1925,12 @@
     \advance\oddsidemargin by\ta@bcor
     \evensidemargin\oddsidemargin
   \fi
+  \scr@ifundefined{@ptsize}{%
+    \topskip=\f@size\p@
+  }{%
+    \topskip=\@ptsize\p@
+    \advance\topskip by 10\p@
+  }%
   \headheight=15\p@
   \advance\headheight by\f@size\p@
   \advance\headheight by-10\p@
