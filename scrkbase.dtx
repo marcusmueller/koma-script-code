@@ -1,4 +1,4 @@
-% \CheckSum{632}
+% \CheckSum{710}
 % \iffalse meta-comment
 % ======================================================================
 % scrkbase.dtx
@@ -109,21 +109,6 @@
 % \StopEventually{\PrintIndex\PrintChanges}
 %
 % \iffalse
-%<*option>
-% \fi
-%
-% \subsection{Optionen}
-%
-% \changes{v2.96}{2006/08/20}{Optionen werden abgearbeitet}
-% Derzeit gibt es keine Optionen in diesem Bereich. Damit fehlerhaft
-% angegebene Optionen gemeldet werden, müssen trotzdem Optionen abgearbeitet
-% werden:
-%    \begin{macrocode}
-\ProcessOptions\relax
-%    \end{macrocode}
-%
-% \iffalse
-%</option>
 %<*load>
 % \fi
 %
@@ -136,7 +121,7 @@
 %
 % \iffalse
 %</load>
-%<*body>
+%<*option>
 % \fi
 %
 % \subsection{Laden von \textsf{keyval}}
@@ -147,6 +132,143 @@
 %    \end{macrocode}
 % erledigt ist.
 %
+%
+% \subsection{Anweisungen zur Abarbeitung von Optionen}
+%
+%  \begin{macro}{\scr@ifundefined}
+%    \changes{v2.95c}{2006/08/12}{neu (intern)}
+% Dieses Makro arbeitet wie \cs{@ifundefined}, definiert dabei aber
+% ein undefiniertes Makro nicht als \cs{relax}. Es muss bereits hier definiert
+% werden, weil es gleich verwendet wird.
+%    \begin{macrocode}
+\begingroup\expandafter\expandafter\expandafter\endgroup
+\expandafter\ifx\csname ifcsname\endcsname
+  \newcommand{\scr@ifundefined}[1]{%
+    \ifcsname #1\endcsname
+      \expandafter\@secondoftwo
+    \else
+      \expandafter\@firstoftwo
+    \fi
+  }
+\else
+  \newcommand{\scr@ifundefined}[1]{%
+    \begingroup\expandafter\expandafter\expandafter\endgroup
+    \expandafter\ifx\csname #1\endcsname\relax
+      \expandafter\@firstoftwo
+    \else
+      \expandafter\@secondoftwo
+    \fi
+  }
+\fi
+%    \end{macrocode}
+%  \end{macro}
+%
+%  \begin{macro}{\DeclareKeyValOption}
+% Dieses Makro deklariert alle bisher definierten Schlüssel eines
+% Bereichs (erste Argument) als Optionen. Das optionale Argument
+% erlaubt außerdem die Deklaration einer
+% \cs{DeclareOption*}-Auswertung. \cs{DeclareOption*} darf nicht
+% zusammen mit dieser Anweisung verwendet werden. Diese Anweisung darf
+% je Paket oder Klasse nur einmal verwendet werden.
+%    \begin{macrocode}
+\newcommand*{\DeclareKeyValOption}[2][%
+  \ifx\@currext\@clsextension\OptionNotUsed\else\@unkownoptionerror\fi
+]{%
+  \DeclareOption*{%
+    \def\@tempa##1=##2=##3\@nil{%
+      \scr@ifundefined{KV@#2@##1}{#1}{%
+        \@expandtwoargs\setkeys{#2}\CurrentOption
+      }%
+    }%
+    \expandafter\@tempa\CurrentOption==\@nil
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \subsection{Definition von KOMA-\textsf{keyval}-Schlüsseln (Basis)}
+%
+% Üblicherweise verwendet \KOMAScript{} für alle
+% \textsf{keyval}-Schlüssel die gleiche Bereichskennung
+% "`\texttt{KOMA}"'. Dadurch ist es möglich, dass Pakete die Schlüssel
+% der Klassen umdefinieren und dass jeder Teil von \KOMAScript{} die
+% Schlüssel jedes anderen Teils ausführen kann -- sobald sie definiert
+% sind.
+%
+%  \begin{macro}{\KOMA@key}
+% Einzig, um etwas Tipparbeit zu sparen, wird ein abkürzendes Makro
+% definiert:
+%    \begin{macrocode}
+\newcommand*{\KOMA@key}{\define@key{KOMA}}
+%    \end{macrocode}
+%  \end{macro}
+%
+% \subsection{Optionen}
+%
+% \begin{option}{internalonly}
+%   \changes{v2.96}{2006/11/26}{neu}
+% \begin{macro}{\dont@let@as@internal@defined}
+%   \changes{2.96}{2006/11/26}{neu (intern)}
+% Anweisungen, die mit einem internen und einem Anwendername vorhanden sind,
+% können vor dem Anwender optional verborgen werden.
+%    \begin{macrocode}
+\newcommand*{\dont@let@as@internal@defined}{/}
+\KOMA@key{internalonly}{%
+  \begingroup
+    \@expandtwoargs\in@{#1}\dont@let@as@internal@defined
+  \expandafter\endgroup
+  \ifin@\else\g@addto@macro\dont@let@as@internal@defined{#1/}\fi
+}
+\DeclareKeyValOption{KOMA}
+%    \end{macrocode}
+% \end{macro}
+% \end{option}
+%
+% \changes{v2.96}{2006/08/20}{Optionen werden abgearbeitet}
+%    \begin{macrocode}
+\ProcessOptions\relax
+%    \end{macrocode}
+%
+% \begin{macro}{\@globaloptionslist}
+%   \changes{v2.96}{2006/11/26}{new}
+%   \changes{v2.96}{2006/11/26}{Klassenoptionen durchsuchen}
+% Die Lister der globalen Optionen wird teilweise benötigt. Weil
+% \textsl{xkeyval} dämlicherweise glaubt, es müsse alle Optionen mit
+% Gleichheitszeichen aus der Liste der Klassenoptionen entfernen
+% (seltsamerweise aber nicht die (x)keyval-Optionen, die ohne Wert aufgerufen
+% werden, weil ihr Defaultwert verwendet werden soll), wird hier ein eigenes
+% Makro definiert.
+%    \begin{macrocode}
+\newcommand*{\@globaloptionslist}{}
+\scr@ifundefined{XKV@classooptionslist}{%
+  \let\@globaloptionslist\@classoptionslist
+}{%
+  \let\@globaloptionslist\XKV@classoptionslist
+}
+\@expandtwoargs\in@{,internalonly=}{,\@globaloptionslist}
+\ifin@
+  \begingroup
+    \catcode`\=12\catcode`\:=12
+    \def\@do@internalonly #1internalonly=#2\@nil{%
+      \ifx\relax#1\relax\setkeys{KOMA}{internalonly=#2}\fi
+      \@expandtwoargs\@removeelement{internalonly=#2}\@unusedoptionlist
+      \@unusedoptionlist
+    }%
+    \expandafter\@for\expandafter\@tempa\expandafter:\expandafter=%
+    \@globaloptionslist\do{%
+      \expandafter\@do@internalonly\@tempa\@nil
+    }%
+    \global\let\@unusedoptionlist\@unusedoptionlist
+  \endgroup
+\fi
+%    \end{macrocode}
+% \end{macro}
+%
+% \iffalse
+%</option>
+%<*body>
+% \fi
 %
 % \subsection{Häufig benötigte Befehle}
 %
@@ -170,85 +292,78 @@
 %
 %  \begin{macro}{\let@as@internal@defined}
 %    \changes{v2.95}{2002/08/19}{neu (intern)}
-%    \changes{v2.95c}{2008/08/12}{Warnung bei Umdefinierung}
+%    \changes{v2.95c}{2006/08/12}{Warnung bei Umdefinierung}
+%    \changes{v2.96}{2006/11/26}{Herausreichen von internen Makros als
+%      Benutzermakros kann verhindert werden}
 % Dieses Makro wird intern verwendet, um dokumentierte Makros mit der
 % Definition von internen Makros zu versehen, falls sie nicht bereits
-% definiert sind. Der Name des dokumentierten Makros wird als
-% Parameter übergeben. Dies wird gleich benötigt.
+% definiert oder als nicht zu definieren markiert sind. Der Name des
+% dokumentierten Makros wird als Parameter übergeben. Dies wird gleich
+% benötigt.
 %    \begin{macrocode}
-\newcommand*{\let@as@internal@defined}[1]{
-  \@ifundefined{#1}{%
-    \begingroup
-      \expandafter\def\expandafter\@tempa
-        \expandafter{\csname scr@#1\endcsname}
-      \expandafter\def\expandafter\@tempb
-        \expandafter{\csname #1\endcsname}
-    \expandafter\expandafter\expandafter\endgroup
-    \expandafter\expandafter\expandafter\let\expandafter\@tempb\@tempa
-    \if@atdocument\else
-      \g@addto@macro\document{%
-        \expandafter\ifx\csname #1\expandafter\endcsname
-        \csname scr@#1\endcsname
-        \else
-          \PackageWarning{scrkbase}{%
-            \expandafter\string\csname #1\endcsname\space was
-            redefined\MessageBreak
-            at the document preamble.\MessageBreak
-            If you did not redefine it by yourself, have a\MessageBreak
-            a look at the description of this command at\MessageBreak
-            the manual of every package you are using\@gobble
-          }%
-        \fi
-      }%
-    \fi
-  }{%
+\newcommand*{\let@as@internal@defined}[1]{%
+  \begingroup
+    \@expandtwoargs\in@{/#1/}\dont@let@as@internal@defined
+  \expandafter\endgroup
+  \ifin@
     \PackageInfo{%
       scrkbase%
     }{%
-      \expandafter\string\csname #1\endcsname\space already
-      defined.\MessageBreak
-      If \expandafter\string\csname #1\endcsname\space does not behave
-      like\MessageBreak
-      it was described at the KOMA-Script manual, try to\MessageBreak
-      load `scrkbase.sty' earlier or find out at which\MessageBreak
-      package or class \expandafter\string\csname #1\endcsname\space
-      was defined before\@gobble
+      \expandafter\string\csname #1\endcsname\space excluded from being
+      defined%
     }%
-  }%
+  \else
+    \@ifundefined{#1}{%
+      \begingroup
+        \expandafter\def\expandafter\@tempa
+          \expandafter{\csname scr@#1\endcsname}
+        \expandafter\def\expandafter\@tempb
+          \expandafter{\csname #1\endcsname}
+      \expandafter\expandafter\expandafter\endgroup
+      \expandafter\expandafter\expandafter\let\expandafter\@tempb\@tempa
+      \if@atdocument\else
+        \g@addto@macro\document{%
+          \expandafter\ifx\csname #1\expandafter\endcsname
+          \csname scr@#1\endcsname
+          \else
+            \PackageWarning{scrkbase}{%
+              \expandafter\string\csname #1\endcsname\space was
+              redefined\MessageBreak
+              at the document preamble.\MessageBreak
+              If you did not redefine it by yourself, have a\MessageBreak
+              a look at the description of this command at\MessageBreak
+              the manual of every package you are using\@gobble
+            }%
+          \fi
+        }%
+      \fi
+    }{%
+      \PackageInfo{%
+        scrkbase%
+      }{%
+        \expandafter\string\csname #1\endcsname\space already
+        defined.\MessageBreak
+        If \expandafter\string\csname #1\endcsname\space does not behave
+        like\MessageBreak
+        it was described at the KOMA-Script manual, try to\MessageBreak
+        load `scrkbase.sty' earlier or find out at which\MessageBreak
+        package or class \expandafter\string\csname #1\endcsname\space
+        was defined before\@gobble
+      }%
+    }%
+  \fi
 }
 %    \end{macrocode}
 %  \end{macro}
 %
-%  \begin{macro}{\scr@ifundefined}
-%    \changes{v2.95c}{2006/08/12}{neu (intern)}
 %  \begin{macro}{\ifundefined}
 %    \changes{v2.95}{2002/08/21}{neu}
 %    \changes{v2.95c}{2006/08/12}{über interne Anweisung definiert}
 % Dieses Makro arbeitet wie \cs{@ifundefined}, definiert dabei aber
 % ein undefiniertes Makro nicht als \cs{relax}.
 %    \begin{macrocode}
-\begingroup\expandafter\expandafter\expandafter\endgroup
-\expandafter\ifx\csname ifcsname\endcsname
-  \newcommand{\scr@ifundefined}[1]{%
-    \ifcsname #1\endcsname
-      \expandafter\@secondoftwo
-    \else
-      \expandafter\@firstoftwo
-    \fi
-  }
-\else
-  \newcommand{\scr@ifundefined}[1]{%
-    \begingroup\expandafter\expandafter\expandafter\endgroup
-    \expandafter\ifx\csname #1\endcsname\relax
-      \expandafter\@firstoftwo
-    \else
-      \expandafter\@secondoftwo
-    \fi
-  }
-\fi
 \let@as@internal@defined{ifundefined}
 %    \end{macrocode}
-%  \end{macro}
 %  \end{macro}
 %
 %  \begin{macro}{\ifnotundefined}
@@ -576,48 +691,7 @@
 %  \end{macro}
 %
 %
-% \subsection{Abarbeitung von Optionen}
-%
-%  \begin{macro}{\DeclareKeyValOption}
-% Dieses Makro deklariert alle bisher definierten Schlüssel eines
-% Bereichs (erste Argument) als Optionen. Das optionale Argument
-% erlaubt außerdem die Deklaration einer
-% \cs{DeclareOption*}-Auswertung. \cs{DeclareOption*} darf nicht
-% zusammen mit dieser Anweisung verwendet werden. Diese Anweisung darf
-% je Paket oder Klasse nur einmal verwendet werden.
-%    \begin{macrocode}
-\newcommand*{\DeclareKeyValOption}[2][%
-  \ifx\@currext\@clsextension\OptionNotUsed\else\@unkownoptionerror\fi
-]{%
-  \DeclareOption*{%
-    \def\@tempa##1=##2=##3\@nil{%
-      \scr@ifundefined{KV@#2@##1}{#1}{%
-        \@expandtwoargs\setkeys{#2}\CurrentOption
-      }%
-    }%
-    \expandafter\@tempa\CurrentOption==\@nil
-  }%
-}
-%    \end{macrocode}
-% \end{macro}
-%
-%
-% \subsection{Definition von KOMA-\textsf{keyval}-Schlüsseln}
-%
-% Üblicherweise verwendet \KOMAScript{} für alle
-% \textsf{keyval}-Schlüssel die gleiche Bereichskennung
-% "`\texttt{KOMA}"'. Dadurch ist es möglich, dass Pakete die Schlüssel
-% der Klassen umdefinieren und dass jeder Teil von \KOMAScript{} die
-% Schlüssel jedes anderen Teils ausführen kann -- sobald sie definiert
-% sind.
-%
-%  \begin{macro}{\KOMA@key}
-% Einzig, um etwas Tipparbeit zu sparen, wird ein abkürzendes Makro
-% definiert:
-%    \begin{macrocode}
-\newcommand*{\KOMA@key}{\define@key{KOMA}}
-%    \end{macrocode}
-%  \end{macro}
+% \subsection{Definition von KOMA-\textsf{keyval}-Schlüsseln (Hauptteil)}
 %
 %  \begin{macro}{\KOMAoptions}
 %    \changes{v2.96}{2006/08/20}{Neuer Hook nach den Optionen}
