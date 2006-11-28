@@ -1,4 +1,4 @@
-% \CheckSum{1501}
+% \CheckSum{1522}
 % \iffalse meta-comment
 % ======================================================================
 % scrksect.dtx
@@ -1975,24 +1975,41 @@
       \advance\leftskip\@tempdima
       \hskip -\leftskip
       #1\nobreak\hfil \nobreak\hb@xt@\@pnumwidth{\hss #2}\par
+%    \end{macrocode}
+%   \changes{v2.96b}{2006/11/30}{Umbruch zwischen \cs{part}-Eintrag im
+%     Inhaltsverzeichnis und untergeordneten Einträgen verhindern}
+% Aus unerfindlichen Gründen war es bis Version~2.96 erlaubt, dass zwischen
+% der \cs{part}-Überschrift und der nachfolgenden Überschrift ein Umbruch
+% stattfinden kann. Ab Version~2.96a gilt das nur noch, wenn die nachfolgende
+% Überschrift wiederum eine \cs{part}-Überschrift ist.
+%    \begin{macrocode}
+      \ifnum \scr@compatibility>\@nameuse{scr@v@2.96}
+      \endgroup
+      \penalty20010
+      \else
 %<*article>
-      \if@compatibility
-        \global\@nobreaktrue
+        \if@compatibility
+          \global\@nobreaktrue
 %    \end{macrocode}
 %    \changes{v2.3g}{1996/01/14}{fehlendes Kommentarzeichen ergänzt}
 %    \begin{macrocode}
-        \everypar{\global\@nobreakfalse\everypar{}}%
-      \else
+          \everypar{\global\@nobreakfalse\everypar{}}%
+        \else
 %</article>
-        \penalty\@highpenalty
-%<article>       \fi
-    \endgroup
+          \penalty\@highpenalty
+%<article>         \fi
+      \endgroup
+    \fi
   \fi
 }
 %    \end{macrocode}
 %  \end{macro}
 %  \begin{macro}{\l@chapter}
 %    \changes{v2.9k}{2003/01/02}{Anpassung an Option \texttt{tocleft}}
+%    \changes{v2.96b}{2006/11/30}{Umbruch zwischen \cs{part}-Eintrag im
+%      Inhaltsverzeichnis und untergeordneten Einträgen verhindern}
+%    \changes{v2.96b}{2006/11/30}{Umbruch zwischen \cs{chapter}-Eintrag im
+%      Inhaltsverzeichnis und untergeordneten Einträgen verhindern}
 % \iffalse
 %<*report|book>
 % \fi
@@ -2000,7 +2017,9 @@
 %    \begin{macrocode}
 \newcommand*\l@chapter[2]{%
   \ifnum \c@tocdepth >\m@ne
-    \addpenalty{-\@highpenalty}%
+    \ifnum \lastpenalty<20010
+      \addpenalty{-\@highpenalty}%
+    \fi
     \vskip 1.0em \@plus\p@
     \setlength\@tempdima{1.5em}%
     \if@tocleft
@@ -2015,8 +2034,13 @@
       \advance\leftskip\@tempdima
       \hskip -\leftskip
       #1\nobreak\hfil \nobreak\hb@xt@\@pnumwidth{\hss #2}\par
-      \penalty\@highpenalty
-    \endgroup
+      \ifnum \scr@compatibility>\@nameuse{scr@v@2.96}
+      \endgroup
+      \penalty20009
+      \else
+        \penalty\@highpenalty
+      \endgroup
+    \fi
   \fi
 }
 %    \end{macrocode}
@@ -2026,6 +2050,10 @@
 %  \end{macro}
 %  \begin{macro}{\l@section}
 %    \changes{v2.9k}{2003/01/02}{Anpassung an Option \texttt{tocleft}}
+%    \changes{v2.96b}{2006/11/30}{Umbruch zwischen \cs{part}-Eintrag im
+%      Inhaltsverzeichnis und untergeordneten Einträgen verhindern}
+%    \changes{v2.96b}{2006/11/30}{Umbruch zwischen \cs{chapter}-Eintrag im
+%      Inhaltsverzeichnis und untergeordneten Einträgen verhindern}
 % Bei der Artikel-Klasse folgt die Formatierung für
 % \cs{section}-Einträge, an Stelle der Einträge für \cs{chapter}
 % der Buch- oder der Bericht-Klasse. Bei diesen handelt es sich hier
@@ -2034,7 +2062,9 @@
 %<*article>
 \newcommand*\l@section[2]{%
   \ifnum \c@tocdepth >\z@
-    \addpenalty{\@secpenalty}%
+    \ifnum \lastpenalty<20009
+      \addpenalty{\@secpenalty}%
+    \fi
     \addvspace{1.0em \@plus\p@}%
     \setlength\@tempdima{1.5em}%
      \if@tocleft
@@ -2048,7 +2078,7 @@
       \leavevmode \sectfont
       \advance\leftskip\@tempdima
       \hskip -\leftskip
-      #1\nobreak\hfil \nobreak\hb@xt@\@pnumwidth{\hss #2}\par
+      #1\nobreak\hfil \nobreak\hb@xt@\@pnumwidth{\hss #2}\par\nobreak
     \endgroup
   \fi
 }
