@@ -1,4 +1,4 @@
-% \CheckSum{1558}
+% \CheckSum{1574}
 % \iffalse meta-comment
 % ======================================================================
 % scrksect.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrksect.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrksect.dtx}[2006/11/30 v2.96a KOMA-Script (disposition)]
+\ProvidesFile{scrksect.dtx}[2006/12/02 v2.96a KOMA-Script (disposition)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -674,6 +674,8 @@
 %    \changes{v2.8}{2001/06/15}{\cs{chapappifprefix} eingefügt}
 %    \changes{v2.8o}{2001/09/19}{\cs{chapappifchapterprefix} statt
 %      \cs{chapappifprefix}} 
+%    \changes{v2.96a}{2006/12/02}{\cs{mbox} eingefügt, um \cs{caps} zu
+%      ermöglichen}
 %  \begin{macro}{\chaptermarkformat}
 %    \changes{v2.3a}{1995/07/08}{Leerraum nach der Kapitelnummer
 %      erhöht}
@@ -713,7 +715,7 @@
 \newcounter{chapter}
 \renewcommand*{\thechapter}{\@arabic\c@chapter}
 \newcommand*{\chapterformat}{%
-  \chapappifchapterprefix{\ }\thechapter\autodot\enskip
+  \mbox{\chapappifchapterprefix{~}\thechapter\autodot\enskip}%
 }
 \newcommand*\chaptermarkformat{\chapappifchapterprefix{\ }%
   \thechapter\autodot\enskip}
@@ -991,10 +993,10 @@
     \normalfont\sectfont\nobreak
 %<article>    \ifnum \c@secnumdepth >\m@ne
 %<book|report>    \ifnum \c@secnumdepth >-2\relax
-      \size@partnumber\partformat
+      \size@partnumber{\partformat}%
       \partheadmidvskip
     \fi
-    \size@part #2\strut%
+    \size@part{#2}\strut%
     \partmark{#1}\par
   \endgroup
 %<*article>
@@ -1010,7 +1012,7 @@
     \raggedpart
     \interlinepenalty \@M
     \normalfont
-    \sectfont\nobreak\size@part #1\strut\@mkboth{}{}\par
+    \sectfont\nobreak\size@part{#1}\strut\@mkboth{}{}\par
   \endgroup
 %<*article>
   \nobreak
@@ -1247,9 +1249,14 @@
   \@@makechapterhead{#1}%
   \use@preamble{chapter@u}\nobreak
 }
+%    \end{macrocode}
+%    \changes{v2.96a}{2006/12/02}{Abstand nach der Präfixzeile nur, wenn eines
+%      Präfixzeile ausgegeben wurde}
+%    \begin{macrocode}
 \newcommand*{\@@makechapterhead}[1]{\chapterheadstartvskip
-  {\normalfont\sectfont\size@chapter
+  {%
     \setlength{\parindent}{\z@}\setlength{\parfillskip}{\fill}%
+    \normalfont\sectfont\size@chapter{}%
     \if@chapterprefix
       \let\@tempa\raggedsection
     \else
@@ -1257,12 +1264,19 @@
     \fi
     \@tempa{\ifnum \c@secnumdepth >\m@ne%
 %<book>      \if@mainmatter 
-        \chapterformat
+        \if@chapterprefix
+          \expandafter\size@chapterprefix
+        \else
+          \expandafter\size@chapter
+        \fi
+        {\chapterformat}%
+        \if@chapterprefix
+          \size@chapterprefix{}\par\nobreak\vskip.5\baselineskip
+        \fi
 %<book>        \fi
       \fi
     }%
-    \if@chapterprefix\par\nobreak\vskip.5\baselineskip\fi
-    {\raggedsection \interlinepenalty \@M #1\par}}%
+    {\raggedsection \interlinepenalty \@M \size@chapter{#1}\par}}%
   \nobreak\chapterheadendvskip
 }
 %    \end{macrocode}
@@ -1295,9 +1309,9 @@
 }
 \newcommand*{\@@makeschapterhead}[1]{%
   \chapterheadstartvskip%
-  {\normalfont\sectfont\size@chapter
+  {\normalfont\sectfont\size@chapter{}%
     \setlength{\parindent}{\z@}\setlength{\parfillskip}{\fill}%
-    \raggedsection \interlinepenalty \@M #1\par}%
+    \raggedsection \interlinepenalty \@M \size@chapter{#1}\par}%
   \nobreak\chapterheadendvskip%
 }
 \newcommand*{\@makeschapterhead}[1]{%
@@ -1599,10 +1613,18 @@
 %
 %  \begin{macro}{\size@part}
 %    \changes{v2.8o}{2001/09/14}{neu (intern)}
+%    \changes{v2.96a}{2006/12/02}{letztes Element darf ein Argument erwarten,
+%      wenn es keine Auswirkung auf den Zeilen abstand hat}
 %  \begin{macro}{\size@partnumber}
 %    \changes{v2.8o}{2001/09/14}{neu (intern)}
+%    \changes{v2.96a}{2006/12/02}{letztes Element darf ein Argument erwarten,
+%      wenn es keine Auswirkung auf den Zeilen abstand hat}
 %  \begin{macro}{\size@chapter}
 %    \changes{v2.8o}{2001/09/14}{neu (intern)}
+%    \changes{v2.96a}{2006/12/02}{letztes Element darf ein Argument erwarten,
+%      wenn es keine Auswirkung auf den Zeilen abstand hat}
+%  \begin{macro}{\size@chapterprefix}
+%    \changes{v2.96a}{2006/12/02}{neu (intern)}
 %  \begin{macro}{\size@section}
 %    \changes{v2.8o}{2001/09/14}{neu (intern)}
 %  \begin{macro}{\size@subsection}
@@ -1618,12 +1640,14 @@
 \newcommand*{\size@part}{}
 \newcommand*{\size@partnumber}{}
 %<book|report>\newcommand*{\size@chapter}{}
+%<book|report>\newcommand*{\size@chapterprefix}{\size@chapter}
 \newcommand*{\size@section}{}
 \newcommand*{\size@subsection}{}
 \newcommand*{\size@subsubsection}{}
 \newcommand*{\size@paragraph}{}
 \newcommand*{\size@subparagraph}{}
 %    \end{macrocode}
+%  \end{macro}
 %  \end{macro}
 %  \end{macro}
 %  \end{macro}
@@ -1645,6 +1669,8 @@
 %    \changes{v2.8p}{2001/09/23}{neues Element \texttt{partnumber}}
 %  \begin{macro}{\scr@fnt@chapter}
 %    \changes{v2.8o}{2001/09/14}{neues Element \texttt{chapter}}
+%  \begin{macro}{\scr@fnt@chapterprefix}
+%    \changes{v2.96a}{2006/12/02}{neues Element \texttt{chapterprefix}}
 %  \begin{macro}{\scr@fnt@section}
 %    \changes{v2.8o}{2001/09/14}{neues Element \texttt{section}}
 %  \begin{macro}{\scr@fnt@subsection}
@@ -1665,6 +1691,7 @@
 \newcommand*{\scr@fnt@part}{\size@part}
 \newcommand*{\scr@fnt@partnumber}{\size@partnumber}
 %<book|report>\newcommand*{\scr@fnt@chapter}{\size@chapter}
+%<book|report>\newcommand*{\scr@fnt@chapterprefix}{\size@chapterprefix}
 \newcommand*{\scr@fnt@section}{\size@section}
 \newcommand*{\scr@fnt@subsection}{\size@subsection}
 \newcommand*{\scr@fnt@subsubsection}{\size@subsubsection}
@@ -1674,6 +1701,7 @@
 \aliaskomafont{sectioning}{disposition}
 %    \end{macrocode}
 %  \end{KOMAfont}
+%  \end{macro}
 %  \end{macro}
 %  \end{macro}
 %  \end{macro}
