@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2006/07/01 v0.9a internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2006/11/29 v0.9b internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -78,7 +78,13 @@
 % these options will be processed by |\LoadClassWithOptions| below.
 %    \begin{macrocode}
 \ExecuteOptions{pagereftolabel,lessindexnotes}
-\PassOptionsToClass{bibtotoc,idxtotoc,tablecaptionabove}{scrguide}
+\PassOptionsToClass{%
+  version,
+  bibtotoc,
+  idxtotoc,
+  tablecaptionabove,
+  smallheadings
+}{scrguide}
 \ProcessOptions\relax
 %    \end{macrocode}
 %
