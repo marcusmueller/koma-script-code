@@ -1,4 +1,4 @@
-% \CheckSum{1618}
+% \CheckSum{1624}
 % \iffalse meta-comment
 % ======================================================================
 % scrktare.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrktare.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrktare.dtx}[2006/09/12 v2.96 KOMA-Script (type area)]
+\ProvidesFile{scrktare.dtx}[2006/11/29 v2.96a KOMA-Script (type area)]
 % \iffalse
 %</driver>
 %<package&identify>\ProvidesPackage{typearea}[%
@@ -1367,15 +1367,42 @@
 %    \end{macrocode}
 %  \end{macro}
 %
-%  \begin{macro}{\@typearea@end}
-% Das Makro \cs{@typearea@end} wird verwendet, um mit einem gewaltigen
-% Hack die Änderung des Satzspiegels innerhalb eines Dokuments zu
-% ermöglichen. Es wird daher erst am Anfang des Dokuments definiert.
+%  \begin{macro}{\AfterCalculatingTypearea}
+%    \changes{v2.96a}{2006/11/29}{neu}
+% Neuerdings besteht die Möglichkeit, auf Benutzerebene das Verhalten von
+% \cs{typearea} zu beeinflussen. In der Sternvariante wird dabei lokal
+% gearbeitet.
 %    \begin{macrocode}
-\AtBeginDocument{%
-  \newcommand\@typearea@end{%
+\newcommand*{\AfterCalculatingTypearea}{%
+  \@ifstar \l@addto@macro \g@addto@macro \@typearea@end
+}
 %    \end{macrocode}
-% Als erstes wird jedoch eine Warnung ausgegeben, weil es wirklich sehr
+%  \begin{macro}{\@typearea@end}
+%    \changes{v2.96a}{2006/11/29}{wird wieder immer aber mit neuer Bedeutung
+%      definiert}
+% Das Makro \cs{@typearea@end} dient als Hook, um am Ende von \cs{typearea}
+% noch irgendwelche Änderungen vornehmen zu können. Dies geschieht ggf. noch
+% vor der Aktivierung der Einstellungen innerhalb eines Dokuments.
+%    \begin{macrocode}
+\newcommand*{\@typearea@end}{}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%
+%  \begin{macro}{\activateareas}
+%    \changes{v2.96a}{Neuer Name für alte Anweisung}
+% Dieses Makro wird verwendet, um mit einem gewaltigen Hack die Änderung des
+% Satzspiegels innerhalb eines Dokuments zu ermöglichen. Es stellt selbst
+% sicher, dass es nur innerhalb des Dokuments ausgeführt wird.
+%    \begin{macrocode}
+\newcommand*{\activateareas}{%
+%    \end{macrocode}
+% Als erstes wird getestet, ob wir überhaupt innerhalb des Dokuments sind und
+% nur dann wird etwas getan.
+%    \begin{macrocode}
+  \if@atdocument
+%    \end{macrocode}
+% Wenn dem so ist,  wird jedoch eine Warnung ausgegeben, weil es wirklich sehr
 % unsauber ist, so zu verfahren. Das ganze ist absolut abhängig von der
 % \LaTeX-Version.
 %    \begin{macrocode}
@@ -1402,7 +1429,7 @@
     \hsize=\columnwidth 
     \linewidth\hsize
     \scr@ifundefined{@pagesizelast}{}{\KOMAoptions{pagesize=\@pagesizelast}}%
-  }%
+  \fi
 }
 %    \end{macrocode}
 %  \end{macro}
@@ -1864,7 +1891,8 @@
       \space\string\baselineskip\space\space\space=%
                            \space\the\baselineskip\MessageBreak
     }%
-    \if@atdocument\@typearea@end\fi
+    \@typearea@end
+    \activateareas
   \fi
 }
 %    \end{macrocode}
@@ -1959,7 +1987,7 @@
   \fi
   \marginparsep=1cc
   \marginparpush=0.45\baselineskip
-  \if@atdocument\@typearea@end\fi
+  \activateareas
 }
 %    \end{macrocode}
 %  \end{macro}
