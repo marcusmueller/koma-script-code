@@ -1,4 +1,4 @@
-% \CheckSum{1565}
+% \CheckSum{1638}
 % \iffalse meta-comment
 % ======================================================================
 % scrksect.dtx
@@ -1219,28 +1219,61 @@
       \refstepcounter{chapter}%
       \@maybeautodot\thechapter
       \typeout{\@chapapp\space\thechapter.}%
-      \addcontentsline{toc}{chapter}%
-      {\protect\numberline{\thechapter}#1}%
-%<book>    \else
-%<book>      \addcontentsline{toc}{chapter}{#1}%
-%<book>    \fi
+      \addcontentsline{toc}{chapter}{\protect\numberline{\thechapter}#1}%
+      \if@chaptertolists
+        \addcontentsline{lof}{chapteratlist}{%
+          \protect\numberline{\thechapter}#1}%
+        \addcontentsline{lot}{chapteratlist}{%
+          \protect\numberline{\thechapter}#1}%
+        \@ifundefined{float@addtolists}{}{%
+          \float@addtolists{%
+            \protect\contentsline{chapteratlist}{%
+              \protect\numberline{\thechapter}#1}{\thepage}%
+          }%
+        }%
+      \fi
+%<*book>
     \else
       \addcontentsline{toc}{chapter}{#1}%
-    \fi
-    \chaptermark{#1}%
-    \addtocontents{lof}{\protect\addvspace{10\p@}}%
-    \addtocontents{lot}{\protect\addvspace{10\p@}}%
-    \@ifundefined{float@addtolists}{}{%
-      \float@addtolists{\protect\addvspace{10\p@}}%
-    }%
-    \if@twocolumn
-      \if@at@twocolumn
-        \@makechapterhead{#2}%
-      \else
-        \@topnewpage[\@makechapterhead{#2}]%
+      \if@chaptertolists
+        \addcontentsline{lof}{chapteratlist}{#1}%
+        \addcontentsline{lot}{chapteratlist}{#1}%
+        \@ifundefined{float@addtolists}{}{%
+          \float@addtolists{%
+            \protect\contentsline{chapteratlist}{#1}{\thepage}%
+          }%
+        }%
       \fi
-    \else
+    \fi
+%</book>
+  \else
+    \addcontentsline{toc}{chapter}{#1}%
+    \if@chaptertolists
+      \addcontentsline{lof}{chapteratlist}{#1}%
+      \addcontentsline{lot}{chapteratlist}{#1}%
+      \@ifundefined{float@addtolists}{}{%
+        \float@addtolists{%
+          \protect\contentsline{chapteratlist}{#1}{\thepage}%
+        }%
+      }%
+    \fi
+  \fi
+  \chaptermark{#1}%
+  \ifdim \@chapterlistsgap>\z@
+    \addtocontents{lof}{\protect\addvspace{\@chapterlistsgap}}%
+    \addtocontents{lot}{\protect\addvspace{\@chapterlistsgap}}%
+    \@ifundefined{float@addtolists}{}{%
+      \float@addtolists{\protect\addvspace{\@chapterlistsgap}}%
+    }%
+  \fi
+  \if@twocolumn
+    \if@at@twocolumn
       \@makechapterhead{#2}%
+    \else
+      \@topnewpage[\@makechapterhead{#2}]%
+    \fi
+  \else
+    \@makechapterhead{#2}%
     \@afterheading
   \fi
 }
@@ -1263,16 +1296,16 @@
       \let\@tempa\@hangfrom
     \fi
     \@tempa{\ifnum \c@secnumdepth >\m@ne%
-%<book>      \if@mainmatter 
-        \if@chapterprefix
-          \expandafter\size@chapterprefix
-        \else
-          \expandafter\size@chapter
-        \fi
-        {\chapterformat}%
-        \if@chapterprefix
-          \size@chapterprefix{}\par\nobreak\vskip.5\baselineskip
-        \fi
+%<book>        \if@mainmatter 
+          \if@chapterprefix
+            \expandafter\size@chapterprefix
+          \else
+            \expandafter\size@chapter
+          \fi
+          {\chapterformat}%
+          \if@chapterprefix
+            \size@chapterprefix{}\endgraph\nobreak\vskip.5\baselineskip
+          \fi
 %<book>        \fi
       \fi
     }%
@@ -1396,6 +1429,24 @@
 \newcommand*{\@addchap}{}
 \def\@addchap[#1]#2{\@schapter{#2}%
   \addcontentsline{toc}{chapter}{#1}%
+  \if@chaptertolists
+    \addcontentsline{lof}{chapteratlist}{#1}%
+    \addcontentsline{lot}{chapteratlist}{#1}%
+    \@ifundefined{float@addtolists}{}{%
+      \float@addtolists{%
+        \protect\contentsline{chapteratlist}{#1}{\thepage}%
+      }%
+    }%
+  \fi
+  \ifnum \@nameuse{scr@ver@2.96}<\scr@compatibility
+    \ifdim \@chapterlistsgap>\z@
+      \addtocontents{lof}{\protect\addvspace{\@chapterlistsgap}}%
+      \addtocontents{lot}{\protect\addvspace{\@chapterlistsgap}}%
+      \@ifundefined{float@addtolists}{}{%
+        \float@addtolists{\protect\addvspace{\@chapterlistsgap}}%
+      }%
+    \fi
+  \fi
   \if@twoside\@mkboth{#1}{}\else\@mkboth{}{#1}\fi
 }
 \newcommand*{\@saddchap}[1]{\@schapter{#1}\@mkboth{}{}}
@@ -2081,6 +2132,17 @@
   \fi
 }
 %    \end{macrocode}
+%
+%  \begin{macro}{\l@chapteratlist}
+%    \changes{v2.96a}{2006/12/03}{neues Macro}
+% Dieses Makro wird ggf. für die Kapiteleinträge in den Listen der
+% Gleitumgebungen verwendet. Zunächst einmal wird hier dasselbe verwendet, wie
+% für die Kapiteleinträge ins Inhaltsverzeichnis.
+%    \begin{macrocode}
+\newcommand*{\l@chapteratlist}{\l@chapter}
+%    \end{macrocode}
+%   
+%  \end{macro}
 % \iffalse
 %</report|book>
 % \fi
