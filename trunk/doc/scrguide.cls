@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2006/11/29 v0.9b internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2006/12/07 v0.9b internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -83,7 +83,8 @@
   bibtotoc,
   idxtotoc,
   tablecaptionabove,
-  smallheadings
+  smallheadings,
+  cleardoubleplain
 }{scrguide}
 \ProcessOptions\relax
 %    \end{macrocode}
