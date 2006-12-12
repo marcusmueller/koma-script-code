@@ -45,7 +45,7 @@
 %
 % ============================================================================
 
-\ProvidesFile{scrbookreportarticle.tex}[2006/11/29 KOMA-Script guide (chapter:
+\ProvidesFile{scrbookreportarticle.tex}[2006/12/12 KOMA-Script guide (chapter:
 scrbook, scrreprt, scrartcl)]
 
 \chapter{Die Hauptklassen \Class{scrbook}, \Class{scrreprt}, \Class{scrartcl}}
@@ -141,6 +141,8 @@ weder voreingestellt sein, noch vom Anwender gewählt werden.
       \emph{nicht definiert}   & Voreinstellung   & Voreinstellung         \\
     \Option{bigheadings}       & 
       Voreinstellung           & Voreinstellung   & Voreinstellung         \\
+    \Option{chapteratlists=}   &
+      \PValue{10pt}            & \PValue{10pt}    & \emph{nicht definiert} \\
     \Option{final}             & 
       Voreinstellung           & Voreinstellung   & Voreinstellung         \\
     \Option{footnosepline}     & 
@@ -173,6 +175,8 @@ weder voreingestellt sein, noch vom Anwender gewählt werden.
       Voreinstellung           & Voreinstellung   & Voreinstellung         \\
     \Option{twoside}           & 
       Voreinstellung           &                  &                        \\
+    \Option{version=}          & 
+      \PValue{first}           & \PValue{first}   & \PValue{first}         \\
     \bottomrule
   \end{tabular}
   \label{tab:maincls.stdOptions}
@@ -203,6 +207,66 @@ weder voreingestellt sein, noch vom Anwender gewählt werden.
 %
 \fi
 \end{Explain}
+
+
+\subsection{Optionen für die Kompatibilität}
+\label{sec:maincls.compatibilityOptions}
+\BeginIndex{}{Kompatibilität}
+
+Wer seine Dokumente im Quellcode archiviert, legt in der Regel allergrößten
+Wert darauf, dass bei zukünftigen \LaTeX{}-Läufen immer wieder exakt dasselbe
+Ergebnis erzielt wird. In einigen Fällen ist es aber so, dass Verbesserungen
+und Korrekturen an der Klasse zu Änderungen im Verhalten, inbesondere beim
+Umbruch, führen.
+
+\begin{Declaration}
+  \Option{version}\\
+  \XOption{version}=\PName{Wert}
+\end{Declaration}
+\BeginIndex{Option}{version}%
+Seit\ChangedAt{v2.96a}{\Class{scrbook}\and\Class{scrreprt}\and\Class{scrartcl}}
+Version~2.96a besteht bei \KOMAScript\ die Wahl, ob eine Quelldatei so weit
+irgend möglich auch zukünftig bei einem \LaTeX{}-Lauf zu exakt demselben
+Ergebnis führen soll oder ob jeweils entsprechend der Anpassungen der neusten
+Version der Klasse zu setzen ist. Zu welcher Version Kompatibilität
+herzustellen ist, wird dabei über die Option \Option{version}
+festgelegt. Voreingestellt ist Version 2.9t. Dasselbe Ergebnis kann mit
+\begin{lstlisting}
+  version=first
+\end{lstlisting}
+oder
+\begin{lstlisting}
+  version=2.9
+\end{lstlisting}
+oder
+\begin{lstlisting}
+  version=2.9t
+\end{lstlisting}
+erreicht werden. Bei Angabe einer unbekannten Version als \PName{Wert} wird
+eine Warnung ausgegeben und sicherheitshalber \Option{version=}\PValue{first}
+angenommen. Mit
+\begin{lstlisting}
+  version=last
+\end{lstlisting}
+kann die jeweils neuste Version ausgewählt werden. In diesem Fall wird also
+auf zukünftige Kompatibilität verzichtet. Wird die Option ohne Wertangabe
+verwendet, so wird ebenfalls \PValue{last} angenommen.
+
+Die Frage der Kompatiblität betrifft in erster Linie Fragen des Umbruchs. Neue
+Möglichkeiten, die sich nicht auf den Umbruch auswirken, sind auch dann
+verfügbar, wenn man per Option die Kompatibilität zu einer älteren Version
+ausgewählt hat. Die Option hat keine Auswirkungen auf Umbruchänderungen, die
+bei Verwendung einer neueren Version durch Beseitigung eindeutiger Fehler
+entstehen. Wer auch im Fehlerfall unbedingte Umbruchkompatibitlität benötigt,
+sollte stattdessen mit dem Dokument auch die verwendete \KOMAScript-Version
+archivieren.
+
+Es ist zu beachten, dass die Option \Option{version} nach dem Laden der Klasse
+nicht mehr verändert werden kann.%
+%
+\EndIndex{Option}{version}%
+%
+\EndIndex{}{Kompatibilität}
 
 
 \subsection{Optionen für den Satzspiegel}
@@ -941,6 +1005,33 @@ werden, bis die Verzeichnisse ihre endgültige Form erhalten haben.
 %
 \EndIndex{Option}{listsindent}%
 \EndIndex{Option}{listsleft}%
+
+\begin{Declaration}
+  \Option{chapteratlists}\\
+  \XOption{chapteratlists}=\PName{Wert}
+\end{Declaration}%
+\BeginIndex{Option}{chapteratlists}%
+\OnlyAt{\Class{scrbook}\and\Class{scrreprt}}%
+Normalerweise\ChangedAt{v2.96a}{\Class{scrbook}\and \Class{scrreprt}} fügt
+jeder mit \Macro{chapter} erzeugte Kapiteleintrag einen vertikalen Abstand in
+die Verzeichnisse der Gleitumgebungen ein. Seit Version~2.96a gilt dies auch
+für die Anweisung \Macro{addchap}, wenn nicht eine Kompatibilitätseinstellung
+zu einer früheren Version gewählt wurde (siehe Option \Option{version} in
+\autoref{sec:maincls.compatibilityOption},
+\autopageref{desc:maincls.option.version}).
+
+Außerdem kann nun mit der Option \Option{chapteratlists} der Abstand verändert
+werden. Dazu gibt man als \PName{Wert} den gewünschten Abstand
+an. Voreingestellt sind 10\,pt. Gibt man als Wert \PValue{entry} an oder
+verwendet man die Form ohne Angabe eines Wertes, so wird statt des Abstandes
+der Kapiteleintrag selbst in die Verzeichnisse eingetragen.
+
+Diese Option kann per \Macro{KOMAoptions}\Parameter{chapteratlists} oder
+\Macro{KOMAoption}\Parameter{chapteratlists=\PName{Wert}} auch innerhalb des
+Dokuments verändert werden. Sie hat dann Auswirkungen ab der nächsten
+Überschrift. Änderungen der Option werden jedoch erst nach dem übernächsten
+\LaTeX-Lauf in den Verzeichnissen sichtbar.
+\EndIndex{Option}{chapteratlists}%
 
 
 \subsection{Optionen für die Formatierung}
