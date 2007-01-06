@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2006/12/07 v0.9b internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2007/01/06 v0.9c internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -129,7 +129,7 @@
     }%
     \newcommand*{\iffree}{\@firstoftwo}%
     \usepackage{lmodern}%
-    \@twosidefalse\@openrightfalse
+    \@twosidefalse\@openrightfalse\@mparswitchfalse
     \RequirePackage{geometry}%
     \geometry{papersize={140mm,210mm},%
       includehead,includemp,reversemp,marginparwidth=2em,%
