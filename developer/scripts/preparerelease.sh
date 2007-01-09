@@ -59,7 +59,7 @@ steptwo() {
     cat > README <<EOF
 
 KOMA-Script $version
-Copyright (c) Markus Kohm <komascript(at)gmx.info>, 1994-2006
+Copyright (c) Markus Kohm <komascript(at)gmx.info>, 1994-2007
 
 This material is subject to the LaTeX Project Public License. See
 lppl.txt (english) or lppl-de.txt (german) for the details of that

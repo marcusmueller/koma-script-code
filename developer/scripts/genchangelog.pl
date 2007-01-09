@@ -4,7 +4,7 @@ eval 'exec perl -S $0 ${1+"$@"}'
 
 # ======================================================================
 # genchangelog.pl
-# Copyright (c) Markus Kohm, 2002-2006
+# Copyright (c) Markus Kohm, 2002-2007
 #
 # This file is part of the LaTeX2e KOMA-Script bundle.
 #
@@ -22,7 +22,7 @@ eval 'exec perl -S $0 ${1+"$@"}'
 # This work consists of all files listed in manifest.txt.
 # ----------------------------------------------------------------------
 # genchangelog.pl
-# Copyright (c) Markus Kohm, 2002-2006
+# Copyright (c) Markus Kohm, 2002-2007
 #
 # Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 # Version 1.3b, verteilt und/oder veraendert werden.
