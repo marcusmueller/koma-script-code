@@ -1,4 +1,4 @@
-% \CheckSum{1638}
+% \CheckSum{1642}
 % \iffalse meta-comment
 % ======================================================================
 % scrksect.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrksect.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrksect.dtx}[2007/01/08 v2.96a KOMA-Script (disposition)]
+\ProvidesFile{scrksect.dtx}[2007/01/24 v2.97 KOMA-Script (disposition)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -747,20 +747,37 @@
 %    \end{macrocode}
 %  \begin{macro}{\@seccntformat}
 %    \changes{v2.3c}{1995/08/06}{CJK erweitert}
-%    \changes{v2.9p}{2004/01/07}{\cs{protect} eingef"ugt}
+%    \changes{v2.9p}{2004/01/07}{\cs{protect} eingefügt}
+%    \changes{v2.97}{2007/01/24}{Workaround für das blöde \cs{protect}}
 %  \begin{macro}{\othersectionlevelsformat}
 %    \changes{v2.7}{2000/01/03}{neu}
 %    \changes{v2.7}{2000/01/03}{\cs{quad} durch \cs{enskip} ersetzt}
 %    \changes{v2.7i}{2001/05/17}{\cs{let} durch \cs{def} ersetzt}
+%    \changes{v2.97}{2007/01/24}{statt einem Argument jetzt drei}
 % Bei den Ebenen ab \cs{section} erfolgt die Formatierung der
 % Gliederungnummer in der Überschrift mit einer gemeinsamen
 % Anweisung. Die interne Anweisung \cs{@seccntformat} wird dabei von
 % \LaTeX-Kern verwendet und muss umdefiniert werden, um eine
 % entsprechende Anweisung auf Anwenderebene verfügbar zu haben.
+% Ab Version 2.9p wurde in \cs{@seccntformat} ein \cs{protect} vor
+% \cs{othersectionlevelsformat} eingefügt. Damit wurde es für den Benutzer
+% deutlich einfacher, die Anweisung \cs{othersectionlevelsformat}
+% umzudefinieren. Dafür war dadurch aber \cs{the\dots} nicht mehr
+% expandiert. Das wiederum gab Probleme, wenn \cs{\@seccntformat} für den
+% \cs{mark}-Mechanismus genutzt wurde. Deshalb hat
+% \cs{othersectionlevelsformat} ab Version 2.97 drei Argumente statt nur
+% eines. Das zweite Argument sollte vom Anwender ignoriert werden, es
+% existiert nur, um die Kompatibitlität Umdefinitionen zu erhalten, bei denen
+% \cs{othersectionlevelsformat} nur ein Argument besitzt. Das dritte Argument
+% ist die \cs{the\dots}-Anweisung. Das zweite Argument funktioniert so, das es
+% das dritte Argument frisst, falls \cs{othersectionlevelsformat} nur ein
+% Argument liest.
 %    \begin{macrocode}
-\newcommand*{\othersectionlevelsformat}[1]{%
-  \csname the#1\endcsname\autodot\enskip}
-\renewcommand*{\@seccntformat}{\protect\othersectionlevelsformat}
+\newcommand*{\othersectionlevelsformat}[3]{#3\autodot\enskip}
+\renewcommand*{\@seccntformat}[1]{%
+   \protect\othersectionlevelsformat{#1}{%
+     \expandafter\aftergroup\noexpand\@gobble}{\csname the#1\endcsname}%
+}
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
