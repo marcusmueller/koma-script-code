@@ -205,7 +205,7 @@ endif
 	$(INSTALL) $(notdir $(DISTDIR))-bin/komascript-texmf/doc/latex/koma-script/koma*.html $(notdir $(DISTDIR))-bin
 	$(GREP) 'CheckKOMAScriptVersion{' $(notdir $(DISTDIR))-bin/komascript-texmf/source/latex/koma-script/scrkvers.dtx | grep -o '2.*t' > $(notdir $(DISTDIR))-bin/VERSION
 	$(CD) $(notdir $(DISTDIR))-bin/komascript-texmf && \
-	  $(ZIP) ../komascript-texmf.zip source doc tex
+	  $(ZIP) ../komascript.tds.zip source doc tex
 	$(RMDIR) $(notdir $(DISTDIR))-bin/komascript-texmf
 	$(SRM) $(notdir $(DISTDIR))-bin.zip
 	$(CD) $(notdir $(DISTDIR))-bin && \
