@@ -1,4 +1,4 @@
-% \CheckSum{252}
+% \CheckSum{259}
 % \iffalse meta-comment
 % ======================================================================
 % scrlfile.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrlfile.dtx
 %<*driver|scrlfile|load>
 % \fi
-\def\scrlfileversion{2006/07/19 v2.96}
+\def\scrlfileversion{2007/03/07 v2.97a}
 % \iffalse
 %</driver|scrlfile|load>
 %<*driver>
@@ -456,8 +456,10 @@
 %
 %  \begin{macro}{\@loadwithoptions}
 %    \changes{v2.96}{2006/07/19}{new redefinition}
-%  \begin{macro}{\scr@loadwithoption}
+%  \begin{macro}{\scr@loadwithoptions}
 %    \changes{v2.96}{2006/07/19}{new helper macro}
+%  \begin{macro}{\scr@@loadwithoptions}
+%    \changes{v2.97a}{2007/03/07}{new helper macro}
 % \LaTeX{} uses this macro for loading classes and packages using
 % \cs{LoadClassWithOptions} or \cs{RequirePackageWithOptions}. We simply say
 % now: if the class or package should be replaced by another, try it again
@@ -465,18 +467,23 @@
 % error if the replacements are nested too deep. This should be, because it
 % will also result in an error using ring replacements.
 %    \begin{macrocode}
+\newcommand*{\scr@@loadwithoptions}{}
 \newcommand*{\scr@loadwithoptions}{}
 \let\scr@loadwithoptions\@loadwithoptions
 \renewcommand*{\@loadwithoptions}[3]{%
   \begingroup\expandafter\expandafter\expandafter\endgroup
   \expandafter\ifx\csname #3.#1-@aliasname\endcsname\relax
-    \scr@loadwithoptions{#1}{#2}{#3}%
+    \def\scr@@loadwithoptions{\scr@loadwithoptions{#1}{#2}{#3}}%
   \else
     \scr@replacefile@msg{\csname #3.#1-@aliasname\endcsname.#1}{#3.#1}% 
-    \@loadwithoptions{#1}{#2}{\csname #3.#1-@aliasname\endcsname}%
+    \def\scr@@loadwithoptions{%
+      \@loadwithoptions{#1}{#2}{\csname #3.#1-@aliasname\endcsname}%
+    }%
   \fi
+  \scr@@loadwithoptions
 }
 %    \end{macrocode}
+%  \end{macro}
 %  \end{macro}
 %  \end{macro}
 %
