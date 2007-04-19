@@ -1,4 +1,4 @@
-% \CheckSum{711}
+% \CheckSum{936}
 % \iffalse meta-comment
 % ======================================================================
 % scrkbase.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkbase.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkbase.dtx}[2007/04/17 v2.97c KOMA-Script (basics)]
+\ProvidesFile{scrkbase.dtx}[2007/04/19 v2.97c KOMA-Script (basics)]
 % \iffalse
 %</driver>
 %<package&option>\ProvidesPackage{scrkbase}[%
@@ -138,6 +138,7 @@
 %  \begin{macro}{\scr@ifundefined}
 %    \changes{v2.95c}{2006/08/12}{neu (intern)}
 %    \changes{v2.97b}{2007/03/08}{vermurkste Logik korrigiert}
+%    \changes{v2.97c}{2007/04/18}{vermurkste Funktion korrigiert}
 % Dieses Makro arbeitet wie \cs{@ifundefined}, definiert dabei aber
 % ein undefiniertes Makro nicht als \cs{relax}. Es muss bereits hier definiert
 % werden, weil es gleich verwendet wird.
@@ -155,7 +156,11 @@
 \else
   \newcommand{\scr@ifundefined}[1]{%
     \ifcsname #1\endcsname
-      \expandafter\@secondoftwo
+      \expandafter\ifx\csname #1\endcsname\relax
+        \expandafter\expandafter\expandafter\@firstoftwo
+      \else
+        \expandafter\expandafter\expandafter\@secondoftwo
+      \fi
     \else
       \expandafter\@firstoftwo
     \fi
@@ -163,29 +168,6 @@
 \fi
 %    \end{macrocode}
 %  \end{macro}
-%
-%  \begin{macro}{\DeclareKeyValOption}
-% Dieses Makro deklariert alle bisher definierten Schlüssel eines
-% Bereichs (erste Argument) als Optionen. Das optionale Argument
-% erlaubt außerdem die Deklaration einer
-% \cs{DeclareOption*}-Auswertung. \cs{DeclareOption*} darf nicht
-% zusammen mit dieser Anweisung verwendet werden. Diese Anweisung darf
-% je Paket oder Klasse nur einmal verwendet werden.
-%    \begin{macrocode}
-\newcommand*{\DeclareKeyValOption}[2][%
-  \ifx\@currext\@clsextension\OptionNotUsed\else\@unkownoptionerror\fi
-]{%
-  \DeclareOption*{%
-    \def\@tempa##1=##2=##3\@nil{%
-      \scr@ifundefined{KV@#2@##1}{#1}{%
-        \@expandtwoargs\setkeys{#2}\CurrentOption
-      }%
-    }%
-    \expandafter\@tempa\CurrentOption==\@nil
-  }%
-}
-%    \end{macrocode}
-% \end{macro}
 %
 %
 % \subsection{Definition von KOMA-\textsf{keyval}-Schlüsseln (Basis)}
@@ -197,15 +179,148 @@
 % Schlüssel jedes anderen Teils ausführen kann -- sobald sie definiert
 % sind.
 %
-%  \begin{macro}{\KOMA@key}
-% Einzig, um etwas Tipparbeit zu sparen, wird ein abkürzendes Makro
-% definiert:
+% \begin{macro}{\KOMA@key}
+%   \changes{v2.97c}{2007/04/19}{neues optionales Argument}
+% \begin{macro}{\KOMA@key@familylist}
+% \textsf{keyval}-Schlüssel für \KOMAScript{} werden mit \cs{KOMAkey}
+% definiert, damit auch die Familie korrekt gesetzt und ggf. der Liste der
+% Familien (\cs{KOMA@key@familylist}) hinzugefügt wird.
 %    \begin{macrocode}
-\newcommand*{\KOMA@key}{\define@key{KOMA}}
+\newcommand*{\KOMA@key}[1][.\@currname.\@currext]{%
+  \edef\reserved@a{\noexpand\in@{KOMA#1,}{\KOMA@key@familylist}}\reserved@a
+  \ifin@\else\xdef\KOMA@key@familylist{\KOMA@key@familylist KOMA#1,}\fi
+  \define@key{KOMA#1}%
+}
+\newcommand*{\KOMA@key@familylist}{}
 %    \end{macrocode}
-%  \end{macro}
+% \end{macro}
+% \end{macro}
 %
 % \subsection{Optionen}
+%
+% Ab Version 2.97c sollen sowohl globale KOMA-Optionen als auch die
+% KOMA-Optionen der jeweiligen Datei als auch die normalen Optionen in der
+% Reihenfolge ausgeführt werden, in der sie angegeben wurden -- zuerst die
+% globalen Optionen, dann die lokalen. Dabei werden nur die Optionen
+% verwendet, die auch für das jeweilige Paket bzw. die jeweilige Klasse
+% definiert wurden.
+%
+% \begin{macro}{\@globaloptionslist}
+%   \changes{v2.96}{2006/11/26}{new}
+%   \changes{v2.96}{2006/11/26}{Klassenoptionen durchsuchen}
+% Die Lister der globalen Optionen wird teilweise benötigt. Weil
+% \textsl{xkeyval} dämlicherweise glaubt, es müsse alle Optionen mit
+% Gleichheitszeichen aus der Liste der Klassenoptionen entfernen
+% (seltsamerweise aber nicht die (x)keyval-Optionen, die ohne Wert aufgerufen
+% werden, weil ihr Defaultwert verwendet werden soll), wird hier ein eigenes
+% Makro definiert.
+%    \begin{macrocode}
+\newcommand*{\@globaloptionslist}{}
+\let\@globaloptionslist\@classoptionslist
+\scr@ifundefined{XKV@classoptionslist}{}{%
+  \ifx\XKV@classoptionslist\@empty\else
+    \let\@globaloptionslist\XKV@classoptionslist
+  \fi
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\KOMAProcessOptions}
+%   \changes{v2.97c}{2007/04/18}{neu}
+% Diese Anweisung führt alle Optionen, sowohl normal deklarierte als auch
+% keyval-Optionen eines Pakets bzw. einer Klasse in der Reihenfolge, in der
+% sie verwendet wurden aus -- zuerst gloable Optionen, dann lokale
+% Optionen. Das entspricht der Verwendung von \cs{ProcessOptions*} mit dem
+% Unterschied, dass eben auch die keyval-Optionen abgearbeitet
+% werden. keyval-Optionen, die keiner einzelnen Klasse und keinem einzelnen
+% Paket zugeordnet werden, werden dabei vor gleichnamigen eigenen
+% keyval-Optionen ausgeführt.
+%    \begin{macrocode}
+\newcommand*{\KOMAProcessOptions}[1][KOMA]{%
+  \let\ds@\@empty
+  \edef\@curroptions{\@ptionlist{\@currname.\@currext}}%
+  \ifx\@currext\@clsextension\else
+    \@for\CurrentOption:=\@globaloptionslist\do{%
+      \ifx\CurrentOption\@empty\else
+        \@expandtwoargs\in@{,\CurrentOption,}{,\@declaredoptions,}%
+        \ifin@
+          \@use@ption
+          \expandafter\let\csname ds@\CurrentOption\endcsname\@empty
+        \else
+          \KOMA@optiontest{#1}\CurrentOption{}{%
+            \@use@ption
+            \@expandtwoargs\setkeys{#1}%
+            \CurrentOption
+          }%
+          \KOMA@optiontest{#1.\@currname.\@currext}\CurrentOption{}{%
+            \@use@ption
+            \@expandtwoargs\setkeys{#1.\@currname.\@currext}%
+            \CurrentOption
+          }%
+        \fi
+      \fi
+    }%
+  \fi
+  \@for\CurrentOption:=\@curroptions\do{%
+    \@use@ption
+    \scr@ifundefined{ds@\CurrentOption}{%
+      \KOMA@optiontest{#1}\CurrentOption{%
+        \KOMA@optiontest{#1.\@currname.\@currext}\CurrentOption{%
+          \default@ds
+        }{%
+          \let\scr@sr@co\CurrentOption
+          \@expandtwoargs\setkeys{#1.\@currname.\@currext}%
+          \CurrentOption
+          \let\CurrentOption\scr@sr@co
+        }%
+      }{%
+        \@expandtwoargs\setkeys{#1}%
+        \CurrentOption
+        \KOMA@optiontest{#1.\@currname.\@currext}\CurrentOption{}{%
+          \@expandtwoargs\setkeys{#1.\@currname.\@currext}%
+          \CurrentOption
+        }%
+      }%
+    }{%
+    }%
+  }%
+  \@for\CurrentOption:=\@declaredoptions\do{%
+    \expandafter\let\csname ds@\CurrentOption\endcsname\relax}%
+  \let\CurrentOption\@empty
+  \let\@fileswith@pti@ns\@@fileswith@pti@ns
+  \AtEndOfPackage{\let\@unprocessedoptions\relax}%
+}
+\@onlypreamble\KOMA@process@options
+\@onlypreamble\KOMAProcessOptions
+%    \end{macrocode}
+% \begin{macro}{\KOMA@optiontest}
+%   \changes{v2.97c}{2007/04/18}{neu (intern)}
+% \begin{macro}{\KOMA@pti@ntest}
+%   \changes{v2.97c}{2007/04/18}{neu (intern)}
+% Es werden zwei interne Makros benötigt, um zu testen, ob eine entsprechende
+% keyval-Option definiert ist. Grund der Übung ist, dass sowohl das
+% Familienargument als auch die Options selbst expandiert werden muss.
+%    \begin{macrocode}
+\newcommand*{\KOMA@optiontest}[2]{%
+  \edef\reserved@a{\noexpand\KOMA@pti@ntest{#1}#2=\noexpand\@nil}%
+  \reserved@a
+}
+\newcommand*{\KOMA@pti@ntest}{}
+\def\KOMA@pti@ntest#1#2=#3\@nil{\scr@ifundefined{KV@#1@#2}}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \begin{macro}{\scr@sr@co}
+%    \changes{v2.96}{2006/08/20}{neu (intern)}
+% Da das \texttt{xkeyval}-Paket leider \cs{CurrentOption} vernichtet, das aber
+% innerhalb von \cs{ProcessOptions} und \cs{KOMAProcessOptions} nach dem
+% Ausführen der Option noch benötigt wird, muss die Anweisung gesichert
+% werden. Dafür wird ein Hilfsmakro benötigt.
+%    \begin{macrocode}
+\newcommand*{\scr@sr@co}{}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
 %
 % \begin{option}{internalonly}
 %   \changes{v2.96}{2006/11/26}{neu}
@@ -221,50 +336,16 @@
   \expandafter\endgroup
   \ifin@\else\g@addto@macro\dont@let@as@internal@defined{#1/}\fi
 }
-\DeclareKeyValOption{KOMA}
 %    \end{macrocode}
 % \end{macro}
 % \end{option}
 %
 % \changes{v2.96}{2006/08/20}{Optionen werden abgearbeitet}
+% \changes{v2.97c}{2007/04/18}{Optionen werden mit \cs{KOMAProcessOptions}
+%   abgearbeitet}
 %    \begin{macrocode}
-\ProcessOptions\relax
+\KOMAProcessOptions\relax
 %    \end{macrocode}
-%
-% \begin{macro}{\@globaloptionslist}
-%   \changes{v2.96}{2006/11/26}{new}
-%   \changes{v2.96}{2006/11/26}{Klassenoptionen durchsuchen}
-% Die Lister der globalen Optionen wird teilweise benötigt. Weil
-% \textsl{xkeyval} dämlicherweise glaubt, es müsse alle Optionen mit
-% Gleichheitszeichen aus der Liste der Klassenoptionen entfernen
-% (seltsamerweise aber nicht die (x)keyval-Optionen, die ohne Wert aufgerufen
-% werden, weil ihr Defaultwert verwendet werden soll), wird hier ein eigenes
-% Makro definiert.
-%    \begin{macrocode}
-\newcommand*{\@globaloptionslist}{}
-\scr@ifundefined{XKV@classooptionslist}{%
-  \let\@globaloptionslist\@classoptionslist
-}{%
-  \let\@globaloptionslist\XKV@classoptionslist
-}
-\@expandtwoargs\in@{,internalonly=}{,\@globaloptionslist}
-\ifin@
-  \begingroup
-    \catcode`\=12\catcode`\:=12
-    \def\@do@internalonly #1internalonly=#2\@nil{%
-      \ifx\relax#1\relax\setkeys{KOMA}{internalonly=#2}\fi
-      \@expandtwoargs\@removeelement{internalonly=#2}\@unusedoptionlist
-      \@unusedoptionlist
-    }%
-    \expandafter\@for\expandafter\@tempa\expandafter:\expandafter=%
-    \@globaloptionslist\do{%
-      \expandafter\@do@internalonly\@tempa\@nil
-    }%
-    \global\let\@unusedoptionlist\@unusedoptionlist
-  \endgroup
-\fi
-%    \end{macrocode}
-% \end{macro}
 %
 % \iffalse
 %</option>
@@ -694,18 +775,126 @@
 %
 % \subsection{Definition von KOMA-\textsf{keyval}-Schlüsseln (Hauptteil)}
 %
-%  \begin{macro}{\KOMAoptions}
-%    \changes{v2.96}{2006/08/20}{Neuer Hook nach den Optionen}
-%  \begin{macro}{\post@kopt@hook}
-%    \changes{v2.96}{2006/08/20}{Neuer Hook nach den Optionen}
-%  \begin{macro}{\AfterKOMAoptions}
-%    \changes{v2.96}{2006/08/20}{Neuer Hook nach den Optionen}
+% \begin{macro}{\KOMAExecuteOptions}
+%   \changes{v2.97c}{2007/04/19}{neu (nur für Klassen- und Paketautoren)}
+% Liste von Optionen ausführen
+%    \begin{macrocode}
+\newcommand*{\KOMAExecuteOptions}[2][KOMA]{%
+  \def\reserved@a##1\@nil{%
+    \@for\KOMA@key@atlist:=#2\do{%
+      \expandafter\KOMA@key@split@name@value\KOMA@key@atlist==\@nil
+      \scr@ifundefined{KV@#1@\KOMA@key@name}{}{%
+        \edef\reserved@a{\noexpand\setkeys{#1}{\KOMA@key@atlist}%
+        }%
+        \reserved@a
+      }%
+      \scr@ifundefined{KV@#1.\@currname.\@currext @\KOMA@key@name}{}{%
+        \edef\reserved@a{%
+          \noexpand\setkeys{#1.\@currname.\@currext}{\KOMA@key@atlist}%
+        }%
+        \reserved@a
+      }%
+      \let\CurrentOption\KOMA@key@atlist
+      \csname ds@\CurrentOption\endcsname
+    }%
+    \edef\CurrentOption{##1}%
+  }%
+  \expandafter\reserved@a\CurrentOption\@nil
+}
+\@onlypreamble\KOMAExecuteOptions
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\KOMAoptions}
+%   \changes{v2.96}{2006/08/20}{Neuer Hook nach den Optionen}
+%   \changes{v2.97c}{2007/04/19}{Optionen aller KOMA-Familien abarbeiten}
+% \begin{macro}{\post@kopt@hook}
+%   \changes{v2.96}{2006/08/20}{Neuer Hook nach den Optionen}
+% \begin{macro}{\AfterKOMAoptions}
+%   \changes{v2.96}{2006/08/20}{Neuer Hook nach den Optionen}
 % Es werden Schlüssel verwendet und ggf. danach noch Dinge ausgeführt.
 %    \begin{macrocode}
 \newcommand*{\KOMAoptions}[1]{%
   \let\post@kopt@hook\@empty
-  \setkeys{KOMA}{#1}%
+  \KOMA@options{#1}{%
+% Wenn der Schlüssel für keine der bekannten Familien definiert ist, wird ein
+% Fehler ausgegeben.
+%    \begin{macrocode}
+    \PackageError{scrkbase}{%
+      unknown KOMA option `\KOMA@key@name'%
+    }{%
+      You have used \string\KOMAoptions\space to set
+      `\KOMA@key@atlist',\MessageBreak
+      but KOMA-Script does not know any option named
+      `\KOMA@key@name'.\MessageBreak
+      See the KOMA-Script manual for more informations about options
+      and\MessageBreak
+      their values.%
+    }%
+  }%
   \post@kopt@hook\let\post@kopt@hook\relax
+}
+%    \end{macrocode}
+% \begin{macro}{\KOMA@options}
+%   \changes{v2.97c}{2007/04/19}{Neues Makro (intern)}
+% Das interne Macro \cs{KOMA@options} macht die eigentliche Arbeit. Das erste
+% Argument ist dabei die Liste der Optionen, das zweite Code, der im
+% Fehlerfall ausgeführt werden soll. Dabei sind die Makros
+% \cs{KOMA@key@atlist}, \cs{KOMA@key@name} und \cs{KOMA@key@value} gültig und
+% können verwendet werden.
+%
+% Anmerkung: Es wird nicht auf \textsf{ykeyval} und den dortigen Befehl
+% \cs{setkeys+} gesetzt, weil dieser die Optionen nicht in der Reihenfolge der
+% Optionen, sondern in der Reihenfolge der Familien ausführt. Das passt mir
+% aber hier gar nicht.
+%
+% In einer Schleife über alle Optionen werden die Optionen zunächst in Option
+% und Wert aufgespaltet.
+%    \begin{macrocode}
+\newcommand*{\KOMA@options}[2]{%
+  \@for\KOMA@key@atlist:=#1\do{%
+    \expandafter\KOMA@key@split@name@value\KOMA@key@atlist==\@nil
+%    \end{macrocode}
+% Dann wird in einer Schleife über alle Familien festgestellt, ob die Option
+% in einer Familie bekannt ist und ggf. ausgeführt.
+%    \begin{macrocode}
+    \KOMA@key@found@false
+    \@for\@tempa:=\KOMA@key@familylist\do{%
+      \scr@ifundefined{KV@\@tempa @\KOMA@key@name}{}{%
+        \KOMA@key@found@true
+        \edef\reserved@a{\noexpand\setkeys{\@tempa}{\KOMA@key@atlist}%
+          \noexpand\edef\noexpand\@tempa{\@tempa}%
+          \noexpand\edef\noexpand\KOMA@key@atlist{\KOMA@key@atlist}%
+          \noexpand\edef\noexpand\KOMA@key@name{\KOMA@key@name}%
+          \noexpand\edef\noexpand\KOMA@key@value{\KOMA@key@value}%
+        }%
+        \reserved@a
+      }%
+    }%
+    \ifKOMA@key@found@\else#2\fi
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\ifKOMA@key@found@}
+%   \changes{v2.97c}{2007/04/19}{Neuer Schalter (intern)}
+% \begin{macro}{\KOMA@key@atlist}
+%   \changes{v2.97c}{2007/04/19}{Neues Makro (intern)}
+% \begin{macro}{\KOMA@key@name}
+%   \changes{v2.97c}{2007/04/19}{Neues Makro (intern)}
+% \begin{macro}{\KOMA@key@value}
+%   \changes{v2.97c}{2007/04/19}{Neues Makro (intern)}
+% \begin{macro}{\KOMA@key@split@name@value}
+%   \changes{v2.97c}{2007/04/19}{Neues Makro (intern)}
+%    \begin{macrocode}
+\newif\ifKOMA@key@found@
+\newcommand*{\KOMA@key@atlist}{}
+\newcommand*{\KOMA@key@name}{}
+\newcommand*{\KOMA@key@value}{}
+\newcommand*{\KOMA@key@split@name@value}{}
+\def\KOMA@key@split@name@value#1=#2=#3\@nil{%
+  \def\KOMA@key@name{#1}%
+  \def\KOMA@key@value{#2}%
 }
 \newcommand*{\post@kopt@hook}{}
 \let\post@kopt@hook\relax
@@ -723,53 +912,14 @@
   \post@kopt@hook
 }
 %    \end{macrocode}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
-%
-%  \begin{option}{nokey}
-% Dies ist in Wirklichkeit kein Schlüssel, sondern eine Fehlermeldung
-% für nicht definierte Schlüssel. Er kann jedoch wie ein Schlüssel
-% definiert und auch so verwendet werden.
-%    \begin{macrocode}
-\KOMA@key{nokey}{%
-  \PackageError{%
-    scrkeyval%
-  }{%
-    unknown KOMA option `#1'%
-  }{%
-    You've tried to use the KOMA option `#1'.\MessageBreak 
-    But there is no KOMA option with that name.\MessageBreak 
-    See the manual of KOMA-Script for information about known KOMA
-    options.%
-  }%
-}%
-%    \end{macrocode}
-%  \end{option}
-%
-%  \begin{option}{noval}
-% Dies ist in Wirklichkeit kein Schlüssel, sondern eine Fehlermeldung
-% für das Fehlen eines Wertes bei der Verwendung eines Schlüssels ohne
-% Defaultwert. Er kann jedoch wie ein Schlüssel definiert und auch so
-% verwendet werden.
-%    \begin{macrocode}
-\KOMA@key{noval}{%
-  \PackageError{%
-    scrkbase%
-  }{%
-    KOMA option `#1' needs a value%
-  }{%
-    You've tried to use the KOMA option `#1' without a
-    value.\MessageBreak 
-    But this option has no default value, so you have to set a
-    value.\MessageBreak
-    See the manual of KOMA-Script for information about the option and
-    all known\MessageBreak
-    values.%
-  }%
-}%
-%    \end{macrocode}
-%  \end{option}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 %
 %  \begin{macro}{\KOMA@unknown@keyval}
 % Dieses Makro berichtet über Fehler wegen unbekannter Wertübergabe an
@@ -902,52 +1052,39 @@
 %  \end{macro}
 %  \end{macro}
 %
-%  \begin{macro}{\KOMA@DeclareObsoleteOption}
-%    \changes{v2.96}{2006/08/20}{\cs{CurrentOption wir geschützt}}
+% \begin{macro}{\KOMA@DeclareObsoleteOption}
+%   \changes{v2.96}{2006/08/20}{\cs{CurrentOption wir geschützt}}
 % Mit Hilfe dieses Makros kann eine Option definiert werden, die
 % eigentlich obsolete ist. Statt dieser Option wird dann ein Schlüssel
 % verwendet. Das erste Argument ist optional und muss dann entweder
 % \cs{PackageInfo}, \cs{PackageInfoNoLine}, \cs{PackageWarning} oder
 % \cs{PackageWarningNoLine} sein. Das zweite Argument ist der Name der
 % Option. Das dritte Argument ist das Setzen des gewünschten Schlüssels.
-%  \begin{macro}{\scr@sr@co}
-%    \changes{v2.96}{2006/08/20}{neu (intern)}
-% Da das \texttt{xkeyval}-Paket leider \cs{CurrentOption} vernichtet, das aber
-% innerhalb von \cs{ProcessOptions} nach dem Ausführen der Option noch
-% benötigt wird, muss die Anweisung gesichert werden.
 %    \begin{macrocode}
-\newcommand*{\scr@sr@co}{}
 \newcommand*{\KOMA@DeclareObsoleteOption}[3][\@gobbletwo]{%
-  \DeclareOption{#2}{%
-    \let\scr@sr@co\CurrentOption
-    \KOMA@UseObsolete{option}{#1}{#2}{#3}%
-    \let\CurrentOption\scr@sr@co
-  }%
+  \DeclareOption{#2}{\KOMA@UseObsoleteOption{#1}{#2}{#3}}%
 }
 %    \end{macrocode}
-%  \end{macro}
-%  \begin{macro}{\KOMA@UseObsolete}
-%    \changes{v2.97c}{2007/04/17}{Hinweistext zu obsoleten Optionen
-%      verbessert}
-% Die eigentliche Arbeit wird von diesem Makro erledigt. Ob es sich um
-% eine Option oder eine Anweisung handelt wird in Argument 1
-% übergeben. Alle anderen Argumente schließen sich daran an.
+% \begin{macro}{\KOMA@UseObsoleteOption}
+%   \changes{v2.97c}{2007/04/19}{neu (intern)}
+% Die eigentliche Arbeit wird von diesem Makro erledigt. Die Argumente sind
+% dieselben.
 %    \begin{macrocode}
-\newcommand*{\KOMA@UseObsolete}[4]{%
-  #2{%
-    scrkbase%
-  }{%
-    You've used the obsolete #1 `#3'.\MessageBreak
-    \protect\KOMAoptions{#4} will be used instead.\MessageBreak
-    You should also try the syntax `#4'%
+\newcommand*{\KOMA@UseObsoleteOption}[3]{%
+  \let\scr@sr@co\CurrentOption
+  #1{scrkbase}{%
+    You've used obsolete option `#2'.\MessageBreak
+    \protect\KOMAExecuteOptions{#3} will be used instead.\MessageBreak
+    You may simply replace `#2' by `#3'%
   }%
-  \KOMAoptions{#4}%
+  \KOMAExecuteOptions{#3}%
+  \let\CurrentOption\scr@sr@co
 }
 %    \end{macrocode}
-%  \end{macro}
-%  \end{macro}
+% \end{macro}
+% \end{macro}
 %
-%  \begin{macro}{\KOMA@newobsoletecommand}
+% \begin{macro}{\KOMA@newobsoletecommand}
 % Mit Hilfe dieses Makros kann ein Makro definiert werden, das
 % eigentlich obsolete ist. Das Makro verwendet dann schlicht einen
 % Schlüssel. Das erste Argument ist optional und muss dann entweder
@@ -958,10 +1095,27 @@
 % \cs{long} und versteht auch keine Argumente.
 %    \begin{macrocode}
 \newcommand*{\KOMA@newobsoletecommand}[3][\@gobbletwo]{%
-  \newcommand*{#2}{\KOMA@UseObsolete{command}{#1}{\string#2}{#3}}%
+  \newcommand*{#2}{\KOMA@UseObsoleteCommand{#1}{\string#2}{#3}}%
 }
 %    \end{macrocode}
-%  \end{macro}
+% \begin{macro}{\KOMA@UseObsoleteCommand}
+%   \changes{v2.97c}{2007/04/19}{neu (intern)}
+% Die eigentliche Arbeit wird von diesem Makro erledigt. Die Argumente sind
+% dieselben.
+%    \begin{macrocode}
+\newcommand*{\KOMA@UseObsoleteCommand}[3]{%
+  #1{%
+    scrkbase%
+  }{%
+    You've used the obsolete command `#2'.\MessageBreak
+    \protect\KOMAoptions{#3} will be used instead.\MessageBreak
+    You should also replace `#2' by `\protect\KOMAoptions{#3}'%
+  }%
+  \KOMAoptions{#3}%
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
 %
 %
 % \iffalse

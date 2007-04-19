@@ -58,7 +58,7 @@
 %%% From File: scrktare.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrktare.dtx}[2006/11/29 v2.96a KOMA-Script (type area)]
+\ProvidesFile{scrktare.dtx}[2007/04/19 v2.97c KOMA-Script (type area)]
 % \iffalse
 %</driver>
 %<package&identify>\ProvidesPackage{typearea}[%
@@ -177,7 +177,7 @@
 %    \end{macrocode}
 %  \end{macro}
 %
-% Ab hier nun wieder Teile für Klassen und Paket:
+% Ab hier nun Teile für Klassen und Paket:
 %    \begin{macrocode}
 %</package>
 %<*class|package>
@@ -469,6 +469,11 @@
 %    \end{macrocode}
 %  \end{macro}
 %
+% Jetzt wieder nur für Pakete:
+%    \begin{macrocode}
+%</class|package>
+%<*package>
+%    \end{macrocode}
 %
 % \subsection{Optionen mit \textsf{keyval}}
 %
@@ -481,13 +486,10 @@
 % definiert, die bevorzugt zu verwenden ist.
 %    \begin{macrocode}
 \KOMA@key{headlines}{%
-%<*package>
   \begingroup
     \setlength{\@tempdima}{#1\baselineskip}%
   \endgroup
   \def\ta@hh{#1\baselineskip}%
-%</package>
-%<class>  \PassOptionsToPackage{headlines=#1}{typearea}%
 }
 %    \end{macrocode}
 %  \end{option}
@@ -500,19 +502,17 @@
 % gehört.
 %  \begin{macro}{\if@hincl}
 %    \changes{v2.95}{2002/07/08}{Verwendung von \textsf{scrkeyvl}}
+%    \changes{v2.97c}{2007/04/19}{direkte Initialisierung über \cs{if@hsl},
+%      falls definiert}
 %  \begin{macro}{\@hincltrue}
 %  \begin{macro}{\@hinclfalse}
 %  Der Zustand selbst wird in einem Schalter gespeichert.
 %    \begin{macrocode}
-%<*package>
+\newif\if@hincl\@ifundefined{if@hsl}{}{\let\if@hincl\if@hsl}
 \KOMA@ifkey{headinclude}{@hincl}
 \KOMA@DeclareObsoleteOption[\PackageInfo]{headexclude}{%
   headinclude=false%
 }
-%</package>
-%<*class>
-\KOMA@key{headinclude}[true]{\PassOptionsToPackage{headinclude=#1}{typearea}}
-%</class>
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
@@ -526,21 +526,19 @@
 %    \changes{v2.95}{2002/07/08}{Verwendung von \textsf{scrkeyvl}}
 % Diese Optionen bestimmen, ob die Fußzeilen noch zum Textbereich
 % gehören.
-%  \begin{macro}{\if@incl}
+%  \begin{macro}{\if@fincl}
 %    \changes{v2.95}{2002/07/08}{Verwendung von \textsf{scrkeyvl}}
+%    \changes{v2.97c}{2007/04/19}{direkte Initialisierung über \cs{if@fsl},
+%      falls definiert}
 %  \begin{macro}{\@fincltrue}
 %  \begin{macro}{\@finclfalse}
 % Der Zustand selbst wird in einem Schalter gespeichert.
 %    \begin{macrocode}
-%<*package>
+\newif\if@fincl\@ifundefined{if@fsl}{}{\let\if@fincl\if@fsl}
 \KOMA@ifkey{footinclude}{@fincl}
 \KOMA@DeclareObsoleteOption[\PackageInfo]{footexclude}{%
   footinclude=false%
 }
-%</package>
-%<*class>
-\KOMA@key{footinclude}[true]{\PassOptionsToPackage{footinclude=#1}{typearea}}
-%</class>
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
@@ -566,15 +564,10 @@
 % Bei Verwendung dieser Option müssen größere DIV-Werte verwendet
 % werden. Siehe dazu weiter unten.
 %    \begin{macrocode}
-%<*package>
 \KOMA@ifkey{mpinclude}{@mincl}
 \KOMA@DeclareObsoleteOption[\PackageInfo]{mpexclude}{%
   mpinclude=false%
 }
-%</package>
-%<*class>
-\KOMA@key{mpinclude}[true]{\PassOptionsToPackage{mpinclude=#1}{typearea}}
-%</class>
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
@@ -591,18 +584,15 @@
 % Laden des Pakets absolut keinen Sinn ergeben!
 %    \begin{macrocode}
 \KOMA@key{BCOR}{%
-%<*package>
   \edef\@tempa{#1}\edef\@tempb{current}\ifx\@tempa\@tempb\else
     \setlength{\ta@bcor}{#1}%
   \fi
-%</package>
-%<class>  \PassOptionsToPackage{BCOR=#1}{typearea}%
 }
 %    \end{macrocode}
 % Wenn allerdings der Satzspiegel bereits berechnet ist, dann muss er
 % hier stattdessen neu berechnet werden.
 %    \begin{macrocode}
-%<package>\AtEndOfPackage{\KOMA@key{BCOR}{\typearea[{#1}]{last}}}
+\AtEndOfPackage{\KOMA@key{BCOR}{\typearea[{#1}]{last}}}
 %    \end{macrocode}
 %  \end{option}
 %
@@ -616,7 +606,6 @@
 % wenn diese beim Laden des Pakets absolut keinen Sinn ergeben!
 %    \begin{macrocode}
 \KOMA@key{DIV}[calc]{%
-%<*package>
   \edef\@tempa{#1}%
   \def\@tempb{last}\ifx\@tempa\@tempb\let\@tempa=\@lastdiv\fi
   \def\@tempb{current}\ifx\@tempa\@tempb\else
@@ -628,14 +617,12 @@
       \fi
     \fi
   \fi
-%</package>
-%<class>  \PassOptionsToPackage{DIV=#1}{typearea}%
 }
 %    \end{macrocode}
 % Wenn allerdings der Satzspiegel bereits berechnet ist, dann muss er
 % hier stattdessen neu berechnet werden.
 %    \begin{macrocode}
-%<package>\AtEndOfPackage{\KOMA@key{DIV}{\typearea[current]{#1}}}
+\AtEndOfPackage{\KOMA@key{DIV}{\typearea[current]{#1}}}
 %    \end{macrocode}
 %  \end{option}
 %
@@ -649,10 +636,8 @@
 %      reimplementiert}
 % Dann gibt es da noch zwei alte Sonderfälle.
 %    \begin{macrocode}
-%<*package>
 \KOMA@DeclareObsoleteOption[\PackageInfo]{DIVcalc}{DIV=calc}
 \KOMA@DeclareObsoleteOption[\PackageInfo]{DIVclassic}{DIV=classic}
-%</package>
 %    \end{macrocode}
 %  \end{option}
 %  \end{option}
@@ -667,9 +652,9 @@
 \KOMA@key{twoside}[true]{%
   \KOMA@set@ifkey{twoside}{@twoside}{#1}%
   \if@twoside\@mparswitchtrue\else\@mparswitchfalse\fi%
-%<package>  \csname recalctypearea\endcsname
+  \csname recalctypearea\endcsname
 }
-%<package>\KOMA@DeclareObsoleteOption[\PackageInfo]{oneside}{twoside=false}
+\KOMA@DeclareObsoleteOption[\PackageInfo]{oneside}{twoside=false}
 %    \end{macrocode}
 % \end{option}
 % \end{option}
@@ -684,9 +669,9 @@
 %    \begin{macrocode}
 \KOMA@key{twocolumn}[true]{%
   \KOMA@set@ifkey{twocolumn}{@twocolumn}{#1}%
-%<package>  \csname recalctypearea\endcsname
+  \csname recalctypearea\endcsname
 }
-%<package>\KOMA@DeclareObsoleteOption[\PackageInfo]{onecolumn}{twocolumn=false}
+\KOMA@DeclareObsoleteOption[\PackageInfo]{onecolumn}{twocolumn=false}
 %    \end{macrocode}
 % \end{option}
 % \end{option}
@@ -717,7 +702,6 @@
 % \end{labeling}
 %    \begin{macrocode} 
 \KOMA@key{pagesize}[auto]{%
-%<*package>
   \begingroup
     \KOMA@set@ncmdkey{pagesize}{@tempa}{%
       {auto}{0},{automedia}{1},{dvips}{2},{pdftex}{3}%
@@ -739,8 +723,6 @@
       \set@pdftexpagesize
   \fi
   \edef\@pagesizelast{#1}%
-%</package>
-%<class>  \PassOptionsToPackage{pagesize=#1}{typearea}%
 }
 %    \end{macrocode}
 %
@@ -760,7 +742,6 @@
 %   \texttt{\cs{begin}\{document\}}. 
 % \end{description}
 %    \begin{macrocode}+
-%<*package>
 \newcommand{\set@pdftexpagesize}{%
   \AtBeginDocument{%
     \ifnotundefined{pdfpagewidth}{\pdfpagewidth=\paperwidth}{}%
@@ -815,7 +796,6 @@
     \ifnotundefined{mediaheight}{\mediaheight=\paperheight}{}%
   }%
 }
-%</package>
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
@@ -832,11 +812,9 @@
 % verwendet, weil die Verwendung von \texttt{pagesize=dvips} selbst
 % ebenfalls zu einer Warnung führen kann.
 %    \begin{macrocode}
-%<*package>
 \KOMA@DeclareObsoleteOption[\PackageWarning]{dvips}{%
   pagesize=dvips%
 }
-%</package>
 %    \end{macrocode}
 %  \end{option}
 %
@@ -846,11 +824,9 @@
 % Die Option ist obsolete und wird nun über die Option
 % \texttt{pagesize} implementiert.
 %    \begin{macrocode}
-%<*package>
 \KOMA@DeclareObsoleteOption[\PackageInfo]{pdftex}{%
   pagesize=pdftex%
 }
-%</package>
 %    \end{macrocode}
 %  \end{option}
 %
@@ -879,7 +855,6 @@
 % die übrigen Papiergrößenoptionen später noch per Mustererkennung
 % verarbeitet.
 %    \begin{macrocode}
-%<*package>
 \KOMA@DeclareObsoleteOption[\PackageInfo]{a4paper}{paper=a4}
 \KOMA@DeclareObsoleteOption[\PackageInfo]{a5paper}{paper=a5}
 \KOMA@DeclareObsoleteOption[\PackageInfo]{b5paper}{paper=b5}
@@ -888,7 +863,6 @@
 \KOMA@DeclareObsoleteOption[\PackageInfo]{executivepaper}{paper=executive}
 \KOMA@DeclareObsoleteOption[\PackageInfo]{landscape}{paper=landscape}
 \KOMA@DeclareObsoleteOption[\PackageInfo]{portrait}{paper=portrait}
-%</package>
 %    \end{macrocode}
 %  \end{option}
 %  \end{option}
@@ -908,7 +882,6 @@
 % "`\texttt{portrait}"' und "`\texttt{landscape}"' erlaubt.
 %    \begin{macrocode}
 \KOMA@key{paper}{%
-%<*package>
   \ifstr{#1}{landscape}{%
     \if@landscape\else
       \setlength{\@tempdima}{\paperwidth}%
@@ -961,8 +934,6 @@
       \fi
     }%
   }%
-%</package>
-%<class>  \PassOptionsToPackage{paper=#1}{typearea}%
 }
 %    \end{macrocode}
 %  \begin{macro}{\if@landscape}
@@ -971,7 +942,7 @@
 % In diesem Schalter wird gespeichert, ob Hoch- oder Breitformat
 % verwendet wird.
 %    \begin{macrocode}
-%<package>\newif\if@landscape
+\newif\if@landscape
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
@@ -985,26 +956,36 @@
 % Wenn ja, wird \cs{@tempa} mit dem ersten und \cs{@tempb} mit dem
 % zweiten Argument definiert.
 %    \begin{macrocode}
-%<*package>
 \newcommand*{\maybe@pair}{%
   \@ifnextchar (%
   {\@tempswatrue\maybe@@pair}{\@tempswafalse\gobble@till@scr@next}%
 }
 \newcommand*{\maybe@@pair}{}
 \def\@maybepair(#1,#2)\scr@next{\def\@tempa{#1}\def\@tempb{#2}}%
-%</package>
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
 %  \end{option}
 %
 %    \begin{macrocode}
-%</class|package>
+%</package>
 %    \end{macrocode}
 %
 %
+% \subsubsection{Geparste Optionen}
+%
+% Die Behandlung für \texttt{BCOR\emph{Wert}}, \texttt{DIV\emph{Wert}} und
+% \texttt{a\emph{Wert}paper}, \texttt{b\emph{Wert}paper},
+% \texttt{c\emph{Wert}paper} sowie \texttt{d\emph{Wert}paper} und
+% \texttt{\emph{Wert}headlines}.
+%    \begin{macrocode}
+%<*class|package>
+\DeclareOption*{\x@paper}
+%</class|package>
+%    \end{macrocode}
+%
 % \iffalse
-% Aber das gehört nicht mehr zu den Optionen.
+% Der Rest gehört nicht mehr zu den Optionen.
 %</option>
 %<*body>
 %<*package>
@@ -1029,18 +1010,6 @@
 %    \end{macrocode}
 %
 %
-% \subsubsection{Keyval-Optionen aktivieren}
-%
-% Die Behandlung für \textsf{keyval}-Optionen sowie
-% \texttt{BCOR\emph{Wert}}, \texttt{DIV\emph{Wert}} und
-% \texttt{a\emph{Wert}paper}, \texttt{b\emph{Wert}paper},
-% \texttt{c\emph{Wert}paper} sowie \texttt{d\emph{Wert}paper} und
-% \texttt{\emph{Wert}headlines}.
-%    \begin{macrocode}
-\DeclareKeyValOption[\x@paper]{KOMA}
-%    \end{macrocode}
-%
-%
 % \subsubsection{Standardoptionen}
 %
 % Als Standardoptionen sind \texttt{headinclude=false},
@@ -1051,9 +1020,14 @@
 %   ergänzt.}
 % \changes{v2.96}{2006/08/18}{Optionen werden in Reihenfolge der Angabe statt
 %   in Reihenfolge der Deklaration abgearbeitet.}
+% \changes{v2.97c}{2007/04/19}{Verwendung von \cs{KOMAExecuteOptions} an
+%   Stelle von \cs{KOMAoptions} und \cs{KOMAProcessOptions} an Stelle von
+%   \cs{ProcessOptions}}
+% \changes{v2.97c}{2007/04/19}{Optionen, die der Voreinstellung ohnehin
+%   entsprechen, werden nicht explizit gesetzt}
 %    \begin{macrocode}
-\KOMAoptions{headinclude=false,footinclude=false,paper=A4}
-\ProcessOptions*\relax
+\KOMAExecuteOptions{paper=A4}
+\KOMAProcessOptions
 %    \end{macrocode}
 %
 %
