@@ -1,4 +1,4 @@
-% \CheckSum{1716}
+% \CheckSum{1743}
 % \iffalse meta-comment
 % ======================================================================
 % scrknpap.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrknpap.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrknpap.dtx}[2007/03/30 v2.96c KOMA-Script (note-paper)]
+\ProvidesFile{scrknpap.dtx}[2007/05/08 v2.97c KOMA-Script (note-paper)]
 % \iffalse
 \documentclass{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -602,6 +602,8 @@
 %  \begin{macro}{\@firsthead}
 %  \begin{macro}{\@gen@firsthead}
 %    \changes{v2.8q}{2002/01/28}{Neu}
+%    \changes{v2.97c}{2007/05/08}{Dicke der Linie konfigurierbar}
+%    \changes{v2.97c}{2007/05/08}{Schrift (Farbe) der Linie konfigurierbar}
 % Bei \texttt{scrlttr2} gibt es die üblichen Seitenstile, allerdings
 % ist deren Verhalten etwas anders als gewohnt. Dies ist in den
 % Besonderheiten für Briefen begründet. Zunächst die Voreinstellung für
@@ -644,23 +646,26 @@
 %    \end{macrocode}
 % Hat \verb|\@rulefrom| den nummerischen Wert 1, so soll direkt auf den
 % Absender eine Linie folgen. Die Länge dieser Linie kann vom Anwender
-% bestimmt oder automatisch gewählt werden. Es wird dabei die
-% Pseudo-Länge \texttt{fromrulewidth} verwendet. Ist diese negativ,
-% so wird sie automatisch bestimmt. Bei der automatischen
-% Längenbestimmung wird dafür gesorgt, dass die Linie nicht bis in das
-% Logo ragt, das eventuell rechtsbündig neben dem Absender steht:
+% bestimmt oder automatisch gewählt werden. Es werden dabei die
+% Pseudo-Längen \texttt{fromrulewidth} und \texttt{fromrulethickness}
+% verwendet. Ist \texttt{fromrulewidth} negativ, so wird sie automatisch
+% bestimmt. Bei der automatischen Längenbestimmung wird dafür gesorgt, dass
+% die Linie nicht bis in das Logo ragt, das eventuell rechtsbündig neben dem
+% Absender steht:
 %    \begin{macrocode}
           {%
             \ifnum\@rulefrom=1\\[-.5\baselineskip]%
-              \setlength{\@tempdima}{\useplength{fromrulewidth}}%
-              \ifdim\@tempdima=\z@
-                \setlength{\@tempdima}{\textwidth}%
-                \if@logo
-                  \settowidth{\@tempdimb}{\usekomavar{fromlogo}}%
-                  \addtolength{\@tempdima}{-\@tempdimb}%
+              \usekomafont{fromrule}{%
+                \setlength{\@tempdima}{\useplength{fromrulewidth}}%
+                \ifdim\@tempdima=\z@
+                  \setlength{\@tempdima}{\textwidth}%
+                  \if@logo
+                    \settowidth{\@tempdimb}{\usekomavar{fromlogo}}%
+                    \addtolength{\@tempdima}{-\@tempdimb}%
+                  \fi
                 \fi
-              \fi
-              \expandafter\rule\expandafter{\the\@tempdima}{.4pt}%
+                \expandafter\rule\expandafter{\the\@tempdima}{%
+                  \useplength{fromrulethickness}}}%
             \fi
           }%
           \\
@@ -685,11 +690,13 @@
 % stehen hat. Die entsprechende Berechnung kann also entfallen.
 %    \begin{macrocode}
           \ifnum\@rulefrom=2\\[-.5\baselineskip]%
-            \setlength{\@tempdima}{\useplength{fromrulewidth}}%
-            \ifdim\@tempdima=\z@
-              \setlength{\@tempdima}{\textwidth}%
-            \fi
-            \expandafter\rule\expandafter{\the\@tempdima}{.4pt}%
+            \usekomafont{fromrule}{%
+              \setlength{\@tempdima}{\useplength{fromrulewidth}}%
+              \ifdim\@tempdima=\z@
+                \setlength{\@tempdima}{\textwidth}%
+              \fi
+              \expandafter\rule\expandafter{\the\@tempdima}{%
+                \useplength{fromrulethickness}}}%
           \fi
           \\
         }%
@@ -717,11 +724,13 @@
           \usekomavar{fromname}%
           {%
             \ifnum\@rulefrom=1\\[-.5\baselineskip]%
-              \setlength{\@tempdima}{\useplength{fromrulewidth}}%
-              \ifdim\@tempdima=\z@
-                \setlength{\@tempdima}{\textwidth}%
-              \fi
-              \expandafter\rule\expandafter{\the\@tempdima}{.4pt}%
+              \usekomafont{fromrule}{%
+                \setlength{\@tempdima}{\useplength{fromrulewidth}}%
+                \ifdim\@tempdima=\z@
+                  \setlength{\@tempdima}{\textwidth}%
+                \fi
+                \expandafter\rule\expandafter{\the\@tempdima}{%
+                  \useplength{fromrulethickness}}}%
             \fi
           }%
           \\
@@ -733,11 +742,13 @@
           \if@email\\\usekomavar*{fromemail}\usekomavar{fromemail}\fi%
           \if@www\\\usekomavar*{fromurl}\usekomavar{fromurl}\fi%
           \ifnum\@rulefrom=2\\[-.5\baselineskip]%
-            \setlength{\@tempdima}{\useplength{fromrulewidth}}%
-            \ifdim\@tempdima=\z@
-              \setlength{\@tempdima}{\textwidth}%
-            \fi
-            \expandafter\rule\expandafter{\the\@tempdima}{.4pt}%
+            \usekomafont{fromrule}{%
+              \setlength{\@tempdima}{\useplength{fromrulewidth}}%
+              \ifdim\@tempdima=\z@
+                \setlength{\@tempdima}{\textwidth}%
+              \fi
+              \expandafter\rule\expandafter{\the\@tempdima}{%
+                \useplength{fromrulethickness}}}%
           \fi
           \\
         }%
@@ -758,15 +769,17 @@
           \usekomavar{fromname}%
           {%
             \ifnum\@rulefrom=1\\[-.5\baselineskip]%
-              \setlength{\@tempdima}{\useplength{fromrulewidth}}%
-              \ifdim\@tempdima=\z@
-                \setlength{\@tempdima}{\textwidth}%
-                \if@logo
-                  \settowidth{\@tempdimb}{\usekomavar{fromlogo}}%
-                  \addtolength{\@tempdima}{-\@tempdimb}%
+              \usekomafont{fromrule}{%
+                \setlength{\@tempdima}{\useplength{fromrulewidth}}%
+                \ifdim\@tempdima=\z@
+                  \setlength{\@tempdima}{\textwidth}%
+                  \if@logo
+                    \settowidth{\@tempdimb}{\usekomavar{fromlogo}}%
+                    \addtolength{\@tempdima}{-\@tempdimb}%
+                  \fi
                 \fi
-              \fi
-              \expandafter\rule\expandafter{\the\@tempdima}{.4pt}%
+                \expandafter\rule\expandafter{\the\@tempdima}{%
+                  \useplength{fromrulethickness}}}%
             \fi
           }%
           \\
@@ -778,11 +791,13 @@
           \if@email\\\usekomavar*{fromemail}\usekomavar{fromemail}\fi%
           \if@www\\\usekomavar*{fromurl}\usekomavar{fromurl}\fi%
           \ifnum\@rulefrom=2\\[-.5\baselineskip]%
-            \setlength{\@tempdima}{\useplength{fromrulewidth}}%
-            \ifdim\@tempdima=\z@
-              \setlength{\@tempdima}{\textwidth}%
-            \fi
-            \expandafter\rule\expandafter{\the\@tempdima}{.4pt}%
+            \usekomafont{fromrule}{%
+              \setlength{\@tempdima}{\useplength{fromrulewidth}}%
+              \ifdim\@tempdima=\z@
+                \setlength{\@tempdima}{\textwidth}%
+              \fi
+              \expandafter\rule\expandafter{\the\@tempdima}{%
+                \useplength{fromrulethickness}}}%
           \fi
           \\
         }%
@@ -809,6 +824,14 @@
 %
 % \subsubsection{Schrifteinstellungen für den Briefbogen}
 %
+% \begin{KOMAfont}{foldmark}
+%   \changes{v2.97c}{2007/05/08}{Neu}
+% Die Schrift (hier ist die Farbe der entscheidende Faktor) der Faltmarken.
+%    \begin{macrocode}
+\newkomafont{foldmark}{}
+%    \end{macrocode}
+% \end{KOMAfont}
+%
 % \begin{KOMAfont}{fromname}
 %   \changes{v2.95}{2006/03/23}{jetzt mit \cs{newkomafont}}
 % Der Absendername im Briefkopf.
@@ -822,6 +845,15 @@
 % Die Absenderadresse im Briefkopf.
 %    \begin{macrocode}
 \newkomafont{fromaddress}{}
+%    \end{macrocode}
+% \end{KOMAfont}
+%
+% \begin{KOMAfont}{fromrule}
+%   \changes{v2.97c}{2007/05/08}{Neu}
+% Die Schrift (hier ist die Farbe der entscheidende Faktor) der Linie im
+% Absender.
+%    \begin{macrocode}
+\newkomafont{fromrule}{}
 %    \end{macrocode}
 % \end{KOMAfont}
 %
@@ -868,6 +900,14 @@
 \@newplength{bfoldmarkvpos}
 %    \end{macrocode}
 % \end{macro}
+% \end{macro}
+% \begin{macro}{\ltr@len@foldmarkthickness}
+%   \changes{2.97c}{2007/05/08}{Neu}
+% Dicke der Faltmarken.
+%    \begin{macrocode}
+\@newplength{foldmarkthickness}
+\@setplength{foldmarkthickness}{.2pt}
+%    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\ltr@len@toaddrvpos}
 %   \changes{v2.8q}{2001/10/06}{Neu}
@@ -1007,8 +1047,18 @@
 %   \changes{v2.8q}{2002/01/28}{Neu}
 % Die Länge einer eventuell gesetzten Linie im Absender. Negative
 % Werte bedeuten, dass die Länge automtaisch bestimmt wird.
+%    \begin{macrocode}
 \@newplength{fromrulewidth}
 \@setplength{fromrulewidth}{0pt}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\ltr@len@fromrulethickness}
+%   \changes{v2.97c}{2007/05/08}{Neue Pseudolänge \texttt{fromrulewidth}}
+% Die Dicke einer eventuell gesetzte Linie im Absender.
+%    \begin{macrocode}
+\@newplength{fromrulethickness}
+\@setplength{fromrulethickness}{.4pt}
+%    \end{macrocode}
 % \end{macro}
 %
 %
@@ -1112,6 +1162,8 @@
 %   \changes{v2.8n}{2001/09/07}{Neu}
 %   \changes{v2.95}{2006/06/06}{\cs{vskip} in \cs{vb@t@z} verschoben, damit es
 %     vom Satzspiegel unabhängig wird}
+%   \changes{v2.97c}{2007/05/08}{Dicke konfigurierbar}
+%   \changes{v2.97c}{2007/05/08}{Schrift (Farbe) konfigurierbar}
 % Das geht am einfachsten, wenn wir auch einen Befehl haben, mit dem man eine
 % einzelne Faltmarke relativ zur aktuellen Position setzen kann. Dies
 % geschieht mit Hilfe von |\rlap|, damit die horizontale Position unverändert
@@ -1119,9 +1171,12 @@
 % und die Länder der Marke übergeben.
 %    \begin{macrocode}
 \newcommand*{\@foldmark}[2]{%
-  \vb@t@z{\vskip #1%
+  \vb@t@z{\setlength{\@tempdima}{#1}%
+    \addtolengthplength[-.5]{\@tempdima}{foldmarkthickness}%
+    \vskip \@tempdima
     \rlap{\move@topl\hskip\useplength{foldmarkhpos}%
-      \rule{#2}{.2pt}}}%
+      \usekomafont{foldmark}{%
+        \rule{#2}{\useplength{foldmarkthickness}}}}}%
   \ignorespaces%
 }
 \newcommand*{\@foldmarks}{%
