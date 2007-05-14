@@ -1,4 +1,4 @@
-% \CheckSum{1743}
+% \CheckSum{1777}
 % \iffalse meta-comment
 % ======================================================================
 % scrknpap.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrknpap.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrknpap.dtx}[2007/05/08 v2.97c KOMA-Script (note-paper)]
+\ProvidesFile{scrknpap.dtx}[2007/05/14 v2.97c KOMA-Script (note-paper)]
 % \iffalse
 \documentclass{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -865,6 +865,22 @@
 %    \end{macrocode}
 % \end{KOMAfont}
 %
+% \begin{KOMAfont}{refname}
+%   \changes{v2.97c}{2007/05/14}{Neues Font-Element}
+% Die Feldnamen in der Geschäftszeile.
+%    \begin{macrocode}
+\newkomafont{refname}{\sffamily\scriptsize}
+%    \end{macrocode}
+% \end{KOMAfont}
+%
+% \begin{KOMAfont}{refvalue}
+%   \changes{v2.97c}{2007/05/14}{Neues Font-Element}
+% Die Feldwerte in der Geschäftszeile.
+%    \begin{macrocode}
+\newkomafont{refvalue}{\sffamily\scriptsize}
+%    \end{macrocode}
+% \end{KOMAfont}
+%
 % \begin{KOMAfont}{title}
 %   \changes{v2.95}{2006/03/23}{jetzt mit \cs{newkomafont}}
 % Der Brieftitel.
@@ -1462,6 +1478,7 @@
 % \begin{macro}{\@datefield}
 %   \changes{v2.8q}{2002/01/14}{Schalter \cs{if@tempwa} wird bereits hier auf
 %     \texttt{true} gesetzt}
+%   \changes{v2.97c}{2007/05/14}{Neue Fontelemente}
 % Je nachdem, welche Felder definiert sind, muss eine geschäftsmäßiger
 % Standardbrief oder ein eher persönliches Aussehen gewählt werden.
 % \begin{macro}{\@set@reffield}
@@ -1473,12 +1490,12 @@
 %    \begin{macrocode}
 \newcommand*{\@set@reffield}[1]{%
   \ifkomavarempty{#1}{}{%
-    \settowidth{\@tempdima}{\strut\usekomavar{#1}}%
-    \setbox0\hbox{\strut\scriptsize\sffamily\usekomavar*{#1}}%
+    \settowidth{\@tempdima}{\strut\usekomafont{refvalue}\usekomavar{#1}}%
+    \setbox0\hbox{\strut\usekomafont{refname}\usekomavar*{#1}}%
     \ifdim \@tempdima<\wd0\setlength{\@tempdima}{\wd0}\fi
     \if@tempswa\enskip\hfill\fi
     \parbox[t]{\@tempdima}{\noindent\raggedright
-        \strut\box0\\\strut\usekomavar{#1}}%
+        \strut\box0\\\usekomafont{refvalue}\strut\usekomavar{#1}}%
     \@tempswatrue
   }%
 }
@@ -1543,6 +1560,7 @@
 %     Dokumentation angepasst}
 %   \changes{v2.9l}{2003/01/28}{Berechnung von \texttt{refhpos} hinzugefügt}
 %   \changes{v2.95}{2006/03/23}{Absatzeinzug mit \cs{setparsizes} abschalten}
+%   \changes{v2.97c}{2007/05/14}{Neue Font-Elemente}
 %    \begin{macrocode}
 \newcommand*{\@datefield}{{%
     \setparsizes{\z@}{\z@}{\z@ plus 1fil}\par@updaterelative
@@ -1602,7 +1620,25 @@
 %    \begin{macrocode}
     \rlap{\noindent\move@topl\hskip\useplength{refhpos}%
       \vbox{\hsize\useplength{refwidth}%
-        \noindent\@set@reffields
+        \noindent\@set@reffields%
+%    \end{macrocode}
+% Seit Version~2.97c wird hier auch noch getestet, ob die Geschäftszeile
+% möglicherweise mit zu großer Schrift gesetzt wird.
+%    \begin{macrocode}
+        \if@tempswa
+          \setbox0\hbox{\usekomafont{refname}\strutbox}%
+          \ifdim\ht0>\ht\strutbox
+            \ClassWarningNoLine{scrlttr}{%
+              Font element `refname' should not be larger than
+              \string\normalsize!}%
+          \fi
+          \setbox0\hbox{\usekomafont{refvalue}\strutbox}%
+          \ifdim\ht0>\ht\strutbox
+            \ClassWarningNoLine{scrlttr}{%
+              Font element `refvalue' should not be larger than
+              \string\normalsize!}%
+          \fi
+        \fi
         \ifkomavarempty{date}{%
           \if@tempswa
             \typeout{Reference line(s): with fields but without date}%
@@ -1613,12 +1649,13 @@
           }{%
           \if@tempswa
             \typeout{Reference line(s): with fields and date}%
-            \settowidth{\@tempdima}{\strut\usekomavar{date}}%
-            \setbox0\hbox{\scriptsize\sffamily\usekomavar*{date}}%
+            \settowidth{\@tempdima}{\strut
+              \usekomafont{refvalue}\usekomavar{date}}%
+            \setbox0\hbox{\usekomafont{refname}\usekomavar*{date}}%
             \ifdim \@tempdima<\wd0\setlength{\@tempdima}{\wd0}\fi
             \enskip\hfill
             \parbox[t]{\@tempdima}{\noindent\raggedright%
-              \strut\box0\\\strut\usekomavar{date}}%
+              \strut\box0\\\strut\usekomafont{refvalue}\usekomavar{date}}%
           \else
             \typeout{Reference line: only place and date}%
             \enskip\hfill
