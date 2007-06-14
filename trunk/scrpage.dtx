@@ -1,4 +1,4 @@
-% \CheckSum{2537}
+% \CheckSum{2564}
 % \iffalse
 % ======================================================================
 % scrpage.dtx
@@ -65,7 +65,7 @@
 %<v1>\ProvidesPackage{scrpage}[2006/03/29 v1.3d KOMA-Script
 %<v2>\ProvidesPackage{scrpage2}
 %<*!v1>
-                [2006/03/29 v2.2c LaTeX2e KOMA-Script
+                [2007/06/13 v2.2d LaTeX2e KOMA-Script
 %</!v1>
 %<scrpage>                 package]
 %<*driver>
@@ -633,11 +633,28 @@
 %  \begin{macro}{\if@mainmatter}
 %    \changes{v1.2}{1995/07/08}{Definition changed}
 %    \changes{v2.1b}{2003/05/31}{more save test}
+%    \changes{v2.2d}{2007/03/13}{additional \cs{if@mainmatter} test}
 % Next distinguish between matter- and nomatter-classes.
 %    \begin{macrocode}
 \def\@tempa{\newif\if@mainmatter\@mainmattertrue}
 \begingroup\expandafter\expandafter\expandafter\endgroup
-\expandafter\ifx\csname mainmatter\endcsname\relax\else\let\@tempa\relax\fi
+\expandafter\ifx\csname mainmatter\endcsname\relax
+\else
+%<*v2>
+  \begingroup\expandafter\expandafter\expandafter\endgroup
+  \expandafter\ifx\csname if@mainmatter\endcsname\relax
+    \PackageWarningNoLine{scrpage2}{%
+      \string\mainmatter\space defined without
+      \string\if@mainmatter!\MessageBreak
+      This switch is obligatory for scrpage2 to omit\MessageBreak
+      running head chapter numbers in front and\MessageBreak
+      back matter%
+    }%
+  \else
+%</v2>
+    \let\@tempa\relax
+%<v2>  \fi
+\fi
 \@tempa
 %    \end{macrocode}
 %  \end{macro}
@@ -696,13 +713,14 @@
 %    \end{macrocode}
 % Now the we can define the head and the foot. First at twoside-mode:
 % \changes{v1.0b}{1995/05/25}{Dot deleted after number at
-%                             chapter- and sectionmark}
+%   chapter- and sectionmark}
 % \changes{v1.0b}{1995/05/25}{Use CJK at \cs{chaptermark},
-%                             \cs{sectionmark} and \cs{subsectionmark}}
+%   \cs{sectionmark} and \cs{subsectionmark}}
 % \changes{v2.0}{2001/04/20}{Version 2 uses \cs{automark} and
-%                            \cs{manualmark}, so star and non-star
-%                            version are same} 
+%   \cs{manualmark}, so star and non-star version are same} 
 % \changes{v2.1a}{2002/10/30}{Use \cs{if@automark}}
+% \changes{v2.2d}{2007/06/14}{Support of article-classes with
+%   \cs{if@mainmatter}}
 %    \begin{macrocode}
 \if@twoside
   \def\@defpagestyle[#1]#2#3#4{%
@@ -724,9 +742,9 @@
         \else
           \def\sectionmark####1{%
             \markboth {\ifnum \c@secnumdepth >\z@%
-              \sectionmarkformat\fi ####1}{%
+              \if@mainmatter\sectionmarkformat\fi\fi ####1}{%
               \ifnum \c@secnumdepth >\z@%
-              \sectionmarkformat\fi ####1}}
+              \ifmainmatter\sectionmarkformat\fi\fi ####1}}
           \def\subsectionmark####1{%
             \markright {\ifnum \c@secnumdepth >\@ne%
               \subsectionmarkformat\fi ####1}}
@@ -765,7 +783,7 @@
         \else
           \def\sectionmark####1{%
             \markright{\ifnum \c@secnumdepth >\z@%
-              \sectionmarkformat\fi ####1}}
+              \if@mainmatter\sectionmarkformat\fi\fi ####1}}
           \def\subsectionmark####1{}
         \fi
       \else
