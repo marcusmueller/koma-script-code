@@ -1,4 +1,4 @@
-% \CheckSum{936}
+% \CheckSum{951}
 % \iffalse meta-comment
 % ======================================================================
 % scrkbase.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkbase.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkbase.dtx}[2007/04/19 v2.97c KOMA-Script (basics)]
+\ProvidesFile{scrkbase.dtx}[2007/06/20 v2.97c KOMA-Script (basics)]
 % \iffalse
 %</driver>
 %<package&option>\ProvidesPackage{scrkbase}[%
@@ -135,17 +135,18 @@
 %
 % \subsection{Anweisungen zur Abarbeitung von Optionen}
 %
-%  \begin{macro}{\scr@ifundefined}
+%  \begin{macro}{\scr@ifundefinedorrelax}
 %    \changes{v2.95c}{2006/08/12}{neu (intern)}
 %    \changes{v2.97b}{2007/03/08}{vermurkste Logik korrigiert}
 %    \changes{v2.97c}{2007/04/18}{vermurkste Funktion korrigiert}
+%    \changes{v2.97c}{2007/04/18}{von \cs{scr@ifundefined} umbenannt}
 % Dieses Makro arbeitet wie \cs{@ifundefined}, definiert dabei aber
 % ein undefiniertes Makro nicht als \cs{relax}. Es muss bereits hier definiert
 % werden, weil es gleich verwendet wird.
 %    \begin{macrocode}
 \begingroup\expandafter\expandafter\expandafter\endgroup
 \expandafter\ifx\csname ifcsname\endcsname\relax
-  \newcommand{\scr@ifundefined}[1]{%
+  \newcommand{\scr@ifundefinedorrelax}[1]{%
     \begingroup\expandafter\expandafter\expandafter\endgroup
     \expandafter\ifx\csname #1\endcsname\relax
       \expandafter\@firstoftwo
@@ -154,7 +155,7 @@
     \fi
   }
 \else
-  \newcommand{\scr@ifundefined}[1]{%
+  \newcommand{\scr@ifundefinedorrelax}[1]{%
     \ifcsname #1\endcsname
       \expandafter\ifx\csname #1\endcsname\relax
         \expandafter\expandafter\expandafter\@firstoftwo
@@ -217,7 +218,7 @@
 %    \begin{macrocode}
 \newcommand*{\@globaloptionslist}{}
 \let\@globaloptionslist\@classoptionslist
-\scr@ifundefined{XKV@classoptionslist}{}{%
+\scr@ifundefinedorrelax{XKV@classoptionslist}{}{%
   \ifx\XKV@classoptionslist\@empty\else
     \let\@globaloptionslist\XKV@classoptionslist
   \fi
@@ -263,7 +264,7 @@
   \fi
   \@for\CurrentOption:=\@curroptions\do{%
     \@use@ption
-    \scr@ifundefined{ds@\CurrentOption}{%
+    \scr@ifundefinedorrelax{ds@\CurrentOption}{%
       \KOMA@optiontest{#1}\CurrentOption{%
         \KOMA@optiontest{#1.\@currname.\@currext}\CurrentOption{%
           \default@ds
@@ -306,7 +307,7 @@
   \reserved@a
 }
 \newcommand*{\KOMA@pti@ntest}{}
-\def\KOMA@pti@ntest#1#2=#3\@nil{\scr@ifundefined{KV@#1@#2}}
+\def\KOMA@pti@ntest#1#2=#3\@nil{\scr@ifundefinedorrelax{KV@#1@#2}}
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
@@ -324,17 +325,25 @@
 %
 % \begin{option}{internalonly}
 %   \changes{v2.96}{2006/11/26}{neu}
+%   \changes{v2.97c}{2007/06/20}{geht auch ohne Argument}
 % \begin{macro}{\dont@let@as@internal@defined}
 %   \changes{2.96}{2006/11/26}{neu (intern)}
 % Anweisungen, die mit einem internen und einem Anwendername vorhanden sind,
-% können vor dem Anwender optional verborgen werden.
+% können vor dem Anwender optional verborgen werden. Wird kein Argument
+% angegeben, so werden alle Anweisungen verborgen.
 %    \begin{macrocode}
 \newcommand*{\dont@let@as@internal@defined}{/}
-\KOMA@key{internalonly}{%
-  \begingroup
-    \@expandtwoargs\in@{#1}\dont@let@as@internal@defined
-  \expandafter\endgroup
-  \ifin@\else\g@addto@macro\dont@let@as@internal@defined{#1/}\fi
+\newif\if@let@as@internalonly@defined\@let@as@internalonly@definedfalse
+\KOMA@key{internalonly}[\relax]{%
+  \ifx\relax#1\relax
+    \@let@as@internalonly@definedtrue
+  \else
+    \@let@as@internalonly@definedfalse
+    \begingroup
+      \@expandtwoargs\in@{#1}\dont@let@as@internal@defined
+    \expandafter\endgroup
+    \ifin@\else\g@addto@macro\dont@let@as@internal@defined{#1/}\fi
+  \fi
 }
 %    \end{macrocode}
 % \end{macro}
@@ -372,11 +381,13 @@
 %  \end{macro}
 %  \end{macro}
 %
-%  \begin{macro}{\let@as@internal@defined}
-%    \changes{v2.95}{2002/08/19}{neu (intern)}
-%    \changes{v2.95c}{2006/08/12}{Warnung bei Umdefinierung}
-%    \changes{v2.96}{2006/11/26}{Herausreichen von internen Makros als
-%      Benutzermakros kann verhindert werden}
+% \begin{macro}{\let@as@internal@defined}
+%   \changes{v2.95}{2002/08/19}{neu (intern)}
+%   \changes{v2.95c}{2006/08/12}{Warnung bei Umdefinierung}
+%   \changes{v2.96}{2006/11/26}{Herausreichen von internen Makros als
+%     Benutzermakros kann verhindert werden}
+%   \changes{v2.97c}{2007/06/20}{Herausreichen von internen Makros kann
+%     generell verhindert werden}
 % Dieses Makro wird intern verwendet, um dokumentierte Makros mit der
 % Definition von internen Makros zu versehen, falls sie nicht bereits
 % definiert oder als nicht zu definieren markiert sind. Der Name des
@@ -385,7 +396,11 @@
 %    \begin{macrocode}
 \newcommand*{\let@as@internal@defined}[1]{%
   \begingroup
-    \@expandtwoargs\in@{/#1/}\dont@let@as@internal@defined
+    \if@let@as@internalonly@defined
+      \in@true
+    \else
+      \@expandtwoargs\in@{/#1/}\dont@let@as@internal@defined
+    \fi
   \expandafter\endgroup
   \ifin@
     \PackageInfo{%
@@ -438,13 +453,14 @@
 %    \end{macrocode}
 %  \end{macro}
 %
-%  \begin{macro}{\ifundefined}
+%  \begin{macro}{\ifundefinedorrelax}
 %    \changes{v2.95}{2002/08/21}{neu}
 %    \changes{v2.95c}{2006/08/12}{über interne Anweisung definiert}
+%    \changes{v2.97c}{2007/06/20}{umbenannt von \cs{ifundefined}}
 % Dieses Makro arbeitet wie \cs{@ifundefined}, definiert dabei aber
 % ein undefiniertes Makro nicht als \cs{relax}.
 %    \begin{macrocode}
-\let@as@internal@defined{ifundefined}
+\let@as@internal@defined{ifundefinedorrelax}
 %    \end{macrocode}
 %  \end{macro}
 %
@@ -455,7 +471,7 @@
 % ist es ganz nützlich, auch das zu haben. Dieses Makro heißt nicht
 % \cs{ifdefined}, weil \eTeX\ bereits ein solches Primitiv bietet.
 %    \begin{macrocode}
-\scr@ifundefined{ifcsname}{%
+\scr@ifundefinedorrelax{ifcsname}{%
   \newcommand{\ifnotundefined}[1]{%
     \begingroup\expandafter\expandafter\expandafter\endgroup
     \expandafter\ifx\csname #1\endcsname\relax
@@ -685,8 +701,8 @@
 % für die Deklaration der Option \texttt{pagesize} benötigt.
 %    \begin{macrocode}
 \newcommand{\scr@ifpdfoutput}{%
-  \scr@ifundefined{pdfoutput}{%
-    \scr@ifundefined{OpMode}{%
+  \scr@ifundefinedorrelax{pdfoutput}{%
+    \scr@ifundefinedorrelax{OpMode}{%
       \expandafter\@secondoftwo%
     }{%
       \ifnum\OpMode=1
@@ -749,8 +765,8 @@
 % ausgegeben wird oder nicht, Befehle auszuführen.
 %    \begin{macrocode}
 \newcommand*{\scr@ifdvioutput}{%
-  \scr@ifundefined{pdfoutput}{%
-    \scr@ifundefined{OpMode}{%
+  \scr@ifundefinedorrelax{pdfoutput}{%
+    \scr@ifundefinedorrelax{OpMode}{%
       \expandafter\@firstoftwo
     }{%
       \ifnum\OpMode=0
@@ -783,12 +799,12 @@
   \def\reserved@a##1\@nil{%
     \@for\KOMA@key@atlist:=#2\do{%
       \expandafter\KOMA@key@split@name@value\KOMA@key@atlist==\@nil
-      \scr@ifundefined{KV@#1@\KOMA@key@name}{}{%
+      \scr@ifundefinedorrelax{KV@#1@\KOMA@key@name}{}{%
         \edef\reserved@a{\noexpand\setkeys{#1}{\KOMA@key@atlist}%
         }%
         \reserved@a
       }%
-      \scr@ifundefined{KV@#1.\@currname.\@currext @\KOMA@key@name}{}{%
+      \scr@ifundefinedorrelax{KV@#1.\@currname.\@currext @\KOMA@key@name}{}{%
         \edef\reserved@a{%
           \noexpand\setkeys{#1.\@currname.\@currext}{\KOMA@key@atlist}%
         }%
@@ -860,7 +876,7 @@
 %    \begin{macrocode}
     \KOMA@key@found@false
     \@for\@tempa:=\KOMA@key@familylist\do{%
-      \scr@ifundefined{KV@\@tempa @\KOMA@key@name}{}{%
+      \scr@ifundefinedorrelax{KV@\@tempa @\KOMA@key@name}{}{%
         \KOMA@key@found@true
         \edef\reserved@a{\noexpand\setkeys{\@tempa}{\KOMA@key@atlist}%
           \noexpand\edef\noexpand\@tempa{\@tempa}%
