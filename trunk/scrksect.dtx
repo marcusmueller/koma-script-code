@@ -1,4 +1,4 @@
-% \CheckSum{1642}
+% \CheckSum{1655}
 % \iffalse meta-comment
 % ======================================================================
 % scrksect.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrksect.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrksect.dtx}[2007/03/09 v2.97a KOMA-Script (disposition)]
+\ProvidesFile{scrksect.dtx}[2007/06/21 v2.97c KOMA-Script (disposition)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -1690,6 +1690,61 @@
 %    \end{macrocode}
 %  \end{macro}
 %
+%  \begin{KOMAfont}{partentry}
+%    \changes{v2.97c}{2007/06/21}{neues Font-Element}
+%    Schrift für den \cs{part}-Eintrag im Inhaltsverzeichnis.
+%    \begin{macrocode}
+\newkomafont{partentry}{\usekomafont{sectioning}\large}
+%    \end{macrocode}
+%  \end{KOMAfont}
+%
+%  \begin{KOMAfont}{partentrypagenumber}
+%    \changes{v2.97c}{2007/06/21}{neues Font-Element}
+%    Schrift für die Seitenzahl des \cs{part}-Eintrags im Inhaltsverzeichnis
+%    abweichend von \texttt{partentry}.
+%    \begin{macrocode}
+\newkomafont{partentrypagenumber}{}
+%    \end{macrocode}
+%  \end{KOMAfont}
+%
+%  \begin{KOMAfont}{chapterentry}
+%    \changes{v2.97c}{2007/06/21}{neues Font-Element}
+%    Schrift für den \cs{chapter}-Eintrag im Inhaltsverzeichnis.
+%    \begin{macrocode}
+%<*book|report>
+\newkomafont{chapterentry}{\usekomafont{sectioning}}
+%    \end{macrocode}
+%  \end{KOMAfont}
+%
+%  \begin{KOMAfont}{chapterentrypagenumber}
+%    \changes{v2.97c}{2007/06/21}{neues Font-Element}
+%    Schrift für die Seitenzahl des \cs{chapter}-Eintrags im Inhaltsverzeichnis
+%    abweichend von \texttt{chapterentry}.
+%    \begin{macrocode}
+\newkomafont{chapterentrypagenumber}{}
+%</book|report>
+%    \end{macrocode}
+%  \end{KOMAfont}
+%
+%  \begin{KOMAfont}{sectionentry}
+%    \changes{v2.97c}{2007/06/21}{neues Font-Element}
+%    Schrift für den \cs{section}-Eintrag im Inhaltsverzeichnis.
+%    \begin{macrocode}
+%<*article>
+\newkomafont{sectionentry}{\usekomafont{sectioning}}
+%    \end{macrocode}
+%  \end{KOMAfont}
+%
+%  \begin{KOMAfont}{sectionentrypagenumber}
+%    \changes{v2.97c}{2007/06/21}{neues Font-Element}
+%    Schrift für die Seitenzahl des \cs{section}-Eintrags im Inhaltsverzeichnis
+%    abweichend von \texttt{sectionentry}.
+%    \begin{macrocode}
+\newkomafont{sectionentrypagenumber}{}
+%</article>
+%    \end{macrocode}
+%  \end{KOMAfont}
+%
 %  \begin{macro}{\size@part}
 %    \changes{v2.8o}{2001/09/14}{neu (intern)}
 %    \changes{v2.96a}{2006/12/02}{letztes Element darf ein Argument erwarten,
@@ -2051,7 +2106,11 @@
 % Die Gliederungsbefehle schreiben auch Einträge ins
 % Inhaltsverzeichnis, die dort ebenfalls formatiert werden müssen.
 %
-%  \begin{macro}{\l@part}
+% \begin{macro}{\l@part}
+%   \changes{v2.97c}{2007/06/21}{\cs{sectfont}\cs{large} durch Verwendung von
+%     Element \texttt{partentry} ersetzt}
+%   \changes{v2.97c}{2007/06/21}{Element \texttt{partentrypagenumber} wird
+%     verwendet}
 % Der Eintrag für \cs{part}:
 %    \begin{macrocode}
 \newcommand*\l@part[2]{%
@@ -2082,7 +2141,8 @@
       \leavevmode\sectfont\large
       \advance\leftskip\@tempdima
       \hskip -\leftskip
-      #1\nobreak\hfil \nobreak\hb@xt@\@pnumwidth{\hss #2}\par
+      \usekomafont{partentry}{#1\nobreak\hfil\nobreak
+        \hb@xt@\@pnumwidth{\hss\usekomafont{partentrypagenumber}{#2}}}\par
 %    \end{macrocode}
 %   \changes{v2.96b}{2006/11/30}{Umbruch zwischen \cs{part}-Eintrag im
 %     Inhaltsverzeichnis und untergeordneten Einträgen verhindern}
@@ -2118,6 +2178,10 @@
 %      Inhaltsverzeichnis und übergeordneten Einträgen verhindern}
 %    \changes{v2.96b}{2006/11/30}{Umbruch zwischen \cs{chapter}-Eintrag im
 %      Inhaltsverzeichnis und untergeordneten Einträgen verhindern}
+%    \changes{v2.97c}{2007/06/21}{\cs{sectfont} durch Verwendung von
+%      Element \texttt{chapterentry} ersetzt}
+%    \changes{v2.97c}{2007/06/21}{Element \texttt{chapterentrypagenumber} wird
+%      verwendet}
 % \iffalse
 %<*report|book>
 % \fi
@@ -2138,10 +2202,11 @@
     \begingroup
       \parindent \z@ \rightskip \@pnumwidth
       \parfillskip -\@pnumwidth
-      \leavevmode \sectfont
+      \leavevmode
       \advance\leftskip\@tempdima
       \hskip -\leftskip
-      #1\nobreak\hfil \nobreak\hb@xt@\@pnumwidth{\hss #2}\par
+      \usekomafont{chapterentry}{#1\nobreak\hfil\nobreak
+      \hb@xt@\@pnumwidth{\hss\usekomafont{chapterentrypagenumber}{#2}}}\par
       \ifnum \scr@compatibility>\@nameuse{scr@v@2.96}
       \endgroup
       \penalty20009
@@ -2173,6 +2238,10 @@
 %      Inhaltsverzeichnis und übergeordneten Einträgen verhindern}
 %    \changes{v2.96b}{2006/11/30}{Umbruch zwischen \cs{section}-Eintrag im
 %      Inhaltsverzeichnis und untergeordneten Einträgen verhindern}
+%    \changes{v2.97c}{2007/06/21}{\cs{sectfont} durch Verwendung von
+%      Element \texttt{sectionentry} ersetzt}
+%    \changes{v2.97c}{2007/06/21}{Element \texttt{sectionentrypagenumber} wird
+%      verwendet}
 % Bei der Artikel-Klasse folgt die Formatierung für
 % \cs{section}-Einträge, an Stelle der Einträge für \cs{chapter}
 % der Buch- oder der Bericht-Klasse. Bei diesen handelt es sich hier
@@ -2194,10 +2263,11 @@
    \begingroup
       \parindent \z@ \rightskip \@pnumwidth
       \parfillskip -\@pnumwidth
-      \leavevmode \sectfont
+      \leavevmode
       \advance\leftskip\@tempdima
       \hskip -\leftskip
-      #1\nobreak\hfil \nobreak\hb@xt@\@pnumwidth{\hss #2}\par\nobreak
+      \usekomafont{sectionentry}{#1\nobreak\hfil\nobreak
+        \hb@xt@\@pnumwidth{\hss\usekomafont{sectionentrypagenumber}{#2}}}\par
     \endgroup
     \ifnum \scr@compatibility>\@nameuse{scr@v@2.96}
       \penalty20008
