@@ -1,4 +1,4 @@
-% \CheckSum{1655}
+% \CheckSum{1669}
 % \iffalse meta-comment
 % ======================================================================
 % scrksect.dtx
@@ -2138,11 +2138,12 @@
 %    \changes{v2.5e}{1998/07/17}{beinhaltet \cs{sectfont} eine
 %      Größenangabe, so wird diese überschrieben} 
 %    \begin{macrocode}
-      \leavevmode\sectfont\large
+      \leavevmode
       \advance\leftskip\@tempdima
       \hskip -\leftskip
-      \usekomafont{partentry}{#1\nobreak\hfil\nobreak
-        \hb@xt@\@pnumwidth{\hss\usekomafont{partentrypagenumber}{#2}}}\par
+      \usekomafont{partentry}{#1\nobreak
+        \usekomafont{partentrypagenumber}{\hfil\nobreak
+          \hb@xt@\@pnumwidth{\hss#2}}}\par
 %    \end{macrocode}
 %   \changes{v2.96b}{2006/11/30}{Umbruch zwischen \cs{part}-Eintrag im
 %     Inhaltsverzeichnis und untergeordneten Einträgen verhindern}
@@ -2182,6 +2183,8 @@
 %      Element \texttt{chapterentry} ersetzt}
 %    \changes{v2.97c}{2007/06/21}{Element \texttt{chapterentrypagenumber} wird
 %      verwendet}
+%    \changes{v2.97c}{2007/06/21}{weitgehend umgeschrieben, um linksbündige
+%      Einträge zu ermöglichen}
 % \iffalse
 %<*report|book>
 % \fi
@@ -2200,13 +2203,26 @@
       \fi
     \fi
     \begingroup
-      \parindent \z@ \rightskip \@pnumwidth
+      \raggedchapterentry
+      \parindent \z@ \advance\rightskip \@pnumwidth
       \parfillskip -\@pnumwidth
+      \interlinepenalty\@M
       \leavevmode
-      \advance\leftskip\@tempdima
-      \hskip -\leftskip
-      \usekomafont{chapterentry}{#1\nobreak\hfil\nobreak
-      \hb@xt@\@pnumwidth{\hss\usekomafont{chapterentrypagenumber}{#2}}}\par
+      \advance\leftskip \@tempdima \null\nobreak\hskip -\leftskip
+      \usekomafont{chapterentry}{#1\nobreak
+        \usekomafont{chapterentrypagenumber}{%
+%    \end{macrocode}
+% Und dann könnte man noch folgendes machen:
+%    \begin{verbatim}
+%          \if@chapterentrywithdots
+%            \leaders\hbox{$\m@th
+%              \mkern \@dotsep mu\hbox{.}\mkern \@dotsep
+%              mu$}%
+%          \fi
+%    \end{verbatim}
+%    \begin{macrocode}
+          \hfill\nobreak
+          \hb@xt@\@pnumwidth{\hss#2}}}\par
       \ifnum \scr@compatibility>\@nameuse{scr@v@2.96}
       \endgroup
       \penalty20009
@@ -2217,6 +2233,13 @@
   \fi
 }
 %    \end{macrocode}
+% \begin{macro}{\raggedchapterentry}
+%   \changes{v2.97c}{2007/06/21}{neue Anweisung}
+%   Ausrichtung des Textes der Kapiteleinträge im Inhaltsverzeichnis.
+%    \begin{macrocode}
+\newcommand*{\raggedchapterentry}{}
+%    \end{macrocode}   
+% \end{macro}
 %
 %  \begin{macro}{\l@chapteratlist}
 %    \changes{v2.96a}{2006/12/03}{neues Macro}
@@ -2242,6 +2265,8 @@
 %      Element \texttt{sectionentry} ersetzt}
 %    \changes{v2.97c}{2007/06/21}{Element \texttt{sectionentrypagenumber} wird
 %      verwendet}
+%    \changes{v2.97c}{2007/06/21}{weitgehend umgeschrieben, um linksbündige
+%      Einträge zu ermöglichen}
 % Bei der Artikel-Klasse folgt die Formatierung für
 % \cs{section}-Einträge, an Stelle der Einträge für \cs{chapter}
 % der Buch- oder der Bericht-Klasse. Bei diesen handelt es sich hier
@@ -2261,19 +2286,42 @@
       \fi
     \fi
    \begingroup
-      \parindent \z@ \rightskip \@pnumwidth
+      \raggedsectionentry
+      \parindent \z@ \advance\rightskip \@pnumwidth
       \parfillskip -\@pnumwidth
+      \interlinepenalty\@M
       \leavevmode
-      \advance\leftskip\@tempdima
-      \hskip -\leftskip
-      \usekomafont{sectionentry}{#1\nobreak\hfil\nobreak
-        \hb@xt@\@pnumwidth{\hss\usekomafont{sectionentrypagenumber}{#2}}}\par
+      \advance\leftskip \@tempdima \null\nobreak\hskip -\leftskip
+      \usekomafont{sectionentry}{#1\nobreak
+        \usekomafont{sectionentrypagenumber}{%
+%    \end{macrocode}
+% Und dann könnte man noch folgendes machen:
+%    \begin{verbatim}
+%          \if@sectionentrywithdots
+%            \leaders\hbox{$\m@th
+%              \mkern \@dotsep mu\hbox{.}\mkern \@dotsep
+%              mu$}%
+%          \fi
+%    \end{verbatim}
+%    \begin{macrocode}
+          \hfill\nobreak
+          \hb@xt@\@pnumwidth{\hss#2}}}\par
     \endgroup
     \ifnum \scr@compatibility>\@nameuse{scr@v@2.96}
       \penalty20008
     \fi
   \fi
 }
+%    \end{macrocode}   
+% \begin{macro}{\raggedsectionentry}
+%   \changes{v2.97c}{2007/06/21}{neue Anweisung}
+%   Ausrichtung des Textes der Abschnittseinträge im Inhaltsverzeichnis.
+%    \begin{macrocode}
+\newcommand*{\raggedsectionentry}{}
+%    \end{macrocode}   
+% \end{macro}
+%
+%    \begin{macrocode}
 %</article>
 %<*report|book>
 \newcommand*\l@section{\bprot@dottedtocline{1}{1.5em}{2.3em}}
