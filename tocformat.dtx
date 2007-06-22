@@ -77,6 +77,13 @@
 \date{\filedate}
 \author{Markus Kohm}
 
+\tocformatdefdepend{ragged}{\raggedright}
+\tocformatdefdepend{fill}{~--~}
+\tocformatdefdepend{pagenumber}{\hbox}
+\makeatletter
+\tocformatdefdepend{parfillskip}{-\@tocrmarg plus 1fil}
+\makeatother
+
 \begin{document}
   \maketitle
   \DocInput{\filename}
@@ -112,8 +119,73 @@
 % \fi
 %
 % \subsection{Option}
-% ADD IMPLEMENTATION HERE
 %
+% \begin{option}{redefinetocentries}
+% \begin{option}{holdtocentries}
+% \begin{macro}{\tocformat@redefinition}
+% The package may redefine the levels ``part'' till ``subparagraph'' to
+% activate all features (option \texttt{redefinedtocentries}) or redefine only
+% kernel macros of \LaTeX{} (option \texttt{holdtocentries}). Default is
+% \texttt{redefinedtocentries} and with \texttt{holdtocentries} e.g. the part
+% entrie of common classed would not use the new features.
+%    \begin{macrocode}
+\newcommand*\tocformat@redefinition{}
+\let\tocformat@redefinition\relax
+\DeclareOption{redefinetocentries}{%
+  \def\tocformat@redefinition{%
+    \@tempdimb 2em\relax
+    \ifcsname l@part\endcsname
+      \PackageInfo{tocformat}{Redefining toc entry:\MessageBreak
+        \@spaces level:\@spaces\@spaces -1\MessageBreak
+        \@spaces name:\@spaces\@spaces\space part\MessageBreak
+        \@spaces indent:\@spaces\space\space\space 
+        \the\z@\MessageBreak
+        \@spaces number width: \the\@tempdimb\@gobble}%
+      \def\l@part{\@dottedtocline{-1}{\z@}{2em}}
+    \fi
+    \begingroup
+      \@tempcnta=\z@
+      \@tempdima=\z@
+      \@tempdimb=1.5em\relax
+      \@whilenum \@tempcnta<6\relax\do{%
+        \expandafter\edef\expandafter\reserved@a\expandafter{%
+          \ifcase \@tempcnta chapter\or section\or subsection\or 
+          subsubsection\or paragraph\or subparagraph\fi}%
+        \ifx\reserved@a\@empty\else
+          \ifcsname l@\reserved@a\endcsname
+            \PackageInfo{tocformat}{Redefining toc entry:\MessageBreak
+              \@spaces level:\@spaces\@spaces \the\@tempcnta\MessageBreak
+              \@spaces name:\@spaces\@spaces\space \reserved@a\MessageBreak
+              \@spaces indent:\@spaces\space\space\space 
+                                     \the\@tempdima\MessageBreak
+              \@spaces number width: \the\@tempdimb\@gobble}%
+            \edef\reserved@a{\noexpand\expandafter\noexpand\gdef
+              \noexpand\csname l@\reserved@a\noexpand\endcsname{%
+                \noexpand\@dottedtocline
+                {\the\@tempcnta}{\the\@tempdima}{\the\@tempdimb}}}%
+            \reserved@a
+            \advance\@tempdima\@tempdimb
+            \advance\@tempdimb .9em\relax
+          \fi
+        \fi
+        \advance\@tempcnta \@ne\relax
+      }
+    \endgroup
+  }%
+}
+\DeclareOption{holdtocentries}{%
+  \let\tocformat@redefinition\relax
+}
+\AtEndOfPackage{\tocformat@redefinition}%
+%    \end{macrocode}
+% \end{macro}
+% \end{option}
+% \end{option}
+%
+%    \begin{macrocode}
+\ExecuteOptions{redefinetocentries}
+\ProcessOptions\relax
+%    \end{macrocode}
 %
 % \subsection{Body}
 %
@@ -150,7 +222,13 @@
       \tocformat@depth@depend{#1}{entrystartvskip}{\z@ \@plus.2\p@}%
     }%
     {%
-      \tocformat@depth@depend{#1}{ragged}%
+      \edef\tocformatdepth{#1}%
+      \let\tocformatdepthname\relax
+      \ifcsname tocformat@depth@#1@name\endcsname
+        \expandafter\let\expandafter\tocformatdepthname
+        \csname tocformat@depth@#1@name\endcsname
+      \fi
+      \tocformat@depth@depend{#1}{ragged}{}%
       \advance\leftskip #2\relax 
       \advance\rightskip \tocformat@depth@depend{#1}{tocmarg}{\@tocrmarg}%
       \parfillskip \tocformat@depth@depend{#1}{parfillskip}{-\rightskip}%
@@ -159,6 +237,7 @@
       \leavevmode
       \@tempdima #3\relax
       \advance\leftskip \@tempdima \null\nobreak\hskip -\leftskip
+      \tocformat@depth@depend{#1}{hook}{}%
       {#4}\nobreak
       \tocformat@depth@depend{#1}{fill}{%
         \leaders\hbox{$\m@th
@@ -187,6 +266,17 @@
   \hb@xt@\@pnumwidth{\hfil\normalfont \normalcolor #1}%
 }
 %    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\tocformatdepth}
+% \begin{macro}{\tocformatdepthname}
+% Two helpers, that may be used e.g. at formating macros (e.g. the improved
+% \cs{numberline} command). The current valid depth and name of the depth.
+%    \begin{macrocode}
+\newcommand*{\tocformatdepth}{}
+\newcommand*{\tocformatdepthname}{}
+%    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
 % \subsubsection{Macros for Configurating the Format of the Entries}
@@ -277,11 +367,67 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}{\tocformatextenddepend}
+% Defines a depth depending argument, e.g. \cs{tocformatdefdepend}\oarg{name
+% of depth}\marg{foo}\marg{bar} would define argument \meta{foo} of level
+% named \meta{name of depth} to be \meta{foo}. If no \meta{name of depth} is
+% given or the \meta{name of depth} is \cs{relax}, the arguments \meta{foo} of
+% all known levels will be defined to be \meta{bar}.
+%    \begin{macrocode}
+\newcommand{\tocformatextenddepend}[3][\relax]{%
+  \ifx\relax#1\relax
+    \expandafter\@for \expandafter\reserved@a \expandafter:\expandafter=%
+    \tocformat@names\do{%
+      \ifx\reserved@a\@empty\else
+        \ifcsname tocformat@\reserved@a @#2\endcsname
+          \PackageInfo{tocformat}{extending `#2' for `\reserved@a'}%
+        \else
+          \PackageInfo{tocformat}{defining `#2' for `\reserved@a'}%
+          \@namedef{tocformat@\reserved@a @#2}{}%
+        \fi
+        \expandafter\l@addto@macro\csname tocformat@\reserved@a
+          @#2\endcsname{#3}%
+      \fi
+    }%
+  \else
+    \@expandtwoargs\in@{,#1,}{,\tocformat@names,}
+    \ifcsname tocformat@#1@#2\endcsname
+      \ifin@
+        \PackageInfo{tocformat}{extending `#2' for `#1'}%
+      \else
+        \PackageWarning{tocformat}{extending `#2' for `#1',\MessageBreak
+          but no depth with name `#1' defined}%
+      \fi
+    \else
+      \ifin@
+        \PackageInfo{tocformat}{defining `#2' for `#1'}%
+      \else
+        \PackageWarning{tocformat}{defining `#2' for `#1',\MessageBreak
+          but no depth with name `#1' defined}%
+      \fi
+      \@namedef{tocformat@#1@#2}{}%
+    \fi
+    \expandafter\l@addto@macro\csname tocformat@#1@#2\endcsname{#3}%
+  \fi
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\l@addto@macro}
+% Something like \cs{g@addto@macro} but only with local effect. While other
+% packages or classes may also define this, \cs{providecommand} will be used.
+%    \begin{macrocode}
+\providecommand{\l@addto@macro}[2]{%
+  \edef#1{\unexpanded\expandafter{#1#2}}%
+}%
+%    \end{macrocode}
+% \end{macro}
+%
 % \subsubsection{Settings for Common Classes}
 % \label{sec:settings}
 %    \begin{macrocode}
 \ifcsname part\endcsname\tocformatdefdepthname{-1}{part}\fi
-\ifcsname chapter\endcsname\tocformatdefdepthname{0}[chapter]\fi
+\ifcsname chapter\endcsname\tocformatdefdepthname{0}{chapter}\fi
 \ifcsname section\endcsname\tocformatdefdepthname{1}{section}\fi
 \ifcsname subsection\endcsname\tocformatdefdepthname{2}{subsection}\fi
 \ifcsname subsubsection\endcsname\tocformatdefdepthname{3}{subsubsection}\fi
@@ -290,13 +436,16 @@
 \ifcsname part\endcsname
   \tocformatdefdepend[part]{entrystartvskip}{2.25em \@plus\p@}
   \tocformatdefdepend[part]{fill}{\hfill}
+  \tocformatdefdepend[part]{hook}{\bfseries\large}
 \fi
 \ifcsname chapter\endcsname
   \tocformatdefdepend[chapter]{entrystartvskip}{1em \@plus\p@}
   \tocformatdefdepend[chapter]{fill}{\hfill}
+  \tocformatdefdepend[chapter]{hook}{\bfseries}
 \else
   \tocformatdefdepend[section]{entrystartvskip}{1em \@plus\p@}
   \tocformatdefdepend[section]{fill}{\hfill}
+  \tocformatdefdepend[section]{hook}{\bfseries}
 \fi
 %    \end{macrocode}
 %
