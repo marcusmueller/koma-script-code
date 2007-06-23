@@ -68,7 +68,7 @@
 %<*driver>
 \documentclass{scrdoc}
 \usepackage[ngerman,english]{babel}
-\usepackage{tocformat}
+\usepackage[tocleft]{tocformat}
 \CodelineIndex
 \RecordChanges
 \GetFileInfo{tocformat.dtx}
@@ -118,7 +118,7 @@
 %<*package>
 % \fi
 %
-% \subsection{Option}
+% \subsection{Options}
 %
 % \begin{option}{redefinetocentries}
 % \begin{option}{holdtocentries}
@@ -182,9 +182,30 @@
 % \end{option}
 % \end{option}
 %
+% \begin{option}{tocautolength}
+% This option does not work together with \KOMAScript-Option \texttt{tocleft}
+% because it changes the same things.
 %    \begin{macrocode}
-\ExecuteOptions{redefinetocentries}
+\newif\iftocformat@autolength
+\DeclareOption{tocautolength}{\tocformat@autolengthtrue}
+\DeclareOption{tocsetlength}{\tocformat@autolengthfalse}
+%    \end{macrocode}
+% \end{option}
+%
+% \begin{option}{tocleft}
+% \begin{option}{tocindent}
+%    \begin{macrocode}
+\newif\if@tocleft
+\DeclareOption{tocleft}{\@toclefttrue}
+\DeclareOption{tocindent}{\@tocleftfalse}
+%    \end{macrocode}
+% \end{option}
+% \end{option}
+%
+%    \begin{macrocode}
+\ExecuteOptions{redefinetocentries,tocautolength,tocindent}
 \ProcessOptions\relax
+\if@tocleft\ExecuteOptions{tocautolength}\fi
 %    \end{macrocode}
 %
 % \subsection{Body}
@@ -229,15 +250,92 @@
         \csname tocformat@depth@#1@name\endcsname
       \fi
       \tocformat@depth@depend{#1}{ragged}{}%
-      \advance\leftskip #2\relax 
+      \parindent #2\relax
+%    \end{macrocode}
+% Calculate the left indention of the entry
+%    \begin{macrocode}
+      \iftocformat@autolength
+        \ifnum #1>\z@
+          \@tempcnta #1\relax
+          \advance\@tempcnta by\m@ne
+          \ifcsname tocformat@\the\@tempcnta @leftskip\endcsname
+            \ifcsname tocformat@\the\@tempcnta @numwidth\endcsname
+              \parindent
+                \csname tocformat@\the\@tempcnta @leftskip\endcsname\relax
+              \advance\parindent by
+                \csname tocformat@\the\@tempcnta @numwidth\endcsname\relax
+            \fi
+          \fi
+        \fi
+        \expandafter\xdef\csname tocformat@#1@leftskip\endcsname{%
+          \the\parindent
+        }%
+        \ifcsname tocformat@#1@maxleftskip\endcsname
+          \parindent \csname tocformat@#1@maxleftskip\endcsname\relax
+        \fi
+        \if@tocleft
+          \parindent \z@
+        \fi
+      \fi
+%    \end{macrocode}
+% Set left an right indention
+%    \begin{macrocode}
+      \advance\leftskip \parindent
+      \@afterindenttrue
       \advance\rightskip \tocformat@depth@depend{#1}{tocmarg}{\@tocrmarg}%
       \parfillskip \tocformat@depth@depend{#1}{parfillskip}{-\rightskip}%
-      \parindent #2\relax\@afterindenttrue
       \interlinepenalty\@M
       \leavevmode
-      \@tempdima #3\relax
-      \advance\leftskip \@tempdima \null\nobreak\hskip -\leftskip
       \tocformat@depth@depend{#1}{hook}{}%
+      \@tempdima #3\relax
+%    \end{macrocode}
+% Calculate the width of the number of the entry
+%    \begin{macrocode}
+      \iftocformat@autolength
+        \renewcommand*{\numberline}[1]{%
+          \settowidth{\@tempdima}{\tocformat@inner@numberline{##1}}%
+          \ifcsname tocformat@#1@numwidth\endcsname\else
+            \@namedef{tocformat@#1@numwidth}{\z@}%
+          \fi
+          \ifdim \csname tocformat@#1@numwidth\endcsname<\@tempdima
+            \expandafter\xdef\csname tocformat@#1@numwidth\endcsname{%
+              \the\@tempdima}%
+            \if@filesw
+              \protected@write\@auxout{}{%
+                \protect\tocformat@set@length{#1}{%
+                  \csname tocformat@#1@numwidth\endcsname}{%
+                  \csname tocformat@#1@leftskip\endcsname}%
+              }%
+            \fi
+          \else
+            \@tempdima=\csname tocformat@#1@numwidth\endcsname\relax
+          \fi
+          \ifcsname tocformat@#1@maxnumwidth\endcsname
+            \@tempdima \csname tocformat@#1@maxnumwidth\endcsname\relax
+          \fi
+          \if@tocleft
+            \ifcsname tocformat@maxdepth\endcsname
+              \ifcsname tocformat@\tocformat@maxdepth @maxnumwidth\endcsname
+                \@tempdima 
+                \csname tocformat@\tocformat@maxdepth 
+                        @maxnumwidth\endcsname\relax
+              \fi
+            \fi
+          \fi
+          \hb@xt@\@tempdima{%
+            \tocformat@inner@numberline{##1}\hfil}%
+        }%
+        \ifcsname tocformat@#1@maxnumwidth\endcsname
+          \@tempdima \csname tocformat@#1@maxnumwidth\endcsname\relax
+        \fi
+      \fi
+%    \end{macrocode}
+% Set left indention of text
+%    \begin{macrocode}
+      \advance\leftskip \@tempdima \null\nobreak\hskip -\leftskip
+%    \end{macrocode}
+% Set the entry
+%    \begin{macrocode}
       {#4}\nobreak
       \tocformat@depth@depend{#1}{fill}{%
         \leaders\hbox{$\m@th
@@ -260,6 +358,17 @@
 %    \end{macrocode}
 % \end{macro}
 %
+%    \begin{macrocode}
+\newcommand*{\tocformat@set@length}[3]{%
+  \ifcsname tocformat@maxdepth\endcsname\else
+    \let\tocformat@maxdepth\z@
+  \fi
+  \ifnum #1>\tocformat@maxdepth \xdef\tocformat@maxdepth{#1}\fi
+  \expandafter\xdef\csname tocformat@#1@maxnumwidth\endcsname{#2}%
+  \expandafter\xdef\csname tocformat@#1@maxleftskip\endcsname{#3}%
+}
+%    \end{macrocode}
+%
 % \begin{macro}{\tocformat@pnumbox}
 %    \begin{macrocode}
 \newcommand*\tocformat@pnumbox[1]{%
@@ -267,6 +376,10 @@
 }
 %    \end{macrocode}
 % \end{macro}
+%
+%    \begin{macrocode}
+\newcommand*{\tocformat@inner@numberline}[1]{#1\enskip}
+%    \end{macrocode}
 %
 % \begin{macro}{\tocformatdepth}
 % \begin{macro}{\tocformatdepthname}
