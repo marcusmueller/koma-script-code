@@ -1,4 +1,4 @@
-% \CheckSum{1659}
+% \CheckSum{1661}
 % \iffalse meta-comment
 % ======================================================================
 % tocstyle.dtx
@@ -373,13 +373,16 @@ for less width of page numbers at the first than the last TOC page!
 \begin{Description}
   \Option{stackedtocstyle}
   \Option{unstackedtocstyle}
+  \Option{unboxedtocstyle}
 \end{Description}%
 \BeginIndex{Option}{stackedtocstyle}\BeginIndex{Option}{unstackedtocstyle}%
+\BeginIndex{Option}{unboxedtocstyle}%
 %</doc>
 %<*dtx>
 %\fi
 \DescribeMacro{stackedtocstyle}
 \DescribeMacro{unstackedtocstyle}
+\DescribeMacro{unboxedtocstyle}
 %\iffalse
 %</dtx>
 %<*doc>
@@ -405,11 +408,71 @@ aligned\,---\,version of all TOCs. You know the unstacked version from the
     \selecttocstyleoption{unstackedtocstyle}%
   }]{toc}%
 \end{ShowOutput}
+The option \Option{unboxedtocstyle} is similar to unstacked version of all
+TOCs, but there is even no box of same width for the numbers of all entries.
+This may e.g. look like:
+\begin{ShowOutput}
+  \showtoc[{%
+    \aliastoc{\tocstyleTOC}{toc}%
+    \usetocstyle[toc]{standard}%
+    \selecttocstyleoption{unboxedtocstyle}%
+  }]{toc}%
+\end{ShowOutput}
 Default is option \Option{stackedtocstyle}.
 %\iffalse
 \EndIndex{Option}{stackedtocstyle}\EndIndex{Option}{unstackedtocstyle}%
+\EndIndex{Option}{unboxedtocstyle}%
 %\fi
 %
+%\iffalse
+\begin{Description}
+  \Option{tocdepthpenalties}\\
+  \Option{tocdepthlesspenatlies}
+\end{Description}%
+\BeginIndex{Option}{tocdepthpenalties}%
+\BeginIndex{Option}{tocdepthlesspenatlies}%
+%</doc>
+%<*dtx>
+%\fi
+\DescribeMacro{tocdepthpenalties}
+\DescribeMacro{tocdepthlesspenatlies}
+%\iffalse
+%</dtx>
+%<*doc>
+%\fi
+Default option \Option{tocdepthpenalties} sets a lot of penalties before and
+after TOC entries to avoid page break between a TOC entry and it's parent. But
+sometimes you may like to allow more page breaks. You may use option
+\Option{tocdepthlesspenatlies} for this.
+%\iffalse
+\EndIndex{Option}{tocdepthpenalties}\EndIndex{Option}{tocdepthlesspenatlies}%
+%\fi
+%
+%\iffalse
+\begin{Description}
+  \Option{indentalltocentries}\\
+  \Option{indentnumberedtocentries}
+\end{Description}%
+\BeginIndex{Option}{indentalltocentries}%
+\BeginIndex{Option}{indentnumberedtocentries}%
+%</doc>
+%<*dtx>
+%\fi
+\DescribeMacro{indentalltocentries}
+\DescribeMacro{indentnumberedtocentries}
+%\iffalse
+%</dtx>
+%<*doc>
+%\fi
+With default option \Option{indentnumberedtocentries} unnumbered TOC entries,
+e.g. from \KOMAScript{} command \Macro{\addchap}, are indented only as wide as
+the number of numbered TOC entries of the same level are. But with option
+\Option{indentalltocentries} these are indented as if they have an emptry
+number.
+%\iffalse
+\EndIndex{Option}{indentalltocentries}%
+\EndIndex{Option}{indentnumberedtocentries}%
+%\fi
 %
 \section{Using TOC Styles}
 \label{sec:tocstyle.usestyles}
@@ -492,7 +555,7 @@ others may not.
     \pventry{lol}{List of listings of package \Package{listings}. Currently
       the usability of \Package{listings} with \Package{tocstyle} is not
       recomended. Maybe it works, maybe not. Maybe you should try
-      \Macro{\usetocstyle[lol]}\PParameter{unspecified}.}
+      \Macro{\deactivatetocstyle[lol]}.}
   \end{desctabular}
 \end{table}
 %\iffalse
@@ -616,7 +679,8 @@ features. But wouldn't it be nice to define your own TOC style?
 
 %\iffalse
 \begin{Description}
-  \Macro{\newtocstyle}\OParameter[parent style]\Parameter{new style}%
+  \Macro{\newtocstyle}\OParameter{parent style}\OParameter{exclude features}%
+  \Parameter{new style}%
   \Parameter{\Macro{\settocstylefeature}-commands}
 \end{Description}%
 \BeginIndex{Macro}{\newtocstyle}%
@@ -625,18 +689,22 @@ features. But wouldn't it be nice to define your own TOC style?
 %\fi
 \DescribeMacro{\newtocstyle}
 You may do this using \Macro{\newtocstyle}\OParameter{parent
-  style} \Parameter{style
+  style} \OParameter{exclude features} \Parameter{style
   name} \Parameter{\Macro{\settocstylefeature}-commands}.
 %\iffalse
 %</dtx>
 %<*doc>
 %\fi
-If you used the optional Argument \PName{parent style} all features of the
+If you used the optional argument \PName{parent style} all features of the
 parent style will be part of the new style, before overwriting them with the
 features of the \Macro{\settocstylefeature}-commands. You should not use any
 other commands at the last argument. But at \Macro{\newtocstyle} the command
 \Macro{\settocfeature} becomes an alias for \Macro{\settocstylefeature} to
 avoid to much mistakes.
+
+The second optional argument is a comma seperated list of feature names. If it
+is used, these features of the parent style (and all ancestors of the parent)
+will not be part of the new style.
 %\iffalse
 \BeginIndex{Macro}{\newtocstyle}%
 %\fi
@@ -1732,7 +1800,6 @@ usefull to define your own toc styles.
 % \subsubsection{Defining Some TOC Styles}
 %
 %    \begin{macrocode}
-\newtocstyle{unspecified}{}
 \newtocstyle{standard}{%
   \settocfeature{dothook}{\normalfont}%
   \settocfeature[-1]{entryhook}{\bfseries}%
@@ -1822,6 +1889,17 @@ usefull to define your own toc styles.
   \settocfeature{leaders}{\quad}%
   \settocfeature{parfillskip}{\z@ plus 1fil}%
   \settocfeature{pagenumberbox}{\hbox}%
+}
+%    \end{macrocode}
+%
+% \subsubsection{Defining Some TOC Styles}
+%
+% Loading a optional configuration file.
+%    \begin{macrocode}
+\InputIfFileExists{tocstyle.cfg}{%
+  \PackageInfo{tocstyle}{using tocstyle.cfg}%
+}{%
+  \PackageInfo{tocstyle}{no tocstyle.cfg found}%
 }
 %    \end{macrocode}
 %
