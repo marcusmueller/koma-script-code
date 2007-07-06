@@ -1,4 +1,4 @@
-% \CheckSum{1440}
+% \CheckSum{1659}
 % \iffalse meta-comment
 % ======================================================================
 % tocstyle.dtx
@@ -298,11 +298,7 @@ you simply may decide not to use it.
   Loading the package \Package{tocstyle} will redefine the kernel macros
   \Macro{\@starttoc}, \Macro{\@dottedtocline}, and \Macro{\@numberline}. This
   must be done to add some new features to them. The package tests wether the
-  original kernel macros were used or not and warns if not. While some
-  \KOMAScript{} classes also change some of these macros, the use of this
-  package together with a \KOMAScript{} class will result in this
-  warning. This is correct, because some features of the \KOMAScript{} classes
-  will be replaced by features of this package.
+  original kernel macros were used or not and warns if not.
 
   Redefining these macros will activate the features of \Package{tocstyle} for
   all lists that uses these, e.g. table of contents, list of figures and list
@@ -551,9 +547,23 @@ features are show at \autoref{tab:tocstyle.features}.
   \caption{Features that May Be Set}
   \label{tab:tocstyle.features}
   \begin{desctabular}
-    \pventry{entryhook}{hook before the entry will be set}
-    \pventry{pagenumberhook}{hook before the page number will be set}
-    \multicolumn{2}{l}{More features will be implemented soon}\\
+    \pventry{dothook}{will be executed before any dot of the dot line}%
+    \pventry{entryhook}{hook before the entry will be set}%
+    \pventry{entryvskip}{initial vertical skip amount (if not set 0pt plus
+      .2pt will be used)}%
+    \pventry{leaders}{commands for fillin the gap between entry text and page
+      number (if not set the default leaders command with dots will be used)}%
+    \pventry{pagenumberbox}{the box command for setting the page number (if
+      not set the default box of with \Macro{\@pnumwidth} will be used); note,
+      that this has to be a command with exactly one argument}%
+    \pventry{pagenumberhook}{hook before the page number will be set at the
+      page number box}%
+    \pventry{parfillskip}{add this amount to the default value of
+      \Macro{\parfillskip} after setting up all lengths}%
+    \pventry{raggedhook}{the only allowed values here are \Macro{raggedright}
+      or nothing}%
+    \pventry{spaceafternumber}{amount of minimum space after the entry number,
+      if the needed width will be calculated automaticly}%
   \end{desctabular}
 \end{table}
 
@@ -853,31 +863,17 @@ usefull to define your own toc styles.
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}{\@dottedtocline}
-% This will be used even for undotted toc lines. First check the definition:
+% \begin{macro}{\tocstyle@saved@dottedtocline}
+% For saving the unchanged definition (at \cs{begin{document}}):
 %    \begin{macrocode}
-\CheckCommand*{\@dottedtocline}[5]{%
-  \ifnum #1>\c@tocdepth \else
-    \vskip \z@ \@plus.2\p@
-    {\leftskip #2\relax \rightskip \@tocrmarg \parfillskip -\rightskip
-     \parindent #2\relax\@afterindenttrue
-     \interlinepenalty\@M
-     \leavevmode
-     \@tempdima #3\relax
-     \advance\leftskip \@tempdima \null\nobreak\hskip -\leftskip
-     {#4}\nobreak
-     \leaders\hbox{$\m@th
-        \mkern \@dotsep mu\hbox{.}\mkern \@dotsep
-        mu$}\hfill
-     \nobreak
-     \hb@xt@\@pnumwidth{\hfil \normalfont \normalcolor #5}%
-     \par}%
-  \fi}
+\newcommand*{\tocstyle@saved@dottedtocline}{}
 %    \end{macrocode}
-% Now, redefine:
+% \end{macro}
+% \begin{macro}{\tocstyle@dottedtocline}
+% Implement new definition and redefine:
 %^^A ------ Help me to find the \renecommand*{\@dottedtocline} ----------------
 %    \begin{macrocode}
-\renewcommand*{\@dottedtocline}[5]{%
+\newcommand*{\tocstyle@dottedtocline}[5]{%
   \ifnum #1>\c@tocdepth \else
 %    \end{macrocode}
 % Penalty feature: no page break between higher and lower depths.
@@ -1035,25 +1031,19 @@ usefull to define your own toc styles.
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\numberline}
-%   This macro needed to be redefined to calculate the with of the numbers.
-%   First of all: check the definition. This is a bit more difficult, because
-%   of respecting \KOMAScript:
-%    \begin{macrocode}
-\def\@tempa#1{\hb@xt@\@tempdima{#1\autodot\hfil}}
-\ifx\numberline\@tempa\else
-  \CheckCommand*{\numberline}{\hb@xt@\@tempdima{#1\hfil}}
-\fi
-%    \end{macrocode}
-%   After this: redefine it.
+% \begin{macro}{\tocstyle@saved@numberline}
+% \begin{macro}{\tocstyle@numberline}
+%   Define a new \cs{numberline}, that will do all the job after
+%   \cs{begin{document}} and one to save the original definition.
 %^^A----------------------- \renewcommand*\numberline ------------------------
 %    \begin{macrocode}
-\renewcommand*{\numberline}[1]{%
+\newcommand*{\tocstyle@saved@numberline}{}
+\newcommand*{\tocstyle@numberline}[1]{%
   \begingroup
     \ifx\tocstyle@feature@spaceafternumber\relax
-      \settowidth\@tempdima{\tocstyle@numberline{#1}\enskip}%
+      \settowidth\@tempdima{\tocstyle@@numberline{#1}\enskip}%
     \else
-      \settowidth\@tempdima{\tocstyle@numberline{#1}}%
+      \settowidth\@tempdima{\tocstyle@@numberline{#1}}%
       \advance \@tempdima \tocstyle@feature@spaceafternumber\relax
     \fi
     \ifcsname tocstyle@numwidth@\tocstyleTOC @\tocstyledepth\endcsname
@@ -1071,37 +1061,42 @@ usefull to define your own toc styles.
     \hskip -\leftskip
   \fi
   \ifcase \tocstyle@indentstyle
-    \hb@xt@\@tempdima{\tocstyle@numberline{#1}\hfil}%
+    \hb@xt@\@tempdima{\tocstyle@@numberline{#1}\hfil}%
   \or
-    \hb@xt@\@tempdima{\tocstyle@numberline{#1}\hfil}%
+    \hb@xt@\@tempdima{\tocstyle@@numberline{#1}\hfil}%
   \else
     \ifx\tocstyle@feature@spaceafternumber\relax
-      \hbox{\tocstyle@numberline{#1}\enskip}%
+      \hbox{\tocstyle@@numberline{#1}\enskip}%
     \else
-      \hbox{\tocstyle@numberline{#1}\hskip
+      \hbox{\tocstyle@@numberline{#1}\hskip
         \tocstyle@feature@spaceafternumber\relax}%
     \fi
   \fi
 }
 %    \end{macrocode}
-% \begin{macro}{\tocstyle@numberline}
+% \begin{macro}{\tocstyle@@numberline}
 %   Do the main work!
 %    \begin{macrocode}
-\newcommand*{\tocstyle@numberline}[1]{%
+\newcommand*{\tocstyle@@numberline}[1]{%
   #1\csname autodot\endcsname
 }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
+% \end{macro}
 %
 % \subsubsection{Redefining Class Macros}
-%
-%    \begin{macrocode}
-%    \end{macrocode}
 %
 % \begin{macro}{\l@part}
 % \begin{macro}{\l@chapter}
 % \begin{macro}{\l@section}
+% \begin{macro}{\l@subsection}
+% \begin{macro}{\l@subsubsection}
+% \begin{macro}{\l@paragraph}
+% \begin{macro}{\l@subparagraph}
+% \begin{macro}{\l@table}
+% \begin{macro}{\l@figure}
+% Try to redefine the toc commands at startup.
 %    \begin{macrocode}
 \AtBeginDocument{%
   \ifcsname l@part\endcsname
@@ -1111,16 +1106,107 @@ usefull to define your own toc styles.
   \ifcsname l@chapter\endcsname
     \setbox\@tempboxa\vbox{\hsize\maxdimen
       \l@chapter{\tocstyle@l@define{chapter}{0}}{}}%
-  \else
-    \ifcsname l@section\endcsname
-      \setbox\@tempboxa\vbox{\hsize\maxdimen
-        \l@section{\tocstyle@l@define{section}{1}}{}}%
+  \fi
+  \ifcsname l@section\endcsname
+    \setbox\@tempboxa\vbox{\hsize\maxdimen
+      \l@section{\tocstyle@l@define{section}{1}}{}}%
+  \fi
+  \ifcsname l@subsection\endcsname
+    \setbox\@tempboxa\vbox{\hsize\maxdimen
+      \l@subsection{\tocstyle@l@define{subsection}{2}}{}}%
+  \fi
+  \ifcsname l@subsubsection\endcsname
+    \setbox\@tempboxa\vbox{\hsize\maxdimen
+      \l@subsubsection{\tocstyle@l@define{subsubsection}{3}}{}}%
+  \fi
+  \ifcsname l@paragraph\endcsname
+    \setbox\@tempboxa\vbox{\hsize\maxdimen
+      \l@paragraph{\tocstyle@l@define{paragraph}{4}}{}}%
+  \fi
+  \ifcsname l@subparagraph\endcsname
+    \setbox\@tempboxa\vbox{\hsize\maxdimen
+      \l@subparagraph{\tocstyle@l@define{subparagraph}{5}}{}}%
+  \fi
+  \ifcsname l@table\endcsname
+    \setbox\@tempboxa\vbox{\hsize\maxdimen
+      \l@table{\tocstyle@l@define{table}{1}}{}}%
+  \fi
+  \ifcsname l@figure\endcsname
+    \setbox\@tempboxa\vbox{\hsize\maxdimen
+      \l@figure{\tocstyle@l@define{figure}{1}}{}}%
+  \fi
+%    \end{macrocode}
+% \begin{macro}{\@dottedtocline}
+% This will be used even for undotted toc lines. First check the definition,
+% then redefine.
+%    \begin{macrocode}
+  \def\@tempa#1#2#3#4#5{%
+    \ifnum #1>\c@tocdepth \else
+      \vskip \z@ \@plus.2\p@
+      {\leftskip #2\relax \rightskip \@tocrmarg \parfillskip -\rightskip
+       \parindent #2\relax\@afterindenttrue
+       \interlinepenalty\@M
+       \leavevmode
+       \@tempdima #3\relax
+       \advance\leftskip \@tempdima \null\nobreak\hskip -\leftskip
+       {#4}\nobreak
+       \leaders\hbox{$\m@th
+          \mkern \@dotsep mu\hbox{.}\mkern \@dotsep
+          mu$}\hfill
+       \nobreak
+       \hb@xt@\@pnumwidth{\hfil \normalfont \normalcolor #5}%
+       \par}%
+    \fi}%
+  \ifx\@dottedtocline\@tempa\else
+    \tocstyle@macrochangewarning\@dottedtocline
+  \fi
+  \let\tocstyle@saved@dottedtocline\@dottedtocline
+  \let\@dottedtocline\tocstyle@dottedtocline
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\numberline}
+%   This macro needed to be redefined to calculate the with of the numbers.
+%   First of all: check the definition. This is a bit more difficult, because
+%   of respecting \KOMAScript:
+%    \begin{macrocode}
+  \def\@tempa#1{\hb@xt@\@tempdima{#1\autodot\hfil}}%
+  \ifx\numberline\@tempa\else
+    \def\@tempa#1{\hb@xt@\@tempdima{#1\hfil}}%
+    \ifx\numberline@tempa\else
+      \tocstyle@macrochangewarning\numberline
     \fi
   \fi
+  \let\tocstyle@saved@numberline\numberline
+  \let\numberline\tocstyle@numberline
 }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\tocstyle@macrochangewarning}
+%    \begin{macrocode}
+\newcommand*{\tocstyle@macrochangewarning}[1]{%
+  \PackageWarningNoLine{tocstyle}{%
+    unexpected \string#1\space definition!\MessageBreak
+    You are either using an unknown LaTeX kernel\MessageBreak
+    version, an unknown class or package, that redefines\MessageBreak
+    \string#1, or a \string#1\space
+    redefinition\MessageBreak
+    at the document preamble.\MessageBreak
+    Because of this you may get unexpected results!\MessageBreak
+    Maybe it would be better not to use package tocstyle}%
+  \PackageInfo{tocstyle}{Unexpected definition is:\MessageBreak
+    \meaning#1}%
+}
+%    \end{macrocode}
 % \end{macro}
 %
 % \begin{macro}{\tocstyle@l@define}
@@ -1128,12 +1214,17 @@ usefull to define your own toc styles.
 \newcommand*{\tocstyle@l@define}[2]{%
   \advance\leftskip-\@tempdima
   \edef\@tempa{%
+    \noexpand\global\noexpand\let
+    \expandafter\noexpand\csname tocstyle@saved@l@#1\endcsname
+    \expandafter\noexpand\csname l@#1\endcsname
     \noexpand\gdef
-    \expandafter\noexpand\csname l@#1\endcsname{%
+    \expandafter\noexpand\csname tocstyle@l@#1\endcsname{%
       \noexpand\@dottedtocline{#2}{\the\leftskip}{\the\@tempdima}}%
+    \noexpand\global\noexpand\let
+    \expandafter\noexpand\csname l@#1\endcsname
+    \expandafter\noexpand\csname tocstyle@l@#1\endcsname
   }%
-  \PackageInfo{tocstyle}{\expandafter\strip@prefix\meaning\@tempa
-    \MessageBreak o\expandafter\@gobble}%
+  \PackageInfo{tocstyle}{redefining \expandafter\string \csname l@#1\endcsname}%
   \@tempa
 }
 %    \end{macrocode}
@@ -1205,41 +1296,73 @@ usefull to define your own toc styles.
 % Commands before and after the original \cs{@starttoc}.
 %    \begin{macrocode}
 \newcommand*{\tocstyle@pre@starttoc}[1]{%
-  \parskip \z@
-  \parindent \z@
-  \parfillskip \z@\@plus 1fil
-  \ifcsname tocstyle@alias@TOC@#1\endcsname
-    \edef\tocstyleAliasTOC{\csname tocstyle@alias@TOC@#1\endcsname}%
+  \expandafter\ifx\csname tocstyle@deactivated@\endcsname\relax
+    \expandafter\ifx\csname tocstyle@deactivated@#1\endcsname\relax\relax
+      \tocstyle@activetrue
+    \else
+      \tocstyle@activefalse
+    \fi
   \else
-    \edef\tocstyleAliasTOC{#1}%
+    \tocstyle@activefalse
   \fi
-  \edef\tocstyleTOC{#1}%
+  \iftocstyle@active
+    \parskip \z@
+    \parindent \z@
+    \parfillskip \z@\@plus 1fil
+    \ifcsname tocstyle@alias@TOC@#1\endcsname
+      \edef\tocstyleAliasTOC{\csname tocstyle@alias@TOC@#1\endcsname}%
+    \else
+      \edef\tocstyleAliasTOC{#1}%
+    \fi
+    \edef\tocstyleTOC{#1}%
+  \else
+    \let\@dottedtocline\tocstyle@saved@dottedtocline
+    \let\numberline\tocstyle@saved@numberline
+    \ifcsname l@part\endcsname
+      \let\l@part\tocstyle@saved@l@part\fi
+    \ifcsname l@section\endcsname
+      \let\l@section\tocstyle@saved@l@section\fi
+    \ifcsname l@subsection\endcsname
+      \let\l@subsection\tocstyle@saved@l@subsection\fi
+    \ifcsname l@subsubsection\endcsname
+      \let\l@subsubsection\tocstyle@saved@l@subsubsection\fi
+    \ifcsname l@paragraph\endcsname
+      \let\l@paragraph\tocstyle@saved@l@paragraph\fi
+    \ifcsname l@subparagraph\endcsname
+      \let\l@subparagraph\tocstyle@saved@l@subparagraph\fi
+    \ifcsname l@table\endcsname
+      \let\l@table\tocstyle@saved@l@table\fi
+    \ifcsname l@figure\endcsname
+      \let\l@figure\tocstyle@saved@l@figure\fi
+  \fi
 }
 \newcommand*{\tocstyle@post@starttoc}[1]{%
-  \if@filesw
-    \ifcsname tocstyle@unumwidth@#1@\endcsname
-      \protected@write\@auxout{}{%
-        \protect\tocstyle@set@width{unum}{#1}{}{%
-          \csname tocstyle@unumwidth@#1@\endcsname}%
-      }%
-    \fi
-    \expandafter\let\expandafter\@tempa\csname tocstyle@depthlist@#1\endcsname
-    \ifx\@tempa\relax\else
-      \expandafter\@for \expandafter\@tempa\expandafter:\expandafter=\@tempa
-      \do {
-        \ifcsname tocstyle@numwidth@#1@\@tempa\endcsname
-          \protected@write\@auxout{}{%
-            \protect\tocstyle@set@width{num}{#1}{\@tempa}{%
-              \csname tocstyle@numwidth@#1@\@tempa\endcsname}%
-          }%
-        \fi
-        \ifcsname tocstyle@skipwidth@#1@\@tempa\endcsname
-          \protected@write\@auxout{}{%
-            \protect\tocstyle@set@width{skip}{#1}{\@tempa}{%
-              \csname tocstyle@skipwidth@#1@\@tempa\endcsname}%
-          }%
-        \fi
-      }%
+  \iftocstyle@active
+    \if@filesw
+      \ifcsname tocstyle@unumwidth@#1@\endcsname
+        \protected@write\@auxout{}{%
+          \protect\tocstyle@set@width{unum}{#1}{}{%
+            \csname tocstyle@unumwidth@#1@\endcsname}%
+        }%
+      \fi
+      \expandafter\let\expandafter\@tempa\csname tocstyle@depthlist@#1\endcsname
+      \ifx\@tempa\relax\else
+        \expandafter\@for \expandafter\@tempa\expandafter:\expandafter=\@tempa
+        \do {%
+          \ifcsname tocstyle@numwidth@#1@\@tempa\endcsname
+            \protected@write\@auxout{}{%
+              \protect\tocstyle@set@width{num}{#1}{\@tempa}{%
+                \csname tocstyle@numwidth@#1@\@tempa\endcsname}%
+            }%
+          \fi
+          \ifcsname tocstyle@skipwidth@#1@\@tempa\endcsname
+            \protected@write\@auxout{}{%
+              \protect\tocstyle@set@width{skip}{#1}{\@tempa}{%
+                \csname tocstyle@skipwidth@#1@\@tempa\endcsname}%
+            }%
+          \fi
+        }%
+      \fi
     \fi
   \fi
 }
@@ -1270,6 +1393,19 @@ usefull to define your own toc styles.
 %    \begin{macrocode}
 \newcommand*{\tocstyledepth}{}
 %    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\deactivatetoc}%
+% \begin{macro}{\reactivatetoc}%
+%     You may (de)activate all influence of tocstyle either for one or all TOCs.
+%    \begin{macrocode}
+\newif\iftocstyle@active
+\newcommand*{\deactivatetoc}[1][]{%
+  \expandafter\let\csname tocstyle@deactivated@#1\endcsname\@empty}
+\newcommand*{\reactivatetoc}[1][]{%
+  \expandafter\let\csname tocstyle@deactivated@#1\endcsname\relax}
+%    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
 % \begin{macro}{\settocfeature}
