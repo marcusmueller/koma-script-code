@@ -1,4 +1,4 @@
-% \CheckSum{1798}
+% \CheckSum{1848}
 % \iffalse meta-comment
 % ======================================================================
 % scrknpap.dtx
@@ -445,6 +445,19 @@
 %   verkneifen.}. 
 % Deshalb kann alternativ zum Einschalten des Betreff-Titels hier auch
 % dies aktiviert werden.
+% \begin{macro}{\subject@format}
+%   \changes{v2.97c}{2007/07/06}{neu (intern)}
+%   Das Format des Betreffs kann geändert werden.
+%    \begin{macrocode}
+\newcommand{\subject@format}[1]{#1}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\raggedsubject}
+%   \changes{v2.97c}{2007/07/06}{neu (intern)}
+%    \begin{macrocode}
+\newcommand*{\raggedsubject}{}
+%    \end{macrocode}
+% \end{macro}
 % \begin{macro}{\if@subj}
 % \begin{macro}{\@subjtrue}
 % \begin{macro}{\@subjfalse}
@@ -457,25 +470,34 @@
 \newif\if@subjafter
 \KOMA@key{subject}{%
   \begingroup
-    \KOMA@set@ncmdkey{locfield}{@tempa}{%
+    \KOMA@set@ncmdkey{subject}{@tempa}{%
       {titled}{0},%
       {untitled}{1},%
       {afteropening}{2},%
-      {beforeopening}{3}%
+      {beforeopening}{3},%
+      {underlined}{4},%
+      {left}{5},%
+      {right}{6},%
+      {centered}{7}%
     }{#1}%
     \ifcase\@tempa
-      \endgroup
-      \@subjtrue
+      \aftergroup\@subjtrue
     \or
-      \endgroup
-      \@subjfalse
+      \aftergroup\@subjfalse
     \or
-      \endgroup
-      \@subjaftertrue
-    \else
-      \endgroup
-      \@subjafterfalse
+      \aftergroup\@subjaftertrue
+    \or
+      \aftergroup\@subjafterfalse
+    \or
+      \aftergroup\let\aftergroup\subject@format\aftergroup\underline
+    \or
+      \aftergroup\let\aftergroup\raggedsubject\aftergroup\raggedright
+    \or
+      \aftergroup\let\aftergroup\raggedsubject\aftergroup\raggedleft
+    \or
+      \aftergroup\let\aftergroup\raggedsubject\aftergroup\centering
     \fi
+  \endgroup
 }
 %    \end{macrocode}
 % \end{macro}
@@ -1749,15 +1771,22 @@
     \ifkomavarempty{subject}{%
       \typeout{Subject: no}%
     }{%
-      \if@subjafter%
-        \typeout{Subject: after opening}%
-        \centering%
-      \else%
-        \typeout{Subject: before opening}%
-        \noindent%
-      \fi%
-      {\usekomafont{subject}\if@subj\@hangfrom{\usekomavar*{subject}}\fi%
-        {\usekomavar{subject}}\par}\vskip2\baselineskip%
+      \ifx\raggedsubject\@empty
+        \if@subjafter%
+          \typeout{Subject: after opening}%
+          \let\raggedsubject\centering%
+        \else%
+          \typeout{Subject: before opening}%
+          \def\raggedsubject{\noindent\@hangfrom}%
+        \fi%
+      \fi
+      {%
+        \usekomafont{subject}%
+        \show\raggedsubject
+        \raggedsubject{\if@subj \subject@format{\strut\ignorespaces
+            \usekomavar*{subject}}\fi}%
+        \subject@format{\strut\ignorespaces\usekomavar{subject}}\par
+      }\vskip2\baselineskip%
     }%
   }%
 }
