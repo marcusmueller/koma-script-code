@@ -1,4 +1,4 @@
-% \CheckSum{1785}
+% \CheckSum{1798}
 % \iffalse meta-comment
 % ======================================================================
 % scrknpap.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrknpap.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrknpap.dtx}[2007/05/17 v2.97c KOMA-Script (note-paper)]
+\ProvidesFile{scrknpap.dtx}[2007/07/06 v2.97c KOMA-Script (note-paper)]
 % \iffalse
 \documentclass{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -865,6 +865,38 @@
 %    \end{macrocode}
 % \end{KOMAfont}
 %
+% \begin{KOMAfont}{specialmail}
+%   \changes{v2.97c}{2007/07/06}{Neues Font-Element}
+% Die Versandart.
+%    \begin{macrocode}
+\newkomafont{specialmail}{}
+%    \end{macrocode}
+% \end{KOMAfont}
+%
+% \begin{KOMAfont}{addressee}
+%   \changes{v2.97c}{2007/07/06}{Neues Font-Element}
+%   Die komplette Anschrift.
+%    \begin{macrocode}
+\newkomafont{addressee}{}
+%    \end{macrocode}
+% \end{KOMAfont}
+%
+% \begin{KOMAfont}{toname}
+%   \changes{v2.97c}{2007/07/06}{Neues Font-Element}
+%   Der Name des Empfängers in der Anschrift.
+%    \begin{macrocode}
+\newkomafont{toname}{}
+%    \end{macrocode}
+% \end{KOMAfont}
+%
+% \begin{KOMAfont}{toaddress}
+%   \changes{v2.97c}{2007/07/06}{Neues Font-Element}
+%   Die Adresse des Empfängers in der Anschrift.
+%    \begin{macrocode}
+\newkomafont{toaddress}{}
+%    \end{macrocode}
+% \end{KOMAfont}
+%
 % \begin{KOMAfont}{refname}
 %   \changes{v2.97c}{2007/05/14}{Neues Font-Element}
 % Die Feldnamen in der Geschäftszeile.
@@ -1382,15 +1414,18 @@
             \ifkomavarempty{specialmail}{}{%
               \vbox{\hsize\useplength{toaddrwidth}%
                 \noindent\hspace*{\useplength{specialmailindent}}%
-                \underline{\usekomavar{specialmail}}%
+                \specialmail@format{%
+                  \usekomafont{specialmail}\usekomavar{specialmail}}%
                 \hspace*{\useplength{specialmailrightindent}}}%
             }%
             \vfil%
             \noindent\hskip\useplength{toaddrindent}%
             \setlength{\@tempdima}{\useplength{toaddrwidth}}%
             \addtolengthplength[-2]{\@tempdima}{toaddrindent}%
-            \vbox{\hsize\@tempdima%
-              \noindent\usekomavar{toname}\\\usekomavar{toaddress}}%
+            \vbox{\hsize\@tempdima\raggedright
+              \usekomafont{addressee}{%
+                \usekomafont{toname}{\usekomavar{toname}\\}%
+                \usekomafont{toaddress}{\usekomavar{toaddress}}}}%
             \vfil\null}%
           {address field}{toaddrheight}%
           {\begin{letter} or you\MessageBreak
@@ -1403,6 +1438,15 @@
   \fi
   }
 %    \end{macrocode}
+% \begin{macro}{\specialmail@format}
+%   \changes{v2.97c}{2007/07/06}{neu (intern)}
+%   Die Anweisung, die für das Aussehen der Versandart zuständig ist.
+%    \begin{macrocode}
+\newcommand*{\specialmail@format}[1]{}
+\let\specialmail@format\underline
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}{\@ogobble}
 %   \changes{v2.8q}{2002/01/22}{Neu}
 % In obiger Definition wird das Makro \cs{@ogobble} verwendet, um
