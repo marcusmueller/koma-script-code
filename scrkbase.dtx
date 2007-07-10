@@ -1,4 +1,4 @@
-% \CheckSum{951}
+% \CheckSum{971}
 % \iffalse meta-comment
 % ======================================================================
 % scrkbase.dtx
@@ -930,6 +930,30 @@
   \post@kopt@hook
 }
 %    \end{macrocode}
+% \begin{macro}{\l@addto@macro}
+%   \changes{v2.8p}{2001/09/22}{neu (intern)} 
+%   Damit \cs{AfterKOMAoptions} lokal möglich ist, wird eine lokal arbeitende
+%   Variante von \cs{g@addto@macro} benötigt, wie sie hier vorgestellt wird.
+%   \changes{v2.95}{2006/06/02}{korrigiert, damit es sich bezüglich
+%     Erweiterung um Makrodefinitonen mit Argumenten wie \cs{g@addto@macro}
+%     verhält}
+%    \begin{macrocode}
+\scr@ifundefinedorrelax{unexpanded}{%
+  \newcommand*{\g@addto@macro@temp}{}%
+  \newcommand{\l@addto@macro}[2]{%
+    \begingroup%
+      \toks@\expandafter{#1#2}%
+      \xdef\g@addto@macro@temp{\the\toks@}%
+    \endgroup
+    \let#1\g@addto@macro@temp
+  }%
+}{%
+  \newcommand{\l@addto@macro}[2]{%
+    \edef#1{\unexpanded\expandafter{#1#2}}%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
