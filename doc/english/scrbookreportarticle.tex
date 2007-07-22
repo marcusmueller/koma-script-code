@@ -45,7 +45,7 @@
 %
 % ============================================================================
 
-\ProvidesFile{scrbookreportarticle.tex}[2007/07/21 KOMA-Script guide (chapter:
+\ProvidesFile{scrbookreportarticle.tex}[2007/07/22 KOMA-Script guide (chapter:
 scrbook, scrreprt, scrartcl)]
 % Date of translated german file: 2005-11-26
 
@@ -3816,12 +3816,13 @@ These two environments are also list environments and can be found
 both in the standard and the {\KOMAScript} classes. Both environments
 use justified text which is indented both on the left and right side.
 Usually they are used to separate long citations\Index{citations} from
-the main text. The difference between these two lies in the matter how
-paragraphs are typeset. While \Environment{quote} paragraphs are
+the main text. The difference between these two lies in the manner in
+which paragraphs are typeset. While \Environment{quote} paragraphs are
 highlighted by vertical space, in \Environment{quotation} paragraphs
 the first line is indented. This is also true for the first line of a
-\Environment{quotation} environment. To get around this behaviour you
-have to insert a \Macro{noindent} command\IndexCmd{noindent} in front.
+\Environment{quotation} environment. To prevent indentation you have
+to insert a \Macro{noindent} command\IndexCmd{noindent} before the
+text.
 \begin{Example}
   You want to highlight a short anecdote. You write the following
   \Environment{quotation} environment for this:
@@ -3894,22 +3895,26 @@ have to insert a \Macro{noindent} command\IndexCmd{noindent} in front.
   \Environment{addmargin*}\OParameter{inner indentation}\Parameter{indentation}
 \end{Declaration}
 \BeginIndex{Env}{addmargin}%
-Similar to \Environment{quote} and \Environment{quotation} the
+Similar to \Environment{quote} and \Environment{quotation}, the
 \Environment{addmargin} environment changes the margin\Index{margin}.
-Different to the first two environments using \Environment{addmargin}
-the user can influence the width of the indentation. Furthermore this
-environment doesn't change the indentation of the first line and the
-vertical spacing between paragraphs.
+In contrast to the first two environments, with
+\Environment{addmargin} the user can set the width of the
+indentation. Besides this, this environment does not change the
+indentation of the first line nor the vertical spacing between
+paragraphs.
 
 If only the obligatory argument \PName{indentation} is given, both the
 left and right margin are expanded by this value. If the optional
-argument \PName{indentation} is given the value \PName{left
-  indentation} is added to \PName{indentation} at the left margin.
+argument \PName{left indentation} is given as well, then at the left
+margin the value \PName{left indentation} is used instead of
+\PName{indentation}.
 
 The starred \Environment{addmargin*} only differs from the normal
-version in a twoside layout. In addition the difference only occurs if
-the optional argument \PName{inner indentation} is used. In this case
-this value is added to the normal inner indentation. Then the value of
+version in a two-sided layout. Furthermore, the difference only occurs
+if the optional argument \PName{inner indentation} is used. In this
+case this value \PName{inner indentation} is added to the normal inner
+indentation. For right-hand pages this is the left margin, for
+left-hand pages the right margin. Then the value of
 \PName{indentation} determines the width of the opposite margin.
 
 Both versions of this environment take also negative values for all
@@ -3918,7 +3923,7 @@ margin.
 \begin{Example}
   Suppose you write a documentation which includes short source code
   examples. To highlight these you want them separated from the text
-  by a horizontal line and slightly spanning into the outer
+  by a horizontal line and shifted slightly into the outer
   margin. First you define the environment:
 \begin{lstlisting}
   \newenvironment{SourceCodeFrame}{%
@@ -3957,48 +3962,52 @@ margin.
 }
 \end{lstlisting}
   \end{SourceCodeFrame}
-  This may be feasible or not. In any way it shows the usage of this
+  This may be feasible or not. In any case it shows the usage of this
   environment.
   \end{ShowOutput}
   The optional argument of the \Environment{addmargin*} environment
   makes sure that the inner margin is extended by 1\Unit{em}. In turn
   the outer margin is decreased by 1\Unit{em}. The result is a shift
-  by 1\Unit{em} to the outside.  Instead of \PValue{1em} you can use a
-  length of, for example, \PValue{2\Macro{parindent}} of course.
+  by 1\Unit{em} to the outside.  Instead of \PValue{1em} you can of
+  course use a length, for example, \PValue{2\Macro{parindent}}.
 \end{Example}
 There is one problem with the \Environment{addmargin*} which you
 should be aware of. If a page break occurs within an
-\Environment{addmargin*} environment the indentation on the following
-page is on the wrong side.  This means that suddenly the \PName{inner
-  indentation} is applied on the outside of the page. Therefore it is
-recommended to prevent page breaks within this environment. This can
-be achieved by using an additional \Macro{parbox} or, as in the
-example above, a \Environment{minipage}. This makes use of the fact
-that neither the argument of a \Macro{parbox} nor the content of a
-\Environment{minipage} is broken at the end of a page.  Unfortunately
-this is not without disadvantages: In some cases pages can't be filled
-correctly which has the effect of several warnings.
+\Environment{addmargin*} environment, the indentation on the following
+page will be on the wrong side.  This means that suddenly the
+\PName{inner indentation} is applied on the outside of the
+page. Therefore it is recommended to prevent page breaks within this
+environment. This can be achieved by using an additional
+\Macro{parbox} or, as in the example above, a
+\Environment{minipage}. This makes use of the fact that neither the
+argument of a \Macro{parbox} nor the content of a
+\Environment{minipage} breaks at the end of a page.  Unfortunately
+this is not without another disadvantage: in some cases pages can no
+longer be filled correctly, which has the effect of generating several
+warnings.
 
-By the way, whether a page is going to be on the left or right side of the
-book can't be determined in the first \LaTeX\ compiling for sure.  For details
-please refer to the explanation for the command \Macro{ifthispageodd} and
-\Macro{ifthispagewasodd} at \autoref{sec:maincls.pageStyle},
+Incidentally, whether a page is going to be on the left or right side
+of the book can not be determined for certain in the first {\LaTeX}
+run.  For details please refer to the explanation of the commands
+\Macro{ifthispageodd} and \Macro{ifthispagewasodd} in
+\autoref{sec:maincls.pageStyle},
 \autopageref{desc:maincls.macro.ifthispageodd}.
 %
 \EndIndex{Env}{addmargin}%
 
 
 \begin{Explain}
-  One concluding note to the list environments: In the internet and
-  support it is often asked why such an environment is followed by a
-  indented\Index{indentation} paragraph. In fact this is the result of
-  demanding a new paragraph. In \LaTeX\ empty lines are interpreted as
-  a new paragraph. This is also the case before and after list
-  environments. Thus, if you want a list environment to be set within
-  a paragraph you have to omit empty lines before and after. To
-  separate this environment from the rest of your text nevertheless,
-  you can insert a comment line which only consists of a percent
-  character in the {\LaTeX} source.
+  One concluding remark on list environments: on the internet and
+  during support it is often asked why such an environment is followed
+  by a indented\Index{indentation} paragraph. In fact, this is not the
+  case but is the result of the user demanding a new paragraph. In
+  {\LaTeX} empty lines are interpreted as a new paragraph. This is
+  also the case before and after list environments. Thus, if you want
+  a list environment to be set within a paragraph you have to omit
+  empty lines before and after. To nevertheless separate the
+  environment from the rest of your text in the {\LaTeX} source file,
+  you can insert a comment line before and after, that is, lines which
+  begin with a percent character and contain nothing more.
 \end{Explain}
 \EndIndex[indexother]{}{lists}
 
