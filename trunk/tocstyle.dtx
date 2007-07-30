@@ -1,4 +1,4 @@
-% \CheckSum{1672}
+% \CheckSum{1623}
 % \iffalse meta-comment
 % ======================================================================
 % tocstyle.dtx
@@ -295,33 +295,36 @@ you simply may decide not to use it.
 \label{sec:tocstyle.howitworks}
 
 \begin{Explain}
-  Loading the package \Package{tocstyle} will redefine the kernel macros
-  \Macro{@starttoc}, \Macro{@dottedtocline}, and \Macro{@numberline}. This
-  must be done to add some new features to them. The package tests wether the
-  original kernel macros were used or not and warns if not.
+  Loading the package \Package{tocstyle} will redefine the kernel macro
+  \Macro{@starttoc}. Using the redefined \Macro{@starttoc} will redefine
+  \Macro{@dottedtocline}, \Macro{l@part} down to \Macro{l@subparagraph},
+  \Macro{l@figure}, and \Macro{l@table}, if and only if \Package{tocstyle}
+  wasn't deactivated for all TOCs or this TOC. Usage the redefined
+  \Macro{@dottedtocline} will redefine \Macro{numberline}.
 
-  Redefining these macros will activate the features of \Package{tocstyle} for
-  all lists that uses these, e.g. table of contents, list of figures and list
-  of tables at the standard or the \KOMAScript{} classes. But while not all
-  classes uses \Macro{@dottedtocline} and \Macro{@numberline} for all
-  entries to table of contents and list of floats the package may optionally
-  redefine some other macros that are typically used for those entries. These
-  are e.g. \Macro{l@part}, \Macro{l@chapter} and some more. If the class even
-  does not use those macros, you may not use \Package{tocstyle} to change the
-  lists. The term TOC will be used for all kind of list, that may be processed
-  by \Package{tocstyle}.
+  Redefining \Macro{@starttoc}, \Macro{@dottedtocline}, and \Macro{numberline}
+  will activate the features of \Package{tocstyle} for all lists that uses
+  these, e.g. table of contents, list of figures and list of tables at the
+  standard or the \KOMAScript{} classes. But while not all classes uses
+  \Macro{@dottedtocline} and \Macro{@numberline} for all entries to table of
+  contents and list of floats the package redefines some other macros that are
+  typically used for those entries. These are e.g. \Macro{l@part},
+  \Macro{l@chapter} and some more. If the class even does not use those
+  macros, you may not use \Package{tocstyle} to change the lists. The term TOC
+  will be used for all kind of list, that may be processed by
+  \Package{tocstyle}. The package tests wether the original kernel macros
+  \Macro{@starttoc}, \Macro{@dottedtocline}, and \Macro{numberline} were used
+  or not and warns if not.
 
   Package \Package{tocstyle} needs some more information. For the standard and
-  the \KOMAScript{} classes these informations may detected by the package. If
-  the result is not the expected, you may configure these informations
-  manually.
+  the \KOMAScript{} classes these informations may be detected by the
+  package. If the result is not the expected, you may configure these
+  informations manually.
 
   The entries of every TOC hat a depth. See the counter \Counter{tocdepth} for
   more information about the depth. You may change several settings for the
-  entroes of either all depths of all TOCs, all depths of one TOC, or one
-  depth of one TOC. If \Package{tocstyle} knows the name of a depth
-  (e.g. ``chapter'', ``section'', or ``figure'') you may configure by the
-  name, too.
+  entries of either all depths of all TOCs, all depths of one TOC, or one
+  depth of one TOC. 
 
   But most users will not need to set up \Package{tocstyle} at this low
   level. They simply will select one of the predefined styles and maybe select
@@ -725,7 +728,7 @@ usefull to define your own toc styles.
 %   \section{Examples for the Different TOC Styles}
 %   Here you will find the table of contents of this document set in the
 %   different TOC styles. All are set with option \Option{autotocwidth}.
-%^^A   The appendix wil be omitted.
+%^^A   The appendix will be omitted.
 %   \subsection{Graduated Versions}
 %   First of all all graduated versions of the table of contents
 %   \selecttocstyleoption{tocgraduated}%
@@ -948,11 +951,9 @@ usefull to define your own toc styles.
 \newcommand*\tocstyle@saved@starttoc{}
 \let\tocstyle@saved@starttoc\@starttoc
 \renewcommand*{\@starttoc}[1]{%
-  \begingroup
-    \tocstyle@pre@starttoc{#1}%
-    \tocstyle@saved@starttoc{#1}%
-    \tocstyle@post@starttoc{#1}%
-  \endgroup
+  \tocstyle@pre@starttoc{#1}%
+  \tocstyle@saved@starttoc{#1}%
+  \tocstyle@post@starttoc{#1}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -969,6 +970,7 @@ usefull to define your own toc styles.
 %^^A ------ Help me to find the \renecommand*{\@dottedtocline} ----------------
 %    \begin{macrocode}
 \newcommand*{\tocstyle@dottedtocline}[5]{%
+  \let\numberline\tocstyle@numberline
   \ifnum #1>\c@tocdepth \else
 %    \end{macrocode}
 % Penalty feature: no page break between higher and lower depths.
@@ -1261,7 +1263,6 @@ usefull to define your own toc styles.
     \tocstyle@macrochangewarning\@dottedtocline
   \fi
   \let\tocstyle@saved@dottedtocline\@dottedtocline
-  \let\@dottedtocline\tocstyle@dottedtocline
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\numberline}
@@ -1277,7 +1278,6 @@ usefull to define your own toc styles.
     \fi
   \fi
   \let\tocstyle@saved@numberline\numberline
-  \let\numberline\tocstyle@numberline
 }
 %    \end{macrocode}
 % \end{macro}
@@ -1310,7 +1310,9 @@ usefull to define your own toc styles.
 % \end{macro}
 %
 % \begin{macro}{\tocstyle@l@define}
+% \begin{macro}{\tocstyle@activate@all@l}
 %    \begin{macrocode}
+\newcommand*{\tocstyle@activate@all@l}{}
 \newcommand*{\tocstyle@l@define}[2]{%
   \advance\leftskip-\@tempdima
   \edef\@tempa{%
@@ -1320,14 +1322,17 @@ usefull to define your own toc styles.
     \noexpand\gdef
     \expandafter\noexpand\csname tocstyle@l@#1\endcsname{%
       \noexpand\@dottedtocline{#2}{\the\leftskip}{\the\@tempdima}}%
-    \noexpand\global\noexpand\let
-    \expandafter\noexpand\csname l@#1\endcsname
-    \expandafter\noexpand\csname tocstyle@l@#1\endcsname
+    \noexpand\g@addto@macro\noexpand\tocstyle@activate@all@l{%
+      \noexpand\let\expandafter\noexpand\csname l@#1\endcsname
+      \expandafter\noexpand\csname tocstyle@l@#1\endcsname
+    }%
   }%
-  \PackageInfo{tocstyle}{redefining \expandafter\string \csname l@#1\endcsname}%
+  \PackageInfo{tocstyle}{prepare \expandafter\string 
+    \csname l@#1\endcsname\space for redefinition}%
   \@tempa
 }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
 % \subsubsection{New Macros}
@@ -1351,8 +1356,8 @@ usefull to define your own toc styles.
     \edef\tocstyleAliasTOC{#2}%
     \edef\tocstyleTOC{#2\csname tocstyle@copyname@#2\endcsname}%
     #1
-    \makeatletter
     \tocstyle@pre@starttoc{#2\csname tocstyle@copyname@#2\endcsname}%
+    \makeatletter
     \@input{\jobname.#2\csname tocstyle@copyname@#2\endcsname}%
     \@nobreakfalse
     \tocstyle@post@starttoc{#2\csname tocstyle@copyname@#2\endcsname}%
@@ -1396,75 +1401,61 @@ usefull to define your own toc styles.
 % Commands before and after the original \cs{@starttoc}.
 %    \begin{macrocode}
 \newcommand*{\tocstyle@pre@starttoc}[1]{%
-  \expandafter\ifx\csname tocstyle@deactivated@\endcsname\relax
-    \expandafter\ifx\csname tocstyle@deactivated@#1\endcsname\relax\relax
-      \tocstyle@activetrue
+  \begingroup
+    \expandafter\ifx\csname tocstyle@deactivated@\endcsname\relax
+      \expandafter\ifx\csname tocstyle@deactivated@#1\endcsname\relax\relax
+        \tocstyle@activetrue
+      \else
+        \tocstyle@activefalse
+      \fi
     \else
       \tocstyle@activefalse
     \fi
-  \else
-    \tocstyle@activefalse
-  \fi
-  \iftocstyle@active
-    \parskip \z@
-    \parindent \z@
-    \parfillskip \z@\@plus 1fil
-    \ifcsname tocstyle@alias@TOC@#1\endcsname
-      \edef\tocstyleAliasTOC{\csname tocstyle@alias@TOC@#1\endcsname}%
-    \else
-      \edef\tocstyleAliasTOC{#1}%
+    \iftocstyle@active
+      \let\@dottedtocline\tocstyle@dottedtocline
+      \parskip \z@
+      \parindent \z@
+      \parfillskip \z@\@plus 1fil
+      \ifcsname tocstyle@alias@TOC@#1\endcsname
+        \edef\tocstyleAliasTOC{\csname tocstyle@alias@TOC@#1\endcsname}%
+      \else
+        \edef\tocstyleAliasTOC{#1}%
+      \fi
+      \edef\tocstyleTOC{#1}%
+      \tocstyle@activate@all@l
     \fi
-    \edef\tocstyleTOC{#1}%
-  \else
-    \let\@dottedtocline\tocstyle@saved@dottedtocline
-    \let\numberline\tocstyle@saved@numberline
-    \ifcsname l@part\endcsname
-      \let\l@part\tocstyle@saved@l@part\fi
-    \ifcsname l@section\endcsname
-      \let\l@section\tocstyle@saved@l@section\fi
-    \ifcsname l@subsection\endcsname
-      \let\l@subsection\tocstyle@saved@l@subsection\fi
-    \ifcsname l@subsubsection\endcsname
-      \let\l@subsubsection\tocstyle@saved@l@subsubsection\fi
-    \ifcsname l@paragraph\endcsname
-      \let\l@paragraph\tocstyle@saved@l@paragraph\fi
-    \ifcsname l@subparagraph\endcsname
-      \let\l@subparagraph\tocstyle@saved@l@subparagraph\fi
-    \ifcsname l@table\endcsname
-      \let\l@table\tocstyle@saved@l@table\fi
-    \ifcsname l@figure\endcsname
-      \let\l@figure\tocstyle@saved@l@figure\fi
-  \fi
 }
 \newcommand*{\tocstyle@post@starttoc}[1]{%
-  \iftocstyle@active
-    \if@filesw
-      \ifcsname tocstyle@unumwidth@#1@\endcsname
-        \protected@write\@auxout{}{%
-          \protect\tocstyle@set@width{unum}{#1}{}{%
-            \csname tocstyle@unumwidth@#1@\endcsname}%
-        }%
-      \fi
-      \expandafter\let\expandafter\@tempa\csname tocstyle@depthlist@#1\endcsname
-      \ifx\@tempa\relax\else
-        \expandafter\@for \expandafter\@tempa\expandafter:\expandafter=\@tempa
-        \do {%
-          \ifcsname tocstyle@numwidth@#1@\@tempa\endcsname
-            \protected@write\@auxout{}{%
-              \protect\tocstyle@set@width{num}{#1}{\@tempa}{%
-                \csname tocstyle@numwidth@#1@\@tempa\endcsname}%
-            }%
-          \fi
-          \ifcsname tocstyle@skipwidth@#1@\@tempa\endcsname
-            \protected@write\@auxout{}{%
-              \protect\tocstyle@set@width{skip}{#1}{\@tempa}{%
-                \csname tocstyle@skipwidth@#1@\@tempa\endcsname}%
-            }%
-          \fi
-        }%
+    \iftocstyle@active
+      \if@filesw
+        \ifcsname tocstyle@unumwidth@#1@\endcsname
+          \protected@write\@auxout{}{%
+            \protect\tocstyle@set@width{unum}{#1}{}{%
+              \csname tocstyle@unumwidth@#1@\endcsname}%
+          }%
+        \fi
+        \expandafter\let\expandafter\@tempa
+          \csname tocstyle@depthlist@#1\endcsname
+        \ifx\@tempa\relax\else
+          \expandafter\@for \expandafter\@tempa\expandafter:\expandafter=\@tempa
+          \do {%
+            \ifcsname tocstyle@numwidth@#1@\@tempa\endcsname
+              \protected@write\@auxout{}{%
+                \protect\tocstyle@set@width{num}{#1}{\@tempa}{%
+                  \csname tocstyle@numwidth@#1@\@tempa\endcsname}%
+              }%
+            \fi
+            \ifcsname tocstyle@skipwidth@#1@\@tempa\endcsname
+              \protected@write\@auxout{}{%
+                \protect\tocstyle@set@width{skip}{#1}{\@tempa}{%
+                  \csname tocstyle@skipwidth@#1@\@tempa\endcsname}%
+              }%
+            \fi
+          }%
+        \fi
       \fi
     \fi
-  \fi
+  \endgroup
 }
 %    \end{macrocode}
 % \end{macro}
