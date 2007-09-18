@@ -335,6 +335,92 @@
 %    \end{macrocode}
 %
 %
+% \section{Collect All Translators}
+%
+% At the translated guides, the translators should also be shown somewhere at
+% the title.
+%
+% \begin{macro}{\translator}
+%   \changes{v0.9d}{2007/09/18}{new}
+% This macro is used, so save one or more translators into the aux file.
+%    \begin{macrocode}
+\newcommand*{\translator}[1]{%
+  \protected@write\@auxout{\def\and{,}}{%
+    \protect\@addtranslators{#1}%
+  }%
+}
+%    \end{macrocode}
+% \begin{macro}{\@translator}
+% \begin{macro}{\@addtranslator}
+% And we need macros so store the translators
+%    \begin{macrocode}
+\newcommand*{\@translator}{}
+%    \end{macrocode}
+% and to read the translators from the aux file.
+%    \begin{macrocode}
+\newcommand*{\@addtranslators}[1]{%
+  \ifx\@translator\@empty\else\g@addto@macro\@translator{,}\fi
+  \g@addto@macro\@translator{#1}%
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+%
+% \begin{macro}{\settranslator}
+%   \changes{v0.9d}{2007/09/18}{new}
+% Last but not least, we need a macro to set the list of translators.
+%    \begin{macrocode}
+\newcommand{\settranslator}[2]{%
+  \ifx\@translator\@empty\else
+    #1%
+    \begingroup
+%   \end{macrocode}
+% Run through all translators, but store each once only.
+      \let\@tempb\@empty
+      \@tempcnta=\z@
+      \expandafter\@for \expandafter\@tempa\expandafter:\expandafter=%
+      \@translator\do {%
+        \ifx\@tempa\@empty\else
+          \typeout{Test: `,\@tempa,' at `,\@tempb,'}%
+          \@expandtwoargs\in@{,\@tempa,}{,\@tempb,}%
+          \ifin@\else
+            \edef\@tempb{\@tempb\@tempa,}%
+            \advance\@tempcnta by 1\relax
+          \fi
+        \fi
+      }%
+%    \end{macrocode}
+% Set each of the stored translators.
+%    \begin{macrocode}
+      \@tempcntb=\z@
+      \expandafter\@for \expandafter\@tempa\expandafter:\expandafter=%
+      \@tempb\do {%
+        \ifx\@tempa\@empty\else
+          \advance\@tempcntb by 1\relax
+          \typeout{Translator \the\@tempcntb: \@tempa}%
+          \ifnum\@tempcntb >\@ne\relax
+            \ifnum\@tempcntb=\@tempcnta\relax
+              \ifnum\@tempcntb=\tw@\relax
+                \GuideAnd\ %
+              \else
+                \GuideListAnd\ %
+              \fi
+            \else
+              ,
+            \fi
+          \fi
+          \@tempa
+        \fi
+      }%
+    \endgroup
+    #2%
+  \fi
+}
+%    \end{macrocode}
+% \end{macro}
+%
 % \section{Emphasization and Fonts}
 %
 % The \KOMAScript{} guide uses a lot of emphasizations. Most of them are
