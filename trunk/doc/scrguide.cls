@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2007/01/06 v0.9c internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2007/09/18 v0.9d internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -576,8 +576,8 @@
 %   This environment is used for all examples at the \KOMAScript{} guide.
 %    \begin{macrocode}
 \newenvironment{Example}{%
-  \labeling{{\usekomafont{sectioning}\GuideExample:\ }}
-  \item[{\usekomafont{sectioning}\GuideExample:\ }]%
+  \labeling{{\usekomafont{disposition}\GuideExample:\ }}
+  \item[{\usekomafont{disposition}\GuideExample:\ }]%
 }{%
   \endlabeling
 }
@@ -1124,7 +1124,7 @@ KOMAScript \endcsname
 %    \begin{macrocode}
 \newcommand*{\indexsection}[1]{%
   \ifx\empty#1\empty\else
-  \hspace{0pt plus 2fil}{{\usekomafont{sectioning} #1}}\hspace{0pt plus
+  \hspace{0pt plus 2fil}{{\usekomafont{disposition} #1}}\hspace{0pt plus
     1fil}\nopagebreak
   \fi
 }
