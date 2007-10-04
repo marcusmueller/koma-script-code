@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2007/09/18 v0.9d internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2007/10/04 v0.9e internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -403,9 +403,9 @@
           \ifnum\@tempcntb >\@ne\relax
             \ifnum\@tempcntb=\@tempcnta\relax
               \ifnum\@tempcntb=\tw@\relax
-                \GuideAnd\ %
+                \GuideAnd
               \else
-                \GuideListAnd\ %
+                \GuideListAnd
               \fi
             \else
               ,
