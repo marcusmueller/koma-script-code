@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2007/10/04 v0.9e internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2007/10/12 v0.9f internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -137,13 +137,17 @@
     \RequirePackage{xcolor}%
     \RequirePackage{scrpage2}%
     \clearscrheadfoot
-    \ohead{\rule[-\dp\strutbox]{0pt}{\headheight}\headmark\hspace{2mm}}%
-    \ihead[{\colorbox{yellow!50}{\makebox[\linewidth][l]{%
+    \ohead{\smash{%
+        \rule[-\dp\strutbox]{0pt}{\headheight}\headmark\hspace{2mm}}%
+    }%
+    \ihead[{\smash{\colorbox{yellow!50}{%
+        \makebox[\dimexpr\linewidth-2\fboxsep\relax][l]{%
             \rule[-\dp\strutbox]{0pt}{\headheight}%
-            \makebox[2em][r]\pagemark}}}]%
-      {\colorbox{yellow!50}{\makebox[\linewidth][l]{%
+            \makebox[2em][r]\pagemark}}}}]%
+      {\smash{\colorbox{yellow!50}{%
+          \makebox[\dimexpr\linewidth-2\fboxsep\relax][l]{%
             \rule[-\dp\strutbox]{0pt}{\headheight}%
-            \makebox[2em][r]\pagemark}}}%
+            \makebox[2em][r]\pagemark}}}}%
     \renewcommand*{\headfont}{\normalfont\sffamily}%
     \setkomafont{pagenumber}{}%
     \renewcommand*{\chaptermark}[1]{%
