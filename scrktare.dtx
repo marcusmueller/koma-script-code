@@ -1,4 +1,4 @@
-% \CheckSum{1642}
+% \CheckSum{1663}
 % \iffalse meta-comment
 % ======================================================================
 % scrktare.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrktare.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrktare.dtx}[2007/10/03 v2.97d KOMA-Script (type area)]
+\ProvidesFile{scrktare.dtx}[2007/10/23 v2.97e KOMA-Script (type area)]
 % \iffalse
 %</driver>
 %<package&identify>\ProvidesPackage{typearea}[%
@@ -378,6 +378,15 @@
 %    \begin{macrocode}
   \multiply\paperwidth by186468
   \multiply\paperheight by186468
+%    \end{macrocode}
+% Jetzt noch die gewünschte Ausrichtung beachten.
+%   \changes{v2.97e}{2007/10/23}{gewünschte Papierausrichtung wird beachtet}
+%    \begin{macrocode}
+  \if@landscape
+    \setlength{\@tempdima}{\paperwidth}%
+    \setlength{\paperwidth}{\paperheight}%
+    \setlength{\paperheight}{\@tempdima}%
+  \fi
 }
 %    \end{macrocode}
 %  \end{macro}
@@ -418,6 +427,8 @@
 %
 % Zurück zur Mustererkennung. Diese ist tatsächlich etwas einfacher
 % als die in den beiden Fällen zuvor.
+% \changes{v2.97e}{2007/10/23}{Optionen werden nach der neuen Syntax an
+%   typearea weitergeleitet}
 %    \begin{macrocode}
 \newcommand*{\x@paper}{%
   \expandafter\x@@paper\CurrentOption paper\x@@paper%
@@ -427,19 +438,19 @@
   \ifstr{#3}{paper}{%
     \ifnumber{#2}{%
       \ifstr{#1}{a}{%
-%<class>        \PassOptionsToPackage{#1#2#3}{typearea}%
+%<class>        \PassOptionsToPackage{#3=#1#2}{typearea}%
 %<package>        \isopaper[a]{#2}%
       }{%
         \ifstr{#1}{b}{%
-%<class>          \PassOptionsToPackage{#1#2#3}{typearea}%
+%<class>          \PassOptionsToPackage{#3=#1#2}{typearea}%
 %<package>          \isopaper[b]{#2}%
         }{%
           \ifstr{#1}{c}{%
-%<class>            \PassOptionsToPackage{#1#2#3}{typearea}%
+%<class>            \PassOptionsToPackage{#3=#1#2}{typearea}%
 %<package>            \isopaper[c]{#2}%
           }{%
             \ifstr{#1}{d}{%
-%<class>              \PassOptionsToPackage{#1#2#3}{typearea}%
+%<class>              \PassOptionsToPackage{#3=#1#2}{typearea}%
 %<package>              \isopaper[d]{#2}%
             }{\scr@pti@nerr@r}%
           }%
@@ -931,16 +942,31 @@
       \fi
     }{%
       \ifstr{#1}{letter}{%
-        \setlength\paperheight{11in}%
-        \setlength\paperwidth {8.5in}%
+        \if@landscape
+          \setlength\paperheight{8.5in}%
+          \setlength\paperwidth {11in}%
+        \else
+          \setlength\paperheight{11in}%
+          \setlength\paperwidth {8.5in}%
+        \fi
       }{%
         \ifstr{#1}{legal}{%
-          \setlength\paperheight{14in}%
-          \setlength\paperwidth {8.5in}%
+          \if@landscape
+            \setlength\paperheight{8.5in}%
+            \setlength\paperwidth {14in}%
+          \else
+            \setlength\paperheight{14in}%
+            \setlength\paperwidth {8.5in}%
+          \fi
         }{%
           \ifstr{#1}{executive}{%
-            \setlength\paperheight{10.5in}%
-            \setlength\paperwidth {7.25in}%
+            \if@landscape
+              \setlength\paperheight{7.25in}%
+              \setlength\paperwidth {10.5in}%
+            \else
+              \setlength\paperheight{10.5in}%
+              \setlength\paperwidth {7.25in}%
+           \fi
           }{%
             \iso@paper{#1}%
             \if@tempswa\else
@@ -959,11 +985,6 @@
           }%
         }%
       }%
-      \if@landscape
-        \setlength{\@tempdima}{\paperwidth}%
-        \setlength{\paperwidth}{\paperheight}%
-        \setlength{\paperheight}{\@tempdima}%
-      \fi
     }%
   }%
 }
