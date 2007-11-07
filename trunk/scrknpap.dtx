@@ -1,4 +1,4 @@
-% \CheckSum{1853}
+% \CheckSum{1874}
 % \iffalse meta-comment
 % ======================================================================
 % scrknpap.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrknpap.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrknpap.dtx}[2007/10/12 v2.97d KOMA-Script (note-paper)]
+\ProvidesFile{scrknpap.dtx}[2007/11/07 v2.97e KOMA-Script (note-paper)]
 % \iffalse
 \documentclass{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -1041,11 +1041,33 @@
 \@newplength{toaddrheight}
 %    \end{macrocode}
 % \end{macro}
+% \begin{macro}{\ltr@len@locvpos}
+%   \changes{v2.97e}{2007/11/07}{Neu}
+% Abstand der Absenderergänzung von der oberen Papierkante.
+%    \begin{macrocode}
+\@newplength{locvpos}
+%    \end{macrocode}
+% \end{macro}
 % \begin{macro}{\ltr@len@locwidth}
 %   \changes{v2.8q}{2001/10/06}{Neu}
 % Breite des Feldes neben dem Adressfenster
 %    \begin{macrocode}
 \@newplength{locwidth}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\ltr@len@lochpos}
+%   \changes{v2.97e}{2007/11/07}{Neu}
+% Abstand der Absenderergänzung von der linken Papierkante bzw. wenn negativ
+% von der rechten Papierkante.
+%    \begin{macrocode}
+\@newplength{lochpos}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\ltr@len@locheight}
+%   \changes{v2.97e}{2007/11/07}{Neu}
+% Höhe der Absenderergänzung.
+%    \begin{macrocode}
+\@newplength{locheight}
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\ltr@len@refvpos}
@@ -1516,10 +1538,19 @@
     \typeout{Location field: empty}%
     }{%
     \typeout{Location field: yes}%
-    \move@topt\vskip\useplength{toaddrvpos}%
+    \ifdim \useplength{lochpos}=\z@%
+      \@setplength{lochpos}{\useplength{toaddrhpos}}%
+    \fi
+    \ifdim \useplength{locvpos}=\z@%
+      \@setplength{locvpos}{\useplength{toaddrvpos}}%
+    \fi
+    \ifdim \useplength{locheight}=\z@%
+      \@setplength{locheight}{\useplength{toaddrheight}}%
+    \fi
+    \move@topt\vskip\useplength{locvpos}%
     \vb@t@z{\rlap{%
         \move@topl
-        \setlengthtoplength[-]{\@tempskipa}{toaddrhpos}%
+        \setlengthtoplength[-]{\@tempskipa}{lochpos}%
         \ifdim \@tempskipa<\z@
           \addtolength{\@tempskipa}{\paperwidth}%
         \else
@@ -1527,7 +1558,7 @@
         \fi
         \hskip\@tempskipa
         \llap{%
-          \@savevbox{\useplength{toaddrheight}}{%
+          \@savevbox{\useplength{locheight}}{%
             \noindent\hsize\useplength{locwidth}%
             \ifnum 1=\@alignfrom
               \if@logo
@@ -1537,10 +1568,10 @@
               \fi
             \fi
             \usekomavar{location}\vskip \z@ \@plus .00001fil}%
-          {location field}{toaddrheight}{\setkomavar}%
+          {location field}{locheight}{\setkomavar}%
           }}%
       }%
-    \vskip-\useplength{toaddrvpos}\move@frompt
+    \vskip-\useplength{locvpos}\move@frompt
     }%
   }
 %    \end{macrocode}
