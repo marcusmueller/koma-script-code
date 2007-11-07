@@ -190,6 +190,7 @@ define latex
 	  $(CKSUM) $(CKSUMFILES) > guide.md5 \
 	  && $(PDFLATEX) guide.tex \
 	  && ( $(BIBTEX) guide || [ $$? -le $(BIBTEXNOERROR) ] || exit 1 ) \
+          && $(BIBTEXFIX) guide.bbl \
 	  && $(MAKEINDEX) guide.ind guide.idx  \
 	  && $(INDEXPOSTOP) guide \
 	  && $(MAKECHANGE) guide.chn guide.glo \
@@ -224,6 +225,7 @@ guide.chn: guide.glo
 
 guide.bbl: $(BIBTEX_SRC) guide.aux
 	$(BIBTEX) guide || test $$? -le $(BIBTEXNOERROR)
+	$(BIBTEXFIX) guide.bbl
 
 guide.glo guide.idx guide.aux: ../guide.tex $(TEX_SRC)
 	$(PDFLATEX) guide.tex
