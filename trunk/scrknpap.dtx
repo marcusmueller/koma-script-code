@@ -1,4 +1,4 @@
-% \CheckSum{1874}
+% \CheckSum{2002}
 % \iffalse meta-comment
 % ======================================================================
 % scrknpap.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrknpap.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrknpap.dtx}[2007/11/07 v2.97e KOMA-Script (note-paper)]
+\ProvidesFile{scrknpap.dtx}[2007/11/08 v2.97e KOMA-Script (note-paper)]
 % \iffalse
 \documentclass{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -392,8 +392,81 @@
 % Schalter gespeichert.
 %    \begin{macrocode}
 \newif\if@fold\@foldtrue
-\KOMA@ifkey{foldmarks}{@fold}
 %    \end{macrocode}
+% \begin{macro}{\@usefolds}
+% Welche Faltmarken gesetzt werden sollen, wird in einem Makro gespeichert.
+%   \changes{v2.97e}{2007/11/08}{Neu}
+%    \begin{macrocode}
+\newcommand*{\@usefolds}{TMBV}
+\KOMA@key{foldmarks}[true]{%
+  \begingroup
+    \def\KOMA@unknown@keyval##1##2##3{%
+      \def\sc@nf@ldch@rs####1{%
+        \ifx ####1\@nil\else
+          \if ####1T\g@addto@macro\@usefolds{####1}\else
+            \if ####1M\g@addto@macro\@usefolds{####1}\else
+              \if ####1B\g@addto@macro\@usefolds{####1}\else
+                \if ####1V\g@addto@macro\@usefolds{####1}\else
+                  \if ####1H\g@addto@macro\@usefolds{TMB}\else
+                    \if ####1t\scr@removechar\@usefolds{T}\else
+                      \if ####1m\scr@removechar\@usefolds{M}\else
+                        \if ####1b\scr@removechar\@usefolds{B}\else
+                          \if ####1v\scr@removechar\@usefolds{V}\else
+                            \if ####1h%
+                              \scr@removechar\@usefolds{T}%
+                              \scr@removechar\@usefolds{M}%
+                              \scr@removechar\@usefolds{B}%
+                            \else
+                              \ClassError{\KOMAClassName}{%
+                                unknown fold mark switch `####1'}{%
+                                You should use option `foldmarks' either with
+                                one of\MessageBreak
+                                \@spaces `true', `on', or `yes' to switch
+                                fold marks on,\MessageBreak
+                                \@spaces `false', `off', or `no' to switch 
+                                fold marks off,\MessageBreak
+                                or a combination of\MessageBreak
+                                \@spaces `T', `M', `B', `V', `H' to select
+                                dedicated fold marks\MessageBreak
+                                or\MessageBreak
+                                \@spaces `t', `m', 'b', 'v', 'h' to deselect
+                                dedicated fold marks.\MessageBreak
+                                See the KOMA-Script manual for more information.
+                              }%
+                            \fi
+                          \fi
+                        \fi
+                      \fi
+                    \fi
+                  \fi
+                \fi
+              \fi
+            \fi
+          \fi
+          \expandafter\sc@nf@ldch@rs
+        \fi
+      }%
+      \expandafter\sc@nf@ldch@rs#1\@nil
+    }%
+    \KOMA@set@ifkey\@empty{@fold}{#1}%
+    \if@fold\aftergroup\@foldtrue\else\aftergroup\@foldfalse\fi
+  \endgroup
+}
+%    \end{macrocode}
+% \begin{macro}{\scr@removechar}
+%   \changes{v2.97e}{2007/11/08}{Neu (intern)}
+%    \begin{macrocode}
+\newcommand*{\scr@removechar}[2]{%
+  \def\in@@##1#2##2##3\in@@{%
+    \ifx\in@##2\else
+      \def\in@@####1#2\in@{\gdef#1{##1####1}}%
+      \in@@##2##3%
+    \fi}%
+  \expandafter\in@@#1#2\in@\in@@
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -967,13 +1040,18 @@
 % \end{macro}
 % \begin{macro}{\ltr@len@tfoldmarkvpos}
 %   \changes{v2.8q}{2001/10/06}{Neu}
+% \begin{macro}{\ltr@len@mfoldmarkvpos}
+%   \changes{v2.97e}{2007/11/08}{Neu}
 % \begin{macro}{\ltr@len@bfoldmarkvpos}
 %   \changes{v2.8q}{2001/10/06}{Neu}
-% Abstand der oberen und unteren Faltmarken von der oberen Papierkante.
+% Abstand der oberen, mittleren und unteren Faltmarken von der oberen
+% Papierkante.
 %    \begin{macrocode}
 \@newplength{tfoldmarkvpos}
+\@newplength{mfoldmarkvpos}
 \@newplength{bfoldmarkvpos}
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \begin{macro}{\ltr@len@foldmarkthickness}
@@ -1253,8 +1331,13 @@
 % \end{macro}
 %
 % \begin{macro}{\@foldmarks}
+%   \changes{v2.97e}{2007/08/11}{\texttt{mfoldmarkvpos} wird verwendet}
 % Für die Faltmarken müssen nicht nur Abstände definiert werden, es wird auch
 % ein Befehl benötigt, um die Faltmarken zu setzen.
+% \begin{macro}{\@hfoldmark}
+%   \changes{v2.97e}{2007/08/11}{Neu (intern)}
+% Dabei werden nur die horizontalen Faltmarken gesetzt, die tatsächlich
+% existieren.
 % \begin{macro}{\@foldmark}
 %   \changes{v2.8n}{2001/09/07}{Neu}
 %   \changes{v2.95}{2006/06/06}{\cs{vskip} in \cs{vb@t@z} verschoben, damit es
@@ -1276,19 +1359,31 @@
         \rule{#2}{\useplength{foldmarkthickness}}}}}%
   \ignorespaces%
 }
+\newcommand*{\@hfoldmark}[3]{%
+  \begingroup
+    \@expandtwoargs\in@{#1}{\@usefolds}%
+    \ifin@
+      \@foldmark{#2}{#3}%
+    \fi
+  \endgroup
+}
 \newcommand*{\@foldmarks}{%
   \if@fold%
     \typeout{Foldmarks: yes}%
     \move@topt
-    \@foldmark{\useplength{tfoldmarkvpos}}{2mm}%
-    \@foldmark{.5\paperheight}{4mm}%
-    \@foldmark{\useplength{bfoldmarkvpos}}{2mm}%
+    \ifdim \useplength{mfoldmarkvpos}=\z@
+      \@setplength{mfoldmarkvpos}{.5\paperheight}%
+    \fi
+    \@hfoldmark{T}{\useplength{tfoldmarkvpos}}{2mm}%
+    \@hfoldmark{M}{\useplength{mfoldmarkvpos}}{4mm}%
+    \@hfoldmark{B}{\useplength{bfoldmarkvpos}}{2mm}%
     \move@frompt
   \else
     \typeout{Foldmarks: no}%
   \fi%
 }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 %
