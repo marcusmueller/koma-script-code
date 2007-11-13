@@ -1,4 +1,4 @@
-% \CheckSum{2088}
+% \CheckSum{2277}
 % \iffalse meta-comment
 % ======================================================================
 % scrknpap.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrknpap.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrknpap.dtx}[2007/11/12 v2.97e KOMA-Script (note-paper)]
+\ProvidesFile{scrknpap.dtx}[2007/11/13 v2.97e KOMA-Script (note-paper)]
 % \iffalse
 \documentclass{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -122,6 +122,8 @@
 % rechtsbündig gesetzt werden soll.
 % \begin{macro}{\@alignfrom}
 %   \changes{v2.8q}{2002/01/25}{Neu}
+%   \changes{v2.97e}{2007/11/13}{neue Werte für Verwendung der
+%     Absenderergänzung}
 % Die Einstellung wird in einem nummerisch auszuwertenden Makro
 % gespeichert. Dabei gelten folgende Werte:
 % \begin{center}
@@ -130,6 +132,8 @@
 %     0    & linksbündig \\
 %     1    & zentriert \\
 %     2    & rechtsbündig \\
+%     3    & linksbündig in der Absenderergänzung \\
+%     4    & rechtbündig in der Absenderergänzung \\
 %     10000 & nicht antasten \\
 %   \end{tabular}
 % \end{center}
@@ -140,6 +144,8 @@
   {left}{0},%
   {center}{1},{centered}{1},{middle}{1},%
   {right}{2},%
+  {locationleft}{3},{leftlocation}{3},%
+  {locationright}{4},{rightlocation}{4},{location}{4},%
   {no}{10000},{false}{10000},{off}{10000}%
 }
 %    \end{macrocode}
@@ -905,6 +911,17 @@
         }%
       }%
     }%
+%    \end{macrocode}
+%   \changes{v2.97e}{2007/11/13}{neue Werte für Verwendung der
+%     Absenderergänzung werden berücksichtigt}
+% Damit ist der rechtsbündige Absender abgeschlossen, es geht weiter mit den
+% beiden Absendern in der Absenderergänzung. In diesen beiden Fällen muss der
+% Kopf gelöscht werden!
+%    \begin{macrocode}
+  \or
+    \renewcommand*{\@firsthead}{}%
+  \or
+    \renewcommand*{\@firsthead}{}%
 %    \end{macrocode}
 % Damit ist die Umdefinierung beendet. In allen anderen Fällen wird
 % der Kopf nicht verändert.
@@ -1721,11 +1738,40 @@
       \@setplength[.5]{locwidth}{\useplength{locwidth}}%
     \fi%
   \fi%
-  \ifnum 1=\@alignfrom
+%    \end{macrocode}
+%   \changes{v2.97e}{2007/11/13}{Der Absender kann nun ebenfalls in der
+%     Absenderergänzung stehen}
+% Je nach Absenderanordnung muss hier nun ebenfalls etwas getan werden.
+% Der Fall 0, also linksbündiger Absender im Kopf spielt hier keine Rolle.
+%    \begin{macrocode}
+  \ifcase\@alignfrom
+%    \end{macrocode}
+% Im Fall 1, also zentrierter Absender im Kopf wird jedoch das Logo hier
+% platziert, also darf die Absenderergänzung nicht leer sein.
+%    \begin{macrocode}
+  \or
     \if@logo
-      \ifkomavarempty{location}{%
-        \setkomavar{location}{\null}}{}%
+      \ifkomavarempty{location}{\setkomavar{location}{\null}}{}%
     \fi
+%    \end{macrocode}
+% Im Fall 2, also rechtsbündiger Absender im Kopf, ist auch nichts zu tun.
+%    \begin{macrocode}
+  \or
+%    \end{macrocode}
+% Im Fall 3, also linksbündiger Absender in der Absenderergänzung wird hier
+% eine Menge ausgegeben, also darf die Absenderergänzung nicht leer sein.
+%    \begin{macrocode}
+  \or
+    \ifkomavarempty{location}{\setkomavar{location}{\null}}{}%
+%    \end{macrocode}
+% Im Fall 3, also linksbündiger Absender in der Absenderergänzung wird hier
+% eine Menge ausgegeben, also darf die Absenderergänzung nicht leer sein.
+%    \begin{macrocode}
+  \or
+    \ifkomavarempty{location}{\setkomavar{location}{\null}}{}%
+%    \end{macrocode}
+% Alle anderen Fälle sind wie hier ebenfalls ohne Bedeutung.
+%    \begin{macrocode}
   \fi
   \ifkomavarempty{location}{%
     \typeout{Location field: empty}%
@@ -1754,20 +1800,150 @@
         \llap{%
           \@savevbox{\useplength{locheight}}{%
             \noindent\hsize\useplength{locwidth}%
-            \ifnum 1=\@alignfrom
+%    \end{macrocode}
+% In einigen Fällen der Absenderanordnung muss hier nun eine ganze Menge getan
+% werden. In anderen ist hingegen nur wenig zu tun.
+% Im Fall 0, also linksbündiger Absender im Kopf wird nur die
+% Absenderergänzung ausgegeben.
+%    \begin{macrocode}
+            \ifcase\@alignfrom
+              \usekomavar{location}%
+%    \end{macrocode}
+% Im Fall 1, also zentrierter Absender im Kopf wird jedoch das Logo hier
+% platziert, die Absenderergänzung wird hingegen ignorriert.
+%    \begin{macrocode}
+            \or
               \if@logo
-                \ifkomavarempty{fromlogo}{}{%
+                \ifkomavarempty{fromlogo}{\null}{%
                   {\raggedleft\noindent\usekomavar{fromlogo}\\
                     \vskip\parskip}\noindent}%
               \fi
+%    \end{macrocode}
+% Im Fall 2, also rechtsbündiger Absender im Kopf, wird auch nur die
+% Absenderergänzung ausgegeben.
+%    \begin{macrocode}
+            \or
+              \usekomavar{location}%
+%    \end{macrocode}
+% Im Fall 3, also linksbündiger Absender in der Absenderergänzung wird hier
+% sozusagen der linksbündige Kopf (jedoch ohne Logo) nachgebaut.
+%    \begin{macrocode}
+            \or
+              \raggedright
+%    \end{macrocode}
+% Zuerst wird der Name gesetzt. Dabei soll eine eigene Schriftart für
+% den Namen verwendet werden.
+%    \begin{macrocode}
+              {\usekomafont{fromname}\strut\ignorespaces
+                \usekomavar{fromname}%
+%    \end{macrocode}
+% Hat \verb|\@rulefrom| den nummerischen Wert 1, so soll direkt auf den
+% Absender eine Linie folgen. Die Länge dieser Linie kann vom Anwender
+% bestimmt oder automatisch gewählt werden. Es werden dabei die
+% Pseudo-Längen \texttt{fromrulewidth} und \texttt{fromrulethickness}
+% verwendet. Ist \texttt{fromrulewidth} 0, so wird sie automatisch
+% bestimmt. Bei der automatischen Längenbestimmung wird einfach eine Linie
+% über de Gesamtbreite der Absenderergänzung gesetzt.
+%    \begin{macrocode}
+                {%
+                  \ifnum\@rulefrom=1\\[-.5\baselineskip]%
+                    \usekomafont{fromrule}{%
+                      \setlength{\@tempdima}{\useplength{fromrulewidth}}%
+                      \ifdim\@tempdima=\z@
+                        \setlength{\@tempdima}{\useplength{locwidth}}%
+                      \fi
+                      \expandafter\rule\expandafter{\the\@tempdima}{%
+                        \useplength{fromrulethickness}}%
+                    }%
+                  \fi
+                }%
+                \\
+              }%
+%    \end{macrocode}
+% Als Nächstes wird die Absenderadresse einschließlich aller
+% optionalen Felder gesetzt. Dabei werden optionale Felder nur
+% gesetzt, wenn der entsprechende Schalter \emph{true} ist. Die
+% Adresse wird ebenfalls innerhalb einer Gruppe in einer eigenen
+% Schriftart gesetzt. 
+%    \begin{macrocode}
+              {\usekomafont{fromaddress}\strut\ignorespaces
+                \usekomavar{fromaddress}%
+                \if@phone\\\usekomavar*{fromphone}\usekomavar{fromphone}\fi%
+                \if@fax\\\usekomavar*{fromfax}\usekomavar{fromfax}\fi%
+                \if@email\\\usekomavar*{fromemail}\usekomavar{fromemail}\fi%
+                \if@www\\\usekomavar*{fromurl}\usekomavar{fromurl}\fi%
+%    \end{macrocode}
+% Wie weiter oben erwähnt, kann auch an dieser Stelle eine Linie
+% gesetzt  werden.
+%    \begin{macrocode}
+                \ifnum\@rulefrom=2\\[-.5\baselineskip]%
+                  \usekomafont{fromrule}{%
+                    \setlength{\@tempdima}{\useplength{fromrulewidth}}%
+                    \ifdim\@tempdima=\z@
+                      \setlength{\@tempdima}{\useplength{locwidth}}%
+                    \fi
+                    \expandafter\rule\expandafter{\the\@tempdima}{%
+                      \useplength{fromrulethickness}}}%
+                \fi
+                \\
+              }%
+%    \end{macrocode}
+% Damit ist die Definition des linksbündigen Absenders in der
+% Absenderergänzung abgeschlossen.
+% Im Fall 4, also rechtsbündiger Absender in der Absenderergänzung wird hier
+% exakt wie für Fall 3 verfahren. Nur ist jetzt alles rechtsbündig.
+%    \begin{macrocode}
+            \or
+              \raggedleft
+              {\usekomafont{fromname}\strut\ignorespaces
+                \usekomavar{fromname}%
+                {%
+                  \ifnum\@rulefrom=1\\[-.5\baselineskip]%
+                    \usekomafont{fromrule}{%
+                      \setlength{\@tempdima}{\useplength{fromrulewidth}}%
+                      \ifdim\@tempdima=\z@
+                        \setlength{\@tempdima}{\useplength{locwidth}}%
+                      \fi
+                      \expandafter\rule\expandafter{\the\@tempdima}{%
+                        \useplength{fromrulethickness}}%
+                    }%
+                  \fi
+                }%
+                \\
+              }%
+              {\usekomafont{fromaddress}\strut\ignorespaces
+                \usekomavar{fromaddress}%
+                \if@phone\\\usekomavar*{fromphone}\usekomavar{fromphone}\fi%
+                \if@fax\\\usekomavar*{fromfax}\usekomavar{fromfax}\fi%
+                \if@email\\\usekomavar*{fromemail}\usekomavar{fromemail}\fi%
+                \if@www\\\usekomavar*{fromurl}\usekomavar{fromurl}\fi%
+                \ifnum\@rulefrom=2\\[-.5\baselineskip]%
+                  \usekomafont{fromrule}{%
+                    \setlength{\@tempdima}{\useplength{fromrulewidth}}%
+                    \ifdim\@tempdima=\z@
+                      \setlength{\@tempdima}{\useplength{locwidth}}%
+                    \fi
+                    \expandafter\rule\expandafter{\the\@tempdima}{%
+                      \useplength{fromrulethickness}}}%
+                \fi
+                \\
+              }%
+%    \end{macrocode}
+% In allen anderen Fällen wird ebenfalls die Absenderergänzung gesetzt.
+%    \begin{macrocode}
+              \usekomavar{location}%
             \fi
-            \usekomavar{location}\vskip \z@ \@plus .00001fil}%
+%    \end{macrocode}
+% Zum Schluss wird noch verhindert, dass wegen nicht vollen vertikalen Boxen
+% gemotzt wird.
+%    \begin{macrocode}
+            \vskip \z@ \@plus .00001fil}%
           {location field}{locheight}{\setkomavar}%
-          }}%
-      }%
-    \vskip-\useplength{locvpos}\move@frompt
+        }}%
     }%
-  }
+    \vskip-\useplength{locvpos}\move@frompt
+  }%
+}
 %    \end{macrocode}
 % \end{macro}
 %
