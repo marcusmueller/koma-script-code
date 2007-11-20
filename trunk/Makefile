@@ -115,6 +115,7 @@ CLS_MAIN_DTX    = scrbeta.dtx \
 		  scrkidx.dtx \
 		  scrklang.dtx \
 		  scrklco.dtx \
+		  japanlco.dtx \
 		  scrkliof.dtx \
 		  scrklist.dtx \
 		  scrkmisc.dtx \
