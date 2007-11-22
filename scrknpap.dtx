@@ -1,4 +1,4 @@
-% \CheckSum{2315}
+% \CheckSum{2325}
 % \iffalse meta-comment
 % ======================================================================
 % scrknpap.dtx
@@ -116,6 +116,19 @@
 % veröffentlicht. Die Funktionalität ist nun direkt verfügbar. Dazu
 % werden verschiedene Optionen benötigt.
 %
+% \begin{option}{firsthead}
+%   \changes{v2.97e}{2007/11/22}{Neu}
+% Der Briefkopf kann auch einfach abgeschaltet werden.
+% \begin{macro}{\if@firsthead}
+%   \changes{v2.8q}{2002/01/25}{Neuer Schalter (intern)}
+% Gespeichert wird die Information in einem einfachen Schalter.
+% Voreingestellt ist die Verwendung des Briefkopfes.
+%    \begin{macrocode}
+\KOMA@ifkey{firsthead}{@firsthead}\@firstheadtrue
+%    \end{macrocode}
+% \end{macro}
+% \end{option}
+%
 % \begin{option}{fromalign}
 %   \changes{v2.8q}{2002/01/25}{Neu}
 % Diese Option legt fest, ob der Absender linksbündig, mittig oder
@@ -132,21 +145,24 @@
 %     0    & linksbündig \\
 %     1    & zentriert \\
 %     2    & rechtsbündig \\
-%     3    & linksbündig in der Absenderergänzung \\
-%     4    & rechtbündig in der Absenderergänzung \\
+%     3    & linksbündig in der Absenderergänzung ohne Kopf \\
+%     4    & rechtbündig in der Absenderergänzung ohne Kopf \\
 %     10000 & nicht antasten \\
 %   \end{tabular}
 % \end{center}
 % Voreingestellt ist "`nicht antasten"'.
 %    \begin{macrocode}
 \newcommand*{\@alignfrom}{0}
-\KOMA@ncmdkey{fromalign}{@alignfrom}{%
-  {left}{0},%
-  {center}{1},{centered}{1},{middle}{1},%
-  {right}{2},%
-  {locationleft}{3},{leftlocation}{3},%
-  {locationright}{4},{rightlocation}{4},{location}{4},%
-  {no}{10000},{false}{10000},{off}{10000}%
+\KOMA@key{fromalign}{%
+  \KOMA@set@ncmdkey{fromalign}{@alignfrom}{%
+    {left}{0},%
+    {center}{1},{centered}{1},{middle}{1},%
+    {right}{2},%
+    {locationleft}{3},{leftlocation}{3},%
+    {locationright}{4},{rightlocation}{4},{location}{4},%
+    {no}{10000},{false}{10000},{off}{10000}%
+  }{#1}%
+  \ifcase\@alignfrom\or\or\or\@firstheadfalse\or\@firstheadfalse\fi
 }
 %    \end{macrocode}
 % \end{macro}
@@ -918,17 +934,6 @@
       }%
     }%
 %    \end{macrocode}
-%   \changes{v2.97e}{2007/11/13}{neue Werte für Verwendung der
-%     Absenderergänzung werden berücksichtigt}
-% Damit ist der rechtsbündige Absender abgeschlossen, es geht weiter mit den
-% beiden Absendern in der Absenderergänzung. In diesen beiden Fällen muss der
-% Kopf gelöscht werden!
-%    \begin{macrocode}
-  \or
-    \renewcommand*{\@firsthead}{}%
-  \or
-    \renewcommand*{\@firsthead}{}%
-%    \end{macrocode}
 % Damit ist die Umdefinierung beendet. In allen anderen Fällen wird
 % der Kopf nicht verändert.
 %    \begin{macrocode}
@@ -1582,31 +1587,35 @@
 % und richtet sich stattdessen nach der Position des Adressfeldes.
 %    \begin{macrocode}
 \newcommand*{\@firstheadfootfield}{%
-  \typeout{Head of first page}%
-  \move@topt\vskip\useplength{firstheadvpos}%
-  \vb@t@z{%
-    \rlap{\move@topl
-      \setlength\@tempskipa{.5\paperwidth}%
-      \addtolengthplength[-.5]{\@tempskipa}{firstheadwidth}%
-      \hskip\@tempskipa
-      \vbox{\hsize\useplength{firstheadwidth}%
-        \setlength{\@tempskipa}{\useplength{toaddrvpos}}%
-        \addtolengthplength[-1]{\@tempskipa}{firstheadvpos}%
-        \addtolength{\@tempskipa}{-\baselineskip}%
+  \if@firsthead
+    \typeout{Head of first page}%
+    \move@topt\vskip\useplength{firstheadvpos}%
+    \vb@t@z{%
+      \rlap{\move@topl
+        \setlength\@tempskipa{.5\paperwidth}%
+        \addtolengthplength[-.5]{\@tempskipa}{firstheadwidth}%
+        \hskip\@tempskipa
+        \vbox{\hsize\useplength{firstheadwidth}%
+          \setlength{\@tempskipa}{\useplength{toaddrvpos}}%
+          \addtolengthplength[-1]{\@tempskipa}{firstheadvpos}%
+          \addtolength{\@tempskipa}{-\baselineskip}%
 %    \end{macrocode}
 % Da sich einige -- beispielsweise |briefkopf.sty| -- darauf verlassen, dass
 % |\textwidth| die Breite des Briefkopfes ist, wird diese Länge lokal
 % entsprechend gesetzt. Außerdem wird dafür gesorgt, dass |\parfillskip| hier
 % nicht berücksichtigt wird.
 %    \begin{macrocode}
-        \setlength{\textwidth}{\useplength{firstheadwidth}}%
-        \setlength{\parfillskip}{\z@ \@plus 1fil}%
-        \@savevbox{\@tempskipa}{\@firsthead\vskip \z@ \@plus .00001fil}%
-        {head of first page}{firstheadvpos}{\firsthead}%
+          \setlength{\textwidth}{\useplength{firstheadwidth}}%
+          \setlength{\parfillskip}{\z@ \@plus 1fil}%
+          \@savevbox{\@tempskipa}{\@firsthead\vskip \z@ \@plus .00001fil}%
+          {head of first page}{firstheadvpos}{\firsthead}%
+        }%
       }%
     }%
-  }%
-  \vskip-\useplength{firstheadvpos}\move@frompt
+    \vskip-\useplength{firstheadvpos}\move@frompt
+  \else
+    \typeout{No head at first page}%
+  \fi
   \typeout{Foot of first page}%
   \move@topt
   \vb@t@z{%

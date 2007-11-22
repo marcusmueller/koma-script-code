@@ -102,7 +102,12 @@ CLS_MAIN	= scrbook.cls \
 		  DINmtext.lco \
 		  SN.lco \
 	 	  SNleft.lco \
-		  KOMAold.lco
+		  KOMAold.lco \
+		  NipponEH.lco \
+		  NipponEL.lco \
+		  NipponLH.lco \
+		  NipponLL.lco \
+		  KakuLL.lco
 
 CLS_MAIN_DTX    = scrbeta.dtx \
 		  scrkbase.dtx \
