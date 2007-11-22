@@ -1,4 +1,4 @@
-% \CheckSum{2325}
+% \CheckSum{2341}
 % \iffalse meta-comment
 % ======================================================================
 % scrknpap.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrknpap.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrknpap.dtx}[2007/11/20 v2.97e KOMA-Script (note-paper)]
+\ProvidesFile{scrknpap.dtx}[2007/11/22 v2.97e KOMA-Script (note-paper)]
 % \iffalse
 \documentclass{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -637,6 +637,22 @@
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
+% \end{macro}
+% \end{option}
+%
+%
+% \subsubsection{Optionen für den Briefbogenfuß}
+%
+% \begin{option}{firstfoot}
+%   \changes{v2.97e}{2007/11/22}{Neu}
+% Der Fuß des Briefbogens kann auch einfach abgeschaltet werden.
+% \begin{macro}{\if@firstfoot}
+%   \changes{v2.8q}{2002/01/25}{Neuer Schalter (intern)}
+% Gespeichert wird die Information in einem einfachen Schalter.
+% Voreingestellt ist die Verwendung des Fußes.
+%    \begin{macrocode}
+\KOMA@ifkey{firstfoot}{@firstfoot}\@firstfoottrue
+%    \end{macrocode}
 % \end{macro}
 % \end{option}
 %
@@ -1580,6 +1596,8 @@
 %   \changes{v2.8q}{2001/10/30}{\cs{parfillskip} lokal auf 0 gesetzt}
 %   \changes{v2.8q}{2001/10/30}{Fuß explizit in eine Box gesetzt}
 %   \changes{v2.9l}{2003/01/23}{Positionierung verbessert}
+%   \changes{v2.97e}{2007/11/22}{Optionen \texttt{firsthead} und
+%     \texttt{firstfoot} beachten}
 % Ab Version 2.8n werden Kopf und Fuß der ersten Seite nicht mehr per
 % Seitenstil \texttt{firstpage} gesetzt, sondern mit einem speziellen
 % Feld. Dabei wird auch beachtet, dass dieses Feld im Kopf eine bestimmte aber
@@ -1616,27 +1634,31 @@
   \else
     \typeout{No head at first page}%
   \fi
-  \typeout{Foot of first page}%
   \move@topt
-  \vb@t@z{%
-    \rlap{\move@topl
-      \setlength\@tempskipa{.5\paperwidth}%
-      \addtolengthplength[-.5]{\@tempskipa}{firstfootwidth}%
-      \hskip\@tempskipa%
-      \vbox{\hsize\useplength{firstfootwidth}%
-        \vskip\useplength{firstfootvpos}%
+  \if@firstfoot
+    \typeout{Foot of first page}%
+    \vb@t@z{%
+      \rlap{\move@topl
+        \setlength\@tempskipa{.5\paperwidth}%
+        \addtolengthplength[-.5]{\@tempskipa}{firstfootwidth}%
+        \hskip\@tempskipa%
+        \vbox{\hsize\useplength{firstfootwidth}%
+          \vskip\useplength{firstfootvpos}%
 %    \end{macrocode}
 % Da sich einige -- beispielsweise |briefkopf.sty| -- darauf verlassen, dass
 % |\textwidth| die Breite des Brieffußes ist, wird diese Länge lokal
 % entsprechend gesetzt. Außerdem wird dafür gesorgt, dass |\parfillskip| hier
 % nicht berücksichtigt wird.
 %    \begin{macrocode}
-        \setlength{\textwidth}{\useplength{firstfootwidth}}%
-        \setlength{\parfillskip}{\z@ \@plus 1fil}%
-        \vbox{\hsize\useplength{firstfootwidth}\@firstfoot}%
+          \setlength{\textwidth}{\useplength{firstfootwidth}}%
+          \setlength{\parfillskip}{\z@ \@plus 1fil}%
+          \vbox{\hsize\useplength{firstfootwidth}\@firstfoot}%
+        }%
       }%
     }%
-  }%
+  \else
+    \typeout{No foot at first page}%
+  \fi
   \move@frompt%
   {%
     \setlength{\@tempdima}{1in}\addtolength{\@tempdima}{\topmargin}%
@@ -1644,7 +1666,11 @@
     \addtolength{\@tempdima}{\headsep}%
     \addtolength{\@tempdima}{\textheight}%
     \addtolength{\@tempdima}{\footskip}%
-    \addtolengthplength[-1]{\@tempdima}{firstfootvpos}%
+    \if@firstfoot
+      \addtolengthplength[-1]{\@tempdima}{firstfootvpos}%
+    \else
+      \addtolength{\@tempdima}{-\paperheight}%
+    \fi
     \ifdim\@tempdima>\z@\enlargethispage{-\@tempdima}%
     \else\if@enlargefp\enlargethispage{-\@tempdima}\fi\fi
   }%
@@ -1859,8 +1885,10 @@
 % ggf. rechtsbündig oben.
 %    \begin{macrocode}
             \or
-              \ifkomavarempty{fromlogo}{}{%
-                \raggedleft\usekomavar{fromlogo}\par}%
+              \if@logo
+                \ifkomavarempty{fromlogo}{}{%
+                  \raggedleft\usekomavar{fromlogo}\par}%
+              \fi
               \raggedright
 %    \end{macrocode}
 % Zuerst wird der Name gesetzt. Dabei soll eine eigene Schriftart für
@@ -1927,7 +1955,9 @@
 %    \begin{macrocode}
             \or
               \raggedleft
-              \ifkomavarempty{fromlogo}{}{\usekomavar{fromlogo}\par}%
+              \if@logo
+                \ifkomavarempty{fromlogo}{}{\usekomavar{fromlogo}\par}%
+              \fi
               {\usekomafont{fromname}\strut\ignorespaces
                 \usekomavar{fromname}%
                 {%
