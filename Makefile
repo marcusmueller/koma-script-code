@@ -107,6 +107,7 @@ CLS_MAIN	= scrbook.cls \
 		  NipponEL.lco \
 		  NipponLH.lco \
 		  NipponLL.lco \
+		  NipponRL.lco \
 		  KakuLL.lco
 
 CLS_MAIN_DTX    = scrbeta.dtx \
