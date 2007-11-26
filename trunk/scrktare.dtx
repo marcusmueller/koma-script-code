@@ -1,4 +1,4 @@
-% \CheckSum{1671}
+% \CheckSum{1678}
 % \iffalse meta-comment
 % ======================================================================
 % scrktare.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrktare.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrktare.dtx}[2007/10/23 v2.97e KOMA-Script (type area)]
+\ProvidesFile{scrktare.dtx}[2007/11/26 v2.97e KOMA-Script (type area)]
 % \iffalse
 %</driver>
 %<package&identify>\ProvidesPackage{typearea}[%
@@ -987,7 +987,7 @@
           }{%
             \iso@paper{#1}%
             \if@tempswa\else
-              \expandafter\maybe@pair#1\scr@next
+              \expandafter\maybe@pair#1::\@nil
               \if@tempswa
                 \setlength\paperheight{\@tempa}%
                 \setlength\paperwidth{\@tempb}%
@@ -995,7 +995,7 @@
                 \KOMA@unknown@keyval{paper}{#1}{%
                   `letter', `legal', `executive', `a'<nr>, `b'<nr>,
                   `c'<nr>, `d'<nr>,\MessageBreak
-                  `('<width>`,'<height>`)', `landscape' and `portrait'%
+                  <width>`:'<height>, `landscape' and `portrait'%
                 }%
               \fi
             \fi
@@ -1019,21 +1019,20 @@
 %  \end{macro}
 %  \begin{macro}{\maybe@pair}
 %    \changes{v2.95}{2002/12/03}{neu (intern)}
+%    \changes{v2.97e}{2007/11/26}{funktioniert zum ersten Mal}
 % Testet, ob der nachfolgende Parameter die Form
-% "`(\meta{erstes Argument},\meta{zweites Argument})"' hat.
-%  \begin{macro}{\maybe@@pair}
-%    \changes{v2.95}{2002/12/03}{neu (intern)}
+% "`\meta{erstes Argument}:\meta{zweites Argument}"' hat.
 % Wenn ja, wird \cs{@tempa} mit dem ersten und \cs{@tempb} mit dem
 % zweiten Argument definiert.
 %    \begin{macrocode}
-\newcommand*{\maybe@pair}{%
-  \@ifnextchar (%
-  {\@tempswatrue\maybe@@pair}{\@tempswafalse\gobble@till@scr@next}%
+\newcommand*{\maybe@pair}{}
+\def\maybe@pair#1:#2:#3\@nil{%
+  \edef\@tempa{#1}\edef\@tempb{#2}%
+  \ifx\@tempa\@empty\@tempswafalse\else
+    \ifx\@tempb\@empty\@tempswafalse\else\@tempswatrue\fi
+  \fi
 }
-\newcommand*{\maybe@@pair}{}
-\def\@maybepair(#1,#2)\scr@next{\def\@tempa{#1}\def\@tempb{#2}}%
 %    \end{macrocode}
-%  \end{macro}
 %  \end{macro}
 %  \end{option}
 %
@@ -1106,7 +1105,7 @@
 \else
   \KOMAExecuteOptions{twoside=false}
 \fi
-\KOMAProcessOptions
+\KOMAProcessOptions\relax
 %    \end{macrocode}
 %
 %
