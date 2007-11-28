@@ -45,7 +45,7 @@
 %
 % ============================================================================
 
-\ProvidesFile{scrbookreportarticle.tex}[2007/09/04 KOMA-Script guide (chapter:
+\ProvidesFile{scrbookreportarticle.tex}[2007/11/28 KOMA-Script guide (chapter:
 scrbook, scrreprt, scrartcl)]
 
 \chapter{Die Hauptklassen \Class{scrbook}, \Class{scrreprt}, \Class{scrartcl}}
@@ -1405,12 +1405,18 @@ definiert ist.
     Überschrift der Ebene \Macro{section}}%
   \feentry{sectioning}{%
     alternative Bezeichnung für \FontElement{disposition}}%
+  \feentry{subject}{%
+    Typisierung des Dokuments, also das Argument von \Macro{subject} auf der
+    Haupttitelseite}%
   \feentry{subparagraph}{%
     Überschrift der Ebene \Macro{subparagraph}}%
   \feentry{subsection}{%
     Überschrift der Ebene \Macro{subsection}}%
   \feentry{subsubsection}{%
     Überschrift der Ebene \Macro{subsubsection}}%
+  \feentry{subtitle}{%
+    Untertitel des Dokuments, also das Argument von \Macro{subtitle} auf der
+    Haupttitelseite}%
   \feentry{title}{%
     Haupttitel des Dokuments, also das Argument von \Macro{title} (bezüglich
     der Größe des Haupttitels siehe die ergänzenden Bemerkungen im Text ab
@@ -1997,17 +2003,20 @@ einer solchen Titelei durch Umdefinierung des Makros \Macro{titlepagestyle}
 verändert werden.  Siehe hierzu \autoref{sec:maincls.pageStyle},
 \autopageref{desc:maincls.macro.titlepagestyle}.
 
-Die folgenden Anweisungen führen nicht unmittelbar zum Setzen der
-Titelei. Das Setzen der Titelei erfolgt immer mit
-\Macro{maketitle}. Mit den nachfolgend erklärten Anweisungen
-werden lediglich die Inhalte der Titelei festgelegt. Sie müssen
-daher auch unbedingt vor \Macro{maketitle} verwendet werden. Es
-ist jedoch nicht notwendig und bei Verwendung des
-\Package{babel}-Pakets\IndexPackage{babel} (siehe
-\cite{package:babel}) auch nicht empfehlenswert, diese
-Anweisungen in der Dokumentpräambel vor
-\Macro{begin}\PParameter{document} zu verwenden.
-Beispieldokumente finden Sie am Ende des Abschnitts.
+Die folgenden Anweisungen führen nicht unmittelbar zum Setzen der Titelei. Das
+Setzen der Titelei erfolgt immer mit \Macro{maketitle}. Es sei an dieser
+Stelle auch darauf hingewiesen, dass \Macro{maketitle} nicht innerhalb einer
+\Environment{titlepage}-Umgebung zu verwenden ist. Wie in den Beispielen
+angegeben sollte man nur entweder \Macro{maketitle} oder
+\Environment{titlepage} verwenden.
+
+Mit den nachfolgend erklärten Anweisungen werden lediglich die Inhalte der
+Titelei festgelegt. Sie müssen daher auch unbedingt vor \Macro{maketitle}
+verwendet werden. Es ist jedoch nicht notwendig und bei Verwendung des
+\Package{babel}-Pakets\IndexPackage{babel} (siehe \cite{package:babel}) auch
+nicht empfehlenswert, diese Anweisungen in der Dokumentpräambel vor
+\Macro{begin}\PParameter{document} zu verwenden.  Beispieldokumente finden Sie
+am Ende des Abschnitts.
 
 
 \begin{Explain}%
@@ -2068,6 +2077,7 @@ erfolgt als Bestandteil der Titelei mit \Macro{maketitle}.
   \Macro{titlehead}\Parameter{Titelkopf}\\
   \Macro{subject}\Parameter{Typisierung}\\
   \Macro{title}\Parameter{Titel}\\
+  \Macro{subtitle}\Parameter{Untertitel}\\
   \Macro{author}\Parameter{Autor}\\
   \Macro{date}\Parameter{Datum}\\
   \Macro{publishers}\Parameter{Herausgeber}\\
@@ -2077,20 +2087,29 @@ erfolgt als Bestandteil der Titelei mit \Macro{maketitle}.
 \BeginIndex{Cmd}{titlehead}%
 \BeginIndex{Cmd}{subject}%
 \BeginIndex{Cmd}{title}%
+\BeginIndex{Cmd}{subtitle}%
 \BeginIndex{Cmd}{author}%
 \BeginIndex{Cmd}{date}%
 \BeginIndex{Cmd}{publishers}%
 \BeginIndex{Cmd}{and}%
 \BeginIndex{Cmd}{thanks}%
-Für den Inhalt der Haupttitelseite stehen sechs Elemente zur
-Verfügung. Der \PName{Titelkopf}\Index[indexmain]{Titel>Kopf} wird
+Für den Inhalt der Haupttitelseite stehen sieben Elemente zur Verfügung. Die
+Ausgabe der Haupttitelseite erfolgt als Bestandteil der Titelei mit
+\Macro{maketitle}, während die hier aufgeführten Anweisungen lediglich der
+Definition der entspechenden Elemente dienen.
+
+Der \PName{Titelkopf}\Index[indexmain]{Titel>Kopf} wird
 mit der Anweisung \Macro{titlehead} definiert. Er wird über die
 gesamte Textbreite in normalem Blocksatz am Anfang der Seite
 ausgegeben. Er kann vom Anwender frei gestaltet werden.
 
-Die \PName{Typisierung}\Index[indexmain]{Typisierung} wird unmittelbar
-über dem \PName{Titel} ausgegeben. Dabei wird eine gegenüber der
-Grundschrift leicht vergößerte Schrift verwendet. 
+Die \PName{Typisierung}\Index[indexmain]{Typisierung} wird unmittelbar über
+dem \PName{Titel}
+ausgegeben. Dabei\ChangedAt{v2.95}{\Class{scrbook}\and\Class{scrreprt}\and\Class{scrartcl}}
+findet die Schriftumschaltung für das Element
+\FontElement{subject}\IndexFontElement{subject} Anwendung. Die Voreinstellung,
+die in \autoref{tab:maincls.titlefonts} zu finden ist, kann mit Hilfe der
+Anweisungen aus \autoref{sec:maincls.font} verändert werden.
 
 Der \PName{Titel} wird in einer sehr großen Schrift ausgegeben.
 Dabei\ChangedAt{v2.8p}{%
@@ -2105,7 +2124,31 @@ mit Hilfe der Anweisungen aus \autoref{sec:maincls.font} verändert werden. Die
 Größe ist jedoch davon unabhängig (siehe \autoref{tab:maincls.mainTitle},
 \autopageref{tab:maincls.mainTitle}).
 
-Unter dem \PName{Titel} folgt der \PName{Autor}\Index[indexmain]{Autor}.
+Der
+\PName{Untertitel}\ChangedAt{v2.97c}{\Class{scrbook}\and\Class{scrreprt}\and\Class{scrartcl}}
+wird in der über das Element \FontElement{subtitle}\IndexFontElement{subtitle}
+eingestellten Schrift knapp unter dem Titel ausgegeben. Die Voreinstellung,
+die \autoref{tab:maincls.titlefonts} zu entnehmen ist, kann mit Hilfe der
+Anweisungen aus \autoref{sec:maincls.font} verändert werden.
+
+\begin{table}
+  \centering
+  \caption{Schriftvoreinstellungen für die Elemente des Titels}
+  \begin{tabular}{ll}
+    \toprule
+    Element-Name & Voreinstellung \\
+    \midrule
+    \FontElement{subject} &
+    \Macro{normalfont}\Macro{normalcolor}\Macro{bfseries}\Macro{Large} \\
+    \FontElement{title} & \Macro{usekomafont}\PParameter{disposition} \\
+    \FontElement{subtitle} &
+    \Macro{usekomafont}\PParameter{title}\Macro{large} \\
+    \bottomrule
+  \end{tabular}
+  \label{tab:maincls.titlefonts}
+\end{table}
+
+Unter dem \PName{Untertitel} folgt der \PName{Autor}\Index[indexmain]{Autor}.
 Es kann auch durchaus mehr als ein Autor innerhalb des Arguments von
 \Macro{author} angegeben werden. Die Autoren sind dann mit \Macro{and}
 voneinander zu trennen.
@@ -2141,11 +2184,15 @@ zusammengefasst in \autoref{tab:maincls.mainTitle} zu finden.
     \Macro{maketitle}}
   \begin{tabular}{llll}
     \toprule
-    Element     & Anweisung          & Schrift            & Ausrichtung \\
+    Element     & Anweisung          & Schrift            & Satz \\
     \midrule
     Seitenkopf  & \Macro{titlehead}  & \Macro{normalsize} & Blocksatz   \\
-    Typisierung & \Macro{subject}    & \Macro{Large}      & zentriert   \\
-    Titel       & \Macro{title}      & \Macro{huge}       & zentriert   \\
+    Typisierung & \Macro{subject}    & \Macro{usekomafont}\PParameter{subject}
+    & zentriert   \\
+    Titel       & \Macro{title}      &
+    \Macro{huge}\Macro{usekomafont}\PParameter{title} & zentriert   \\
+    Untertitel  & \Macro{subtitle}   &
+    \Macro{usekomafont}\PParameter{subtitle} & zentriert \\
     Autoren     & \Macro{author}     & \Macro{Large}      & zentriert   \\
     Datum       & \Macro{date}       & \Macro{Large}      & zentriert   \\
     Herausgeber & \Macro{publishers} & \Macro{Large}      & zentriert   \\
@@ -2173,6 +2220,7 @@ zusammengefasst in \autoref{tab:maincls.mainTitle} zu finden.
     34567 Schlauenheim}
   \subject{Diplomarbeit}
   \title{Digitale Raumsimulation mit dem DSP\,56004}
+  \subtitle{Klein aber fein?}
   \author{cand. stup. Uli Ungenau}
   \date{30. Februar 2001}
   \publishers{Betreut durch Prof. Dr. rer. stup. 
@@ -2207,6 +2255,7 @@ zusammengefasst in \autoref{tab:maincls.mainTitle} zu finden.
 \EndIndex{Cmd}{titlehead}%
 \EndIndex{Cmd}{subject}%
 \EndIndex{Cmd}{title}%
+\EndIndex{Cmd}{subtitle}%
 \EndIndex{Cmd}{author}%
 \EndIndex{Cmd}{date}%
 \EndIndex{Cmd}{publishers}%
