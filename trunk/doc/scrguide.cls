@@ -951,6 +951,9 @@
   \newcommand*{\feentry}[1]{%
     \entry{\FontElement{##1}\IndexFontElement[indexmain]{##1}}%
   }%
+  \newcommand*{\oentry}[1]{%
+    \entry{\Option{##1}\IndexOption[indexmain]{##1}}%
+  }%
 }
 % \end{macro}
 %
