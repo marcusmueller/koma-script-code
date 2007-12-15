@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2007/10/12 v0.9f internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2007/12/15 v1.0 internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -547,6 +547,14 @@
 \setkomafont{caption}{\normalcolor\small}
 %    \end{macrocode}
 %
+%
+% \section{Footnotes}
+%
+% \begin{macro}{\thempfootnote}
+%    \begin{macrocode}
+\renewcommand*{\thempfootnote}{\textit{\@arabic{\c@mpfootnote}}}
+%    \end{macrocode}
+% \end{macro}
 %
 % \section{Math}
 %
@@ -1060,6 +1068,15 @@ KOMAScript \endcsname
 \renewcommand*\@dotsep{2.5}
 %    \end{macrocode}
 %
+% \section{Appendix}
+%
+% \begin{macro}{\appendix}
+% Use only first if used more than once. With this, every appendix file may
+% start with |\appendix|.
+%    \begin{macrocode}
+\g@addto@macro\appendix{\global\let\appendix\relax}
+%    \end{macrocode}
+% \end{macro}
 %
 % \section{Bibliography}
 %
