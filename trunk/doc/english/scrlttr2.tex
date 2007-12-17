@@ -45,7 +45,7 @@
 %
 % ============================================================================
 
-\ProvidesFile{scrlttr2.tex}[2007/12/15 KOMA-Script guide (chapter: scrlttr2)]
+\ProvidesFile{scrlttr2.tex}[2007/12/17 KOMA-Script guide (chapter: scrlttr2)]
 \translator{Harald Bongartz\and Georg Grandke\and Raimund Kohl\and Jens-Uwe
   Morawski\and Stephan Hennig\and Gernot Hassenpflug\and Markus Kohm}
 
@@ -745,14 +745,16 @@ Default is \PValue{true}.
   \Option{subject}
 \end{Declaration}
 \BeginIndex{Option}{subject}%
-This option serves two purposes: first, you can choose if your subject
-should have a title, given by the \PName{subject} variable (see
-\autoref{tab:scrlttr2.subjectTerm},
+This option serves two purposes: first, you can choose if your
+subject\Index{subject} should have a title, given by the
+\PName{subject} variable (see \autoref{tab:scrlttr2.subjectTerm},
 \autopageref{tab:scrlttr2.subjectTerm}); second, you can choose if the
-subject should be set before or after the opening. Possible values for
-this option are shown in \autoref{tab:scrlttr2.subject}. Defaults are
-\PValue{beforeopening} and \PValue{untitled}.
-
+subject should be set before or after the opening. Furthermore, the
+formatting\ChangedAt{v2.97c}{\Class{scrlttr2}} of the subject can be
+modified. Possible values for this option are shown in
+\autoref{tab:scrlttr2.subject}. It is expressly noted that when using
+the setting \PValue{underlined}, the subject must fit on one line!
+Defaults are \PValue{beforeopening} and \PValue{untitled}.
 \begin{table}
   \caption[{Possible values of option \Option{subject} with
     \Class{scrlttr2}}]{Possible values of option \Option{subject} for the
@@ -762,7 +764,11 @@ this option are shown in \autoref{tab:scrlttr2.subject}. Defaults are
   \begin{desctabular}
     \pventry{afteropening}{set subject after opening}%
     \pventry{beforeopening}{set subject before opening}%
+    \pventry{centered}{set subject centered}%
+    \pventry{left}{set subject left-justified}%
+    \pventry{right}{set subject right-justified}%
     \pventry{titled}{add title to subject}%
+    \pventry{underlined}{set subject underlined (see note in text)}%
     \pventry{untitled}{do not add title to subject}%
   \end{desctabular}
 \end{table}
@@ -934,23 +940,23 @@ pseudo-length \PLength{firstfootvpos}\IndexPLength{firstfootvpos}
 (siehe \autoref{sec:scrlttr2.firstFoot},
 \autopageref{desc:scrlttr2.plength.firstfootvpos}).
 
-% TODO: Translate the description of option "firstfoot"
 \begin{Declaration}
   \Option{firstfoot}
 \end{Declaration}
 \BeginIndex{Option}{firstfoot}%
-Diese\ChangedAt{v2.97e}{\Class{scrlttr2}} Option bestimmt, ob der
-Briefbogenfuß überhaupt gesetzt wird. Wird der Briefbogenfuß nicht gesetzt, so
-wird außerdem die Einstellung der Pseudolänge \PLength{firstfootvpos}
-ignorriert und stattdessen von \Class{scrlttr2} angenommen, dass deren Wert
-\Length{paperheight} ist. Dies hat Auswirkungen, wenn gleichzeigit die Option
-\Option{enlargefirstpage} (siehe \autoref{sec:scrlttr2.firstFoot},
-\autopageref{desc:scrlttr2.plength.firstfootvpos}) verwendet wird. 
-
-Die Option versteht die Standardwerte für einfache Schalter, die in
-\autoref{tab:scrlttr2.simpleSwitchValues},
-\autopageref{tab:scrlttr2.simpleSwitchValues} angegeben sind. Voreingestellt
-ist das Setzen des Briefbogenfußes.
+This\ChangedAt{v2.97e}{\Class{scrlttr2}} option determines whether the
+letterfoot is set or not. If the letterfoot is not set then the
+pseudo-length \PLength{firstfootvpos} is also ignored, and instead
+\Class{scrlttr2} assumes that the value is equal to
+\Length{paperheight}.  This has an effect when the option
+\Option{enlargefirstpage} (see \autoref{sec:scrlttr2.firstFoot},
+\autopageref{desc:scrlttr2.plength.firstfootvpos}) is used
+concurrently.
+  
+The option understands the standard values for simple switches, as
+given in \autoref{tab:scrlttr2.simpleSwitchValues},
+\autopageref{tab:scrlttr2.simpleSwitchValues}. Default is the setting
+of the letterfoot.
 \EndIndex{Option}{firstfoot}%
 
 \EndIndex{}{letter>footer}
@@ -1061,17 +1067,9 @@ loading the \File{lco} file are local to the corresponding letter.
 \end{Example}
 
 \begin{Explain}
-  If an \File{lco} file is loaded via \Macro{documentclass}, it may
-  nevertheless take the name of an option, provided it is an option
-  that does not take an argument. Nevertheless, it would be possible
-  to give the name \File{fromalign=left.lco} to an \File{lco}
-  file. This will then be loaded every time the \Macro{documentclass}
-  option \Option{fromalign} is used with the value
-  \PValue{left}. Admittedly, this is only of academic interest. Of
-  course you can use this feature only if your operating system and
-  file system support this kind of file name. Otherwise you have to
-  choose another file name and add the corresponding option, if
-  needed.
+  If\ChangedAt{v2.97}{\Class{scrlttr2}} an \File{lco} file is loaded
+  via \Macro{documentclass}, then it may no longer have the same name
+  as an option.
 \end{Explain}
 
 \begin{Example}
@@ -1145,49 +1143,74 @@ value. Additionally, also reduce \PLength{toaddrwidth} accordingly.
 %
 \EndIndex{Cmd}{LoadLetterOption}%
 
-\begin{table}
-\centering
-\caption{The predefined \File{lco} files}
-\begin{tabular}{lp{.7\textwidth}}
-  \toprule
-  \File{lco} file & Description and features \\
-  \midrule
-  \Option{DIN}\IndexOption[indexmain]{DIN}%
-                & parameter set for letters on A4-size paper,
-                  complying with German standard DIN~676;
-                  suitable for window envelopes in the sizes C4, C5, C6,
-                  and C6/5 (C6 long).\\
-  \Option{DINmtext}\IndexOption[indexmain]{DINmtext}%
-                & parameter set for letters on A4-size paper,
-                  complying with DIN~676, but using an alternate layout
-                  with more text on the first page;
-                  only suitable for window envelopes in the sizes C6 and
-                  C6/5 (C6 long).\\
-  \Option{KOMAold}\IndexOption[indexmain]{KOMAold}%
-                & parameter set for letters on A4-size paper using a
-                  layout close to the now obsolete \Class{scrlettr}
-                  letter class; suitable for window envelopes in the sizes
-                  C4, C5, C6, and C6/5 (C6 long);
-                  some additional commands to improve compatibility with
-                  obsolete \Class{scrlettr} commands are defined;
-                  \Class{scrlttr2} may behave slightly different when
-                  used with this \File{lco} file than with the other
-                  \File{lco} files.\\
-  \Option{SN}\IndexOption[indexmain]{SN}%
-                & parameter set for Swiss letters with address field on
-                  the right side, according to SN~010\,130; suitable for
-                  Swiss window envelopes in the sizes C4, C5, C6, and
-                  C6/5 (C6 long).\\
-  \Option{SNleft}\IndexOption[indexmain]{SNleft}%
-                & parameter set for Swiss letters with address field on 
-                  the left side;
-                  suitable for Swiss window envelopes with window on the
-                  left side in the sizes C4, C5, C6, and C6/5 (C6 long).
-                  \\
-  \bottomrule
-\end{tabular}
-\label{tab:lcoFiles}
-\end{table}
+\begin{desctable}
+  \caption{The predefined \File{lco} files\label{tab:lcoFiles}}\\
+  \Endfirsthead%
+  \caption[]{The predefined \File{lco} files (\emph{continuation})}\\
+  \Endhead%
+  \standardfoot%
+  \oentry{DIN}{%
+    parameter set for letters on A4-size paper, complying with German
+    standard DIN~676; suitable for window envelopes in the sizes C4,
+    C5, C6, and C6/5 (C6 long).}%
+  \oentry{DINmtext}{%
+    parameter set for letters on A4-size paper, complying with
+    DIN~676, but using an alternate layout with more text on the first
+    page; only suitable for window envelopes in the sizes C6 and C6/5
+    (C6 long).}%
+  \oentry{KOMAold}{%
+    parameter set for letters on A4-size paper using a layout close to
+    the now obsolete \Class{scrlettr} letter class; suitable for
+    window envelopes in the sizes C4, C5, C6, and C6/5 (C6 long); some
+    additional commands to improve compatibility with obsolete
+    \Class{scrlettr} commands are defined; \Class{scrlttr2} may behave
+    slightly different when used with this \File{lco} file than with
+    the other \File{lco} files.}%
+  \oentry{NipponEL}{%
+    parameter set for Japanese letters in A4 format; suitable for
+    Japanese window envelopes of types Chou or You 3 or 4, in which
+    the windows is approximately 90\Unit{mm} wide, 45\Unit{mm} high,
+    and positioned 22\Unit{mm} from the left and 12\Unit{mm} from the
+    top edge (see \autoref{cha:japanlco}).}%
+  \oentry{NipponEH}{%
+    parameter set for Japanese letters in A4 format; suitable for
+    Japanese window envelopes of types Chou or You 3 or 4, in which
+    the windows is approximately 90\Unit{mm} wide, 55\Unit{mm} high,
+    and positioned 22\Unit{mm} from the left and 12\Unit{mm} from the
+    top edge (see \autoref{cha:japanlco}).}%
+  \oentry{NipponLL}{%
+    parameter set for Japanese letters in A4 format; suitable for
+    Japanese window envelopes of types Chou or You 3 or 4, in which
+    the windows is approximately 90\Unit{mm} wide, 45\Unit{mm} high,
+    and positioned 25\Unit{mm} from the left and 12\Unit{mm} from the
+    top edge (see \autoref{cha:japanlco}).}%
+  \oentry{NipponLH}{%
+    parameter set for Japanese letters in A4 format; suitable for
+    Japanese window envelopes of types Chou or You 3 or 4, in which
+    the windows is approximately 90\Unit{mm} wide, 55\Unit{mm} high,
+    and positioned 25\Unit{mm} from the left and 12\Unit{mm} from the
+    top edge (see \autoref{cha:japanlco}).}%
+  \oentry{NipponRL}{%
+    parameter set for Japanese letters in A4 format; suitable for
+    Japanese window envelopes of types Chou or You 3 or 4, in which
+    the windows is approximately 90\Unit{mm} wide, 45\Unit{mm} high,
+    and positioned 25\Unit{mm} from the left and 24\Unit{mm} from the
+    top edge (see \autoref{cha:japanlco}).}%
+  \oentry{KakuLL}{%
+    parameter set for Japanese letters in A4 format; suitable for
+    Japanese window envelopes of type Kaku A4, in which the windows is
+    approximately 90\Unit{mm} wide, 45\Unit{mm} high, and positioned
+    25\Unit{mm} from the left and 24\Unit{mm} from the top edge (see
+    \autoref{cha:japanlco}).}%
+  \oentry{SN}{%
+    parameter set for Swiss letters with address field on the right
+    side, according to SN~010\,130; suitable for Swiss window
+    envelopes in the sizes C4, C5, C6, and C6/5 (C6 long).}%
+  \oentry{SNleft}{%
+    parameter set for Swiss letters with address field on the left
+    side; suitable for Swiss window envelopes with window on the left
+    side in the sizes C4, C5, C6, and C6/5 (C6 long).}%
+\end{desctable}
 
 \begin{Explain}
 \begin{Declaration}
