@@ -1,4 +1,4 @@
-% \CheckSum{259}
+% \CheckSum{263}
 % \iffalse meta-comment
 % ======================================================================
 % scrlfile.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrlfile.dtx
 %<*driver|scrlfile|load>
 % \fi
-\def\scrlfileversion{2007/03/07 v2.97a}
+\def\scrlfileversion{2007/12/18 v2.98}
 % \iffalse
 %</driver|scrlfile|load>
 %<*driver>
@@ -491,6 +491,8 @@
 %    \changes{v2.96}{2006/07/19}{new redefinition}
 %  \begin{macro}{\scr@onefilewithoption}
 %    \changes{v2.96}{2006/07/19}{new helper macro}
+%  \begin{macro}{\scr@@onefilewithoption}
+%    \changes{v2.98}{2007/12/18}{new helper macro}
 % \LaTeX{} uses this macro for loading classes and packages using
 % \cs{LoadClass}, \cs{documentclass}, \cs{RequirePackage}, and
 % \cs{usepackage}. We simply say now: if the class or package should be
@@ -504,15 +506,22 @@
 \def\@onefilewithoptions#1[#2][#3]#4{%
   \begingroup\expandafter\expandafter\expandafter\endgroup
   \expandafter\ifx\csname #1.#4-@aliasname\endcsname\relax
-    \scr@onefilewithoptions{#1}[{#2}][{#3}]{#4}%
+%    \end{macrocode}
+% Do this ridiculous definition and call outside of \cs{ifx}\dots\cs{fi}
+% because of some errornous packages like some versions of
+% \textsf{breakurl}. This does not avoid an error, but the message about
+% unclosed \cs{if} will be outside of \textsf{scrlfile}.
+%    \begin{macrocode}
+    \def\scr@@onefilewithoptions{\scr@onefilewithoptions{#1}}%
   \else
     \scr@replacefile@msg{\csname #1.#4-@aliasname\endcsname.#4}{#1.#4}%
-    \expandafter\@onefilewithoptions\expandafter{%
-      \csname #1.#4-@aliasname\endcsname
-    }[{#2}][{#3}]{#4}%
+    \edef\scr@@onefilewithoptions{%
+      \noexpand\@onefilewithoptions{\csname #1.#4-@aliasname\endcsname}}%
   \fi
+  \scr@@onefilewithoptions[{#2}][{#3}]{#4}%
 }
 %    \end{macrocode}
+%  \end{macro}
 %  \end{macro}
 %  \end{macro}
 %
@@ -551,11 +560,12 @@
 %
 %  \begin{macro}{\scr@replacefile@msg}
 %    \changes{v2.96}{2006/07/19}{new helper command}
+%    \changes{v2.98}{2007/12/18}{spellfix}
 % Last but not least \textsf{scrlfile} will write a message to the log file at
 % every replacement.
 %    \begin{macrocode}
 \newcommand*{\scr@replacefile@msg}[2]{%
-  \PackageInfo{scrlfile}{inputting `#1' instead of `#2'}%
+  \PackageInfo{scrlfile}{inputing `#1' instead of `#2'}%
 }
 %    \end{macrocode}
 %  \end{macro}
@@ -732,5 +742,5 @@
 
 %%% Local Variables:
 %%% mode: doctex
-%%% Text-master: t
+%%% TeX-master: t
 %%% End:
