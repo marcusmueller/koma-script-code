@@ -98,6 +98,7 @@ CLS_MAIN	= scrbook.cls \
 		  scrpage2.sty \
 		  scrtime.sty \
 		  scrdate.sty \
+		  tocstyle.sty \
 	          DIN.lco \
 		  DINmtext.lco \
 		  SN.lco \
@@ -139,7 +140,8 @@ CLS_MAIN_DTX    = scrbeta.dtx \
 		  scrpage.dtx \
 		  scrtime.dtx \
 		  scrlettr.dtx \
-		  scrlogo.dtx
+		  scrlogo.dtx \
+		  tocstyle.dtx
 
 STATIC_DOC      = README \
 	          INSTALL.txt \
@@ -156,11 +158,14 @@ CLS_MAIN_INS	= scrmain.ins
 CLS_MAIN_SUBINS	= scrlfile.ins scraddr.ins scrlettr.ins scrpage.ins \
 		  scrtime.ins
 
+ALPHA_INS       = tocstyle.dtx
+
 CLS_MAIN_SRC	= $(CLS_MAIN_DTX) $(CLS_MAIN_INS) $(CLS_MAIN_SUBINS) \
 		  scrsource.tex
 
 $(CLS_MAIN): $(CLS_MAIN_DVI) $(CLS_MAIN_INS) $(INS_TEMPLATES) $(MAKE_FILES)
 	$(TEXUNPACK) $(CLS_MAIN_INS)
+	$(foreach alphains,$(ALPHA_INS),$(TEXUNPACK) $(alphains);)
 
 scrsource.dvi: scrsource.tex $(CLS_MAIN_DTX) $(MAKE_FILES) scrdoc.cls
 	$(makedvifromdtx)
