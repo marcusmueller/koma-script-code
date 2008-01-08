@@ -160,6 +160,8 @@ CLS_MAIN_SUBINS	= scrlfile.ins scraddr.ins scrlettr.ins scrpage.ins \
 
 ALPHA_INS       = tocstyle.dtx
 
+DTX_IS_INS      = tocstyle.dtx
+
 CLS_MAIN_SRC	= $(CLS_MAIN_DTX) $(CLS_MAIN_INS) $(CLS_MAIN_SUBINS) \
 		  scrsource.tex
 
@@ -201,7 +203,9 @@ MAINTAIN_FILES  = $(MAINTAIN_SRC)
 bindist: dist
 	$(UNTARGZ) $(DISTDIR).tar.gz
 ifdef PREPARERELEASE
+	$(foreach dtxins,$(DTX_IS_INS),$(SYMLINK) $(dtxins) $(dtxins).ins;)
 	developer/scripts/preparerelease.sh 2 $(notdir $(DISTDIR))
+	$(foreach dtxins,$(DTX_IS_INS),$(RM) $(dtxins).ins;)
 endif
 	$(CD) $(notdir $(DISTDIR)) && \
 	  $(MAKE)
