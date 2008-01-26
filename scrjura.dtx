@@ -35,7 +35,7 @@
 %<driver>\ProvidesFile{scrjura.drv}
 %<package>\ProvidesPackage{scrjura}
 %<*dtx|package|driver>
-                [2008/01/23 v0.4a alpha
+                [2008/01/23 v0.4b alpha
 %</dtx|package|driver>
 %<driver>                 (driver)%
 %<package>                (package)%
@@ -241,16 +241,15 @@ standard classes created by The LaTeX3 Project 1994-1996.
 %
 % \section{Das Paket »scrjura«}
 % \subsection{Überblick}
-% Das Paket \textsf{scrjura} unterstützt das Setzen von Paragraphen in
-% Verträgen. Über eine Reihe von Optionen kann die Wirkung des Pakets
+% Das Paket \textsf{scrjura} ist in erster Linie für den Satz von 
+% Verträgen gedacht. 
+% Über eine Reihe von Optionen kann die Wirkung des Pakets
 % verändert werden. Innerhalb von Verträgen steht eine Reihe von Befehlen zur
 % Verfügung. 
 % 
 % Wer juristische Dokumente verfasst, steht oft unter hohem
 % Zeitdruck. Überraschende Fehlermeldungen von \LaTeXe{} kann man da nicht
-% brauchen. Eine Vorgabe bei der Implementation war daher, die Funktionalität
-% des Pakets mit möglichst wenigen anderen Paketen zu erreichen; gebraucht
-% wird lediglich das keyval"=Paket.
+% brauchen. Erfreulicherweise setzt \textsf{scrjura} lediglich das keyval"=Paket voraus.
 %
 % \textsf{scrjura} bietet zwei Modi:
 % \begin{enumerate}
@@ -284,7 +283,9 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % beispielsweise "`§ 16 Absatz 3 Satz 1"' als auch "`§ 16 III 1"' als Ausgabe
 % zu erhalten.
 %
-% Derzeit unterstützt \textsf{scrjura} leider das |hyperref|"=Paket noch nicht. 
+% \textsf{scrjura} unterstützt das |hyperref|"=Paket, ist damit aber hier noch nicht ausfürlich
+% getestet worden. Wie immer, wird |hyperref| zuletzt geladen. Andernfalls gibt es faszinierende
+% Fehlermeldungen. Wird |hyperref| wieder entfernt, muss die *.aux-Datei gelöscht werden.
 %
 % \subsection{Die Optionen beim Laden des Pakets}
 %
@@ -305,7 +306,7 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % Inhaltsverzeichnisses zurück. Bei dreistelligen Paragraphennummern kann im
 % Inhaltsverzeichnis die Nummer in den Überschriftstext hineinragen.
 % 
-% Die einfachste Abhilfe besteht darin, die Box mit der Gliederungsnummer zu
+% Die einfachste Abhilfe gegen diesen Fehler besteht darin, die Box mit der Gliederungsnummer zu
 % verbreitern, beispielsweise mit
 %  
 % |\renewcommand{\numberline}[1]{\makebox[6em][l]{#1}}|.
@@ -319,13 +320,14 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % erkauft man sich allerdings mit einem erhöhten Risiko, dass Fehler
 % auftreten.
 %
+% Im deutschen Recht werden \textit{Absätze} in Normen zwar arabisch nummeriert, 
+% aber mit römischen Nummern referenziert.
 % \DescribeOption{parcitename}%
-% Normalerweise werden Absätze mit römischen Nummern referenziert. Es kann
-% jedoch mit der Option \texttt{parcitename} auch dafür gesorgt werden, dass
-% sie in der Form |\parname~|\meta{Nummer} referenziert werden.
+% Mit der Option \texttt{parcitename} kann dafür gesorgt werden, dass
+% \textsf{scrjura} Absätze anders, nämlich in der Form |\parname~|\meta{Nummer} referenziert.
 %
 % \DescribeOption{sentencecitename}%
-% Normalerweise werden Sätze mit arabischen Nummern referenziert. Es kann
+% Normalerweise werden \textit{Sätze} mit arabischen Nummern gezählt und referenziert. Es kann
 % jedoch mit der Option \texttt{sentencecitename} auch dafür gesorgt werden,
 % dass sie in der Form |\sentencename~|\meta{Nummer} referenziert werden.
 %
@@ -334,12 +336,12 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % \label{sec:paragraph}
 % \textsf{scrjura} führt zwei Gliederungsebenen ein: Paragraph und
 % Subparagraph.  Selbstverständlich funktioniert deren im folgenden
-% beschriebenen Befehle im \textit{Umgebungsmodus} nur innerhalb der
+% beschriebene Befehle im \textit{Umgebungsmodus} nur innerhalb der
 % Vertragsumgebung.
 % 
 % \DescribeMacro{\Paragraph}%
 % Für die Paragraphenüberschrift stehen verschiedene optionale Argumente zur
-% Verfügung, die -- ungewohnterweise -- mit durch Kommata zu trennenden
+% Verfügung, die -- ungewohnterweise -- in einer durch Kommata zu trennenden
 % key=value-Liste angegeben werden:
 % 
 % \bigskip\renewcommand{\arraystretch}{1.3}
@@ -461,6 +463,26 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % kann der Satzendepunkt apostrophiert gesetzt werden: |'.|, damit wird dann
 % der nächste Satz nummeriert.
 % % 
+% \subsection{kile anpassen}
+% Bei langen Verträgen ist es sehr hilfreich, die Gliederung und die Paragraphentitel
+% auf dem Bildschirm einblenden zu können. Wer kile als Editor verwendet,
+% der kann sich -- Open Source sei Dank! -- selbst helfen. Bei Version 2.0.0 
+% von kile genügt es, in der Datei |kiledocumentinfo.cpp| an geeigneter Stelle
+% zwei Zeilen einzufügen:
+% \begin{verbatim}
+% m_dictStructLevel["\\Paragraph"]=
+% KileStructData(5, KileStruct::Sect, "Paragraph");
+% 
+% m_dictStructLevel["\\SubParagraph"]=
+% KileStructData(6, KileStruct::Sect, "SubParagraph");
+% \end{verbatim}
+% (Einzufügen ohne Zeilenumbruch.)
+%
+% 
+% Zahlen über 7 sind eine schlechte Idee. Nach dem Speichern der Datei folgt der übliche
+% Dreisprung: configure, make, make install (oder checkinstall \dots). kile zeigt danach
+% Paragraphen und »Unterparagraphen« als Dokumentenstruktur an. Vielleicht
+% findet ein Anwender ja heraus, wie dies mit tecniccenter zu bewerkstelligen ist. 
 % 
 % \subsection{Sonstiges}
 %\label{sec:else}
