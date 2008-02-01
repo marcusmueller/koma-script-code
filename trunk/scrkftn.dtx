@@ -1,4 +1,4 @@
-% \CheckSum{111}
+% \CheckSum{249}
 % \iffalse meta-comment
 % ======================================================================
 % scrkftn.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkftn.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkftn.dtx}[2006/03/28 v2.95 KOMA-Script (footnotes)]
+\ProvidesFile{scrkftn.dtx}[2008/02/01 v2.98c KOMA-Script (footnotes)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -97,7 +97,75 @@
 % \fi
 %
 % \subsection{Option}
-% Die Fußnoten werden nicht unmittelbar von Optionen beeinflusst.
+%
+% \begin{option}{multifootnotes}
+%   \changes{v2.98c}{2008/02/01}{Neue Option für Mehrfachfußnoten}
+% Mehrfachfußnoten gibt es dann, wenn zu einer Textstelle mehrere Fußnoten
+% hintereinander gesetzt werden. Normalerweise werden die einfach ohne Abstand
+% hintereinander geklatscht. Man kann dann aber die beiden Fußnoten 1 und 2
+% beispielsweise nicht von der Fußnote 12 unterscheiden. Besser ist es, wenn
+% mehrere Fußnoten automatisch durch ein Trennzeichen getrennt
+% werden.
+% \begin{macro}{\if@ftnmulti}
+%   \changes{v2.98c}{2008/02/01}{Neuer Schalter für Mehrfachfußnoten}
+% \begin{macro}{\@ftnmultitrue}
+%   \changes{v2.98c}{2008/02/01}{Neuer Schalter für Mehrfachfußnoten}
+% \begin{macro}{\@ftnmultifalse}
+%   \changes{v2.98c}{2008/02/01}{Neuer Schalter für Mehrfachfußnoten}
+% Gespeichert wird der Zustand in einem Schalter.
+%    \begin{macrocode}
+\newif\if@ftnmulti
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% Die beiden Anweisungen sind dem Namen und der Funktion nach aus footmisc
+% übernommen. Das sollte so auch problemlos funktionieren, solange dort nicht
+% ebenfalls die Option \texttt{multiple} verwendet wird. Also schalten wir sie
+% ggf. ab.
+%    \begin{macrocode}
+\KOMA@key{multifootnotes}[true]{%
+  \ifx\@footnotemark\scr@saved@footnotemark
+  \else
+    \ifx\@footnotemark\scr@footnotemark
+    \else
+      \ClassWarning{\KOMAClassName}{%
+        I've detected an unexpected change of
+        `\string\@footnotemark'!\MessageBreak
+        Use of `multifootnotes=#1' may break another package!\MessageBreak
+        Maybe you should remove the usage of this option}%
+    \fi
+  \fi
+  \KOMA@set@ifkey{multifootnotes}{@ftnmulti}{#1}%
+  \if@ftnmulti
+    \let\@footnotemark\scr@footnotemark
+  \else
+    \let\@footnotemark\scr@saved@footnotemark
+  \fi
+}
+%    \end{macrocode}
+% \begin{macro}{\scr@saved@footnotemark}
+%   \changes{v2.98c}{2008/02/01}{Neu (intern)}
+% \begin{macro}{\scr@footnotemark}
+%   \changes{v2.98c}{2008/02/01}{Neu (intern)}
+%    \begin{macrocode}
+\newcommand*{\scr@saved@footnotemark}{%
+  \leavevmode
+  \ifhmode\edef\@x@sf{\the\spacefactor}\nobreak\fi
+  \@makefnmark
+  \ifhmode\spacefactor\@x@sf\fi
+  \relax}
+\newcommand*{\scr@footnotemark}{%
+  \leavevmode
+  \ifhmode\edef\@x@sf{\the\spacefactor}\scr@prepare@footnotemark\nobreak\fi
+  \@makefnmark
+  \scr@mark@footnotemark
+  \ifhmode\spacefactor\@x@sf\fi
+  \relax}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{option}
 %
 %
 % \iffalse
@@ -252,6 +320,89 @@
 %  \end{macro}
 %  \end{macro}
 %
+% \begin{macro}{\scr@prepare@footnotemark}
+%   \changes{v2.98c}{2008/02/01}{Neu (intern)}
+% Dafür sorgen, dass hier ggf. der Trenner eingefügt wird.
+%    \begin{macrocode}
+\newcommand*{\scr@prepare@footnotemark}{%
+  \ifdim\lastkern=\multiplefootnotemarker\relax
+    \unkern\multiplefootnoteseparator
+    \spacefactor\@x@sf\relax
+  \fi
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\scr@mark@footnotemark}
+%   \changes{v2.98c}{2008/02/01}{Neu (intern)}
+% Damit |\scr@prepare@footnotemark| informiert ist, dass es etwas zu tun hat. 
+%    \begin{macrocode}
+\newcommand*{\scr@mark@footnotemark}{%
+  \kern-\multiplefootnotemarker\kern\multiplefootnotemarker\relax
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\@footnotetext}
+% \begin{macro}{\scr@footnotetext}
+%   \changes{v2.98c}{2008/02/01}{Neu (intern)}
+% Auch hier muss dafür gesorgt werden, dass die Markierung erfolgt.
+%    \begin{macrocode}
+\newcommand*{\scr@footnotetext}{}
+\let\scr@footnotetext\@footnotetext
+\renewcommand*{\@footnotetext}[1]{%
+  \scr@footnotetext{#1}\scr@mark@footnotemark
+}
+\BeforePackage{footmisc}{%
+  \let\@footnotetext\scr@footnotetext
+  \if@ftnmulti
+    \begingroup
+      \@tempcnta\inputlineno\advance\@tempcnta\m@ne\let\inputlineno\@tempcnta
+      \ClassWarning{\KOMAClassName}{%
+        Option `multifootnotes' deactivated!\MessageBreak
+        You may use option `multiple' loading\MessageBreak
+        package `footmisc'%
+      }%
+    \endgroup
+  \fi
+  \KOMA@key{multifootnotes}[true]{%
+    \ClassWarning{\KOMAClassName}{%
+      Multiple footnotes are handled by package\MessageBreak
+      `footmisc'.\space\space
+      Option `multifootnotes=#1'\MessageBreak will not work%
+    }%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\multiplefootnoteseparator}
+%   \changes{v2.98c}{2008/02/01}{Neu}
+% Das ist die der formatierte Separator!
+%    \begin{macrocode}
+\newcommand*{\multiplefootnoteseparator}{%
+  \begingroup\let\thefootnotemark\multfootsep\@makefnmark\endgroup
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\multfootsep}
+%   \changes{v2.98c}{2008/02/01}{Neu}
+% Und hier \textsf{footmisc}-kompatibel unformatiert
+%    \begin{macrocode}
+\newcommand*{\multfootsep}{,}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\multiplefootnotemarker}
+%   \changes{v2.98c}{2008/02/01}{Neu}
+% Das Markierungskerning wieder \textsf{footmisc}-kompatibel.
+%    \begin{macrocode}
+\newcommand*{\multiplefootnotemarker}{3sp}
+%    \end{macrocode}
+% \end{macro}
+%
 %  \begin{macro}{\thefootnotemark}
 %    \changes{v2.4l}{1997/02/06}{neu}
 % Makro, damit \cs{@thefnmark} auf Anwenderebene verfügbar wird:
@@ -269,6 +420,26 @@
 %    \end{macrocode}
 %  \end{macro}
 %
+% \subsection{Fußnotenreferenz}
+%
+% \begin{macro}{\footref}
+%   \changes{v2.98c}{2008/02/01}{Neue Anweisung}
+% Damit man nicht nur zu diesem Zweck das Paket \textsf{footmisc} laden muss,
+% kann man jetzt auch mit \KOMAScript{} alleine Fußnoten setzen, die
+% Referenzen auf andere Fußnoten sind. Der Code stammt einerseits aus footmisc
+% andererseits auf der Usenet-Gruppe comp.text.tex. Wer den zuerst hatte, ist
+% für mich nicht mehr reproduzierbar. Jedenfalls steht er in footmisc unter
+% LPPL und \KOMAScript{} steht ebenfalls unter LPPL. Das sollte also im
+% Zweifelsfall nicht das Problem sein.
+%    \begin{macrocode}
+\newcommand*{\footref}[1]{%
+  \begingroup
+    \unrestored@protected@xdef\@thefnmark{\ref{#1}}%
+  \endgroup
+  \@footnotemark
+}
+%    \end{macrocode}
+% \end{macro}
 %
 % \iffalse
 %</body>
