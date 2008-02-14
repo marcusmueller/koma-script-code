@@ -1,4 +1,4 @@
-% \CheckSum{261}
+% \CheckSum{284}
 % \iffalse meta-comment
 % ======================================================================
 % scrkftn.dtx
@@ -130,7 +130,7 @@
     \ifx\@footnotemark\scr@footnotemark
     \else
       \ClassWarning{\KOMAClassName}{%
-        Unexpected change of `\string\@footnotemark' detected!\MessageBreak
+        Change of `\string\@footnotemark' detected!\MessageBreak
         Use of `multifootnotes=#1' may break\MessageBreak
         another package!\MessageBreak
         Maybe you should remove the usage of\MessageBreak
@@ -140,11 +140,24 @@
   \KOMA@set@ifkey{multifootnotes}{@ftnmulti}{#1}%
   \if@ftnmulti
     \let\@footnotemark\scr@footnotemark
+    \let\FN@mf@prepare\scr@mf@prepare
+    \def\scr@footmisc@options{multiple}%
   \else
     \let\@footnotemark\scr@saved@footnotemark
+    \let\FN@mf@prepare\relax
+    \let\scr@footmisc@options\@empty
   \fi
 }
 %    \end{macrocode}
+% \begin{macro}{\scr@footmisc@options}
+%   \changes{v2.98c}{2008/02/14}{Neuer (intern)}
+% Für etwas mehr Kompatibilität mit \textsf{footmisc}, wird die aktuelle
+% Einstellung der \texttt{multifootnotes} an das Paket weitergereicht.
+%    \begin{macrocode}
+\newcommand*{\scr@footmisc@options}{}
+\PassOptionsToPackage{\noexpand\scr@footmisc@options}{footmisc}
+%    \end{macrocode}
+% \end{macro}
 % \begin{macro}{\scr@saved@footnotemark}
 %   \changes{v2.98c}{2008/02/01}{Neu (intern)}
 % \begin{macro}{\scr@footnotemark}
@@ -160,9 +173,9 @@
 \expandafter{\scr@saved@footnotemark}
 \newcommand*{\scr@footnotemark}{%
   \leavevmode
-  \ifhmode\edef\@x@sf{\the\spacefactor}\scr@prepare@footnotemark\nobreak\fi
+  \ifhmode\edef\@x@sf{\the\spacefactor}\FN@mf@check\nobreak\fi
   \@makefnmark
-  \scr@mark@footnotemark
+  \csname FN@mf@prepare\endcsname
   \ifhmode\spacefactor\@x@sf\fi
   \relax}
 %    \end{macrocode}
@@ -323,12 +336,13 @@
 %  \end{macro}
 %  \end{macro}
 %
-% \begin{macro}{\scr@prepare@footnotemark}
+% \begin{macro}{\FN@mf@check}
 %   \changes{v2.98c}{2008/02/01}{Neu (intern)}
 % Dafür sorgen, dass hier ggf. der Trenner eingefügt wird.
 %    \begin{macrocode}
-\newcommand*{\scr@prepare@footnotemark}{%
+\newcommand*{\FN@mf@check}{%
   \ifdim\lastkern=\multiplefootnotemarker\relax
+    \edef\@x@sf{\the\spacefactor}%
     \unkern\multiplefootnoteseparator
     \spacefactor\@x@sf\relax
   \fi
@@ -336,13 +350,20 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\scr@mark@footnotemark}
+% \begin{macro}{\scr@mf@prepare}
 %   \changes{v2.98c}{2008/02/01}{Neu (intern)}
-% Damit |\scr@prepare@footnotemark| informiert ist, dass es etwas zu tun hat. 
+% Damit |\FN@mf@check| informiert ist, dass es etwas zu tun hat. 
 %    \begin{macrocode}
-\newcommand*{\scr@mark@footnotemark}{%
-  \kern-\multiplefootnotemarker\kern\multiplefootnotemarker\relax
+\newcommand*{\scr@mf@prepare}{%
+  \kern-\multiplefootnotemarker
+  \kern\multiplefootnotemarker\relax
 }
+% \end{macro}
+% \begin{macro}{\F@mf@prepare}
+%   \changes{v2.98c}{2008/02/14}{Neu (intern)}
+% Aus Gründen der Kompatibilität mit \textsf{footmisc} wird das dann
+% vorsoglich auch noch definiert.
+\let\FN@mf@prepare\relax
 %    \end{macrocode}
 % \end{macro}
 %
@@ -354,7 +375,8 @@
 \newcommand*{\scr@saved@footnotetext}{}
 \let\scr@saved@footnotetext\@footnotetext
 \renewcommand*{\@footnotetext}[1]{%
-  \scr@saved@footnotetext{#1}\scr@mark@footnotemark
+  \scr@saved@footnotetext{#1}%
+  \csname FN@mf@prepare\endcsname
 }
 \BeforePackage{footmisc}{%
   \let\@footnotemark\scr@saved@footnotemark
@@ -369,13 +391,6 @@
       }%
     \endgroup
   \fi
-  \KOMA@key{multifootnotes}[true]{%
-    \ClassWarning{\KOMAClassName}{%
-      Multiple footnotes are handled by package\MessageBreak
-      `footmisc'.\space\space
-      Option `multifootnotes=#1'\MessageBreak will not work%
-    }%
-  }%
 }
 %    \end{macrocode}
 % \end{macro}
