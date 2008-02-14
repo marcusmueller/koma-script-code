@@ -1,4 +1,4 @@
-% \CheckSum{284}
+% \CheckSum{269}
 % \iffalse meta-comment
 % ======================================================================
 % scrkftn.dtx
@@ -98,55 +98,42 @@
 %
 % \subsection{Option}
 %
-% \begin{option}{multifootnotes}
+% \begin{option}{footnotes}
 %   \changes{v2.98c}{2008/02/01}{Neue Option für Mehrfachfußnoten}
 % Mehrfachfußnoten gibt es dann, wenn zu einer Textstelle mehrere Fußnoten
 % hintereinander gesetzt werden. Normalerweise werden die einfach ohne Abstand
 % hintereinander geklatscht. Man kann dann aber die beiden Fußnoten 1 und 2
 % beispielsweise nicht von der Fußnote 12 unterscheiden. Besser ist es, wenn
 % mehrere Fußnoten automatisch durch ein Trennzeichen getrennt
-% werden.
-% \begin{macro}{\if@ftnmulti}
-%   \changes{v2.98c}{2008/02/01}{Neuer Schalter für Mehrfachfußnoten}
-% \begin{macro}{\@ftnmultitrue}
-%   \changes{v2.98c}{2008/02/01}{Neuer Schalter für Mehrfachfußnoten}
-% \begin{macro}{\@ftnmultifalse}
-%   \changes{v2.98c}{2008/02/01}{Neuer Schalter für Mehrfachfußnoten}
-% Gespeichert wird der Zustand in einem Schalter.
+% werden. Die Funktion ist \textsf{footmisc} entnommen und sollte inklusive
+% Ein- und Ausschalten auch zusammen mit diesem Paket funktionieren.
 %    \begin{macrocode}
-\newif\if@ftnmulti
-%    \end{macrocode}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-% Die beiden Anweisungen sind dem Namen und der Funktion nach aus footmisc
-% übernommen. Das sollte so auch problemlos funktionieren, solange dort nicht
-% ebenfalls die Option \texttt{multiple} verwendet wird. Also schalten wir sie
-% ggf. ab.
-%    \begin{macrocode}
-\KOMA@key{multifootnotes}[true]{%
+\KOMA@key{footnotes}{%
   \ifx\@footnotemark\scr@saved@footnotemark
   \else
     \ifx\@footnotemark\scr@footnotemark
     \else
       \ClassWarning{\KOMAClassName}{%
         Change of `\string\@footnotemark' detected!\MessageBreak
-        Use of `multifootnotes=#1' may break\MessageBreak
+        Use of `footnotes=#1' may break\MessageBreak
         another package!\MessageBreak
         Maybe you should remove the usage of\MessageBreak
-        option `multifootnotes'}%
+        option `footnotes=#1'}%
     \fi
   \fi
-  \KOMA@set@ifkey{multifootnotes}{@ftnmulti}{#1}%
-  \if@ftnmulti
+  \ifstr{#1}{multiple}{%
     \let\@footnotemark\scr@footnotemark
     \let\FN@mf@prepare\scr@mf@prepare
     \def\scr@footmisc@options{multiple}%
-  \else
-    \let\@footnotemark\scr@saved@footnotemark
-    \let\FN@mf@prepare\relax
-    \let\scr@footmisc@options\@empty
-  \fi
+  }{%
+    \ifstr{#1}{nomultiple}{%
+      \let\@footnotemark\scr@saved@footnotemark
+      \let\FN@mf@prepare\relax
+      \let\scr@footmisc@options\@empty
+    }{%
+      \KOMA@unknown@keyval{footnotes}{#1}{`multiple' and `nomultiple'}%
+    }%
+  }%
 }
 %    \end{macrocode}
 % \begin{macro}{\scr@footmisc@options}
@@ -378,23 +365,20 @@
   \scr@saved@footnotetext{#1}%
   \csname FN@mf@prepare\endcsname
 }
-\BeforePackage{footmisc}{%
-  \let\@footnotemark\scr@saved@footnotemark
-  \let\@footnotetext\scr@saved@footnotetext
-  \if@ftnmulti
-    \begingroup
-      \@tempcnta\inputlineno\advance\@tempcnta\m@ne\let\inputlineno\@tempcnta
-      \ClassWarning{\KOMAClassName}{%
-        Option `multifootnotes' deactivated!\MessageBreak
-        You may use option `multiple' loading\MessageBreak
-        package `footmisc'%
-      }%
-    \endgroup
-  \fi
-}
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
+%
+% Es muss auch dafür gesorgt werden, dass \textsf{footmisc} nicht unnötig mit
+% Warnung um sich wirft.
+%    \begin{macrocode}
+\BeforePackage{footmisc}{%
+  \ifx\@footnotemark\scr@footnotemark
+    \let\@footnotemark\scr@saved@footnotemark
+  \fi
+  \let\@footnotetext\scr@saved@footnotetext
+}
+%    \end{macrocode}
 %
 % \begin{macro}{\multiplefootnoteseparator}
 %   \changes{v2.98c}{2008/02/01}{Neu}
