@@ -1,4 +1,4 @@
-% \CheckSum{1629}
+% \CheckSum{1649}
 % \iffalse meta-comment
 % ======================================================================
 % tocstyle.dtx
@@ -203,7 +203,7 @@ THERE IS NO SUPPORT, IF YOU USE THIS PACKAGE!
 %<driver>\ProvidesFile{tocstyle.drv}
 %<doc>\ProvidesFile{tocstyle.tex}
 %<*dtx|package|driver|doc>
-  [2007/12/21 v0.2alpha LaTeX2e KOMA-Script package (versatile toc styles)]
+  [2008/01/14 v0.2a-alpha LaTeX2e KOMA-Script package (versatile toc styles)]
 %</dtx|package|driver|doc>
 %<*driver>
 \documentclass{scrdoc}
@@ -532,12 +532,12 @@ shortcuts are shown at \autoref{tab:tocstyle.shortcuts}.
       face, too. All other depth will be set in normal font. Depth -1 (part)
       will be set using \Macro{large}. The font changes are valid for the
       page numbers, too.}%
-    \pventry{KOMAScript}{A style similar to the \KOMAScript{} classes. This is
+    \pventry{KOMAlike}{A style similar to the \KOMAScript{} classes. This is
       almost the same like \PValue{standard}, but instead of bold face
       \Macro{usekomafont}\PParameter{disposition} will be used if
       \Macro{usekomafont} was defined and sans serif, bold face
       (\Macro{sffamily}\Macro{bfseries}) if not.}%
-    \pventry{classic}{Like \PValue{KOMAScript} but all page numbers are set
+    \pventry{classic}{Like \PValue{KOMAlike} but all page numbers are set
       using normal font.}%
     \pventry{allwithdot}{Like \PValue{classic} but dots between entry text and
       page numbers are used at all depths.}%
@@ -741,8 +741,8 @@ usefull to define your own toc styles.
 %   \subsubsection{\PValue{standard} with Option \Option{tocgraduated}}
 %   \usetocstyle[toc]{standard}
 %   \showtoc{toc}\clearpage
-%   \subsubsection{\PValue{KOMAScript} with Option \Option{tocgraduated}}
-%   \usetocstyle[toc]{KOMAScript}
+%   \subsubsection{\PValue{KOMAlike} with Option \Option{tocgraduated}}
+%   \usetocstyle[toc]{KOMAlike}
 %   \showtoc{toc}\clearpage
 %   \subsubsection{\PValue{classic} with Option \Option{tocgraduated}}
 %   \usetocstyle[toc]{classic}
@@ -762,8 +762,8 @@ usefull to define your own toc styles.
 %   \subsubsection{\PValue{standard} with Option \Option{tocflat}}
 %   \usetocstyle[toc]{standard}
 %   \showtoc{toc}\clearpage
-%   \subsubsection{\PValue{KOMAScript} with Option \Option{tocflat}}
-%   \usetocstyle[toc]{KOMAScript}
+%   \subsubsection{\PValue{KOMAlike} with Option \Option{tocflat}}
+%   \usetocstyle[toc]{KOMAlike}
 %   \showtoc{toc}\clearpage
 %   \subsubsection{\PValue{classic} with Option \Option{tocflat}}
 %   \usetocstyle[toc]{classic}
@@ -785,8 +785,8 @@ usefull to define your own toc styles.
 %   \subsubsection{\PValue{standard} with Option \Option{tocfullflat}}
 %   \usetocstyle[toc]{standard}
 %   \showtoc{toc}\clearpage
-%   \subsubsection{\PValue{KOMAScript} with Option \Option{tocfullflat}}
-%   \usetocstyle[toc]{KOMAScript}
+%   \subsubsection{\PValue{KOMAlike} with Option \Option{tocfullflat}}
+%   \usetocstyle[toc]{KOMAlike}
 %   \showtoc{toc}\clearpage
 %   \subsubsection{\PValue{classic} with Option \Option{tocfullflat}}
 %   \usetocstyle[toc]{classic}
@@ -1694,42 +1694,65 @@ usefull to define your own toc styles.
 %
 % \begin{macro}{\usetocstyle}
 % \begin{macro}{\@usetocstyle}
-%   Use the predefined TOC style.
+%   \changes{v0.2a}{2008/02/14}{extended for deprecated TOC styles}
+%   Use the predefined TOC style. You may define
+%   |\tocstyle@deprecated@style@foo| to mark TOC style |foo| to be
+%   deprecated.  If |\tocstyle@deprecated@style@foo| is |\@empty| TOC style
+%   |deprecated@foo| will be used instead almost silently.   Otherwise TOC
+%   style |\tocstyle@deprecated@style@foo| will be used instead and the user
+%   will be told about this change.
 %    \begin{macrocode}
 \newcommand*{\usetocstyle}[2][]{%
-  \@ifundefined{tocstyle@style@#2}{%
-    \PackageError{tocstyle}{unknown TOC style `#2'}{%
-      You've told me to use TOC style `#2',\MessageBreak
-      but there's no TOC style `#2' defined.}%
-  }{%
-    \def\settocfeature{%
-      \@ifnextchar[ {\@@settocfeature[{#1}]}{\@@settocfeature[{#1}][]}%
-    }%
-    \let\settocstylefeature\settocfeature
+  \@ifundefined{tocstyle@deprecated@style@#2}{%
+    \@ifundefined{tocstyle@style@#2}{%
+      \PackageError{tocstyle}{unknown TOC style `#2'}{%
+        You've told me to use TOC style `#2',\MessageBreak
+        but there's no TOC style `#2' defined.}%
+    }{%
+      \def\settocfeature{%
+        \@ifnextchar[ {\@@settocfeature[{#1}]}{\@@settocfeature[{#1}][]}%
+      }%
+      \let\settocstylefeature\settocfeature
 %    \end{macrocode}
 % Deactivate all known features for this TOC
 %    \begin{macrocode}
-    \expandafter\ifx\csname tocstyle@commandlist@#1\endcsname\relax
-    \else
-      \expandafter\expandafter\expandafter\@for 
-      \expandafter\expandafter\expandafter\@tempa
-      \expandafter\expandafter\expandafter:%
-      \expandafter\expandafter\expandafter=%
-      \csname tocstyle@commandlist@#1\endcsname
-      \do{%
-        \expandafter\let\csname \@tempa\endcsname\relax
-      }%
+      \expandafter\ifx\csname tocstyle@commandlist@#1\endcsname\relax
+      \else
+        \expandafter\expandafter\expandafter\@for 
+        \expandafter\expandafter\expandafter\@tempa
+        \expandafter\expandafter\expandafter:%
+        \expandafter\expandafter\expandafter=%
+        \csname tocstyle@commandlist@#1\endcsname
+        \do{%
+          \expandafter\let\csname \@tempa\endcsname\relax
+        }%
 %    \end{macrocode}
 % So there are no more known features for this TOC.
 %    \begin{macrocode}
-      \expandafter\let\csname tocstyle@commandlist@#1\endcsname\relax
-    \fi
+        \expandafter\let\csname tocstyle@commandlist@#1\endcsname\relax
+      \fi
 %    \end{macrocode}
 % Activate all known features for this style and TOC
 %    \begin{macrocode}
-    \@usetocstyle{#2}%
-    \let\settocfeature\@settocfeature
-    \let\settocstylefeature\@settocstylefeature
+      \@usetocstyle{#2}%
+      \let\settocfeature\@settocfeature
+      \let\settocstylefeature\@settocstylefeature
+    }%
+  }{%
+    \expandafter\ifx\csname tocstyle@deprecated@style@#2\endcsname\@empty
+      \PackageWarning{tocstyle}{%
+        deprecated TOC style `#2'!\MessageBreak
+        You should not longer use this style,\MessageBreak
+        because it will be removed soon.\MessageBreak
+        You should select another TOC style}%
+      \usetocstyle[{#1}]{deprecated@#2}%
+    \else
+      \PackageWarning{tocstyle}{%
+        deprecated TOC style `#2'!\MessageBreak
+        You should use TOC style '\csname
+        tocstyle@deprecated@style@#2\endcsname'\MessageBreak
+        instead of `#2'}%
+    \fi
   }%
 }
 \newcommand*{\@usetocstyle}[1]{%
@@ -1840,7 +1863,7 @@ usefull to define your own toc styles.
 }
 \begingroup\expandafter\expandafter\expandafter\endgroup
 \expandafter\ifx\csname sectfont\endcsname\relax
-  \newtocstyle{KOMAScript}{%
+  \newtocstyle{KOMAlike}{%
     \settocfeature{dothook}{\normalfont}%
     \settocfeature[-1]{entryhook}{\sffamily\bfseries}%
     \settocfeature[-1]{entryvskip}{2.25em\@plus\p@}%
@@ -1865,7 +1888,7 @@ usefull to define your own toc styles.
     \fi
   }
 \else
-  \newtocstyle{KOMAScript}{%
+  \newtocstyle{KOMAlike}{%
     \settocfeature{dothook}{\normalfont}%
     \settocfeature[-1]{entryhook}{\sectfont}%
     \settocfeature[-1]{entryvskip}{2.25em\@plus\p@}%
@@ -1890,7 +1913,8 @@ usefull to define your own toc styles.
     \fi
   }
 \fi
-\newtocstyle[KOMAScript]{classic}{%
+\newcommand*{\tocstyle@deprecated@style@KOMAScript}{KOMAlike}%
+\newtocstyle[KOMAlike]{classic}{%
   \settocfeature{pagenumberhook}{\normalfont\normalcolor}%
   \settocfeature{raggedhook}{\raggedright}%
 }
