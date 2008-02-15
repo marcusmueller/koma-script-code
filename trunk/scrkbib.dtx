@@ -1,4 +1,4 @@
-% \CheckSum{144}
+% \CheckSum{170}
 % \iffalse meta-comment
 % ======================================================================
 % scrkbib.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkbib.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkbib.dtx}[2006/03/28 v2.95 KOMA-Script (bibliography)]
+\ProvidesFile{scrkbib.dtx}[2008/02/15 v2.98c KOMA-Script (bibliography)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -101,38 +101,117 @@
 % \iffalse
 %<*option>
 % \fi
+% \subsection{Anweisungen, die für die Optionen benötigt werden}
+%
+% Einige Anweisungen werden über Optionen verändert. Dazu müssen sie aber
+% bereits vor der Abarbeitung der Optionen definiert sein.
+%
+% \subsubsection{Literaturverzeichnisstile}
+%
+% \begin{macro}{\newbibstyle}
+%   \changes{v2.98c}{2008/02/12}{Neu}
+% Neue Literaturverzeichnisstile müssen mit dieser Anweisung definiert werden,
+% wenn sie von der Fehlermeldung korrekt angezeigt werden sollen. Das erste
+% Argument ist der Name des Stils, das zweite Argument ist Code für den
+% Stil. Darin sollten normalerweise Umdefinierungen für |\@openbib@code| und
+% |\newblock| enthalten sein.
+%    \begin{macrocode}
+\newcommand{\newbibstyle}[2]{%
+  \scr@ifundefinedorrelax{scr@bibstyle@#1}{%
+    \@namedef{scr@bibstyle@#1}{#2}%
+    \g@addto@macro\scr@bibstylelist{, `#1'}%
+  }{%
+    \ClassError{\KOMAClassName}{bibligraphy style `#1' already exists}{%
+      You've told me to define the new bibliography style `#1',\MessageBreak
+      but this style already exists.\MessageBreak
+      You have to use another bibliography style name.\MessageBreak
+      See the KOMA-Script manual for more information.%
+    }%
+  }%
+}
+%    \end{macrocode}
+% \begin{macro}{\scr@bibstylelist}
+%   \changes{v2.98c}{2008/02/12}{Neu (intern)}%
+% Liste der mit \cs{newbibstyle} definierten und daher bekannten
+% Literaturverzeichnisstile.
+% \begin{macro}{\@openbib@code}
+%   \changes{v2.3g}{1996/01/14}{Neu (intern)}
+%   \changes{v2.98c}{2008/02/12}{wird nun früher definiert}
+% Code, der am Anfang des Literaturverzeichnisses ausgeführt wird und
+% normalerweise ursprünglich für die \texttt{openbib}-Funktionalität verwendet
+% wurde. Inzwischen wird er für die komplette Stilauswahl verwendet.
+% \begin{macro}{\newblock}
+%   \changes{v2.3g}{1996/01/14}{Grundeinstellung geändert}
+%   \changes{v2.98c}{2008/02/12}{wird nun früher definiert}
+%    \begin{macrocode}
+\newcommand*{\scr@bibstylelist}{\@gobble}
+\newcommand*{\@openbib@code}{}
+\newcommand*{\newblock}{}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \begin{macro}{\scr@bibstyle@openstyle}
+%   \changes{v2.98c}{2008/02/12}{Neu (intern)}%
+% Vordefiniert sind zwei Stile.  Mit dem Bibliographystil \texttt{openstyle}
+% kann eine alternative Darstellung der Literatureinträge aktiviert
+% werden. Dabei fügt \cs{newblock} keinen horizontalen Abstand mehr ein,
+% sondern beginnt einen neuen Absatz (in Form einer neuen Zeile).
+% \begin{macro}{\scr@bibstyle@oldstyle}
+%   \changes{v2.98c}{2008/02/12}{Neu (intern)}
+% Der Stil \texttt{oldstyle} entspricht hingegen der Voreinstellung.
+%    \begin{macrocode}
+\newbibstyle{openstyle}{%
+  \renewcommand*{\@openbib@code}{%
+    \advance\leftmargin\bibindent
+    \itemindent -\bibindent
+    \listparindent \itemindent
+    \parsep \z@
+  }%
+  \renewcommand*{\newblock}{\par}%
+}
+\newbibstyle{oldstyle}{%
+  \renewcommand*{\@openbib@code}{}%
+  \renewcommand*{\newblock}{\hskip .11em\@plus.33em\@minus.07em}%
+}
+\scr@bibstyle@oldstyle
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 %
 % \subsection{Optionen für das Literaturverzeichnis}
 %
-%  \begin{option}{openbib}
-%    \changes{v2.3g}{1996/01/14}{\cs{if@openbib} (\cs{@openbibtrue},
-%      \cs{@openbibfalse}) entfernt}
-%    \changes{v2.3g}{1996/01/14}{Definition der openbib Option neu
-%      implementiert}
-%  \begin{macro}{\@openbib@code}
-%  \begin{macro}{\newblock}
+% \begin{option}{bibliography}
+%   \changes{v2.98c}{2008/02/12}{Neu}
+% Dies ist der Generalschlüssel für alle Optionen, die das
+% Literaturverzeichnis betreffen. Neu ist, dass verschiedene Stile
+% definiert werden können.
+%    \begin{macrocode}
+\KOMA@key{bibliography}{%
+  \scr@ifundefinedorrelax{scr@bibstyle@#1}{%
+    \KOMA@unknown@keyval{bibliography}{#1}{\scr@bibstylelist}%
+  }{%
+    \csname scr@bibstyle@#1\endcsname
+  }%
+}
+%    \end{macrocode}
+% \end{option}
+%
+% \begin{option}{openbib}
+%   \changes{v2.3g}{1996/01/14}{\cs{if@openbib} (\cs{@openbibtrue},
+%     \cs{@openbibfalse}) entfernt}
+%   \changes{v2.3g}{1996/01/14}{Definition der openbib Option neu
+%     implementiert}
+%   \changes{v2.98c}{2008/02/15}{obsolete}
 % Mit dieser Option kann eine alternative Darstellung der
 % Literatureinträge aktiviert werden. Dabei fügt \cs{newblock} keinen
 % horizontalen Abstand mehr ein, sondern beginnt einen neuen Absatz
 % (in Form einer neuen Zeile).
 %    \begin{macrocode}
-%<*!scrlettr>
-\DeclareOption{openbib}{%
-  \AtEndOfPackage{%
-    \renewcommand*\@openbib@code{%
-      \advance\leftmargin\bibindent
-      \itemindent -\bibindent
-      \listparindent \itemindent
-      \parsep \z@
-    }%
-    \renewcommand*\newblock{\par}%
-  }%
-}
-%</!scrlettr>
+\KOMA@DeclareObsoleteOption[\ClassInfoNoLine]{openbib}{bibliography=openstyle}
 %    \end{macrocode}
-%  \end{macro}
-%  \end{macro}
-%  \end{option}
+% \end{option}
 %
 %
 %  \begin{option}{bibtotoc}
@@ -319,25 +398,6 @@
 }
 %    \end{macrocode}
 %  \end{environment}
-%
-%  \begin{macro}{\newblock}
-%    \changes{v2.3g}{1996/01/14}{Grundeinstellung geändert}
-% Makro für den nächsten Bereich innerhalb eines Eintrags.
-%    \begin{macrocode}
-\newcommand*\newblock{\hskip .11em\@plus.33em\@minus.07em}
-%    \end{macrocode}
-%  \end{macro}
-%
-%  \begin{macro}{\@openbib@code}
-%    \changes{v2.3g}{1996/01/14}{neues Makro}
-% Code, der am Anfang des Literaturverzeichnisses ausgeführt wird und
-% normalerweise für die \texttt{openbib}-Funktionalität verwendet
-% wird.
-%    \begin{macrocode}
-\let\@openbib@code\@empty
-%    \end{macrocode}
-%  \end{macro}
-%
 %
 %
 % \iffalse
