@@ -1,4 +1,4 @@
-% \CheckSum{1082}
+% \CheckSum{1102}
 % \iffalse meta-comment
 % ======================================================================
 % scrkfloa.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkfloa.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkfloa.dtx}[2007/11/23 v2.97e KOMA-Script (floats)]
+\ProvidesFile{scrkfloa.dtx}[2008/02/18 v2.98c KOMA-Script (floats)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -99,8 +99,6 @@
 %
 % \StopEventually{\PrintIndex\PrintChanges}
 %
-% \subsection{Optionen für Titel von Gleitumgebungen}
-%
 % \iffalse
 %<*option>
 % \fi
@@ -109,34 +107,89 @@
 %<*!letter>
 % \fi
 %
-%  \begin{option}{tablecaptionabove}
-%    \changes{v2.8h}{2001/07/19}{neue Option}
-%    \changes{v2.8k}{2001/08/15}{aus \texttt{typearea} in die Klassen
-%      verschoben}  
-%  \begin{option}{tablecaptionbelow}
-%    \changes{v2.8h}{2001/07/19}{neue Option}
-%    \changes{v2.8k}{2001/08/15}{aus \texttt{typearea} in die Klassen
-%      verschoben} 
+% \subsection{Einige Anweisungen und Einstellungen für die Optionen}
+%
+% Einige Anweisungen und Einstellungen werden bereits benötigt, bevor die
+% Optionen abgearbeitet werden.
+%
+% \begin{macro}{\if@tablecaptionabove}
+%   \changes{v2.8h}{2001/07/19}{neu Option}
+%   \changes{v2.8k}{2001/08/15}{aus \texttt{typearea} in die Klassen
+%     verschoben} 
+%   \changes{v2.98c}{2008/02/18}{Definition erfolgt etwas früher}
+% \begin{macro}{\@tablecaptionabovetrue}
+% \begin{macro}{\@tablecaptionabovefalse}
+% Die Einstellung, ob es Tabellenüber- oder -unterschriften sind, wird in
+% einem Schalter gespeichert.
+%    \begin{macrocode}
+\newif\if@tablecaptionabove\@tablecaptionabovefalse
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\scr@captionpkg}
+%   \changes{v2.98c}{2008/02/18}{neu (intern)}
+% Dieses Makro führt eine Anweisung für das \textsf{caption}-Paket aus, wenn
+% dieses geladen wurde, oder wenn es noch geladen wird.
+%    \begin{macrocode}
+\newcommand*{\scr@captionpkg}[1]{%
+  \scr@ifundefinedorrelax{captionsetup}{%
+    \if@atdocument\else\AfterPackage{caption}{#1}\fi
+  }{#1}%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \subsection{Optionen für Titel von Gleitumgebungen}
+%
+% \begin{option}{captions}
+%   \changes{2.98c}{2008/02/18}{Neuer Zentralschalter für caption}
+% Dies ist nun die zentrale Option für Einstellungen zu \cs{caption}. Als
+% besondere Schwierigkeit ergibt sich dabei jedoch, dass das Paket
+% \textsf{caption} einige Sonderbehandlungen für \KOMAScript{} enthält, die
+% darauf angewiesen sind, dass die alte Optionenschnittstelle verwendet
+% wird.
+%    \begin{macrocode}
+\KOMA@key{captions}{%
+  \KOMA@set@ncmdkey{captions}{@tempa}{%
+    {tableheading}{0},%
+    {tableabove}{0},{abovetable}{0},{abovetabular}{0},{topattable}{0},%
+    {tablesignature}{1},%
+    {tablebelow}{1},{belowtable}{1},{belowtabular}{1},{bottomattable}{1}%
+  }{#1}%
+  \ifcase \@tempa\relax
+    \@tablecaptionabovetrue
+    \scr@captionpkg{\captionsetup[table]{position=t}}%
+  \or
+    \@tablecaptionabovefalse
+    \scr@captionpkg{\captionsetup[table]{position=b}}%
+  \fi
+}
+%    \end{macrocode}
+% \end{option}
+%
+% \begin{option}{tablecaptionabove}
+%   \changes{v2.8h}{2001/07/19}{neue Option}
+%   \changes{v2.8k}{2001/08/15}{aus \texttt{typearea} in die Klassen
+%     verschoben} 
+%   \changes{v2.98c}{2008/02/18}{obsolete} 
+% \begin{option}{tablecaptionbelow}
+%   \changes{v2.8h}{2001/07/19}{neue Option}
+%   \changes{v2.8k}{2001/08/15}{aus \texttt{typearea} in die Klassen
+%     verschoben} 
+%   \changes{v2.98c}{2008/02/18}{obsolete} 
 % Es besteht nun die Wahl, ob \cs{caption} bei Tabellen für Unter-
 % oder Überschriften voreingestellt ist. Die Defaulteinstellung ist
 % aus Kompatibilitätsgründen die Tabellenunterschrift.
-%  \begin{macro}{\if@tablecaptionabove}
-%    \changes{v2.8h}{2001/07/19}{neu Option}
-%    \changes{v2.8k}{2001/08/15}{aus \texttt{typearea} in die Klassen
-%      verschoben} 
-%  \begin{macro}{\@tablecaptionabovetrue}
-%  \begin{macro}{\@tablecaptionabovefalse}
-% Die Einstellung wird in einem Schalter gespeichert.
 %    \begin{macrocode}
-\newif\if@tablecaptionabove\@tablecaptionabovefalse
-\DeclareOption{tablecaptionabove}{\@tablecaptionabovetrue}
-\DeclareOption{tablecaptionbelow}{\@tablecaptionabovefalse}
+\KOMA@DeclareObsoleteOption[\ClassWarningNoLine]{tablecaptionabove}%
+                                                {captions=tableheading}
+\KOMA@DeclareObsoleteOption[\ClassWarningNoLine]{tablecaptionbelow}%
+                                                {captions=tablesignature}
 %    \end{macrocode}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
-%  \end{option}
-%  \end{option}
+% \end{option}
+% \end{option}
 %
 %  \begin{option}{origlongtable}
 %    \changes{v2.8l}{2001/08/16}{neue Option}
