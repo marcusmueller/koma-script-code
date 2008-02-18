@@ -1,4 +1,4 @@
-% \CheckSum{992}
+% \CheckSum{1012}
 % \iffalse meta-comment
 % ======================================================================
 % scrkbase.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkbase.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkbase.dtx}[2008/02/15 v2.98c KOMA-Script (basics)]
+\ProvidesFile{scrkbase.dtx}[2008/02/18 v2.98c KOMA-Script (basics)]
 % \iffalse
 %</driver>
 %<package&option>\ProvidesPackage{scrkbase}[%
@@ -1132,25 +1132,52 @@
 %
 % \begin{macro}{\KOMA@DeclareObsoleteOption}
 %   \changes{v2.96}{2006/08/20}{\cs{CurrentOption wir geschützt}}
+% \begin{macro}{\KOMA@@DeclareObsoleteOption}
+%   \changes{v2.98c}{2008/02/18}{neu (intern)}
+% \begin{macro}{\KOMA@@@DeclareObsoleteOption}
+%   \changes{v2.98c}{2008/02/18}{neu (intern)}
+% \begin{macro}{\KOMA@iv@DeclareObsoleteOption}
+%   \changes{v2.98c}{2008/02/18}{neu (intern)}
 % Mit Hilfe dieses Makros kann eine Option definiert werden, die
 % eigentlich obsolete ist. Statt dieser Option wird dann ein Schlüssel
 % verwendet. Das erste Argument ist optional und muss dann entweder
-% \cs{PackageInfo}, \cs{PackageInfoNoLine}, \cs{PackageWarning} oder
-% \cs{PackageWarningNoLine} sein. Das zweite Argument ist der Name der
-% Option. Das dritte Argument ist das Setzen des gewünschten Schlüssels.
+% \cs{PackageInfo}, \cs{PackageInfoNoLine}, \cs{PackageWarning},
+% \cs{PackageWarningNoLine} oder das gleiche für Klassen sein. Das zweite
+% Argument ist ebenfalls optional und der Name des Pakets oder der Klasse. Das
+% dritte Argument ist der Name der Option. Das vierte Argument ist das Setzen
+% des gewünschten Schlüssels.
 %    \begin{macrocode}
-\newcommand*{\KOMA@DeclareObsoleteOption}[3][\@gobbletwo]{%
-  \DeclareOption{#2}{\KOMA@UseObsoleteOption{#1}{#2}{#3}}%
+\newcommand*{\KOMA@DeclareObsoleteOption}{%
+  \@ifnextchar [%]
+  {\KOMA@@DeclareObsoleteOption}%
+  {\KOMA@@DeclareObsoleteOption[\@gobbletwo]}%
+}
+\newcommand*{\KOMA@@DeclareObsoleteOption}{}
+\def\KOMA@@DeclareObsoleteOption[#1]{%
+  \@ifnextchar [%]
+  {\KOMA@@@DeclareObsoleteOption{#1}}%
+  {\KOMA@@@DeclareObsoleteOption{#1}[]}%
+}
+\newcommand*{\KOMA@@@DeclareObsoleteOption}{}
+\def\KOMA@@@DeclareObsoleteOption#1[#2]#3#4{%
+  \ifstr{#2}{}{%
+    \KOMA@iv@DeclareObsoleteOption{#1}{\@currname}{#3}{#4}%
+  }{%
+    \KOMA@UseObsoleteOption{#1}{#2}{#3}{#4}%
+  }%
+}
+\newcommand*{\KOMA@iv@DeclareObsoleteOption}[4]{%
+  \DeclareOption{#3}{\KOMA@UseObsoleteOption{#1{#2}}{#3}{#4}}%
 }
 %    \end{macrocode}
 % \begin{macro}{\KOMA@UseObsoleteOption}
 %   \changes{v2.97c}{2007/04/19}{neu (intern)}
 % Die eigentliche Arbeit wird von diesem Makro erledigt. Die Argumente sind
-% dieselben.
+% 1. Meldungsbefehl, 2. obsolete Option, 3. Setzen des Schlüssels.
 %    \begin{macrocode}
 \newcommand*{\KOMA@UseObsoleteOption}[3]{%
   \let\scr@sr@co\CurrentOption
-  #1{scrkbase}{%
+  #1{%
     You've used obsolete option `#2'.\MessageBreak
     \protect\KOMAExecuteOptions{#3} will be\MessageBreak
     used instead.\MessageBreak
@@ -1161,6 +1188,9 @@
   \let\CurrentOption\scr@sr@co
 }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 %
