@@ -1,4 +1,4 @@
-% \CheckSum{1095}
+% \CheckSum{1118}
 % \iffalse meta-comment
 % ======================================================================
 % scrkfloa.dtx
@@ -128,6 +128,47 @@
 % \end{macro}
 % \end{macro}
 %
+% \begin{macro}{\ifonelinecaptions}
+%   \changes{v2.8q}{2001/11/17}{neuer Schalter}
+%   \changes{v2.98c}{2008/03/03}{Definition erfolgt etwas früher}
+% \begin{macro}{\onelinecaptionstrue}
+% \begin{macro}{\onelinecaptionsfalse}
+% Die Entscheidung, ob die Sonderbehandlung für einzeilige caption-Texte
+% durchgeführt werden soll, wird in einem Schalter gespeichert. In der
+% Hoffnung, beim Laden von \textsf{caption2} Speicher zu sparen, wird
+% der gleiche Name verwendet, den auch \textsf{caption2}
+% verwendet. Trotzdem sollte man diesen Schalter als internen Schalter
+% betrachten.
+%    \begin{macrocode}
+\newif\ifonelinecaptions\onelinecaptionstrue
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\scap@pos}
+%   \changes{v2.8q}{2001/11/22}{neu (intern)}
+%   \changes{v2.98c}{2008/03/03}{Definition erfolgt etwas früher}
+% Hier wird gespeichert, ob die Beschreibung bei |captionbeside| links oder
+% rechts vom Rest stehen soll. Voreingestellt ist rechts davon
+% (\emph{\textbf{r}ight}). Andere Möglichkeiten sind \emph{\textbf{l}eft},
+% \emph{\textbf{o}uter}, \emph{\textbf{i}nner}.
+%    \begin{macrocode}
+\newcommand*{\scap@pos}{r}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\scap@valign}
+%   \changes{v2.8q}{2001/11/22}{neu (intern)}
+%   \changes{v2.98c}{2008/03/03}{Definition erfolgt etwas früher}
+% Hier wird gespeichert, ob bei |captionbeside| die beiden Boxen (siehe
+% Definition der Umgebung) \emph{\textbf{t}op}, \emph{\textbf{b}ottem} oder
+% \emph{\textbf{c}enter} ausgerichtet werden sollen. Andere Buchstaben
+% sind nicht erlaubt. Voreingestellt ist \emph{\textbf{b}ottem}.
+%    \begin{macrocode}
+\newcommand*{\scap@valign}{b}
+%    \end{macrocode}
+% \end{macro}
 %
 % \subsection{Optionen für Titel von Gleitumgebungen}
 %
@@ -139,7 +180,8 @@
 % darauf angewiesen sind, dass die alte Optionenschnittstelle verwendet
 % wird. Erfreulicherweise funktioniert das aber ab Version~3.1g über eine
 % Erweiterung der Schalter-Umschaltbefehle (|\@tablecaptionabovetrue|,
-% |\@tablecaptionabovefalse|), so dass lediglich dafür georgt werden muss,
+% |\@tablecaptionabovefalse|, |\onelinecaptionstrue|,
+% |\onelinecaptionsfalse|), so dass lediglich dafür georgt werden muss,
 % dass diese weiterhin verwendet werden.
 %    \begin{macrocode}
 \KOMA@key{captions}{%
@@ -147,12 +189,40 @@
     {tableheading}{0},%
     {tableabove}{0},{abovetable}{0},{abovetabular}{0},{topattable}{0},%
     {tablesignature}{1},%
-    {tablebelow}{1},{belowtable}{1},{belowtabular}{1},{bottomattable}{1}%
+    {tablebelow}{1},{belowtable}{1},{belowtabular}{1},{bottomattable}{1},%
+    {oneline}{2},%
+    {nooneline}{3},%
+    {rightbeside}{4},{besideright}{4},%
+    {leftbeside}{5},{besideleft}{5},%
+    {innerbeside}{6},{besideinner}{6},%
+    {outerbeside}{7},{besideouter}{7},%
+    {topbeside}{8},{besidetop}{8},%
+    {centeredbeside}{9},{besidecentered}{9},%
+    {middlebeside}{9},{besidemiddle}{9},%
+    {bottombeside}{10},{besidebottom}{10}%
   }{#1}%
   \ifcase \@tempa\relax
     \@tablecaptionabovetrue
   \or
     \@tablecaptionabovefalse
+  \or
+    \onelinecaptionstrue
+  \or
+    \onelinecaptionsfalse
+  \or
+    \renewcommand*{\scap@pos}{r}%
+  \or
+    \renewcommand*{\scap@pos}{l}%
+  \or
+    \renewcommand*{\scap@pos}{i}%
+  \or
+    \renewcommand*{\scap@pos}{o}%
+  \or
+    \renewcommand*{\scap@valign}{t}%
+  \or
+    \renewcommand*{\scap@valign}{c}%
+  \or
+    \renewcommand*{\scap@valign}{b}%
   \fi
 }
 %    \end{macrocode}
@@ -201,41 +271,28 @@
 %  \end{macro}
 %  \end{option}
 %
-%  \begin{option}{onelinecaption}
-%    \changes{v2.8q}{2001/11/17}{neue Option}
-%  \begin{option}{noonelinecaption}
-%    \changes{v2.8q}{2001/11/17}{neue Option}
-% Genau wie beim \textsf{caption2}-Paket gibt es Optionen, mit denen
-% die Sonderbehandlung für einzeilige Tabellen- und Abbildungstitel
-% ein- und ausgeschaltet werden werden können.
-%  \begin{macro}{\ifonelinecaptions}
-%    \changes{v2.8q}{2001/11/17}{neuer Schalter}
-%  \begin{macro}{\onelinecaptionstrue}
-%  \begin{macro}{\onelinecaptionsfalse}
-% Die Entscheidung wird in einem Schalter gespeichert. In der
-% Hoffnung, beim Laden von \textsf{caption2} Speicher zu sparen, wird
-% der gleiche Name verwendet, den auch \textsf{caption2}
-% verwendet. Trotzdem sollte man diesen Schalter als internen Schalter
-% betrachten.
-%    \begin{macrocode}
-\newif\ifonelinecaptions\onelinecaptionstrue
-%    \end{macrocode}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
+% \begin{option}{onelinecaption}
+%   \changes{v2.8q}{2001/11/17}{neue Option}
+%   \changes{v2.98c}{2008/03/03}{obsolete} 
+%   \changes{v2.98c}{2008/03/03}{keine Sonderbehandlung für \textsf{caption2}
+%     mehr}
+% \begin{option}{noonelinecaption}
+%   \changes{v2.8q}{2001/11/17}{neue Option}
+%   \changes{v2.98c}{2008/03/03}{obsolete} 
+%   \changes{v2.98c}{2008/03/03}{keine Sonderbehandlung für \textsf{caption2}
+%     mehr}
 % Da für diese Option nicht der gleiche Name verwendet wird, wie bei
-% \textsf{caption2}, wird von den Optionen nicht nur der Schalter
-% entsprechend gesetzt, sondern auch die korrespondierende Option an
+% \textsf{caption2}, wurde von den Optionen bis Version~2.98b nicht nur der
+% Schalter entsprechend gesetzt, sondern auch die korrespondierende Option an
 % \textsf{caption2} weitergeleitet. Der gleiche Name konnte schlecht
 % verwendet werden, weil er bei einer Klasse auch nicht ansatzweise
-% als selbsterklärend bezeichnet werden kann.
+% als selbsterklärend bezeichnet werden kann. Ab Version~2.98c entfällt die
+% Sonderbehandlung von \textsf{caption2}.
 %    \begin{macrocode}
-\DeclareOption{onelinecaption}{\onelinecaptionstrue
-  \PassOptionsToPackage{oneline}{caption2}%
-}
-\DeclareOption{noonelinecaption}{\onelinecaptionsfalse
-  \PassOptionsToPackage{nooneline}{caption2}%
-}
+\KOMA@DeclareObsoleteOption[\ClassWarningNoLine]{onelinecaption}
+                                                {captions=oneline}
+\KOMA@DeclareObsoleteOption[\ClassWarningNoLine]{noonelinecaption}
+                                                {captions=nooneline}
 %    \end{macrocode}
 %  \end{option}
 %  \end{option}
@@ -335,26 +392,6 @@
 % Tabelle oder Abbildung zu setzen, ist der Versuch, sie daneben zu
 % setzen. Dies funktioniert frundsätzlich auch nicht mit
 % \texttt{longtable}-Tabellen.
-%
-%  \begin{macro}{\scap@pos}
-%    \changes{v2.8q}{2001/11/22}{neu (intern)}
-% Hier wird gespeichert, ob die Beschreibung links oder rechts vom
-% Rest stehen soll. Voreingestellt ist rechts davon.
-%    \begin{macrocode}
-\newcommand*{\scap@pos}{r}
-%    \end{macrocode}
-%  \end{macro}
-%
-%  \begin{macro}{\scap@valign}
-%    \changes{v2.8q}{2001/11/22}{neu (intern)}
-% Hier wird gespeichert, ob die beiden Boxen (siehe Definition der
-% Umgebung) \emph{\textbf{t}op}, \emph{\textbf{b}ottem} oder
-% \emph{\textbf{c}enter} ausgerichtet werden sollen. Andere Buchstaben
-% sind nicht erlaubt. Voreingestellt ist \emph{\textbf{b}ottem}.
-%    \begin{macrocode}
-\newcommand*{\scap@valign}{b}
-%    \end{macrocode}
-%  \end{macro}
 %
 %  \begin{macro}{\scap@caption}
 %    \changes{v2.8q}{2001/11/22}{neu (intern)}
