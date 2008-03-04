@@ -58,7 +58,7 @@
 %%% From File: scrkidx.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkidx.dtx}[2006/03/28 v2.95 KOMA-Script (index)]
+\ProvidesFile{scrkidx.dtx}[2008/03/04 v2.98c KOMA-Script (index)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -102,61 +102,82 @@
 %<*option>
 % \fi
 %
+% \subsection{Anweisungen und Einstellungen für die Optionen}
+%
+% Einige Anweisungen und Einstellungen werden bereits benötigt, bevor die
+% Optionen abgearbeitet werden.
+%
+% \begin{macro}{\idx@@heading}
+%   \changes{2.98c}{2008/03/04}{neu (intern)}
+% Diese Anweisung wird verwendet, um nur die Überschrift zu setzen (nichts
+% weiter!). Sie hat genau ein Argument, nämlich den Text der Überschrift und
+% wird innerhalb von |\idx@heading| verwendet.
+%    \begin{macrocode}
+\newcommand*{\idx@@heading}{%
+%<article>  \section*
+%<book|report>  \chapter*
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%
 % \subsection{Optionen für den Index}
 %
-%  \begin{option}{idxtotoc}
-%    \changes{v2.3h}{1995/01/21}{neue Option}
+% \begin{option}{index}
+%   \changes{v2.98c}{2008/03/04}{Neue Option}
+% \begin{macro}{\idx@@heading}
 % Die Option sorgt dafür, dass der Index auch im Inhaltsverzeichnis
-% erscheint.
-%  \begin{macro}{\idx@heading}
-% Dazu wird das interne Makro \cs{idx@heading} umdefiniert, über das 
-% die Überschrift gesetzt und der Kolumnentitel angepasst wird.
-%    \changes{v2.4c}{1996/04/04}{Kolumnentitel werden nun korrekt
-%      behandelt}
-%    \changes{v2.4g}{1996/11/04}{Index auch bei \textsf{scrartcl}
-%      wieder zweispaltig}
-%    \changes{v2.6c}{2000/06/10}{im Index kann nach der Überschrift
-%      eine Präambel gesetzt werden}
-%    \changes{v2.7a}{2001/01/04}{für \textsf{scrbook} und
-%      \textsf{scrreprt} die Link-Erzeugung mit \texttt{hyperref}
-%      verbessert}
-%    \changes{v2.7j}{2001/05/27}{Setzen der Präambel in die
-%      \texttt{theindex}-Umgebung verschoben}
-%    \changes{v2.9l}{2003/01/19}{\cs{if@twoside} durch
-%      \cs{if@openright} ersetzt}
+% erscheint. Dazu wird das interne Makro \cs{idx@@heading} umdefiniert, über
+% das die Überschrift gesetzt und der Kolumnentitel angepasst wird.
+%   \changes{v2.4c}{1996/04/04}{Kolumnentitel werden nun korrekt
+%     behandelt}
+%   \changes{v2.4g}{1996/11/04}{Index auch bei \textsf{scrartcl}
+%     wieder zweispaltig}
+%   \changes{v2.6c}{2000/06/10}{im Index kann nach der Überschrift
+%     eine Präambel gesetzt werden}
+%   \changes{v2.7a}{2001/01/04}{für \textsf{scrbook} und
+%     \textsf{scrreprt} die Link-Erzeugung mit \texttt{hyperref}
+%     verbessert}
+%   \changes{v2.7j}{2001/05/27}{Setzen der Präambel in die
+%     \texttt{theindex}-Umgebung verschoben}
+%   \changes{v2.9l}{2003/01/19}{\cs{if@twoside} durch
+%     \cs{if@openright} ersetzt}
+%   \changes{v2.98c}{2008/03/04}{statt \cs{idx@heading} wird nun
+%     \cs{idx@@heading} umdefiniert}
 % An dieser Stelle muss dafür gesorgt werden, dass im Falle von
 % \textsf{scrbook} und \textsf{scrreprt} das Makro \cs{@schapter}
 % verwendet wird. Damit dies hier möglich ist mussten tiefreifendere
 % Änderungen am \LaTeX-Kernel bzw. am Gliederungsbefehl \cs{chapter}
 % vorgenommen werden.
-%
-% Die ursprüngliche Definition sah so aus:
-% \begin{verbatim}
-% \renewcommand*\idx@heading{%
-%   \if@twoside\cleardoublepage\else\clearpage\fi%
-%   \@mkboth{\indexname}{\indexname}%
-% %<report|book>   \addcontentsline{toc}{chapter}{\indexname}%
-%   \twocolumn[%
-% %<article>   \addsec
-% %<report|book>    \@makeschapterhead
-%     {\indexname}\index@preamble]%
-% }
-% \end{verbatim}\vspace{-\baselineskip}
-% Die neue Definition wurde wie folgt geändert:
 %    \begin{macrocode}
-\DeclareOption{idxtotoc}{%
-  \AtEndOfClass{%
-    \renewcommand*\idx@heading{%
-%<report|book>      \if@openright\cleardoublepage\else\clearpage\fi
-%<article>      \twocolumn[\addsec{\indexname}]%
-%<report|book>      \twocolumn[\addchap{\indexname}]%
-      \@mkboth{\indexname}{\indexname}%
+\KOMA@key{index}{%
+  \KOMA@set@ncmdkey{index}{@tempa}{%
+    {notoc}{0},{default}{0},{plainheading}{0},%
+    {totoc}{1},{toc}{1},{notnumbered}{1}%
+  }{#1}%
+  \ifcase \@tempa\relax
+    \renewcommand*{\idx@@heading}{%
+%<article>    \section*
+%<book|report>    \chapter*
     }%
-  }%
+  \or
+    \renewcommand*{\idx@@heading}{%
+%<article>    \addsec
+%<book|report>    \addchap
+    }%
+  \fi
 }
 %    \end{macrocode}
-%  \end{macro}
-%  \end{option}
+% \end{macro}
+% \end{option}
+%
+% \begin{option}{idxtotoc}
+%   \changes{v2.3h}{1995/01/21}{neue Option}
+%   \changes{v2.98c}{2008/03/04}{obsolete}
+%    \begin{macrocode}
+\KOMA@DeclareObsoleteOption[\ClassWarningNoLine]{idxtotoc}{index=totoc}
+%    \end{macrocode}
+% \end{option}
 %
 %
 % \iffalse
@@ -185,18 +206,19 @@
 %  \end{macro}
 %  \end{macro}
 %
-%  \begin{macro}{\idx@heading}
-%    \changes{v2.3h}{1995/01/21}{neu (intern)}
-%    \changes{v2.4c}{1995/04/04}{Kolumnentitel werden nun korrekt
-%      behandelt}
-%    \changes{v2.4g}{1996/11/04}{Index auch bei \texttt{scrartcl}
-%      wieder zweispaltig}
-%    \changes{v2.6c}{2000/06/10}{Verwendung von \cs{index@preamble}
-%      eingefügt}
-%    \changes{v2.7j}{2001/05/27}{Setzen der Präambel in die
-%      \texttt{theindex}-Umgebung verschoben}
-%    \changes{v2.9l}{2003/01/19}{\cs{if@twoside} durch
-%      \cs{if@openright} ersetzt}
+% \begin{macro}{\idx@heading}
+%   \changes{v2.3h}{1995/01/21}{neu (intern)}
+%   \changes{v2.4c}{1995/04/04}{Kolumnentitel werden nun korrekt
+%     behandelt}
+%   \changes{v2.4g}{1996/11/04}{Index auch bei \texttt{scrartcl}
+%     wieder zweispaltig}
+%   \changes{v2.6c}{2000/06/10}{Verwendung von \cs{index@preamble}
+%     eingefügt}
+%   \changes{v2.7j}{2001/05/27}{Setzen der Präambel in die
+%     \texttt{theindex}-Umgebung verschoben}
+%   \changes{v2.9l}{2003/01/19}{\cs{if@twoside} durch
+%     \cs{if@openright} ersetzt}
+%   \changes{v2.98c}{2008/03/04}{Verwendung von \cs{idx@@heading}}
 % Befehl zum Setzen der Überschrift des Indexes.
 % Bis Version 2.7a sah diese Definition so aus:
 % \begin{verbatim}
@@ -221,12 +243,11 @@
 %    \begin{macrocode}
 \newcommand*{\idx@heading}{%
 %<report|book>  \if@openright\cleardoublepage\else\clearpage\fi%
-%<article>  \twocolumn[\section*{\indexname}]%
-%<report|book>  \twocolumn[\chapter*{\indexname}]%
+  \twocolumn[\idx@@heading{\indexname}]%
   \@mkboth{\indexname}{\indexname}%
 }
 %    \end{macrocode}
-%  \end{macro}
+% \end{macro}
 %
 %  \begin{environment}{theindex}
 %    \changes{v2.8d}{2001/07/05}{\cs{indexpagestyle} statt
