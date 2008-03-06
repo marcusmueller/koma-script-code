@@ -1,4 +1,4 @@
-% \CheckSum{1699}
+% \CheckSum{1710}
 % \iffalse meta-comment
 % ======================================================================
 % scrksect.dtx
@@ -114,11 +114,13 @@
 % \begin{option}{open}
 %   \changes{v2.98c}{2008/03/06}{Neue Option}
 % Bei \textsf{scrreprt} und \textsf{scrbook} kann per Option eingestellt
-% werden, ob Kapitel nur auf linken beginnen dürfen oder auf jeder Seite.
+% werden, ob Kapitel nur auf linken oder rechten Seiten beginnen dürfen oder
+% auf jeder Seite.
 % \begin{macro}{\if@openright}
 % \begin{macro}{\@openrighttrue}
 % \begin{macro}{\@openrightfalse}
-% Der Zustand wird dann zwei Schaltern gespeichert.
+% Der Zustand wird dann in einem Schalter und durch umdefinieren von
+% \cs{cleardoublestandardpage} gespeichert.
 %    \begin{macrocode}
 \newif\if@openright
 %<report>\@openrightfalse
@@ -131,12 +133,18 @@
 \KOMA@key{open}{%
   \KOMA@set@ncmdkey{open}{@tempa}{%
     {any}{0},%
-    {right}{1}%
+    {right}{1},%
+    {left}{2}%
   }{#1}%
   \ifcase \@tempa\relax
     \@openrightfalse
+    \renewcommand*{\cleardoublestandardpage}{\cleardoubleoddstandardpage}%
   \or
     \@openrighttrue
+    \renewcommand*{\cleardoublestandardpage}{\cleardoubleoddstandardpage}%
+  \or
+    \@openrighttrue
+    \renewcommand*{\cleardoublestandardpage}{\cleardoubleevenstandardpage}%
   \fi
 }
 %    \end{macrocode}
