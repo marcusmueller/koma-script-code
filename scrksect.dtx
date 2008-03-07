@@ -1,4 +1,4 @@
-% \CheckSum{1710}
+% \CheckSum{1733}
 % \iffalse meta-comment
 % ======================================================================
 % scrksect.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrksect.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrksect.dtx}[2008/02/15 v2.98c KOMA-Script (disposition)]
+\ProvidesFile{scrksect.dtx}[2008/03/17 v2.98c KOMA-Script (disposition)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -164,65 +164,107 @@
 % \fi
 %
 %
-%  \begin{option}{pointednumbers}
-%    \changes{v2.3h}{1995/01/19}{neue Option}
-%    \changes{v2.4g}{1996/11/04}{die Option heißt nun wirklich so,
-%      bei \texttt{pointednumber} wird explizit ein Fehler gemeldet}
-%    \changes{v2.4g}{1996/11/04}{\cs{@altsecnumformatfalse} wird
-%      direkt auf \cs{@altsecnumformattrue} gesetzt}
-%  \begin{option}{pointlessnumbers}
-%    \changes{v2.3h}{1995/01/19}{neue Option}
-%    \changes{v2.4g}{1996/11/04}{die Option heißt nun wirklich so,
-%      bei \texttt{pointlessnumber} wird explizit ein Fehler gemeldet}
-%    \changes{v2.4g}{1996/11/04}{\cs{@altsecnumformattrue} wird direkt
-%      auf \cs{@altsecnumformatfalse} gesetzt}
-% Normalerweise wird automatisch entschieden, ob Nummern mit einem
-% Punkt enden müssen oder nicht. Um dies abzuschalten, muss nur der
-% gewünschte Zustand eingeschaltet und die Umschaltmöglichkeit
-% entfernt werden. Dies kann jedoch erst am Ende der Klasse
-% geschehen.
+% \begin{option}{numbers}
+%   \changes{v2.98c}{2008/03/07}{Neue Option}
+% Dies ist die zentrale Option zur Konfiguration der Nummerierung. Dabei geht
+% es primär um die Gliederungsnummern, es sind jedoch auch davon abgeleitete
+% Nummern betroffen.
+% \begin{macro}{scr@dotchangeatdocument}
+%   \changes{v2.98c}{2008/03/07}{Neu (intern)}
+% Da die Umschaltung zwischen automatischem Endpunkt, immer Endpunkt und kein
+% Endpunkt unbedingt \emph{vor} \cs{begin{document}} erfolgen muss, wird eine
+% Fehlermeldung ausgegeben, falls das jemand zu einem späteren Zeitpunkt
+% probiert.
 %    \begin{macrocode}
-\DeclareOption{pointednumbers}{%
-  \AtEndOfClass{\@altsecnumformattrue
-    \global\let\@altsecnumformatfalse\@altsecnumformattrue}%
-}
-\DeclareOption{pointednumber}{%
-  \AtEndOfClass{\@altsecnumformattrue
-    \global\let\@altsecnumformatfalse\@altsecnumformattrue}%
+\newcommand*{\scr@dotchangeatdocument}[1]{%
   \ClassError{\KOMAClassName}{%
-    undefined option `pointednumber' instead of `pointednumbers'%
+    change of end dot feature after \string\begin{document}%
   }{%
-    You've used the class-option `pointednumber'.\MessageBreak
-    This name was an implementation-error at versions from 2.3h till
-    2.4f.\MessageBreak
-    The correct name is `pointednumbers'.
-    Change this at your document.\MessageBreak
-    If you'll continue, the option `pointednumbers' will be used%
-  }%
-}
-\DeclareOption{pointlessnumbers}{%
-  \AtEndOfClass{\@altsecnumformatfalse
-    \global\let\@altsecnumformattrue\@altsecnumformatfalse}%
-}
-\DeclareOption{pointlessnumber}{%
-  \AtEndOfClass{\@altsecnumformatfalse
-    \global\let\@altsecnumformattrue\@altsecnumformatfalse}%
-  \ClassError{\KOMAClassName}{%
-    undefined option `pointlessnumber' instead of `pointlessnumbers'%
-  }{%
-    You've used the class-option `pointlessnumber'.\MessageBreak
-    This name was an implementation-error at versions from 2.3h till
-    2.4f.\MessageBreak
-    The correct name is `pointlessnumbers'.
-    Change this at your document.\MessageBreak
-    If you'll continue, the option `pointlessnumbers' will be used%
+    You've tried to set `numbers=#1' after \string\begin{document},\MessageBreak
+    but this option is only allowed at the document preamble.\MessageBreak
+    See KOMA-Script manual for more information about.%
   }%
 }
 %    \end{macrocode}
+% \end{macro}
+% Normalerweise wird automatisch entschieden, ob Nummern mit einem
+% Punkt enden müssen oder nicht. Um dies abzuschalten, muss nur der
+% gewünschte Zustand eingeschaltet und die Umschaltmöglichkeit
+% entfernt werden. Die Umschaltung kann jedoch nicht direkt erfolgen, sondern
+% erfolgt zeitverzögert in \cs{begin{document}}. Hier wird nur das Makro
+% umgeschaltet, das dort verwendet wird.
+%    \begin{macrocode}
+\KOMA@key{numbers}{%
+  \KOMA@set@ncmdkey{numbers}{@tempa}{%
+    {autoenddot}{0},{auto}{0},%
+    {enddot}{1},{withenddot}{1},{dotatend}{1},%
+    {noenddot}{2},{nodotatend}{2}%
+  }{#1}%
+  \ifcase \@tempa\relax
+    \if@atdocument\scr@dotchangeatdocument{#1}\else
+      \let\scr@altsecnumhook\@empty
+    \fi
+  \or
+    \if@atdocument\scr@dotchangeatdocument{#1}\else
+      \let\scr@altsecnumhook\scr@altsecnumhooktrue
+    \fi
+  \or
+    \if@atdocument\scr@dotchangeatdocument{#1}\else
+      \let\scr@altsecnumhook\scr@altsecnumhookfalse
+    \fi
+  \fi
+}
+%    \end{macrocode}
+% \begin{macro}{\scr@altsecnumhook}
+%   \changes{v2.98c}{2008/03/07}{Neu (intern)}
+% \begin{macro}{\scr@altsecnumhooktrue}
+%   \changes{v2.98c}{2008/03/07}{Neu (intern)}
+% \begin{macro}{\scr@altsecnumhookfalse}
+%   \changes{v2.98c}{2008/03/07}{Neu (intern)}
+% Es werden drei Hilfsmakros benötigt. Das erste davon wird bei
+% \cs{begin{document}} ausgeführt (nachdem die \texttt{aux}-Datei gelesen
+% wurde!) und schaltet den gewünschten Zustand ein. Dazu wird es per Option
+% ggf. auf die eine oder andere Bedeutung umgeschaltet. Im Auto-Fall ist es
+% übrigens \cs{@empty}.
+%    \begin{macrocode}
+\newcommand*{\scr@altsecnumhook}{}
+\AtBeginDocument{\scr@altsecnumhook}
+\newcommand*{\scr@altsecnumhooktrue}{%
+  \@altsecnumformattrue\global\let\@altsecnumformatfalse\@altsecnumformattrue
+}
+\newcommand*{\scr@altsecnumhookfalse}{%
+  \@altsecnumformatfalse\global\let\@altsecnumformattrue\@altsecnumformatfalse
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{option}
+%
+% \begin{option}{pointednumbers}
+%   \changes{v2.3h}{1995/01/19}{neue Option}
+%   \changes{v2.4g}{1996/11/04}{die Option heißt nun wirklich so,
+%     bei \texttt{pointednumber} wird explizit ein Fehler gemeldet}
+%   \changes{v2.4g}{1996/11/04}{\cs{@altsecnumformatfalse} wird
+%     direkt auf \cs{@altsecnumformattrue} gesetzt}
+%   \changes{v2.98c}{2008/03/07}{obsolet}
+% \begin{option}{pointlessnumbers}
+%   \changes{v2.3h}{1995/01/19}{neue Option}
+%   \changes{v2.4g}{1996/11/04}{die Option heißt nun wirklich so,
+%     bei \texttt{pointlessnumber} wird explizit ein Fehler gemeldet}
+%   \changes{v2.4g}{1996/11/04}{\cs{@altsecnumformattrue} wird direkt
+%     auf \cs{@altsecnumformatfalse} gesetzt}
+%   \changes{v2.98c}{2008/03/07}{obsolet}
+%    \begin{macrocode}
+\KOMA@DeclareObsoleteOption[\ClassWarningNoLine]{pointednumbers}
+                                                {numbers=enddot}
+\KOMA@DeclareObsoleteOption[\ClassWarningNoLine]{pointlessnumbers}
+                                                {numbers=noenddot}
+%    \end{macrocode}
 % Übrigens weiß ich, wie blödsinnig die Namen der Optionen sind. Aber
 % das ist nun nicht mehr zu ändern.
-%  \end{option}
-%  \end{option}
+% \end{option}
+% \end{option}
 %
 %
 %  \begin{option}{bigheadings}
