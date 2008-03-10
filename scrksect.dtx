@@ -1,4 +1,4 @@
-% \CheckSum{1710}
+% \CheckSum{1718}
 % \iffalse meta-comment
 % ======================================================================
 % scrksect.dtx
@@ -267,6 +267,76 @@
 % \end{option}
 %
 %
+%  \begin{option}{chapterprefix}
+%    \changes{v2.8}{2001/06/15}{neue Option}
+%    \changes{v2.95c}{2006/08/21}{als \textsf{keyval}-Option}
+%  \begin{option}{nochapterprefix}
+%    \changes{v2.8}{2001/06/15}{neue Option}
+%    \changes{v2.95c}{2006/08/21}{obsolete Option}
+% \iffalse
+%<*book|report>
+% \fi
+% Normalerweise verwenden \textsf{scrbook} und \textsf{scrreprt} nicht
+% die enorm großen Überschriften von \textsf{book} und
+% \textsf{report}, die mit einem Absatz "`Kapitel \emph{Nummer}"'
+% beginnen. Mit der Option \texttt{chapterprefix} kann dies jetzt
+% wieder aktiviert werden. Die Option, zur Deaktivierung heißt
+% entsprechend \textsf{nochapterprefix}. 
+%  \begin{macro}{\if@chapterprefix}
+%  \begin{macro}{\@chapterprefixtrue}
+%  \begin{macro}{\@chapterprefixfalse}
+% Um für Spezialanwendungen auch innerhalb des Dokuments eine
+% Umschaltung zu ermöglichen bzw. für die Optionen
+% \texttt{appendixprefix} und \texttt{noappendixprefix} erfolgt die
+% Umschaltung durch einen Schalter.
+%    \begin{macrocode}
+\newif\if@chapterprefix\@chapterprefixfalse
+\KOMA@ifkey{chapterprefix}{@chapterprefix}
+\KOMA@DeclareObsoleteOption{nochapterprefix}{chapterprefix=false}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+% \iffalse
+%</book|report>
+% \fi
+%  \end{option}
+%  \end{option}
+%
+%
+%  \begin{option}{appendixprefix}
+%    \changes{v2.8}{2001/06/15}{neue Option}
+%    \changes{v2.95c}{2006/08/21}{als \textsf{keyval}-Option}
+%  \begin{option}{noappendixprefix}
+%    \changes{v2.8}{2001/06/15}{neue Option}
+%    \changes{v2.95c}{2006/08/21}{obsolete Option}
+% \iffalse
+%<*book|report>
+% \fi
+% Will man abweichend von der Option \texttt{chapterprefix} die großen
+% Überschriften für den Anhang aktivieren oder deaktivieren, so kann man das
+% mit dieser Option erreichen. Allerdings setzt diese keinen Schalter, sondern
+% ein Zusatzmakro, das auch für andere Zwecke genutzt werden kann. Übrigens
+% ist keine der beiden Einstellungen die Voreinstellung!
+%    \begin{macrocode}
+\KOMA@key{appendixprefix}[true]{%
+  \KOMA@set@ifkey{appendixprefix}{@tempswa}{#1}%
+  \if@tempswa
+    \def\appendixmore{\@chapterprefixtrue}%
+  \else
+    \def\appendixmore{\@chapterprefixfalse}%
+  \fi
+}
+\KOMA@DeclareObsoleteOption[\ClassInfoNoLine]{noappendixprefix}{%
+  appendixprefix=false}
+%    \end{macrocode}
+% \iffalse
+%</book|report>
+% \fi
+%  \end{option}
+%  \end{option}
+%
+%
 % \begin{macro}{\size@part}
 %   \changes{v2.8o}{2001/09/14}{neu (intern)}
 %   \changes{v2.96a}{2006/12/02}{letztes Element darf ein Argument erwarten,
@@ -359,6 +429,14 @@
     ,{openany}{3},%
     {openright}{4},%
     {openleft}{5}%
+    ,{twolinechapter}{6},{chapterprefix}{6},{chapterwithprefix}{6},%
+    {chapterwithprefixline}{6},%
+    {onelinechapter}{7},{nochapterprefix}{7},{chapterwithoutprefix}{7},%
+    {chapterwithoutprefixline}{7}%
+    ,{twolineappendix}{8},{appendixprefix}{8},{appendixwithprefix}{8},%
+    {appendixwithprefixline}{8},%
+    {onelineappendix}{9},{noappendixprefix}{9},{appendixwithoutprefix}{9},%
+    {appendixwithoutprefixline}{9}%
 %</book|report>
   }{#1}%
   \ifcase \@tempa\relax
@@ -451,6 +529,27 @@
 %<*book|report>
     \KOMA@options{open=left}{}%
 %</book|report>
+%    \end{macrocode}
+% Für \textsf{scrbook} und \textsf{scrreprt} gibt es dann noch die
+% Möglichkeit, auch hierüber die Optionen \texttt{chapterprefix} und
+% \texttt{appendixprefix} zu setzen.
+%    \begin{macrocode}
+  \or
+%<*book|report>
+    \KOMA@options{chapterprefix=true}{}%
+%</book|report>
+  \or
+%<*book|report>
+    \KOMA@options{chapterprefix=false}{}%
+%</book|report>
+  \or
+%<*book|report>
+    \KOMA@options{appendixprefix=true}{}%
+%</book|report>
+  \or
+%<*book|report>
+    \KOMA@options{appendixprefix=false}{}%
+%</book|report>
   \fi
 }
 %    \end{macrocode}
@@ -493,76 +592,6 @@
 %  \end{macro}
 %  \end{option}
 %  \end{macro}
-%  \end{option}
-%
-%
-%  \begin{option}{chapterprefix}
-%    \changes{v2.8}{2001/06/15}{neue Option}
-%    \changes{v2.95c}{2006/08/21}{als \textsf{keyval}-Option}
-%  \begin{option}{nochapterprefix}
-%    \changes{v2.8}{2001/06/15}{neue Option}
-%    \changes{v2.95c}{2006/08/21}{obsolete Option}
-% \iffalse
-%<*book|report>
-% \fi
-% Normalerweise verwenden \textsf{scrbook} und \textsf{scrreprt} nicht
-% die enorm großen Überschriften von \textsf{book} und
-% \textsf{report}, die mit einem Absatz "`Kapitel \emph{Nummer}"'
-% beginnen. Mit der Option \texttt{chapterprefix} kann dies jetzt
-% wieder aktiviert werden. Die Option, zur Deaktivierung heißt
-% entsprechend \textsf{nochapterprefix}. 
-%  \begin{macro}{\if@chapterprefix}
-%  \begin{macro}{\@chapterprefixtrue}
-%  \begin{macro}{\@chapterprefixfalse}
-% Um für Spezialanwendungen auch innerhalb des Dokuments eine
-% Umschaltung zu ermöglichen bzw. für die Optionen
-% \texttt{appendixprefix} und \texttt{noappendixprefix} erfolgt die
-% Umschaltung durch einen Schalter.
-%    \begin{macrocode}
-\newif\if@chapterprefix\@chapterprefixfalse
-\KOMA@ifkey{chapterprefix}{@chapterprefix}
-\KOMA@DeclareObsoleteOption{nochapterprefix}{chapterprefix=false}
-%    \end{macrocode}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
-% \iffalse
-%</book|report>
-% \fi
-%  \end{option}
-%  \end{option}
-%
-%
-%  \begin{option}{appendixprefix}
-%    \changes{v2.8}{2001/06/15}{neue Option}
-%    \changes{v2.95c}{2006/08/21}{als \textsf{keyval}-Option}
-%  \begin{option}{noappendixprefix}
-%    \changes{v2.8}{2001/06/15}{neue Option}
-%    \changes{v2.95c}{2006/08/21}{obsolete Option}
-% \iffalse
-%<*book|report>
-% \fi
-% Will man abweichend von der Option \texttt{chapterprefix} die großen
-% Überschriften für den Anhang aktivieren oder deaktivieren, so kann man das
-% mit dieser Option erreichen. Allerdings setzt diese keinen Schalter, sondern
-% ein Zusatzmakro, das auch für andere Zwecke genutzt werden kann. Übrigens
-% ist keine der beiden Einstellungen die Voreinstellung!
-%    \begin{macrocode}
-\KOMA@key{appendixprefix}[true]{%
-  \KOMA@set@ifkey{appendixprefix}{@tempswa}{#1}%
-  \if@tempswa
-    \def\appendixmore{\@chapterprefixtrue}%
-  \else
-    \def\appendixmore{\@chapterprefixfalse}%
-  \fi
-}
-\KOMA@DeclareObsoleteOption[\ClassInfoNoLine]{noappendixprefix}{%
-  appendixprefix=false}
-%    \end{macrocode}
-% \iffalse
-%</book|report>
-% \fi
-%  \end{option}
 %  \end{option}
 %
 %
