@@ -1,4 +1,4 @@
-% \CheckSum{1012}
+% \CheckSum{1088}
 % \iffalse meta-comment
 % ======================================================================
 % scrkbase.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkbase.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkbase.dtx}[2008/02/18 v2.98c KOMA-Script (basics)]
+\ProvidesFile{scrkbase.dtx}[2008/03/12 v2.98c KOMA-Script (basics)]
 % \iffalse
 %</driver>
 %<package&option>\ProvidesPackage{scrkbase}[%
@@ -997,6 +997,55 @@
 % \end{macro}
 % \end{macro}
 % \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\KOMAoption}
+%   \changes{v2.98c}{2008/03/12}{Neue Anweisung}
+% Im Gegensatz zu \cs{KOMAoptions} kann man mit dieser Anweisung nur eine
+% einzige Options setzen. Dafür kann man gleich mehrere durch Komma getrennte
+% Argumente für diese Option setzen. Das erste obligatorische Argument ist die
+% Option, das zweite, obligatorische Argument ist die Liste der Werte für
+% diese Option.
+%    \begin{macrocode}
+\newcommand*{\KOMAoption}[2]{%
+  \let\post@kopt@hook\@empty
+  \expandafter\KV@@sp@def\expandafter\KOMA@key@name\expandafter{#1}%
+  \KOMA@key@found@false
+  \@for\@tempa:=\KOMA@key@familylist\do{%
+    \scr@ifundefinedorrelax{KV@\@tempa @\KOMA@key@name}{}{%
+      \KOMA@key@found@true
+      \let\@tempb\@tempa
+    }%
+  }%
+  \ifKOMA@key@found@
+    \let\reserved@a\@empty
+    \@for\@tempa:=#2\do{%
+      \expandafter\KV@@sp@def\expandafter\@tempa\expandafter{\@tempa}%
+      \edef\reserved@a{\reserved@a,\KOMA@key@name=\@tempa}%
+    }%
+    \ifx\reserved@a\@empty
+      \edef\reserved@a{\noexpand\setkeys{\@tempb}{\KOMA@key@name}}%
+    \else
+      \edef\reserved@a{%
+        \noexpand\setkeys{\@tempb}{\expandafter\@gobble\reserved@a}}%
+    \fi
+    \reserved@a
+  \else
+    \PackageError{scrkbase}{%
+      unknown KOMA option `\KOMA@key@name'%
+    }{%
+      You have used \string\KOMAoption\space to set
+      `\KOMA@key@name',\MessageBreak
+      but KOMA-Script does not know any option named
+      `\KOMA@key@name'.\MessageBreak
+      See the KOMA-Script manual for more informations about options
+      and\MessageBreak
+      their values.%
+    }%
+  \fi
+  \post@kopt@hook\let\post@kopt@hook\relax
+}
+%    \end{macrocode}
 % \end{macro}
 %
 %  \begin{macro}{\KOMA@unknown@keyval}
