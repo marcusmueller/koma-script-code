@@ -206,13 +206,11 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % \let\OParameter\oarg
 % \let\PName\meta
 % \let\PValue\texttt
-% \newenvironment{Example}{%
-%   \quote\hspace*{-\leftmargin}\textbf{Example:}\enskip\ignorespaces
-% }{%
-%   \endquote
-% }
+% \newenvironment{Example}{\quote
+%   \hspace*{-\leftmargin}\textbf{Example:}\enskip\ignorespaces
+% }{\endquote}
 % \newlength\descwidth
-% \newenvironment{desctabular}{%
+% \newenvironment{desctabular}{
 %   \setlength{\descwidth}{\linewidth}
 %   \addtolength{\descwidth}{-1em}
 %   \addtolength{\descwidth}{-2\tabcolsep}
@@ -222,18 +220,15 @@ standard classes created by The LaTeX3 Project 1994-1996.
 %   \hline
 %   \endtabular
 % }
-% \newcommand{\pventry}[2]{%
-%   \multicolumn{2}{@{}l@{}}{\PValue{#1}}\\
+% \newcommand{\pventry}[2]{\multicolumn{2}{@{}l@{}}{\PValue{#1}}\\
 %   ~ & #2 \\ }
 % \providecommand*{\autoref}[1]{\expandafter\AUTOREF#1:}
 % \newcommand*{\AUTOREF}{}
 % \makeatletter
-% \def\AUTOREF#1:#2:{%
-%   \edef\@tempa{#1}%
-%   \edef\@tempb{tab}\ifx\@tempa\@tempb table~\fi
+% \def\AUTOREF#1:#2:{\edef\@tempa{#1}\edef\@tempb{tab}\ifx\@tempa\@tempb 
+%   table~\fi
 %   \edef\@tempb{sec}\ifx\@tempa\@tempb section~\fi
-%   \ref{#1:#2}%
-% }
+%   \ref{#1:#2}}
 % \makeatother
 %
 % \begin{document}
@@ -322,7 +317,7 @@ was used. The second kind are commands to create the list of something.
 \subsection{Basic Commands}
 \label{sec:tocbasic.basics}
 
-Basic commands are used to handle a list of all extensions used for files
+Basic commands are used to handle a list of all extensions known for files
 representing a list of something.  Entries to such files are written using
 \Macro{addtocontents} or \Macro{addcontentsline} typically.  There are also
 commands to do something for all known extensions.  And there are commands to
@@ -344,7 +339,6 @@ Command \Macro{ifattoclist}\Parameter{extension}\Parameter{true
   part}\Parameter{false part}
 % \iffalse
 %</dtx>
-%<*doc>
 % \fi
 may be used to ask, wether a \PName{extension} is already a known extension or
 not.  If the \PName{extension} is already known the \PName{true part} will be
@@ -380,9 +374,8 @@ This command
 Command \Macro{addtotoclist}\OParameter{owner}\Parameter{extension}
 % \iffalse
 %</dtx>
-%<*doc>
 % \fi
-adds the \PName{extension} to the list of used extensions.  If the optional
+adds the \PName{extension} to the list of known extensions.  If the optional
 argument, \OParameter{owner}, was given this \PName{owner} will be stored to
 be the owner of the \PName{extension}.  If you omit the optional argument,
 \Package{tocbasic} tries to find out the filename of the current processed
@@ -438,10 +431,85 @@ empty owner.
   ``\PValue{float.sty}'', because there is no class \Class{float.cls} and
   therfore ``\PValue{float}'' should be unique too.
 \end{Example}
-%
+
 % \iffalse
-%</doc>
+\begin{Description}
+  \Macro{AtAddToTocList}\OParameter{owner}\Parameter{commands}
+\end{Description}
+This command
+%<*dtx>
+%\fi
+\DescribeMacro{\AtAddtoTocList}
+Command \Macro{AtAddToTocList}\OParameter{owner}\Parameter{commands}
+% \iffalse
+%</dtx>
 % \fi
+adds the \PName{commands} to a internal list of commands, that should be
+processed, if a toc-file with the given \PName{owner} will be added to the
+list of known extensions using \Macro{addtoloclist}.  If you omit the optional
+argument, \Package{tocbasic} tries to find out the filename of the current
+processed class or package and stores this as owner.  This will fail if
+\Macro{AtAddToTocList} was not used, loading a class or package but using a
+command of a class or package after loading this class or package.  In this
+case the owner will be set to ``\PValue{.}''.  Note that an empty
+\PName{owner} is not the same like omitting the optional argument. With an
+empty \PName{owner} you may add \Parameter{commands}, that will be processed
+at every succefull \Macro{addtotoclist}, after processing the commands for the
+indivdual owner.  While processing the \PValue{commands}, \Macro{@currext} wil
+be set to the extension of the currently added extension.
+\begin{Example}
+\Package{tocbasic} itself uses
+\begin{lstlisting}
+  \AtAddToTocList[]{%
+    \expandafter\tocbasic@extend@babel
+    \expandafter{\@currext}%
+  }
+\end{lstlisting}
+to add every extension to the \Package{tocbasic}-internal babel handling of
+toc-files.  The \Macro{expandafter} are needed, because the argument of
+\Macro{tocbasic@extend@babel} has to expanded!  See the description of
+\Macro{tocbasic@extend@babel} at \autoref{sec:tocbasic.internals}%
+% \iffalse
+, \autopageref{desc:tocbasic.macro.tocbasic@extend@babel}
+% \fi
+for more information.
+\end{Example}
+
+% \iffalse
+\begin{Description}
+  \Macro{removefromtoclist}\OParameter{owner}\Parameter{extension}
+\end{Description}
+This command
+%<*dtx>
+%\fi
+\DescribeMacro{\removefromtoclist}
+Command \Macro{removefromtotoclist}\OParameter{owner}\Parameter{extension}
+% \iffalse
+%</dtx>
+% \fi
+removes the \PName{extension} from the list of known extensions.  If the
+optional argument, \OParameter{owner}, was given the \PName{extension} will
+only be removed, if it was added by this \PName{owner}.  If you omit the
+optional argument, \Package{tocbasic} tries to find out the filename of the
+current processed class or package and use this as owner.  This will fail if
+\Macro{removefromtoclist} was not used, loading a class or package but using a
+command of a class or package after loading this class or package.  In this
+case the owner will be set to ``\PValue{.}''.  Note that an empty
+\PName{owner} is not the same like omitting the optional argument, but removes
+the \PName{extension} without any owner test.
+
+%
+% \textsc{To be continued!}
+%
+%\subsection{Creating a List of Something}
+%\label{sec:tocbasic.more}
+%
+% \textsc{To be continued!}
+%
+%\subsection{Internal Commands for Class and Package Authors}
+%\label{sec:tocbasic.internals}
+%
+%
 %
 % \textsc{To be continued!}
 %
@@ -449,6 +517,10 @@ empty owner.
 % class and package authors should be able to read the implemenation
 % documentation.
 %
+%
+% \iffalse
+%</doc|dtx>
+% \fi
 %
 % \StopEventually{\PrintIndex\PrintChanges}
 %
