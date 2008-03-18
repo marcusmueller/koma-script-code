@@ -1,4 +1,4 @@
-% \CheckSum{524}
+% \CheckSum{583}
 % \iffalse meta-comment
 % tocbasic.dtx
 %
@@ -34,7 +34,7 @@
 %<doc>\ProvidesFile{tocbasic.tex}
 %<package>\ProvidesPackage{tocbasic}
 %<*dtx|package|driver|doc>
-                [2008/03/13 v0.1 alpha
+                [2008/03/18 v0.1 alpha
 %</dtx|package|driver|doc>
 %<driver>                 (driver)%
 %<package>                (package)%
@@ -528,16 +528,16 @@ used.
 \end{Example}
 
 
-% \subsection{Creating a List of Something}
-% \label{sec:tocbasic.more}
-%
-% At the previous section you've seen commands to handle a list of known
-% extensions and to trigger commands while adding a new extension to this
-% list. You've also seen a command to do something for all known extensions or
-% all known extensions of one owner. In this section you will see commands to
-% handle the file corresponding with an extension or the list of known
-% extensions.
-%
+\subsection{Creating a List of Something}
+\label{sec:tocbasic.more}
+
+At the previous section you've seen commands to handle a list of known
+extensions and to trigger commands while adding a new extension to this
+list. You've also seen a command to do something for all known extensions or
+all known extensions of one owner. In this section you will see commands to
+handle the file corresponding with an extension or the list of known
+extensions.
+
 % \iffalse
 \begin{Description}
   \Macro{addtoeachtocfile}\OParameter{owner}\Parameter{contents}
@@ -595,19 +595,339 @@ toc-files or all known toc-files of a given owner.
       \protect\numberline{\thechapter}#1}
   \end{lstlisting}
 \end{Example}
+
+% \iffalse
+%<*dtx>
+% \fi
+\DescribeMacro{\listoftoc}
+\DescribeMacro{\listoftoc*}
+Commands
+% \iffalse
+%</dtx>
+\begin{Description}
+% \fi
+  \Macro{listoftoc*}\Parameter{extension}
+% \iffalse
+\\
+%<*dtx>
+% \fi
+and
+% \iffalse
+%</dtx>
+% \fi
+  \Macro{listoftoc}\OParameter{list of title}\Parameter{extension}
+% \iffalse
+\end{Description}
+This commands
+% \fi
+may be used to set the ``list of'' of a toc-file. The star version
+\Macro{listoftoc*} needs only one argument, the extension of the toc-file. It
+does setup the vertical and horizontal spacing of paragraphs, calls before and
+after hooks and reads the toc-file.  You may use it as direct replacement of
+the \LaTeX{} kernel macro \Macro{@starttoc}.
+
+The version without star, sets the whole toc-file with title, optional table
+of contents entry, and running heads. If the optional argument
+\OParameter{list of title} was given, it will be used as title term, optional
+table of contents entry and running head. Note: If the optional argument is
+empty, this term will be empty, too! If you omit the optional argument, but
+\Macro{listof\PName{extension}name} was defined, that will be used.
+
+\begin{Example}
+  You have a new ``list of algorithms'' with extension \PValue{loa} and want to
+  show it.
+  \begin{lstlisting}
+  \listof[list of algorithm]{loa}
+  \end{lstlisting}
+  Maybe you want, that the ``list of algorithms'' will create an entry at the
+  table of contents. You may set
+  \begin{lstlisting}
+  \setuptoc{loa}{totoc}
+  \end{lstlisting}
+  But maybe the ``list of algorithms'' should not be set with a title. So you
+  may use
+  \begin{lstlisting}
+  \listof*{loa}
+  \end{lstlisting}
+  Note that in this case no entry at the table of contents will be created,
+  even if you'd used the setup command above.
+\end{Example}
+
+The default heading new following features using \Macro{setuptoc}:
+\begin{description}
+\item[\texttt{totoc}] writes the title of the list of to the table of contents
+\item[\texttt{numbered}] uses a numbered headings for the list of
+\item[\texttt{leveldown}] uses not the top level heading (e.g., \cs{chapter}
+  with book) but the first sub level (e.g., \cs{section} with book).
+\end{description}
+
+
+% \iffalse
+%<*dtx>
+% \fi
+\begin{sloppypar}
+\DescribeMacro{\BeforeStartingTOC}
+\DescribeMacro{\AfterStartingTOC}
+The Commands
+% \iffalse
+%</dtx>
+\begin{Description}
+% \fi
+  \Macro{BeforeStartingTOC}\OParameter{extension}\Parameter{commands}
+% \iffalse
+\\
+%<*dtx>
+% \fi
+and
+% \iffalse
+%</dtx>
+% \fi
+  \Macro{AfterStartingTOC}\OParameter{extension}\Parameter{commands}
+% \iffalse
+\end{Description}
+This commands
+% \fi
+may be used to process \PName{commands} before or after loading the toc-file
+with given \PName{extension} using \Macro{listoftoc*} or \Macro{listoftoc}. If
+you omit the optional argument (or set an empty one) the general hooks will be
+set. The general before hook will be called before the individuel one and the
+general after hook will be called after the individuel one. While calling the
+hooks \Macro{@currext} is the extension of the toc-file and should not be
+changed.
+% \iffalse
+%<*dtx>
+% \fi
+\end{sloppypar}
+% \iffalse
+%</dtx>
+% \fi
+
+% \iffalse
+%<*dtx>
+% \fi
+\begin{sloppypar}
+\DescribeMacro{\BeforeTOCHead}
+\DescribeMacro{\AfterTOCHead}
+The Commands
+% \iffalse
+%</dtx>
+\begin{Description}
+% \fi
+  \Macro{BeforeTOCHead}\OParameter{extension}\Parameter{commands}
+% \iffalse
+\\
+%<*dtx>
+% \fi
+and
+% \iffalse
+%</dtx>
+% \fi
+  \Macro{AfterTOCHead}\OParameter{extension}\Parameter{commands}
+% \iffalse
+\end{Description}
+This commands
+% \fi
+may be used to process \PName{commands} before or after setting the title of a
+toc-file with given \PName{extension} using \Macro{listoftoc*} or
+\Macro{listoftoc}. If you omit the optional argument (or set an empty one) the
+general hooks will be set. The general before hook will be called before the
+individuel one and the general after hook will be called after the individuel
+one. While calling the hooks \Macro{@currext} is the extension of the toc-file
+and should not be changed.
+% \iffalse
+%<*dtx>
+% \fi
+\end{sloppypar}
+% \iffalse
+%</dtx>
+% \fi
+
+% \iffalse
+%<*dtx>
+% \fi
+\DescribeMacro{\listofeachtoc}
+Command
+% \iffalse
+%</dtx>
+\begin{Description}
+% \fi
+  \Macro{listofeachtoc}\OParameter{owner}
+% \iffalse
+\end{Description}
+This command
+% \fi
+sets all toc-files or all toc-files of the given \PName{owner} using
+\Macro{listoftoc}. You should have defined
+\Macro{listof\PName{extension}name} for each toc-file, otherwise you'll get a
+warning.
+
+% \iffalse
+%<*dtx>
+% \fi
+\DescribeMacro{\MakeMarkcase}
+Command
+% \iffalse
+%</dtx>
+\begin{Description}
+% \fi
+  \Macro{MakeMarkcase}
+% \iffalse
+\end{Description}
+This command
+% \fi
+will be used to change the case of the letters at the running
+head. The default is, to use \Macro{@firstofone} for \KOMAScript{} classes and
+\Macro{MakeUppercase} for all other classes. If you are the class author you
+may define \Macro{MakeMarkcase} on your own. If \Package{scrpage2} or another
+package, that defines \Macro{MakeMarkcase} will be used, \Package{tocbasci}
+will not overwrite that Definition.
+
+% \iffalse
+%<*dtx>
+% \fi
+\DescribeMacro{\deftocheading}
+Command
+% \iffalse
+%</dtx>
+\begin{Description}
+% \fi
+  \Macro{deftocheading}\Parameter{extension}\Parameter{definition}
+% \iffalse
+\end{Description}
+This command
+% \fi
+defines a heading command, that will be used instead of the
+default heading using \Macro{listoftoc}. The heading command has exactly one
+argument. You may reference to that argument using \texttt{\#1} at your
+\PName{defintion}.
+
+% \iffalse
+%<*dtx>
+% \fi
+\begin{sloppypar}
+\DescribeMacro{\setuptoc}
+\DescribeMacro{\unsettoc}
+The Commands
+% \iffalse
+%</dtx>
+\begin{Description}
+% \fi
+  \Macro{setuptoc}\Parameter{extension}\Parameter{featurelist}
+% \iffalse
+\\
+%<*dtx>
+% \fi
+and
+% \iffalse
+%</dtx>
+% \fi
+  \Macro{unsettoc}\Parameter{extension}\Parameter{featurelist}
+% \iffalse
+\end{Description}
+This commands
+% \fi
+set up and unset features binded to an \PName{extension}. The
+\PName{featurelist} is a comma seperated list of single
+features. \Package{tocbasic} does know following features:
+\begin{description}
+\item[\texttt{totoc}] writes the title of the list of to the table of contents
+\item[\texttt{numbered}] uses a numbered headings for the list of
+\item[\texttt{leveldown}] uses not the top level heading (e.g., \cs{chapter}
+  with book) but the first sub level (e.g., \cs{section} with book).
+\item[\texttt{nobabel}] prevents the extension to be added to the babel
+  handling of toc-files.  To make this work, you have to set the feature
+  before adding the extension to the list of known extension.
+\end{description}
+Classes and packages may know features, too.
+% \iffalse
+%<*dtx>
+% \fi
+\end{sloppypar}
+% \iffalse
+%</dtx>
+% \fi
+
+
+% \iffalse
+%<*dtx>
+% \fi
+\DescribeMacro{\iftocfeature}
+Command
+% \iffalse
+%</dtx>
+\begin{Description}
+% \fi
+  \Macro{iftocfeature}\Parameter{extension}\Parameter{feature}%^^A
+  \Parameter{true-part}\Parameter{false-part}
+% \iffalse
+\end{Description}
+This command
+% \fi
+may be used, to test, if a \PName{feature} was set for \PName{extension}. If
+so the \PName{true-part} will be processed, otherwise the \PName{false-part}
+will be.
+
+
+\subsection{Internal Commands for Class and Package Authors}
+\label{sec:tocbasic.internals}
+
+Commands with prefix \Macro{tocbasic@} are internal but class and package
+authors may use them. But even if you are a class or package author you
+should not change them!
+
+% \iffalse
+%<*dtx>
+% \fi
+\DescribeMacro{\tocbasic@extend@babel}
+Command
+% \iffalse
+%</dtx>
+\begin{Description}
+% \fi
+  \Macro{tocbasic@extend@babel}\Parameter{extension}
+% \iffalse
+\end{Description}
+This command
+% \fi
+extends the babel handling of toc-files. By default babel writes language
+selections only to \PValue{toc}, \PValue{lot} and
+\PValue{lof}. \Package{tocbasic} adds every \PName{extension} added to the
+list of known extensions (see \Macro{addtotoclist}, \autoref{sec:tocbasic.basics}%
+% \iffalse
+, \autopageref{desc:tocbasic.macro.addtotoclist}%
+% \fi
+) using \Macro{tocbasic@extend@babel}. Note: This should be called only once
+per \PName{extension}. \Macro{tocbasic@extend@babel} does nothing, if the
+feature \PValue{nobabel} was set for \PName{extension} before using
+\Macro{addtotoclist}.
+
+% \iffalse
+%<*dtx>
+% \fi
+\DescribeMacro{\tocbasic@}
+Command
+% \iffalse
+%</dtx>
+\begin{Description}
+% \fi
+  \Macro{tocbasic@}
+% \iffalse
+\end{Description}
+This command
+% \fi
+%
 %
 % \textsc{To be continued!}
 %
-% \subsection{Internal Commands for Class and Package Authors}
-% \label{sec:tocbasic.internals}
-%
-%
-%
-% \textsc{To be continued!}
-%
+% \iffalse
+%<*dtx>
+% \fi
 % For more information see the section~\ref{sec:implementation}. I think,
 % class and package authors should be able to read the implemenation
 % documentation.
+% \iffalse
+%</dtx>
+% \fi
 %
 %
 % \iffalse
@@ -690,7 +1010,7 @@ toc-files or all known toc-files of a given owner.
 %   second, mandatory argument is the extension of the toc-file. NOTE: An
 %   empty first argument is not the same like omitting the first argument!
 %    \begin{macrocode}
-\newcommand*{addtotoclist}{%
+\newcommand*{\addtotoclist}{%
   \@ifnextchar [%]
     \@@addtotoclist\@addtotoclist
 }
@@ -756,7 +1076,7 @@ toc-files or all known toc-files of a given owner.
 }
 \newcommand*{\@AtAddToTocList}{%
   \ifx\@currname\@empty
-    \def\reserved@a{\@@addtotoclist[]}%
+    \def\reserved@a{\@@AtAddToTocList[]}%
   \else
     \edef\reserved@a{\noexpand\@@AtAddToTocList[\@currname.\@currext]}%
   \fi
@@ -779,17 +1099,17 @@ toc-files or all known toc-files of a given owner.
     \PackageInfo{tocbasic}{babel extension for `#1' omitted\MessageBreak
       because of missing \string\bbl@set@language}%
   \else
-    \@ifundefined{tocbasic@#1@feature@nobabel}{%
-      \PackageInfo{tocbasic}{setting babel extension for `#1'}%
-      \expandafter\gdef\expandafter\bbl@set@language\expandafter#\expandafter1%
-      \expandafter{%
-        \bbl@set@language{#1}%
-        \addtocontents{test}{\xstring\select@language{\languagename}}%
-      }%
-    }{%
+    \iftocfeature{#1}{nobabel}{%
       \PackageInfo{tocbasic}{omitting babel extension for `#1'\MessageBreak
         because of feature `nobabel' available\MessageBreak
         for `#1'}%
+    }{%
+      \PackageInfo{tocbasic}{setting babel extension for `#1'}%
+      \expandafter\gdef\expandafter\bbl@set@language\expandafter##\expandafter1%
+      \expandafter{%
+        \bbl@set@language{##1}%
+        \addtocontents{#1}{\xstring\select@language{\languagename}}%
+      }%
     }%
   \fi
 }
@@ -918,7 +1238,7 @@ toc-files or all known toc-files of a given owner.
 \newcommand{\@addcontentslinetoeachtocfile}[3][]{%
   \doforeachtocfile[{#1}]{\addcontentsline{\@currext}{#2}{#3}}%
 }
-\newcommand{\@addcontentslinetoeachtocfile}[2]{%
+\newcommand{\@@addcontentslinetoeachtocfile}[2]{%
   \doforeachtocfile{\addcontentsline{\@currext}{#1}{#2}}%
 }
 %    \end{macrocode}
@@ -942,11 +1262,12 @@ toc-files or all known toc-files of a given owner.
     \setlength{\parskip}{\z@}%
     \setlength{\parindent}{\z@}%
     \setlength{\parfillskip}{\z@\@plus 1fil}%
-    \tocbasic@@before@hook
+    \def\@currext{#1}%
+    \csname tocbasic@@before@hook\endcsname
     \csname tb@#1@before@hook\endcsname
     \@starttoc{#1}%
     \csname tb@#1@after@hook\endcsname
-    \tocbasic@@after@hook
+    \csname tocbasic@@after@hook\endcsname
   \endgroup
 }
 %    \end{macrocode}
@@ -1003,7 +1324,8 @@ toc-files or all known toc-files of a given owner.
     \if@twocolumn
       \aftergroup\twocolumne\onecolumn
     \fi
-    \tocbasic@listhead{\list@fname}%
+    \def\@currext{#2}%
+    \tocbasic@listhead{#1}%
     \tocbasic@starttoc{#2}%
   \endgroup
 }
@@ -1039,65 +1361,79 @@ toc-files or all known toc-files of a given owner.
 %   argument.
 %    \begin{macrocode}
 \newcommand*{\tocbasic@listhead}[1]{%
-  \@ifundefined{tocbasic@listhead@#1}{%
+  \@ifundefined{tocbasic@listhead@\@currext}{%
     \begingroup\expandafter\expandafter\expandafter\endgroup
     \expandafter\ifx\csname chapter\endcsname\relax
-      \expandafter\def\csname tocbasic@listhead@#1\endcsname##1{%
-        \@ifundefined{tocbasic@#1@feature@leveldown}{%
-          \@ifundefined{tocbasic@#1@numbered}{%
-            \section*{##1}%
-            \@ifundefined{tocbasic@#1@feature@totoc}{}{%
-              \addcontentsline{toc}{section}{##1}%
-            }%
-          }{%
-            \section[##1]{##1\@mkboth{##1}{##1}}%
-          }%
-          \@mkboth{\MakeMarkcase{##1}}{\MakeMarkcase{##2}}%
-        }{%
-          \@ifundefined{tocbasic@#1@feature@numbered}{%
-            \subsection*{##1}%
-            \@ifundefined{tocbasic@#1@feature@totoc}{}{%
-              \addcontentsline{toc}{subsection}{##1}%
-            }%
-          }{%
+      \expandafter\def\csname tocbasic@listhead@\@currext\endcsname##1{%
+        \iftocfeature{\@currext}{leveldown}{%
+          \iftocfeature{\@currext}{numbered}{%
             \subsection[##1]{##1}%
+          }{%
+            \subsection*{##1}%
+            \iftocfeature{\@currext}{totoc}{%
+              \addcontentsline{toc}{subsection}{##1}%
+            }{}%
           }%
           \ifx\@mkboth\@gobbletwo\else\markright{\MakeMarkcase{##1}}\fi
+        }{%
+          \iftocfeature{\@currext}{numbered}{%
+            \section[##1]{##1\@mkboth{##1}{##1}}%
+          }{%
+            \section*{##1}%
+            \iftocfeature{\@currext}{totoc}{%
+              \addcontentsline{toc}{section}{##1}%
+            }{}%
+          }%
+          \@mkboth{\MakeMarkcase{##1}}{\MakeMarkcase{##2}}%
         }%
       }%
     \else
-      \expandafter\def\csname tocbasic@listhead@#1\endcsname##1{%
-        \@ifundefined{tocbasic@#1@feature@leveldown}{%
-          \@ifundefined{tocbasic@#1@feature@numbered}{%
-            \chapter*{##1}%
-            \@ifundefined{tocbasic@#1@feature@totoc}{}{%
-              \addcontentsline{toc}{chapter}{##1}%
-            }%
-          }{%
-            \chapter[##1]{##1\@mkboth{##1}{##1}}%
-          }%
-          \@mkboth{\MakeMarkcase{##1}}{\MakeMarkcase{##1}}%
-        }{%
-          \@ifundefined{tocbasic@#1@feature@numbered}{%
-            \section*{##1}%
-            \@ifundefined{tocbasic@#1@feature@totoc}{}{%
-              \addcontentsline{toc}{section}{##1}%
-            }%
-          }{%
+      \expandafter\def\csname tocbasic@listhead@\@currext\endcsname##1{%
+        \iftocfeature{\@currext}{leveldown}{%
+          \iftocfeature{\@currext}{numbered}{%
             \section{##1}%
+          }{%
+            \section*{##1}%
+            \iftocfeature{\@currext}{totoc}{%
+              \addcontentsline{toc}{section}{##1}%
+            }{}%
           }%
           \ifx\@mkboth\@gobbletwo\else\markright{\MakeMarkcase{##1}}\fi
+        }{%
+          \iftocfeature{\@currext}{numbered}{%
+            \chapter[##1]{##1\@mkboth{##1}{##1}}%
+          }{%
+            \chapter*{##1}%
+            \iftocfeature{\@currext}{totoc}{%
+              \addcontentsline{toc}{chapter}{##1}%
+            }{}%
+          }%
+          \@mkboth{\MakeMarkcase{##1}}{\MakeMarkcase{##1}}%
         }%
       }%
     \fi
-  }%
-  \tb@@beforehead@hook
-  \csname tb@#1@beforehead@hook\endcsname
-  \csname tocbasic@listhead@#1\endcsname{#1}%
-  \csname tb@#1@afterhead@hook\endcsname
-  \tb@@afterhead@hook
+  }{}%
+  \csname tb@@beforehead@hook\endcsname
+  \csname tb@\@currext @beforehead@hook\endcsname
+  \csname tocbasic@listhead@\@currext\endcsname{#1}%
+  \csname tb@\@currext @afterhead@hook\endcsname
+  \csname tb@@afterhead@hook\endcsname
 }
 %    \end{macrocode}
+% \begin{macro}{\BeforeTOCHead}
+% \begin{macro}{\AfterTOCHead}
+%   These are the commands to add code to the general or individual hooks. If
+%   the first, optional argument was given, the second, mandatory argument
+%   will be added to the individual hook, otherwise the general hook will be
+%   extended.
+\newcommand{\BeforeTOCHead}[2][]{%
+  \expandafter\g@addto@macro\csname tb@#1@beforehead@hook\endcsname{#2}%
+}
+\newcommand{\AfterTOCHead}[2][]{%
+  \expandafter\g@addto@macro\csname tb@#1@beforehead@hook\endcsname{#2}%
+}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 %
 % \begin{macro}{\MakeMarkcase}
@@ -1125,6 +1461,7 @@ toc-files or all known toc-files of a given owner.
 % \end{macro}
 %
 % \begin{macro}{\setuptoc}
+% \begin{macro}{\unsettoc}
 %   Known features are:
 %   \begin{description}
 %   \item[\texttt{totoc}] writes the title of the list of to the table of
@@ -1151,6 +1488,12 @@ toc-files or all known toc-files of a given owner.
     \@namedef{tocbasic@#1@feature@\@tempa}{}%
   }%
 }
+\newcommand*{\unsettoc}[2]{%
+  \@for\@tempa:=#2\do{%
+    \expandafter\tb@@sp@def\expandafter\@tempa\expandafter{\@tempa}%
+    \expandafter\let\csname tocbasic@#1@feature@\@tempa\endcsname\relax
+  }%
+}
 \def\@tempa#1{%
   \def\tb@@sp@def##1##2{%
     \futurelet\tb@sp@tempa\tb@@sp@d##2\@nil\@nil#1\@nil\relax##1}%
@@ -1165,6 +1508,20 @@ toc-files or all known toc-files of a given owner.
 \@tempa{ }
 \def\tb@@sp@c#1\@nil#2\relax#3{\@temptokena{#1}\edef#3{\the\@temptokena}}
 %    \end{macrocode}
+% \begin{macro}{\iftocfeature}
+%   We need a test for the features
+%    \begin{macrocode}
+\newcommand*{\iftocfeature}[2]{%
+  \begingroup\expandafter\expandafter\expandafter\endgroup
+  \expandafter\ifx\csname tocbasic@#1@feature@#2\endcsname\relax
+    \expandafter\@secondoftwo
+  \else
+    \expandafter\@firstoftwo
+  \fi
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 %
 % \iffalse
