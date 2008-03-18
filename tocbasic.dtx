@@ -1,4 +1,4 @@
-% \CheckSum{583}
+% \CheckSum{601}
 % \iffalse meta-comment
 % tocbasic.dtx
 %
@@ -528,6 +528,23 @@ used.
   \end{lstlisting}
 \end{Example}
 
+% \iffalse
+%<*dtx>
+% \fi
+\DescribeMacro{\tocbasicautomode}
+Command
+% \iffalse
+%</dtx>
+\begin{Description}
+% \fi
+  \Macro{tocbasicautomode}
+% \iffalse
+\end{Description}
+This command
+% \fi
+redefines \LaTeX{} kernel macro \Macro{@starttoc} to add all not yet added
+extensions to the list of known extensions and use \Macro{tocbasic@starttoc}
+instead of \Macro{@starttoc}.
 
 \subsection{Creating a List of Something}
 \label{sec:tocbasic.more}
@@ -1168,6 +1185,12 @@ be defined and used in \Macro{tocbasic@listhead}.
   \fi
 }
 %    \end{macrocode}
+% Do not add the files, that babel handles by default.
+%    \begin{macrocode}
+\setuptoc{toc}{nobabel}
+\setuptoc{lof}{nobabel}
+\setuptoc{lot}{nobabel}
+%    \end{macrocode}
 %   This feature should be used for all toc-files (unless feature
 %   \texttt{nobabl} was set for the toc-file.
 %    \begin{macrocode}
@@ -1576,6 +1599,24 @@ be defined and used in \Macro{tocbasic@listhead}.
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\tocbasicautomode}
+%   \Package{tocbasic} can overtake \Macro{@starttoc} to automaticly add all
+%   used extensions to the list of known extensions and use
+%   \Macro{tocbasic@starttoc} instead of \Macro{@starttoc} from \LaTeX{}
+%   kernel.
+%    \begin{macrocode}
+\newcommand*{\tocbasicautomode}{%
+  \let\tb@saved@starttoc\@starttoc
+  \BeforeStartingTOC{%
+    \let\@starttoc\tb@saved@starttoc
+    \expandafter\ifattoclist\expandafter{\@currext}{}{%
+      \@addtotoclist[tocbasicautomode]{\@currext}%
+    }%
+  }%
+}
+%    \end{macrocode}
 % \end{macro}
 %
 % \iffalse
