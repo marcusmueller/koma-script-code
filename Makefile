@@ -98,6 +98,7 @@ CLS_MAIN	= scrbook.cls \
 		  scrpage2.sty \
 		  scrtime.sty \
 		  scrdate.sty \
+		  tocbasic.sty \
 		  tocstyle.sty \
 	          DIN.lco \
 		  DINmtext.lco \
@@ -141,6 +142,7 @@ CLS_MAIN_DTX    = scrbeta.dtx \
 		  scrtime.dtx \
 		  scrlettr.dtx \
 		  scrlogo.dtx \
+		  tocbasic.dtx \
 		  tocstyle.dtx
 
 STATIC_DOC      = README \
@@ -158,12 +160,23 @@ CLS_MAIN_INS	= scrmain.ins
 CLS_MAIN_SUBINS	= scrlfile.ins scraddr.ins scrlettr.ins scrpage.ins \
 		  scrtime.ins
 
-ALPHA_INS       = tocstyle.dtx
+ALPHA_INS       = tocstyle.dtx tocbasic.dtx scrjura.dtx
 
-DTX_IS_INS      = tocstyle.dtx
+ALPHA_DOC       = tocstyle.pdf tocbasic.pdf scrjura.pdf
+
+ALPHA_DTX       = $(subst .pdf,.dtx,$(ALPHA_DOC))
+
+DTX_IS_INS      = tocstyle.dtx tocbasic.dtx scrjura.dtx
 
 CLS_MAIN_SRC	= $(CLS_MAIN_DTX) $(CLS_MAIN_INS) $(CLS_MAIN_SUBINS) \
 		  scrsource.tex
+
+$(ALPHA_DOC): $(ALPHA_DTX)
+	$(LATEX) $(BATCHMODE) $(PDFOUTPUT) $(subst .pdf,.dtx,$@)
+	$(MKINDEX) $(subst .pdf,,$@)
+	$(LATEX) $(BATCHMODE) $(PDFOUTPUT) $(subst .pdf,.dtx,$@)
+	$(MKINDEX) $(subst .pdf,,$@)
+	$(LATEX) $(BATCHMODE) $(PDFOUTPUT) $(subst .pdf,.dtx,$@)
 
 $(CLS_MAIN): $(CLS_MAIN_DVI) $(CLS_MAIN_INS) $(INS_TEMPLATES) $(MAKE_FILES)
 	$(TEXUNPACK) $(CLS_MAIN_INS)
@@ -191,7 +204,7 @@ MISC_SRC	= $(INS_TEMPLATES) $(MAKE_FILES) \
 
 DIST_SRC	= $(MISC_SRC) $(CLS_SRC)
 
-DIST_FILES	= $(DIST_SRC) $(STATIC_DOC)
+DIST_FILES	= $(DIST_SRC) $(STATIC_DOC) $(ALPHA_DOC)
 
 MAINTAIN_SRC    = $(DIST_SRC) missing.dtx .cvsignore
 
@@ -240,7 +253,7 @@ ChangeLog:
 
 default_local: test_baseinit $(CLS_FILES)
 
-install_local: test_baseinit $(DIST_SRC) $(CLS_FILES) $(STATIC_DOC)
+install_local: test_baseinit $(DIST_SRC) $(CLS_FILES) $(STATIC_DOC) $(ALPHA_DOC)
 	@if ! $(MKDIR) $(INSTALLSRCDIR) \
 	  || ! $(MKDIR) $(INSTALLCLSDIR) \
 	  || ! $(MKDIR) $(INSTALLDOCDIR) ; then \
@@ -253,7 +266,7 @@ install_local: test_baseinit $(DIST_SRC) $(CLS_FILES) $(STATIC_DOC)
 	fi
 	$(INSTALL) $(DIST_SRC) $(INSTALLSRCDIR)
 	$(INSTALL) $(CLS_FILES) $(INSTALLCLSDIR)
-	$(INSTALL) $(STATIC_DOC) $(INSTALLDOCDIR)
+	$(INSTALL) $(STATIC_DOC) $(ALPHA_DOC) $(INSTALLDOCDIR)
 	$(SECHO) ------------------------------------------------------------
 	$(SECHO) Installed files at $(INSTALLSRCDIR):
 	$(SECHO) $(DIST_SRC)
@@ -262,7 +275,7 @@ install_local: test_baseinit $(DIST_SRC) $(CLS_FILES) $(STATIC_DOC)
 	$(SECHO) $(CLS_FILES)
 	$(SECHO) ------------------------------------------------------------
 	$(SECHO) Installed files at $(INSTALLDOCDIR):
-	$(SECHO) $(STATIC_DOC)
+	$(SECHO) $(STATIC_DOC) $(ALPHA_DOC)
 	$(SECHO) ------------------------------------------------------------
 
 uninstall_local:
