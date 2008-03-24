@@ -233,10 +233,9 @@ endif
 # local rules
 
 ChangeLog:
-	$(warning Developers should generate ChangeLog manually using:)
-	$(SECHO) "  developer/scripts/genchangelog.pl ." >&2
-	$(SECHO) "  mv doc/ChangeLog.tmp doc/ChangeLog.svn" >&2
-	$(SECHO) "  cat doc/ChangeLog.svn ChangeLog.cvs > ChangeLog" >&2
+	$(warning Developers should generate ChangeLog manually, see developers/doc/README.)
+	$(warning Distributors should not use a SVN version for their distributions!)
+	$(warning Betatester may continue with an empty ChangeLog after using: touch ChangeLog)
 	@exit 1
 
 default_local: test_baseinit $(CLS_FILES)
