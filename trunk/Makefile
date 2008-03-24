@@ -98,6 +98,7 @@ CLS_MAIN	= scrbook.cls \
 		  scrpage2.sty \
 		  scrtime.sty \
 		  scrdate.sty \
+		  scrjura.sty \
 		  tocbasic.sty \
 		  tocstyle.sty \
 	          DIN.lco \
@@ -142,6 +143,7 @@ CLS_MAIN_DTX    = scrbeta.dtx \
 		  scrtime.dtx \
 		  scrlettr.dtx \
 		  scrlogo.dtx \
+		  scrjura.dtx \
 		  tocbasic.dtx \
 		  tocstyle.dtx
 
