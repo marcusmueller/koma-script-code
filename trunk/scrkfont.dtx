@@ -1,4 +1,4 @@
-% \CheckSum{964}
+% \CheckSum{1832}
 % \iffalse meta-comment
 % ======================================================================
 % scrkfont.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkfont.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkfont.dtx}[2008/03/22 v2.98c KOMA-Script (font selection)]
+\ProvidesFile{scrkfont.dtx}[2008/03/26 v2.98c KOMA-Script (font selection)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -156,6 +156,8 @@
 %
 % \begin{option}{fontsize}
 %   \changes{v2.96}{2006/08/11}{Funktion komplett geändert}
+%   \changes{v2.98c}{2008/03/26}{lädt nach Möglichkeit die zugehörige
+%     Schriftgrößendatei}
 % Hier nun die Option, die tatsächlich verwendet wird. Es sei darauf
 % hingewiesen, dass damit auch Schriftgrößen wie \texttt{10.3pt} denkbar
 % wären.
@@ -165,12 +167,34 @@
     \@defaultunits\@tempdima#1pt\relax\@nnil
     \edef\@ptsize{#1}%
   }{%
-    \changefontsizes{#1}%
+    \expandafter\@defaultunits\expandafter\@tempdima#1 pt\relax\@nnil
+    \edef\@tempa{#1}%
+    \setlength{\@tempdimb}{\@tempdima}%
+    \edef\@tempb{\strip@pt\@tempdimb}%
+    \addtolength{\@tempdimb}{-10\p@}%
+    \edef\@ptsize{\strip@pt\@tempdimb}%
+    \edef\@tempa{%
+      \noexpand\makeatletter
+      \noexpand\InputIfFileExists{\@fontsizefilebase\@tempa.clo}{%
+        \noexpand\ClassInfo{\KOMAClassName}{%
+          File `\@fontsizefilebase\@tempa.clo' used to setup font sizes}%
+      }{%
+        \noexpand\InputIfFileExists{\@fontsizefilebase\@tempb pt.clo}{%
+          \noexpand\ClassInfo{\KOMAClassName}{%
+            File `\@fontsizefilebase\@tempb pt.clo' used instead of%
+            \noexpand\MessageBreak
+            file `\@fontsizefilebase\@tempa.clo' to setup font sizes}%
+        }{%
+          \noexpand\changefontsizes{#1}%
+        }%
+      }%
+      \noexpand\catcode`\noexpand\@=\the\catcode`\@
+    }%
+    \@tempa
   }%
 }
 %    \end{macrocode}
 % \end{option}
-%
 %
 %
 % \iffalse
@@ -182,6 +206,319 @@
 %
 % \changes{v2.6}{2000/01/04}{Einlesen der Schriftgrößen-Options-Datei
 %   funktioniert nun mit diversen Größen}
+% \changes{v2.98c}{2008/03/26}{Eigener \texttt{scrsize}-Datei definiert}
+%
+% \iffalse
+%</body>
+%<*10pt|11pt|12pt>
+% \fi
+%
+% Trotzdem werden min. drei Schriftgrößendateien benötigt. Ab Version 2.98c
+% verwendet \KOMAScript{} vorzugsweise eigene Dateien, die auch noch zu einem
+% späteren Zeitpunkt geladen werden können.  Ansonsten sind diese Dateien
+% weitestgehend dem Quellcode der Standardklassen \texttt{classes.dtx}
+% entnommen.
+%
+%    \begin{macrocode}
+\ProvidesFile{%
+%<10pt>  scrsize10pt.clo%
+%<11pt>  scrsize11pt.clo%
+%<12pt>  scrsize12pt.clo%
+}[\KOMAScriptVersion\space font size class option %
+%<10pt>  (10pt)%
+%<11pt>  (11pt)%
+%<12pt>  (12pt)%
+]
+%    \end{macrocode}
+%
+% \begin{macro}{\normalsize}
+%   \changes{v2.98c}{2008/03/26}{in eigener \texttt{scrsize}-Datei definiert}
+% \begin{macro}{\small}
+%   \changes{v2.98c}{2008/03/26}{in eigener \texttt{scrsize}-Datei definiert}
+% \begin{macro}{\footnotesize}
+%   \changes{v2.98c}{2008/03/26}{in eigener \texttt{scrsize}-Datei definiert}
+% \begin{macro}{\scriptsize}
+%   \changes{v2.98c}{2008/03/26}{in eigener \texttt{scrsize}-Datei definiert}
+% \begin{macro}{\tiny}
+%   \changes{v2.98c}{2008/03/26}{in eigener \texttt{scrsize}-Datei definiert}
+% \begin{macro}{\large}
+%   \changes{v2.98c}{2008/03/26}{in eigener \texttt{scrsize}-Datei definiert}
+% \begin{macro}{\Large}
+%   \changes{v2.98c}{2008/03/26}{in eigener \texttt{scrsize}-Datei definiert}
+% \begin{macro}{\LARGE}
+%   \changes{v2.98c}{2008/03/26}{in eigener \texttt{scrsize}-Datei definiert}
+% \begin{macro}{\huge}
+%   \changes{v2.98c}{2008/03/26}{in eigener \texttt{scrsize}-Datei definiert}
+% \begin{macro}{\Huge}
+%   \changes{v2.98c}{2008/03/26}{in eigener \texttt{scrsize}-Datei definiert}
+% Siehe \texttt{classes.dtx}.
+%    \begin{macrocode}
+\def\normalsize{%
+%<*10pt>
+  \@setfontsize\normalsize\@xpt\@xiipt
+  \abovedisplayskip 10\p@ \@plus2\p@ \@minus5\p@
+  \abovedisplayshortskip \z@ \@plus3\p@
+  \belowdisplayshortskip 6\p@ \@plus3\p@ \@minus3\p@
+%</10pt>
+%<*11pt>
+  \@setfontsize\normalsize\@xipt{13.6}%
+  \abovedisplayskip 11\p@ \@plus3\p@ \@minus6\p@
+  \abovedisplayshortskip \z@ \@plus3\p@
+  \belowdisplayshortskip 6.5\p@ \@plus3.5\p@ \@minus3\p@
+%</11pt>
+%<*12pt>
+  \@setfontsize\normalsize\@xiipt{14.5}%
+  \abovedisplayskip 12\p@ \@plus3\p@ \@minus7\p@
+  \abovedisplayshortskip \z@ \@plus3\p@
+  \belowdisplayshortskip 6.5\p@ \@plus3.5\p@ \@minus3\p@
+%</12pt>
+  \belowdisplayskip \abovedisplayskip
+  \let\@listi\@listI
+}
+\def\small{%
+%<*10pt>
+  \@setfontsize\small\@ixpt{11}%
+  \abovedisplayskip 8.5\p@ \@plus3\p@ \@minus4\p@
+  \abovedisplayshortskip \z@ \@plus2\p@
+  \belowdisplayshortskip 4\p@ \@plus2\p@ \@minus2\p@
+  \def\@listi{\leftmargin\leftmargini
+    \topsep 4\p@ \@plus2\p@ \@minus2\p@
+    \parsep 2\p@ \@plus\p@ \@minus\p@
+    \itemsep \parsep}%
+%</10pt>
+%<*11pt>
+  \@setfontsize\small\@xpt\@xiipt
+  \abovedisplayskip 10\p@ \@plus2\p@ \@minus5\p@
+  \abovedisplayshortskip \z@ \@plus3\p@
+  \belowdisplayshortskip 6\p@ \@plus3\p@ \@minus3\p@
+  \def\@listi{\leftmargin\leftmargini
+    \topsep 6\p@ \@plus2\p@ \@minus2\p@
+    \parsep 3\p@ \@plus2\p@ \@minus\p@
+    \itemsep \parsep}%
+%</11pt>
+%<*12pt>
+  \@setfontsize\small\@xipt{13.6}%
+  \abovedisplayskip 11\p@ \@plus3\p@ \@minus6\p@
+  \abovedisplayshortskip \z@ \@plus3\p@
+  \belowdisplayshortskip 6.5\p@ \@plus3.5\p@ \@minus3\p@
+  \def\@listi{\leftmargin\leftmargini
+    \topsep 9\p@ \@plus3\p@ \@minus5\p@
+    \parsep 4.5\p@ \@plus2\p@ \@minus\p@
+    \itemsep \parsep}%
+%</12pt>
+  \belowdisplayskip \abovedisplayskip
+}
+\def\footnotesize{%
+%<*10pt>
+  \@setfontsize\footnotesize\@viiipt{9.5}%
+  \abovedisplayskip 6\p@ \@plus2\p@ \@minus4\p@
+  \abovedisplayshortskip \z@ \@plus\p@
+  \belowdisplayshortskip 3\p@ \@plus\p@ \@minus2\p@
+  \def\@listi{\leftmargin\leftmargini
+    \topsep 3\p@ \@plus\p@ \@minus\p@
+    \parsep 2\p@ \@plus\p@ \@minus\p@
+    \itemsep \parsep}%
+%</10pt>
+%<*11pt>
+  \@setfontsize\footnotesize\@ixpt{11}%
+  \abovedisplayskip 8\p@ \@plus2\p@ \@minus4\p@
+  \abovedisplayshortskip \z@ \@plus\p@
+  \belowdisplayshortskip 4\p@ \@plus2\p@ \@minus2\p@
+  \def\@listi{\leftmargin\leftmargini
+    \topsep 4\p@ \@plus2\p@ \@minus2\p@
+    \parsep 2\p@ \@plus\p@ \@minus\p@
+    \itemsep \parsep}%
+%</11pt>
+%<*12pt>
+   \@setfontsize\footnotesize\@xpt\@xiipt
+   \abovedisplayskip 10\p@ \@plus2\p@ \@minus5\p@
+   \abovedisplayshortskip \z@ \@plus3\p@
+   \belowdisplayshortskip 6\p@ \@plus3\p@ \@minus3\p@
+   \def\@listi{\leftmargin\leftmargini
+               \topsep 6\p@ \@plus2\p@ \@minus2\p@
+               \parsep 3\p@ \@plus2\p@ \@minus\p@
+               \itemsep \parsep}%
+%</12pt>
+  \belowdisplayskip \abovedisplayskip
+}
+%<*10pt>
+\def\scriptsize{\@setfontsize\scriptsize\@viipt\@viiipt}
+\def\tiny{\@setfontsize\tiny\@vpt\@vipt}
+\def\large{\@setfontsize\large\@xiipt{14}}
+\def\Large{\@setfontsize\Large\@xivpt{18}}
+\def\LARGE{\@setfontsize\LARGE\@xviipt{22}}
+\def\huge{\@setfontsize\huge\@xxpt{25}}
+\def\Huge{\@setfontsize\Huge\@xxvpt{30}}
+%</10pt>
+%<*11pt>
+\def\scriptsize{\@setfontsize\scriptsize\@viiipt{9.5}}
+\def\tiny{\@setfontsize\tiny\@vipt\@viipt}
+\def\large{\@setfontsize\large\@xiipt{14}}
+\def\Large{\@setfontsize\Large\@xivpt{18}}
+\def\LARGE{\@setfontsize\LARGE\@xviipt{22}}
+\def\huge{\@setfontsize\huge\@xxpt{25}}
+\def\Huge{\@setfontsize\Huge\@xxvpt{30}}
+%</11pt>
+%<*12pt>
+\def\scriptsize{\@setfontsize\scriptsize\@viiipt{9.5}}
+\def\tiny{\@setfontsize\tiny\@vipt\@viipt}
+\def\large{\@setfontsize\large\@xivpt{18}}
+\def\Large{\@setfontsize\Large\@xviipt{22}}
+\def\LARGE{\@setfontsize\LARGE\@xxpt{25}}
+\def\huge{\@setfontsize\huge\@xxvpt{30}}
+\let\Huge=\huge
+%</12pt>
+\normalsize
+%    \end{macrocode}
+% \begin{Length}{\footnotesep}
+%   \changes{v2.98c}{2008/03/26}{in eigener \texttt{scrsize}-Datei definiert}
+% \begin{Length}{\footins}
+%   \changes{v2.98c}{2008/03/26}{in eigener \texttt{scrsize}-Datei definiert}
+% \begin{Length}{\floatsep}
+%   \changes{v2.98c}{2008/03/26}{in eigener \texttt{scrsize}-Datei definiert}
+% \begin{Length}{\textfloatsep}
+%   \changes{v2.98c}{2008/03/26}{in eigener \texttt{scrsize}-Datei definiert}
+% \begin{Length}{\intextsep}
+%   \changes{v2.98c}{2008/03/26}{in eigener \texttt{scrsize}-Datei definiert}
+% \begin{Length}{\dblfloatsep}
+%   \changes{v2.98c}{2008/03/26}{in eigener \texttt{scrsize}-Datei definiert}
+% \begin{Length}{\sbltextfloatsep}
+%   \changes{v2.98c}{2008/03/26}{in eigener \texttt{scrsize}-Datei definiert}
+% \begin{Length}{\@fptop}
+%   \changes{v2.98c}{2008/03/26}{in eigener \texttt{scrsize}-Datei definiert}
+% \begin{Length}{\@fpsep}
+%   \changes{v2.98c}{2008/03/26}{in eigener \texttt{scrsize}-Datei definiert}
+% \begin{Length}{\@fpbot}
+%   \changes{v2.98c}{2008/03/26}{in eigener \texttt{scrsize}-Datei definiert}
+% \begin{Length}{\@dblfptop}
+%   \changes{v2.98c}{2008/03/26}{in eigener \texttt{scrsize}-Datei definiert}
+% \begin{Length}{\@dblfpsep}
+%   \changes{v2.98c}{2008/03/26}{in eigener \texttt{scrsize}-Datei definiert}
+% \begin{Length}{\@dblfpbot}
+%   \changes{v2.98c}{2008/03/26}{in eigener \texttt{scrsize}-Datei definiert}
+% \begin{Length}{\partopsep}
+%   \changes{v2.98c}{2008/03/26}{in eigener \texttt{scrsize}-Datei definiert}
+% Siehe \texttt{classes.dtx}.
+%    \begin{macrocode}
+%<*10pt>
+\setlength\footnotesep    {6.65\p@}
+\setlength{\skip\footins} {9\p@ \@plus 4\p@ \@minus 2\p@}
+\setlength\floatsep       {12\p@ \@plus 2\p@ \@minus 2\p@}
+\setlength\textfloatsep   {20\p@ \@plus 2\p@ \@minus 4\p@}
+\setlength\intextsep      {12\p@ \@plus 2\p@ \@minus 2\p@}
+\setlength\dblfloatsep    {12\p@ \@plus 2\p@ \@minus 2\p@}
+\setlength\dbltextfloatsep{20\p@ \@plus 2\p@ \@minus 4\p@}
+\setlength\@fptop         {0\p@ \@plus 1fil}
+\setlength\@fpsep         {8\p@ \@plus 2fil}
+\setlength\@fpbot         {0\p@ \@plus 1fil}
+\setlength\@dblfptop      {0\p@ \@plus 1fil}
+\setlength\@dblfpsep      {8\p@ \@plus 2fil}
+\setlength\@dblfpbot      {0\p@ \@plus 1fil}
+\setlength\partopsep      {2\p@ \@plus 1\p@ \@minus 1\p@}
+%</10pt>
+%<*11pt>
+\setlength\footnotesep    {7.7\p@}
+\setlength{\skip\footins} {10\p@ \@plus 4\p@ \@minus 2\p@}
+\setlength\floatsep       {12\p@ \@plus 2\p@ \@minus 2\p@}
+\setlength\textfloatsep   {20\p@ \@plus 2\p@ \@minus 4\p@}
+\setlength\intextsep      {12\p@ \@plus 2\p@ \@minus 2\p@}
+\setlength\dblfloatsep    {12\p@ \@plus 2\p@ \@minus 2\p@}
+\setlength\dbltextfloatsep{20\p@ \@plus 2\p@ \@minus 4\p@}
+\setlength\@fptop         {0\p@ \@plus 1fil}
+\setlength\@fpsep         {8\p@ \@plus 2fil}
+\setlength\@fpbot         {0\p@ \@plus 1fil}
+\setlength\@dblfptop      {0\p@ \@plus 1fil}
+\setlength\@dblfpsep      {8\p@ \@plus 2fil}
+\setlength\@dblfpbot      {0\p@ \@plus 1fil}
+\setlength\partopsep      {3\p@ \@plus 1\p@ \@minus 1\p@}
+%</11pt>
+%<*12pt>
+\setlength\footnotesep    {8.4\p@}
+\setlength{\skip\footins} {10.8\p@ \@plus 4\p@ \@minus 2\p@}
+\setlength\floatsep       {12\p@ \@plus 2\p@ \@minus 4\p@}
+\setlength\textfloatsep   {20\p@ \@plus 2\p@ \@minus 4\p@}
+\setlength\intextsep      {14\p@ \@plus 4\p@ \@minus 4\p@}
+\setlength\dblfloatsep    {14\p@ \@plus 2\p@ \@minus 4\p@}
+\setlength\dbltextfloatsep{20\p@ \@plus 2\p@ \@minus 4\p@}
+\setlength\@fptop         {0\p@ \@plus 1fil}
+\setlength\@fpsep         {10\p@ \@plus 2fil}
+\setlength\@fpbot         {0\p@ \@plus 1fil}
+\setlength\@dblfptop      {0\p@ \@plus 1fil}
+\setlength\@dblfpsep      {10\p@ \@plus 2fil}
+\setlength\@dblfpbot      {0\p@ \@plus 1fil}
+\setlength\partopsep      {3\p@ \@plus 2\p@ \@minus 2\p@}
+%</12pt>
+%    \end{macrocode}
+% \begin{macro}{\@listi}
+%   \changes{v2.98c}{2008/03/26}{in eigener \texttt{scrsize}-Datei definiert}
+% \begin{macro}{\@listii}
+%   \changes{v2.98c}{2008/03/26}{in eigener \texttt{scrsize}-Datei definiert}
+% \begin{macro}{\@listiii}
+%   \changes{v2.98c}{2008/03/26}{in eigener \texttt{scrsize}-Datei definiert}
+% \begin{macro}{\@listiv}
+%   \changes{v2.98c}{2008/03/26}{in eigener \texttt{scrsize}-Datei definiert}
+% \begin{macro}{\@listv}
+%   \changes{v2.98c}{2008/03/26}{in eigener \texttt{scrsize}-Datei definiert}
+% \begin{macro}{\@listvi}
+%   \changes{v2.98c}{2008/03/26}{in eigener \texttt{scrsize}-Datei definiert}
+% Siehe \texttt{classes.dtx}.
+%    \begin{macrocode}
+\def\@listi{\leftmargin\leftmargini
+%<*10pt>
+            \parsep 4\p@ \@plus2\p@ \@minus\p@
+            \topsep 8\p@ \@plus2\p@ \@minus4\p@
+            \itemsep4\p@ \@plus2\p@ \@minus\p@}
+%</10pt>
+%<*11pt>
+            \parsep 4.5\p@ \@plus2\p@ \@minus\p@
+            \topsep 9\p@   \@plus3\p@ \@minus5\p@
+            \itemsep4.5\p@ \@plus2\p@ \@minus\p@}
+%</11pt>
+%<*12pt>
+            \parsep 5\p@  \@plus2.5\p@ \@minus\p@
+            \topsep 10\p@ \@plus4\p@   \@minus6\p@
+            \itemsep5\p@  \@plus2.5\p@ \@minus\p@}
+%</12pt>
+\let\@listI\@listi
+\def\@listii {\leftmargin\leftmarginii
+              \labelwidth\leftmarginii
+              \advance\labelwidth-\labelsep
+%<*10pt>
+              \topsep    4\p@ \@plus2\p@ \@minus\p@
+              \parsep    2\p@ \@plus\p@  \@minus\p@
+%</10pt>
+%<*11pt>
+              \topsep    4.5\p@ \@plus2\p@ \@minus\p@
+              \parsep    2\p@   \@plus\p@  \@minus\p@
+%</11pt>
+%<*12pt>
+              \topsep    5\p@   \@plus2.5\p@ \@minus\p@
+              \parsep    2.5\p@ \@plus\p@    \@minus\p@
+%</12pt>
+              \itemsep   \parsep}
+\def\@listiii{\leftmargin\leftmarginiii
+              \labelwidth\leftmarginiii
+              \advance\labelwidth-\labelsep
+%<10pt>              \topsep    2\p@ \@plus\p@\@minus\p@
+%<11pt>              \topsep    2\p@ \@plus\p@\@minus\p@
+%<12pt>              \topsep    2.5\p@\@plus\p@\@minus\p@
+              \parsep    \z@
+              \partopsep \p@ \@plus\z@ \@minus\p@
+              \itemsep   \topsep}
+\def\@listiv {\leftmargin\leftmarginiv
+              \labelwidth\leftmarginiv
+              \advance\labelwidth-\labelsep}
+\def\@listv  {\leftmargin\leftmarginv
+              \labelwidth\leftmarginv
+              \advance\labelwidth-\labelsep}
+\def\@listvi {\leftmargin\leftmarginvi
+              \labelwidth\leftmarginvi
+              \advance\labelwidth-\labelsep}
+%    \end{macrocode}
+% \iffalse
+%</10pt|11pt|12pt>
+%<*body>
+% \fi
 %
 % \begin{macro}{\changefontsizes}
 %   \changes{v2.96}{2006/08/11}{neue Anweisung (benötigt \eTeX)}
@@ -443,6 +780,36 @@
   }%
 }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{Length}
+% \end{Length}
+% \end{Length}
+% \end{Length}
+% \end{Length}
+% \end{Length}
+% \end{Length}
+% \end{Length}
+% \end{Length}
+% \end{Length}
+% \end{Length}
+% \end{Length}
+% \end{Length}
+% \end{Length}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 %
 % \begin{macro}{\@fontsizefilebase}

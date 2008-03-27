@@ -91,6 +91,9 @@ CLS_MAIN	= scrbook.cls \
 		  scrlttr2.cls \
 	          scrlettr.cls \
 		  typearea.sty \
+		  scrsize10pt.clo \
+		  scrsize11pt.clo \
+		  scrsize12pt.clo \
 		  scrlfile.sty \
 		  scrkbase.sty \
 		  scraddr.sty \
