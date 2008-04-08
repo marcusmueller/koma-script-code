@@ -494,8 +494,8 @@
 %    \begin{macrocode}
 \DeclareRobustCommand*{\Macro}[1]{\mbox{\texttt{\char`\\#1}}}
 \DeclareRobustCommand*{\Option}[1]{\mbox{\texttt{#1}}}
-\DeclareRobustCommand*{\KOption}[1]{\mbox{\Option{#1}\texttt{=}}}
-\DeclareRobustCommand*{\OptionValue}[2]{\mbox{\Option{#1}\texttt{=}\PValue{#2}}}
+\DeclareRobustCommand*{\KOption}[1]{\mbox{\Option{#1}\texttt=}}
+\DeclareRobustCommand*{\OptionValue}[2]{\mbox{\texttt{#1=#2}}}
 \DeclareRobustCommand*{\FloatStyle}[1]{\mbox{\texttt{#1}}}
 \DeclareRobustCommand*{\Pagestyle}[1]{\mbox{\texttt{#1}}}
 \DeclareRobustCommand*{\Environment}[1]{\mbox{\texttt{#1}}}
