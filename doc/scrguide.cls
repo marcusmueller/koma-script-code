@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2007/12/15 v1.0 internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2008/04/08 v1.2 internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -456,6 +456,8 @@
 %
 % \begin{macro}{\Macro}
 % \begin{macro}{\Option}
+% \begin{macro}{\KOption}
+% \begin{macro}{\OptionValue}
 % \begin{macro}{\Environment}
 % \begin{macro}{\Counter}
 % \begin{macro}{\Length}
@@ -473,6 +475,7 @@
 %   \begin{description}
 %   \item[\cs{Macro}] \LaTeX{} or \TeX{} macro
 %   \item[\cs{Option}] class or package option
+%   \item[\cs{KOption}] |\KOMAoptions| option
 %   \item[\cs{Environment}] \LaTeX{} environment
 %   \item[\cs{Counter}] \LaTeX{} counter
 %   \item[\cs{Length}] \LaTeX{} length
@@ -491,6 +494,8 @@
 %    \begin{macrocode}
 \DeclareRobustCommand*{\Macro}[1]{\mbox{\texttt{\char`\\#1}}}
 \DeclareRobustCommand*{\Option}[1]{\mbox{\texttt{#1}}}
+\DeclareRobustCommand*{\KOption}[1]{\mbox{\Option{#1}\texttt{=}}}
+\DeclareRobustCommand*{\OptionValue}[2]{\mbox{\Option{#1}\texttt{=}\PValue{#2}}}
 \DeclareRobustCommand*{\FloatStyle}[1]{\mbox{\texttt{#1}}}
 \DeclareRobustCommand*{\Pagestyle}[1]{\mbox{\texttt{#1}}}
 \DeclareRobustCommand*{\Environment}[1]{\mbox{\texttt{#1}}}
@@ -512,6 +517,8 @@
     )}}
 \DeclareRobustCommand*{\PParameter}[1]{\texttt{\{#1\}}}
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -641,9 +648,25 @@
     }%
     \expandafter\let\csname ##1\expandafter\endcsname\csname new##1\endcsname
   }%
+  \newcommand*{\new@xelement}[2]{%
+    \expandafter\newcommand\expandafter*\csname X##1\endcsname{}%
+    \expandafter\let\csname X##1\expandafter\endcsname
+    \csname ##1\endcsname
+    \expandafter\newcommand\expandafter*\csname new##1\endcsname[2]{%
+      \begingroup
+        \let\ensuremath\@firstofone
+        \let\textit\@firstofone
+        \lowercase{\def\@tempa{##1}}%
+        \pdfstringdef\@tempb{\label@base.\@tempa.####1.####2}%
+        \xdef\@currentHref{\@tempb}%
+        \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
+        \label{desc:\label@base.\@tempa.####1.####2}%
+      \endgroup
+      \csname X##1\endcsname{####1}{##2{####2}}\ignorespaces
+    }%
+    \expandafter\let\csname ##1\expandafter\endcsname\csname new##1\endcsname
+  }%
 %    \end{macrocode}
-% \begin{macro}{\newOption}
-% \begin{macro}{\newMacro}
 %    \begin{macrocode}
   \new@element{Option}%
   \new@element{Macro}%
@@ -652,9 +675,8 @@
   \new@element{FloatStyle}%
   \new@element{PLength}%
   \new@element{Variable}%
+  \new@xelement{OptionValue}{\PValue}%
 %    \end{macrocode}
-% \end{macro}
-% \end{macro}
 % \end{macro}
 %    \begin{macrocode}
   \par\small\addvspace{2\baselineskip plus .5\baselineskip}%
