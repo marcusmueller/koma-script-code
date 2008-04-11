@@ -582,6 +582,11 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% Wie allow page breaks at display math.
+%    \begin{macrocode}
+\allowdisplaybreaks[1]
+%    \end{macrocode}
+%
 %
 % \section{Acronyms}
 %
@@ -679,15 +684,16 @@
 %    \end{macrocode}
 % \end{macro}
 %    \begin{macrocode}
-  \par\small\addvspace{2\baselineskip plus .5\baselineskip}%
+  \par\small\addvspace{2\baselineskip}%
   \vspace{-\baselineskip}%
+  \vspace{\z@ plus \baselineskip}%
   \noindent\hspace{-1em}%
   \tabular{|l|}\hline\ignorespaces
 }{%
   \\\hline\endtabular\nobreak\par\nobreak
-  \vspace{1.5\baselineskip}\vspace{-\baselineskip}%
-  \vspace{0pt minus .5\baselineskip}%
-  \noindent\ignorespacesafterend
+  \vspace{1.5\baselineskip}\nobreak\vspace{-\baselineskip}\nobreak%
+  \vspace{0pt minus .5\baselineskip}\nobreak%
+  \aftergroup\@afterindentfalse\aftergroup\@afterheading
 }
 %    \end{macrocode}
 % \end{environment}
@@ -755,7 +761,7 @@
 %   \KOMAScript{} but not important for using \KOMAScript.
 %    \begin{macrocode}
 \newenvironment{Explain}{%
-  \par\sffamily
+  \par\sffamily\ignorespaces
 }{%
   \normalcolor\par
 }
