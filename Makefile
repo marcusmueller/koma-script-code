@@ -258,6 +258,8 @@ ChangeLog:
 
 default_local: test_baseinit $(CLS_FILES)
 
+prepare_local: # nothing to do
+
 install_local: test_baseinit $(DIST_SRC) $(CLS_FILES) $(STATIC_DOC) $(ALPHA_DOC)
 	@if ! $(MKDIR) $(INSTALLSRCDIR) \
 	  || ! $(MKDIR) $(INSTALLCLSDIR) \
