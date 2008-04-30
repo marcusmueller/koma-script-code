@@ -45,11 +45,25 @@
 %
 % ======================================================================
 
-\ProvidesFile{typearea.tex}[2006/11/29 KOMA-Script guide (chapter: typearea)]
+
+\ProvidesFile{typearea.tex}[2008/04/14 KOMA-Script guide (chapter: typearea)]
 \chapter{Satzspiegelberechnung mit \Package{typearea.sty}}
 \labelbase{typearea}
 
+Viele \LaTeX-Klassen, darunter auch die Standardklassen, bieten dem Anwender
+eine weitgehend feste Aufteilung zwischen Rändern und Textbereich. Bei den
+Standardklassen ist die konkrete Aufteilung in engen Grenzen von der gewählten
+Schriftgröße abhängig. Darüber hinaus gibt es Pakete wie
+\Package{geometry}\IndexPackage{geometry} (siehe \cite{package:geometry}), die
+dem Anwender die volle Kontrolle aber auch Verantwortung für die Einstellungen
+des Textbereichs und der Ränder überlassen. \KOMAScript{} geht mit dem Paket
+\Package{typearea} einen etwas anderen Weg. Hier werden basierend auf einer in
+der Typografie etablierten Konstruktion Einstellmöglichkeiten und Automatismen
+geboten, die es dem Anwender erleichtern, eine gute Wahl zu treffen.
+
+
 \section{Grundlagen der Satzspiegelkonstruktion}
+\label{sec:typearea.basics}
 
 \begin{Explain}
   Betrachtet man eine einzelne Seite eines Buches oder eines anderen
@@ -80,7 +94,7 @@
   Rand genauso groß sein sollte wie jeder der beiden äußeren Ränder. Eine
   einzelne Seite steuert dabei jeweils nur die Hälfte des inneren Randes bei.
   
-  Im vorherigen Abschnitt wurde \emph{die Seite} erwähnt und
+  Im vorherigen Absatz wurde \emph{die Seite} erwähnt und
   hervorgehoben. Irrtümlich wird oftmals angenommen, das Format der
   Seite wäre mit dem Format des Papiers
   gleichzusetzen.\Index[indexmain]{Seitenformat}
@@ -199,15 +213,15 @@
   Bevor wir uns an die konkrete Konstruktion machen, fehlen jetzt nur noch
   Kleinigkeiten, die man wissen sollte. \LaTeX{} beginnt die erste Zeile des
   Textbereichs einer Seite nicht am oberen Rand des Textbereichs, sondern
-  setzt die Zeile mit einem definierten Abstand zum oberen Rand des
-  Textbereichs. Desweiteren verfügt \LaTeX{} über die beiden Befehle
-  \Macro{raggedbottom}\IndexCmd{raggedbottom} und
+  setzt die Grundlinie der Zeile mit einem definierten Mindestabstand zum
+  oberen Rand des Textbereichs. Desweiteren verfügt \LaTeX{} über die beiden
+  Befehle \Macro{raggedbottom}\IndexCmd{raggedbottom} und
   \Macro{flushbottom}\IndexCmd{flushbottom}. Der erste dieser Befehle legt
   fest, dass die letzte Zeile einer jeden Seite dort liegen soll, wo sie eben
   zu liegen kommt. Das kann dazu führen, dass sich die Position der letzten
   Zeile von Seite zu Seite vertikal um nahezu eine Zeile verändern kann -- bei
-  Zusammentreffen des Seitenendes mit Überschriften, Abbildungen, Tabellen oder
-  ähnlichem auch mehr. Im doppelseitigen Druck ist das in der Regel
+  Zusammentreffen des Seitenendes mit Überschriften, Abbildungen, Tabellen
+  oder ähnlichem auch mehr. Im doppelseitigen Druck ist das in der Regel
   unerwünscht. Mit dem zweiten Befehl, \Macro{flushbottom}, wird hingegen
   festgelegt, dass die letzte Zeile immer am unteren Rand des Textbereichs zu
   liegen kommt. Um diesen vertikalen Ausgleich zu erreichen, muss \LaTeX{}
@@ -251,12 +265,15 @@
   mindestens 9 betragen. Mit diesem Wert ist die Konstruktion auch als
   \emph{klassische Neunteilung} bekannt.
 
-  Bei {\KOMAScript} ist diese Art der Konstruktion im Paket
-  \Package{typearea} realisiert. Dabei sind für A4-Papier je nach
-  Schriftgröße unterschiedliche Werte voreingestellt, die
+  Bei {\KOMAScript} ist diese Art der Konstruktion im Paket \Package{typearea}
+  realisiert, wobei der untere Rand weniger als eine Textzeile kleiner
+  ausfallen kann, um die im vorherigen Abschnitt erwähnte Nebenbedingung für
+  die Satzspiegelhöhe einzuhalten und damit die dort erwähnte Problematik in
+  Bezug auf \Macro{flushbottom} zu mindern. Dabei sind für A4-Papier je nach
+  Schriftgröße unterschiedliche Werte für \Var{DIV} voreingestellt, die
   \autoref{tab:typearea.div} zu entnehmen sind. Bei Verzicht auf
-  Bindekorrektur, wenn also \Var{BCOR} = 0\Unit{pt} gilt, ergeben
-  sich in etwa die Satzspiegelmaße aus \autoref{tab:typearea.typearea}.
+  Bindekorrektur, wenn also \Var{BCOR} = 0\Unit{pt} gilt, ergeben sich in etwa
+  die Satzspiegelmaße aus \autoref{tab:typearea.typearea}.
 
   Neben den voreingestellten Werten kann man \Var{BCOR} und \Var{DIV}
   direkt beim Laden des Pakets als Option angeben (siehe
@@ -296,7 +313,8 @@
   unsinnigen -- \Var{DIV}-Wertes oder eine spezielle Paket-Option
   derjenige \Var{DIV}-Wert ermittelt wird, bei dem der resultierende
   Satzspiegel dem spätmittelalterlichen Buchseitenkanon am nächsten
-  kommt. 
+  kommt. Es wird also wiederum auf die Satzspiegelkonstruktion durch Teilung
+  zurückgegriffen.
 \iffalse
 % Umbruchkorrekturtext
   Bei Wahl einer guten Schrift stimmt dieses Ergebnis nicht selten mit der
@@ -307,6 +325,73 @@
 \end{Explain}
 
 
+\section{Wahl der Optionen}
+\label{sec:typearea.optionselection}
+
+Bei \LaTeX{} beeinflussen Paketoptionen normalerweise die grundsätzliche
+Arbeitsweise eines Pakets. Wie man Pakete lädt und Paketoptionen übergibt,
+entnehmen Sie bitte der Literatur zu \LaTeX{}, beispielsweise \cite{l2kurz}
+und \cite{latex:usrguide}. Dies ist auch bei \KOMAScript{} der Fall. Das Paket
+\Package{typearea} bietet jedoch auch die Möglichkeit, seine Einstellungen
+noch zu einem späteren Zeitpunkt zu ändern.
+
+\begin{Declaration}
+  \Macro{documentclass}\OParameter{Optionenliste}\Parameter{Klasse}\\
+  \Macro{usepackage}\OParameter{Optionenliste}\PParameter{typearea}
+\end{Declaration}
+Eigentlich ist bei \LaTeX{} vorgesehen, dass Anwender Paketoptionen in Form
+einer durch Komma getrennten Liste einfacher Schlüsselwörter als optionales
+Argument von \Macro{usepackage} angeben. Alternativ können sehr viele
+Paketoptionen vom Anwender auch im optionalen Argument von
+\Macro{documentclass} angegeben werden. Dies ist insbesondere dann von
+Vorteil, wenn mehrere Pakete dieselbe Option auswerten. \KOMAScript{}
+erweitert\ChangedAt{v3.00}{\Package{typearea}} den Mechanismus der Optionen für
+einige seiner Pakete und alle offiziellen \KOMAScript-Klassen um weitere
+Möglichkeiten. So haben viele Paketoptionen bei \KOMAScript{} einen
+zusätzlichen Wert. Eine Option hat also nicht unbedingt nur die Form
+\PName{Option}, sondern kann auch die Form
+\PName{Option}\texttt{=}\PName{Wert} haben.
+
+Bei Verwendung einer \KOMAScript-Klasse sollten im Übrigen beim Laden des
+Pakets \Package{typearea} keine Optionen angegeben werden. Das ist darin
+begründet, dass die Klasse das Paket bereits ohne Optionen lädt und \LaTeX{}
+das mehrmalige Laden eines Pakets mit unterschiedlicher Angabe von Optionen
+verweigert. Überhaupt ist es bei Verwendung einer \KOMAScript-Klasse nicht
+notwendig, das Paket \Package{typearea} auch noch explizit zu laden.
+
+\begin{Declaration}
+  \Macro{KOMAoptions}\Parameter{Optionenliste}\\
+  \Macro{KOMAoption}\Parameter{Option}\Parameter{Werteliste}
+\end{Declaration}
+\BeginIndex{Cmd}{KOMAoptions}%
+\BeginIndex{Cmd}{KOMAoption}%
+\KOMAScript{}\ChangedAt{v3.00}{\Package{typearea}} bietet bei den meisten
+Paket- und Klassenoptionen auch die Möglichkeit den Wert der Optionen noch
+nach dem Laden des Pakets zu ändern. Dies ist insbesondere für das Paket
+\Package{typearea} nützlich, wenn man dessen Optionen nicht global bei
+\Macro{documentclass} angeben will oder kann. Man kann dann wahlweise mit der
+Anweisung \Macro{KOMAoptions} die Werte einer Reihe von Optionen ändern. Jede
+Option der \PName{Optionenliste} hat dabei die Form \PName{Option} oder
+\PName{Option}\texttt{=}\PName{Wert}.
+
+Manche Optionen können auch gleichzeitig mehrere Werte besitzen. Für solche
+Optionen besteht die Möglichkeit, mit Hilfe von \Macro{KOMAoption}
+der einen \PName{Option} nacheinander eine Reihe von Werten zuzuweisen. Die
+einzelnen Werte sind dabei in der \PName{Werteliste} durch Komma voneinander
+getrennt.
+
+\begin{Explain}
+  Falls man in der \PName{Optionenliste} eine Option auf einen unzulässigen
+  Wert setzt oder die \PName{Werteliste} einen unzulässigen Wert enthält, so
+  wird ein Fehler gemeldet. Wird \LaTeX{} in einem Modus verwendet, in dem im
+  Fehlerfall Interaktionen möglich sind, so stoppt \LaTeX{} in diesem
+  Fall. Durch Eingabe von »\texttt{h}« erhält man dann eine Hilfe, in der
+  auch die möglichen Werte für die entsprechende Option angegeben sind.%
+\end{Explain}%
+\EndIndex{Cmd}{KOMAoption}%
+\EndIndex{Cmd}{KOMAoptions}
+
+
 \section{Optionen und Makros zur Beeinflussung des Satzspiegels}
 \label{sec:typearea.options}
 % DIV, DIVcalc, DIVclassic, BCOR
@@ -315,28 +400,23 @@
 
 Das Paket \Package{typearea} bietet zwei unterschiedliche
 Benutzerschnittstellen, um auf die Satzspiegelkonstruktion Einfluss zu
-nehmen. Die erste Möglichkeit ist, beim Laden des Pakets entsprechende
-Optionen anzugeben. Wie man Pakete lädt und Paketoptionen übergibt,
-entnehmen Sie bitte der Literatur zu \LaTeX{}, beispielsweise
-\cite{l2kurz} und \cite{latex:usrguide}, oder den auf den folgenden
-Seiten aufgeführten
-Beispielen. Da bei der Verwendung der \KOMAScript-Hauptklassen das
-Paket \Package{typearea} automatisch geladen wird, müssen die
-entsprechenden Paket-Optionen bei diesen Klassen auch direkt als
-Klassen-Optionen übergeben werden (siehe
-\autoref{sec:maincls.options}).
+nehmen. Die erste und wichtigste Möglichkeit ist die Angabe von Optionen. Wie
+im vorherigen Abschnitt erwähnt, können die Optionen dabei auf
+unterschiedlichem Wege gesetzt werden.
+
 
 \begin{Declaration}
-  \Option{BCOR}\PName{Korrektur}
+  \KOption{BCOR}\PName{Korrektur}
 \end{Declaration}%
-\BeginIndex{Option}{BCOR}%
-Mit Hilfe der Option \Option{BCOR}\PName{Korrektur} geben Sie den
-absoluten Wert der Bindekorrektur\Index{Bindekorrektur} an, also
-die Breite des Bereichs der durch die Bindung von der Papierbreite
-verloren geht. Dieser Wert wird in der Satzspiegelkonstruktion
-automatisch berücksichtigt und bei der Ausgabe wieder dem inneren
-beziehungsweise linken Rand zugeschlagen. Als \PName{Korrektur}
-können Sie jede von \TeX{} verstandene Maßeinheit angeben.
+\BeginIndex{Option}{BCOR~=\PName{Wert}}%
+Mit Hilfe der Option
+\KOption{BCOR}\PName{Korrektur}\ChangedAt{v3.00}{\Package{typearea}} geben Sie
+den absoluten Wert der Bindekorrektur\Index{Bindekorrektur} an, also die
+Breite des Bereichs der durch die Bindung von der Papierbreite verloren
+geht. Dieser Wert wird in der Satzspiegelkonstruktion automatisch
+berücksichtigt und bei der Ausgabe wieder dem inneren beziehungsweise linken
+Rand zugeschlagen. Als \PName{Korrektur} können Sie jede von \TeX{}
+verstandene Maßeinheit angeben.
 
 \begin{Example}
   Angenommen, Sie erstellen einen Finanzbericht. Das Ganze soll
@@ -347,46 +427,75 @@ können Sie jede von \TeX{} verstandene Maßeinheit angeben.
   verloren. Sie schreiben dann also:
 \begin{lstlisting}
   \documentclass[a4paper]{report}
-  \usepackage[BCOR8.25mm]{typearea}
+  \usepackage[BCOR=8.25mm]{typearea}
 \end{lstlisting}
-  oder bei Verwendung einer \KOMAScript-Klasse:
+  oder
 \begin{lstlisting}
-  \documentclass[a4paper,BCOR8.25mm]{scrreprt}
+  \documentclass[a4paper,BCOR=8.25mm]{report}
+  \usepackage{typearea}
 \end{lstlisting}
+  bei Angabe von \Option{BCOR} als globale Option.
+
+  Bei Verwendung einer \KOMAScript-Klasse kann das explizite Laden von
+  \Package{typearea} entfallen:
+  \begin{lstlisting}
+  \documentclass[BCOR=8.25mm]{scrreprt}
+  \end{lstlisting}
+  genügt in diesem Fall.
+
+  Setzt man die Option erst später auf einen neuen Wert, verwendet man also
+  beispielsweise
+  \begin{lstlisting}
+  \documentclass{scrreprt}
+  \KOMAoptions{BCOR=8.25mm}
+  \end{lstlisting}
+  so werden bereits beim Laden der Klasse \Class{scrreprt}
+  Standardeinstellungen vorgenommen. Beim Ändern der
+  Einstellung mit Hilfe der Anweisung \Macro{KOMAoptions} wird dann
+  automatisch ein neuer Satzspiegel mit neuen Randeinstellungen
+  berechnet.
 \end{Example}
 
-Bitte beachten Sie unbedingt, dass diese Option bei Verwendung einer
-der \KOMAScript-Klassen als Klassenoption übergeben werden muss.
-Demgegenüber funktioniert dies bei Verwendung einer anderen Klasse
-nur, wenn diese Klasse \Package{typearea} explizit unterstützt. Bei
-den Standardklassen ist die Option also direkt beim Laden von
-\Package{typearea} zu übergeben. Die Verwendung von
-\Macro{PassOptionsToPackage} (siehe \cite{latex:clsguide}) vor dem
-Laden von \Package{typearea} funktioniert hingegen immer.
-%
-\EndIndex{Option}{BCOR}
+Bitte beachten Sie unbedingt, dass diese Option bei Verwendung einer der
+\KOMAScript-Klassen wie im Beispiel als Klassenoption oder per
+\Macro{KOMAoptions} nach dem Laden der Klasse übergeben werden muss.  Wird die
+Option per \Macro{KOMAoptions} nach dem Laden des Pakets geändert, so werden
+Satzspiegel und Rändern automatisch neu berechnet.
+
+\begin{Explain}
+  Es wird darauf hingewiesen, dass für frühere Versionen von \KOMAScript{} die
+  Angabe ohne Gleichheitszeichen zwischen \Option{BCOR} und \PName{Wert} für
+  die Verwendung innerhalb des optionalen Arguments von \Macro{documentclass}
+  und \Macro{usepackage} dokumentiert war. Für \Macro{usepackage} erlaubt
+  \KOMAScript{} diese Form derzeit noch immer. Für \Macro{documentclass} hat
+  diese Möglichkeit immer die Verwendung einer \KOMAScript-Klasse
+  vorausgesetzt. Dies ist auch weiterhin der Fall. Es wird empfohlen, diese
+  veraltete Form der Optionenangabe nicht mehr zu verwenden.
+\end{Explain}
+\EndIndex{Option}{BCOR~=\PName{Wert}}
+
 
 \begin{Declaration}
-  \Option{DIV}\PName{Faktor}
+  \KOption{DIV}\PName{Faktor}
 \end{Declaration}%
-\BeginIndex{Option}{DIV}%
-Mit Hilfe der Option \Option{DIV}\PName{Faktor} wird festgelegt, in
-wieviele Streifen die Seite horizontal und vertikal bei der
+\BeginIndex{Option}{DIV~=\PName{Wert}}%
+Mit Hilfe der Option
+\KOption{DIV}\PName{Faktor}\ChangedAt{v3.00}{\Package{typearea}} wird
+festgelegt, in wieviele Streifen die Seite horizontal und vertikal bei der
 Satzspiegelkonstruktion eingeteilt wird. Die genaue Konstruktion ist
-\autoref{sec:typearea.divConstruction} zu entnehmen. Wichtig zu
-wissen ist, dass gilt: Je größer der \PName{Faktor} desto größer wird
-der Textbereich und desto kleiner die Ränder. Als \PName{Faktor} kann
-jeder ganzzahlige Wert ab 4 verwendet werden. Bitte beachten Sie
-jedoch, dass sehr große Werte dazu führen können, dass Randbedingungen
-der Satzspiegelkonstruktion, je nach Wahl der weiteren Optionen,
-verletzt werden. So kann die Kopfzeile im Extremfall auch außerhalb
-der Seite liegen. Bei Verwendung der Option \Option{DIV}\PName{Faktor}
-sind Sie für die Einhaltung der Randbedingungen sowie eine nach
-typografischen Gesichtspunkten günstige Zeilenlänge selbst
+\autoref{sec:typearea.divConstruction} zu entnehmen. Wichtig zu wissen ist,
+dass gilt: Je größer der \PName{Faktor} desto größer wird der Textbereich und
+desto kleiner die Ränder. Als \PName{Faktor} kann jeder ganzzahlige Wert ab 4
+verwendet werden. Bitte beachten Sie jedoch, dass sehr große Werte dazu führen
+können, dass Randbedingungen der Satzspiegelkonstruktion, je nach Wahl der
+weiteren Optionen, verletzt werden. So kann die Kopfzeile im Extremfall auch
+außerhalb der Seite liegen. Bei Verwendung der Option
+\KOption{DIV}\PName{Faktor} sind Sie für die Einhaltung der Randbedingungen
+sowie eine nach typografischen Gesichtspunkten günstige Zeilenlänge selbst
 verantwortlich.
 
 In \autoref{tab:typearea.typearea} finden Sie für das Seitenformat A4
-ohne Bindekorrektur die aus einigen DIV-Faktoren
+ohne Bindekorrektur die aus einigen \Var{DIV}-Faktoren
 resultierenden Satzspiegelgrößen. Dabei werden die weiteren von der
 Schriftgröße abhängigen Nebenbedingungen nicht berücksichtigt.
 
@@ -438,7 +547,7 @@ Schriftgröße abhängigen Nebenbedingungen nicht berücksichtigt.
 \begin{lstlisting}
   \documentclass[a4paper,twoside]{protokol}
   \usepackage{bookman}
-  \usepackage[DIV15]{typearea}
+  \usepackage[DIV=15]{typearea}
 \end{lstlisting}
   Als Sie fertig sind, macht man Sie darauf aufmerksam, dass die
   Protokolle neuerdings gesammelt und am Quartalsende alle zusammen
@@ -452,12 +561,13 @@ Schriftgröße abhängigen Nebenbedingungen nicht berücksichtigt.
 \begin{lstlisting}
   \documentclass[a4paper,twoside]{iso9000p}
   \usepackage{bookman}
-  \usepackage[DIV15,BCOR12mm]{typearea}
+  \usepackage[DIV=15,BCOR=12mm]{typearea}
 \end{lstlisting}
   Natürlich können Sie auch hier wieder eine \KOMAScript-Klasse
   verwenden:
 \begin{lstlisting}
-  \documentclass[twoside,DIV15,BCOR12mm]{scrartcl}
+  \documentclass[twoside,DIV=15,BCOR=12mm]
+                {scrartcl}
   \usepackage{bookman}
 \end{lstlisting}
   Die Option \Option{a4paper} konnte bei der Klasse \Class{scrartcl} entfallen,
@@ -465,40 +575,41 @@ Schriftgröße abhängigen Nebenbedingungen nicht berücksichtigt.
 \end{Example}
 
 Bitte beachten Sie unbedingt, dass diese Option bei Verwendung einer der
-\KOMAScript-Klassen als Klassenoption übergeben werden muss.  Demgegenüber
-funktioniert die Angabe als Klassenoption bei Verwendung einer anderen Klasse
-nur, wenn diese Klasse \Package{typearea} explizit unterstützt. Bei den
-Standardklassen ist die Option also direkt beim Laden von \Package{typearea}
-zu übergeben.
-\iftrue
-% Umbruchoptimierungstext
-Die Verwendung von \Macro{PassOptionsToPackage} (siehe \cite{latex:clsguide})
-vor dem Laden von \Package{typearea} und gegebenenfalls auch vor dem Laden der
-Klasse funktioniert hingegen immer.
-%
-\fi
-%
-\EndIndex{Option}{DIV}
+\KOMAScript-Klassen wie im Beispiel als Klassenoption oder per
+\Macro{KOMAoptions} nach dem Laden der Klasse übergeben werden muss.
+Wird die Option per \Macro{KOMAoptions} nach dem Laden des Pakets geändert, so
+werden Satzspiegel und Rändern automatisch neu berechnet.
+
+\begin{Explain}
+  Es wird darauf hingewiesen, dass für frühere Versionen von \KOMAScript{} die
+  Angabe ohne Gleichheitszeichen zwischen \PName{DIV} und \PValue{Wert} für
+  die Verwendung innerhalb des optionalen Arguments von \Macro{documentclass}
+  und \Macro{usepackage} dokumentiert war. Für \Macro{usepackage} erlaubt
+  \KOMAScript{} diese Form derzeit noch immer. Für \Macro{documentclass} hat
+  diese Möglichkeit immer die Verwendung einer \KOMAScript-Klasse
+  vorausgesetzt. Dies ist auch weiterhin der Fall. Es wird empfohlen, diese
+  veraltete Form der Optionenangabe nicht mehr zu verwenden.
+\end{Explain}
 
 \begin{Declaration}
-  \Option{DIVcalc}\\
-  \Option{DIVclassic}
+  \OptionValue{DIV}{calc}\\
+  \OptionValue{DIV}{classic}
 \end{Declaration}%
-\BeginIndex{Option}{DIVcalc}%
-\BeginIndex{Option}{DIVclassic}%
-Wie bereits in \autoref{sec:typearea.divConstruction} erwähnt, gibt
-es nur für das Papierformat A4 feste Voreinstellungen für den
-\Var{DIV}-Wert. Diese sind \autoref{tab:typearea.div} zu entnehmen. Wird
-ein anderes Papierformat gewählt, so berechnet \Package{typearea}
-selbst einen guten \Var{DIV}-Wert.  Natürlich können Sie diese
-Berechnung auch für A4 wählen. Hierzu verwenden Sie einfach die Option
-\Option{DIVcalc} an Stelle von \Option{DIV}\PName{Faktor}.
-Selbstverständlich können Sie diese Option auch explizit bei allen
-anderen Papierformaten angeben. Wenn Sie die automatische Berechnung
-wünschen, ist diese Angabe sogar sinnvoll, da die Möglichkeit besteht,
-in einer Konfigurationsdatei andere Voreinstellungen zu setzen (siehe
-\autoref{sec:typearea.cfg}). Eine explizit angegebene Option \Option{DIVcalc}
-überschreibt diese Vorkonfiguration aber.
+\BeginIndex{Option}{DIV~=classic}%
+\BeginIndex{Option}{DIV~=calc}%
+Wie\ChangedAt{v3.00}{\Package{typearea}} bereits in
+\autoref{sec:typearea.divConstruction} erwähnt, gibt es nur für das
+Papierformat A4 feste Voreinstellungen für den \Var{DIV}-Wert. Diese sind
+\autoref{tab:typearea.div} zu entnehmen. Wird ein anderes Papierformat
+gewählt, so berechnet \Package{typearea} selbst einen guten \Var{DIV}-Wert.
+Natürlich können Sie diese Berechnung auch für A4 wählen. Hierzu verwenden Sie
+einfach die Option \OptionValue{DIV}{calc} an Stelle von
+\KOption{DIV}\PName{Faktor}.  Selbstverständlich können Sie diese Option auch
+explizit bei allen anderen Papierformaten angeben. Wenn Sie die automatische
+Berechnung wünschen, ist diese Angabe sogar sinnvoll, da die Möglichkeit
+besteht, in einer Konfigurationsdatei andere Voreinstellungen zu setzen (siehe
+\autoref{sec:typearea.cfg}). Eine explizit angegebene Option
+\OptionValue{DIV}{calc} überschreibt diese Vorkonfiguration aber.
 
 \begin{table}
   \centering
@@ -513,13 +624,13 @@ in einer Konfigurationsdatei andere Voreinstellungen zu setzen (siehe
 
 Die in \autoref{sec:typearea.circleConstruction} erwähnte klassische
 Konstruktion, der mittelalterliche Buchseitenkanon, ist ebenfalls auswählbar.
-Verwenden Sie in diesem Fall an Stelle von \Option{DIV}\PName{Faktor} oder
-\Option{DIVcalc} einfach die Option \Option{DIVclassic}. Es wird dann ein
-\Var{DIV}-Wert ermittelt, der dem mitterlalterlichen Buchseitenkanon möglichst
-nahe kommt.
+Verwenden Sie in diesem Fall an Stelle von \KOption{DIV}\PName{Faktor} oder
+\OptionValue{DIV}{calc} einfach \OptionValue{DIV}{classic}. Es wird dann
+ein \Var{DIV}-Wert ermittelt, der dem mitterlalterlichen Buchseitenkanon
+möglichst nahe kommt.
 
 \begin{Example}
-  In dem bei der Option \Option{DIV}\PName{Faktor} aufgeführten
+  In dem bei der Option \KOption{DIV}\PName{Faktor} aufgeführten
   Beispiel mit der Schriftart Bookman gab es ja genau das Problem,
   dass man einen zur Schriftart besser passenden \Var{DIV}-Wert haben
   wollte. Man könnte also in Abwandlung des ersten Beispiels auch
@@ -527,122 +638,123 @@ nahe kommt.
 \begin{lstlisting}
   \documentclass[a4paper,twoside]{protokol}
   \usepackage{bookman}
-  \usepackage[DIVcalc]{typearea}
+  \usepackage[DIV=calc]{typearea}
 \end{lstlisting}
 \end{Example}
+
+Bitte beachten Sie unbedingt, dass diese Optionen bei Verwendung einer der
+\KOMAScript-Klassen wie im Beispiel als Klassenoption oder per
+\Macro{KOMAoptions} nach dem Laden der Klasse übergeben werden müssen.  Wird
+einer der Optionen per \Macro{KOMAoptions} nach dem Laden des Pakets
+verwendet, so werden Satzspiegel und Rändern automatisch neu berechnet.
+
+\begin{Explain}
+  Es wird darauf hingewiesen, dass für frühere Versionen von \KOMAScript{} die
+  Optionen \Option{DIVcalc}\IndexOption{DIVcalc} und
+  \Option{DIVclassic}\IndexOption{DIVclassic}, also ohne Gleichheitszeichen,
+  für die Verwendung innerhalb des optionalen Arguments von
+  \Macro{documentclass} und \Macro{usepackage} dokumentiert war. \KOMAScript{}
+  erlaubt diese Form für \Macro{usepackage} derzeit noch immer. Für
+  \Macro{documentclass} hat diese Möglichkeit immer die Verwendung einer
+  \KOMAScript-Klasse vorausgesetzt. Dies ist auch weiterhin der Fall. Es wird
+  empfohlen, diese veraltete Form der Optionenangabe nicht mehr zu verwenden.%
+\end{Explain}%
+\EndIndex{Option}{DIV~=classic}%
+\EndIndex{Option}{DIV~=calc}%
 
 \begin{Declaration}
-  \Macro{typearea}\OParameter{BCOR}\Parameter{DIV}
+  \OptionValue{DIV}{current}\\
+  \OptionValue{DIV}{last}
 \end{Declaration}%
-\BeginIndex{Cmd}{typearea}%
-Wenn Sie bis hier die Beispiele aufmerksam verfolgt haben, werden Sie
-sich fragen, wie man die Berechnung eines \Var{DIV}-Wertes in
-Abhängigkeit von der gewählten Schrift erreicht, wenn eine
-\KOMAScript-Klasse verwendet wird, also die Optionen für
-\Package{typearea} vor dem Laden beispielsweise des
-\Package{bookman}-Pakets erfolgen müsste. In diesem Fall könnte
-\Package{typearea} nur einen Satzspiegel für die Standardschrift, nicht
-jedoch für die dann tatsächlich verwendete Schrift Bookman berechnen.
-Nach der Auswertung der Optionen berechnet das
-\Package{typearea}-Paket den Satzspiegel mit Hilfe des Befehls
-\Macro{typearea}\OParameter{BCOR}\Parameter{DIV}. Dabei werden der
-gewählte \Var{BCOR}-Wert als optionaler Parameter und der
-\Var{DIV}-Wert als Parameter übergeben. Bei der Option 
-\Option{DIVcalc} werden
-dabei als \PName{DIV} der eigentlich ungültige Wert~1 und bei der
-Option \Option{DIVclassic} der eigentlich ungültige
-Wert~3 übergeben. Den Befehl \Macro{typearea} kann man auch 
-explizit in der Präambel aufrufen.
+\BeginIndex{Option}{DIV~=current}%
+\BeginIndex{Option}{DIV~=last}%
+Wenn\ChangedAt{v3.00}{\Package{typearea}} Sie bis hier die Beispiele aufmerksam
+verfolgt haben, wissen Sie eigentlich bereits, wie man die Berechnung eines
+\Var{DIV}-Wertes in Abhängigkeit von der gewählten Schrift erreicht, wenn eine
+\KOMAScript-Klasse zusammen mit einem Schriftpaket verwendet wird.
+
+\begin{Explain}
+  Das Problem dabei ist, dass die \KOMAScript-Klasse das Paket
+  \Package{typearea} bereits selbst lädt. Die Übergabe der Optionen als
+  optionale Argumente von \Macro{usepackage} ist also nicht möglich. Es würde
+  auch nichts nützen, die Option \KOption{DIV=calc} als optionales Argument
+  von \Macro{documentclass} anzugeben. Diese Option würde direkt beim Laden
+  des Pakets \Package{typearea} ausgewertet. Damit würden Satzspiegel und
+  Ränder für die \LaTeX-Standardschrift und nicht für die später geladene
+  Schrift berechnet.
+
+  Selbstverständlich ist es aber möglich, mit
+  \Macro{KOMAoptions}\PParameter{DIV=calc} oder
+  \Macro{KOMAoption}\PParameter{DIV}\PParameter{calc} nach dem Laden des
+  Schriftpakets Satzspiegel und Ränder neu berechnen zu lassen. Dabei wird
+  dann über den Wert \PValue{calc} direkt ein \Var{DIV}-Wert für eine gute
+  Zeilenlänge eingefordert.
+
+  Da es aber häufig praktischer ist, die Einstellung für die Option
+  \Option{DIV} nicht erst nach dem Laden der Schrift vorzunehmen, sondern an
+  herausgehobener Stelle, beispielsweise beim Laden der Klasse, bietet
+  \Package{typeare} zwei weitere symbolische Werte für diese Option.
+\end{Explain}
+
+Mit \KOption{DIV}\PName{current}\ChangedAt{v3.00}{\Package{typearea}} wird eine
+Neubrechnung von Satzspiegel und Rändern angestoßen, wobei genau der
+\Var{DIV}-Wert verwendet wird, der aktuell eingestellt ist. Dies ist weniger
+für die Neuberechnung des Satzspiegels nach Wahl einer anderen Grundschrift
+von Interesse. Vielmehr ist das dann nützlich, wenn man etwa nach Änderung des
+Durchschusses bei Beibehaltung des Teilers \Var{DIV} die Randbedingung
+sicherstellen will, dass \Length{textheight} abzüglich \Length{topskip} ein
+Vielfaches von \Length{baselineskip} sein sollte.
+
+Mit \KOption{DIV}\PName{last}\ChangedAt{v3.00}{\Package{typearea}} wird eine
+Neuberechnung von Satzspiegel und Rändern angestoßen, wobei genau dieselbe
+Einstellung wie bei der letzten Berechnung verwendet wird.
 
 \begin{Example}
-  Gehen wir wieder davon aus, dass für die Schriftart Bookman ein
-  Satzspiegel mit guter Zeilenlänge berechnet werden soll.
-  Gleichzeitig wird eine \KOMAScript-Klasse verwendet. Dies ist unter
-  Verwendung des \Macro{typearea}-Befehls mit dem
-  \Option{DIVcalc}-Wert 1 als \PName{DIV}-Parameter möglich:
+  Gehen wir wieder davon aus, dass für die Schriftart Bookman ein Satzspiegel
+  mit guter Zeilenlänge berechnet werden soll.  Gleichzeitig wird eine
+  \KOMAScript-Klasse verwendet. Dies ist mit dem symbolischen Wert
+  \PValue{last} und der Anweisung \Macro{KOMAoptions} sehr einfach möglich:
 \begin{lstlisting}
-  \documentclass[BCOR12mm,DIVcalc,twoside]{scrartcl}
+  \documentclass[BCOR=12mm,DIV=calc,twoside]
+                {scrartcl}
   \usepackage{bookman}
-  \typearea[12mm]{1}% entspricht obigen Optionen
+  \KOMAoptions{DIV=last}
 \end{lstlisting}
-  Wiederum wurde darauf verzichtet, mit der Option \Option{a4paper} die
-  Voreinstellung der \KOMAScript-Klasse \Class{scrartcl} explizit zu
-  wiederholen.
+  Wird später entschieden, dass ein anderer \Var{DIV}-Wert
+  verwendet werden soll, so muss nur die Einstellung im optionalen Argument
+  von \Macro{documentclass} geändert werden.
 \end{Example}
 
-Nun ist es möglicherweise etwas unpraktisch, wenn man bei der
-\Option{DIV}-Option die Möglichkeit hat, \Option{DIVcalc} und
-\Option{DIVclassic} anzuwenden, beim \Macro{typearea}-Befehl aber mit
-irgendwelchen Pseudowerten jonglieren soll. Deshalb versteht \Macro{typearea}
-für den Parameter \PName{DIV} auch die symbolischen Angaben aus
-\autoref{tab:symbolicDIV}.
+Eine Zusammenfassung aller möglichen symbolischen Werte für die Option
+\Option{DIV} finden Sie in \autoref{tab:symbolicDIV}. Es wird an dieser Stelle
+darauf hingewiesen, dass auch die Verwendung des Pakets
+\Package{fontenc}\IndexPackage{fontenc} dazu führen kann, dass \LaTeX{} eine
+andere Schrift lädt.
 
 \begin{table}
-  \caption[{Symbolische \PName{DIV}-Argumente für
-    \Macro{typearea}}]{Mögliche symbolische \PName{DIV}-Argumente für
+  \caption[{Symbolische Werte für Option \Option{DIV} und das
+    \PName{DIV}-Argument von \Macro{typearea}}]{Mögliche symbolische Werte
+    für Option \Option{DIV} oder das \PName{DIV}-Argument von
     \Macro{typearea}\OParameter{BCOR}\Parameter{DIV}}
   \label{tab:symbolicDIV}
   \begin{desctabular}
+    \pventry{areaset}{Satzspiegel neu anordnen.\IndexOption{DIV~=areaset}}%
     \pventry{calc}{Satzspiegelberechnung einschließlich Ermittlung eines guten
-      \Var{DIV}-Wertes erneut durchführen.}
+      \Var{DIV}-Wertes erneut durchführen.\IndexOption{DIV~=calc}}%
     \pventry{classic}{Satzspiegelberechnung nach dem mittelalterlichen
-      Buchseitenkanon (Kreisberechnung) erneut durchführen.}
+      Buchseitenkanon (Kreisberechnung) erneut
+      durchführen.\IndexOption{DIV~=classic}}%
     \pventry{current}{Satzspiegelberechnung mit dem aktuell gültigen
-      \Var{DIV}-Wert erneut durchführen.}
+      \Var{DIV}-Wert erneut durchführen.\IndexOption{DIV~=current}}%
     \pventry{default}{Satzspiegelberechnung mit dem Standardwert für das
       aktuelle Seitenformat und die aktuelle Schriftgröße erneut durchführen.
-      Falls kein Standardwert existiert \PValue{calc} anwenden.}
+      Falls kein Standardwert existiert \PValue{calc}
+      anwenden.\IndexOption{DIV~=default}}%
     \pventry{last}{Satzspiegelberechnung mit demselben \PName{DIV}-Argument,
-      das beim letzten Aufruf angegeben wurde, erneut durchführen}
+      das beim letzten Aufruf angegeben wurde, erneut
+      durchführen.\IndexOption{DIV~=last}}%
   \end{desctabular}
 \end{table}
-
-Jetzt wäre es natürlich äußerst unpraktisch, wenn man zwar eine
-Satzspiegelberechnung mit dem aktuellen \Var{DIV}-Wert erneut
-durchführen könnte, jedoch dabei den \Var{BCOR}-Wert neu angeben
-müsste. Deshalb versteht \Macro{typearea} für den Parameter \PName{BCOR} auch
-die symbolische Angabe aus \autoref{tab:symbolicBCOR}
-
-\begin{table}
-  \caption[{Symbolische \PName{BCOR}-Argumente für
-    \Macro{typearea}}]{Mögliche symbolische \PName{BCOR}-Argumente für
-    \Macro{typearea}\OParameter{BCOR}\Parameter{DIV}}
-  \label{tab:symbolicBCOR}
-  \begin{desctabular}
-    \pventry{current}{Satzspiegelberechnung mit dem aktuell gültigen
-      \Var{BCOR}-Wert erneut durchführen.}
-  \end{desctabular}
-\end{table}
-
-\begin{Example}
-  Gehen wir wieder davon aus, dass für die Schriftart Bookman
-  ein Satzspiegel mit guter Zeilenlänge berechnet werden
-  soll. Gleichzeitig wird eine \KOMAScript-Klasse verwendet. Unter
-  Verwendung der symbolischen Parameterwerte für \PName{BCOR} und
-  \PName{DIV} ist dies mit dem \Macro{typearea}-Befehl einfach
-  möglich:
-\begin{lstlisting}
-  \documentclass[BCOR12mm,DIVcalc,twoside]{scrartcl}
-  \usepackage{bookman}
-  \typearea[current]{calc}
-\end{lstlisting}
-  Soll hingegen die neuerliche Berechnung mit einem festen
-  \Var{DIV}-Wert durchgeführt werden, so gibt es neben der
-  Möglichkeit:
-\begin{lstlisting}
-  \documentclass[BCOR12mm,DIV11,twoside]{scrartcl}
-  \usepackage{bookman}
-  \typearea[current]{last}
-\end{lstlisting}
-  natürlich auch noch die naheliegende Methode:
-\begin{lstlisting}
-  \documentclass[twoside]{scrartcl}
-  \usepackage{bookman}
-  \typearea[12mm]{11}
-\end{lstlisting}
-  Letztlich ist es eine Frage des Geschmacks, welche Lösung man lieber
-  verwendet.
-\end{Example}
 
 Häufig wird die Satzspiegelneuberechnung im Zusammenhang mit der
 Ver"-änderung des Zeilenabstandes
@@ -662,24 +774,25 @@ diesen Zeilenabstand neu berechnet werden.
   dies Problems wie folgt aussehen:
 \begin{lstlisting}
   \documentclass[10pt,twoside,%
-                 BCOR12mm,DIVcalc]{scrreprt}
+                 BCOR=12mm,DIV=calc]{scrreprt}
   \linespread{1.25}
-  \typearea[current]{last}
+  \KOMAoptions{DIV=last}
 \end{lstlisting}\IndexCmd{linespread}
-  Da \Macro{typearea} selbst immer die Anweisung \Macro{normalsize} ausführt,
-  ist es nicht notwendig nach \Macro{linespread} den gewählten Durchschuss mit
-  \Macro{selectfont} zu aktiveren, damit dieser auch tatsächlich für die
-  Neuberechnung verwendet wird.
+  Da \Package{typearea} selbst immer die Anweisung \Macro{normalsize} bei
+  Berechung eines neuen Satzspiegels ausführt, ist es nicht notwendig nach
+  \Macro{linespread} den gewählten Durchschuss mit \Macro{selectfont} zu
+  aktiveren, damit dieser auch tatsächlich für die Neuberechnung verwendet
+  wird.
 
   Das gleiche Beispiel sähe unter Verwendung des
   \Package{setspace}-Pakets (siehe \cite{package:setspace}) wie folgt
   aus:
 \begin{lstlisting}
   \documentclass[10pt,twoside,%
-                 BCOR12mm,DIVcalc]{scrreprt}
+                 BCOR=12mm,DIV=calc]{scrreprt}
   \usepackage{setspace}
   \onehalfspacing
-  \typearea[current]{last}
+  \KOMAoptions{DIV=last}
 \end{lstlisting}
   Wie man sieht, spart man sich mit dem \Package{setspace}-Paket
   das Wissen um den korrekten Dehnungswert.
@@ -690,10 +803,10 @@ diesen Zeilenabstand neu berechnet werden.
   also:
 \begin{lstlisting}
   \documentclass[10pt,twoside,%
-                 BCOR12mm,DIVcalc]{scrreprt}
+                 BCOR=12mm,DIV=calc]{scrreprt}
   \usepackage{setspace}
   \onehalfspacing
-  \typearea[current]{last}
+  \KOMAoptions{DIV=last}
   \begin{document}
   \title{Title}
   \author{Markus Kohm}
@@ -707,73 +820,227 @@ diesen Zeilenabstand neu berechnet werden.
   Siehe hierzu auch die Anmerkungen in \autoref{sec:typearea.tips}.
 \end{Example}
 
+Bitte beachten Sie unbedingt, dass diese Optionen zur Verwendung mit
+\Macro{KOMAoptions} nach dem Laden des Pakets vorgesehen sind und dann eine
+automatische Neuberechnung von Satzspiegel und Rändern auslösen.
+%
+\EndIndex{Option}{DIV~=current}%
+\EndIndex{Option}{DIV~=last}%
+\EndIndex{Option}{DIV~=\PName{Wert}}
+
+\begin{Declaration}
+  \Macro{typearea}\OParameter{BCOR}\Parameter{DIV}\\
+  \Macro{recalctypearea}
+\end{Declaration}%
+\BeginIndex{Cmd}{typearea}%
+\BeginIndex{Cmd}{recalctypearea}%
 \begin{Explain}
-  Der Befehl \Macro{typearea} ist derzeit so definiert, dass es
-  theoretisch auch möglich wäre, mitten in einem Dokument den
-  Satzspiegel zu wechseln. Dabei werden allerdings Annahmen über den
-  Aufbau des \LaTeX-Kerns gemacht und interne Definitionen und Größen
-  des \LaTeX-Kerns verändert. Es gibt zwar eine gewisse
-  Wahrscheinlichkeit, aber keine Garantie, dass dies in zukünftigen
-  Versionen von \LaTeXe{} noch funktionieren wird. Es ist anzunehmen,
-  dass es bei \LaTeX3 nicht mehr zu einem korrekten Ergebnis führt.
-  Aber als Autor von {\KOMAScript} gehe ich derzeit davon aus, dass
-  der Umstieg zu \LaTeX3 mit sehr viel mehr Inkompatiblilitäten 
-  einhergehen wird.\par
+Wird die Option \Option{DIV} oder die Option \Option{BCOR} nach dem Laden des
+Pakets \Package{typearea} gesetzt, so wird intern die Anweisung
+\Macro{typearea} aufgerufen. Dabei wird beim Setzen der Option \Option{DIV}
+für \PName{BCOR} intern der symbolische Wert \PValue{current} verwendet, der
+aus Gründen der Vollständigkeit auch in \autoref{tab:symbolicBCOR} zu finden
+ist. Beim Setzen der Option \Option{BCOR} wird für \PName{DIV} hingegen der
+symbolische Wert \PValue{last} verwendet. Wollen Sie, dass Satzspiegel und
+Rändern stattdessen mit dem symbolischen Wert \PValue{current} für \PName{DIV}
+neu berechnet werden, so können Sie direkt
+\Macro{typearea}\PParameter{current}\PParameter{current} verwenden.
+\end{Explain}
+
+\begin{table}
+  \caption[{Symbolische \PName{BCOR}-Argumente für
+    \Macro{typearea}}]{Mögliche symbolische \PName{BCOR}-Argumente für
+    \Macro{typearea}\OParameter{BCOR}\Parameter{DIV}}
+  \label{tab:symbolicBCOR}
+  \begin{desctabular}
+    \pventry{current}{Satzspiegelberechnung mit dem aktuell gültigen
+      \Var{BCOR}-Wert erneut durchführen.\IndexOption{BCOR~=current}}
+  \end{desctabular}
+\end{table}
+
+Sollen sowohl \PName{BCOR} als auch \PName{DIV} geändert werden, so ist die
+Verwendung von \Macro{typearea} zu empfehlen, da hierbei die Ränder und der
+Satzspiegel nur einmal neu berechnet werden. Bei
+\Macro{KOMAoptions}\PParameter{\KOption{DIV}\PName{DIV},%
+  \KOption{BCOR}\PName{BCOR}} werden Ränder und Satzspiegel hingegen zunächst
+bei der Änderung für \PName{DIV} und dann zusätzlich bei der Änderung für
+\PName{BCOR} neu berechnet.
+
+\begin{Explain}
+  Der Befehl \Macro{typearea} ist derzeit so definiert, dass es auch möglich
+  ist, mitten in einem Dokument den Satzspiegel zu wechseln. Dabei werden
+  allerdings Annahmen über den Aufbau des \LaTeX-Kerns gemacht und interne
+  Definitionen und Größen des \LaTeX-Kerns verändert. Es gibt zwar eine
+  gewisse Wahrscheinlichkeit, aber keine Garantie, dass dies in zukünftigen
+  Versionen von \LaTeXe{} noch funktionieren wird. Die Verwendung innerhalb
+  des Dokuments führt außerdem zu einem Seitenumbruch.
+\end{Explain}
+
+Da \Macro{typearea}\PParameter{current}\PParameter{last} oder
+\Macro{KOMAoptions}\PParameter{DIV=last} für die Neuberechnung des
+Satzspiegels und der Ränder recht häufig benötigt
+werden, gibt es dafür die abkürzende Anweisung
+\Macro{recalctypearea}\ChangedAt{v3.00}{\Package{typearea}}.
+
+\begin{Example}
+  Wenn Ihnen die Schreibweisen
+  \begin{lstlisting}
+  \KOMAoptions{DIV=last}
+  \end{lstlisting}
+  oder
+  \begin{lstlisting}
+  \typearea[current]{last}
+  \end{lstlisting}
+  für die Neuberechnung von Satzspiegel und Rändern aufgrund der vielen
+  Sonderzeichen zu umständlich ist, können Sie einfach
+  \begin{lstlisting}
+  \recalctypearea
+  \end{lstlisting}
+  verwenden.
+\end{Example}%
+\EndIndex{Cmd}{recalctypearea}%
+\EndIndex{Cmd}{typearea}
+
+
+\begin{Declaration}
+  \KOption{twoside}\PName{Ein-Aus-Wert}
+\end{Declaration}%
+\BeginIndex{Option}{twoside~=\PName{Ein-Aus-Wert}}%
+Wie bereits in \autoref{sec:typearea.basics} erklärt hängt die Randverteilung
+davon ab, ob ein Dokument einseitig oder zweiseitig gesetzt werden soll. Bei
+einseitigem Satz sind der linke und der rechte Rand gleich breit, während bei
+doppelseitigem Satz der innere Randanteil einer Seite nur halb so groß ist wie
+der jeweilige äußere Rand. Um diese Unterscheidung vornehmen zu können, muss
+\Package{typearea} mit der Option \KOption{twoside} mitgeteilt werden, ob das
+Dokument doppelseitig gesetzt wird. Als \PName{Ein-Aus-Wert} kann dabei einer
+der Standardwerte für einfache Schalter aus \autoref{tab:truefalseswitch}
+verwendet werden. Wird die Option ohne Wert-Angabe verwendet, so wird der Wert
+\PValue{true} angenommen, also doppelseitiger Satz verwendet. Ein Deaktivieren
+der Option bedeutet einseitiger Satz.
+
+Die Option kann wahlweise als Klassenoption bei \Macro{documentclass}, als
+Paketoption bei \Macro{usepackage} oder auch nach dem Laden von
+\Package{typearea} per \Macro{KOMAoptions} oder \Macro{KOMAoption} gesetzt
+werden. Eine Verwendung dieser Option nach dem Laden von \Package{typearea}
+führt dabei automatischen zur Neuberechnung des Satzspiegels mittels
+\Macro{recalctypearea} (siehe
+\autopageref{desc:typearea.macro.recalctypearea}). War vor der Option
+doppelseitiger Satz aktiv, wird noch vor der Neuberechnung auf die nächste
+ungerade Seite umbrochen.
+
+\begin{Explain}
+  Es wird darauf hingewiesen, dass für frühere Versionen von \KOMAScript{} und
+  für die Standardklassen die Option \Option{twoside} ohne Wertangabe und
+  dafür zusätzlich die Option \Option{oneside}\IndexOption{oneside} an
+  Stelle von \OptionValue{twoside}{false} dokumentiert ist. Aus Gründen der
+  Kompatibilität versteht \Package{typearea} diese Option noch immer und wird
+  sie auch zukünftig verstehen.
 \end{Explain}
 %
-\EndIndex{Cmd}{typearea}
-\EndIndex{Option}{DIVclassic}%
-\EndIndex{Option}{DIVcalc}
+\EndIndex{Option}{twoside~=\PName{Ein-Aus-Wert}}
 
-\begin{Explain}%
+\begin{table}
+  \begin{minipage}{\textwidth}
+  \centering
+  \caption{Standardwerte für einfache Schalter in \KOMAScript}
+  \begin{tabular}{ll}
+    \toprule
+    Wert & Bedeutung \\
+    \midrule
+    \PValue{true}\footnote{Dieser Wert wird auch
+      eingesetzt, wenn die entsprechende Option ohne Wertangabe verwendet
+      wird.} & aktiviert die Option\\
+    \PValue{on}   & aktiviert die Option \\
+    \PValue{yes}  & aktiviert die Option \\
+    \PValue{false}& deaktiviert die Option \\
+    \PValue{off}  & deaktiviert die Option \\
+    \PValue{no}   & deaktiviert die Option \\
+    \bottomrule
+  \end{tabular}
+  \label{tab:truefalseswitch}
+  \end{minipage}
+\end{table}
+
+
 \begin{Declaration}
-  \Option{headinclude}\\
-  \Option{headexclude}\\
-  \Option{footinclude}\\
-  \Option{footexclude}
+  \KOption{twocolumn}\PName{Ein-Aus-Wert}
+\end{Declaration}
+\BeginIndex{Option}{twocolumn~=\PName{Ein-Aus-Wert}}
+Für die Berechnung eines guten Satzspiegels mit Hilfe von
+\OptionValue{DIV=calc} ist es erforderlich zu wissen, ob das Dokument ein-
+oder zweispaltig gesetzt wird. Da die Betrachtungen zur Zeilenlänge aus
+\autoref{sec:typearea.basics} dann für jede einzelne Spalte gilt, darf der
+Satzspiegel in doppelspaltigen Dokumenten bis zu doppelt so breit sein wie in
+einspaltigen Dokumenten. 
+
+Um diese Unterscheidung vornehmen zu können, muss
+\Package{typearea} mit der Option \Option{twocolumn} mitgeteilt werden, ob das
+Dokument doppelspaltig gesetzt wird. Als \PName{Ein-Aus-Wert} kann dabei einer
+der Standardwerte für einfache Schalter aus \autoref{tab:truefalseswitch}
+verwendet werden. Wird die Option ohne Wert-Angabe verwendet, so wird der Wert
+\PValue{true} angenommen, also doppelspaltiger Satz verwendet. Ein Deaktivieren
+der Option bedeutet einspaltiger Satz.
+
+Die Option kann wahlweise als Klassenoption bei \Macro{documentclass}, als
+Paketoption bei \Macro{usepackage} oder auch nach dem Laden von
+\Package{typearea} per \Macro{KOMAoptions} oder \Macro{KOMAoption} gesetzt
+werden. Eine Verwendung dieser Option nach dem Laden von \Package{typearea}
+führt dabei automatischen zur Neuberechnung des Satzspiegels mittels
+\Macro{recalctypearea} (siehe
+\autopageref{desc:typearea.macro.recalctypearea}).
+
+\begin{Explain}
+  Es wird darauf hingewiesen, dass für frühere Versionen von \KOMAScript{} und
+  für die Standardklassen die Option \Option{twocolumn} ohne Wertangabe und
+  dafür zusätzlich die Option \Option{onecolumn}\IndexOption{onecolumn}
+  an Stelle von \OptionValue{twocolumn}{false} dokumentiert ist. Aus Gründen
+  der Kompatibilität versteht \Package{typearea} diese Option noch immer und
+  wird sie auch zukünftig verstehen.
+\end{Explain}
+%
+\EndIndex{Option}{twocolumn~=\PName{Ein-Aus-Wert}}
+
+
+\begin{Declaration}
+  \KOption{headinclude}\PName{Ein-Aus-Wert}\\
+  \KOption{footinclude}\PName{Ein-Aus-Wert}
 \end{Declaration}%
-\BeginIndex{Option}{headinclude}%
-\BeginIndex{Option}{headexclude}%
-\BeginIndex{Option}{footinclude}%
-\BeginIndex{Option}{footexclude}%
+\BeginIndex{Option}{headinclude~=\PName{Ein-Aus-Wert}}%
+\BeginIndex{Option}{footinclude~=\PName{Ein-Aus-Wert}}%
+\begin{Explain}%
   Bisher wurde zwar erklärt, wie die
-  Satzspiegelkonstruktion\Index{Satzspiegel}
-  funktioniert und in welchem Verhältnis die Ränder\Index{Rand} zueinander und der
-  Textkörper zur Seite steht, aber eine entscheidende Frage blieb
-  ausgeklammert. Es handelt sich dabei um die Frage, was denn
-  eigentlich unter dem Rand zu verstehen ist. Auf den ersten Blick
-  wirkt diese Frage trivial: Der Rand ist der Teil der Seite, der
-  oben, unten, links und rechts frei bleibt. Doch das ist nur die
-  halbe Wahrheit. Der äußere Rand ist keineswegs immer leer. Teilweise
-  findet man darin noch gesetzte Randnotizen (siehe den Befehl
-  \Macro{marginpar} beispielsweise in \cite{l2kurz} bzw.
-  \autoref{sec:maincls.marginNotes}).
+  Satzspiegelkonstruktion\Index{Satzspiegel} funktioniert und in welchem
+  Verhältnis die Ränder\Index{Rand} zueinander und der Textkörper zur Seite
+  steht, aber eine entscheidende Frage blieb ausgeklammert. Es handelt sich
+  dabei um die Frage, was denn eigentlich unter dem Rand zu verstehen ist. Auf
+  den ersten Blick wirkt diese Frage trivial: Der Rand ist der Teil der Seite,
+  der oben, unten, links und rechts frei bleibt. Doch das ist nur die halbe
+  Wahrheit. Der äußere Rand ist keineswegs immer leer. Teilweise findet man
+  darin noch gesetzte Randnotizen (siehe den Befehl \Macro{marginpar}
+  beispielsweise in \cite{l2kurz} bzw. \autoref{sec:maincls.marginNotes}).
 
   Beim oberen und unteren Rand stellt sich die Frage, wie Kopf- und
-  Fußzeile\Index{Seitenkopf} \Index{Seitenfuß} zu behandeln sind. 
-  Gehören diese beiden zum Textkörper oder
-  zum jeweiligen Rand? Die Frage ist nicht einfach zu beantworten.
-  Eindeutig ist, dass ein leerer Fuß und ein leerer Kopf zum Rand zu
-  rechnen sind. Schließlich können sie nicht vom restlichen Rand
-  unterschieden werden. Ein Fuß, der nur die
-  Paginierung\Index[indexmain]{Paginierung}\footnote{Unter der 
-  Paginierung versteht man die Angabe
-    der Seitenzahl.} enthält, wirkt optisch ebenfalls eher wie Rand und
-  sollte deshalb zu diesem gerechnet werden. Für die optische Wirkung
-  ist dabei unwesentlich, ob der Fuß beim Lesen oder Überfliegen
-  leicht als Fuß erkannt werden kann oder nicht. Entscheidend ist, wie
-  eine wohlgefüllte Seite bei \emph{unscharfer Betrachtung}
-  wirkt. Dazu bedient man sich beispielsweise seiner
-  altersweitsichtigen Großeltern, denen man die Brille stibitzt und
-  dann die Seite etwa einen halben Meter von der Nasenspitze entfernt
-  hält. In Ermangelung erreichbarer Großeltern kann man sich auch
-  damit behelfen, dass man die eigenen Augen auf Fernsicht stellt, die
-  Seite aber nur mit ausgestreckten Armen hält. Brillenträger sind
-  hier deutlich im Vorteil. Hat man eine Fußzeile, die neben der
-  Paginierung weitere, weitschweifige Angaben enthält, beispielsweise
-  einen Copyright-Hinweis, so wirkt die Fußzeile eher wie ein etwas
-  abgesetzter Teil des Textkörpers. Bei der Berechnung des
-  Satzspiegels sollte das berücksichtigt werden.
+  Fußzeile\Index{Seitenkopf}\Index{Seitenfuß} zu behandeln sind.  Gehören
+  diese beiden zum Textkörper oder zum jeweiligen Rand? Die Frage ist nicht
+  einfach zu beantworten.  Eindeutig ist, dass ein leerer Fuß und ein leerer
+  Kopf zum Rand zu rechnen sind. Schließlich können sie nicht vom restlichen
+  Rand unterschieden werden. Ein Fuß, der nur die
+  Paginierung\Index[indexmain]{Paginierung}\footnote{Unter der Paginierung
+    versteht man die Angabe der Seitenzahl.} enthält, wirkt optisch ebenfalls
+  eher wie Rand und sollte deshalb zu diesem gerechnet werden. Für die
+  optische Wirkung ist dabei unwesentlich, ob der Fuß beim Lesen oder
+  Überfliegen leicht als Fuß erkannt werden kann oder nicht. Entscheidend ist,
+  wie eine wohlgefüllte Seite bei \emph{unscharfer Betrachtung} wirkt. Dazu
+  bedient man sich beispielsweise seiner altersweitsichtigen Großeltern, denen
+  man die Brille stibitzt und dann die Seite etwa einen halben Meter von der
+  Nasenspitze entfernt hält. In Ermangelung erreichbarer Großeltern kann man
+  sich auch damit behelfen, dass man die eigenen Augen auf Fernsicht stellt,
+  die Seite aber nur mit ausgestreckten Armen hält. Brillenträger sind hier
+  deutlich im Vorteil. Hat man eine Fußzeile, die neben der Paginierung
+  weitere, weitschweifige Angaben enthält, beispielsweise einen
+  Copyright-Hinweis, so wirkt die Fußzeile eher wie ein etwas abgesetzter Teil
+  des Textkörpers. Bei der Berechnung des Satzspiegels sollte das
+  berücksichtigt werden.
   
   Bei der Kopfzeile sieht es noch schwieriger aus. In der Kopfzeile
   wird häufig der
@@ -805,103 +1072,156 @@ diesen Zeilenabstand neu berechnet werden.
   unerheblich. Entscheidend ist die unscharfe Betrachtung.\par
 \end{Explain}
 
-Das \Package{typearea}-Paket trifft die Entscheidung, ob ein Kopf oder
-Fuß zum Textkörper gehört oder davon getrennt zum Rand gerechnet
-werden muss, nicht selbst. Stattdessen kann mit der Option
-\Option{headinclude} der Kopf und mit der Option \Option{footinclude} der Fuß
-explizit zum Textkörper gezählt werden, während mit den Optionen
-\Option{headexclude} und \Option{footexclude} der Kopf bzw. Fuß zum
-Rand gerechnet wird. Wenn Sie unsicher sind, was die richtige
-Einstellung ist, lesen Sie bitte obige Erläuterungen. Voreingestellt
-sind normalerweise \Option{headexclude} und \Option{footexclude}. Dies
-kann sich jedoch bei den \KOMAScript-Klassen je nach Klassenoption
-oder bei Verwendung anderer \KOMAScript-Pakete generell ändern (siehe
-\autoref{sec:maincls.options} und \autoref{cha:scrpage}).
+Das \Package{typearea}-Paket trifft die Entscheidung, ob ein Kopf oder Fuß zum
+Textkörper gehört oder davon getrennt zum Rand gerechnet werden muss, nicht
+selbst. Stattdessen kann mit den Optionen \Option{headinclude} und
+\Option{footinclude} eingestellt werden, ob der Kopf und der Fuß zum
+Textkörper gerechnet werden sollen. Die Optionen verstehen dabei als
+\PName{Ein-Aus-Wert}\ChangedAt{v3.00}{\Package{typearea}} die Standardwerte
+für einfache Schalter, die in \autoref{tab:truefalseswitch} angegeben
+sind. Man kann die Optionen auch ohne Wertzuweisung verwenden. In diesem Fall
+wird \PValue{true} als \PName{Ein-Aus-Wert} verwendet, also der Kopf oder Fuß
+zum Satzspiegel gerechnet.
+
+Wenn Sie unsicher sind, was die richtige Einstellung ist, lesen Sie bitte
+obige Erläuterungen. Voreingestellt sind normalerweise
+\OptionValue{headinclude}{false} und
+\OptionValue{footinclude}{false}. Dies kann sich jedoch bei den
+\KOMAScript-Klassen je nach Klassenoption oder bei Verwendung anderer
+\KOMAScript-Pakete generell ändern (siehe \autoref{sec:maincls.options} und
+\autoref{cha:scrpage}).
+
+Bitte beachten Sie unbedingt, dass diese Optionen bei Verwendung einer der
+\KOMAScript-Klassen als Klassenoptionen oder per \Macro{KOMAoptions} nach dem
+Laden der Klasse übergeben werden müssen. Eine Änderung dieser Optionen nach
+dem Laden von \Package{typearea} führt dabei nicht zu einer automatischen
+Neuberechnung des Satzspiegels. Vielmehr wirkt sich die Änderung erst bei der
+nächsten Neuberechnung des Satzspiegels aus. Zur Neuberechnung des
+Satzspiegels siehe Option \Option{DIV} mit den Werten \PValue{last} oder
+\PValue{current} (siehe \autopageref{desc:typearea.optionvalue.DIV.last}) oder
+die Anweisung \Macro{recalctypearea}
+(siehe \autopageref{desc:typearea.macro.recalctypearea}).
+
+\begin{Explain}
+  Es wird darauf hingewiesen, dass für frühere Versionen von \KOMAScript{} die
+  Optionen \Option{headexclude}\IndexOption{headexclude} und
+  \Option{footexclude}\IndexOption{footexclude}, für die Verwendung innerhalb
+  des optionalen Arguments von \Macro{documentclass} und \Macro{usepackage}
+  dokumentiert war. \KOMAScript{} erlaubt diese Form für \Macro{usepackage}
+  und \Macro{documentclass} noch immer. Es wird jedoch empfohlen, diese
+  veraltete Form der Optionenangabe nicht mehr zu verwenden. Ihre Funktion
+  wurde von \OptionValue{headinclude}{false} und
+  \OptionValue{footexclude}{false} übernommen.
+\end{Explain}
 %
-\EndIndex{Option}{headinclude}%
-\EndIndex{Option}{headexclude}%
-\EndIndex{Option}{footinclude}%
-\EndIndex{Option}{footexclude}%
+\EndIndex{Option}{headinclude~=\PName{Ein-Aus-Wert}}%
+\EndIndex{Option}{footinclude~=\PName{Ein-Aus-Wert}}%
 
 
 \begin{Declaration}
-  \Option{mpinclude}\\
-  \Option{mpexclude}
+  \KOption{mpinclude}\PName{Ein-Aus-Wert}
 \end{Declaration}
-\BeginIndex{Option}{mpinclude}%
-\BeginIndex{Option}{mpexclude}%
+\BeginIndex{Option}{mpinclude~=\PName{Ein-Aus-Wert}}%
 Neben\ChangedAt{v2.8q}{\Class{scrbook}\and \Class{scrreprt}\and
-  \Class{scrartcl}} Dokumenten, bei denen der Kopf und der Fuß der
-Seite eher zum Textbereich als zum Rand gehört, gibt es auch
-Dokumente, bei denen dies für Randnotizen zutrifft. Mit der Option
-\Option{mpinclude} kann genau dies erreicht werden. Der Effekt dabei
-ist, dass eine Breiteneinheit vom Textbereich weggenommen und als
-Bereich für die Randnotizen verwendet wird. Mit der Option
-\Option{mpexclude}, die der Voreinstellung entspricht, wird
-hingegen ein Teil des Randes für Randnotizen verwendet. Dies ist, je
-nachdem, ob einseitig oder doppelseitig gearbeitet wird, ebenfalls
-eine Breiteneinheit oder auch eineinhalb Breiteneinheiten. In der
-Regel ist die Verwendung von \Option{mpinclude} nicht anzuraten
-beziehungsweise sollte Experten vorbehalten bleiben.
+  \Class{scrartcl}} Dokumenten, bei denen der Kopf und der Fuß der Seite eher
+zum Textbereich als zum Rand gehört, gibt es auch Dokumente, bei denen dies
+für Randnotizen zutrifft. Mit der Option \Option{mpinclude} kann genau dies
+erreicht werden.  Die Optionen verstehen dabei als
+\PName{Ein-Aus-Wert}\ChangedAt{v3.00}{\Package{typearea}} die Standardwerte
+für einfache Schalter, die in \autoref{tab:truefalseswitch} angegeben
+sind. Man kann die Optionen auch ohne Wertzuweisung verwenden. In diesem Fall
+wird \PValue{true} als \PName{Ein-Aus-Wert} verwendet.
+
+Der Effekt von \OptionValue{mpinclude}{true} ist, dass eine Breiteneinheit vom
+Textbereich weggenommen und als Bereich für die Randnotizen verwendet
+wird. Mit \OptionValue{mpinclude}{false}, was der Voreinstellung entspricht,
+wird hingegen ein Teil des Randes für Randnotizen verwendet. Dies ist, je
+nachdem ob einseitig oder doppelseitig gearbeitet wird, ebenfalls eine
+Breiteneinheit oder auch eineinhalb Breiteneinheiten. In der Regel ist die
+Verwendung von \OptionValue{mpinclude}{true} nicht anzuraten beziehungsweise
+sollte Experten vorbehalten bleiben.
 
 \begin{Explain}
-In den meisten Fällen, in denen die Option \Option{mpinclude} sinnvoll
-ist, werden außerdem breitere Randnotizen benötigt. In sehr vielen
-Fällen sollte dabei aber nicht die gesamte Breite, sondern nur ein
-Teil davon, dem Textbereich zugeordnet werden. Dies ist beispielsweise
-der Fall, wenn der Rand für Zitate verwendet wird. Solche Zitate
-werden üblicherweise im Flattersatz gesetzt, wobei die bündige Kante
-an den Textbereich anschließt. Da sich kein geschlossener optischer
-Eindruck ergibt, dürfen die flatternden Enden also durchaus teilweise
-in den Rand ragen. Man kann das einfach erreichen, indem man zum einen
-die Option \Option{mpinclude} verwendet. Zum anderen vergrößert man
-die Länge \Length{marginparwidth} nach der Berechnung des Satzspiegels
-noch mit Hilfe der \Macro{addtolength}-Anweisung. Um welchen Wert man
-vergrößern sollte, hängt vom Einzelfall ab und erfordert einiges
-Fingerspitzengefühl. Auch deshalb ist die Option \Option{mpinclude}
-eher etwas für Experten. Natürlich kann man auch festlegen, dass die
-Randnotizen beispielsweise zu einem Drittel in den Rand hineinragen
-sollen. Im Beispiel würde man das mit
+  In den meisten Fällen, in denen die Option \Option{mpinclude} sinnvoll ist,
+  werden außerdem breitere Randnotizen benötigt. In sehr vielen Fällen sollte
+  dabei aber nicht die gesamte Breite, sondern nur ein Teil davon, dem
+  Textbereich zugeordnet werden. Dies ist beispielsweise der Fall, wenn der
+  Rand für Zitate verwendet wird. Solche Zitate werden üblicherweise im
+  Flattersatz gesetzt, wobei die bündige Kante an den Textbereich
+  anschließt. Da sich kein geschlossener optischer Eindruck ergibt, dürfen die
+  flatternden Enden also durchaus teilweise in den Rand ragen. Man kann das
+  einfach erreichen, indem man zum einen die Option \Option{mpinclude}
+  verwendet. Zum anderen vergrößert man die Länge \Length{marginparwidth} nach
+  der Berechnung des Satzspiegels noch mit Hilfe der
+  \Macro{addtolength}-Anweisung. Um welchen Wert man vergrößern sollte, hängt
+  vom Einzelfall ab und erfordert einiges Fingerspitzengefühl. Auch deshalb
+  ist die Option \Option{mpinclude} eher etwas für Experten. Natürlich kann
+  man auch festlegen, dass die Randnotizen beispielsweise zu einem Drittel in
+  den Rand hineinragen sollen. Im Beispiel würde man das mit
 \begin{lstlisting}
   \setlength{\marginparwidth}{1.5\marginparwidth}
 \end{lstlisting}
-erreichen.
+  erreichen.
 
-Da es derzeit keine Option gibt, um mehr Platz für die Randnotizen
-innerhalb des Textbereichs vorzusehen, gibt es nur eine
-Möglichkeit dies zu erreichen. Man verzichtet auf die Option
-\Option{mpinclude}, verringert nach der Satzspiegelberechnung die
-Breite des Textbereichs \Macro{textwidth} und setzt die Breite des
-Bereichs der Randnotizen auf den Wert, um den man die Breite des
-Textbereichs verringert hat. Leider lässt sich dieses Vorgehen nicht
-mit der automatischen Berechnung des \PName{DIV}-Wertes verbinden.
-Demgegenüber wird \Option{mpinclude} bei
-\Option{DIVcalc}\IndexOption{DIVcalc} berücksichtigt.
+  Da es derzeit keine Option gibt, um mehr Platz für die Randnotizen innerhalb
+  des Textbereichs vorzusehen, gibt es nur eine Möglichkeit dies zu
+  erreichen. Man verzichtet auf die Option \Option{mpinclude} oder setzt
+  \Option{mpinclude} auf \PValue{false}, verringert nach der
+  Satzspiegelberechnung die Breite des Textbereichs \Macro{textwidth} und
+  setzt die Breite des Bereichs der Randnotizen auf den Wert, um den man die
+  Breite des Textbereichs verringert hat. Leider lässt sich dieses Vorgehen
+  nicht mit der automatischen Berechnung des \PName{DIV}-Wertes verbinden.
+  Demgegenüber wird \Option{mpinclude} bei
+  \OptionValue{DIV}{calc}\IndexOption{DIV=calc} (siehe
+  \autopageref{desc:typearea.optionvalue.DIV.calc}) berücksichtigt.
 \end{Explain}
+
+Bitte beachten Sie unbedingt, dass diese Option bei Verwendung einer der
+\KOMAScript-Klassen als Klassenoption oder per \Macro{KOMAoptions} nach dem
+Laden der Klasse übergeben werden muss. Eine Änderung dieser Option nach dem
+Laden von \Package{typearea} führt nicht zu einer automatischen Neuberechnung
+des Satzspiegels. Vielmehr wirkt sich die Änderung erst bei der nächsten
+Neuberechnung des Satzspiegels aus. Zur Neuberechnung des Satzspiegels siehe
+Option \Option{DIV} mit den Werten \PValue{last} oder \PValue{current}
+(siehe \autopageref{desc:typearea.optionvalue.DIV.last}) oder die Anweisung
+\Macro{recalctypearea} (siehe \autopageref{desc:typearea.macro.recalctypearea}).
+
+\begin{Explain}
+  Es wird darauf hingewiesen, dass für frühere Versionen von \KOMAScript{} die
+  Option \Option{mpexclude}\IndexOption{mpexclude} für die Verwendung innerhalb
+  des optionalen Arguments von \Macro{documentclass} und \Macro{usepackage}
+  dokumentiert war. \KOMAScript{} erlaubt diese Form für \Macro{usepackage}
+  und \Macro{documentclass} noch immer. Es wird jedoch empfohlen, diese
+  veraltete Form der Optionenangabe nicht mehr zu verwenden. Ihre Funktion
+  wurde von \OptionValue{mpinclude}{false} übernommen.%
+\end{Explain}%
 %
-\EndIndex{Option}{mpinclude}%
-\EndIndex{Option}{mpexclude}%
+\EndIndex{Option}{mpinclude~=\PName{Ein-Aus-Wert}}%
 
 
 \begin{Declaration}
-  \PName{Wert}\Option{headlines}
+  \KOption{headlines}\PName{Zeilenanzahl}\\
+  \KOption{headheight}\PName{Höhe}
 \end{Declaration}%
-\BeginIndex{Option}{headlines}%
-Es ist nun also bekannt, wie man Satzspiegel mit dem
-\Package{typearea}-Paket berechnet und wie man dabei angibt, ob der
-Kopf oder Fuß zum Textkörper oder zum Rand gehört. Insbesondere für
-den Kopf fehlt aber noch die Angabe, wie hoch er denn eigentlich sein
-soll. Hierzu dient die Option \Option{headlines}, der man die Anzahl
-der Kopfzeilen voranstellt. Normalerweise arbeitet das
-\Package{typearea}-Paket mit 1,25 Kopfzeilen. Dieser Wert stellt einen
-Kompromiss dar. Zum einen ist er groß genug, um auch für eine
-unterstrichene Kopfzeile (siehe \autoref{sec:maincls.options})
-Platz zu bieten, zum anderen ist er klein genug, um das Randgewicht
-nicht zu stark zu verändern, wenn mit einer einfachen, nicht
-unterstrichenen Kopfzeile gearbeitet wird. Damit ist der
-voreingestellte Wert in den meisten Standardfällen ein guter Wert.
-In einigen Fällen will oder muss man aber die Kopfhöhe genauer den
-tatsächlichen Erfordernissen anpassen.
+\BeginIndex{Option}{headlines~=\PName{Anzahl}}%
+\BeginIndex{Option}{headheight~=\PName{Höhe}}%
+Es ist nun also bekannt, wie man Satzspiegel mit dem \Package{typearea}-Paket
+berechnet und wie man dabei angibt, ob der Kopf oder Fuß zum Textkörper oder
+zum Rand gehört. Insbesondere für den Kopf fehlt aber noch die Angabe, wie
+hoch er denn eigentlich sein soll. Hierzu dienen die Optionen
+\Option{headlines} und
+\Option{headheight}\ChangedAt{v3.00}{\Package{typearea}}.
+
+Die Option \Option{headlines} setzt man dabei auf die Anzahl der Kopfzeilen.
+Normalerweise arbeitet das \Package{typearea}-Paket mit 1,25
+Kopfzeilen. Dieser Wert stellt einen Kompromiss dar. Zum einen ist er groß
+genug, um auch für eine unterstrichene Kopfzeile (siehe
+\autoref{sec:maincls.options}) Platz zu bieten, zum anderen ist er klein
+genug, um das Randgewicht nicht zu stark zu verändern, wenn mit einer
+einfachen, nicht unterstrichenen Kopfzeile gearbeitet wird. Damit ist der
+voreingestellte Wert in den meisten Standardfällen ein guter Wert.  In einigen
+Fällen will oder muss man aber die Kopfhöhe genauer den tatsächlichen
+Erfordernissen anpassen.
 
 \begin{Example}
   Angenommen, es soll ein Text mit einem zweizeiligen Kopf erstellt
@@ -912,27 +1232,48 @@ tatsächlichen Erfordernissen anpassen.
   zu berechnen:
 \begin{lstlisting}
   \documentclass[a4paper]{article}
-  \usepackage[2.1headlines]{typearea}
+  \usepackage[headlines=2.1]{typearea}
 \end{lstlisting}
-  Bei Verwendung einer \KOMAScript-Klasse muss die Option auch wieder
-  direkt an die Klasse übergeben werden:
+  Es ist auch wieder möglich und bei Verwendung einer \KOMAScript-Klasse
+  empfehlenswert diese Option direkt an die Klasse zu übergeben:
 \begin{lstlisting}
-  \documentclass[a4paper,2.1headlines]{scrartcl}
+  \documentclass[headlines=2.1]{scrartcl}
 \end{lstlisting}
   Befehle, mit denen dann der Inhalt der zweizeiligen Kopfzeile
   definiert werden kann, sind in \autoref{cha:scrpage} zu finden.
 \end{Example}
 
-Bitte beachten Sie unbedingt, dass diese Option bei Verwendung einer
-der \KOMAScript-Klassen als Klassenoption übergeben werden muss.
-Demgegenüber funktioniert dies bei Verwendung einer anderen Klasse
-nur, wenn diese Klasse \Package{typearea} explizit unterstützt. Bei
-den Standardklassen ist die Option also direkt beim Laden von
-\Package{typearea} zu übergeben. Die Verwendung von
-\Macro{PassOptionsToPackage} (siehe \cite{latex:clsguide}) vor dem
-Laden von \Package{typearea} funktioniert hingegen immer.
+In einigen Fällen ist es nützlich, wenn man die Kopfhöhe nicht in Zeilen,
+sondern direkt als Längenwert angeben kann. Dies ist mit Hilfe der alternativ
+verwendbaren Option \Option{headheight} möglich. Als \PName{Höhe} sind alle
+Längen und Größen verwendbar, die \LaTeX{} kennt. Es ist jedoch zu beachten,
+dass bei Verwendung einer LaTeX-Länge wie \Length{baselineskip} nicht deren
+Größe zum Zeitpunkt des Setzens der Option, sondern zum Zeitpunkt der
+Berechnung des Satzspiegels und der Rändern entscheidend ist.
+
+Bitte beachten Sie unbedingt, dass diese Optionen bei Verwendung einer der
+\KOMAScript-Klassen als Klassenoption oder per \Macro{KOMAoptions} nach dem
+Laden der Klasse übergeben werden müssen. Eine Änderung dieser Optionen nach
+dem Laden von \Package{typearea} führt nicht zu einer automatischen
+Neuberechnung des Satzspiegels. Vielmehr wirkt sich die Änderung erst bei der
+nächsten Neuberechnung des Satzspiegels aus. Zur Neuberechnung des
+Satzspiegels siehe Option \Option{DIV} mit den Werten \PValue{last} oder
+\PValue{current} (siehe \autopageref{desc:typearea.optionvalue.DIV.last}) oder
+die Anweisung \Macro{recalctypearea}
+(siehe \autopageref{desc:typearea.macro.recalctypearea}).
+
+\begin{Explain}
+  Es wird darauf hingewiesen, dass für frühere Versionen von \KOMAScript{} die
+  Option \Option{\PName{Zeilenanzahl}headlines} für die Verwendung innerhalb
+  des optionalen Arguments von \Macro{documentclass} und \Macro{usepackage}
+  dokumentiert war. \KOMAScript{} erlaubt diese Form für \Macro{usepackage}
+  und \Macro{documentclass} noch immer. Es wird jedoch empfohlen, diese
+  veraltete Form der Optionenangabe nicht mehr zu benützen. Stattdessen sollte
+  \KOption{headlines}\PName{Zeilenanzahl} verwendet werden.%
+\end{Explain}%
 %
-\EndIndex{Option}{headlines}
+\EndIndex{Option}{headheight~=\PName{Höhe}}%
+\EndIndex{Option}{headlines~=\PName{Anzahl}}
 
 
 \begin{Declaration}
@@ -956,7 +1297,9 @@ Bindekorrektur als Parameter die Breite und Höhe des Textbereichs
 berechnet, wobei gegebenenfalls auch die Paketoptionen
 \Option{headinclude}, \Option{headexclude}, sowie
 \Option{footinclude} und \Option{footexclude} berücksichtigt
-werden.
+werden. Die Optionen \Option{headlines}\IndexOption{headlines} und
+\Option{headheight}\IndexOption{headheight} bleiben in diesem Fall jedoch
+unberücksichtigt!
 
 \begin{Example}
   Angenommen, ein Text auf A4-Papier soll genau die Breite von 60
@@ -992,56 +1335,58 @@ werden.
 \end{Example}
 \EndIndex{Cmd}{areaset}
 
+\begin{Declaration}
+  \OptionValue{DIV}{areaset}
+\end{Declaration}%
+\BeginIndex{Option}{DIV~=\PName{Wert}}%
+\BeginIndex{Option}{DIV~=areaset}%
+In\ChangedAt{v3.00}{\Package{typearea}} seltenen Fällen ist es nützlich, wenn
+man den aktuell eingestellten Satzspiegel neu ausrichten lassen kann. Dies ist
+mit der Option \OptionValue{DIV}{areaset} möglich. Wobei
+\Macro{KOMAoptions}\PParameter{DIV=areaset} der Anweisung
+\begin{lstlisting}
+  \areaset[current]{\textwidth}{\textheight}
+\end{lstlisting}
+entspricht. Dasselbe Ergebnis erhält man auch, wenn \OptionValue{DIV}{last}
+verwendet wird und der Satzspiegel zuletzt per \Macro{areaset} eingestellt
+wurde.
+%
+\EndIndex{Option}{DIV~=areaset}%
+\EndIndex{Option}{DIV~=\PName{Wert}}
+
 Wenn Sie konkrete Vorgaben bezüglich der Ränder zu erfüllen haben, ist
 \Package{typearea} nicht geeignet. In diesem Fall ist die Verwendung des
-Paketes \Package{geometry} (siehe \cite{package:geometry}) empfehlenswert.
+Paketes \Package{geometry}\IndexPackage{geometry} (siehe
+\cite{package:geometry}) empfehlenswert.
 
 
 \section{Optionen und Makros zur Auswahl des Papierformats}
 \label{sec:typearea.paperTypes}
 
 \Index{Papierformat}%
-Die \LaTeX-Standardklassen unterstützen mit
-den Klassenoptionen \Option{a4paper}, \Option{a5paper}, \Option{b5paper},
-\Option{letterpaper}, \Option{legalpaper} und
-\Option{executivepaper} die Papierformate A4 und A5 aus der
-ISO-A-Reihe, B5 aus der ISO-B-Reihe, sowie die amerikanischen Formate
-letter, legal und executive.
-\begin{Declaration}
-  \Option{letterpaper} \\
-  \Option{legalpaper} \\
-  \Option{executivepaper} \\
-  \Option{a\Var{X}paper} \\
-  \Option{b\Var{X}paper} \\
-  \Option{c\Var{X}paper} \\
-  \Option{d\Var{X}paper} \\
-  \Option{landscape} \\
-  \Macro{isopaper}\OParameter{Reihe}\Parameter{Formatnummer}
-\end{Declaration}%
-\BeginIndex{Option}{letterpaper}
-\BeginIndex{Option}{legalpaper}
-\BeginIndex{Option}{executivepaper}
-\BeginIndex{Option}{a0paper}
-\BeginIndex{Option}{b0paper}
-\BeginIndex{Option}{c0paper}
-\BeginIndex{Option}{d0paper}
-\BeginIndex{Option}{landscape}
-\BeginIndex{Cmd}{isopaper}%
-Die drei amerikanischen Formate werden vom \Package{typearea}-Paket in
-gleicher Weise unterstützt. Darüber hinaus werden jedoch alle Formate
-der ISO-A-, ISO-B-, ISO-C- und ISO-D-Reihe durch Ableitung aus den
-jeweiligen Grundgrößen A0, B0, C0 und D0 unterstützt. Diese können
-ebenfalls direkt durch entsprechende Optionen \Option{a0paper},
-\Option{a1paper} usw. ausgewählt werden. Genau wie bei den
-Standardklassen ist es mit dem \Package{typearea}-Paket möglich, durch
-zusätzliche Verwendung der Paketoption \Option{landscape} das
-jeweilige Querformat zu wählen.
+Das Papierformat ist ein entscheidendes Grundmerkmal eines Dokuments. Wie
+bereits bei der Vorstellung der unterstützen Satzspiegelkonstruktionen (siehe
+\autoref{sec:typearea.basics} bis \autoref{sec:typearea.circleConstruction})
+augezeigt, steht und fällt die Aufteilung der Seite und damit das gesamte
+Dokumentlayout mit der Wahl des Papierformats. Während die
+\LaTeX-Standardklassen auf einige wenige Formate festgelegt sind, unterstützt
+\KOMAScript{} mit dem Paket \Package{typearea} selbst ausgefallene
+Seitengrößen.
 
-Alternativ kann beim \Package{typearea}-Paket die Papiergröße mit
-Hilfe des Befehls \Macro{isopaper} eingestellt werden. Danach muss
-allerdings der Satzspiegel mit Hilfe des Befehls \Macro{typearea} oder
-\Macro{areaset} neu berechnet werden. Ich rate deshalb von der
-Verwendung des Befehls \Macro{isopaper} ab.
+\begin{Declaration}
+  \KOption{paper}\PName{Format}
+\end{Declaration}%
+\BeginIndex{Option}{paper~=\PName{Format}}%
+\BeginIndex{Option}{paper~=\PName{Ausrichtung}}%
+Die Option \Option{paper}\ChangedAt{v3.00}{\Package{typearea}} ist das
+zentrale Element der Formatauswahl bei \KOMAScript. Als \PName{Format} werden
+dabei zunächst einmal das amerikanische \Option{letter}, \Option{legal} und
+\Option{executive} unterstützt. Darüber sind die ISO-Formate der Reihen A, B,
+C und D möglich, also beispielsweise \PValue{A4} oder klein geschrieben
+\PValue{a4}. Querformate werden dadurch unterstützt, dass man die Option ein
+weiteres Mal mit dem Wert \PValue{landscape}\Index{Papierausrichtung}
+angibt. Zusätzlich kann das \PName{Format} auch in der Form
+\PName{Höhe}\texttt{:}\PName{Breite} angegeben werden.
 
 \begin{Example}
   Angenommen, es soll eine Karteikarte im Format ISO-A8 quer bedruckt
@@ -1050,121 +1395,155 @@ Verwendung des Befehls \Macro{isopaper} ab.
 \begin{lstlisting}
   \documentclass{article}
   \usepackage[headexclude,footexclude,%
-              a8paper,landscape]{typearea}
+              paper=A8,paper=landscape]{typearea}
   \areaset{7cm}{5cm}
   \pagestyle{empty}
   \begin{document}
-  \section*{Papieroptionen}
-  letterpaper, legalpaper, executivepaper, a0paper, 
-  a1paper \dots\ b0paper, b1paper \dots\ c0paper, 
-  c1paper \dots\ d0paper, d1paper \dots
+  \section*{Unterstützte Papiergrößen}
+  letter, legal, executive, a0, a1 \dots\ %
+  b0, b1 \dots\ c0, c1 \dots\ d0, d1 \dots
   \end{document}
 \end{lstlisting}
+  Haben die Karteikarten das Sonderformat (H:B) 5\Unit{cm}\,:\,3\Unit{cm}, so
+  ist dies mit
+\begin{lstlisting}
+  \documentclass{article}
+  \usepackage[headexclude,footexclude,%
+              paper=A8,paper=5cm:3cm]{typearea}
+  \areaset{4cm}{2.4cm}
+  \pagestyle{empty}
+  \begin{document}
+  \section*{Unterstützte Papiergrößen}
+  letter, legal, executive, a0, a1 \dots\ %
+  b0, b1 \dots\ c0, c1 \dots\ d0, d1 \dots
+  \end{document}
+\end{lstlisting}
+  möglich.
 \end{Example}
 
-Bitte beachten Sie unbedingt, dass alle \Option{a\Var{X}paper}-,
-\Option{b\Var{X}paper}-, \Option{c\Var{X}paper}- und
-\Option{d\Var{X}paper}-Optionen mit Ausnahme von \Option{a4paper} und
-\Option{a5paper} bei Verwendung einer der \KOMAScript-Klassen als
-Klassenoption übergeben werden müssen. Demgegenüber funktioniert dies
-bei Verwendung einer anderen Klasse nur, wenn diese Klasse
-\Package{typearea} explizit unterstützt. Bei den Standardklassen sind
-die Optionen also direkt beim Laden von \Package{typearea} zu
-übergeben.  Die Verwendung von \Macro{PassOptionsToPackage} (siehe
-\cite{latex:clsguide}) vor dem Laden von \Package{typearea}
-funktioniert hingegen immer.
+In der Voreinstellung wird bei \KOMAScript{} mit A4-Papier in der Ausrichtung
+portait gearbeitet. Dies ist ein Unterschied zu den Standardklassen, bei denen
+in der Voreinstellung das amerikanische Format letter verwendet wird.
+
+Bitte beachten Sie unbedingt, dass diese Option bei Verwendung einer der
+\KOMAScript-Klassen als Klassenoption oder per \Macro{KOMAoptions} nach dem
+Laden der Klasse übergeben werden muss.  Eine Änderung des Papierformats oder
+der Papierausrichtung mit Hilfe von \Macro{KOMAoptions} oder
+\Macro{KOMAoption} nach dem Laden von \Package{typearea} führt nicht zu einer
+automatischen Neuberechnung des Satzspiegels. Vielmehr wirkt sich die Änderung
+erst bei der nächsten Neuberechnung des Satzspiegels aus. Zur Neuberechnung
+des Satzspiegels siehe Option \Option{DIV} mit den Werten \PValue{last} oder
+\PValue{current} (siehe \autopageref{desc:typearea.optionvalue.DIV.last}) oder
+die Anweisung \Macro{recalctypearea}
+(siehe \autopageref{desc:typearea.macro.recalctypearea}).
+%
+\EndIndex{Option}{paper~=\PName{Ausrichtung}}%
+\EndIndex{Option}{paper~=\PName{Format}}
+
+\begin{Declaration}
+  \Option{letterpaper} \\
+  \Option{legalpaper} \\
+  \Option{executivepaper} \\
+  \Option{a4paper} \\
+  \Option{a5paper} \\
+  \Option{b5paper} \\
+  \Option{landscape}
+\end{Declaration}%
+\BeginIndex{Option}{letterpaper}%
+\BeginIndex{Option}{legalpaper}%
+\BeginIndex{Option}{executivepaper}%
+\BeginIndex{Option}{a4paper}%
+\BeginIndex{Option}{a5paper}%
+\BeginIndex{Option}{b5paper}%
+\BeginIndex{Option}{landscape}%
+Die \LaTeX-Standardklassen unterstützen mit den Klassenoptionen
+\Option{a4paper}, \Option{a5paper}, \Option{b5paper}, \Option{letterpaper},
+\Option{legalpaper} und \Option{executivepaper} die Papierformate A4 und A5
+aus der ISO-A-Reihe, B5 aus der ISO-B-Reihe, sowie die amerikanischen Formate
+letter, legal und executive. Die Ausrichtung quer wird bei diesen Klassen mit
+der Option \Option{landscape} erreicht. Aus Gründen der Kompatibilität
+unterstützt \KOMAScript{} diese Optionen ebenfalls. Wird also
+\Package{typearea} zusammen mit einer Standardklasse verwendet, so können
+diese Standardformate auch auf die herkömmliche Weise angegeben werden. Eine
+Verwendung dieser Optionen mit \Macro{KOMAoptions} oder \Macro{KOMAoption} ist
+jedoch nicht möglich.
+
+\begin{Explain}
+  Es wird darauf hingewiesen, dass für frühere Versionen von \KOMAScript{} die
+  Wahl beliebiger ISO-Papierformate der Reihen A, B, C und D auch in der Form
+  \Option{a\PName{X}paper} für die Verwendung innerhalb des optionalen
+  Arguments von \Macro{documentclass} und \Macro{usepackage} dokumentiert
+  war. \KOMAScript{} erlaubt diese Form für \Macro{usepackage} noch immer. Für
+  \Macro{documentclass} hat diese Möglichkeit immer die Verwendung einer
+  \KOMAScript-Klasse vorausgesetzt. Dies ist auch weiterhin der Fall. Es wird
+  jedoch empfohlen, diese veraltete Form der Optionenangabe nicht mehr zu
+  verwenden. Ihre Funktion wurde von der Option \Option{paper} übernommen.%
+
+  Darüber hinaus war für frühere Versionen von \KOMAScript{} noch die
+  Anweisung \Macro{isopaper}\OParameter{Reihe}\Parameter{Formatnummer}
+  dokumentiert. Von deren Verwendung wird aber schon seit langem abgeraten.
+\end{Explain}
 %
 \EndIndex{Option}{letterpaper}
 \EndIndex{Option}{legalpaper}
 \EndIndex{Option}{executivepaper}
-\EndIndex{Option}{a0paper}
-\EndIndex{Option}{b0paper}
-\EndIndex{Option}{c0paper}
-\EndIndex{Option}{d0paper}
+\EndIndex{Option}{a4paper}
+\EndIndex{Option}{a5paper}
+\EndIndex{Option}{b5paper}
 \EndIndex{Option}{landscape}
-\EndIndex{Cmd}{isopaper}
+
 
 \begin{Declaration}
-  \Macro{paperwidth}\\
-  \Macro{paperheight}
+  \KOption{pagesize}\PName{Ausgabetreiber}
 \end{Declaration}%
-\BeginIndex{Cmd}{paperwidth}%
-\BeginIndex{Cmd}{paperheight}%
-Für besonders exotische Papierformate, die weder durch die oben
-angegebenen amerikanischen Formate noch durch eines der Formate der vier
-ISO-Reihen abgedeckt sind, können direkt die Längen \Macro{paperwidth}
-und \Macro{paperheight} gesetzt werden. Danach muss allerdings der
-Satzspiegel für dieses Format mit einem der Befehle \Macro{typearea}
-oder \Macro{areaset} neu berechnet werden.
-\begin{Example}
-  Angenommen, es soll auf Endlospapier mit den Maßen
-  \(8\frac{1}{4}\Unit{inch} \times 12\Unit{inch}\) gedruckt werden.
-  Dieses Papierformat wird von \Package{typearea} nicht direkt
-  unterstützt. Das Papierformat muss daher vor der Berechnung des
-  Satzspiegels definiert werden:
-\begin{lstlisting}
-  \documentclass{article}
-  \usepackage{typearea}
-  \setlength{\paperwidth}{8.25in}
-  \setlength{\paperheight}{12in}
-  \typearea{1}
-\end{lstlisting}
-\end{Example}
-\EndIndex{Cmd}{paperheight}
-\EndIndex{Cmd}{paperwidth}
-
-\begin{Explain}%
-\begin{Declaration}
-  \Option{dvips}\\
-  \Option{pdftex}\\
-  \Option{pagesize}
-\end{Declaration}%
-\BeginIndex{Option}{dvips}%
-\BeginIndex{Option}{pdftex}%
 \BeginIndex{Option}{pagesize}%
-  Die oben genannten Mechanismen zur Auswahl des Papierformats haben
-  genau genommen nur insofern einen Einfluss auf die Ausgabe, dass
-  gewisse interne {\LaTeX}-Maße so gesetzt werden, dass bestimmte
-  Bereiche der Seite, wie Kopf, Textkörper und Fuß so angeordnet und
-  von \Package{typearea} so berechnet werden, dass sie auf
-  entsprechendes Papier ausgedruckt werden können. Die Spezifikation
-  des DVI-Formats\Index{DVI} sieht aber an keiner Stelle 
-  Angaben zum Papierformat
-  vor. Wird direkt aus dem DVI-Format in eine Low-Level-Druckersprache
-  wie PCL\footnote{PCL ist die Druckersprache, die HP für seine
-    Tinten- und Laserdrucker verwendet.} oder ESC/P2\footnote{ESC/P2
+\BeginIndex{Option}{pagesize~=\PName{Ausgabetreiber}}%
+\begin{Explain}%
+  Die oben genannten Mechanismen zur Auswahl des Papierformats haben genau
+  genommen nur insofern einen Einfluss auf die Ausgabe, dass gewisse interne
+  {\LaTeX}-Maße so gesetzt werden, dass bestimmte Bereiche der Seite, wie
+  Kopf, Textkörper und Fuß so angeordnet und von \Package{typearea} so
+  berechnet werden, dass sie auf entsprechendes Papier ausgedruckt werden
+  können. Die Spezifikation des DVI-Formats\Index{DVI} sieht aber an keiner
+  Stelle Angaben zum Papierformat vor. Wird direkt aus dem DVI-Format in eine
+  Low-Level-Druckersprache wie PCL\footnote{PCL ist die Druckersprache, die HP
+    für seine Tinten- und Laserdrucker verwendet.} oder ESC/P2\footnote{ESC/P2
     ist die Druckersprache, die EPSON für seine Nadel-, Tinten- und
-    Laserdrucker benutzt.}  ausgegeben, spielt dies
-  normalerweiser keine Rolle, da auch bei diesen Ausgaben der
-  0-Bezugspunkt wie bei DVI links oben liegt. Wird aber in Sprachen
-  wie PostScript\Index{PostScript} oder PDF\Index{PDF} übersetzt, 
-  bei denen der 0-Bezugspunkt an
-  anderer Stelle liegt und außerdem das Papierformat in der
-  Ausgabedatei angegeben werden kann, so fehlt diese Information in
-  der DVI-Datei. Als Lösung des Problems verwendet der entsprechende
-  Treiber eine voreingestellte Papiergröße, die der Anwender entweder
-  per Option oder durch entsprechende Angabe in der {\TeX}-Quelldatei
-  verändern kann. Bei Verwendung des DVI-Treibers \File{dvips} kann
-  diese Angabe in Form einer \Macro{special}-Anweisung erfolgen. Bei
-  {pdf\TeX} werden stattdessen zwei Längen entsprechend gesetzt.\par
+    Laserdrucker benutzt.}  ausgegeben, spielt dies normalerweiser keine
+  Rolle, da auch bei diesen Ausgaben der 0-Bezugspunkt wie bei DVI links oben
+  liegt. Wird aber in Sprachen wie PostScript\Index{PostScript} oder
+  PDF\Index{PDF} übersetzt, bei denen der 0-Bezugspunkt an anderer Stelle
+  liegt und außerdem das Papierformat in der Ausgabedatei angegeben werden
+  kann, so fehlt diese Information in der DVI-Datei. Als Lösung des Problems
+  verwendet der entsprechende Treiber eine voreingestellte Papiergröße, die
+  der Anwender entweder per Option oder durch entsprechende Angabe in der
+  {\TeX}-Quelldatei verändern kann. Bei Verwendung des DVI-Treibers
+  \File{dvips} kann diese Angabe in Form einer \Macro{special}-Anweisung
+  erfolgen. Bei {pdf\TeX} oder {V\TeX} werden stattdessen zwei Längen
+  entsprechend gesetzt.
 \end{Explain}
-Mit der Option \Option{dvips} wird erreicht, dass die Papiergröße als
+Mit der Option \OptionValue{pagesize}{dvips}\IndexOption{pagesize~=dvips} wird erreicht, dass die Papiergröße als
 \Macro{special} in die DVI-Datei geschrieben wird. Dieses
 \Macro{special} wird beispielsweise von \File{dvips}
-ausgewertet. Demgegenüber schreibt die Option \Option{pdftex} die
+ausgewertet. Demgegenüber schreibt die Option \OptionValue{pagesize}{pdftex} die
 Papiergröße am Anfang des Dokuments in die {pdf\TeX}-Seitenregister,
+\Length{pdfpagewidth}\IndexLength{pdfpagewidth} und \Length{pdfpageheight}\IndexLength{pdfpageheight},
 so dass später beim Betrachten der erzeugten PDF-Datei das korrekte
-Format angegeben wird. Die Option \Option{pagesize} verhält sich
+Format angegeben wird. Die Option \OptionValue{pagesize}{auto} verhält sich
 flexibler und verwendet je nachdem, ob eine PDF- oder eine DVI-Datei
-ausgegeben wird, den Mechanismus der Option \Option{dvips} oder der
-Option \Option{pdftex}.
+ausgegeben wird, den Mechanismus der Option \OptionValue{pagesize}{dvips} oder der
+Option \OptionValue{pagesize}{pdftex}. Mit Option
+\OptionValue{pagesize}{automedia} werden ggf. auch \Length{mediawidth} und
+\Length{mediaheight} passend gesetzt. Damit wird auch {V\TeX}
+berücksichtigt. Bei Verwendung der Option \Option{pagesize} ohne Angabe eines
+\PName{Ausgabetreiber} wird \PValue{auto} eingesetzt.
 \begin{Example}
   Angenommen, es soll ein Dokument sowohl als DVI-Datei verwendet
   werden, als auch eine Online-Version im PDF-Format erstellt
   werden. Dann könnte die Präambel beispielsweise so beginnen:
 \begin{lstlisting}
   \documentclass{article}
-  \usepackage[a4paper,pagesize]{typearea}
+  \usepackage[paper=A4,pagesize]{typearea}
 \end{lstlisting}
   Wird nun für die Bearbeitung {pdf\TeX} verwendet \emph{und} die
   PDF-Ausgabe aktiviert, so werden die beiden Größen
@@ -1172,20 +1551,30 @@ Option \Option{pdftex}.
   Wird jedoch eine DVI-Datei erzeugt -- egal ob mit {\LaTeX} oder
   {pdf\LaTeX} --, so wird ein \Macro{special} an den Anfang dieser
   Datei geschrieben.
-\end{Example}\IndexCmd{pdfpagewidth}\IndexCmd{pdfpageheight}
-\EndIndex{Option}{dvips}%
-\EndIndex{Option}{pdftex}%
+\end{Example}%
+%
+\begin{Explain}
+  Es wird darauf hingewiesen, dass für frühere Versionen von \KOMAScript{}
+  auch die Optionen \Option{dvips}\IndexOption{dvips} und
+  \Option{pdftex}\IndexOption{pdftex} für die Verwendung innerhalb des
+  optionalen Arguments von \Macro{documentclass} und \Macro{usepackage}
+  dokumentiert waren. Aus Gründen der Kompatibilität erlaubt \KOMAScript{}
+  dies noch immer. Die Optionen werden intern jedoch auf
+  \OptionValue{pagesize}{automedia} und \OptionValue{pagesize}{pdftex}
+  abgebildet. Es wird empfohlen diese neuen Formen direkt zu verwenden.
+\end{Explain}
+%
 \EndIndex{Option}{pagesize}%
+\EndIndex{Option}{pagesize~=\PName{Ausgabetreiber}}%
 
 
 \section{Kleinigkeiten ohne direkten Bezug zum Satzspiegel}
 \label{sec:typearea.else}
 
-Manchmal ist es wünschenswert, in einem Dokument abhängig vom
-Ausgabeformat bestimmte Dinge anders zu machen. Normalerweise
-verwendet {\TeX} das Ausgabeformat DVI. Mit {pdf\TeX} ist aber die
-Wahlmöglichkeit hinzugekommen, statt einer DVI-Datei eine PDF-Datei
-direkt zu erzeugen.
+Manchmal ist es wünschenswert, in einem Dokument abhängig vom Ausgabeformat
+bestimmte Dinge anders zu machen. Normalerweise verwendet {\TeX} das
+Ausgabeformat DVI. Mit {pdf\TeX} und {V\TeX} ist aber die Wahlmöglichkeit
+hinzugekommen, statt einer DVI-Datei eine PDF-Datei direkt zu erzeugen.
 
 \begin{Declaration}
   \Macro{ifpdfoutput}\Parameter{Dann-Teil}\Parameter{Sonst-Teil}
@@ -1193,8 +1582,7 @@ direkt zu erzeugen.
 \BeginIndex{Cmd}{ifpdfoutput}%
 Der Befehl \Macro{ifpdfoutput} stellt eine Verzweigung dar. Wurde die
 PDF-Ausgabe aktiviert, so wird der \PName{Dann-Teil} ausgeführt. Wurde die
-PDF-Ausgabe nicht aktiviert oder wird überhaupt kein {pdf\TeX} verwendet, so
-wird der \PName{Sonst-Teil} ausgeführt.
+PDF-Ausgabe nicht aktiviert, so wird der \PName{Sonst-Teil} ausgeführt.
 \begin{Example}
   Bekanntlich gibt {pdf\LaTeX} ebenfalls eine DVI-Datei an Stelle
   einer PDF-Datei aus, wenn der Zähler \Macro{pdfoutput} auf 0 gesetzt
@@ -1217,6 +1605,54 @@ wird der \PName{Sonst-Teil} ausgeführt.
 \end{Example}\IndexCmd{pdfoutput}
 \EndIndex{Cmd}{ifpdfoutput}
 
+
+\section{Anweisungen für Experten}
+\label{sec:typearea.experts}
+
+\begin{Explain}
+  In diesem Abschnitt werden Anweisungen beschrieben, die für den normalen
+  Anwender kaum oder gar nicht von Interesse sind. Experten bieten diese
+  Anweisungen zusätzliche Möglichkeiten. Da die Beschreibungen für Experten
+  gedacht sind, sind sie kürzer gefasst.
+
+  \begin{Declaration}
+    \Macro{activateareas}
+  \end{Declaration}%
+  \BeginIndex{Cmd}{activateareas}%
+  Diese Anweisung wird von \Package{typearea} genutzt, um die Einstellungen
+  für Satzspiegel und Ränder in die internen \LaTeX-Längen zu übertragen, wenn
+  der Satzspiegel innerhalb des Dokuments, also nach
+  \Macro{begin}\PParameter{document} neu berechnet wurde. Wurde die Option
+  \Option{pagesize} verwendet, so wird diese anschließend mit demselben Wert
+  neu aufgerufen. Damit kann beispielsweise innerhalb von PDF-Dokumenten die
+  Seitengröße tatsächlich variieren.
+
+  Experten können diese Anweisung ebenfalls verwenden, wenn Sie aus
+  irgendwelchen Gründen, Längen wie \Length{textwidth} oder
+  \Length{textheight} innerhalb des Dokuments manuell geändert haben. Der
+  Experte ist dabei für ggf. notwendige Seitenumbrüche vor oder nach der
+  Verwendung jedoch selbst verantwortlich! Darüber hinaus sind alle von
+  \Macro{activateareas} durchgeführten Änderungen lokal!
+  %
+  \EndIndex{Cmd}{activateareas}
+
+  \begin{Declaration}
+    \Macro{AfterCalculatingTypearea}\Parameter{Anweisungen}
+  \end{Declaration}%
+  \BeginIndex{Cmd}{AfterCalculatingTypearea}%
+  Diese Anweisung ermöglicht es dem Experten jedes Mal, nachdem
+  \Package{typearea} eine neue Aufteilung in Satzspiegel und Ränder berechnet
+  hat, also nach jeder impliziten oder expliziten Ausführung von
+  \Macro{typearea}, \PName{Anweisungen} ausführen zu lassen. Diese
+  \PName{Anweisungen} werden unmittelbar vor \Macro{activateareas}
+  ausgeführt. \iffree{}{In \autoref{cha:modernletters} wird von dieser
+    Anweisung für die \emph{Letter-Class-Option} \File{asymTypB.lco} Gebrauch
+    gemacht, um die Randverteilung zu ändern.}
+  %
+  \EndIndex{Cmd}{AfterCalculatinTypearea}
+\end{Explain}
+
+
 \section{Lokale Einstellungen durch die Datei \File{typearea.cfg}}
 \label{sec:typearea.cfg}
 \BeginIndex{File}{typearea.cfg}%
@@ -1226,14 +1662,14 @@ gegebenenfalls. Es ist daher möglich, in dieser Konfigurationsdatei
 beispielsweise zusätzliche Optionen für weitere Papierformate zu
 definieren.
 
-\begin{Explain}%
 \begin{Declaration}
   \Macro{SetDIVList}\Parameter{Liste}
 \end{Declaration}%
 \BeginIndex{Cmd}{SetDIVList}%
+\begin{Explain}%
 Ebenfalls zur Verwendung in dieser Konfigurationsdatei war
 ursprünglich der Befehl \Macro{SetDIVList} vorgesehen.  Bevor die
-Option \Option{DIVcalc} existierte, war dies die einzige Möglichkeit,
+Option \OptionValue{DIV}{calc} existierte, war dies die einzige Möglichkeit,
 für unterschiedliche Schriftgrößen und Papierformate unterschiedliche
 Voreinstellungen für den \Var{DIV}-Wert zu definieren. Die Liste
 besteht dabei aus einer Reihe von Werten in geschweiften Klammern. Der
@@ -1359,7 +1795,7 @@ normalen Satz umschalten. Das \Package{setspace}-Paket bietet
 dafür eine spezielle Umgebung und eigene Befehle.
 
 Das \Package{typearea}-Paket berechnet auch bei der Option
-\Option{DIVcalc} einen sehr großzügigen Textbereich. Viele
+\OptionValue{DIV}{calc} einen sehr großzügigen Textbereich. Viele
 konservative Typografen werden feststellen, dass die resultierende
 Zeilenlänge noch zu groß ist. Der berechnete \Var{DIV}-Wert ist
 ebenfalls in der \File{log}-Datei zum jeweiligen Dokument zu
