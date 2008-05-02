@@ -1,4 +1,4 @@
-% \CheckSum{623}
+% \CheckSum{660}
 % \iffalse meta-comment
 % ======================================================================
 % scrktitl.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrktitl.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrktitl.dtx}[2008/02/15 v2.98c KOMA-Script (title pages)]
+\ProvidesFile{scrktitl.dtx}[2008/05/02 v3.00 KOMA-Script (title pages)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -118,16 +118,36 @@
 %  \begin{macro}{\@titlepagefalse}
 % Die gewählte Einstellung wird in einem Schalter gespeichert.
 %    \begin{macrocode}
+%<*class>
 \newif\if@titlepage
 %<article>\@titlepagefalse
 %<report|book>\@titlepagetrue
+%</class>
+%<*package&extend>
+\scr@ifundefinedorrelax{if@titlepage}{%
+  \expandafter\newif\csname if@titlepage\endcsname
+  \@titlepagefalse
+}{}
+%</package&extend>
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
 %  \end{macro}
 %    \begin{macrocode}
+%<*class>
 \KOMA@ifkey{titlepage}{@titlepage}
-\KOMA@DeclareObsoleteOption[\ClassInfoNoLine]{notitlepage}{titlepage=false}
+%</class>
+%<*package&extend>
+\KOMA@key{titlepage}[true]{%
+  \ifstr{#1}{KOMA}{\scr@ext@activate{title}}{%
+    \def\FamilyElseValues{, `KOMA'}%
+    \KOMA@set@ifkey{titlepage}{@titlepage}{#1}%
+  }%
+}
+%</package&extend>
+\KOMA@DeclareObsoleteOption%
+%<class>  [\PackageInfoNoLine]%
+  {notitlepage}{titlepage=false}
 %    \end{macrocode}
 %  \end{option}
 %  \end{option}
@@ -144,6 +164,7 @@
 % Titel kann aber auch unterdrückt werden.
 %
 % \iffalse
+%<*class>
 %<*article|report>
 % \fi
 % Bei Büchern gibt es keine Zusammenfassung als gesonderte Umgebung. Als
@@ -163,14 +184,15 @@
 %
 %    \begin{macrocode}
 \KOMA@ifkey{abstract}{@abstrt}
-\KOMA@DeclareObsoleteOption[\ClassInfoNoLine]{abstracton}{abstract=true}
-\KOMA@DeclareObsoleteOption[\ClassInfoNoLine]{abstractoff}{abstract=false}
+\KOMA@DeclareObsoleteOption[\PackageInfoNoLine]{abstracton}{abstract=true}
+\KOMA@DeclareObsoleteOption[\PackageInfoNoLine]{abstractoff}{abstract=false}
 %    \end{macrocode}
 %  \end{option}
 %  \end{option}
 %  \end{option}
 % \iffalse
 %</article|report>
+%</class>
 % \fi
 %
 %
@@ -208,22 +230,47 @@
 % Zusatzbefehle \cs{long} deklariert, können also ganze Absätze
 % enthalten.
 %    \begin{macrocode}
-\newcommand*{\@extratitle}{}
-\newcommand{\extratitle}[1]{\gdef\@extratitle{#1}}
-\newcommand*{\@titlehead}{}
-\newcommand{\titlehead}[1]{\gdef\@titlehead{#1}}
-\newcommand*{\@subject}{}
-\newcommand*{\subject}[1]{\gdef\@subject{#1}}
-\newcommand*{\subtitle}[1]{\gdef\@subtitle{#1}}
-\newcommand*{\@subtitle}{}
-\newcommand*{\@publishers}{}
-\newcommand{\publishers}[1]{\gdef\@publishers{#1}}
-\newcommand*{\@uppertitleback}{}
-\newcommand{\uppertitleback}[1]{\gdef\@uppertitleback{#1}}
-\newcommand*{\@lowertitleback}{}
-\newcommand{\lowertitleback}[1]{\gdef\@lowertitleback{#1}}
-\newcommand*{\@dedication}{}
-\newcommand{\dedication}[1]{\gdef\@dedication{#1}}
+%<package&extend>\scr@ext@activateable{title}{%
+\newcommand*{\@extratitle}{}%
+\newcommand{\extratitle}[1]{\gdef\@extratitle{%
+%<extend>    ##1%
+%<!extend>    #1%
+}}%
+\newcommand*{\@titlehead}{}%
+\newcommand{\titlehead}[1]{\gdef\@titlehead{%
+%<extend>    ##1%
+%<!extend>    #1%
+}}%
+\newcommand*{\@subject}{}%
+\newcommand*{\subject}[1]{\gdef\@subject{%
+%<extend>    ##1%
+%<!extend>    #1%
+}}%
+\newcommand*{\subtitle}[1]{\gdef\@subtitle{%
+%<extend>    ##1%
+%<!extend>    #1%
+}}%
+\newcommand*{\@subtitle}{}%
+\newcommand*{\@publishers}{}%
+\newcommand{\publishers}[1]{\gdef\@publishers{%
+%<extend>    ##1%
+%<!extend>    #1%
+}}%
+\newcommand*{\@uppertitleback}{}%
+\newcommand{\uppertitleback}[1]{\gdef\@uppertitleback{%
+%<extend>    ##1%
+%<!extend>    #1%
+}}%
+\newcommand*{\@lowertitleback}{}%
+\newcommand{\lowertitleback}[1]{\gdef\@lowertitleback{%
+%<extend>    ##1%
+%<!extend>    #1%
+}}%
+\newcommand*{\@dedication}{}%
+\newcommand{\dedication}[1]{\gdef\@dedication{%
+%<extend>    ##1%
+%<!extend>    #1%
+}}%
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
@@ -248,7 +295,7 @@
 %      ersetzt}
 % Innerhalb eines Titels auf die nächste Seite umschalten.
 %    \begin{macrocode}
-\newcommand*{\next@tpage}{\clearpage\thispagestyle{empty}}
+\newcommand*{\next@tpage}{\clearpage\thispagestyle{empty}}%
 %    \end{macrocode}
 %  \end{macro}
 %  \begin{macro}{\maketitle}
@@ -286,10 +333,14 @@
 %    \changes{v2.97c}{2007/08/31}{Vakatseiten in der Titelei immer im
 %      Seitenstil \texttt{empty}}
 %    \begin{macrocode}
+%<package&extend>\let\maketitle\relax\let\@maketitle\relax
 \if@titlepage
   \newcommand*\maketitle[1][1]{%
     \begin{titlepage}
-      \setcounter{page}{#1}%
+      \setcounter{page}{%
+%<extend>        ##1%
+%<!extend>        #1%
+      }%
       \let\footnotesize\small
       \let\footnoterule\relax
       \let\footnote\thanks
@@ -300,7 +351,8 @@
         \noindent\@extratitle\next@tpage\cleardoubleemptypage
         \thispagestyle{empty}%
       \fi
-      \setparsizes{\z@}{\z@}{\z@\@plus 1fil}\par@updaterelative
+%<!extend>      \setparsizes{\z@}{\z@}{\z@\@plus 1fil}\par@updaterelative
+%<extend>      \parskip\z@ \parindent\z@ \parfillskip\z@\@plus 1fil
       \ifx\@titlehead\@empty \else
         \begin{minipage}[t]{\textwidth}%
         \@titlehead
@@ -377,7 +429,7 @@
     \global\let\dedication\relax
     \global\let\date\relax
     \global\let\and\relax
-  }
+  }%
 \else
 %    \end{macrocode}
 %    \changes{v2.3a}{1995/07/08}{Verwendung von \cs{@makefnmark} in
@@ -395,8 +447,12 @@
 %      \texttt{plain}}
 %    \begin{macrocode}
   \newcommand*\maketitle[1][1]{\par
-    \@tempcnta=#1\relax\ifnum\@tempcnta=1\else
-      \ClassWarning{\KOMAClassName}{%
+    \@tempcnta=%
+%<extend>    ##1%
+%<!extend>    #1%
+    \relax\ifnum\@tempcnta=1\else
+%<class>      \ClassWarning{\KOMAClassName}{%
+%<package>      \PackageWarning{scrextend}{%
         Optional argument of \string\maketitle\space ignored
         at\MessageBreak
         notitlepage-mode%
@@ -452,7 +508,7 @@
     \global\let\dedication\relax
     \global\let\date\relax
     \global\let\and\relax
-  }
+  }%
 \fi
 %    \end{macrocode}
 %  \begin{macro}{\@maketitle}
@@ -465,7 +521,8 @@
   \ifx\@extratitle\@empty \else
     \noindent\@extratitle \next@tpage \if@twoside \null\next@tpage \fi
   \fi
-  \setparsizes{\z@}{\z@}{\z@\@plus 1fil}\par@updaterelative
+%<!extend>  \setparsizes{\z@}{\z@}{\z@\@plus 1fil}\par@updaterelative
+%<extend>  \parskip\z@ \parindent\z@ \parfillskip\z@\@plus 1fil
   \ifx\@titlehead\@empty \else
     \begin{minipage}[t]{\textwidth}
       \@titlehead
@@ -499,10 +556,45 @@
   \end{center}%
   \par
   \vskip 2em
-}
+}%
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
+%
+%
+% \subsection{Umgebung für die Titelseite}
+%
+%  \begin{environment}{titlepage}
+% Die Titelseite bedarf ebenfalls einer gesonderter Umgebung. Beim
+% zweispaltigen Layout soll die Titelseite z.\,B. einspaltig gedruckt
+% werden.
+%    \begin{macrocode}
+%<package&extend>\scr@ifundefinedorrelax{titlepage}{%
+\newenvironment{titlepage}{%
+%<report|book>  \cleardoublepage
+  \if@twocolumn
+    \@restonecoltrue\onecolumn
+  \else
+    \@restonecolfalse\newpage
+  \fi
+  \thispagestyle{empty}%
+  \if@compatibility
+    \setcounter{page}{0}%
+  \fi
+}{%
+  \if@restonecol\twocolumn \else \newpage \fi
+}%
+%<package&extend>}{}%
+%    \end{macrocode}
+%  \end{environment}
+%
+% Im Fall von \textsf{scrextend} muss das jetzt Kürzel \emph{title} beendet
+% werden:
+%    \begin{macrocode}
+%<package&extend>}\csname scr@ext@immediate@title\endcsname
+%    \end{macrocode}
+%
+% \subsection{Fonts für den Titel}
 %
 %  \begin{macro}{\titlefont}
 %    \changes{v2.8p}{2001/09/22}{neu}
@@ -517,8 +609,8 @@
 % Ebenso verhält es sich mit den \emph{Subject} im Titel. Hier ist
 % aber von vornherein ein internes Makro definiert.
 %    \begin{macrocode}
-\newcommand*\titlefont{\sectfont}
-\newcommand*{\subject@font}{\normalfont\normalcolor\bfseries\Large}
+\newcommand*\titlefont{\sectfont}%
+\newcommand*{\subject@font}{\normalfont\normalcolor\bfseries\Large}%
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
@@ -526,7 +618,7 @@
 % \begin{KOMAfont}{subtitle}
 %   \changes{v2.97c}{2007/06/20}{neu (intern)}
 %    \begin{macrocode}
-\newkomafont{subtitle}{\usekomafont{title}\large}
+\newkomafont{subtitle}{\usekomafont{title}\large}%
 %    \end{macrocode}
 % \end{KOMAfont}
 %
@@ -539,12 +631,14 @@
 %      \textsf{scrreprt} und \textsf{scrartcl}}
 % Die beiden Elemente, deren Schrift geändert werden kann.
 %    \begin{macrocode}
-\newcommand*{\scr@fnt@title}{\titlefont}
-\newcommand*{\scr@fnt@subject}{\subject@font}
+\newcommand*{\scr@fnt@title}{\titlefont}%
+\newcommand*{\scr@fnt@subject}{\subject@font}%
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
 %
+%
+% \subsection{Umgebung für die Zusammenfassung}
 %
 %  \begin{environment}{abstract}
 % \textsf{scrartcl} und \textsf{scrreprt} bieten die Möglichkeit einer
@@ -554,6 +648,7 @@
 % dieser Art. In Büchern werden Zusammenfassungen üblicherweise mit
 % Kapitelcharakter gesetzt.
 % \iffalse
+%<*class>
 %<*article|report>
 % \fi
 %    \changes{v2.3a}{1995/07/08}{\cs{@endparpenalty} zur Verhinderung
@@ -601,32 +696,8 @@
 %    \end{macrocode}
 % \iffalse
 %</article|report>
+%</class>
 % \fi
-%  \end{environment}
-%
-%
-% \subsection{Umgebung für die Titelseite}
-%
-%  \begin{environment}{titlepage}
-% Die Titelseite bedarf ebenfalls einer gesonderter Umgebung. Beim
-% zweispaltigen Layout soll die Titelseite z.\,B. einspaltig gedruckt
-% werden.
-%    \begin{macrocode}
-\newenvironment{titlepage}{%
-%<report|book>  \cleardoublepage
-  \if@twocolumn
-    \@restonecoltrue\onecolumn
-  \else
-    \@restonecolfalse\newpage
-  \fi
-  \thispagestyle{empty}%
-  \if@compatibility
-    \setcounter{page}{0}%
-  \fi
-}{%
-  \if@restonecol\twocolumn \else \newpage \fi
-}
-%    \end{macrocode}
 %  \end{environment}
 %
 %

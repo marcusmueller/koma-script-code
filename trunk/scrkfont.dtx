@@ -1,4 +1,4 @@
-% \CheckSum{1832}
+% \CheckSum{1851}
 % \iffalse meta-comment
 % ======================================================================
 % scrkfont.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkfont.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkfont.dtx}[2008/03/26 v2.98c KOMA-Script (font selection)]
+\ProvidesFile{scrkfont.dtx}[2008/05/01 v3.00 KOMA-Script (font selection)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -115,10 +115,12 @@
 % Schriftgröße wird in \cs{@ptsize} allerdings die tatsächliche Größe
 % angegeben, damit sich Rundungsfehler nicht so leicht summieren.
 %    \begin{macrocode}
+%<*!extend>
 \newcommand*\@ptsize{%
 %<!letter>  11%
 %<letter>  12%
 }
+%</!extend>
 %    \end{macrocode}
 %  \end{macro}
 %  \end{option}
@@ -138,6 +140,7 @@
 % Das Macro \cs{@pt@scan} wird benötigt, um die Schriftgröße nach der alten
 % Methode zu erkennen.
 %    \begin{macrocode}
+%<*!extend>
 \newcommand*{\@pt@scan}{%
   \expandafter\@pt@@scan\CurrentOption pt\@pt@@scan%
 }
@@ -150,9 +153,22 @@
     }{\@headlines}%
   }{\@headlines}%
 }
+%</!extend>
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
+%
+% \begin{macro}{\@fontsizefilebase}
+%   \changes{v2.96}{2006/08/11}{neu (intern)}
+%   \changes{v3.00}{2008/05/01}{Definition für \textsf{scrextend} vorgezogen}
+% Dieses Makro speichert den Präfix der primären
+% Schriftgrößenoptionsdateien. Es wird nur definiert, wenn es nicht bereits
+% definiert ist. Damit können Wrapperklassen komplett andere Größen vorgeben,
+% ohne mit \cs{ReplaceInput} arbeiten zu müssen.
+%    \begin{macrocode}
+\providecommand*{\@fontsizefilebase}{scrsize}
+%    \end{macrocode}
+% \end{macro}
 %
 % \begin{option}{fontsize}
 %   \changes{v2.96}{2006/08/11}{Funktion komplett geändert}
@@ -163,10 +179,12 @@
 % wären.
 %    \begin{macrocode}
 \KOMA@key{fontsize}{%
+%<*!extend>
   \scr@ifundefinedorrelax{changefontsizes}{%
     \@defaultunits\@tempdima#1pt\relax\@nnil
     \edef\@ptsize{#1}%
   }{%
+%</!extend>
     \expandafter\@defaultunits\expandafter\@tempdima#1 pt\relax\@nnil
     \edef\@tempa{#1}%
     \setlength{\@tempdimb}{\@tempdima}%
@@ -176,11 +194,13 @@
     \edef\@tempa{%
       \noexpand\makeatletter
       \noexpand\InputIfFileExists{\@fontsizefilebase\@tempa.clo}{%
-        \noexpand\ClassInfo{\KOMAClassName}{%
+%<!extend>        \noexpand\ClassInfo{\KOMAClassName}{%
+%<extend>        \noexpand\PackageInfo{scrextend}{%
           File `\@fontsizefilebase\@tempa.clo' used to setup font sizes}%
       }{%
         \noexpand\InputIfFileExists{\@fontsizefilebase\@tempb pt.clo}{%
-          \noexpand\ClassInfo{\KOMAClassName}{%
+%<!extend>          \noexpand\ClassInfo{\KOMAClassName}{%
+%<extend>          \noexpand\PackageInfo{scrextend}{%
             File `\@fontsizefilebase\@tempb pt.clo' used instead of%
             \noexpand\MessageBreak
             file `\@fontsizefilebase\@tempa.clo' to setup font sizes}%
@@ -190,6 +210,9 @@
       }%
       \noexpand\catcode`\noexpand\@=\the\catcode`\@
     }%
+%<extend>  \scr@ifundefinedorrelax{changefontsizes}{%
+%<extend>    \expandafter\AtEndOfPackage\expandafter{\@tempa}%
+%<extend>  }{%
     \@tempa
   }%
 }
@@ -527,11 +550,13 @@
 % Argument ist die gewünschte Grundschriftgröße.
 %    \begin{macrocode}
 \newcommand*{\changefontsizes}[2][1.2\@tempdima]{%
-  \ClassWarning{\KOMAClassName}{%
+%<!extend>  \ClassWarning{\KOMAClassName}{%
+%<extend>  \PackageWarning{scrextend}{%
     Using fallback calculation to setup font sizes\MessageBreak
     for basic size `#2'}%
   \scr@ifundefinedorrelax{dimexpr}{%
-    \ClassError{\KOMAClassName}{%
+%<!extend>    \ClassError{\KOMAClassName}{%
+%<extend>    \PackageError{scrextend}{%
       feature only allowed using e-TeX%
     }{%
       The fallback calculation to setup font sizes was implemented
@@ -812,17 +837,6 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}{\@fontsizefilebase}
-%   \changes{v2.96}{2006/08/11}{neu (intern)}
-% Dieses Makro speichert den Präfix der primären
-% Schriftgrößenoptionsdateien. Es wird nur definiert, wenn es nicht bereits
-% definiert ist. Damit können Wrapperklassen komplett andere Größen vorgeben,
-% ohne mit \cs{ReplaceInput} arbeiten zu müssen.
-%    \begin{macrocode}
-\providecommand*{\@fontsizefilebase}{scrsize}
-%    \end{macrocode}
-% \end{macro}
-%
 % Zunächst wird die gewünschte Größe, die in \cs{@ptsize} abgelegt ist, als
 % Länge ermittelt. In \cs{@tempa} wird die ursprünglich gewünschte Größe
 % abgelegt, damit zwischen \texttt{10pt}, \texttt{10} und \texttt{10dd}
@@ -830,6 +844,7 @@
 % abgelegt, damit die Standard-Dateien verwendet werden können. Dann wird
 % \cs{@ptsize} schon einmal richtig eingestellt.
 %    \begin{macrocode}
+%<*!extend>
 \expandafter\@defaultunits\expandafter\@tempdima\@ptsize pt\relax\@nnil
 \edef\@tempa{\@ptsize}%
 \setlength{\@tempdimb}{\@tempdima}%
@@ -879,6 +894,7 @@
 %<book>    }%
   }%
 }
+%</!extend>
 %    \end{macrocode}
 % 
 %
@@ -907,6 +923,7 @@
 % Der aus der \textsf{Script 2.0}-Familie bekannte Befehl \cs{sfb} ist
 % hier ebenfalls definiert.
 %    \begin{macrocode}
+%<*!extend>
 \DeclareOldFontCommand{\rm}{\normalfont\rmfamily}{\mathrm}
 \DeclareOldFontCommand{\sf}{\normalfont\sffamily}{\mathsf}
 \DeclareOldFontCommand{\tt}{\normalfont\ttfamily}{\mathtt}
@@ -916,6 +933,7 @@
 \DeclareOldFontCommand{\sc}{\normalfont\scshape}{\@nomath\sc}
 \DeclareOldFontCommand{\sfb}{\normalfont\sffamily\bfseries}{%
   \@nomath\sfb}
+%</!extend>
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
@@ -942,8 +960,10 @@
 % beiden den Klassen überlassen. Hier ist die Definition aus den
 % Standard-classes übernommen.
 %    \begin{macrocode}
+%<*!extend>
 \DeclareRobustCommand*{\cal}{\@fontswitch\relax\mathcal}
 \DeclareRobustCommand*{\mit}{\@fontswitch\relax\mathnormal}
+%</!extend>
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
@@ -959,7 +979,8 @@
 \newcommand*{\setkomafont}[2]{%
   \@ifundefined{scr@fnt@#1}{%
     \@ifundefined{scr@fnt@instead@#1}{%
-      \ClassError{\KOMAClassName}{%
+%<!extend>      \ClassError{\KOMAClassName}{%
+%<extend>      \PackageError{scrextend}{%
         font of element `#1' can't be set}{%
         You've told me to redefine the font selection of the
         element,\MessageBreak%
@@ -968,7 +989,8 @@
         or the element does not use a special font selection%
       }%
     }{%
-      \ClassInfo{\KOMAClassName}{%
+%<!extend>      \ClassInfo{\KOMAClassName}{%
+%<extend>      \PackageInfo{scrextend}{%
         You've told me to redefine the font selection of the\MessageBreak
         element `#1' that is an alias of element\MessageBreak
         `\csname scr@fnt@instead@#1\endcsname'%
@@ -980,7 +1002,8 @@
     \expandafter\expandafter\expandafter\def\csname scr@fnt@#1\endcsname{#2}%
   }%
   \@ifundefined{scr@fnt@wrn@#1}{}{%
-    \ClassWarning{\KOMAClassName}{%
+%<!extend>    \ClassWarning{\KOMAClassName}{%
+%<extend>    \PackageWarning{scrextend}{%
       \csname scr@fnt@wrn@#1\endcsname{#1}%
     }%
   }%
@@ -996,7 +1019,8 @@
 \newcommand*{\addtokomafont}[2]{%
   \@ifundefined{scr@fnt@#1}{%
     \@ifundefined{scr@fnt@instead@#1}{%
-      \ClassError{\KOMAClassName}{%
+%<!extend>      \ClassError{\KOMAClassName}{%
+%<extend>      \PackageError{scrextend}{%
         font of element `#1' can't be extended%
       }{%
         You've told me to extend the font selection of the
@@ -1006,7 +1030,8 @@
         or the element does not use a special font selection%
       }%
     }{%
-      \ClassInfo{\KOMAClassName}{%
+%<!extend>      \ClassInfo{\KOMAClassName}{%
+%<extend>      \PackageInfo{scrextend}{%
         You've told me to extend the font selection of the\MessageBreak
         element `#1' that is an alias of element\MessageBreak
         `\csname scr@fnt@instead@#1\endcsname'%
@@ -1019,7 +1044,8 @@
     \csname scr@fnt@#1\endcsname{#2}%
   }%
   \@ifundefined{scr@fnt@wrn@#1}{}{%
-    \ClassWarning{\KOMAClassName}{%
+%<!extend>    \ClassWarning{\KOMAClassName}{%
+%<extend>    \PackageWarning{scrextend}{%
       \csname scr@fnt@wrn@#1\endcsname{#1}%
     }%
   }%
@@ -1036,7 +1062,8 @@
 \newcommand*{\usekomafont}[1]{%
   \@ifundefined{scr@fnt@#1}{%
     \@ifundefined{scr@fnt@instead@#1}{%
-      \ClassError{\KOMAClassName}{%
+%<!extend>      \ClassError{\KOMAClassName}{%
+%<extend>      \PackageError{scrextend}{%
         font of element `#1' can't be used%
       }{%
         You've told me to use the font selection of the
@@ -1046,7 +1073,8 @@
         or the element does not use a special font selection%
       }%
     }{%
-      \ClassInfo{\KOMAClassName}{%
+%<!extend>      \ClassInfo{\KOMAClassName}{%
+%<extend>      \PackageInfo{scrextend}{%
         You've told me to use the font selection of the
         element\MessageBreak
         `#1' that is an alias of element `\csname
