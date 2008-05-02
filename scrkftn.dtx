@@ -1,4 +1,4 @@
-% \CheckSum{269}
+% \CheckSum{278}
 % \iffalse meta-comment
 % ======================================================================
 % scrkftn.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkftn.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkftn.dtx}[2008/02/14 v2.98c KOMA-Script (footnotes)]
+\ProvidesFile{scrkftn.dtx}[2008/05/02 v3.00 KOMA-Script (footnotes)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -113,7 +113,8 @@
   \else
     \ifx\@footnotemark\scr@footnotemark
     \else
-      \ClassWarning{\KOMAClassName}{%
+%<class>      \ClassWarning{\KOMAClassName}{%
+%<package>      \PackageWarning{scrextend}{%
         Change of `\string\@footnotemark' detected!\MessageBreak
         Use of `footnotes=#1' may break\MessageBreak
         another package!\MessageBreak
@@ -191,11 +192,13 @@
 % \cs{@textbottom} nicht \cs{relax} ist. Das kann natürlich auch
 % einmal schief gehen, ist dann aber auch nicht ganz so tragisch.
 %    \begin{macrocode}
+%<*class>
 \renewcommand*\footnoterule{%
   \kern-3\p@
   \ifx\@textbottom\relax\else\vskip \z@ \@plus.05fil\fi
   \hrule\@width.4\columnwidth
   \kern 2.6\p@}
+%</class>
 %    \end{macrocode}
 %  \end{macro}
 %
@@ -327,7 +330,8 @@
 %   \changes{v2.98c}{2008/02/01}{Neu (intern)}
 % Dafür sorgen, dass hier ggf. der Trenner eingefügt wird.
 %    \begin{macrocode}
-\newcommand*{\FN@mf@check}{%
+%<package>\providecommand*{\FN@mf@check}{%
+%<class>\newcommand*{\FN@mf@check}{%
   \ifdim\lastkern=\multiplefootnotemarker\relax
     \edef\@x@sf{\the\spacefactor}%
     \unkern\multiplefootnoteseparator
@@ -349,8 +353,9 @@
 % \begin{macro}{\F@mf@prepare}
 %   \changes{v2.98c}{2008/02/14}{Neu (intern)}
 % Aus Gründen der Kompatibilität mit \textsf{footmisc} wird das dann
-% vorsoglich auch noch definiert.
-\let\FN@mf@prepare\relax
+% vorsoglich auch noch definiert (und zwar als \cs{relax}, wenn es bisher noch
+% nicht definiert ist).
+\@ifundefined{FN@mf@prepare}{}{}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -394,7 +399,8 @@
 %   \changes{v2.98c}{2008/02/01}{Neu}
 % Und hier \textsf{footmisc}-kompatibel unformatiert
 %    \begin{macrocode}
-\newcommand*{\multfootsep}{,}
+%<class>\newcommand*{\multfootsep}{,}
+%<package>\providecommand*{\multfootsep}{,}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -410,7 +416,8 @@
 %    \changes{v2.4l}{1997/02/06}{neu}
 % Makro, damit \cs{@thefnmark} auf Anwenderebene verfügbar wird:
 %    \begin{macrocode}
-\newcommand*{\thefootnotemark}{\@thefnmark}
+%<class>\newcommand*{\thefootnotemark}{\@thefnmark}
+%<package>\providecommand*{\thefootnotemark}{\@thefnmark}
 %    \end{macrocode}
 %  \end{macro}
 %
@@ -418,8 +425,10 @@
 %   Fußnotengestaltgebung}
 %  \begin{macro}{\@makefnmark}
 %    \begin{macrocode}
+%<*class>
 \deffootnote[1em]{1.5em}{1em}{\textsuperscript{\thefootnotemark}}
 \deffootnotemark{\textsuperscript{\thefootnotemark}}
+%</class>
 %    \end{macrocode}
 %  \end{macro}
 %
@@ -435,7 +444,8 @@
 % LPPL und \KOMAScript{} steht ebenfalls unter LPPL. Das sollte also im
 % Zweifelsfall nicht das Problem sein.
 %    \begin{macrocode}
-\newcommand*{\footref}[1]{%
+%<class>\newcommand*{\footref}[1]{%
+%<package>\providecommand*{\footref}[1]{%
   \begingroup
     \unrestored@protected@xdef\@thefnmark{\ref{#1}}%
   \endgroup
