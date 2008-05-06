@@ -1,4 +1,4 @@
-% \CheckSum{1225}
+% \CheckSum{1213}
 % \iffalse meta-comment
 % ======================================================================
 % scrkbase.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkbase.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkbase.dtx}[2008/05/02 v3.00 KOMA-Script (basics)]
+\ProvidesFile{scrkbase.dtx}[2008/05/06 v3.00 KOMA-Script (basics)]
 % \iffalse
 %</driver>
 %<package&option>\ProvidesPackage{%
@@ -319,17 +319,17 @@
 % \begin{macro}{\FamilyProcessOptions}
 %   \changes{v3.00}{2008/04/30}{Neue Anweisung}%
 % Diese Anweisung führt alle Optionen, sowohl normal deklarierte als auch
-% \textsf{keyval}-Optionen für eine angegebene Familie und das aktuelle
-% Mitglied, das sich aus dem (Datei-)Namen des aktuellen Pakets bzw. der
-% aktuellen Klasse ergibt, in der Reihenfolge, in der sie verwendet wurden aus
-% -- zuerst globale Optionen, dann lokale Optionen. Das entspricht der
-% Verwendung von \cs{ProcessOptions*} mit dem Unterschied, dass eben auch die
-% \textsf{keyval}-Optionen abgearbeitet werden. \textsf{keyval}-Optionen, die
-% keinem Mitglied zugeordnet, sondern universell sind, werden dabei vor
-% gleichnamigen \textsf{keyval}-Optionen des aktuellen Mitglieds ausgeführt.
+% \textsf{keyval}-Optionen für eine angegebene Familie (2. Argument) und das
+% aktuelle Mitglied (1. optionales Argument) in der Reihenfolge, in der sie
+% verwendet wurden aus -- zuerst globale Optionen, dann lokale Optionen. Das
+% entspricht der Verwendung von \cs{ProcessOptions*} mit dem Unterschied,
+% dass eben auch die \textsf{keyval}-Optionen abgearbeitet
+% werden. \textsf{keyval}-Optionen, die keinem Mitglied zugeordnet, sondern
+% universell sind, werden dabei vor gleichnamigen \textsf{keyval}-Optionen
+% des aktuellen Mitglieds ausgeführt.
 %    \begin{macrocode}
 %<*base>
-\newcommand*{\FamilyProcessOptions}[1]{%
+\newcommand*{\FamilyProcessOptions}[2][.\@currname.\@currext]{%
   \let\ds@\@empty
   \edef\@curroptions{\@ptionlist{\@currname.\@currext}}%
   \ifx\@currext\@clsextension\else
@@ -340,14 +340,14 @@
           \@use@ption
           \expandafter\let\csname ds@\CurrentOption\endcsname\@empty
         \else
-          \scr@optiontest{#1}\CurrentOption{}{%
+          \scr@optiontest{#2}\CurrentOption{}{%
             \@use@ption
-            \@expandtwoargs\setkeys{#1}%
+            \@expandtwoargs\setkeys{#2}%
             \CurrentOption
           }%
-          \scr@optiontest{#1.\@currname.\@currext}\CurrentOption{}{%
+          \scr@optiontest{#2#1}\CurrentOption{}{%
             \@use@ption
-            \@expandtwoargs\setkeys{#1.\@currname.\@currext}%
+            \@expandtwoargs\setkeys{#2#1}%
             \CurrentOption
           }%
         \fi
@@ -357,20 +357,20 @@
   \@for\CurrentOption:=\@curroptions\do{%
     \@use@ption
     \scr@ifundefinedorrelax{ds@\CurrentOption}{%
-      \scr@optiontest{#1}\CurrentOption{%
-        \scr@optiontest{#1.\@currname.\@currext}\CurrentOption{%
+      \scr@optiontest{#2}\CurrentOption{%
+        \scr@optiontest{#2#1}\CurrentOption{%
           \default@ds
         }{%
           \edef\reserved@a{%
-            \noexpand\setkeys{#1.\@currname.\@currext}{\CurrentOption}%
+            \noexpand\setkeys{#2#1}{\CurrentOption}%
             \noexpand\def\noexpand\CurrentOption{\CurrentOption}%
           }\reserved@a
         }%
       }{%
-        \@expandtwoargs\setkeys{#1}%
+        \@expandtwoargs\setkeys{#2}%
         \CurrentOption
-        \scr@optiontest{#1.\@currname.\@currext}\CurrentOption{}{%
-          \@expandtwoargs\setkeys{#1.\@currname.\@currext}%
+        \scr@optiontest{#2#1}\CurrentOption{}{%
+          \@expandtwoargs\setkeys{#2#1}%
           \CurrentOption
         }%
       }%
@@ -964,22 +964,21 @@
 %
 % \begin{macro}{\FamilyExecuteOptions}
 %   \changes{v3.00}{Neue Anweisung}
-% Entspriche \cs{ExecuteOptions} jedoch \textsf{keyval}-Optionen. Bezüglich
-% der Anmerkungen siehe \cs{FamilyExecuteOptions}.
+% Entspriche \cs{ExecuteOptions} jedoch \textsf{keyval}-Optionen.
 %    \begin{macrocode}
 %<*base>
-\newcommand*{\FamilyExecuteOptions}[2]{%
+\newcommand*{\FamilyExecuteOptions}[3][.\@currname.\@currext]{%
   \def\reserved@a##1\@nil{%
-    \@for\scr@key@atlist:=#2\do{%
+    \@for\scr@key@atlist:=#3\do{%
       \expandafter\scr@key@split@name@value\scr@key@atlist==\@nil
-      \scr@ifundefinedorrelax{KV@#1@\scr@key@name}{}{%
-        \edef\reserved@a{\noexpand\setkeys{#1}{\scr@key@atlist}%
+      \scr@ifundefinedorrelax{KV@#2@\scr@key@name}{}{%
+        \edef\reserved@a{\noexpand\setkeys{#2}{\scr@key@atlist}%
         }%
         \reserved@a
       }%
-      \scr@ifundefinedorrelax{KV@#1.\@currname.\@currext @\scr@key@name}{}{%
+      \scr@ifundefinedorrelax{KV@#2#1@\scr@key@name}{}{%
         \edef\reserved@a{%
-          \noexpand\setkeys{#1.\@currname.\@currext}{\scr@key@atlist}%
+          \noexpand\setkeys{#2#1}{\scr@key@atlist}%
         }%
         \reserved@a
       }%
