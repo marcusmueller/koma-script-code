@@ -1,4 +1,4 @@
-% \CheckSum{660}
+% \CheckSum{661}
 % \iffalse meta-comment
 % ======================================================================
 % scrktitl.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrktitl.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrktitl.dtx}[2008/05/02 v3.00 KOMA-Script (title pages)]
+\ProvidesFile{scrktitl.dtx}[2008/06/19 v3.00 KOMA-Script (title pages)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -123,28 +123,34 @@
 %<article>\@titlepagefalse
 %<report|book>\@titlepagetrue
 %</class>
+%    \end{macrocode}
+% Im Falle von \textsf{scrextend} ist die Option Teil der Erweiterung.
+%    \begin{macrocode}
 %<*package&extend>
-\scr@ifundefinedorrelax{if@titlepage}{%
-  \expandafter\newif\csname if@titlepage\endcsname
-  \@titlepagefalse
-}{}
+\scr@ext@activateable{title}{%
+  \scr@ifundefinedorrelax{if@titlepage}{%
+    \expandafter\newif\csname if@titlepage\endcsname
+    \@titlepagefalse
+  }{}
 %</package&extend>
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
 %  \end{macro}
 %    \begin{macrocode}
-%<*class>
-\KOMA@ifkey{titlepage}{@titlepage}
-%</class>
-%<*package&extend>
-\KOMA@key{titlepage}[true]{%
-  \ifstr{#1}{KOMA}{\scr@ext@activate{title}}{%
-    \def\FamilyElseValues{, `KOMA'}%
-    \KOMA@set@ifkey{titlepage}{@titlepage}{#1}%
+%<*class|package>
+\KOMA@ifkey{titlepage}{@titlepage}%
+%<*extend>
+%    \end{macrocode}
+% Diese Erweiterung soll dann auch tatsächlich sofort aktiviert werden:
+%    \begin{macrocode}
+  \def\scr@ext@immediate@title{%
+    \scr@ext@activate{title}%
+    \let\scr@ext@immediate@title\relax
   }%
 }
-%</package&extend>
+%</extend>
+%</class|package>
 \KOMA@DeclareObsoleteOption%
 %<class>  [\PackageInfoNoLine]%
   {notitlepage}{titlepage=false}
@@ -588,7 +594,7 @@
 %    \end{macrocode}
 %  \end{environment}
 %
-% Im Fall von \textsf{scrextend} muss das jetzt Kürzel \emph{title} beendet
+% Im Fall von \textsf{scrextend} muss jetzt das Kürzel \emph{title} beendet
 % werden:
 %    \begin{macrocode}
 %<package&extend>}\csname scr@ext@immediate@title\endcsname
