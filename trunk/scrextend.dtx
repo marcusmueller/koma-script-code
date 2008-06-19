@@ -1,4 +1,4 @@
-% \CheckSum{35}
+% \CheckSum{57}
 % \iffalse meta-comment
 % ======================================================================
 % scrextend.dtx
@@ -127,14 +127,19 @@
 % \cs{csname}~\texttt{scr@ext@immediate@}\meta{Kürzel}\cs{endcsname}
 % ausgeführt. Um das dann zu aktivieren wird
 % \cs{scr@ext@activate}\marg{Kürzel} aufgerufen (beispielsweise innerhalb
-% einer Option).
+% einer Option). Mit \cs{scr@ext@addto@activateable} können Aktivierungen
+% entsprechend um weitere Definitionen erweitert werden.
 % \end{sloppypar}
 %    \begin{macrocode}
 \newcommand*{\scr@ext@activate}[1]{%
   \scr@ifundefinedorrelax{scr@ext@activate@#1}{%
-    \@namedef{scr@ext@immediate@#1}{\csname scr@ext@activate@#1\endcsname}%
+    \@namedef{scr@ext@immediate@#1}{%
+      \expandafter\let\csname scr@ext@immediate@#1\endcsname\relax
+      \csname scr@ext@activate@#1\endcsname
+    }%
   }{%
     \csname scr@ext@activate@#1\endcsname
+    \expandafter\let\csname scr@ext@activate@#1\endcsname\relax
   }%
 }
 \newcommand*{\scr@ext@activateable}[1]{%
@@ -146,6 +151,48 @@
 %
 % \iffalse
 %</prepare>
+%<*option>
+% \fi
+%
+% \subsection{Optionen}
+%
+% Das Paket kennt eine universelle Option, um aktivierbare Möglichkeiten zu
+% aktivieren. Diese Option steht aber nur während dem Laden des Pakets zur
+% Verfügung!
+%
+% \begin{option}{extendedfeature}
+%    \begin{macrocode}
+\KOMA@key{extendedfeature}{%
+  \scr@ext@activate{#1}%
+  \AtEndOfPackage{%
+    \scr@ifundefinedorrelax{scr@ext@immediate@#1}{}{%
+      \PackageErrorNoLine{unkown extended feature `#1'}{%
+        You have used option `extendedfeature' to activate an extended feature
+        named\MessageBreak
+        `#1', but there is no such extended feature.\MessageBreak
+        See the KOMA-Script manual for more infromation about known
+        activatable\MessageBreak
+        extended features%
+      }%
+    }%
+  }%
+}
+\AtEndOfPackage{%
+  \KOMA@key{extendedfeature}{%
+    \PackageError{scrextend}{%
+      Option `extendedfeature' too late%
+    }{%
+      Option `extendedfeature' my be used only while loading the
+      package.\MessageBreak
+      But you've tried to set it up later%
+    }%
+  }%
+}
+%    \end{macrocode}
+% \end{option}
+%
+% \iffalse
+%</option>
 % \fi
 %
 % \Finale
