@@ -1,4 +1,4 @@
-% \CheckSum{1727}
+% \CheckSum{1756}
 % \iffalse meta-comment
 % ======================================================================
 % scrksect.dtx
@@ -1252,6 +1252,7 @@
 %    \changes{v2.8c}{2001/06/29}{neu (intern)}
 %    \changes{v2.8l}{2001/08/17}{erst eintragen, dann ausgeben}
 %    \changes{v2.95}{2004/07/20}{kann Kolumnentitel erzeugen}
+%    \changes{v3.00}{2008/07/01}{Notlösung für \textsf{hyperref} eingefügt}
 %  \begin{macro}{\@saddpart}
 %    \changes{v2.8c}{2001/06/29}{neu (intern)}
 %    \begin{macrocode}
@@ -1276,7 +1277,13 @@
   \secdef\@addpart\@saddpart
 }
 \newcommand*{\@addpart}{}
-\def\@addpart[#1]#2{\addcontentsline{toc}{part}{#1}\@spart{#2}%
+\def\@addpart[#1]#2{%
+%    \end{macrocode}
+% Notlösung, damit \textsf{hyperref} halbwegs damit klar kommt. Das ist aber
+% weit davon entfernt eine echte Lösung zu bringen.
+%    \begin{macrocode}
+  \csname phantomsection\endcsname
+  \addcontentsline{toc}{part}{#1}\@spart{#2}%
   \ifx\partmark\@gobble\else\@mkboth{#1}{}\fi
 }
 \newcommand*{\@saddpart}{\@spart}
@@ -1304,6 +1311,8 @@
 %    \changes{v2.8g}{2001/07/18}{per \cs{float@addtolists} wird nun
 %      auch ein vertikaler Abstand in Listen des \texttt{float}-Pakets
 %      eingebaut}
+%    \changes{v3.00}{2008/07/01}{jetzt auch Kapiteleinträge in andere
+%      float-Verzeichnisse mit hyperref}
 %  \begin{macro}{\@makechapterhead}
 %    \changes{v2.7b}{2001/01/05}{Kapitel können grundsätzlich mit
 %      einer Präambel versehen werden}
@@ -1412,9 +1421,16 @@
         \addcontentsline{lot}{chapteratlist}{%
           \protect\numberline{\thechapter}#1}%
         \@ifundefined{float@addtolists}{}{%
-          \float@addtolists{%
-            \protect\contentsline{chapteratlist}{%
-              \protect\numberline{\thechapter}#1}{\thepage}%
+          \scr@ifundefinedorrelax{@currentHref}{%
+            \float@addtolists{%
+              \protect\contentsline{chapteratlist}{%
+                \protect\numberline{\thechapter}#1}{\thepage}%
+            }%
+          }{%
+            \float@addtolists{%
+              \protect\contentsline{chapteratlist}{%
+                \protect\numberline{\thechapter}#1}{\thepage}{\@currentHref}%
+            }%
           }%
         }%
       \fi
@@ -1425,8 +1441,14 @@
         \addcontentsline{lof}{chapteratlist}{#1}%
         \addcontentsline{lot}{chapteratlist}{#1}%
         \@ifundefined{float@addtolists}{}{%
-          \float@addtolists{%
-            \protect\contentsline{chapteratlist}{#1}{\thepage}%
+          \scr@ifundefinedorrelax{@currentHref}{%
+            \float@addtolists{%
+              \protect\contentsline{chapteratlist}{#1}{\thepage}%
+            }%
+          }{%
+            \float@addtolists{%
+              \protect\contentsline{chapteratlist}{#1}{\thepage}{\@currentHref}%
+            }%
           }%
         }%
       \fi
@@ -1438,8 +1460,14 @@
       \addcontentsline{lof}{chapteratlist}{#1}%
       \addcontentsline{lot}{chapteratlist}{#1}%
       \@ifundefined{float@addtolists}{}{%
-        \float@addtolists{%
-          \protect\contentsline{chapteratlist}{#1}{\thepage}%
+        \scr@ifundefinedorrelax{@currentHref}{%
+          \float@addtolists{%
+            \protect\contentsline{chapteratlist}{#1}{\thepage}%
+          }%
+        }{%
+          \float@addtolists{%
+            \protect\contentsline{chapteratlist}{#1}{\thepage}{\@currentHref}%
+          }%
         }%
       }%
     \fi
@@ -1563,6 +1591,8 @@
 %      ersetzt}
 %    \changes{v2.8d}{2001/07/05}{\cs{chapterpagestyle} statt
 %      \texttt{plain}}
+%    \changes{v3.00}{2008/07/01}{jetzt auch Kapiteleinträge in andere
+%      float-Verzeichnisse mit hyperref}
 % \KOMAScript{} bietet in \textsf{scrbook} und \textsf{scrreprt} den
 % zusätzlichen Gliederungsbefehl \cs{addchap}. Es handelt sich dabei
 % um einen mit \cs{chapter*} vergleichbaren Befehl, bei dem jedoch der
@@ -1621,8 +1651,14 @@
     \addcontentsline{lof}{chapteratlist}{#1}%
     \addcontentsline{lot}{chapteratlist}{#1}%
     \@ifundefined{float@addtolists}{}{%
-      \float@addtolists{%
-        \protect\contentsline{chapteratlist}{#1}{\thepage}%
+      \scr@ifundefinedorrelax{@currentHref}{%
+        \float@addtolists{%
+          \protect\contentsline{chapteratlist}{#1}{\thepage}%
+        }%
+      }{%
+        \float@addtolists{%
+          \protect\contentsline{chapteratlist}{#1}{\thepage}{\@currentHref}%
+        }%
       }%
     }%
   \fi
