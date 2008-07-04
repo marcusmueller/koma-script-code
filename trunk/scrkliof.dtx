@@ -1,4 +1,4 @@
-% \CheckSum{301}
+% \CheckSum{312}
 % \iffalse meta-comment
 % ======================================================================
 % scrkliof.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkliof.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkliof.dtx}[2008/04/16 v2.98c KOMA-Script (lists of)]
+\ProvidesFile{scrkliof.dtx}[2008/07/04 v3.00 KOMA-Script (lists of)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -250,14 +250,19 @@
     {flat}{3},{left}{3},%
     {graduated}{4},{indent}{4},{indented}{4},%
 %    \end{macrocode}
+% Dann gibt es eine Option, mit der die Gliederungsebene der Verzeichnisse
+% verändert werden kann.
+%    \begin{macrocode}
+    {leveldown}{5},
+%    \end{macrocode}
 % Dann gibt es Optionen, für die Unterteilung auf Kapitelebene. Allerdings nur
 % für \textsf{scrbook} und \textsf{scrreprt}.
 %    \begin{macrocode}
 %<*book|report>
-    {chapterentry}{5},{withchapterentry}{5},%
-    {nochaptergap}{6},{ignorechapter}{6},%
-    {chaptergapsmall}{7},{smallchaptergap}{7},%
-    {chaptergapline}{8},{onelinechaptergap}{8}%
+    {chapterentry}{6},{withchapterentry}{6},%
+    {nochaptergap}{7},{ignorechapter}{7},%
+    {chaptergapsmall}{8},{smallchaptergap}{8},%
+    {chaptergapline}{9},{onelinechaptergap}{9}%
 %</book|report>
   }{#1}%
   \ifcase \@tempa\relax
@@ -265,28 +270,46 @@
 %<article>    \section*
 %<report|book>    \chapter*
     }%
-  \or
+    \doforeachtocfile[float]{%
+      \unsettoc{\@currext}{numbered}%
+      \unsettoc{\@currext}{totoc}%
+    }%
+  \or% totoc
     \renewcommand*{\float@@listhead}{%
 %<article>    \addsec
 %<report|book>    \addchap
     }%
-  \or
+    \doforeachtocfile[float]{%
+      \unsettoc{\@currext}{numbered}%
+      \setuptoc{\@currext}{totoc}%
+    }%
+  \or% numbered
     \renewcommand*{\float@@listhead}{%
 %<article>    \section
 %<report|book>    \chapter
     }%
-  \or
+    \doforeachtocfile[float]{%
+      \setuptoc{\@currext}{numbered}%
+      \setuptoc{\@currext}{totoc}%
+    }%
+  \or% flat
     \@dynlisttrue
-  \or
+  \or% graduated
     \@dynlistfalse
-  \or
+  \or% leveldown
+    \doforeachtocfile[float]{%
+      \setuptoc{\@currext}{leveldown}%
+    }%
+%<*book|report>
+  \or% chapterentry
     \KOMA@options{chapteratlists=entry}{}%
-  \or
+  \or% chaptergap
     \KOMA@options{chapteratlists=\z@}{}%
-  \or
+  \or% chaptergapsmall
     \KOMA@options{chapteratlists=10\p@}{}%
-  \or
+  \or% chaptergapline
     \KOMA@options{chapteratlists=\baselineskip}{}%
+%</book|report>
   \fi
 }
 %    \end{macrocode}
@@ -481,15 +504,31 @@
 %    \end{macrocode}
 %  \end{macro}
 %
+% Dafür sorgen, dass die Verzeichnisse von \textsf{tocbasic} so gesetzt
+% werden, wie wir das gerne hätten (wird über einen Trick auch für das
+% Inhaltsverzeichnis verwendet):
+%    \begin{macrocode}
+\g@addto@macro\tocbasic@@before@hook{%
+  \if@dynlist\expandafter\before@starttoc\expandafter{\@currext}\fi
+}
+\g@addto@macro\tocbasic@@after@hook{%
+  \if@dynlist\expandafter\after@starttoc\expandafter{\@currext}\fi
+}
+%    \end{macrocode}
+%
 %
 % \subsection{Definitionen für das Inhaltsverzeichnis}
 %
-%  \begin{macro}{\contentsname}
+% \begin{macro}{\contentsname}
+% \begin{macro}{\listoftocname}
+%   \changes{3.00}{2008/07/03}{neu für Paket \textsf{tocbasic}}
 % Der Name des Verzeichnisses.
 %    \begin{macrocode}
 \newcommand*\contentsname{Contents}
+\newcommand*\listoftocname{\contentsname}
 %    \end{macrocode}
-%  \end{macro}
+% \end{macro}
+% \end{macro}
 %
 %  \begin{Counter}{tocdepth}
 % Der Zähler gibt an, bis zu welcher Gliederungebene Einträge in das
@@ -503,22 +542,31 @@
 %    \end{macrocode}
 %  \end{Counter}
 %
-%  \begin{macro}{\toc@heading}
-%    \changes{v2.3h}{1995/01/21}{neu (intern)}
-%    \changes{v2.95}{2002/06/28}{auch für \textsf{scrreprt} und
-%      \textsf{scrbook}}
+% \begin{macro}{\toc@heading}
+%   \changes{v2.3h}{1995/01/21}{neu (intern)}
+%   \changes{v2.95}{2002/06/28}{auch für \textsf{scrreprt} und
+%     \textsf{scrbook}}
+%   \changes{v3.00}{2008/07/04}{Verwendung von \cs{toc@heading} ist nicht
+%     länger empfohlen}
 % Befehl, zum Setzen der Überschrift des
 % Inhaltsverzeichnisses. Eigentlich ist das überflüssig, weil es nur
 % einmal verwendet wird. Aus Gründen der Konsistenz mit den anderen
 % Verzeichnissen machen wir das hier aber genauso.
 %    \begin{macrocode}
 \newcommand*\toc@heading{%
+  \ClassWarning{\KOMAClassName}{%
+    usage of deprecated \string\toc@heading!\MessageBreak
+    You should use the features of package `tocbasics'\MessageBreak
+    instead of \string\toc@heading.\MessageBreak
+    Definition of \string\toc@heading\space my be removed from\MessageBreak
+    KOMA-Script soon, so it should not be used
+  }%
 %<article>  \section*{\contentsname}%
 %<book|report>  \chapter*{\contentsname}%
   \@mkboth{\contentsname}{\contentsname}%
 }
 %    \end{macrocode}
-%  \end{macro}
+% \end{macro}
 %
 %  \begin{macro}{\toc@l@number}
 %    \changes{v2.8q}{2001/11/14}{neu}
@@ -531,40 +579,25 @@
 %    \end{macrocode}
 %  \end{macro}
 %
-%  \begin{macro}{\tableofcontents}
-%    \changes{v2.3h}{1995/01/21}{Verwendung von \cs{toc@heading}}
-%    \changes{v2.8l}{2001/08/16}{Gruppe eingefügt und \cs{parskip} auf
-%      0 gesetzt}
-%    \changes{v2.8q}{2001/11/13}{\cs{@parskipfalse}%
-%      \cs{@parskip@indent}}
-%    \changes{v2.8q}{2001/11/14}{\cs{if@tocleft} bearbeiten}
-%    \changes{v2.95}{2002/06/28}{\textsf{article} beachtet ebenfalls
-%      \texttt{tocleft}}
-%    \changes{v2.95}{2004/11/05}{\cs{@parskipfalse} und \cs{@parskip@indent}
-%      ersetzt}
+% \begin{macro}{\tableofcontents}
+%   \changes{v2.3h}{1995/01/21}{Verwendung von \cs{toc@heading}}
+%   \changes{v2.8l}{2001/08/16}{Gruppe eingefügt und \cs{parskip} auf
+%     0 gesetzt}
+%   \changes{v2.8q}{2001/11/13}{\cs{@parskipfalse}%
+%     \cs{@parskip@indent}}
+%   \changes{v2.8q}{2001/11/14}{\cs{if@tocleft} bearbeiten}
+%   \changes{v2.95}{2002/06/28}{\textsf{article} beachtet ebenfalls
+%     \texttt{tocleft}}
+%   \changes{v2.95}{2004/11/05}{\cs{@parskipfalse} und \cs{@parskip@indent}
+%     ersetzt}
+%   \changes{v3.00}{2008/07/04}{auf \textsf{tocbasic} umgestellt}
 % Die Ausgabe des Inhaltsverzeichnisses.
 %    \begin{macrocode}
 \newcommand*{\tableofcontents}{%
-  \begingroup
-%<*report|book>
-    \if@twocolumn
-      \@restonecoltrue\onecolumn
-    \else
-      \@restonecolfalse
-    \fi
-%</report|book>
-    \toc@heading%
-    \setparsizes{\z@}{\z@}{\z@\@plus 1fil}\par@updaterelative
-    \if@tocleft\before@starttoc{toc}\fi
-    \@starttoc{toc}%
-    \if@tocleft\after@starttoc{toc}\fi
-%<*report|book>
-    \if@restonecol\twocolumn\fi
-%</report|book>
-  \endgroup
+  \begingroup\let\if@dynlist\if@tocleft\listoftoc{toc}\endgroup
 }
 %    \end{macrocode}
-%  \end{macro}
+% \end{macro}
 %
 %
 % \subsection{Definitionen für die Verzeichnisse der
@@ -575,6 +608,8 @@
 %   \changes{v2.8g}{2001/07/18}{\cs{float@headings} umbenannt in
 %     \cs{float@listhead}}
 %   \changes{v2.98c}{2008/03/05}{\cs{float@@listhead} wird verwendet}
+%   \changes{v3.00}{2008/07/04}{Verwendung von \cs{float@listhead} ist nicht
+%     länger empfohlen}
 % In Absprache mit Anselm Lingnau, dem Autor des Pakets
 % \textsf{float}, wird ab Version 2.8b \cs{float@headings} zum Setzen
 % des Kolumnentitels bei den Verzeichnissen verwendet, die
@@ -585,6 +620,13 @@
 % \cs{float@listhead} zu nennen, wurde dies in Version 2.8g angepasst.
 %    \begin{macrocode}
 \newcommand*{\float@listhead}[1]{%
+  \ClassWarning{\KOMAClassName}{%
+    usage of deprecated \string\float@listhead!\MessageBreak
+    You should use the features of package `tocbasics'\MessageBreak
+    instead of \string\float@listhead.\MessageBreak
+    Definition of \string\float@listhead\space my be removed from\MessageBreak
+    KOMA-Script soon, so it should not be used
+  }%
   \float@@listhead{#1}%
   \@mkboth{#1}{#1}%
 %    \end{macrocode}
@@ -607,58 +649,38 @@
 %    \end{macrocode}
 %  \end{macro}
 %
-%  \begin{macro}{\listfigurename}
-%  \begin{macro}{\listtablename}
-% Die Namen der Verzeichnisse.
+% \begin{macro}{\listfigurename}
+% \begin{macro}{\listtablename}
+% \begin{macro}{\listoflofname}
+%   \changes{3.00}{2008/07/03}{neu für Paket \textsf{tocbasic}}
+% \begin{macro}{\listotlofname}
+%   \changes{3.00}{2008/07/03}{neu für Paket \textsf{tocbasic}}
+% Die Namen der Verzeichnisse auch für das Paket \textsf{tocbasic}.
 %    \begin{macrocode}
 \newcommand*\listfigurename{List of Figures}
+\newcommand*\listoflofname{\listfigurename}
 \newcommand*\listtablename{List of Tables}
+\newcommand*\listoflotname{\listtablename}
 %    \end{macrocode}
-%  \end{macro}
-%  \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 %
-%  \begin{macro}{\lof@heading}
-%    \changes{v2.3h}{1995/01/21}{neu (intern)}
-%    \changes{v2.4d}{1996/04/11}{\cs{addsec} durch \cs{section*}
-%      ersetzt}
-%    \changes{v2.8b}{2001/06/26}{Verwendung von \cs{float@headings}}
-%    \changes{v2.8g}{2001/07/18}{\cs{float@headings} umbenannt in
-%      \cs{float@listhead}}
-% Befehl, zum Setzen der Überschrift des Abbildungsverzeichnisses.
-%    \begin{macrocode}
-\newcommand*\lof@heading{\float@listhead{\listfigurename}}
-%    \end{macrocode}
-%  \end{macro}
-%
-%  \begin{macro}{\listoffigures}
-%    \changes{v2.3h}{1995/01/21}{Verwendung von \cs{lof@heading}}
-%    \changes{v2.4k}{1996/12/13}{\cs{lof@heading} nicht nur bei
-%      \textsf{scrartcl}}
-%    \changes{v2.8l}{2001/08/16}{Gruppe eingefügt und \cs{parskip} auf
-%      0 gesetzt}
-%    \changes{v2.8q}{2001/11/13}{\cs{@parskipfalse}%
-%      \cs{@parskip@indent}}
-%    \changes{v2.95}{2004/11/05}{\cs{@parskipfalse} und \cs{@parskip@indent}
-%      ersetzt}
+% \begin{macro}{\listoffigures}
+%   \changes{v2.3h}{1995/01/21}{Verwendung von \cs{lof@heading}}
+%   \changes{v2.4k}{1996/12/13}{\cs{lof@heading} nicht nur bei
+%     \textsf{scrartcl}}
+%   \changes{v2.8l}{2001/08/16}{Gruppe eingefügt und \cs{parskip} auf
+%     0 gesetzt}
+%   \changes{v2.8q}{2001/11/13}{\cs{@parskipfalse}%
+%     \cs{@parskip@indent}}
+%   \changes{v2.95}{2004/11/05}{\cs{@parskipfalse} und \cs{@parskip@indent}
+%     ersetzt}
+%   \changes{v3.00}{2008/07/04}{Verwendung von \textsf{tocbasic}}
 % Die Ausgabe des Abbildungsverzeichnisses.
 %    \begin{macrocode}
-\newcommand*\listoffigures{%
-  \begingroup%
-%<*report|book>
-    \if@twocolumn
-      \@restonecoltrue\onecolumn
-    \else
-      \@restonecolfalse
-    \fi
-%</report|book>
-    \lof@heading%
-    \setparsizes{0}{0}{\z@\@plus 1fil}\par@updaterelative
-    \@starttoc{lof}%
-%<*report|book>
-    \if@restonecol\twocolumn\fi
-%</report|book>
-  \endgroup
-}
+\newcommand*\listoffigures{\listoftoc{lof}}
 %    \end{macrocode}
 %
 %  \begin{macro}{\l@figure}
@@ -669,57 +691,29 @@
 %  \end{macro}
 %  \end{macro}
 %
-%  \begin{macro}{\lot@heading}
-%    \changes{v2.3h}{1995/01/21}{neu (intern)}
-%    \changes{v2.4a}{1996/03/13}{\cs{listtabelname} durch
-%      \cs{listtablename} ersetzt}
-%    \changes{v2.8b}{2001/06/26}{Verwendung von \cs{float@headings}}
-%    \changes{v2.8g}{2001/07/18}{\cs{float@headings} umbenannt in
-%      \cs{float@listhead}} 
-% Befehl zum Setzen der Überschrift des Tabellenverzeichnisses.
-%    \begin{macrocode}
-\newcommand*\lot@heading{\float@listhead{\listtablename}}
-%    \end{macrocode}
-%  \end{macro}
-%
-%  \begin{macro}{\listoftables}
-%    \changes{v2.3h}{1995/01/21}{Verwendung von \cs{lot@heading}}
-%    \changes{v2.4k}{1996/12/13}{\cs{lot@heading} nicht nur bei
-%      \textsf{scrartcl}}
-%    \changes{v2.8l}{2001/08/16}{Gruppe eingefügt und \cs{parskip} auf
-%      0 gesetzt}
-%    \changes{v2.8q}{2001/11/13}{\cs{@parskipfalse}%
-%      \cs{@parskip@indent}}
-%    \changes{v2.95}{2004/11/05}{\cs{@parskipfalse} und \cs{@parskip@indent}
-%      ersetzt}
+% \begin{macro}{\listoftables}
+%   \changes{v2.3h}{1995/01/21}{Verwendung von \cs{lot@heading}}
+%   \changes{v2.4k}{1996/12/13}{\cs{lot@heading} nicht nur bei
+%     \textsf{scrartcl}}
+%   \changes{v2.8l}{2001/08/16}{Gruppe eingefügt und \cs{parskip} auf
+%     0 gesetzt}
+%   \changes{v2.8q}{2001/11/13}{\cs{@parskipfalse}%
+%     \cs{@parskip@indent}}
+%   \changes{v2.95}{2004/11/05}{\cs{@parskipfalse} und \cs{@parskip@indent}
+%     ersetzt}
+%   \changes{v3.00}{2008/07/04}{Verwendung von \textsf{tocbasic}}
 % Die Ausgabe des Tabellenverzeichnisses.
 %    \begin{macrocode}
-\newcommand*\listoftables{%
-  \begingroup
-%<*report|book>
-    \if@twocolumn
-      \@restonecoltrue\onecolumn
-    \else
-      \@restonecolfalse
-    \fi
-%</report|book>
-    \lot@heading
-    \setparsizes{0}{0}{\z@\@plus 1fil}\par@updaterelative
-    \@starttoc{lot}%
-%<*report|book>
-    \if@restonecol\twocolumn\fi
-%</report|book>
-  \endgroup
-}
+\newcommand*\listoftables{\listoftoc{lot}}
 %    \end{macrocode}
 %
-%  \begin{macro}{\l@table}
+% \begin{macro}{\l@table}
 % Befehl zur Formatierung eines Verzeichniseintrags.
 %    \begin{macrocode}
 \let\l@table\l@figure
 %    \end{macrocode}
-%  \end{macro}
-%  \end{macro}
+% \end{macro}
+% \end{macro}
 %
 %
 % \iffalse
