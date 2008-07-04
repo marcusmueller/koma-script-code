@@ -1,4 +1,4 @@
-% \CheckSum{601}
+% \CheckSum{645}
 % \iffalse meta-comment
 % ======================================================================
 % tocbasic.dtx
@@ -64,6 +64,11 @@
 %
 % \iffalse
 %%% From File: tocbasic.dtx
+%<*dtx|package|driver|doc|load>
+% \fi
+\def\tocbasicversion{2008/07/04 v0.9}
+% \iffalse
+%</dtx|package|driver|doc|load>
 %<*dtx>
 \def\LaTeXformat{LaTeX2e}
 \ifx\fmtname\LaTeXformat\def\MainBodyWork{%
@@ -74,7 +79,7 @@
 %<doc>\ProvidesFile{tocbasic.tex}
 %<package>\ProvidesPackage{tocbasic}
 %<*dtx|package|driver|doc>
-                [2008/03/18 v0.1
+                [\tocbasicversion
 %</dtx|package|driver|doc>
 %<driver>                 (driver)%
 %<package>                (package)%
@@ -372,7 +377,9 @@ commands to do something for all known extensions.  And there are commands to
 set or unset features of an extension or the file represented by the
 extension.  Typically an extension also has an owner.  This owner my be a
 class or package or a term decided by the author of the class or package
-using \Package{tocbasic}.
+using \Package{tocbasic}, e.g., \KOMAScript{} uses the owner \texttt{float}
+for list of figures ans list of tables and the default owner for the table of
+contents.
 
 % \iffalse
 \begin{Description}
@@ -476,8 +483,9 @@ empty owner.
   extension is already in use.  You may use any owner you want.  But it should
   be unique!  So, if you are the author of package \Package{float} you may
   use for example owner ``\PValue{float}'' instead of owner
-  ``\PValue{float.sty}'', because there is no class \Class{float.cls} and
-  therfore ``\PValue{float}'' should be unique too.
+  ``\PValue{float.sty}'', so the \KOMAScript{} options for list of figure and
+  list of table will also handle the lists of this package, that are already
+  added to the known extensions, when the option is used.
 \end{Example}
 
 % \iffalse
@@ -1054,6 +1062,7 @@ be defined and used in \Macro{tocbasic@listhead}.
 %
 % \StopEventually{\PrintIndex\PrintChanges}
 %
+%
 % \section{Implementation}
 % \label{sec:implementation}
 %
@@ -1239,7 +1248,7 @@ be defined and used in \Macro{tocbasic@listhead}.
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{removefromtoclist}
+% \begin{macro}{\removefromtoclist}
 %   This command will remove an extension from the list of toc-files. If the
 %   first, optional argument is given, the extension will only be removed, if
 %   it was added by the given owner. NOTE: An empty first argument is not the
@@ -1304,22 +1313,26 @@ be defined and used in \Macro{tocbasic@listhead}.
     \@doforeachtocfile\@@doforeachtocfile
 }
 \newcommand{\@doforeachtocfile}[2][]{%
-  \begingroup
-    \def\do##1##2{%
-      \edef\reserved@a{#1}\edef\reserved@b{##2}\ifx\reserved@a\reserved@b
-        \edef\@currext{##1}#2%
-      \fi
-    }%
-    \tb@listoftocs
-  \endgroup
+  \def\do##1##2{%
+    \edef\reserved@a{#1}\edef\reserved@b{##2}\ifx\reserved@a\reserved@b
+      \edef\@currext{##1}#2%
+    \fi
+  }%
+  \edef\reserved@a{%
+    \noexpand\tb@listoftocs
+    \noexpand\def\noexpand\@currext{\@currext}%
+  }\reserved@a
+  \let\do\relax
 }
 \newcommand{\@@doforeachtocfile}[1]{%
-  \begingroup
-    \def\do##1##2{%
-      \edef\@currext{##1}#1%
-    }%
-    \tb@listoftocs
-  \endgroup
+  \def\do##1##2{%
+    \edef\@currext{##1}#1%
+  }%
+  \edef\reserved@a{%
+    \noexpand\tb@listoftocs
+    \noexpand\def\noexpand\@currext{\@currext}%
+  }\reserved@a
+  \let\do\relax
 }
 %    \end{macrocode}
 % \end{macro}
@@ -1406,12 +1419,14 @@ be defined and used in \Macro{tocbasic@listhead}.
 %   the first, optional argument was given, the second, mandatory argument
 %   will be added to the individual hook, otherwise the general hook will be
 %   extended.
+%    \begin{macrocode}
 \newcommand{\BeforeStartingTOC}[2][]{%
   \expandafter\g@addto@macro\csname tb@#1@before@hook\endcsname{#2}%
 }
 \newcommand{\AfterStartingTOC}[2][]{%
-  \expandafter\g@addto@macro\csname tb@#1@before@hook\endcsname{#2}%
+  \expandafter\g@addto@macro\csname tb@#1@after@hook\endcsname{#2}%
 }
+%    \end{macrocode}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -1502,7 +1517,7 @@ be defined and used in \Macro{tocbasic@listhead}.
               \addcontentsline{toc}{section}{##1}%
             }{}%
           }%
-          \@mkboth{\MakeMarkcase{##1}}{\MakeMarkcase{##2}}%
+          \@mkboth{\MakeMarkcase{##1}}{\MakeMarkcase{##1}}%
         }%
       }%
     \else
@@ -1544,12 +1559,14 @@ be defined and used in \Macro{tocbasic@listhead}.
 %   the first, optional argument was given, the second, mandatory argument
 %   will be added to the individual hook, otherwise the general hook will be
 %   extended.
+%    \begin{macrocode}
 \newcommand{\BeforeTOCHead}[2][]{%
   \expandafter\g@addto@macro\csname tb@#1@beforehead@hook\endcsname{#2}%
 }
 \newcommand{\AfterTOCHead}[2][]{%
-  \expandafter\g@addto@macro\csname tb@#1@beforehead@hook\endcsname{#2}%
+  \expandafter\g@addto@macro\csname tb@#1@afterhead@hook\endcsname{#2}%
 }
+%    \end{macrocode}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -1668,6 +1685,19 @@ be defined and used in \Macro{tocbasic@listhead}.
 %
 % \iffalse
 %</package>
+%<*load>
+% Used at \KOMAScript{} classes to load and initialize the package.
+%    \begin{macrocode}
+\edef\@tempa{\noexpand\RequirePackage{tocbasic}[\tocbasicversion]}
+\@tempa
+%    \end{macrocode}
+% Tell the package, what files are used:
+%    \begin{macrocode}
+\addtotoclist{toc}
+\addtotoclist[float]{lof}
+\addtotoclist[float]{lot}
+%    \end{macrocode}
+%</load>
 % \fi
 %
 % \Finale
