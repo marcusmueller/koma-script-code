@@ -1,4 +1,4 @@
-% \CheckSum{1685}
+% \CheckSum{1738}
 % \iffalse meta-comment
 % ======================================================================
 % scrktare.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrktare.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrktare.dtx}[2008/04/09 v2.98c KOMA-Script (type area)]
+\ProvidesFile{scrktare.dtx}[2008/07/09 v3.00 KOMA-Script (type area)]
 % \iffalse
 %</driver>
 %<package&identify>\ProvidesPackage{typearea}[%
@@ -686,15 +686,42 @@
 %     ersetzt}
 %   \changes{v2.97e}{2007/11/23}{auf vielfachen Wunsch reicht die Klasse die
 %     Option an das Paket weiter}
+%   \changes{v3.00}{2008/07/09}{die Option kennt zusätzlich den Wert
+%     \texttt{semi}}
+% \begin{macro}{if@semitwoside}
+%   \changes{v3.00}{2008/07/09}{neuer Schalter (intern)}
+% \begin{macro}{if@twoside}
+%   \changes{v3.00}{2008/07/09}{Schalter setzt auch \cs{if@semitwoside}}
 % Einseitiger oder zweiseitiger Satzspiegel?
 %    \begin{macrocode}
+\newif\if@semitwoside
+\g@addto@macro\@twosidetrue\@semitwosidefalse
+\g@addto@macro\@twosidefalse\@semitwosidefalse
 %</package>
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%    \begin{macrocode}
 \KOMA@key{twoside}[true]{%
 %<class>  \if@atdocument\else\PassOptionsToPackage{twoside=#1}{typearea}\fi%
 %<*package>
   \if@atdocument\if@twoside\cleardoublepage\else\clearpage\fi\fi
-  \KOMA@set@ifkey{twoside}{@twoside}{#1}%
-  \if@twoside\@mparswitchtrue\else\@mparswitchfalse\fi%
+  \ifstr{#1}{semi}{%
+    \@twosidetrue
+    \@semitwosidetrue
+  }{%
+    \def\FamilyElseValue{, `semi'}%
+    \KOMA@set@ifkey{twoside}{@twoside}{#1}%
+  }%
+  \if@twoside
+    \if@semitwoside
+      \@mparswitchfalse
+    \else
+      \@mparswitchtrue
+    \fi
+  \else
+    \@mparswitchfalse
+  \fi%
   \csname recalctypearea\endcsname
 %</package>
 }
@@ -1120,7 +1147,11 @@
 %    \begin{macrocode}
 \KOMAExecuteOptions{paper=A4}
 \if@twoside
-  \KOMAExecuteOptions{twoside}
+  \if@semitwoside
+    \KOMAExecuteOptions{twoside=semi}
+  \else
+    \KOMAExecuteOptions{twoside}
+  \fi
 \else
   \KOMAExecuteOptions{twoside=false}
 \fi
@@ -1261,7 +1292,11 @@
     \advance\marginparwidth by-\marginparsep
   \else
     \if@twoside
-      \marginparwidth=1.5\ta@hblk
+      \if@semitwoside
+        \marginparwidth=\ta@hblk
+      \else
+        \marginparwidth=1.5\ta@hblk
+      \fi
     \else
       \marginparwidth=\ta@hblk
     \fi
@@ -1277,12 +1312,18 @@
   \oddsidemargin=-1in
   \evensidemargin=-1in
   \if@twoside
-    \advance\oddsidemargin by\ta@hblk
-    \advance\oddsidemargin by\ta@bcor
-    \advance\evensidemargin by2\ta@hblk
-    \if@mincl
-      \advance\evensidemargin by\marginparwidth
-      \advance\evensidemargin by\marginparsep
+    \if@semitwoside
+      \advance\oddsidemargin by1.5\ta@hblk
+      \advance\oddsidemargin by\ta@bcor
+      \evensidemargin=\oddsidemargin
+    \else
+      \advance\oddsidemargin by\ta@hblk
+      \advance\oddsidemargin by\ta@bcor
+      \advance\evensidemargin by2\ta@hblk
+      \if@mincl
+        \advance\evensidemargin by\marginparwidth
+        \advance\evensidemargin by\marginparsep
+      \fi
     \fi
   \else
     \advance\oddsidemargin by1.5\ta@hblk
@@ -2018,9 +2059,15 @@
   \oddsidemargin=-1in
   \evensidemargin=-1in
   \if@twoside
-    \advance\oddsidemargin by\ta@hblk
-    \advance\oddsidemargin by\ta@bcor
-    \advance\evensidemargin by2\ta@hblk
+    \if@semitwoside
+      \advance\oddsidemargin by1.5\ta@hblk
+      \advance\oddsidemargin by\ta@bcor
+      \evensidemargin\oddsidemargin
+    \else
+      \advance\oddsidemargin by\ta@hblk
+      \advance\oddsidemargin by\ta@bcor
+      \advance\evensidemargin by2\ta@hblk
+    \fi
   \else
     \advance\oddsidemargin by1.5\ta@hblk
     \advance\oddsidemargin by\ta@bcor
@@ -2054,7 +2101,11 @@
     \advance\topmargin by-\headsep
   \fi
   \if@twoside
-    \marginparwidth=1.5\ta@hblk
+    \if@semitwoside
+      \marginparwidth=\ta@hblk
+    \else
+      \marginparwidth=1.5\ta@hblk
+    \fi
   \else
     \marginparwidth=\ta@hblk
   \fi
