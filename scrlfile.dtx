@@ -1,4 +1,4 @@
-% \CheckSum{263}
+% \CheckSum{296}
 % \iffalse meta-comment
 % ======================================================================
 % scrlfile.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrlfile.dtx
 %<*driver|scrlfile|load>
 % \fi
-\def\scrlfileversion{2007/12/18 v2.98}
+\def\scrlfileversion{2008/07/09 v3.00}
 % \iffalse
 %</driver|scrlfile|load>
 %<*driver>
@@ -677,27 +677,46 @@
     \ifx\reserved@a\reserved@b
       \let\scr@saved@clearpage=\clearpage
       \renewcommand*{\clearpage}{\scr@saved@clearpage
-        \scr@hook@bcma\let\clearpage=\scr@saved@clearpage}%
+        \scr@hook@bcma
+        \scr@restore@newpage
+        \let\clearpage=\scr@saved@clearpage}%
     \fi%
   }%
 }
 %    \end{macrocode}
-%  \begin{macro}{\scr@saved@checkend}
-%    \changes{v2.95}{2002/09/03}{new (internal)}
+% \begin{macro}{\scr@saved@checkend}
+%   \changes{v2.95}{2002/09/03}{new (internal)}
 % You may see above, that we need a save-to macro.
 %    \begin{macrocode}
 \newcommand*{\scr@saved@checkend}{}
 %    \end{macrocode}
-%  \end{macro}
-%  \begin{macro}{\scr@hook@bcma}
-%    \changes{v2.95}{2002/09/03}{new (internal)}
-% We also need a macro, that saves the commands at the hook and is
-% extendable using \cs{g@addto@macro}. Here we also warn, if we detect
-% one more \cs{newpage}\,---\,maybe at a \cs{clearpage} or
-% \cs{cleardoublepage}.
+% \end{macro}
+% \begin{macro}{\scr@redefine@newpage}
+%   \changes{v3.00}{2008/07/09}{new (internal)}
+%   Some classes (e.g. \textsf{letter}) write output to the aux file.
+%   Because of this, redefinition of \cs{newpage} will only be done, if
+%   \cs{BeforeClosingMainAux} is used.
+% \begin{macro}{\scr@saved@newpage}
+%   \changes{v3.00}{2008/07/09}{new (internal)}
+%   And \cs{newpage} will be restored after the hook.
+% \begin{macro}{\scr@restore@newpage}
 %    \begin{macrocode}
-\newcommand*{\scr@hook@bcma}{%
-  \renewcommand*{\BeforeClosingMainAux}[1]{##1}%
+\newcommand*{\scr@redefine@newpage}{%
+  \let\scr@saved@newpage\newpage
+  \def\scr@restore@newpage{%
+    \renewcommand*{\newpage}{%
+      \PackageWarningNoLine{%
+        scrlfile%
+      }{%
+        \string\newpage\space at main aux file!\MessageBreak
+        You have output material at the main aux file.\MessageBreak
+        Note, that the \string\BeforeClosingMainAux\space commands\MessageBreak
+        are processed before the output from aux file%
+      }%
+      \let\newpage\scr@saved@newpage
+      \newpage
+    }%
+  }%
   \renewcommand*{\newpage}{%
     \PackageError{%
       scrlfile%
@@ -713,11 +732,30 @@
     }%
   }%
 }
+\newcommand*{\scr@restore@newpage}{}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \begin{macro}{\scr@hook@bcma}
+%   \changes{v2.95}{2002/09/03}{new (internal)}
+% We also need a macro, that saves the commands at the hook and is
+% extendable using \cs{g@addto@macro}. Here we also warn, if we detect
+% one more \cs{newpage}\,---\,maybe at a \cs{clearpage} or
+% \cs{cleardoublepage}.
+%    \begin{macrocode}
+\newcommand*{\scr@hook@bcma}{}
 %    \end{macrocode}
 %  \end{macro}
 % Now we are able to write the user command.
 %    \begin{macrocode}
 \newcommand*{\BeforeClosingMainAux}{%
+  \ifx\scr@hook@bcma\@empty
+    \gdef\scr@hook@bcma{%
+      \renewcommand*{\BeforeClosingMainAux}[1]{####1}%
+      \scr@redefine@newpage
+    }%
+  \fi
   \g@addto@macro\scr@hook@bcma%
 }
 %    \end{macrocode}
