@@ -60,6 +60,7 @@ my @variable;
 my @pagestyle;
 my @counter;
 my @floatstyle;
+my @fontelement;
 
 my $baselink;
 my $htmlhead;
@@ -86,9 +87,9 @@ while ( $auxfile=shift ) {
 		$entry = "$3.$page.$1.$2";
 		if ( "$2" eq "option" ) {
 		    push @option,$entry;
-		} elsif ( "$2" eq "macro" ) {
+		} elsif ( "$2" eq "cmd" ) {
 		    push @macro,$entry;
-		} elsif ( "$2" eq "environment" ) {
+		} elsif ( "$2" eq "env" ) {
 		    push @environment,$entry;
 		} elsif ( "$2" eq "plength" ) {
 		    push @plength,$entry;
@@ -100,6 +101,8 @@ while ( $auxfile=shift ) {
 		    push @counter,$entry;
 		} elsif ( "$2" eq "floatstyle" ) {
 		    push @floatstyle,$entry;
+		} elsif ( "$2" eq "fontelement" ) {
+		    push @fontelement,$entry;
 		} else {
 		    print STDERR "Unknown type $2!\n";
 		}
@@ -145,6 +148,7 @@ print "<li><a href=\"#variable\">$titles{variable}</a></li>" if ( @variable );
 print "<li><a href=\"#pagestyle\">$titles{pagestyle}</a></li>" if ( @pagestyle );
 print "<li><a href=\"#counter\">$titles{counter}</a></li>" if ( @counter );
 print "<li><a href=\"#floatstyle\">$titles{floatstyle}</a></li>" if ( @floatstyle );
+#print "<li><a href=\"#fontelement\">$titles{fontelement}</a></li>" if ( @fontelement );
 print "</ul>\n";
 
 process "option","",\@option;
@@ -155,4 +159,5 @@ process "variable","",\@variable;
 process "pagestyle","",\@pagestyle;
 process "counter","",\@counter;
 process "floatstyle","",\@floatstyle;
+#process "fontelement","",\@fontelement;
 print $htmlend;

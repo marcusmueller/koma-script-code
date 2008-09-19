@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2008/04/08 v1.2 internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2008/09/04 v1.3b internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -98,8 +98,17 @@
 \LoadClassWithOptions{scrbook}
 \RequirePackage[latin1]{inputenc}
 \RequirePackage[TS1,T1]{fontenc}
-\RequirePackage{babel}
+\def\languages{}
+\ifstr{\languagename}{english}{}{\g@addto@macro\languages{,english}}
+\ifstr{\languagename}{ngerman}{\frenchspacing}{%
+  \g@addto@macro\languages{,ngerman}}
+\g@addto@macro\languages{,\languagename}
+\edef\uselanguage{\languagename}
+\edef\languages{\languages}
+\expandafter\RequirePackage\expandafter[\languages]{babel}%
 \RequirePackage[fixlanguage]{babelbib}
+\expandafter\selectbiblanguage\expandafter{\uselanguage}
+\RequirePackage{afterpage}
 \RequirePackage{makeidx}
 \RequirePackage{scrdate}
 \RequirePackage{scrtime}
@@ -109,13 +118,15 @@
 \RequirePackage{amsmath}
 \RequirePackage{listings}
 \RequirePackage{multicol}
-\RequirePackage{hyperref}
+\RequirePackage{xcolor,tocstyle}% hyperref needs xcolor with tocstyle
+\RequirePackage[\uselanguage]{hyperref}
 %    \end{macrocode}
 %
 %
 % \section{Free or Non-Free Version}
 %
 %    \begin{macrocode}
+\newif\ifshortversion\shortversionfalse
 \AtEndOfClass{%
   \InputIfFileExists{scrnonfree.tex}{}{%
     \typeout{^^J
@@ -128,6 +139,14 @@
       ^^J%
     }%
     \newcommand*{\iffree}{\@firstoftwo}%
+    \shortversiontrue
+    \newcommand*{\LoadNonFree}[2]{%
+      \par
+      Im \KOMAScript-Buch \cite{book:komascript} finden sich an dieser Stelle
+      weitere Informationen.
+      \par
+    }%
+    \AtBeginDocument{\InputIfFileExists{linkalias.tex}{}}%
     \usepackage{lmodern}%
     \@twosidefalse\@openrightfalse\@mparswitchfalse
     \RequirePackage{geometry}%
@@ -184,6 +203,35 @@
 \RequirePackage{textcomp}
 %    \end{macrocode}
 %
+% \section{Load common paragraphs}
+%
+% \begin{macrocode}
+\newcounter{commonpar}
+\newcommand*{\LoadCommon}[2][\label@base]{%
+  \setcounter{commonpar}{#2}%
+  \@ifundefined{ifCommon#1}{%
+    \expandafter\csname newif\expandafter\endcsname
+    \csname ifCommon#1\endcsname
+  }{}%
+  \csname Common#1true\endcsname
+  \input{common.tex}%
+  \csname Common#1false\endcsname
+}
+\newcommand*{\IfCommon}[1]{%
+  \ifstr{\label@base}{#1}{%
+    \@firstofone
+  }{%
+    \@gobble
+  }%
+}
+\newcommand*{\IfNotCommon}[1]{%
+  \ifstr{\label@base}{#1}{%
+    \@gobble
+  }{%
+    \@firstofone
+  }%
+}
+% \end{macrocode}
 %
 % \section{Language Dependencies}
 %
@@ -191,16 +239,16 @@
 % of the extensions to the language.
 %    \begin{macrocode}
 \AtBeginDocument{%
-  \InputIfFileExists{\jobname-\languagename.tex}{%
-    \ClassInfo{scrguide}{Loading language dependencies for \languagename}%
+  \InputIfFileExists{\jobname-\uselanguage.tex}{%
+    \ClassInfo{scrguide}{Loading language dependencies for \uselanguage}%
   }{%
-    \ClassError{scrguide}{\languagename\space not supported}{%
-      You've tried to generate a guide for language `\languagename' but
+    \ClassError{scrguide}{\uselanguage\space not supported}{%
+      You've tried to generate a guide for language `\uselanguage' but
       language\MessageBreak
-      dependency file `\jobname-\language.tex' was not found.\MessageBreak
+      dependency file `\jobname-\uselanguage.tex' was not found.\MessageBreak
       This may result in a lot of errors and warnings, if you'll continue}%
   }%
-  \expandafter\addto\csname extras\languagename\endcsname
+  \expandafter\addto\csname extras\uselanguage\endcsname
   \GuideLanguageExtensions\GuideLanguageExtensions
 }
 %    \end{macrocode}
@@ -472,6 +520,7 @@
 % \begin{macro}{\OParameter}
 % \begin{macro}{\AParameter}
 % \begin{macro}{\PParameter}
+% \begin{macro}{\POParameter}
 %   \begin{description}
 %   \item[\cs{Macro}] \LaTeX{} or \TeX{} macro
 %   \item[\cs{Option}] class or package option
@@ -516,7 +565,9 @@
   }\PName{#1}\texttt{%(
     )}}
 \DeclareRobustCommand*{\PParameter}[1]{\texttt{\{#1\}}}
+\DeclareRobustCommand*{\POParameter}[1]{\texttt{[#1]}}
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -640,15 +691,15 @@
     \expandafter\let\csname X##1\expandafter\endcsname
     \csname ##1\endcsname
     \expandafter\newcommand\expandafter*\csname new##1\endcsname[1]{%
-      \begingroup
-        \let\ensuremath\@firstofone
-        \let\textit\@firstofone
-        \lowercase{\def\@tempa{##1}}%
-        \pdfstringdef\@tempb{\label@base.\@tempa.####1}%
-        \xdef\@currentHref{\@tempb}%
-        \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
-        \label{desc:\label@base.\@tempa.####1}%
-      \endgroup
+%      \begingroup
+%        \let\ensuremath\@firstofone
+%        \let\textit\@firstofone
+%        \lowercase{\def\@tempa{##1}}%
+%        \pdfstringdef\@tempb{\label@base.\@tempa.####1}%
+%        \xdef\@currentHref{\@tempb}%
+%        \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
+%        \label{desc:\label@base.\@tempa.####1}%
+%      \endgroup
       \csname X##1\endcsname{####1}\ignorespaces
     }%
     \expandafter\let\csname ##1\expandafter\endcsname\csname new##1\endcsname
@@ -658,15 +709,15 @@
     \expandafter\let\csname X##1\expandafter\endcsname
     \csname ##1\endcsname
     \expandafter\newcommand\expandafter*\csname new##1\endcsname[2]{%
-      \begingroup
-        \let\ensuremath\@firstofone
-        \let\textit\@firstofone
-        \lowercase{\def\@tempa{##1}}%
-        \pdfstringdef\@tempb{\label@base.\@tempa.####1.####2}%
-        \xdef\@currentHref{\@tempb}%
-        \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
-        \label{desc:\label@base.\@tempa.####1.####2}%
-      \endgroup
+%      \begingroup
+%        \let\ensuremath\@firstofone
+%        \let\textit\@firstofone
+%        \lowercase{\def\@tempa{##1}}%
+%        \pdfstringdef\@tempb{\label@base.\@tempa.####1.####2}%
+%        \xdef\@currentHref{\@tempb}%
+%        \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
+%        \label{desc:\label@base.\@tempa.####1.####2}%
+%      \endgroup
       \csname X##1\endcsname{####1}{##2{####2}}\ignorespaces
     }%
     \expandafter\let\csname ##1\expandafter\endcsname\csname new##1\endcsname
@@ -684,7 +735,7 @@
 %    \end{macrocode}
 % \end{macro}
 %    \begin{macrocode}
-  \par\small\addvspace{2\baselineskip}%
+  \ifvmode\else\par\fi\small\addvspace{2\baselineskip}%
   \vspace{-\baselineskip}%
   \vspace{\z@ plus \baselineskip}%
   \noindent\hspace{-1em}%
@@ -990,9 +1041,97 @@
 %
 % Setup listings:
 %    \begin{macrocode}
-\lstset{basicstyle=\ttfamily,%
-  aboveskip=.5\baselineskip,%
-  belowskip=.5\baselineskip%
+\lstdefinestyle{basics}{%
+  basicstyle=\ttfamily,%
+  aboveskip=.4\baselineskip,%
+  belowskip=0\baselineskip%
+}
+\lstdefinestyle{code}{%
+  style=basics,%
+  language=[LaTeX]TeX,%
+  moretexcs={%
+    @auxout,
+    @currext,
+    @empty,
+    @float,
+    @ifpackagelater,
+    @ifundefined,
+    @rightmark,
+    @secondoftwo,
+    @tempswafalse,@tempswatrue,
+    AtBeginDocument,
+    AtEndDocument,
+    ClassWarningNoLine,CurrentOption,
+    DeclareOption,dimexpr,
+    end@float,
+    ExecuteOptions,
+    if@filesw,if@tempswa,if@twoside,
+    includegraphics,
+    MessageBreak,
+    onehalfspacing,
+    PackageError,PackageInfo,PackageWarning,PassOptionsToPackage,
+    ProcessOptions,ProvidesFile,ProvidesPackage,
+    RequirePackage,
+    setlength,
+    textsuperscript}%
+}
+\lstdefinestyle{output}{%
+  style=basics,breaklines,prebreak=\mbox{$\hookleftarrow$}%
+}
+\lstdefinestyle{KOMA}{%
+  style=code,%
+  moretexcs={%
+    @addtoplength,@setplength,@newplength,
+    addchap,addrentry,Address,addcontentslinetoeachtocfile,addtoeachtocfile,
+    addtokomafont,addtolengthplength,addtoreffields,addtotoclist,
+    adrchar,adrentry,AfterBibliographyPreamble,AfterFile,AfterPackage,
+    appendixmore,appendixname,areaset,autodot,automark,AtAddToTocList,
+    AtBeginLetter,
+    BeforeClosingMainAux,BeforePackage,bib@beginhook,bib@endhook,
+    cc,captionabove,captionformat,cefoot,cfoot,chapapp,chapappifchapterprefix,
+    chapter,chapterformat,chaptermarkformat,chapterpagestyle,chead,
+    cleardoubleevenemptypage,clearscrheadfoot,closing,cofoot,Comment,
+    dedication,deffootnote,deffootnotemark,DefineFamily,DefineFamilyKey,
+    DefineFamilyMember,defpagestyle,deftripstyle,
+    dictum,dictumauthorformat,dictumwidth,doforeachtocfile,
+    encl,extratitle,
+    FamilyBoolKey,FamilyExecuteOptions,FamilyNumericalKey,%
+    FamilyOption,FamilyOptions,FamilyProcessOptions,FamilySetBool,
+    figureformat,figurename,firstfoot,firsthead,FirstName,footfont,footref,
+    FreeI,FreeII,FreeIII,FreeIV,
+    headfont,headmark,
+    ifattoclist,ifoot,ihead,ifkomavarempty,ifstr,ifthispageodd,InputAddressFile,
+    KOMAoption,KOMAoptions,KOMAScript,
+    l@addto@macro,LastName,LetterOptionNeedsPapersize,listoffigures,
+    listoftables,listoftoc,LoadLetterOption,lohead,lowertitleback,
+    MakeMarkcase,maketitle,manualmark,marginline,minisec,
+    multfootsep,multiplefootnoteseparator,
+    Name,nameday,newbibstyle,newcaptionname,newkomavar,nexthead,
+    ofoot,ohead,opening,othersectionlevelsformat,
+    p@section,pagemark,part,partformat,partname,partpagestyle,pnumfont,
+    publishers,ps,
+    raggedsection,raggedpart,raggedsignature,recalctypearea,rehead,
+    removereffields,ReplaceInput,ReplacePackage,
+    sectionmarkformat,setbibpreamble,setcapindent,setcapwidth,
+    setchapterpreamble,setfootbotline,setfootsepline,setfootwidth,
+    setheadsepline,setheadtopline,setheadwidth,setindexpreamble,setkomafont,
+    setkomavar,setlengthtoplength,setparsizes,setpartpreamble,setuptoc,
+    subject,subsectionmarkformat,subtitle,
+    tableformat,tablename,tableofcontents,textsubscript,thechapter,thefigure,
+    thefootnotemark,thepart,thesection,thesubsection,thetable,thistime,
+    titlehead,tocbasic@extend@babel,todaysname,typearea,
+    unsettoc,usekomafont,useplength,usekomavar,uppertitleback
+  }%
+}
+\lstset{style=basics}
+\lstnewenvironment{lstoutput}[1][]{%
+  \lstset{style=output,basicstyle=\ttfamily\small,#1}%
+}{}
+\lstnewenvironment{lstcode}[1][]{%
+  \lstset{style=KOMA,basicstyle=\ttfamily\small,#1}%
+}{}
+\newcommand*{\lstinputcode}[1][]{%
+  \lstinputlisting[style=KOMA,basicstyle=\ttfamily\small,#1]%
 }
 %    \end{macrocode}
 %
@@ -1094,9 +1233,21 @@ KOMAScript \endcsname
 % We have large page numbers, so better setup the needed width. And we like
 % other dot seperation.
 %    \begin{macrocode}
-\renewcommand*{\@pnumwidth}{1.67em}
+\usetocstyle{classic}
+\renewcommand*{\@pnumwidth}{1.8em}% 1.67
+\renewcommand*\@tocrmarg {2.70em}% 2.55em
 \renewcommand*\@dotsep{2.5}
 %    \end{macrocode}
+%
+% \section{Part}
+%
+% We want another vertical spacing at part headings.
+%    \begin{macrocode}
+\renewcommand*{\partheadstartvskip}{\vspace*{.1\textheight}}
+\renewcommand*{\partheadmidvskip}{\par\nobreak\vspace{.5\baselineskip}}
+\renewcommand*{\partpagestyle}{empty}
+%    \end{macrocode}
+%
 %
 % \section{Appendix}
 %
@@ -1133,10 +1284,19 @@ KOMAScript \endcsname
   \bibliographystyle{babalpha-fl}%
   \renewcommand*{\@openbib@code}{%
     \setlength{\parsep}{0pt}%
-    \renewcommand*{\btxauthorcolon}[1]{:\par}%
-    \renewcommand*{\btxurlfont}{\par\url}%
+    \renewcommand*{\btxauthorcolon}[1]{:\par\nobreak}%
+    \renewcommand*{\btxurlfont}{\par\nobreak\url}%
     \raggedright
   }%
+}
+%    \end{macrocode}
+%
+% The generated argument of thebibliography is to short:
+%    \begin{macrocode}
+\newcommand*{\OrigTheBibliography}{}
+\let\OrigTheBibliography\thebibliography
+\renewcommand*{\thebibliography}[1]{%
+  \OrigTheBibliography{XXXX99}%
 }
 %    \end{macrocode}
 %
@@ -1378,7 +1538,12 @@ KOMAScript \endcsname
 %   |\Define|\dots|Index| for more information about the kind of an index
 %   entry. The third argument is the index entry.
 %    \begin{macrocode}
+\newif\ifnolabel
+\def\nolabelfalse{\global\let\ifnolabel\iffalse}%
+\def\nolabeltrue{\global\let\ifnolabel\iftrue}%
+\newlength\PreserveSkip
 \newcommand*{\BeginIndex}[3][indexmain]{%
+  \ifvmode\PreserveSkip=\lastskip\else\PreserveSkip=\z@\fi
   \expandafter\ifx\csname Index#2\endcsname\relax
     \GenericError{(scrguide)\@spaces\@spaces\@spaces\@spaces}{%
       Document scrguide Error: \string\BeginIndex\space with unknown
@@ -1390,6 +1555,38 @@ KOMAScript \endcsname
     \csname Index#2\endcsname[(%)
       #1]{#3}%
   \fi
+  \ifnolabel\nolabelfalse\else
+    \ifx\relax#2\relax\else
+        \begingroup
+        \def\SplitIndexValue##1~=##2~=##3\@nil{%
+          ##1\expandafter\ifx\expandafter\relax##2\relax\else.##2\fi
+        }%
+        \let\PName\@gobble
+        \let\PValue\@firstofone
+        \let\ensuremath\@firstofone
+        \let\textit\@firstofone
+        \def~{\string~}%
+        \lowercase{\def\@tempa{#2}}%
+        \edef\@tempa{\label@base.\@tempa.\SplitIndexValue#3~=~=\@nil}%
+        \pdfstringdef\@tempb{\@tempa}%
+        \expandafter\ifx\csname \@tempb\endcsname\relax
+          \expandafter\xdef\csname \@tempb\endcsname{\the\inputlineno}%
+          \xdef\@currentHref{\@tempb}%
+          \ClassInfo{scrguide}{Anchor: `\@currentHref'}%
+          \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
+          \label{desc:\@tempa}%
+        \else
+          \ClassWarning{scrguide}{%
+            Label \@tempa\space already defined at \csname
+            \@tempb\endcsname,\MessageBreak
+            ignored}%
+        \fi
+      \endgroup
+    \fi
+  \fi
+  \ifvmode\ifdim \PreserveSkip=\z@\else
+      \vskip -\PreserveSkip\vskip\PreserveSkip
+  \fi\fi
   \ignorespaces
 }
 \newcommand*{\EndIndex}[3][indexmain]{%
@@ -1468,7 +1665,7 @@ KOMAScript \endcsname
     \expandafter\newcommand\expandafter*%
     \csname Index#2\endcsname[2][indexother]{%
       \Index[##1]{##2 (#1)=\UseIndex{gen}#4{##2} (\protect #1)}%
-      \Index[##1]{#2=\UseIndex{gen}\protect#1>##2=\UseIndex{gen}#4{##2}}%
+      \Index[##1]{\csname Guide#2IndexCategoryExpanded\endcsname=\UseIndex{gen}\expandafter\protect\csname Guide#2IndexCategory\endcsname>##2=\UseIndex{gen}#4{##2}}%
       \IndexSeeAt[#1]{##2}{#3}{gen}{\GuidegenIndex}{#4}%
     }%
   \fi
@@ -1506,8 +1703,8 @@ KOMAScript \endcsname
   \else
     \expandafter\newcommand\expandafter*%
     \csname Index#2\endcsname[2][indexother]{%
-      \IndexSeeAt[#1]{##2}{gen}{#3}{#4}{#6}%
-      \Index[##1]{#1=\UseIndex{gen}\protect#1>##2=\UseIndex{gen}#6{##2}}%
+%      \IndexSeeAt[#1]{##2}{gen}{#3}{#4}{#6}%
+%      \Index[##1]{#1=\UseIndex{gen}\protect#1>##2=\UseIndex{gen}#6{##2}}%
       \IndexSeeAt[#1]{##2}{#5}{#3}{#4}{#6}%
       \Index[##1]{##2 (#1)=\UseIndex{#3}#6{##2} (\protect #1)}%
     }%
