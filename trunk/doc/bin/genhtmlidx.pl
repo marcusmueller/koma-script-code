@@ -61,6 +61,7 @@ my @pagestyle;
 my @counter;
 my @floatstyle;
 my @fontelement;
+my @file;
 
 my $baselink;
 my $htmlhead;
@@ -103,6 +104,8 @@ while ( $auxfile=shift ) {
 		    push @floatstyle,$entry;
 		} elsif ( "$2" eq "fontelement" ) {
 		    push @fontelement,$entry;
+		} elsif ( "$2" eq "package" ) {
+		    push @file,$entry;
 		} else {
 		    print STDERR "Unknown type $2!\n";
 		}
@@ -149,6 +152,7 @@ print "<li><a href=\"#pagestyle\">$titles{pagestyle}</a></li>" if ( @pagestyle )
 print "<li><a href=\"#counter\">$titles{counter}</a></li>" if ( @counter );
 print "<li><a href=\"#floatstyle\">$titles{floatstyle}</a></li>" if ( @floatstyle );
 #print "<li><a href=\"#fontelement\">$titles{fontelement}</a></li>" if ( @fontelement );
+#print "<li><a href=\"#file\">$titles{file}</a></li>" if ( @fontelement );
 print "</ul>\n";
 
 process "option","",\@option;
@@ -160,4 +164,5 @@ process "pagestyle","",\@pagestyle;
 process "counter","",\@counter;
 process "floatstyle","",\@floatstyle;
 #process "fontelement","",\@fontelement;
+#process "file","",\@file;
 print $htmlend;

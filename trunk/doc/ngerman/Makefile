@@ -1,4 +1,5 @@
-# Makefile.latexinit
+# ======================================================================
+# Makefile
 # Copyright (c) Markus Kohm, 2002-2008
 #
 # This file is part of the LaTeX2e KOMA-Script bundle.
@@ -7,7 +8,7 @@
 # the LaTeX Project Public License, version 1.3b of the license.
 # The latest version of this license is in
 #   http://www.latex-project.org/lppl.txt
-# and version 1.3b or later is part of all distributions of LaTeX
+# and version 1.3b or later is part of all distributions of LaTeX 
 # version 2005/12/01 or later and of this work.
 #
 # This work has the LPPL maintenance status "author-maintained".
@@ -16,8 +17,8 @@
 #
 # This work consists of all files listed in manifest.txt.
 # ----------------------------------------------------------------------
-# Makefile.latexinit
-# Copyright (c) Markus Kohm, 2002-2006
+# Makefile
+# Copyright (c) Markus Kohm, 2002-2008
 #
 # Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 # Version 1.3b, verteilt und/oder veraendert werden.
@@ -30,39 +31,20 @@
 # (allein durch den Autor verwaltet).
 #
 # Der Aktuelle Verwalter und Autor dieses Werkes ist Markus Kohm.
-#
+# 
 # Dieses Werk besteht aus den in manifest.txt aufgefuehrten Dateien.
 # ======================================================================
 
-# Read input first from basedir and doc dir
-TEXINPUTS	:= ./:$(DOCDIR):$(BASEDIR):$(TEXINPUTS)
+# ----------------------------------------------------------------------
+# Directory with basics
+BASEDIR	?= $(PWD)/../../
+DOCDIR = $(BASEDIR)doc/
+# language
+LANGUAGE         = ngerman
+LANGUAGESHORTCUT = de
+LANGUAGELONG     = ngerman
 
-BIBINPUTS       = $(DOCDIR):$(shell kpsewhich -expand-var=\$$BIBINPUTS)
-BSTINPUTS       = $(DOCDIR):$(shell kpsewhich -expand-var=\$$BSTINPUTS)
-BIBTEX_SRC      = $(DOCDIR)guide.bib
+include Makefile.guide
 
-MAKEINDEXSTYLE  = $(DOCDIR)scrguide.ist
-MAKEINDEXOPT    = -r -s $(MAKEINDEXSTYLE) -o
-MAKEINDEX	= makeindex $(MAKEINDEXOPT)
-
-MAKECHANGESTYLE = $(DOCDIR)scrguide.gst
-MAKECHANGEOPT   = -r -s $(MAKECHANGESTYLE) -o
-MAKECHANGE      = makeindex $(MAKECHANGEOPT)
-
-PDFLATEX	= $(LATEX) $(NONSTOPMODE) \
-                           '\def\languagename{'$(LANGUAGELONG)'}' \
-			   $(PDFOUTPUT)
-INDEXPOSTOP     = $(DOCDIR)/bin/genindex.pl
-GENHTMLINDEX    = $(DOCDIR)/bin/genhtmlidx.pl
-#BIBTEX		= bibtex8
-#BIBTEXNOERROR	= 1 # BibTeX8 returns 1 after warnings
-BIBTEX		= bibtex
-BIBTEXNOERROR   = 0 # BibTeX returns 0 on ok
-BIBTEXFIX       = sed -i -e 's/\\btxurlfont[[:space:]]*$$/\\expandafter&/'
-
-MPOST		= mpost -tex=latex -interaction=batchmode
-MPTOPDF         = mptopdf
-
-EPSTOPDF        = epstopdf
-
-export TEXINPUTS BIBINPUTS BSTINPUTS
+#
+# end of file `Makefile'

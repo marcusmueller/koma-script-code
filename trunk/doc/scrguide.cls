@@ -146,7 +146,7 @@
       weitere Informationen.
       \par
     }%
-    \AtBeginDocument{\InputIfFileExists{linkalias.tex}{}}%
+    \AtBeginDocument{\InputIfFileExists{linkalias.tex}{}{}}%
     \usepackage{lmodern}%
     \@twosidefalse\@openrightfalse\@mparswitchfalse
     \RequirePackage{geometry}%
@@ -911,7 +911,7 @@
 %    \begin{macrocode}
 \providecommand*{\ChangedAt}[2]{%
   \marginline{\footnotesize\fbox{\strut#1}}%
-  \glossary{#2>#1|indexrm}%
+  \glossary{#1|indexrm}%
 }
 %    \end{macrocode}
 % \end{macro}
