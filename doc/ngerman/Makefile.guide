@@ -57,7 +57,7 @@ endif
 
 # ----------------------------------------------------------------------
 # List of all Makefiles
-MAKE_FILES	= Makefile
+MAKE_FILES	= Makefile Makefile.guide
 
 # ----------------------------------------------------------------------
 GUIDENAME       = scrgui$(LANGUAGESHORTCUT)
@@ -77,7 +77,7 @@ TEX_CHAPTERS     = preface.tex introduction.tex \
                    scrlttr2-experts.tex \
                    $(TEX_APPENDICES)
 
-TEX_MISC         = common.tex
+TEX_MISC         = guide.tex common.tex linkalias.tex
 
 EXAMPLE_LETTER_DTX = scrlttr2examples.dtx
 
@@ -115,7 +115,7 @@ TEX_SRC		= guide-$(LANGUAGELONG).tex $(TEX_CHAPTERS) $(TEX_MISC)
 MISC_SRC	= $(MAKE_FILES) htmlsetup \
 		  labelbasic.lco settleford600label.lco
 
-DIST_SRC	= $(MISC_SRC) $(TEX_SRC)
+DIST_SRC	= $(MISC_SRC) $(TEX_SRC) $(EXAMPLE_LETTER_DTX)
 
 GUIDE_FILES     = $(GUIDENAME).pdf $(GUIDENAME).html
 
@@ -245,7 +245,7 @@ $(GUIDENAME).html: guide.aux \
                    $(foreach file,$(TEX_CHAPTERS),$(basename $(file)).aux)
 	$(GENHTMLINDEX) $(addsuffix .aux,$(basename $(TEX_CHAPTERS))) >$@
 
-$(GUIDENAME).pdf: $(DOCDIR)scrguide.cls $(DOCDIR)guide.tex $(GENERATED_SRC)\
+$(GUIDENAME).pdf: $(DOCDIR)scrguide.cls guide.tex $(GENERATED_SRC)\
 		  guide.aux guide.bbl $(BIBTEX_SRC) \
 	          $(MAKEINDEXSTYLE) guide.ind guide.idx \
 		  $(MAKECHANGESTYLE) guide.chn guide.glo \
@@ -281,7 +281,7 @@ guide.bbl: $(BIBTEX_SRC) guide.aux
 	$(BIBTEX) guide || test $$? -le $(BIBTEXNOERROR)
 	$(BIBTEXFIX) guide.bbl
 
-guide.glo guide.idx guide.aux: ../guide.tex $(TEX_SRC)
+guide.glo guide.idx guide.aux: guide.tex $(TEX_SRC)
 	$(PDFLATEX) guide.tex
 
 # ----------------------------------------------------------------------
