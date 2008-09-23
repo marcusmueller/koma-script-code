@@ -42,7 +42,7 @@ export BASEDIR
 
 # ----------------------------------------------------------------------
 # All directories with Makefiles
-SUBDIRS = german english ngerman
+SUBDIRS = english ngerman
 
 # ----------------------------------------------------------------------
 # Default rules
