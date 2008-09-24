@@ -44,7 +44,7 @@ LANGUAGE         = ngerman
 LANGUAGESHORTCUT = de
 LANGUAGELONG     = ngerman
 
-include Makefile.guide
+include $(DOCDIR)$(LANGUAGE)/Makefile.guide
 
 #
 # end of file `Makefile'

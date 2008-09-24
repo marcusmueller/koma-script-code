@@ -224,7 +224,7 @@ edit:
 CKSUMFILES = $(BIBTEX_SRC) $(MAKEINDEXSTYLE) $(MAKECHANGESTYLE) \
 	     guide.aux guide.ind guide.idx guide.bbl guide.toc guide.lot \
 	     guide.out guide.chn guide.glo \
-	     $(foreach file,$(TEX_CHAPTERS),$(basename $(file)).aux)
+	     $(foreach file,$(TEX_CHAPTERS) $(TEX_NONFREECHAPTERS),$(basename $(file)).aux)
 
 define latex
 	$(SMV) $@ guide.pdf || exit 0
@@ -241,15 +241,18 @@ define latex
 	$(SMV) guide.pdf $@
 endef
 
-$(GUIDENAME).html: guide.aux \
-                   $(foreach file,$(TEX_CHAPTERS),$(basename $(file)).aux)
-	$(GENHTMLINDEX) $(addsuffix .aux,$(basename $(TEX_CHAPTERS))) >$@
+$(GUIDENAME).html: htmlsetup guide.aux \
+                   $(foreach file,$(TEX_CHAPTERS) $(TEX_NONFREECHAPTERS),\
+		             $(basename $(file)).aux)
+	$(GENHTMLINDEX) $(addsuffix .aux,\
+	                  $(basename $(TEX_CHAPTERS) $(TEX_NONFREECHAPTERS)))\
+			  >$@
 
 $(GUIDENAME).pdf: $(DOCDIR)scrguide.cls guide.tex $(GENERATED_SRC)\
 		  guide.aux guide.bbl $(BIBTEX_SRC) \
 	          $(MAKEINDEXSTYLE) guide.ind guide.idx \
 		  $(MAKECHANGESTYLE) guide.chn guide.glo \
-	          $(TEX_SRC)
+	          $(TEX_SRC) $(TEX_NONFREECHAPTERS) $(TEX_NONFREEMISC)
 	$(SRM) guide.md5
 	$(latex)
 
@@ -281,7 +284,8 @@ guide.bbl: $(BIBTEX_SRC) guide.aux
 	$(BIBTEX) guide || test $$? -le $(BIBTEXNOERROR)
 	$(BIBTEXFIX) guide.bbl
 
-guide.glo guide.idx guide.aux: guide.tex $(TEX_SRC)
+guide.glo guide.idx guide.aux: guide.tex $(TEX_SRC) \
+	                       $(TEX_NONFREECHAPTERS) $(TEX_NONFREEMISC)
 	$(PDFLATEX) guide.tex
 
 # ----------------------------------------------------------------------
