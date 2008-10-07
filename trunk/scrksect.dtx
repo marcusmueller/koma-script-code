@@ -1,4 +1,4 @@
-% \CheckSum{1845}
+% \CheckSum{1848}
 % \iffalse meta-comment
 % ======================================================================
 % scrksect.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrksect.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrksect.dtx}[2008/07/04 v3.00 KOMA-Script (disposition)]
+\ProvidesFile{scrksect.dtx}[2008/10/07 v3.00 KOMA-Script (disposition)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -741,12 +741,17 @@
 %  \begin{macro}{\if@autodot}
 %    \changes{v2.8e}{2001/07/10}{neuer Schalter}
 %  \begin{macro}{\@autodottrue}
+%    \changes{v3.00}{2008/10/07}{arbeitet nun gobal}
 %  \begin{macro}{\@autodotfalse}
+%    \changes{v3.00}{2008/10/07}{arbeitet nun gobal}
 % Damit die Umschaltung auch wieder zurück auf Regel~5 automatisch
 % erfolgen kann, wird ein zweiter Schalter benötigt.
 %    \begin{macrocode}
 \newif\if@altsecnumformat\@altsecnumformatfalse
-\newif\if@autodot\@autodotfalse
+\newif\if@autodot
+\renewcommand*{\@autodottrue}{\global\let\if@autodot\iftrue}
+\renewcommand*{\@autodotfalse}{\global\let\if@autodot\iffalse}
+\@autodotfalse
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
@@ -767,21 +772,23 @@
 %    \end{macrocode}
 %  \begin{macro}{\@@maybeautodot}
 %    \changes{v2.8e}{2001/07/10}{neu (intern)}
+%    \changes{v3.00}{2008/10/07}{neuerdings überflüssige \cs{aftergroup}
+%      entfernt}
 % Die expandierte Darstellung wird dann auf Darstellungsbefehle für
 % Zähler gescannt.
 %    \begin{macrocode}
 \newcommand*{\@@maybeautodot}[1]{%
   \ifx #1\@stop\let\@@maybeautodot\relax
   \else
-    \ifx #1\Alph \aftergroup\@autodottrue\fi
-    \ifx #1\alph \aftergroup\@autodottrue\fi
-    \ifx #1\Roman \aftergroup\@autodottrue\fi
-    \ifx #1\roman \aftergroup\@autodottrue\fi
-    \ifx #1\@Alph \aftergroup\@autodottrue\fi
-    \ifx #1\@alph \aftergroup\@autodottrue\fi
-    \ifx #1\@Roman \aftergroup\@autodottrue\fi
-    \ifx #1\@roman \aftergroup\@autodottrue\fi
-    \ifx #1\romannumeral \aftergroup\@autodottrue\fi
+    \ifx #1\Alph \@autodottrue\fi
+    \ifx #1\alph \@autodottrue\fi
+    \ifx #1\Roman \@autodottrue\fi
+    \ifx #1\roman \@autodottrue\fi
+    \ifx #1\@Alph \@autodottrue\fi
+    \ifx #1\@alph \@autodottrue\fi
+    \ifx #1\@Roman \@autodottrue\fi
+    \ifx #1\@roman \@autodottrue\fi
+    \ifx #1\romannumeral \@autodottrue\fi
   \fi
   \@@maybeautodot
 }
