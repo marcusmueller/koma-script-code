@@ -45,7 +45,7 @@
 %
 % ======================================================================
 
-\ProvidesFile{typearea.tex}[2008/09/25 KOMA-Script guide (chapter: typearea)]
+\ProvidesFile{typearea.tex}[2008/07/10 KOMA-Script guide (chapter: typearea)]
 \translator{Markus Kohm\and Gernot Hassenpflug}
 
 % Date of translated german file: 2006-11-29
@@ -57,9 +57,8 @@
 \Macro{KOMAoptions}, \Macro{KOMAoption}, \Macro{recalctypearea}.
 
 \textsc{Note:} Following options are still missing in this chapter:
-\KOption{paper}\PName{size}, \OptionValue{twoside}{semi},
-\OptionValue{twocolumn}{false}, \KOption{headheight}\PName{height},
-\OptionValue{pagesize}{automedia}.
+\OptionValue{BCOR}{current}, \OptionValue{twoside}{semi},
+\KOption{headheight}\PName{height}, \OptionValue{pagesize}{automedia}.
 
 \section{Fundamentals of Page Layout}
 
@@ -266,10 +265,59 @@ Since the \Package{typearea} package is loaded automatically when
 using the {\KOMAScript} main classes, the package options can be given
 as class options (see \autoref{sec:maincls.options}).
 
+
+\begin{Declaration}
+  \KOption{twoside}\PName{value}
+\end{Declaration}%
+\BeginIndex{Option}{twoside~=\PName{value}}%
+These two options have the same effect as in the standard classes.
+The option \Option{oneside} defines a one-sided document layout with a
+one-sided page layout. This means in particular that normally a ragged
+page bottom is used.
+
+The option \Option{twoside} defines a two-sided document layout with a
+two-sided page layout. This means that the {\LaTeX} command
+\Macro{flushbottom}\IndexCmd{flushbottom} is used to ensure that page
+breaks don't leave a variable empty space at the bottom of a page. A
+ragged page bottom can be obtained with the {\LaTeX} command
+\Macro{raggedbottom}\IndexCmd{raggedbottom}.
+%
+\EndIndex{Option}{twoside~=\PName{value}}%
+
+
+\begin{Declaration}
+  \KOption{twocolumn}\PName{switch}
+\end{Declaration}%
+\BeginIndex{Option}{twocolumn~=\PName{switch}}%
+These values of the option (see \autoref{tab:truefalseswitch},
+\autopageref{tab:truefalseswitch}) have the same effect like the standard
+options \Option{twocolumn} and \Option{onecolumn}. They are used to switch
+between a one-column and a two-column layout. The standard {\LaTeX}
+capabilities for multi-column layout are only useful for very simple uses. The
+standard package \Package{multicol} is much more versatile (see
+\cite{package:multicol}).\Index{columns}\IndexPackage{multicol}%
+\EndIndex{Option}{twocolumn~=\PName{switch}}
+
+\begin{table}
+  \begin{minipage}{\textwidth}
+  \centering
+  \caption{Standard values for simple switches within \KOMAScript}
+  \begin{tabular}{ll}
+    Value & Description \\\hline\\[-1.75ex]
+    \PValue{true}\footnote{This value will be used also, if you use the option
+      without assigning any value.} & activates the option \\
+    \PValue{on}   & activates the option \\
+    \PValue{false}& deactivates the option \\
+    \PValue{off}  & deactivates the option \\
+  \end{tabular}
+  \label{tab:truefalseswitch}
+  \end{minipage}
+\end{table}
+
 \begin{Declaration}
   \KOption{BCOR}\PName{Correction}
 \end{Declaration}%
-\BeginIndex{Option}{BCOR}%
+\BeginIndex{Option}{BCOR~=\PName{value}}%
 With the \KOption{BCOR}\PName{Correction} option you specify the
 absolute value of the binding correction, i.\,e., the width of the area
 that is used for the binding, thus ``lost'' from the paper width.
@@ -302,7 +350,7 @@ the standard classes, you need to give the option when you load
 (see \cite{latex:clsguide}) before you are loading
 \Package{typearea}, this always works.
 %
-\EndIndex{Option}{BCOR}
+\EndIndex{Option}{BCOR~=\PName{value}}
 
 \begin{Declaration}
   \KOption{DIV}\PName{Factor}
@@ -615,15 +663,11 @@ line spacing requires a re-calculation of page layout.
 
 \begin{Explain}
 \begin{Declaration}
-  \Option{headinclude}\\
-  \OptionValue{headinclude}{false}\\
-  \Option{footinclude}\\
-  \OptionValue{footinclude}{false}
+  \KOption{headinclude}\PName{switch}\\
+  \KOption{footinclude}\PName{switch}
 \end{Declaration}%
-\BeginIndex{Option}{headinclude}%
-\BeginIndex{Option}{headinclude~=false}%
-\BeginIndex{Option}{footinclude}%
-\BeginIndex{Option}{footinclude~=false}%
+\BeginIndex{Option}{headinclude~=\PName{switch}}%
+\BeginIndex{Option}{footinclude~=\PName{switch}}%
 So far we have discussed how the page layout is calculated and what the ratios
 are between the borders and between borders and text area. However, one
 important question has not been answered: What constitutes the borders? This
@@ -670,38 +714,36 @@ separation of text and header or footer, important is only the
 appearance when viewed out of focus.
 \end{Explain}
 
-The \Package{typearea} package can not make the decision whether
-or not to count headers and footers to the text body or the
-border. Options \Option{headinclude} and \Option{footinclude}
-cause the header or footer to be counted as text, options
-\OptionValue{headinclude}{false} and \OptionValue{footinclude}{false} cause them to be
-counted as border. If you are unsure about the correct setting,
-re-read above explanations. Default is usually
-\OptionValue{headinclude}{false} and \OptionValue{footinclude}{false}., but this can
-change depending on {\KOMAScript} class and {\KOMAScript} packages used
-(see \autoref{sec:maincls.options} and \autoref{cha:scrpage}).
+The \Package{typearea} package can not make the decision whether or not to
+count headers and footers to the text body or the border. Options
+\Option{headinclude} and \Option{footinclude} cause the header or footer to be
+counted as text, options \OptionValue{headinclude}{false} and
+\OptionValue{footinclude}{false} cause them to be counted as border (see
+\autoref{tab:truefalseswitch}, \autopageref{tab:truefalseswitch}). If you are
+unsure about the correct setting, re-read above explanations. Default is
+usually \OptionValue{headinclude}{false} and
+\OptionValue{footinclude}{false}, but this can change depending on
+{\KOMAScript} class and {\KOMAScript} packages used (see
+\autoref{sec:maincls.options} and \autoref{cha:scrpage}).
 %
-\EndIndex{Option}{headinclude}%
-\EndIndex{Option}{headinclude~=false}%
-\EndIndex{Option}{footinclude}%
-\EndIndex{Option}{footinclude~=false}%
+\EndIndex{Option}{headinclude~=\PName{switch}}%
+\EndIndex{Option}{footinclude~=\PName{switch}}%
 
 \begin{Declaration}
-  \Option{mpinclude}\\
-  \OptionValue{mpinclude}{false}
+  \KOption{mpinclude}\PName{switch}
 \end{Declaration}
-\BeginIndex{Option}{mpinclude}%
-\BeginIndex{Option}{mpinclude~=false}%
+\BeginIndex{Option}{mpinclude~=\PName{switch}}%
 Besides\ChangedAt{v2.8q}{\Class{scrbook}\and \Class{scrreprt}\and
   \Class{scrartcl}} documents where the head and foot is part of the text
 area, there are also documents where the margin-note area must be counted to
-the text body as well.  The option \Option{mpinclude} does exactly this.  The
-effect is that one width-unit of the text body is taken for the margin-note
-area.  Using option \OptionValue{mpinclude}{false}, the default setting, then the normal
-margin is used for the margin-note area.  The width of that area is one or one
-and a half width-unit, depending on whether one-sided or double-sided page layout
-has been chosen.  The option \Option{mpinclude} is mainly for experts and so
-not recommended.
+the text body as well.  The option \Option{mpinclude} (see
+\autoref{tab:truefalseswitch}, \autopageref{tab:truefalseswitch}) does exactly
+this.  The effect is that one width-unit of the text body is taken for the
+margin-note area.  Using option \OptionValue{mpinclude}{false}, the default
+setting, then the normal margin is used for the margin-note area.  The width
+of that area is one or one and a half width-unit, depending on whether
+one-sided or double-sided page layout has been chosen.  The option
+\Option{mpinclude} is mainly for experts and so not recommended.
   
 \begin{Explain}
   In the cases where the option \Option{mpinclude} is used often a wider
@@ -731,8 +773,7 @@ not recommended.
   \Option{DIV=calc}\IndexOption{DIV~=calc} heeds \Option{mpinclude}.
 \end{Explain}
 %
-\EndIndex{Option}{mpinclude}%
-\EndIndex{Option}{mpinclude~=false}%
+\EndIndex{Option}{mpinclude~=\PName{switch}}%
 
 
 \begin{Declaration}
@@ -849,13 +890,7 @@ The {\LaTeX} standard classes support the options \Option{a4paper},
   \Option{landscape} \\
   \Macro{isopaper}\OParameter{series}\Parameter{number}
 \end{Declaration}%
-\BeginIndex{Option}{letterpaper}
-\BeginIndex{Option}{legalpaper}
-\BeginIndex{Option}{executivepaper}
-\BeginIndex{Option}{a0paper}
-\BeginIndex{Option}{b0paper}
-\BeginIndex{Option}{c0paper}
-\BeginIndex{Option}{d0paper}
+\BeginIndex{Option}{paper~=\PName{size}}
 \BeginIndex{Option}{landscape}
 \BeginIndex{Cmd}{isopaper}%
 In addition to the paper formats of the standard classes, all ISO A-, ISO B-,
@@ -897,13 +932,7 @@ to be given as class options when {\KOMAScript} classes are used. The
 \Option{paper}-Option may be set using \Macro{KOMAoptions} oder
 \Macro{KOMAoption} instead.
 %
-\EndIndex{Option}{letterpaper}
-\EndIndex{Option}{legalpaper}
-\EndIndex{Option}{executivepaper}
-\EndIndex{Option}{a0paper}
-\EndIndex{Option}{b0paper}
-\EndIndex{Option}{c0paper}
-\EndIndex{Option}{d0paper}
+\EndIndex{Option}{paper~=\PName{size}}
 \EndIndex{Option}{landscape}
 \EndIndex{Cmd}{isopaper}
 
