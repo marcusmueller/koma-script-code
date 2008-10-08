@@ -1,4 +1,4 @@
-% \CheckSum{1738}
+% \CheckSum{1748}
 % \iffalse meta-comment
 % ======================================================================
 % scrktare.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrktare.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrktare.dtx}[2008/07/09 v3.00 KOMA-Script (type area)]
+\ProvidesFile{scrktare.dtx}[2008/10/08 v3.00 KOMA-Script (type area)]
 % \iffalse
 %</driver>
 %<package&identify>\ProvidesPackage{typearea}[%
@@ -1568,7 +1568,7 @@
   \if@mincl
     \PackageInfo{typearea}{%
       With option `mpinclude' there are no predefined\MessageBreak
-      DIV-values. Using DIV calculation for good line\MessageBreak
+      DIV values. Using DIV calculation for good line\MessageBreak
       width%
     }%
     \ta@div=2
@@ -1929,6 +1929,8 @@
 %   \changes{v2.5}{1997/06/17}{"`arithmetic overflow"' bei landscape
 %     behoben}
 %   \changes{v2.95}{2004/01/30}{Warnung im Zweispaltenmodus korrigiert}
+%   \changes{v3.00}{2008/10/08}{Layout-Infos werden per \cs{ta@layoutinfo}
+%     in die \texttt{log}-Datei geschrieben}
 % Zum Schluss soll die Seitenaufteilung noch in die \texttt{log}-Datei
 % geschrieben werden.
 %    \begin{macrocode}
@@ -1953,64 +1955,79 @@
     \fi
     \ifnum\@tempcnta <-15
       \PackageWarningNoLine{typearea}{%
-        Bad DIV-value!\MessageBreak
+        Bad DIV value!\MessageBreak
         You should e.g. decrease DIV, increase fontsize\MessageBreak
         or change papersize%
       }%
     \else
       \ifnum\@tempcnta>15
         \PackageWarningNoLine{typearea}{%
-          Bad DIV-value!\MessageBreak
+          Bad DIV value!\MessageBreak
           You should e.g. increase DIV, decrease fontsize\MessageBreak
           or change papersize%
         }
     \fi\fi
     \ifnum\ta@div <6
       \PackageWarningNoLine{typearea}{%
-        Very low DIV-value!\MessageBreak
-        DIV-values less than 6 result in textwidth/-height\MessageBreak
+        Very low DIV value!\MessageBreak
+        DIV values less than 6 result in textwidth/-height\MessageBreak
         smaller than total marginwidth/-height.\MessageBreak
         You should e.g. increase DIV, increase fontsize or\MessageBreak
         change papersize%
       }
     \fi
-    \PackageInfo{typearea}{%
-      These are the values describing the layout:\MessageBreak
-      DIV\space\space=\space\number\ta@div\MessageBreak
-      BCOR\space=\space\the\ta@bcor\MessageBreak
-      \string\paperwidth\space\space\space\space\space\space=%
-                           \space\the\paperwidth\MessageBreak
-      \space\string\textwidth\space\space\space\space\space\space=%
-                           \space\the\textwidth\MessageBreak
-      \space DIV-departure\space\space\space=%
-                           \space\the\@tempcnta/100\MessageBreak
-      \space\string\evensidemargin\space=%
-                           \space\the\evensidemargin\MessageBreak
-      \space\string\oddsidemargin\space\space=%
-                           \space\the\oddsidemargin\MessageBreak
-      \string\paperheight\space\space\space\space\space=%
-                           \space\the\paperheight\MessageBreak
-      \space\string\textheight\space\space\space\space\space=%
-                           \space\the\textheight\MessageBreak
-      \space\string\topmargin\space\space\space\space\space\space=%
-                           \space\the\topmargin\MessageBreak
-      \space\string\headheight\space\space\space\space\space=%
-                           \space\the\headheight\MessageBreak
-      \space\string\headsep\space\space\space\space\space\space\space\space=%
-                           \space\the\headsep\MessageBreak
-      \space\string\topskip\space\space\space\space\space\space\space\space=%
-                           \space\the\topskip\MessageBreak
-      \space\string\footskip\space\space\space\space\space\space\space=%
-                           \space\the\footskip\MessageBreak
-      \space\string\baselineskip\space\space\space=%
-                           \space\the\baselineskip\MessageBreak
-    }%
+    \ta@layoutinfo{\number\ta@div}{\the\@tempcnta}%
     \@typearea@end
     \activateareas
   \fi
 }
 %    \end{macrocode}
 %  \end{macro}
+%
+% \begin{macro}{\ta@layoutinfo}
+%   \changes{v3.00}{2008/10/08}{neu (intern)}
+% Schreibt die Layout-Information in die \texttt{log}-Datei. Dabei ist das
+% erste Argument die Ausgabe für den DIV-Wert und das zweite Argument die
+% DIV-Abweichung. Letztere wird nur ausgegeben, wenn das Argument nicht leer
+% und nicht \cs{relax} ist.
+%    \begin{macrocode}
+\newcommand*{\ta@layoutinfo}[2]{%
+  \PackageInfo{typearea}{%
+    These are the values describing the layout:\MessageBreak
+    DIV\space\space=\space#1\MessageBreak
+    BCOR\space=\space\the\ta@bcor\MessageBreak
+    \string\paperwidth\space\space\space\space\space\space=%
+                         \space\the\paperwidth\MessageBreak
+    \space\string\textwidth\space\space\space\space\space\space=%
+                         \space\the\textwidth\MessageBreak
+    \ifx\relax#2\relax\else
+      \space DIV departure\space\space\space=%
+                           \space#2\@percentchar\MessageBreak
+    \fi
+    \space\string\evensidemargin\space=%
+                         \space\the\evensidemargin\MessageBreak
+    \space\string\oddsidemargin\space\space=%
+                           \space\the\oddsidemargin\MessageBreak
+    \string\paperheight\space\space\space\space\space=%
+                         \space\the\paperheight\MessageBreak
+    \space\string\textheight\space\space\space\space\space=%
+                         \space\the\textheight\MessageBreak
+    \space\string\topmargin\space\space\space\space\space\space=%
+                         \space\the\topmargin\MessageBreak
+    \space\string\headheight\space\space\space\space\space=%
+                         \space\the\headheight\MessageBreak
+    \space\string\headsep\space\space\space\space\space\space\space\space=%
+                         \space\the\headsep\MessageBreak
+    \space\string\topskip\space\space\space\space\space\space\space\space=%
+                         \space\the\topskip\MessageBreak
+    \space\string\footskip\space\space\space\space\space\space\space=%
+                         \space\the\footskip\MessageBreak
+    \space\string\baselineskip\space\space\space=%
+                         \space\the\baselineskip\MessageBreak
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
 %
 %  \begin{macro}{\recalctypearea}
 %    \changes{v2.95}{2002/12/04}{Neu}
@@ -2048,6 +2065,8 @@
 %    \end{macrocode}
 % Erst dann folgt die eigentlich Berechnung:
 %   \changes{v2.96}{2006/09/12}{\cs{topskip} wird gesetzt}
+%   \changes{v3.00}{2008/10/08}{Layout-Infos werden per \cs{ta@layoutinfo}
+%     in die \texttt{log}-Datei geschrieben}
 %    \begin{macrocode}
   \setlength{\textwidth}{#2}%
   \setlength{\textheight}{#3}%
@@ -2111,6 +2130,7 @@
   \fi
   \marginparsep=1cc
   \marginparpush=0.45\baselineskip
+  \ta@layoutinfo{areaset}{}%
   \activateareas
 }
 %    \end{macrocode}
