@@ -170,7 +170,7 @@ CLS_MAIN_SUBINS	= scrlfile.ins scraddr.ins scrlettr.ins scrpage.ins \
 
 ALPHA_INS       = tocstyle.dtx tocbasic.dtx scrjura.dtx
 
-ALPHA_DOC       = tocstyle.pdf tocbasic.pdf scrjura.pdf
+ALPHA_DOC       = tocstyle.pdf scrjura.pdf
 
 ALPHA_DTX       = $(subst .pdf,.dtx,$(ALPHA_DOC))
 
@@ -224,10 +224,13 @@ MAINTAIN_FILES  = $(MAINTAIN_SRC)
 bindist: dist
 	$(UNTARGZ) $(DISTDIR).tar.gz
 ifdef PREPARERELEASE
-	$(foreach dtxins,$(DTX_IS_INS),$(SYMLINK) $(dtxins) $(dtxins).ins;)
+	$(foreach dtxins,$(DTX_IS_INS),\
+	          $(SYMLINK) $(dtxins) $(notdir $(DISTDIR))/$(dtxins).ins;)
 	developer/scripts/preparerelease.sh 2 $(notdir $(DISTDIR))
-	$(foreach dtxins,$(DTX_IS_INS),$(RM) $(dtxins).ins;)
+	$(foreach dtxins,$(DTX_IS_INS),\
+                  $(RM) $(notdir $(DISTDIR))/$(dtxins).ins;)
 endif
+	exit 1;
 	$(CD) $(notdir $(DISTDIR)) && \
 	  $(MAKE)
 	$(MKDIR) $(notdir $(DISTDIR))-bin/komascript-texmf
