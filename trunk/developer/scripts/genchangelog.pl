@@ -4,7 +4,7 @@ eval 'exec perl -S $0 ${1+"$@"}'
 
 # ======================================================================
 # genchangelog.pl
-# Copyright (c) Markus Kohm, 2002-2007
+# Copyright (c) Markus Kohm, 2002-2008
 #
 # This file is part of the LaTeX2e KOMA-Script bundle.
 #
@@ -22,7 +22,7 @@ eval 'exec perl -S $0 ${1+"$@"}'
 # This work consists of all files listed in manifest.txt.
 # ----------------------------------------------------------------------
 # genchangelog.pl
-# Copyright (c) Markus Kohm, 2002-2007
+# Copyright (c) Markus Kohm, 2002-2008
 #
 # Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 # Version 1.3b, verteilt und/oder veraendert werden.
@@ -76,7 +76,8 @@ sub printtext($);
 
 checkchangelog();
 
-File::Find::find({wanted => \&wanted, no_chdir => 1}, $basedir);
+File::Find::find({wanted => \&wanted, no_chdir => 1}, $basedir) 
+    if defined $revrangeopt;
 
 @allinfo = sort {
     $b->[0] <=> $a->[0]
@@ -175,6 +176,14 @@ sub checkchangelog {
 	    my $startrev=$1;
 	    $startrev += 1;
 	    $revrangeopt="-r'$startrev:HEAD'";
+
+	    $_ = `svn log $revrangeopt . 2>&1`;
+	    if ( $_ = /^svn: No such revision/ ) {
+		print STDERR "ChangeLog already up to date.\n" 
+		    if $opt_verbose;
+		undef $revrangeopt;
+	    }
+
 	} else {
 	    print STDERR "Warning: Syntax error at $ChangeLogFile!\n";
 	}
@@ -211,8 +220,6 @@ sub wanted {
 
     print "process: svn log $revrangeopt $File::Find::name\n" 
 	if $opt_verbose;
-
-    $output=`svn log $revrangeopt $File::Find::name`;
 
     open IN,'<',\$output
 	or die "Cannot read output for $File::Find::name!\n";
