@@ -1,4 +1,4 @@
-% \CheckSum{301}
+% \CheckSum{306}
 % \iffalse meta-comment
 % ======================================================================
 % scrkbib.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkbib.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkbib.dtx}[2008/02/15 v2.98c KOMA-Script (bibliography)]
+\ProvidesFile{scrkbib.dtx}[2008/10/16 v3.00 KOMA-Script (bibliography)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -259,7 +259,25 @@
 %    \begin{macrocode}
 \KOMA@key{bibliography}{%
   \scr@ifundefinedorrelax{scr@bibstyle@#1}{%
-    \ifstr{#1}{totoc}{%
+    \let\FamilyElseValues\scr@bibstylelist
+    \KOMA@set@ncmdkey{bibliography}{@tempa}{%
+      {notoc}{0},{nottotoc}{0},{plainheading}{0},%
+      {totoc}{1},{toc}{1},{notnumbered}{1},%
+      {numbered}{2},{totocnumbered}{2},{tocnumbered}{2},{numberedtotoc}{2},%
+      {numberedtoc}{2}%
+    }{#1}%
+    \ifcase \@tempa\relax
+      \renewcommand*\bib@heading{%
+%<*article> 
+        \section*{\refname}%
+        \@mkboth{\refname}{\refname}%
+%</article>
+%<*book|report>
+        \chapter*{\bibname}%
+        \@mkboth{\bibname}{\bibname}%
+%</book|report>
+      }%
+    \or% totoc
       \renewcommand*\bib@heading{%
 %<*article>
         \addsec{\refname}%
@@ -270,36 +288,18 @@
         \@mkboth{\bibname}{\bibname}%
 %</book|report>
       }%
-    }{%
-      \ifstr{#1}{totocnumbered}{%
-        \renewcommand*\bib@heading{%
+    \or% numbered
+      \renewcommand*\bib@heading{%
 %<*article>
-          \section{\refname}%
-          \@mkboth{\sectionmarkformat \refname}{\sectionmarkformat \refname}%
+        \section{\refname}%
+        \@mkboth{\sectionmarkformat \refname}{\sectionmarkformat \refname}%
 %</article>
 %<*book|report>
-          \chapter{\bibname}%
-          \@mkboth{\chaptermarkformat \bibname}{\chaptermarkformat \bibname}%
+        \chapter{\bibname}%
+        \@mkboth{\chaptermarkformat \bibname}{\chaptermarkformat \bibname}%
 %</book|report>
-        }
-      }{%
-        \ifstr{#1}{nottotoc}{%
-          \renewcommand*\bib@heading{%
-%<*article> 
-            \section*{\refname}%
-            \@mkboth{\refname}{\refname}%
-%</article>
-%<*book|report>
-            \chapter*{\bibname}%
-            \@mkboth{\bibname}{\bibname}%
-%</book|report>
-          }%
-        }{%
-          \KOMA@unknown@keyval{bibliography}{#1}{\scr@bibstylelist, `totoc',
-            and `totocnumbered'}%
-        }%
-      }%
-    }%
+      }
+    \fi
   }{%
     \csname scr@bibstyle@#1\endcsname
   }%
