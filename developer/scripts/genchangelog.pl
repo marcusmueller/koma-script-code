@@ -221,6 +221,8 @@ sub wanted {
     print "process: svn log $revrangeopt $File::Find::name\n" 
 	if $opt_verbose;
 
+    $output=`svn log $revrangeopt $File::Find::name`
+
     open IN,'<',\$output
 	or die "Cannot read output for $File::Find::name!\n";
     while ( $data = <IN> ) {
