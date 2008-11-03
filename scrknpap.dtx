@@ -1,4 +1,4 @@
-% \CheckSum{2346}
+% \CheckSum{2393}
 % \iffalse meta-comment
 % ======================================================================
 % scrknpap.dtx
@@ -2248,25 +2248,50 @@
       \typeout{Subject: no}%
     }{%
       \ifx\raggedsubject\@empty
-        \if@subjafter%
-          \typeout{Subject: after opening}%
-          \let\raggedsubject\centering%
-        \else%
-          \typeout{Subject: before opening}%
+        \ifdim\useplength{subjectvpos}=\z@
+          \if@subjafter%
+            \typeout{Subject: after opening}%
+            \let\raggedsubject\centering%
+          \else
+            \typeout{Subject: before opening}%
+            \def\raggedsubject{\noindent\@hangfrom}%
+          \fi
+        \else
+          \typeout{Subject: at absolute vertical position}%
           \def\raggedsubject{\noindent\@hangfrom}%
-        \fi%
+        \fi
       \fi
-      \vskip\useplength{subjectbeforevskip}%
-      {%
-        \usekomafont{subject}%
-        \raggedsubject{\if@subj \subject@format{\strut\ignorespaces
-            \usekomavar*{subject}}\fi}%
-        \subject@format{\strut\ignorespaces\usekomavar{subject}}\par
-      }\vskip\useplength{subjectaftervskip}%
+      \ifdim\useplength{subjectvpos}=\z@
+        \vskip\useplength{subjectbeforevskip}%
+        \begingroup
+      \else
+        \move@topt\vskip\useplength{subjectvpos}%
+        \expandafter\vb@t@z\expandafter{%
+      \fi
+      \usekomafont{subject}%
+      \raggedsubject{\if@subj \subject@format{\strut\ignorespaces
+          \usekomavar*{subject}}\fi}%
+      \subject@format{\strut\ignorespaces\usekomavar{subject}}\par
+      \ifdim\useplength{subjectvpos}=\z@
+        \endgroup
+        \vskip\useplength{subjectaftervskip}%
+      \else
+        }%
+        \vskip-\useplength{subjectvpos}\move@frompt
+      \fi
     }%
   }%
 }
 %    \end{macrocode}
+% \begin{macro}{\ltr@len@subjectvpos}
+%   \changes{v3.01}{2008/11/03}{Neue Pseudolänge \texttt{subjectvpos}}
+%   Manchmal ist es günstiger, wenn man den Betreff absolut positionieren
+%   kann. Das geschieht über diese Pseudolänge, wenn sie \emph{nicht} 0 ist.
+%    \begin{macrocode}
+\@newplength{subjectvpos}
+\@setplength{subjectvpos}{0pt}
+%    \end{macrocode}
+% \end{macro}
 % \begin{macro}{\ltr@len@subjectaftervskip}
 %   \changes{v3.01}{2008/11/03}{Neue Pseudolänge \texttt{subjectaftervskip}}
 %   Abstand nach dem Betreff. Dieser Abstand wird aus Gründen der
@@ -2279,9 +2304,10 @@
 % \end{macro}
 % \begin{macro}{\ltr@len@subjectbeforevskip}
 %   \changes{v3.01}{2008/11/03}{Neue Pseudolänge \texttt{subjectbeforevskip}}
-%   Abstand vor dem Betreff. Dieser Abstand wird aus Gründen der
+%   Abstand zusätzlich vor dem Betreff. Dieser Abstand wird aus Gründen der
 %   Kompatibilität zu früheren Versionen mit \cs{baselineskip}
-%   voreingestellt.
+%   voreingestellt. Es sei darauf hingewiesen, dass hier bereits ein Abstand
+%   beispielsweise vom Titel existieren kann!
 %    \begin{macrocode}
 \@newplength{subjectbeforevskip}
 \@setplength{subjectbeforevskip}{0pt}
@@ -2501,14 +2527,16 @@
   \@gen@firsthead
   \@mkboth{\scr@fromname@var}{\scr@subject@var}%
   \thispagestyle{empty}\noindent
-  \@foldmarks\@firstheadfootfield\@addrfield\@locfield\@datefield
+  \@foldmarks\@firstheadfootfield\@addrfield\@locfield
+  \ifdim\useplength{subjectvpos}=\z@\else\@subjfield\fi
+  \@datefield
   \@maketitle
-  \if@subjafter\else\@subjfield\fi
+  \ifdim\useplength{subjectvpos}=\z@\if@subjafter\else\@subjfield\fi\fi
   {\setparsizes{\z@}{\z@}{\z@ plus 1fil}\par@updaterelative#1\par}%
   {\setlength{\@tempdima}{\baselineskip}%
     \addtolength{\@tempdima}{-\parskip}%
     \ifdim \@tempdima>\z@\vskip\@tempdima\fi}%
-  \if@subjafter\@subjfield\fi%
+  \ifdim\useplength{subjectvpos}=\z@\if@subjafter\@subjfield\fi\fi
   \@afterindentfalse\@afterheading
 }
 %    \end{macrocode}
