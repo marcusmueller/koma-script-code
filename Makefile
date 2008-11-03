@@ -226,7 +226,7 @@ bindist:dist
 	chmod -R a+w $(DISTDIR)
 ifdef PREPARERELEASE
 	$(foreach dtxins,$(DTX_IS_INS),\
-	          $(SYMLINK) $(dtxins) $(notdir $(DISTDIR))/$(dtxins).ins;)
+	          ln -s $(dtxins) $(DISTDIR)/$(dtxins).ins;)
 	developer/scripts/preparerelease.sh 2 $(notdir $(DISTDIR))
 	$(foreach dtxins,$(DTX_IS_INS),\
                   $(RM) $(notdir $(DISTDIR))/$(dtxins).ins;)
@@ -333,9 +333,9 @@ maintainclean_local: clean_local
 	$(SRM) $(GENERATED)
 
 dist_prior:
-ifdef PREPARERELEASE
-	developer/scripts/preparerelease.sh 1
-endif
+#ifdef PREPARERELEASE
+#	developer/scripts/preparerelease.sh 1
+#endif
 	-$(RMDIR) $(DISTDIR)
 	$(MKDIR) $(DISTDIR)
 
