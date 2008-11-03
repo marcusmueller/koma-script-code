@@ -221,8 +221,9 @@ MAINTAIN_FILES  = $(MAINTAIN_SRC)
 
 # ----------------------------------------------------------------------
 # additional ruls
-bindist: dist
+bindist:dist
 	$(UNTARGZ) $(DISTDIR).tar.gz
+	chmod -R a+w $(DISTDIR)
 ifdef PREPARERELEASE
 	$(foreach dtxins,$(DTX_IS_INS),\
 	          $(SYMLINK) $(dtxins) $(notdir $(DISTDIR))/$(dtxins).ins;)
@@ -230,7 +231,6 @@ ifdef PREPARERELEASE
 	$(foreach dtxins,$(DTX_IS_INS),\
                   $(RM) $(notdir $(DISTDIR))/$(dtxins).ins;)
 endif
-	exit 1;
 	$(CD) $(notdir $(DISTDIR)) && \
 	  $(MAKE)
 	$(MKDIR) $(notdir $(DISTDIR))-bin/komascript-texmf
