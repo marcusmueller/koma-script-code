@@ -66,7 +66,7 @@
 %%% From File: tocbasic.dtx
 %<*dtx|package|driver|doc|load>
 % \fi
-\def\tocbasicversion{2008/10/06 v1.0}
+\def\tocbasicversion{2008/11/11 v1.0a}
 % \iffalse
 %</dtx|package|driver|doc|load>
 %<*dtx>
@@ -1186,6 +1186,10 @@ be defined and used in \Macro{tocbasic@listhead}.
 % \end{macro}
 %
 % \begin{macro}{\addtotoclist}
+%   \changes{v1.0a}{2008/11/11}{internal \cs{@addtotoclist} renamed to
+%     \cs{scr@addtotoclist} because of package \textsf{floatfram}}.%
+%   \changes{v1.0a}{2008/11/11}{internal \cs{@@addtotoclist} renamed to
+%     \cs{scr@@addtotoclist} because of package \textsf{floatfram}}.%
 %   This command adds an extension to the list of toc-files. The first,
 %   optional argument is the class or package name with the corresponding
 %   extension of class or package files. If this argument was omitted
@@ -1197,17 +1201,17 @@ be defined and used in \Macro{tocbasic@listhead}.
 %    \begin{macrocode}
 \newcommand*{\addtotoclist}{%
   \@ifnextchar [%]
-    \@@addtotoclist\@addtotoclist
+    \scr@@addtotoclist\scr@addtotoclist
 }
-\newcommand*{\@addtotoclist}{%
+\newcommand*{\scr@addtotoclist}{%
   \ifx\@currname\@empty
-    \def\reserved@a{\@@addtotoclist[]}%
+    \def\reserved@a{\scr@@addtotoclist[]}%
   \else
-    \edef\reserved@a{\noexpand\@@addtotoclist[\@currname.\@currext]}%
+    \edef\reserved@a{\noexpand\scr@@addtotoclist[\@currname.\@currext]}%
   \fi
   \reserved@a
 }
-\newcommand*{\@@addtotoclist}[2][]{%
+\newcommand*{\scr@@addtotoclist}[2][]{%
   \ifattoclist{#2}{%
     \PackageError{tocbasic}{%
       file extension `#2' cannot be used twice
@@ -1724,6 +1728,7 @@ be defined and used in \Macro{tocbasic@listhead}.
 % \end{macro}
 %
 % \begin{macro}{\tocbasicautomode}
+%   \changes{v1.0a}{2008/11/11}{use of \cs{addtotoclist} instead of internal}
 %   \Package{tocbasic} can overtake \Macro{@starttoc} to automaticly add all
 %   used extensions to the list of known extensions and use
 %   \Macro{tocbasic@starttoc} instead of \Macro{@starttoc} from \LaTeX{}
@@ -1734,7 +1739,7 @@ be defined and used in \Macro{tocbasic@listhead}.
   \BeforeStartingTOC{%
     \let\@starttoc\tb@saved@starttoc
     \expandafter\ifattoclist\expandafter{\@currext}{}{%
-      \@addtotoclist[tocbasicautomode]{\@currext}%
+      \addtotoclist[tocbasicautomode]{\@currext}%
     }%
   }%
 }
