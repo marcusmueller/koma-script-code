@@ -1,4 +1,4 @@
-% \CheckSum{645}
+% \CheckSum{649}
 % \iffalse meta-comment
 % ======================================================================
 % tocbasic.dtx
@@ -66,7 +66,7 @@
 %%% From File: tocbasic.dtx
 %<*dtx|package|driver|doc|load>
 % \fi
-\def\tocbasicversion{2008/11/12 v1.0a}
+\def\tocbasicversion{2008/11/13 v3.01}
 % \iffalse
 %</dtx|package|driver|doc|load>
 %<*dtx>
@@ -925,6 +925,8 @@ features. \Package{tocbasic} does know following features:
 \item[\texttt{numbered}] uses a numbered headings for the list of
 \item[\texttt{leveldown}] uses not the top level heading (e.g., \Macro{chapter}
   with book) but the first sub level (e.g., \Macro{section} with book).
+\item[\texttt{onecolumn}] switch to internal one column mode, if the toc
+  is set in internal two column mode and no \texttt{leveldown} was used.
 \item[\texttt{nobabel}] prevents the extension to be added to the babel
   handling of toc-files.  To make this work, you have to set the feature
   before adding the extension to the list of known extension.
@@ -1496,6 +1498,7 @@ be defined and used in \Macro{tocbasic@listhead}.
 % \begin{macro}{\listoftoc}
 % \begin{macro}{\listoftoc*}
 %   \changes{1.0a}{2008/11/12}{\cs{twocolumn} fixed}%
+%   \changes{1.01}{2008/11/13}{new feature \texttt{onecolumn}}
 %   Command to handle the hole list of something. There are additional hooks
 %   for this. The first optional argument is the title for this list. If the
 %   optional argument was omitted \cs{listof\#2name} will be used. The star
@@ -1517,10 +1520,14 @@ be defined and used in \Macro{tocbasic@listhead}.
     }{%
       \expandafter\let\expandafter\list@fname\csname listof#2name\endcsname
     }%
-    \if@twocolumn
-      \aftergroup\twocolumn\onecolumn
-    \fi
     \def\@currext{#2}%
+    \iftocfeature{\@currext}{onecolumn}{%
+      \iftocfeature{\@currext}{leveldown}{}{%
+        \if@twocolumn
+          \aftergroup\twocolumn\onecolumn
+        \fi
+      }%
+    }{}%
     \tocbasic@listhead{#1}%
     \tocbasic@starttoc{#2}%
   \endgroup
@@ -1754,6 +1761,15 @@ be defined and used in \Macro{tocbasic@listhead}.
 %    \begin{macrocode}
 \edef\@tempa{\noexpand\RequirePackage{tocbasic}[\tocbasicversion]}
 \@tempa
+%    \end{macrocode}
+% \changes{v1.00}{auto-activation of feature \texttt{onecolumn}}
+% Set feature \texttt{onecolumn} for every toc file if feature
+% \texttt{leveldown} was not used.
+%    \begin{macrocode}
+%<*chapter>
+\AtAddToTocList[\@currname.\@currext]{\setuptoc{\@currext}{onecolumn}}%
+\AtAddToTocList[float]{\setuptoc{\@currext}{onecolumn}}%
+%</chapter>
 %    \end{macrocode}
 % Tell the package, what files are used:
 %    \begin{macrocode}
