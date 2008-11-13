@@ -78,8 +78,9 @@
 
 \ifToplevel{%
   \keepsilent
-  \askforoverwritetrue
-  \ifx\askonceonly\undefined\else\askonceonly\fi
+  \askforoverwritefalse
+%  \askforoverwritetrue
+%  \ifx\askonceonly\undefined\else\askonceonly\fi
 }
 
 % ---------- validity --------------------------------------------------
