@@ -45,7 +45,7 @@
 %
 % ======================================================================
 
-\ProvidesFile{tocbasic.tex}[2008/07/31 KOMA-Script package tocbasic]
+\ProvidesFile{tocbasic.tex}[2008/11/13 KOMA-Script package tocbasic]
 
 \chapter{Verzeichnisse verwalten mit Hilfe von \Package{tocbasic}}
 \labelbase{tocbasic}
@@ -535,22 +535,6 @@ werden. Die \PName{Liste von Eigenschaften} ist dabei eine durch Komma
 getrennte Aneinanderreihung von \PName{Eigenschaften}. Das Paket
 \Package{tocbasic} wertet folgende Eigenschaften aus:
 \begin{description}
-\item[\PValue{totoc}] bedeutet, dass der Titel des Verzeichnisses in das
-  Inhaltsverzeichnis aufgenommen werden soll. Diese Eigenschaft wird von der
-  internen Überschriftenanweisung ausgewertet. Wird hingegen eine eigene
-  Überschriftenanweisung mit \Macro{deftocheading} definiert, liegt die
-  Auswertung der Eigenschaft in der Verantwortung dessen, der die Definition
-  vornimmt. Die \KOMAScript-Klassen setzen diese Eigenschaft bei Verwendung
-  der Option \OptionValue{listof}{totoc} für alle Dateierweiterungen des
-  Besitzers \Package{float}.
-\item[\PValue{numbered}] bedeutet, dass das Verzeichnis nummeriert und damit
-  ebenfalls in das Inhaltsverzeichnis aufgenommen werden soll. Diese
-  Eigenschaft wird von der internen Überschriftenanweisung ausgewertet. Wird
-  hingegen eine eigene Überschriftenanweisung mit \Macro{deftocheading}
-  definiert, liegt die Auswertung der Eigenschaft in der Verantwortung dessen,
-  der die Definition vornimmt.  Die \KOMAScript-Klassen setzen diese
-  Eigenschaft bei Verwendung der Option \OptionValue{listof}{numbered} für
-  alle Dateierweiterungen des Besitzers \Package{float}.
 \item[\PValue{leveldown}] bedeutet, dass das Verzeichnis nicht mit der
   obersten Gliederungsebene (wenn vorhanden \Macro{chapter}, sonst
   \Macro{section}) erstellt wird, sondern mit einer Überschrift der nächst
@@ -561,12 +545,44 @@ getrennte Aneinanderreihung von \PName{Eigenschaften}. Das Paket
   vornimmt. Die \KOMAScript-Klassen setzen diese Eigenschaft bei Verwendung
   der Option \OptionValue{listof}{leveldown} für alle Dateierweiterungen des
   Besitzers \Package{float}.
+\item[\PValue{numbered}] bedeutet, dass das Verzeichnis nummeriert und damit
+  ebenfalls in das Inhaltsverzeichnis aufgenommen werden soll. Diese
+  Eigenschaft wird von der internen Überschriftenanweisung ausgewertet. Wird
+  hingegen eine eigene Überschriftenanweisung mit \Macro{deftocheading}
+  definiert, liegt die Auswertung der Eigenschaft in der Verantwortung dessen,
+  der die Definition vornimmt.  Die \KOMAScript-Klassen setzen diese
+  Eigenschaft bei Verwendung der Option \OptionValue{listof}{numbered} für
+  alle Dateierweiterungen des Besitzers \Package{float}.
 \item[\PValue{nobabel}] bedeutet, dass die normalerweise automatisch
   verwendete Erweiterung für die Sprachumschaltung mit \Package{babel} für
   diese Dateierweiterung nicht verwendet wird. Diese Eigenschaft sollte nur
   für Verzeichnisse verwendet werden, die nur in einer festen Sprache erstellt
   werden, in denen also Sprachumschaltungen im Dokument nicht zu
   berücksichtigen sind.
+%% NEW FEATURE 3.01
+\item[\PValue{onecolumn}] \leavevmode\ChangedAt{v3.01}{\Package{tocbasic}}%
+  bedeutet, dass für dieses Verzeichnis automatisch der \LaTeX-interne
+  Einspaltenmodus mit \Macro{onecolumn}\IndexCmd{onecolumn} verwendet wird,
+  falls dieses Verzeichnis nicht mit der Eigenschaft \PValue{leveldown} um
+  eine Gliederungsebene nach unten verschoben wurde. Die \KOMAScript-Klassen
+  \Class{scrbook} und \Class{scrreprt} setzen diese Eigenschaft per
+  \Macro{AtAddToTocList} (siehe
+  \autopageref{desc:tocbasic.cmd.AtAddToTocList}) für alle Verzeichnisse mit
+  dem Besitzer \PValue{float} oder mit sich selbst als Besitzer. Damit werden
+  beispielsweise das Inhaltsverzeichnis, das Abbildungsverzeichnis und das
+  Tabellenverzeichnis bei diesen beiden Klassen automatisch einspaltig
+  gesetzt. Der Mehrspaltenmodus des
+  \Package{multicol}-Pakets\IndexPackage{multicol} ist von der Eigenschaft
+  ausdrücklich nicht betroffen.
+%% END NEW FEATURE 3.01
+\item[\PValue{totoc}] bedeutet, dass der Titel des Verzeichnisses in das
+  Inhaltsverzeichnis aufgenommen werden soll. Diese Eigenschaft wird von der
+  internen Überschriftenanweisung ausgewertet. Wird hingegen eine eigene
+  Überschriftenanweisung mit \Macro{deftocheading} definiert, liegt die
+  Auswertung der Eigenschaft in der Verantwortung dessen, der die Definition
+  vornimmt. Die \KOMAScript-Klassen setzen diese Eigenschaft bei Verwendung
+  der Option \OptionValue{listof}{totoc} für alle Dateierweiterungen des
+  Besitzers \Package{float}.
 \end{description}
 Die \KOMAScript-Klassen kennen eine weitere Eigenschaft:
 \begin{description}
@@ -592,10 +608,25 @@ Die \KOMAScript-Klassen kennen eine weitere Eigenschaft:
   \begin{lstcode}
   \setuptoc{loa}{chapteratlist}
   \end{lstcode}
+%% NEW FEATURE 3.01
+  Wollen Sie außerdem, dass bei Klassen, die \Macro{chapter} als oberste
+  Gliederungsebene verwenden, das Verzeichnis automatisch einspaltig gesetzt
+  wird, so verwenden Sie außerdem
+  \begin{lstcode}
+  \ifundefinedorrelax{chapter}{}{%
+    \setuptoc{loa}{onecolumn}%
+  }
+  \end{lstcode}
+  Diese Lösung setzt aufgrund der Verwendung von \Macro{ifundefinedorrelax}
+  zusäzlich das Paket \Package{scrbase} voraus (siehe
+  \autoref{sec:scrbase.if},
+  \autopageref{desc:scrbase.cmd.ifundefinedorrelax}).
+%% END NEW FEATURE 3.01
+
   Sollte Ihr Paket mit einer anderen Klasse verwendet werden, so schadet es
-  trotzdem nicht, dass Sie diese Eigenschaft setzen, im Gegenteil: wertet eine
-  andere Klasse diese Eigenschaft ebenfalls aus, so nutzt Ihr Paket dann eben
-  automatisch die Möglichkeiten jener Klasse.
+  trotzdem nicht, dass Sie diese Eigenschaften setzen, im Gegenteil: wertet
+  eine andere Klasse diese Eigenschaften ebenfalls aus, so nutzt Ihr Paket
+  dann eben automatisch die Möglichkeiten jener Klasse. 
 \end{Example}
 Wie Sie hier sehen, unterstützt ein Paket, das \Package{tocbasic} verwendet,
 bereits ohne nennenswerten Aufwand diverse Möglichkeiten für die dadurch
