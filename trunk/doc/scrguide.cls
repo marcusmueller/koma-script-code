@@ -79,12 +79,12 @@
 %    \begin{macrocode}
 \ExecuteOptions{pagereftolabel,lessindexnotes}
 \PassOptionsToClass{%
-  version,
   bibtotoc,
   idxtotoc,
   tablecaptionabove,
   smallheadings,
-  cleardoubleplain
+  cleardoubleplain,
+  version,
 }{scrguide}
 \ProcessOptions\relax
 %    \end{macrocode}
