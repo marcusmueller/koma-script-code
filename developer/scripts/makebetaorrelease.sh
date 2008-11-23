@@ -3,9 +3,11 @@
 # Copyright (c) Markus Kohm, 2008
 #
 
+datestr=`date +%Y/%m/%d`
+versionstr=`grep '\@CheckKOMAScriptVersion{' scrkvers.dtx | sed s/.*{// | cut -d' ' -f 2- | sed 's/ *KOMA-Script.*//'`
 if [ $# -lt 2 ]; then
     echo "Usage: makebeta.sh <date> <version> [...]" >&2
-    echo "Example: makebeta.sh 2007/05/12 2.97c BETA" >&2
+    echo "Example: makebeta.sh $datestr $versionstr" >&2
     exit 1
 fi
 
