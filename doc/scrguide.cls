@@ -1043,8 +1043,9 @@
 %    \begin{macrocode}
 \lstdefinestyle{basics}{%
   basicstyle=\ttfamily,%
+  columns=fullflexible,keepspaces,%
   aboveskip=.4\baselineskip,%
-  belowskip=0\baselineskip%
+  belowskip=0pt%
 }
 \lstdefinestyle{code}{%
   style=basics,%
