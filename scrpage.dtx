@@ -1,4 +1,4 @@
-% \CheckSum{2570}
+% \CheckSum{2607}
 % \iffalse
 % ======================================================================
 % scrpage.dtx
@@ -65,7 +65,7 @@
 %<v1>\ProvidesPackage{scrpage}[2008/02/29 v1.3e KOMA-Script
 %<v2>\ProvidesPackage{scrpage2}
 %<*!v1>
-                [2008/11/19 v2.2g LaTeX2e KOMA-Script
+                [2008/12/08 v2.3 LaTeX2e KOMA-Script
 %</!v1>
 %<scrpage>                 package]
 %<*driver>
@@ -337,18 +337,62 @@
 % \changes{v2.2c}{2007/07/23}{a lot of \% added and removed}
 %
 % \subsection{Options}
+% \begin{option}{headinclude}
+%   \changes{v2.3}{2008/12/08}{obsolete}
+% \begin{option}{headexclude}
+%   \changes{v2.3}{2008/12/08}{obsolete}
+% \begin{option}{footinclude}
+%   \changes{v2.3}{2008/12/08}{obsolete}
+% \begin{option}{footexclude}
+%   \changes{v2.3}{2008/12/08}{obsolete}
 % \texttt{scrpage} knows some options. They are similar to the
 % \textsf{KOMA}-script-classes. To work with and without
 % the \textsf{KOMA}-script-classes their definitions are not quite simple.
 %
 %    \begin{macrocode}
-\DeclareOption{headinclude}{\PassOptionsToPackage{headinclude}{typearea}}
-\DeclareOption{headexclude}{\PassOptionsToPackage{headexclude}{typearea}}
-\DeclareOption{footinclude}{\PassOptionsToPackage{footinclude}{typearea}}
-\DeclareOption{footexclude}{\PassOptionsToPackage{footexclude}{typearea}}
+%<*v2>
+\newcommand*{\@Pass@Obsolete@Option@To@Typearea}[1]{%
+  \@expandtwoargs\in@{,\CurrentOption,}{,\@curroptions,}%
+  \ifin@
+    \PackageWarningNoLine{scrpage2}{%
+      deprecated passing option `\CurrentOption' to scrpage2.\MessageBreak
+      If you are using package typearea or\MessageBreak
+      a KOMA-Script class since version 3.00\MessageBreak
+      you may use `\string\KOMAoptions{#1}' and\MessageBreak
+      remove passing `\CurrentOption' to scrpage2%
+    }%
+    \begingroup\expandafter\expandafter\expandafter\endgroup
+    \expandafter\ifx\csname KOMAoptions\endcsname\relax
+      \PassOptionsToPackage{#1}{typearea}%
+    \else
+      \KOMAoptions{#1}\csname relcalctypearea\endcsname
+    \fi
+  \fi
+}
+%</v2>
+\DeclareOption{headinclude}{%
+%<v1>  \PassOptionsToPackage{headinclude}{typearea}%
+%<v2>  \@Pass@Obsolete@Option@To@Typearea{headinclude}%
+}
+\DeclareOption{headexclude}{%
+%<v1>  \PassOptionsToPackage{headexclude}{typearea}%
+%<v2>  \@Pass@Obsolete@Option@To@Typearea{headinclude=false}%
+}
+\DeclareOption{footinclude}{%
+%<v1>  \PassOptionsToPackage{footinclude}{typearea}%
+%<v2>  \@Pass@Obsolete@Option@To@Typearea{footinclude}%
+}
+\DeclareOption{footexclude}{%
+%<v1>  \PassOptionsToPackage{footexclude}{typearea}%
+%<v2>  \@Pass@Obsolete@Option@To@Typearea{footinclude=false}%
+}
 %    \end{macrocode}
 % We do so, because we want so set |headinclude|, |footinclude| by
 % default at old version (see below)!
+% \end{option}
+% \end{option}
+% \end{option}
+% \end{option}
 %
 % At version 2 we have additonal options designed for the additional
 % interface.
