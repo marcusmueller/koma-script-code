@@ -917,13 +917,13 @@
     \ifstr{#1}{v2.9t}{\def\@tempa{v2.90t=}}%
     \let\and\ignorespaces
     \def\Package##1{%
-      \glossary{\string\Package{##1}>\@tempa#1|indexrm}%
-      \glossary{\@tempa#1>\string\Package{##1}|indexrm}%
+      \glossary{##1=\string\Package{##1}>\@tempa#1|indexrm}%
+      \glossary{\@tempa#1>##1=\string\Package{##1}|indexrm}%
       \ignorespaces
     }%
     \def\Class##1{%
-      \glossary{\string\Class{##1}>\@tempa#1|indexrm}%
-      \glossary{\@tempa#1>\string\Class{##1}|indexrm}%
+      \glossary{##1=\string\Class{##1}>\@tempa#1|indexrm}%
+      \glossary{\@tempa#1>##1=\string\Class{##1}|indexrm}%
       \ignorespaces
     }%
     \ignorespaces #2%
