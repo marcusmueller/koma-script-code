@@ -1,4 +1,4 @@
-% \CheckSum{1731}
+% \CheckSum{1763}
 % \iffalse meta-comment
 % ======================================================================
 % scrktare.dtx
@@ -996,6 +996,7 @@
 %
 %  \begin{option}{paper}
 %    \changes{v2.95}{2002/12/03}{neu implementiert}
+%    \changes{v3.01b}{2008/12/09}{Höhe und Breite vertauscht}
 % Im Normalfall wird die Papiergröße jedoch über diese Option
 % gesetzt. Dabei sind neben den Standard- und den ISO-Reihen A, B, C
 % und D auch Wertepaare der Form
@@ -1050,8 +1051,20 @@
             \if@tempswa\else
               \expandafter\maybe@pair#1::\@nil
               \if@tempswa
-                \setlength\paperheight{\@tempa}%
-                \setlength\paperwidth{\@tempb}%
+                \ifnum \scr@ta@compatibility<\@nameuse{scr@v@3.01b}\relax
+                  \PackageWarningNoLine{typearea}{%
+                    You may have to exchange height and width!\MessageBreak
+                    Until KOMA-Script version 3.01b the semantic\MessageBreak
+                    of option `paper' was `paper=height:width'\MessageBreak
+                    instead of `paper=width:height'.\MessageBreak
+                    I've switched back to that old interpretation\MessageBreak
+                    because of the given compatiblity settings}%
+                  \setlength\paperheight{\@tempa}%
+                  \setlength\paperwidth{\@tempb}%
+                \else
+                  \setlength\paperwidth{\@tempa}%
+                  \setlength\paperheight{\@tempb}%
+                \fi
               \else
                 \KOMA@unknown@keyval{paper}{#1}{%
                   `letter', `legal', `executive', `a'<nr>, `b'<nr>,
@@ -1946,6 +1959,8 @@
 %   \changes{v2.95}{2004/01/30}{Warnung im Zweispaltenmodus korrigiert}
 %   \changes{v3.00}{2008/10/08}{Layout-Infos werden per \cs{ta@layoutinfo}
 %     in die \texttt{log}-Datei geschrieben}
+%   \changes{v3.01b}{2008/12/09}{Warnungen vor ungünstigen Einstellungen
+%     geändert}
 % Zum Schluss soll die Seitenaufteilung noch in die \texttt{log}-Datei
 % geschrieben werden.
 %    \begin{macrocode}
@@ -1969,17 +1984,25 @@
       \advance\@tempcnta by-4
     \fi
     \ifnum\@tempcnta <-15
+      \@tempcnta=-\@tempcnta
       \PackageWarningNoLine{typearea}{%
-        Bad DIV value!\MessageBreak
+        Bad type area settings!\MessageBreak
+        The detected line width is about
+        \the\@tempcnta\@percentchar\MessageBreak
+        larger than the heuristically detected line width.\MessageBreak
         You should e.g. decrease DIV, increase fontsize\MessageBreak
         or change papersize%
       }%
+      \@tempcnta=-\@tempcnta
     \else
       \ifnum\@tempcnta>15
         \PackageWarningNoLine{typearea}{%
-          Bad DIV value!\MessageBreak
-          You should e.g. increase DIV, decrease fontsize\MessageBreak
-          or change papersize%
+          Maybe no optimal type area settings!\MessageBreak
+          The maximum limit of line width is about
+          \the\@tempcnta\@percentchar\MessageBreak
+          larger than the heuristically detected line width.\MessageBreak
+          You may e.g. increase DIV, decrease fontsize\MessageBreak
+          or change the papersize%
         }
     \fi\fi
     \ifnum\ta@div <6
