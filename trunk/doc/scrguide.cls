@@ -1,6 +1,6 @@
 % ======================================================================
 % scrguide.cls
-% Copyright (C) 2005-2008 Markus Kohm
+% Copyright (C) 2005-2009 Markus Kohm
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -18,7 +18,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrguide.cls
-% Copyright (C) 2005-2008 Markus Kohm
+% Copyright (C) 2005-2009 Markus Kohm
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3b, verteilt und/oder veraendert werden.

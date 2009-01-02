@@ -4,7 +4,7 @@ eval 'exec perl -S $0 ${1+"$@"}'
 
 # ======================================================================
 # changeinitialcomments.pl
-# Copyright (c) Markus Kohm, 2005-2008
+# Copyright (c) Markus Kohm, 2005-2009
 #
 # This file is part of the LaTeX2e KOMA-Script bundle.
 #
@@ -22,7 +22,7 @@ eval 'exec perl -S $0 ${1+"$@"}'
 # This work consists of all files listed in manifest.txt.
 # ----------------------------------------------------------------------
 # changeinitialcomments.pl
-# Copyright (c) Markus Kohm, 2005-2008
+# Copyright (c) Markus Kohm, 2005-2009
 #
 # Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 # Version 1.3b, verteilt und/oder veraendert werden.
