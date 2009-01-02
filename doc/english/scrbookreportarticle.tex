@@ -1,6 +1,6 @@
 % ======================================================================
 % scrbookreportarticle.tex
-% Copyright (c) Markus Kohm, 2001-2008
+% Copyright (c) Markus Kohm, 2001-2009
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -18,7 +18,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrbookreportarticle.tex
-% Copyright (c) Markus Kohm, 2001-2008
+% Copyright (c) Markus Kohm, 2001-2009
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3b, verteilt und/oder veraendert werden.
@@ -45,7 +45,7 @@
 %
 % ============================================================================
 
-\ProvidesFile{scrbookreportarticle.tex}[2008/07/10 KOMA-Script guide (chapter:
+\ProvidesFile{scrbookreportarticle.tex}[2009/01/01 KOMA-Script guide (chapter:
 scrbook, scrreprt, scrartcl)]
 \translator{Jens-Uwe Morawski\and Gernot Hassenpflug\and Markus Kohm}
 
@@ -1256,6 +1256,11 @@ specification to the one currently used with the specified
   \feentry{footnotelabel}{Mark of a footnote; used according to the
     element \FontElement{footnote}}%
   \feentry{footnotereference}{Footnote reference in the text}%
+  \feentry{labelinglabel}{Labels, i.\,e., the optional argument of
+    \Macro{item} in the \Environment{labeling} environment}%
+  \feentry{labelingseparator}{Separator, i.\,e., the optional argument of
+    the \Environment{labeling} environment; used according to the element
+    \FontElement{labelinglabel}}%
   \feentry{minisec}{Title of \Macro{minisec}}%
   \feentry{pagefoot}{The foot of a page, but also the head of a page}%
   \feentry{pagehead}{The head of a page, but also the foot of a page}%
@@ -3725,43 +3730,56 @@ commands for the element
 \BeginIndex{Env}{labeling}%
 \BeginIndex{Cmd}{item}%
 An additional form of a description list is only available in the
-{\KOMAScript} classes: the \Environment{labeling} environment. Unlike
-the \Environment{description} environment, you can provide a pattern
-whose length determines the indentation of all items. Furthermore, you
-can put an optional \PName{delimiter} between the item and its
-description.
+{\KOMAScript} classes: the \Environment{labeling} environment. Unlike the
+\Environment{description} environment, you can provide a pattern whose length
+determines the indentation of all items. Furthermore, you can put an optional
+\PName{delimiter} between the item and its description.  The
+font\Index{font}\ChangedAt{v3.01}{%
+  \Class{scrbook}\and \Class{scrreprt}\and \Class{scrartcl}\and
+  \Package{scrextend}}%
+which is responsible for emphasizing the item and the separator can be changed
+with the commands for the element
+\FontElement{labelinglabel}\IndexFontElement{labelinglabel} and
+\FontElement{labelingseparator}\IndexFontElement{labelingseparator} (see
+\autoref{tab:maincls.elementsWithoutText},
+\autopageref{tab:maincls.elementsWithoutText}) described in
+\autoref{sec:maincls.font}.
 \begin{Example}
   Slightly changing the example from the \Environment{description}
   environment, we could write:
 \begin{lstlisting}
-  \begin{labeling}[~--]{%
-      \usekomafont{descriptionlabel}myheadings}
-    \item[\usekomafont{descriptionlabel}empty]
+  \setkomafont{labelinglabel}{\ttfamily}
+  \setkomafont{labelingseparator}{\normalfont}
+  \begin{labeling}[~--]{myheadings}
+    \item[empty]
       Page style without header and footer
-    \item[\usekomafont{descriptionlabel}plain]
+    \item[plain]
       Page style for chapter beginnings without headings
-    \item[\usekomafont{descriptionlabel}headings]
+    \item[headings]
       Page style for running headings
-    \item[\usekomafont{descriptionlabel}myheadings]
+    \item[myheadings]
       Page style for manual headings
   \end{labeling}
 \end{lstlisting}
   As result we get:
   \begin{ShowOutput}
-    \begin{labeling}[~--]{\usekomafont{descriptionlabel}myheadings}
-      \item[\usekomafont{descriptionlabel}empty]
+    \setkomafont{labelinglabel}{\ttfamily}
+    \setkomafont{labelingseparator}{\normalfont}
+    \begin{labeling}[~--]{myheadings}
+    \item[empty]
       Page style without header and footer
-    \item[\usekomafont{descriptionlabel}plain]
+    \item[plain]
       Page style for chapter beginnings without headings
-    \item[\usekomafont{descriptionlabel}headings]
+    \item[headings]
       Page style for running headings
-    \item[\usekomafont{descriptionlabel}myheadings]
+    \item[myheadings]
       Page style for manual headings
     \end{labeling}
   \end{ShowOutput}
-  As can be seen in this example, a font changing command has to be
-  repeated both in the pattern and in the optional parameter of every
-  \Macro{item} command in this environment.
+  As can be seen in this example, a font changing command may be set in the
+  usual way. But if you don't want the font of the separator be changed in the
+  same way like the font of the label, you have to set the font of the
+  separator different.
 \end{Example}
 Originally this environment was implemented for things like
 ``Precondition, Assertion, Proof'', or ``Given, Required, Solution''
