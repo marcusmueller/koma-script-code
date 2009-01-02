@@ -1,8 +1,8 @@
-% \CheckSum{1767}
+% \CheckSum{1770}
 % \iffalse meta-comment
 % ======================================================================
 % scrksect.dtx
-% Copyright (c) Markus Kohm, 2002-2008
+% Copyright (c) Markus Kohm, 2002-2009
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrksect.dtx
-% Copyright (c) Markus Kohm, 2002-2008
+% Copyright (c) Markus Kohm, 2002-2009
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3b, verteilt und/oder veraendert werden.
@@ -58,7 +58,7 @@
 %%% From File: scrksect.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrksect.dtx}[2008/11/21 v3.01a KOMA-Script (disposition)]
+\ProvidesFile{scrksect.dtx}[2009/01/01 v3.02 KOMA-Script (disposition)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -1137,6 +1137,7 @@
 %    \changes{v2.8p}{2001/09/27}{\cs{vbox} eingefügt}
 %    \changes{v2.8p}{2001/09/27}{\cs{use@preamble} ersetzt
 %      \cs{@part@preamble}}
+%    \changes{v3.02}{2009/01/01}{Verwendung des neuen \cs{partheademptypage}}
 % Der Gliederungsfehl \cs{part} wird wie in den Standardklassen mit
 % Hilfe mehrere Hilfsmakros definiert. Wesentliche Unterschiede zu den
 % Standardklassen existieren nicht, jedoch sind Schriftgröße,
@@ -1150,9 +1151,11 @@
 %    \changes{v2.95a}{2006/07/10}{neue Konfiguratonsmöglichkeit}
 %  \begin{macro}{\partheadendvskip}
 %    \changes{v2.95a}{2006/07/10}{neue Konfiguratonsmöglichkeit}
-% Diese drei Makros werden verwendet, um den Abstand über in und unter der
-% Überschrift eines Teils zu definieren. Prinzipiell kann damit auch der
-% Umbruch zwischen Nummer und Text entfernt werden.
+%  \begin{macro}{\parheademptypage}
+%    \changes{v3.02}{2009/01/01}{neue Konfigurationsmöglichkeit}
+% Diese vier Makros werden verwendet, um den Abstand über in und unter der
+% Überschrift eines Teils und die leere Rückseite zu definieren. Prinzipiell
+% kann damit auch der Umbruch zwischen Nummer und Text entfernt werden.
 %    \begin{macrocode}
 \newcommand*{\partheadstartvskip}{%
 %<article> \addvspace{4ex}%
@@ -1166,7 +1169,17 @@
 %<article>    \vskip 3ex
 %<report|book>  \vfil\newpage
 }
+%<*report|book>
+\newcommand*{\partheademptypage}{%
+  \if@twoside\if@openright
+      \null%
+      \thispagestyle{empty}%
+      \newpage
+  \fi\fi
+}
+%</report|book>
 %    \end{macrocode}
+%  \end{macro}
 %  \end{macro}
 %  \end{macro}
 %  \end{macro}
@@ -1241,11 +1254,7 @@
 %<*book|report>
 \newcommand*{\@endpart}{\vbox to\z@{\use@preamble{part@u}\vss}%
   \partheadendvskip
-  \if@twoside\if@openright
-      \null%
-      \thispagestyle{empty}%
-      \newpage
-  \fi\fi
+  \partheademptypage
   \if@tempswa
     \twocolumn
   \fi
