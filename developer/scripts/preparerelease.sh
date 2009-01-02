@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# Copyright (c) Markus Kohm, 2006-2008
+# Copyright (c) Markus Kohm, 2006-2009
 #
 # This file prepares KOMA-Script for release.
 #
@@ -59,7 +59,7 @@ steptwo() {
     cat > README <<EOF
 
 KOMA-Script $version
-Copyright (c) Markus Kohm <komascript(at)gmx.info>, 1994-2008
+Copyright (c) Markus Kohm <komascript(at)gmx.info>, 1994-2009
 
 This material is subject to the LaTeX Project Public License. See
 lppl.txt (english) or lppl-de.txt (german) for the details of that
