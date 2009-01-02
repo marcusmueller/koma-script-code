@@ -45,10 +45,11 @@
 %
 % ======================================================================
 
-\ProvidesFile{typearea.tex}[2008/07/10 KOMA-Script guide (chapter: typearea)]
+\ProvidesFile{typearea.tex}[2009/01/02 KOMA-Script guide (chapter: typearea)]
 \translator{Markus Kohm\and Gernot Hassenpflug}
 
 % Date of translated german file: 2006-11-29
+% Updated: 2008-01-02
 
 \chapter{Construction of the Page Layout with \Package{typearea}}
 \labelbase{typearea}
@@ -60,38 +61,71 @@
 \OptionValue{BCOR}{current}, \OptionValue{twoside}{semi},
 \KOption{headheight}\PName{height}, \OptionValue{pagesize}{automedia}.
 
+Many {\LaTeX} classes, including the standard classes, present the user
+with the largely fixed configuration of margins and typearea. With the
+standard classes, the configuration determined is very much dependent
+on the chosen font size. There do exist separate packages, such as
+\Package{geometry}\IndexPackage{geometry} (see
+\cite{package:geometry}), which give the user complete control, but
+also full responsibility, for the settings of typearea and margins.
+
+\KOMAScript{} takes a somewhat different approach with its
+\Package{typearea} package. Here the user is given several
+construction setting and automatization possiblities based on
+established typography standards in order to help guide him or her in
+making a good choice.
+
+It should be noted that the \Package{typearea} package makes use of
+the \Package{scrbase} package. The latter is explained in the expert
+section \iffree{of this document}{of this book} in
+\autoref{cha:scrbase} from \autopageref{cha:scrbase} onwards. The
+majority of the rules documented there are however not directed at the
+user, but rather at class- and package authors.
+
 \section{Fundamentals of Page Layout}
+\label{sec:typearea.basics}
 
 \begin{Explain}
   If you look at a single page of a book or other printed materials,
-  you will see that it consists of top, foot, left and right margins,
-  a (running) head area, the text block and a (running) foot area.
-  Looking closer, there is space between the head area and the text
-  block and between the text block and the foot area. The relations
-  between these areas are called the \emph{page layout}.
+  you will see that it consists of top, bottom, left and right
+  margins, a (running) head area, the text block and a (running) foot
+  area.  There is also a space between the head area and the text
+  block, and between the text block and the foot area. The relations
+  between these areas are called the \emph{page
+    layout}.\Index[indexmain]{page layout}
 
-  The literature offers and discusses different algorithms and
-  heuristic approaches for constructing a good page layout.  Often,
+%%
+%% GH: sollte man schon Hinweise zum Buch hineinarbeiten? Auskommentiert?
+%%  \ifx\BUCH\undefined\cite{DANTE:TK0402:MJK}\else(siehe
+%%   \autoref{cha:typeareaconstruction})\fi
+  The literature contains much discussion of different algorithms and
+  heuristic approaches for constructing a good page layout.  Often
   mentioned is an approach which involves diagonals and their
-  intersections. The result is a page where the text block
-  proportions are related to the proportions of the \emph{page}.  In a
+  intersections. The result is a page where the text block proportions
+  are related to the proportions of the \emph{page}.  In a
   single-sided document, the left and the right margin should have
-  equal widths.
-  The relation of the upper margin to the lower margin should
-  be 1\(:\)2. In a double-sided document (e.\,g. a book) however,
-  the complete inner margin (the margin at the spine) should be the same as
-  each of the two outer margins.
+  equal widths.  The relation of the upper margin to the lower margin
+  should be 1\(:\)2. In a double-sided document\Index{doouble-sided}
+  (e.\,g. a book) however, the complete inner margin (the margin at
+  the spine) should be the same as each of the two outer margins; in
+  other words, a single page contriubtes only half of the inner
+  margin.
 
-  In the previous paragraph, we mentioned and emphasized the
-  \emph{page}. Erroneously, it is often thought that the format of
-  the page means the format of the paper. However, if you look at
-  a bound document, it is obvious that part of the paper vanishes in
-  the binding and that is not part of the visible page. It is not the format of
-  the paper which is important in the layout of a page, it is the
-  impression of the visible page to the reader. Therefore, it is
-  clear that the calculation of the page layout must account for the
-  ``lost'' paper in the binding and add this amount to the width of
-  the inner margin. This is called the \emph{binding correction}.
+  In the previous paragraph, we mentioned and emphasized \emph{the
+    page}. Erroneously, it is often thought that with the page format
+  the page is also meant the paper format.\Index[indexmain]{paper
+    format} However, if you look at a bound document, it is obvious
+  that part of the paper vanishes in the
+  binding\Index[indexmain]{binding} and is no longer part of the
+  visible page. For the page layout, it is not the format of the paper
+  which is important, it is the impression of the visible page to the
+  reader. Therefore, it is clear that the calculation of the page
+  layout must account for the ``lost'' paper in the binding and add
+  this amount to the width of the inner margin. This is called the
+  \emph{binding correction}.\Index[indexmain]{binding correction} The
+  binding correction is therefore calculated as part of the
+  \emph{gutter}\Index[indexmain]{gutter}, not however of the visible
+  inner margin.
 
   The binding correction depends on the process of actually
   producing the document and thus cannot be calculated in general.
@@ -106,85 +140,112 @@
   text block. Once we know one of these values, we can calculate
   all the other values from the paper format and the page format or
   the binding correction.
-  \begin{eqnarray*}
-    \Var{textblock~height} : \Var{textblock~width} &=&
-    \Var{page~height} : \Var{page~width}\\
+  \begin{align*}
+    \Var{textblock~height} \Index{textblock height} : \Var{textblock~width} &=
+    \Var{page~height}\Index{page} : \Var{page~width}\\
+    \Var{top~margin}\Index{margin} : \Var{foot~margin} &=
+      \text{1} : \text{2} \\
 %
-    \Var{page~width} &=& \Var{paper~width} - \Var{binding~correction}\\
+    \Var{left~margin} : \Var{right~margin} &=  \text{1} : \text{1} \\
 %
-    \Var{top~margin} + \Var{foot~margin} &=&
+    \Var{half~inner~margin} : \Var{outer~margin} &= \text{1} : \text{2} \\
+%
+   \Var{page~width} &= 
+      \Var{paper~width}\Index{paper} - 
+      \Var{binding~correction}\Index{binding correction}\\
+%
+    \Var{top~margin} + \Var{bottom~margin} &=
     \Var{page~height} - \Var{textblock~height} \\
 %
-    \Var{top~margin} : \Var{foot~margin} &=& 1 : 2 \\
+    \Var{left~margin} + \Var{right~margin} &=
+    \Var{page~width} - \Var{textblock~width} \\
 %
-    \Var{left~margin} : \Var{right~margin} &=& 1 : 1 \\
+    \Var{half~inner~margin} + \Var{outer~margin} &=
+    \Var{page~width} - \Var{textblock~width} \\
 %
-    \Var{half~inner~margin} &=&
-    \frac{1}{2}\Var{outer~margin} + \Var{binding~correction} \\
-  \end{eqnarray*}
-  The values \Var{left~margin} and \Var{right~margin} only
-  exist in a single-sided document while \Var{inner~margin} and
-  \Var{outer~margin} only exist in a double-sided document.  In
-  these equations, we work with \Var{half~inner~margin} since the full
-  inner margin belongs to a double-page. Thus, one page has half of
-  the inner margin.
+    \Var{half~inner~margin} + \Var{binding~correction} &=
+    \Var{gutter}\Index{gutter}
+  \end{align*}
+  \Index[indexmain]{margin}%
+  The values \Var{left~margin} and \Var{right~margin} only exist in a
+  single-sided document while \Var{half~inner~margin} and
+  \Var{outer~margin} only exist in a double-sided document.  In these
+  equations, we work with \Var{half~inner~margin} since the full inner
+  margin belongs to a double-page. Thus, one page has only half of the
+  inner margin, \Var{half~inner~margin}.
 
   The question of the width of the textblock is also discussed in
   the literature. The optimum width depends on several factors:
   \begin{itemize}
-  \item size, width, type of the used font % !!!
-  \item line spacing % !!!
+  \item size, width, type of the font used
+  \item line spacing
   \item word length
   \item available room
   \end{itemize}
-  The importance of the font becomes clear once you think about
-  serifs. Serifs are fine lines % !!!
-  finishing off the letters. Letters whose main strokes run
-  orthogonal to the text line disturb the flow more than they
-  lead the eye along the line. Those letters have serifs at
-  the ends of the vertical strokes, however, so the horizontal serifs
-  lead the eye horizontally too. In addition, it helps the eye to
-  find the beginning of the next line. Thus, the line length for a
-  serif font can be slightly longer than for a sans serif font.
+  The importance of the font becomes clear once you think about the
+  meaning of serifs. Serifs\Index[indexmain]{serifs} are fine strokes
+  finishing off the lines of the letters. Letters whose main strokes
+  run orthogonal to the text line disturb the flow rather than keeping
+  and leading the eye along the line. Those letters then have serifs
+  at the ends of the vertical strokes so that the horizontal serifs
+  can help lead the eye horizontally. In addition, they help the eye
+  to find the beginning of the next line more quickly. Thus, the line
+  length for a serif font can be slightly longer than for a sans serif
+  font.
 
-  In {\LaTeX}, the line spacing is about 20\% of the font
-  size. With commands like \Macro{linespread} or, better, packages like
-  \Package{setspace}, the line spacing can be changed. A wider line
-  spacing helps the eye to follow the line. A very wide line
-  spacing, on the other hand, disturbs reading because the eye has
-  to move a wide distance between lines. Also, the reader gets
-  uncomfortable because of the visible stripe effect. The uniform
-  gray value of the page gets spoiled. Still, with a wider line
+  With line spacing\Index[indexmain]{line spacing} is meant the
+  vertical distance between individual lines of text. In {\LaTeX}, the
+  line spacing is set at about 20\% of the font size. With commands
+  like \Macro{linespread}\IndexCmd{linespread} or, better, packages
+  like \Package{setspace}\IndexPackage{setspace} (see
+  \cite{package:setspace}), the line spacing can be changed. A wider
+  line spacing helps the eye to follow the line. A very wide line
+  spacing, on the other hand, disturbs reading because the eye has to
+  move a wide distance between lines. Also, the reader becomes
+  uncomfortable because of the visible stripe effect. The uniform gray
+  value of the page is thereby spoiled. Still, with a wider line
   spacing, the lines can be longer.
 
-  The literature gives different values for good line lengths, depending
-  on the author. To some extent, this is due to the native language
-  of the author. Since the eye jumps from word to word, short words
-  make this task easier. Not considering language and font, a line
-  length of 60 to 70 letters, including spaces and
-  punctuation, is a usable compromise. This requires well-chosen line
-  spacing, but {\LaTeX}'s default is usually good enough.
+  The literature gives different values for good line
+  lengths\Index[indexmain]{line length}, depending on the author. To
+  some extent, this is related to the native language of the
+  author. Since the eye jumps from word to word, short words make this
+  task easier. Considering all languages and fonts, a line length of
+  60 to 70 characters, including spaces and punctuation, forms a
+  usable compromise. This requires well-chosen line spacing, but
+  {\LaTeX}'s default is usually good enough. Longer line lengths
+  should only be considered for highly-developed readers who spend
+  several hours daily reading. However, even for such, line lengths
+  greater than 80 characters are unsuitable. In any case, the line
+  spacing must be appropriately chosen. An extra 5\% to 10\% are
+  recommended as a good rule of thumb. With fonts such as Palatino,
+  which require some 5\% more line spacing even at normal line
+  lengths, even more can be required.
 
-  Before looking at the actual construction of the page layout,
-  there are some minor things to know. {\LaTeX} doesn't start the
-  first line of the text block at the upper edge of the text block,
-  but with a defined distance from it. Also, {\LaTeX} knows the commands
-  \Macro{raggedbottom} and \Macro{flushbottom}. \Macro{raggedbottom}
-  specifies that the last line of a page should be positioned
-  wherever it was calculated. This means that the position of this
-  line can be different on each page, up to the height of one line.
-  In double-sided documents this is usually undesirable.
-  \Macro{flushbottom} makes sure that the last line is always at the
-  lower edge of the text block. To achieve this, {\LaTeX} sometimes
-  needs to stretch vertical glue more than allowed. Paragraph skip
-  is such a stretchable, vertical glue, even when set to zero.  In
-  order to not stretch the paragraph skip on normal pages where it
-  is the only stretchable glue, the height of the text block should
-  be a multiple of the height of the text line, including the
-  distance from the upper edge of the text block to the first line.
+  Before looking at the actual construction of the page layout, there
+  are just some minor things left to know. {\LaTeX} does not start the
+  first line in the text block of a page at the upper edge of the text
+  block, but sets the baseline at a defined distance from the top of
+  the text block. Also, {\LaTeX} knows the commands
+  \Macro{raggedbottom}\IndexCmd{raggedbottom} and
+  \Macro{flushbottom}\IndexCmd{flushbottom}. \Macro{raggedbottom}
+  specifies that the last line of a page should be positioned wherever
+  it was calculated. This means that the position of this line can be
+  different on each page, up to the height of one line\,--\,in
+  combination of the end of the page with titles, figures, tables or
+  similar, even more. In double-sided documents this is usually
+  undesirable. \Macro{flushbottom} makes sure that the last line is
+  always at the lower edge of the text block. To achieve this,
+  {\LaTeX} sometimes needs to stretch vertical glue more than
+  allowed. Paragraph skip is such a stretchable, vertical glue, even
+  when set to zero.  In order to not stretch the paragraph skip on
+  normal pages where it is the only stretchable glue, the height of
+  the text block should be set to a multiple of the height of the text
+  line, including the distance from the upper edge of the text block
+  to the first line.
 
   This concludes the introduction to page layout as handled by
-  {\KOMAScript}. Now, we can begin with the actual construction.\par
+  {\KOMAScript}. Now, we can begin with the actual construction.
 \end{Explain}
 
 
@@ -192,40 +253,92 @@
 \label{sec:typearea.divConstruction}
 
 \begin{Explain}
-  The easiest way to make sure that the text area has the same
-  ratios as the page is as follows: First, you subtract the
-  binding correction \Var{BCOR} from the inner edge of the paper.
-  Then you divide the rest of the page vertically into
-  \Var{DIV} rows of equal height. Next, you divide the page
-  horizontally into the same number (\Var{DIV}) of columns.  Then you
-  take the uppermost row as the upper margin and the two lowermost
-  rows as the lower margin. If you print double-sided, you also take
-  the innermost column as the inner margin and the two outermost
-  columns as the outer margin. Then, you add the binding correction
-  \Var{BCOR} to the inner margin. The remainder of
-  the page is the text area. The width and the height of the text area result
-  automatically from the number of rows and columns \Var{DIV}. Since
-  the margins always need three rows/columns, \Var{DIV} must
-  be necessarily greater than three. In order that the text area occupy at
-  least twice as much space as the margins, \Var{DIV} should really be equal
-  to or greater than 9. With this value, the construction is known as the
-  \emph{classical division factor of 9}.
+  The easiest way to make sure that the text area has the same ratios
+  as the page is as follows: First, one subtracts the part \Var{BCOR},
+  required for the binding correction\Index{binding correction}, from
+  the inner edge of the paper, and divides the rest of the page
+  vertically into \Var{DIV} rows of equal height. Next, one divides
+  the page horizontally into the same number (\Var{DIV}) of columns.
+  Then, one takes the uppermost row as the upper margin and the two
+  lowermost rows as the lower margin. If one is printing double-sided,
+  one must similarly take the innermost column as the inner margin and
+  the two outermost columns as the outer margin. Then, one adds the
+  binding correction \Var{BCOR} to the inner margin. What now remains
+  of the page is the text area.\Index{text area} The width and the
+  height of the text area and margins result automatically from the
+  number of rows and columns \Var{DIV}. Since the margins always need
+  three stripes, \Var{DIV} must be necessarily greater than three. In
+  order that the text area occupy at least twice as much space as the
+  margins, \Var{DIV} should really be equal to or greater than 9. With
+  this value, the construction is also known as the \emph{classical
+    division factor of 9} (see \autoref{fig:typearea.nineparts}).
+
+  \begin{figure}
+    \centering
+    \setlength{\unitlength}{.25mm}
+    \definecolor{komalight}{gray}{.75}
+    \definecolor{komamed}{gray}{.6}
+    \definecolor{komadark}{gray}{.3}
+    \begin{picture}(420,297)
+      % BCOR
+      \put(198,0){\color{komalight}\rule{24\unitlength}{297\unitlength}}
+      \multiput(198,2)(0,20){15}{\thinlines\line(0,1){10}}
+      \multiput(222,2)(0,20){15}{\thinlines\line(0,1){10}}
+      % the paper
+      \put(0,0){\thicklines\framebox(420,297){}}
+%      \put(210,0){\thicklines\framebox(210,297){}}
+      % the page layout
+      \put(44,66){\color{komamed}\rule{132\unitlength}{198\unitlength}}
+      \put(244,66){\color{komamed}\rule{132\unitlength}{198\unitlength}}
+      % helper lines
+      \multiput(0,33)(0,33){8}{\thinlines\line(1,0){198}}
+      \multiput(222,33)(0,33){8}{\thinlines\line(1,0){198}}
+      \multiput(22,0)(22,0){8}{\thinlines\line(0,1){297}}
+      \multiput(244,0)(22,0){8}{\thinlines\line(0,1){297}}
+      % annotations
+      \put(198,0){\color{white}\makebox(24,297)[c]{%
+          \rotatebox[origin=c]{-90}{binding correction}}}
+      \put(44,66){\color{white}\makebox(132,198)[c]{page layout left}}
+      \put(244,66){\color{white}\makebox(132,198)[c]{page layout right}}
+      % box numbers
+      \makeatletter
+      \multiput(1,27)(0,33){9}{\footnotesize\makebox(0,0)[l]{\the\@multicnt}}
+      \multiput(177,291)(-22,0){9}{%
+        \footnotesize\makebox(0,0)[l]{\the\@multicnt}}
+      \multiput(419,27)(0,33){9}{%
+        \footnotesize\makebox(0,0)[r]{\the\@multicnt}}
+      \multiput(243,291)(22,0){8}{%
+        \footnotesize\makebox(0,0)[r]{\the\numexpr\@multicnt+1\relax}}
+      \makeatother
+    \end{picture}
+    \caption{Double-sided layout with the box construction of the classical division factor of 9, after subtraction of a binding correction}
+    \label{fig:typearea.nineparts}
+  \end{figure}
 
   In {\KOMAScript}, this kind of construction is implemented in the
-  \Package{typearea} package. For A4 paper, \Var{DIV} is predefined
-  according to the font size (see \autoref{tab:typearea.div}).  If there is
-  no binding correction (\(\Var{BCOR} = 0\Unit{pt}\)), the results
-  roughly match the values of \autoref{tab:typearea.typearea}.
+  \Package{typearea} package, where the bottom margin may drop any
+  fractions of a line in order to conform with the minor condition for
+  the text area height mentioned in the previous paragraph, and
+  thereby to minimize the mentioned problem with
+  \Macro{flushbottom}. For A4 paper, \Var{DIV} is predefined according
+  to the font size (see \autoref{tab:typearea.div},
+  \autopageref{tab:typearea.div}). If there is no binding correction
+  (\(\Var{BCOR} = 0\Unit{pt}\)), the results roughly match the values
+  of \autoref{tab:typearea.typearea},
+  \autopageref{tab:typearea.typearea}.
 
-  In addition to the predefined values, you can specify \Var{BCOR}
-  and \Var{DIV} as options when loading the package (see
-  \autoref{sec:typearea.options}). There is also a command to
-  explicitly calculate the type area by providing these values as
-  parameters (also see \autoref{sec:typearea.options}).
+  In addition to the predefined values, one can specify \Var{BCOR} and
+  \Var{DIV} as options when loading the package (see
+  \autoref{sec:typearea.options}, from
+  \autopageref{sec:typearea.typearea} onwards). There is also a
+  command to explicitly calculate the type area by providing these
+  values as parameters (also see \autoref{sec:typearea.options},
+  \autopageref{desc:typearea.cmd.typearea}).
 
-  The \Package{typearea} package can determine the optimal value
-  of \Var{DIV} for the font used automatically.  Again, see
-  \autoref{sec:typearea.options}.\par
+  The \Package{typearea} package can automatically determine the
+  optimal value of \Var{DIV} for the font and line spacing used.
+  Again, see \autoref{sec:typearea.options},
+  \autopageref{desc:typearea.option.DIV.calc}.
 \end{Explain}
 
 
@@ -233,39 +346,51 @@
 \label{sec:typearea.circleConstruction}
 
 \begin{Explain}
-  In addition to the construction method previously described, a somewhat more
-  classical method can be found in the literature. The aim of this method is
-  not only identical ratios in the page proportions, but it is considered
-  optimal when the height of the text block is the same the width of the
-  page. The exact method is described in \cite{JTsch87}.
+  In addition to the page layout construction\Index{page layout}
+  method previously described, a somewhat more classical method can be
+  found in the literature. The aim of this method is not only to
+  obtain identical ratios in the page proportions, but it is
+  considered optimal when the height of the text block is the same as
+  the width of the page. The exact method is described in
+  \cite{JTsch87}.
 
-  A disadvantage of this late Dark Ages method is that the width of
-  the text area is no longer dependent on the font. Thus, one
-  doesn't choose the text area to match the font, but the author or
-  typesetter has to choose the font according to the text area. This
-  can be considered a ``must''.
+  A disadvantage of this late Middle Age method is that the width of
+  the text area is no longer dependent on the font. Thus, one doesn't
+  choose the text area to match the font, but the author or typesetter
+  has to choose the font according to the text area. This can be
+  considered a ``must''.
 
   In the \Package{typearea} package this construction is changed
   slightly. By using a special (normally meaningless) \Var{DIV} value
   or a special package option, a \Var{DIV} value is chosen to match
-  the perfect values as closely as possible. See also
-  \autoref{sec:typearea.options}.\par
+  the perfect values of the late Middle Age method as closely as
+  possible. See also \autoref{sec:typearea.options},
+  \autopageref{desc:typearea.option.DIV.calc}.
 \end{Explain}
 
+\LoadCommon{0}
 
 \section{Options and Macros to Influence the Page Layout}
 \label{sec:typearea.options}
 
 The package \Package{typearea} offers two different user interfaces to
-influence type area construction. The first method is to load the
-package with options. For information on how to load packages and to
-give package options, please refer to the {\LaTeX} literature, e.\,g.
-\cite{lshort} and \cite{latex:usrguide}, or the examples given here.
-Since the \Package{typearea} package is loaded automatically when
-using the {\KOMAScript} main classes, the package options can be given
-as class options (see \autoref{sec:maincls.options}).
+influence type area construction. The more important method is to load
+the package with options. For information on how to load packages and
+to give package options, please refer to the {\LaTeX} literature,
+e.\,g.  \cite{lshort} and \cite{latex:usrguide}, or the examples given
+here.  Since the \Package{typearea} package is loaded automatically
+when using the {\KOMAScript} main classes, the package options can be
+given as class options (see \autoref{sec:maincls.options}).
 
+In this section the \Class{protokol} class will be used, not an
+existing {\KOMAScript} class but a hypothetical one. This\iffree{
+  documentation}{ book} assumes that ideally there exists a class for
+every specific task.
 
+%%% need to fill in from lines 407 
+%\BeginIndex{Option}{BCOR~=\PName{value}}%
+% ...
+% until line 883 in german version
 \begin{Declaration}
   \KOption{twoside}\PName{value}
 \end{Declaration}%
