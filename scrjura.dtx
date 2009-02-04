@@ -1,4 +1,4 @@
-% \CheckSum{1191}
+% \CheckSum{1229}
 % \iffalse meta-comment
 % ======================================================================
 % scrjura.dtx
@@ -795,7 +795,9 @@ standard classes created by The LaTeX3 Project 1994-1996.
 \let\cl@SubParagraph\@empty
 \newcounter{contractParagraph}
 \renewcommand*{\thecontractParagraph}{%
-  {\S~\arabic{contractParagraph}}}
+  {\contract@Paragraphformat{\arabic{contractParagraph}}}}
+\DeclareRobustCommand*{\contract@Paragraphformat}[1]{\paragraphformat{#1}}
+\newcommand*{\paragraphformat}[1]{\S~#1}
 \newcounter{contractSubParagraph}
 \@addtoreset{SubParagraph}{Paragraph}
 \renewcommand*{\thecontractSubParagraph}{%
@@ -1292,6 +1294,25 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % \end{macro}
 % \end{macro}
 %
+% \begin{macro}{\refParagraphN}
+% \begin{macro}{\ref@ParagraphN}
+% Zitiert nur den Paragraphen eines Paragraphen, eines Absatzes oder eines
+% Satzes. Für mehr Kompatibilität mit hyperref gibt es mit hyperref auch eine
+% Sternform. Ohne hyperref produziert diese nur Unsinn.
+%    \begin{macrocode}
+\newcommand*{\refParagraphN}{%
+  \@ifstar {\ref@ParagraphN*}{\ref@ParagraphN{}}
+}
+\newcommand*{\ref@ParagraphN}[2]{%
+  \begingroup
+    \let\paragraphformat\relax
+    \ref@Paragraph{#1}{#2}%
+  \endgroup
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
 % \begin{macro}{\refPar}
 % \begin{macro}{\ref@Par}
 % Zitiert nur den Absatz eines Absatzes oder eines Satzes. Für mehr
@@ -1377,7 +1398,21 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % Das Gleiche zwingend nummerisch.
 %    \begin{macrocode}
 \newcommand*{\refParN}{%
-  \@ifstar {\ref@ParX2*}{\ref@ParX2{}}
+  \@ifstar {\ref@ParN2*}{\ref@ParN2{}}
+}
+\newcommand*{\ref@ParN}[2]{%
+  \@ifnextchar [%]
+    {\ref@@ParN{#1}{#2}}%
+    {\ref@ParX{#1}{#2}}%
+}
+\newcommand*{\ref@@ParN}{}
+\def\ref@@ParN#1#2[#3]#4{%
+  \begingroup
+    \renewcommand*{\parnumericformat}[1]{%
+      \csname @#3\endcsname{\number ##1\relax}%
+    }%
+    \ref@ParX{#1}{#2}{#4}%
+  \endgroup
 }
 %    \end{macrocode}
 % \end{macro}
