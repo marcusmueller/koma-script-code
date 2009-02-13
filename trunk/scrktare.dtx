@@ -1,4 +1,4 @@
-% \CheckSum{1763}
+% \CheckSum{1784}
 % \iffalse meta-comment
 % ======================================================================
 % scrktare.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrktare.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrktare.dtx}[2008/11/21 v3.01a KOMA-Script (type area)]
+\ProvidesFile{scrktare.dtx}[2009/02/13 v3.02c KOMA-Script (type area)]
 % \iffalse
 %</driver>
 %<package&identify>\ProvidesPackage{typearea}[%
@@ -817,14 +817,15 @@
 }
 %    \end{macrocode}
 %
-%  \begin{macro}{\set@pdftexpagesize}
-%    \changes{v2.95}{2002/08/27}{neu (intern)}
-%  \begin{macro}{\set@dvipspagesize}
-%    \changes{v2.95}{2002/08/27}{neu (intern)}
-%  \begin{macro}{\setnot@dvipspagesize}
-%    \changes{v2.95}{2002/08/27}{neu (intern)}
-%  \begin{macro}{\set@vtexpagesize}
-%    \changes{v2.95}{2002/08/27}{neu (intern)}
+% \begin{macro}{\set@pdftexpagesize}
+%   \changes{v2.95}{2002/08/27}{neu (intern)}
+% \begin{macro}{\set@dvipspagesize}
+%   \changes{v2.95}{2002/08/27}{neu (intern)}
+%   \changes{v3.02c}{2009/02/13}{\texttt{seascape} wird beachtet}
+% \begin{macro}{\setnot@dvipspagesize}
+%   \changes{v2.95}{2002/08/27}{neu (intern)}
+% \begin{macro}{\set@vtexpagesize}
+%   \changes{v2.95}{2002/08/27}{neu (intern)}
 % Damit die Option \texttt{pagesize} überhaupt funktionieren kann,
 % werden drei interne Makros benötigt.
 % \begin{description}
@@ -850,6 +851,7 @@
       \endgroup
       \AtBeginDocument{\AtBeginDvi{%
           \special{papersize=\the\paperwidth,\the\paperheight}%
+          \if@seascape\special{! TeXDict begin /landplus90{true}store end }\fi
         }%
       }%
       \let\set@dvipspagesize=\setnot@dvipspagesize
@@ -994,9 +996,10 @@
 % \end{option}
 % \end{option}
 %
-%  \begin{option}{paper}
-%    \changes{v2.95}{2002/12/03}{neu implementiert}
-%    \changes{v3.01b}{2008/12/09}{Höhe und Breite vertauscht}
+% \begin{option}{paper}
+%   \changes{v2.95}{2002/12/03}{neu implementiert}
+%   \changes{v3.01b}{2008/12/09}{Höhe und Breite vertauscht}
+%   \changes{v3.02c}{2009/02/12}{neuer Wert \texttt{seascape}}
 % Im Normalfall wird die Papiergröße jedoch über diese Option
 % gesetzt. Dabei sind neben den Standard- und den ISO-Reihen A, B, C
 % und D auch Wertepaare der Form
@@ -1004,75 +1007,86 @@
 % "`\texttt{portrait}"' und "`\texttt{landscape}"' erlaubt.
 %    \begin{macrocode}
 \KOMA@key{paper}{%
-  \ifstr{#1}{landscape}{%
+  \ifstr{#1}{seascape}{%
+    \@seascapetrue
     \if@landscape\else
       \setlength{\@tempdima}{\paperwidth}%
       \setlength{\paperwidth}{\paperheight}%
       \setlength{\paperheight}{\@tempdima}%
       \@landscapetrue
     \fi
-  }{%
-    \ifstr{#1}{portrait}{%
-      \if@landscape
+  }{%      
+    \ifstr{#1}{landscape}{%
+      \@seascapefalse
+      \if@landscape\else
         \setlength{\@tempdima}{\paperwidth}%
         \setlength{\paperwidth}{\paperheight}%
         \setlength{\paperheight}{\@tempdima}%
-        \@landscapefalse
+        \@landscapetrue
       \fi
     }{%
-      \ifstr{#1}{letter}{%
+      \ifstr{#1}{portrait}{%
         \if@landscape
-          \setlength\paperheight{8.5in}%
-          \setlength\paperwidth {11in}%
-        \else
-          \setlength\paperheight{11in}%
-          \setlength\paperwidth {8.5in}%
+          \setlength{\@tempdima}{\paperwidth}%
+          \setlength{\paperwidth}{\paperheight}%
+          \setlength{\paperheight}{\@tempdima}%
+          \@landscapefalse
         \fi
       }{%
-        \ifstr{#1}{legal}{%
+        \ifstr{#1}{letter}{%
           \if@landscape
             \setlength\paperheight{8.5in}%
-            \setlength\paperwidth {14in}%
+            \setlength\paperwidth {11in}%
           \else
-            \setlength\paperheight{14in}%
+            \setlength\paperheight{11in}%
             \setlength\paperwidth {8.5in}%
           \fi
         }{%
-          \ifstr{#1}{executive}{%
+          \ifstr{#1}{legal}{%
             \if@landscape
-              \setlength\paperheight{7.25in}%
-              \setlength\paperwidth {10.5in}%
+              \setlength\paperheight{8.5in}%
+              \setlength\paperwidth {14in}%
             \else
-              \setlength\paperheight{10.5in}%
-              \setlength\paperwidth {7.25in}%
-           \fi
-          }{%
-            \iso@paper{#1}%
-            \if@tempswa\else
-              \expandafter\maybe@pair#1::\@nil
-              \if@tempswa
-                \ifnum \scr@ta@compatibility<\@nameuse{scr@v@3.01b}\relax
-                  \PackageWarningNoLine{typearea}{%
-                    You may have to exchange height and width!\MessageBreak
-                    Until KOMA-Script version 3.01b the semantic\MessageBreak
-                    of option `paper' was `paper=height:width'\MessageBreak
-                    instead of `paper=width:height'.\MessageBreak
-                    I've switched back to that old interpretation\MessageBreak
-                    because of the given compatiblity settings}%
-                  \setlength\paperheight{\@tempa}%
-                  \setlength\paperwidth{\@tempb}%
-                \else
-                  \setlength\paperwidth{\@tempa}%
-                  \setlength\paperheight{\@tempb}%
-                \fi
-              \else
-                \KOMA@unknown@keyval{paper}{#1}{%
-                  `letter', `legal', `executive', `a'<nr>, `b'<nr>,
-                  `c'<nr>, `d'<nr>,\MessageBreak
-                  <width>`:'<height>, `landscape' and `portrait'%
-                }%
-              \fi
+              \setlength\paperheight{14in}%
+              \setlength\paperwidth {8.5in}%
             \fi
+          }{%
+            \ifstr{#1}{executive}{%
+              \if@landscape
+                \setlength\paperheight{7.25in}%
+                \setlength\paperwidth {10.5in}%
+              \else
+                \setlength\paperheight{10.5in}%
+                \setlength\paperwidth {7.25in}%
+             \fi
+            }{%
+              \iso@paper{#1}%
+              \if@tempswa\else
+                \expandafter\maybe@pair#1::\@nil
+                \if@tempswa
+                  \ifnum \scr@ta@compatibility<\@nameuse{scr@v@3.01b}\relax
+                    \PackageWarningNoLine{typearea}{%
+                      You may have to exchange height and width!\MessageBreak
+                      Until KOMA-Script version 3.01b the semantic\MessageBreak
+                      of option `paper' was `paper=height:width'\MessageBreak
+                      instead of `paper=width:height'.\MessageBreak
+                      I've switched back to that old interpretation\MessageBreak
+                      because of the given compatiblity settings}%
+                    \setlength\paperheight{\@tempa}%
+                    \setlength\paperwidth{\@tempb}%
+                  \else
+                    \setlength\paperwidth{\@tempa}%
+                    \setlength\paperheight{\@tempb}%
+                  \fi
+                \else
+                  \KOMA@unknown@keyval{paper}{#1}{%
+                    `letter', `legal', `executive', `a'<nr>, `b'<nr>,
+                    `c'<nr>, `d'<nr>,\MessageBreak
+                    <width>`:'<height>, `landscape' and `portrait'%
+                  }%
+                \fi
+              \fi
+            }%
           }%
         }%
       }%
@@ -1080,20 +1094,35 @@
   }%
 }
 %    \end{macrocode}
-%  \begin{macro}{\if@landscape}
-%  \begin{macro}{\@landscapetrue}
-%  \begin{macro}{\@landscapefalse}
+% \begin{macro}{\if@seascape}
+%   \changes{v3.02c}{2009/02/12}{neu}
+% \begin{macro}{\@seascapetrue}
+%   \changes{v3.02c}{2009/02/12}{neu}
+% \begin{macro}{\@seascapefalse}
+%   \changes{v3.02c}{2009/02/12}{neu}
+% In diesem Schalter wird nur gespeichert, ob Breitformat ggf. umgekehrt
+% verwendet werden soll. Dies macht derzeit nur bei Verwendung von dvips einen
+% Unterschied!
+%    \begin{macrocode}
+\newif\if@seascape
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \begin{macro}{\if@landscape}
+% \begin{macro}{\@landscapetrue}
+% \begin{macro}{\@landscapefalse}
 % In diesem Schalter wird gespeichert, ob Hoch- oder Breitformat
 % verwendet wird.
 %    \begin{macrocode}
 \newif\if@landscape
 %    \end{macrocode}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
-%  \begin{macro}{\maybe@pair}
-%    \changes{v2.95}{2002/12/03}{neu (intern)}
-%    \changes{v2.97e}{2007/11/26}{funktioniert zum ersten Mal}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \begin{macro}{\maybe@pair}
+%   \changes{v2.95}{2002/12/03}{neu (intern)}
+%   \changes{v2.97e}{2007/11/26}{funktioniert zum ersten Mal}
 % Testet, ob der nachfolgende Parameter die Form
 % "`\meta{erstes Argument}:\meta{zweites Argument}"' hat.
 % Wenn ja, wird \cs{@tempa} mit dem ersten und \cs{@tempb} mit dem
@@ -1107,8 +1136,8 @@
   \fi
 }
 %    \end{macrocode}
-%  \end{macro}
-%  \end{option}
+% \end{macro}
+% \end{option}
 %
 %    \begin{macrocode}
 %</package>
