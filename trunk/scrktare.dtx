@@ -1,4 +1,4 @@
-% \CheckSum{1784}
+% \CheckSum{1890}
 % \iffalse meta-comment
 % ======================================================================
 % scrktare.dtx
@@ -854,7 +854,11 @@
           \if@seascape\special{! TeXDict begin /landplus90{true}store end }\fi
         }%
       }%
-      \let\set@dvipspagesize=\setnot@dvipspagesize
+      \ifnum \scr@compatibility>\@nameuse{scr@v@3.02b}\relax
+        \let\set@dvipspagesize=\@empty
+      \else
+        \let\set@dvipspagesize=\setnot@dvipspagesize
+      \fi
     \else
       \endgroup
   \fi
@@ -878,12 +882,57 @@
   }%
   \let\set@vtexpagesize=\@empty
 }
+\newcommand*{\scr@updatedvipspagesize}{%
+  \special{ps::\@percentchar\@percentchar 
+    PageBoundingBox: 0 0 \the\numexpr\paperwidth/\dimexpr 1bp\relax\relax
+    \space \the\numexpr\paperheight/\dimexpr 1bp\relax\relax^^J%
+    \@percentchar\@percentchar BeginPageSetup^^J%
+    << /PageSize [\the\numexpr\paperwidth/\dimexpr 1bp\relax\relax\space
+    \the\numexpr\paperheight/\dimexpr 1bp\relax\relax] 
+    >> setpagedevice^^J%<<
+    0 0 bop^^J%
+    \@percentchar\@percentchar EndPageSetup}%
+}
 \AtBeginDocument{
   \renewcommand*{\set@pdftexpagesize}{%
     \ifnotundefined{pdfpagewidth}{\pdfpagewidth=\paperwidth}{}%
     \ifnotundefined{pdfpageheight}{\pdfpageheight=\paperheight}{}%
   }%
-  \let\set@dvipspagesize=\setnot@dvipspagesize
+  \ifnum \scr@compatibility>\@nameuse{scr@v@3.02b}\relax
+    \renewcommand*{\set@dvipspagesize}{%
+      \scr@ifundefinedorrelax{AtNextShipout}{%
+        \scr@ifundefinedorrelax{AtBeginShipoutNext}{%
+          \begingroup
+            \protected@edef\reserved@a{\endgroup
+            \scr@updatedvipspagesize}\reserved@a
+        }{%
+          \begingroup
+            \protected@edef\reserved@a{\endgroup
+            \protect\AtBeginShipoutNext{%
+              \protect\bgroup
+                \protect\global\protect\setbox\AtBeginShipoutBox\protect\vbox{%
+                  \scr@updatedvipspagesize
+                  \protect\box\AtBeginShipoutBox
+                }%
+              \protect\egroup
+            }}\reserved@a
+        }%
+      }{%
+        \begingroup
+          \protected@edef\reserved@a{\endgroup
+          \protect\AtNextShipout{%
+            \protect\bgroup
+              \protect\global\protect\setbox\protect\@cclv\protect\vbox{%
+                \scr@updatedvipspagesize
+                \protect\box\protect\@cclv
+              }%
+            \protect\egroup
+          }}\reserved@a
+      }%
+    }%
+  \else
+    \let\set@dvipspagesize=\setnot@dvipspagesize
+  \fi
   \renewcommand*{\set@vtexpagesize}{%
     \ifnotundefined{mediawith}{\mediawidth=\paperwidth}{}%
     \ifnotundefined{mediaheight}{\mediaheight=\paperheight}{}%
