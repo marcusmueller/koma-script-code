@@ -1,4 +1,4 @@
-% \CheckSum{1283}
+% \CheckSum{1277}
 % \iffalse meta-comment
 % ======================================================================
 % scrkbase.dtx
@@ -130,6 +130,39 @@
 %<*option>
 % \fi
 %
+% \subsection{\eTeX-Test}
+% \changes{v3.02c}{2009/02/19}{Fehlermeldung, wenn nicht \eTeX{} verwendet
+%   wird}
+%
+%    \begin{macrocode}
+%<*base>
+\begingroup
+  \def\@tempb{}%
+  \def\@tempa{%
+    \PackageError{scrbase}{seems you are not running e-TeX\@tempb}{%
+      Since 2004 the LaTeX team recommends to use e-TeX.\MessageBreak
+      KOMA-Script since version 2.95 uses several e-TeX features.\MessageBreak
+      At actual systems `latex' should already use e-TeX.\MessageBreak
+      At deprecated systems it may be called `elatex'.\MessageBreak
+      Use either unsupported KOMA-Script up to version 2.9u or\MessageBreak
+      ask you administrator for LaTeX using e-TeX\@tempb.\MessageBreak
+      Not using e-TeX\@tempb\space is a fatal error!\MessageBreak
+      Processing cannot be continued!}%
+    \endgroup
+    \batchmode \errmessage{}\csname @@end\endcsname\end\relax
+    \csname endinput\endcsname
+  }%
+  \expandafter\ifx\csname eTeXversion\endcsname\relax\else
+    \ifnum\eTeXversion <2
+      \def\@tempb{ V 2}%
+    \else
+      \let\@tempa\endgroup
+    \fi
+  \fi
+\@tempa
+%</base>
+%    \end{macrocode}
+%
 % \subsection{Der abhängige Teil lädt den unabhängigen Teil}
 %
 %    \begin{macrocode}
@@ -147,39 +180,28 @@
 %
 % \subsection{Test von Anweisungen}
 %
-%  \begin{macro}{\scr@ifundefinedorrelax}
-%    \changes{v2.95c}{2006/08/12}{neu (intern)}
-%    \changes{v2.97b}{2007/03/08}{vermurkste Logik korrigiert}
-%    \changes{v2.97c}{2007/04/18}{vermurkste Funktion korrigiert}
-%    \changes{v2.97c}{2007/04/18}{von \cs{scr@ifundefined} umbenannt}
+% \begin{macro}{\scr@ifundefinedorrelax}
+%   \changes{v2.95c}{2006/08/12}{neu (intern)}
+%   \changes{v2.97b}{2007/03/08}{vermurkste Logik korrigiert}
+%   \changes{v2.97c}{2007/04/18}{vermurkste Funktion korrigiert}
+%   \changes{v2.97c}{2007/04/18}{von \cs{scr@ifundefined} umbenannt}
+%   \changes{v3.02c}{2009/02/19}{Sonderbehandlung für nicht \eTeX entfernt}
 % Dieses Makro arbeitet wie \cs{@ifundefined}, definiert dabei aber
 % ein undefiniertes Makro nicht als \cs{relax}. Es muss bereits hier definiert
 % werden, weil es gleich verwendet wird.
 %    \begin{macrocode}
 %<*base>
-\begingroup\expandafter\expandafter\expandafter\endgroup
-\expandafter\ifx\csname ifcsname\endcsname\relax
-  \newcommand{\scr@ifundefinedorrelax}[1]{%
-    \begingroup\expandafter\expandafter\expandafter\endgroup
+\newcommand{\scr@ifundefinedorrelax}[1]{%
+  \ifcsname #1\endcsname
     \expandafter\ifx\csname #1\endcsname\relax
-      \expandafter\@firstoftwo
+      \expandafter\expandafter\expandafter\@firstoftwo
     \else
-      \expandafter\@secondoftwo
+      \expandafter\expandafter\expandafter\@secondoftwo
     \fi
-  }
-\else
-  \newcommand{\scr@ifundefinedorrelax}[1]{%
-    \ifcsname #1\endcsname
-      \expandafter\ifx\csname #1\endcsname\relax
-        \expandafter\expandafter\expandafter\@firstoftwo
-      \else
-        \expandafter\expandafter\expandafter\@secondoftwo
-      \fi
-    \else
-      \expandafter\@firstoftwo
-    \fi
-  }
-\fi
+  \else
+    \expandafter\@firstoftwo
+  \fi
+}
 %</base>
 %    \end{macrocode}
 %  \end{macro}
@@ -576,31 +598,21 @@
 %    \end{macrocode}
 %  \end{macro}
 %
-%  \begin{macro}{\ifnotundefined}
-%    \changes{v2.95}{2002/08/21}{neu}
-%    \changes{v2.95c}{2006/08/12}{nutzt \eTeX{} wenn möglich}
+% \begin{macro}{\ifnotundefined}
+%   \changes{v2.95}{2002/08/21}{neu}
+%   \changes{v2.95c}{2006/08/12}{nutzt \eTeX{} wenn möglich}
+%   \changes{v3.02c}{2009/02/19}{\eTeX{} ist zwingend}
 % Dieses Makro arbeitet genau umgekehrt zu \cs{ifundefined}. Manchmal
 % ist es ganz nützlich, auch das zu haben. Dieses Makro heißt nicht
 % \cs{ifdefined}, weil \eTeX\ bereits ein solches Primitiv bietet.
 %    \begin{macrocode}
 %<*base>
-\scr@ifundefinedorrelax{ifcsname}{%
-  \newcommand{\ifnotundefined}[1]{%
-    \begingroup\expandafter\expandafter\expandafter\endgroup
-    \expandafter\ifx\csname #1\endcsname\relax
-      \expandafter\@secondoftwo
-    \else
-      \expandafter\@firstoftwo
-    \fi
-  }%
-}{%
-  \newcommand{\ifnotundefined}[1]{%
-    \ifcsname #1\endcsname
-      \expandafter\@firstoftwo
-    \else
-      \expandafter\@secondoftwo
-    \fi
-  }%
+\newcommand{\ifnotundefined}[1]{%
+  \ifcsname #1\endcsname
+    \expandafter\@firstoftwo
+  \else
+    \expandafter\@secondoftwo
+  \fi
 }
 %</base>
 %    \end{macrocode}
