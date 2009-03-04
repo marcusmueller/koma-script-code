@@ -1,4 +1,4 @@
-% \CheckSum{134}
+% \CheckSum{151}
 % \iffalse meta-comment
 % ======================================================================
 % scrkvars.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkvars.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkvars.dtx}[2006/03/28 v2.95 KOMA-Script (koma variables)]
+\ProvidesFile{scrkvars.dtx}[2009/03/04 v3.03 KOMA-Script (koma variables)]
 % \iffalse
 \documentclass{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -231,16 +231,16 @@
 \newcommand*{\@komavar@err}[2]{%
   \ClassError{%
     scrlttr2%
-    }{%
+  }{%
     KOMA-Script variable not defined%
-    }{%
+  }{%
     You've tried to #1 the not defined KOMA-Script variable
     `#2'.\MessageBreak
     You have to define the variable using \string\newkomavar\space
     before\MessageBreak
     you do this.%
-    }%
-  }
+  }%
+}
 %    \end{macrocode}
 %  \end{macro}
 %
@@ -285,15 +285,32 @@
 %  \end{macro}
 %  \end{macro}
 %
-%  \begin{macro}{\ifkomavarempty}
-%    \changes{v2.8q}{2002/01/14}{Neu}
-%    \changes{v2.9i}{2002/09/04}{Leerzeichen rausgeworfen}
-%    \changes{v2.9i}{2002/09/04}{robust}
-% Es gibt auch noch ein Makro, um zu testen, ob eine KOMA-Script
+% \begin{macro}{\ifkomavar}
+%   \changes{v3.03}{2009/03/04}{Neu}
+% Feststellen, ob eine \KOMAScript-Variable überhaupt definiert ist.
+%    \begin{macrocode}
+\DeclareRobustCommand*{\ifkomavar}[1]{%
+  \scr@ifundefinedorrelax{scr@#1@var}{%
+    \expandafter\@secondoftwo
+  }{%
+    \expandafter\@firstoftwo
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ifkomavarempty}
+%   \changes{v2.8q}{2002/01/14}{Neu}
+%   \changes{v2.9i}{2002/09/04}{Leerzeichen rausgeworfen}
+%   \changes{v2.9i}{2002/09/04}{robust}
+% Es gibt auch noch ein Makro, um zu testen, ob eine \KOMAScript{}
 % Variable oder deren Name leer ist. Die Sternvariante ist wieder für
 % den Namen zuständig.
-%  \begin{macro}{\if@komavarempty}
-%    \changes{v2.8q}{2002/01/14}{Neu}
+% \begin{macro}{\if@komavarempty}
+%   \changes{v2.8q}{2002/01/14}{Neu}
+%   \changes{v3.03}{2009/03/04}{die neue Anweisung \cs{ifkomavar} wird
+%     verwendet}
+%   \changes{v3.03}{2009/03/04}{die Argumente werden nicht mehr direkt gelesen}
 % Da mit einer Sternvariante gearbeitet wird, wird wieder ein
 % Hilfsmakro verwendet.
 %    \begin{macrocode}
@@ -302,27 +319,31 @@
   \@ifstar {\@tempswatrue\@ifkomavarempty}%
            {\@tempswafalse\@ifkomavarempty}%
   }
-\newcommand{\@ifkomavarempty}[3]{%
-  \@ifundefined{scr@#1@var}{%
-    \endgroup\@komavar@err{use}{#1}%
-    }{%
-    \if@tempswa\endgroup
-      \@ifundefined{scr@#1@name}{#2}{%
-        \expandafter\ifx\csname scr@#1@name\endcsname\@empty
-          #2%
-        \else
-          #3%
-        \fi
+\newcommand{\@ifkomavarempty}[1]{%
+    \ifkomavar{#1}{%
+      \if@tempswa
+        \@ifundefined{scr@#1@name}{%
+          \aftergroup\@firstoftwo
+        }{%
+          \expandafter\ifx\csname scr@#1@name\endcsname\@empty
+            \aftergroup\@firstoftwo
+          \else
+            \aftergroup\@secondoftwo
+          \fi
         }%
-    \else\endgroup
-      \expandafter\ifx\csname scr@#1@var\endcsname\@empty
-        #2%
       \else
-        #3%
+        \expandafter\ifx\csname scr@#1@var\endcsname\@empty
+          \aftergroup\@firstoftwo
+        \else
+          \aftergroup\@secondoftwo
+        \fi
       \fi
-    \fi
+    }{%
+      \@komavar@err{use}{#1}%
+      \aftergroup\@gobbletwo
     }%
-  }
+  \endgroup
+}
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
