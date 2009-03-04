@@ -45,7 +45,7 @@
 %
 % ============================================================================
 
-\ProvidesFile{scrlttr2.tex}[2008/08/12 KOMA-Script guide (chapter: scrlttr2)]
+\ProvidesFile{scrlttr2.tex}[2009/03/04 KOMA-Script guide (chapter: scrlttr2)]
 
 \chapter{Die neue Briefklasse \Class{scrlttr2}}
 \labelbase{scrlttr2}
@@ -100,6 +100,11 @@ nachfolgenden Abschnitten. \autoref{tab:scrlttr2.variables} gibt eine
     (\emph{Fortsetzung})}\\
   \Endhead%
   \standardfoot%
+  \ventry{addresseeimage}{Anweisungen zum Setzen des Port-Payé-Kopfes bei
+    Einstellung \OptionValue{addrfield}{backgroundimage} oder der
+    Port-Payé-Anschrift bei Einstellung \OptionValue{addrfield}{image}
+    (\autoref{sec:scrlttr2.firstpage},
+    \autopageref{desc:scrlttr2.variable.addresseeimage})}%
   \ventry{backaddress}{Rücksendeadresse für Fensterbriefumschläge
     (\autoref{sec:scrlttr2.firstpage}, 
      \autopageref{desc:scrlttr2.variable.backaddress})}%
@@ -149,6 +154,10 @@ nachfolgenden Abschnitten. \autoref{tab:scrlttr2.variables} gibt eine
   \ventry{fromurl}{eine URL des Absenders
     (\autoref{sec:scrlttr2.firstpage}, 
      \autopageref{desc:scrlttr2.variable.fromurl})}%
+  \ventry{fromzipcode}{Postleitzahl des Absenders für den Port-Payé-Kopf bei
+    \OptionValue{addrfield}{PP}
+    (\autoref{sec:scrlttr2.firstpage},
+     \autopageref{desc:scrlttr2.variable.fromzipcode})}%
   \ventry{invoice}{Geschäftszeilenfeld »Rechnungsnummer«
     (\autoref{sec:scrlttr2.firstpage}, 
      \autopageref{desc:scrlttr2.variable.invoice})}%
@@ -168,6 +177,14 @@ nachfolgenden Abschnitten. \autoref{tab:scrlttr2.variables} gibt eine
   \ventry{placeseparator}{Trennzeichen zwischen Ort und Datum
     (\autoref{sec:scrlttr2.firstpage}, 
      \autopageref{desc:scrlttr2.variable.placeseparator})}%
+  \ventry{PPdatamatrix}{Anweisungen zum Setzen einer Data-Matrix bei der
+    Einstellung \OptionValue{addrfield}{PP}
+    (\autoref{sec:scrlttr2.firstpage},
+    \autopageref{desc:scrlttr2.variable.PPdatamatrix})}%
+  \ventry{PPcode}{Code zur Identifizierung des Absenders bei Einstellung
+    \OptionValue{addrfield}{PP}
+    (\autoref{sec:scrlttr2.firstpage},
+    \autopageref{desc:scrlttr2.variable.PPcode})}%
   \ventry{signature}{Signatur unter Unterschrift und Grußformel
     (\autoref{sec:scrlttr2.closing}, 
      \autopageref{desc:scrlttr2.variable.signature})}%
@@ -195,6 +212,10 @@ nachfolgenden Abschnitten. \autoref{tab:scrlttr2.variables} gibt eine
   \ventry{yourref}{Geschäftszeilenfeld »Ihr Zeichen«
     (\autoref{sec:scrlttr2.firstpage}, 
      \autopageref{desc:scrlttr2.variable.yourref})}%
+  \ventry{zipcodeseparator}{Trennzeichen zwischen dem Bezeichner und dem
+    Inhalt der Variablen \Variable{fromzipcode}
+    (\autoref{sec:scrlttr2.firstpage},
+    \autopageref{desc:scrlttr2.variable.zipcodeseparator})}%
 \end{desctable}
 
 
@@ -270,6 +291,23 @@ Variablen ist \autoref{sec:scrlttr2-experts.variables},
 \autopageref{desc:scrlttr2-experts.cmd.newkomavar} zu entnehmen.%
 \EndIndex{Cmd}{usekomavar}%
 \EndIndex{Cmd}{usekomavar*}%
+
+
+\begin{Declaration}
+  \Macro{ifkomavar}\Parameter{Name}\Parameter{Dann-Teil}\Parameter{Sonst-Teil}
+\end{Declaration}
+\BeginIndex{Cmd}{ifkomavar}%
+Mit\ChangedAt{v3.03}{\Class{scrlttr2}} dieser Anweisung kann man feststellen,
+ob eine Variable definiert ist. Der \PName{Dann-Teil} wird nur dann
+ausgeführt, wenn die Variable existiert. Dabei wird der Inhalt der Variablen
+nicht getestet, kann also auch leer sein. Der \PName{Sonst-Teil} wird hingegen
+ausgeführt, wenn die Variable nicht existiert. Solche Tests können
+beispielsweise dann sinnvoll sein, wenn eigene Variablen in einer
+\File{lco}-Datei (siehe \autoref{sec:scrlttr2.lcoFile} ab
+\autopageref{sec:scrlttr2.lcoFile}) definiert werden und in einer anderen
+\File{lco}-Datei diese Variable nur dann verwendet werden soll, wenn sie
+existiert.
+\EndIndex{Cmd}{ifkomavar}%
 
 
 \begin{Declaration}
@@ -1449,11 +1487,13 @@ sollte \PName{Aufbau} auch Zugriffe auf Variablen mit Hilfe von
 
 
 \begin{Declaration}
-  \KOption{addrfield}\PName{Ein-Aus-Wert}\\
-  \KOption{backaddress}\PName{Wert}
+  \KOption{addrfield}\PName{Modus}\\
+  \KOption{backaddress}\PName{Wert}\\
+  \KOption{priority}\PName{Priorität}
 \end{Declaration}
 \BeginIndex{}{Anschrift}%
-\BeginIndex{Option}{addrfield~=\PName{Ein-Aus-Wert}}%
+\BeginIndex{Option}{priority~=\PName{Priorität}}%
+\BeginIndex{Option}{addrfield~=\PName{Modus}}%
 \BeginIndex{Variable}{toname}%
 \BeginIndex{Variable}{toaddress}%
 \BeginIndex{Option}{backaddress~=\PName{Wert}}%
@@ -1461,15 +1501,17 @@ sollte \PName{Aufbau} auch Zugriffe auf Variablen mit Hilfe von
 \BeginIndex{Variable}{backaddressseparator}%
 Mit der Option \Option{addrfield} kann gewählt werden, ob ein Anschriftfeld
 gesetzt werden soll oder nicht. Voreingestellt ist die Verwendung eines
-Anschriftfeldes.  Die Option versteht die Standardwerte für einfache Schalter,
-die in \autoref{tab:truefalseswitch}, \autopageref{tab:truefalseswitch}
-angegeben sind. Voreingestellt ist \PValue{true}. Name und Adresse des
-Empfängers, die im Anschriftfeld gesetzt werden, werden über das Argument der
-Umgebung \Environment{letter} (siehe \autoref{sec:scrlttr2.document},
-\autopageref{desc:scrlttr2.env.letter}) bestimmt. Diese Angaben werden
-außerdem in die Variablen \Variable{toname} und \Variable{toaddress} kopiert.
-Die voreingestellten Schriftarten können\ChangedAt{v2.97c}{\Class{scrlttr2}}
-über die Anweisungen \Macro{setkomafont} und \Macro{addtokomafont} (siehe
+Anschriftfeldes.  Die Option versteht die in
+\autoref{tab:scrlttr2.addrfield}\ChangedAt{v3.03}{\Class{scrlttr2}}
+angegebenen Werte für den \PName{Modus}. Voreingestellt ist \PValue{true}. Bei
+den Werten \PValue{true}, \PValue{PP} und \PValue{backgroundimage} werden Name
+und Adresse des Empfängers, die im Anschriftfeld gesetzt werden, über das
+Argument der Umgebung \Environment{letter} (siehe
+\autoref{sec:scrlttr2.document}, \autopageref{desc:scrlttr2.env.letter})
+bestimmt. Diese Angaben werden außerdem in die Variablen \Variable{toname} und
+\Variable{toaddress} kopiert.  Die voreingestellten Schriftarten
+können\ChangedAt{v2.97c}{\Class{scrlttr2}} über die Anweisungen
+\Macro{setkomafont} und \Macro{addtokomafont} (siehe
 \autoref{sec:scrlttr2.textmarkup}, ab
 \autopageref{desc:scrlttr2.cmd.setkomafont}) verändert werden. Dabei
 existieren drei Elemente. Zunächst gibt es das Element
@@ -1482,26 +1524,78 @@ Namen bzw. die Adresse des Empfängers beziehen. Für \FontElement{toname} und
 \FontElement{addressee} definiert werden.
 
 \begin{table}
+  \caption[{Mögliche Werte für Option \Option{addfield} bei
+    \Class{scrlttr2}}]{Mögliche Werte für Option \Option{addrfield} zur
+    Auswahl eines Anschriftenmodus von \Class{scrlttr2}}
+  \label{tab:scrlttr2.addrfield}
+  \begin{desctabular}
+    \entry{\PValue{true}, \PValue{on}, \PValue{yes}}{%
+      Es wird eine Anschrift mit Rücksendeadresse und Versandart oder
+      Priorität gesetzt.}%
+    \entry{\PValue{false}, \PValue{off}, \PValue{no}}{%
+      Es wird keine Anschrift gesetzt.}%
+    \entry{\PValue{PP}, \PValue{pp}, \PValue{PPexplicite},
+      \PValue{PPExplicite}, \PValue{ppexplicite}, \PValue{ppExplicite}}{%
+      Es wird eine Anschrift mit explizit über die Variablen
+      \Variable{fromzipcode}, \Variable{place} und \Variable{PPcode}
+      ausgefüllten Port-Payé-Kopf (P.\,P.-Kopf), ggf. mit Priorität und über
+      Variable \Variable{PPdatamatrix} gesetzte Data-Matrix aber ohne
+      Rücksendeadresse und Versandart gesetzt.}%
+    \entry{\PValue{backgroundimage}, \PValue{PPbackgroundimage},
+      \PValue{PPBackgroundImage}, \PValue{PPBackGroundImage},
+      \PValue{ppbackgroundimage}, \PValue{ppBackgroundImage},
+      \PValue{ppBackGroundImage}}{%
+      Es wird eine Anschrift mit einer in Variable \Variable{addresseeimage}
+      abgelegten Hintergrundgrafik als Port-Payé-Kopf (P.\,P.-Kopf) aber ohne
+      Rücksendeadresse und Versandart gesetzt.}%
+    \entry{\PValue{image}, \PValue{Image}, \PValue{PPimage}, \PValue{PPImage},
+      \PValue{ppimage}, \PValue{ppImage}}{%
+      Eine in Variable \Variable{addresseeimage} abgelegte Abbildung wird als
+      Anschrift mit Port-Payé gesetzt. Adressinformationen und Angaben für
+      Rücksendeadresse, Versandtart oder Priorität werden ignoriert.}%
+  \end{desctabular}
+\end{table}
+
+\begin{table}
   \centering
+  \caption{Schriftvoreinstellungen für die Elemente des Anschriftfensters}
+  \label{tab:scrlttr2.AddresseeElements}
   \begin{tabular}{ll}
     \toprule
     Element & Voreinstellung \\
     \midrule
-    \FontElement{addressee}\IndexFontElement{addressee} & \\
-    \FontElement{backaddress}\IndexFontElement{backaddress} & \Macro{sffamily}
+    \FontElement{addressee}\IndexFontElement{addressee} & 
     \\
-    \FontElement{specialmail}\IndexFontElement{specialmail} & \\
-    \FontElement{toaddress}\IndexFontElement{toaddress} & \\
-    \FontElement{toname}\IndexFontElement{toname} & \\
+    \FontElement{backaddress}\IndexFontElement{backaddress} & 
+    \Macro{sffamily}%
+    \\
+    \FontElement{PPdata}\IndexFontElement{PPdata} &
+    \Macro{sffamily}%
+    \\
+    \FontElement{PPlogo}\IndexFontElement{PPlogo} &
+    \Macro{sffamily}\Macro{bfseries}%
+    \\
+    \FontElement{priority}\IndexFontElement{priority} &
+    \Macro{fontsize}\PParameter{10pt}\PParameter{10pt}%
+    \Macro{sffamily}\Macro{bfseries}%
+    \\
+    \FontElement{prioritykey}\IndexFontElement{prioritykey} &
+    \Macro{fontsize}\PParameter{24.88pt}\PParameter{24.88pt}%
+    \Macro{selectfont}%
+    \\
+    \FontElement{specialmail}\IndexFontElement{specialmail} & 
+    \\
+    \FontElement{toaddress}\IndexFontElement{toaddress} & 
+    \\
+    \FontElement{toname}\IndexFontElement{toname} & 
+    \\
     \bottomrule
   \end{tabular}
-  \caption{Schriftvoreinstellungen für die Elemente des Anschriftfensters}
-  \label{tab:scrlttr2.AddresseeElements}
 \end{table}
 
-Im Anschriftfeld wird zusätzlich in der Voreinstellung noch die
-Rücksendeadresse gesetzt.  Mit der Option \Option{backaddress} kann gewählt
-werden, ob und in welcher Form die
+Im Anschriftfeld wird zusätzlich in der Voreinstellung
+\OptionValue{addrfield}{true} noch die Rücksendeadresse gesetzt.  Mit der
+Option \Option{backaddress} kann gewählt werden, ob und in welcher Form die
 Rücksendeadresse\Index{Ruecksendeadresse=Rücksendeadresse} für
 Fensterbriefumschläge im Anschriftfeld gesetzt werden soll.  Die Option
 versteht dazu einerseits die Standardwerte für einfache Schalter, die in
@@ -1534,23 +1628,121 @@ wird.%
 
 \BeginIndex{Variable}{specialmail}%
 \BeginIndex{FontElement}{specialmail}%
-Zwischen Rücksendeadresse und Empfängeradresse kann noch eine optionale
-Versandart\Index{Versandart} gesetzt werden. Diese wird genau dann gesetzt,
-wenn die Variable \Variable{specialmail} einen Inhalt hat. Die Ausrichtung
-wird mit Hilfe der Pseudolängen \PLength{specialmailindent} und
-\PLength{specialmailrightindent} (siehe
-\autopageref{desc:scrlttr2-experts.plength.specialmailindent}) festgelegt. Die
-voreingestellte Schriftart des Elements\ChangedAt{v2.97c}{\Class{scrlttr2}}
+Zwischen Rücksendeadresse und Empfängeradresse kann bei
+\OptionValue{addrfield}{true} noch eine optionale Versandart\Index{Versandart}
+gesetzt werden. Diese wird genau dann gesetzt, wenn die Variable
+\Variable{specialmail} einen Inhalt hat und
+\OptionValue{priority}{manual}\ChangedAt{v3.03}{\Class{scrlttr2}} gewählt
+wird, was der Voreinstellung entspricht. Die Ausrichtung wird mit Hilfe der
+Pseudolängen \PLength{specialmailindent} und \PLength{specialmailrightindent}
+(siehe \autopageref{desc:scrlttr2-experts.plength.specialmailindent})
+festgelegt. Die voreingestellte Schriftart des
+Elements\ChangedAt{v2.97c}{\Class{scrlttr2}}
 \FontElement{specialmail}\IndexFontElement{specialmail}, die Sie
 \autoref{tab:scrlttr2.AddresseeElements} entnehmen können, kann mit Hilfe der
 Anweisungen \Macro{setkomafont} und \Macro{addtokomafont} (siehe
 \autoref{sec:scrlttr2.textmarkup},
 \autopageref{desc:scrlttr2.cmd.setkomafont}) verändert werden.%
-%
 \EndIndex{FontElement}{specialmail}%
+
+Wird\ChangedAt{v3.03}{\Class{scrlttr2}} hingegen mit \OptionValue{priority}{A}
+oder \OptionValue{priority}{B} (siehe \autoref{tab:scrlttr2.priority}) eine
+internationale Priorität ausgewählt, so wird diese bei
+\OptionValue{addrfield}{true} als Versandart und bei
+\OptionValue{addrfield}{PP} an entsprechender Stelle im Port-Payé-Kopf
+gesetzt. Dabei wird die Grundschrift über das Element
+\FontElement{priority}\IndexFontElement[indexmain]{priority} und die davon
+abweichende Schrift für den Prioritätsschlüssel, »A« oder »B«, über das
+Element \FontElement{prioritykey}\IndexFontElement[indexmain]{prioritykey}
+bestimmt. Die voreingestellten Schriftarten der beiden Elemente, die Sie
+\autoref{tab:scrlttr2.AddresseeElements} entnehmen können, kann mit Hilfe der
+Anweisungen \Macro{setkomafont} und \Macro{addtokomafont} (siehe
+\autoref{sec:scrlttr2.textmarkup},
+\autopageref{desc:scrlttr2.cmd.setkomafont}) verändert werden.%
 \EndIndex{Variable}{specialmail}%
+
+\begin{table}
+  \caption[{Mögliche Werte für Option \Option{priority} bei
+    \Class{scrlttr2}}]{Mögliche Werte für Option \Option{priority} zur
+    Auswahl einer internationalen Priorität im Adressfeld von \Class{scrlttr2}}
+  \label{tab:scrlttr2.priority}
+  \begin{desctabular}
+    \entry{\PValue{false}, \PValue{off}, \PValue{no}, \PValue{manual}}{%
+      Es wird keine Priorität gesetzt.}%
+    \entry{\PValue{B}, \PValue{b}, \PValue{economy}, \PValue{Economy},
+      \PValue{ECONOMY}, \PValue{B-ECONOMY}, \PValue{B-Economy}, 
+      \PValue{b-economy}}{%
+      Es wird die internationale Priorität B-Economy gesetzt. Bei
+      \OptionValue{addrfield}{true} erfolgt dies an Stelle der Versandart.}%
+    \entry{\PValue{A}, \PValue{a}, \PValue{priority}, \PValue{Priority},
+      \PValue{PRIORITY}, \PValue{A-PRIORITY}, \PValue{A-Priority}, 
+      \PValue{a-priority}}{%
+      Es wird die internationale Priorität A-Priority gesetzt. Bei
+      \OptionValue{addrfield}{true} erfolgt dies an Stelle der Versandart.}%
+  \end{desctabular}
+\end{table}
+
+\BeginIndex{Variable}{fromzipcode}%
+\BeginIndex{Variable}{zipcodeseparator}%
+\BeginIndex{Variable}{place}%
+\BeginIndex{Variable}{PPcode}%
+\BeginIndex{Variable}{PPdatamatrix}%
+Bei\ChangedAt{v3.03}{\Class{scrlttr2}} \OptionValue{addrfield}{PP} wird im
+Port-Payé-Kopf außerdem die Postleitzahl aus der Variablen
+\Variable{fromzipcode} und der Ort aus der Variablen \Variable{place}
+gesetzt. Dabei wird der Postleitzahl der Bezeichner der Variablen
+\Variable{fromzipcode} gefolgt von der Variablen \Variable{zipcodeseparator}
+vorangestellt. Die Voreinstellung dieses Bezeichners hängt von der verwendeten
+\File{lco}-Datei (siehe \autoref{sec:scrlttr2.lcoFile} ab
+\autopageref{sec:scrlttr2.lcoFile}) ab. Für \Variable{zipcodeseparator} ist
+hingegen ein kleiner Abstand, gefolgt von einem Streckenstrich, gefolgt von
+einem kleinen Abstand (\Macro{,}\texttt{-{}-}\Macro{,}) voreingestellt.
+
+Darüber\ChangedAt{v3.03}{\Class{scrlttr2}} hinaus wird bei
+\OptionValue{addrfield}{PP} im Port-Payé-Kopf auch noch ein Code gesetzt, der
+den Absender eindeutig identifiziert. Dieser ist in Variable \Variable{PPcode}
+abgelegt. Rechts von der Anschrift kann zusätzlich eine Data-Matrix gesetzt
+werden, die in Variable \Variable{PPdatamatrix} abgelegt ist.
+
+Postleitzahl\ChangedAt{v3.03}{\Class{scrlttr2}}, Ort und Code werden in der
+Voreinstellung mit einer Schrift der Größe 8\,pt gesetzt. Dabei wird die
+Schrift des Elements \FontElement{PPdata}\IndexFontElement[indexmain]{PPdata}
+verwendet. Dessen Voreinstellung ist \autoref{tab:scrlttr2.AddresseeElements}
+zu entnehmen und kann mit Hilfe der Anweisungen \Macro{setkomafont} und
+\Macro{addtokomafont} (siehe \autoref{sec:scrlttr2.textmarkup},
+\autopageref{desc:scrlttr2.cmd.setkomafont}) verändert werden.%
+\EndIndex{Variable}{PPcode}%
+\EndIndex{Variable}{place}%
+\EndIndex{Variable}{zipcodeseparator}%
+\EndIndex{Variable}{fromzipcode}%
+
+\BeginIndex{Variable}{addresseeimage}%
+Bei den Einstellungen
+\OptionValue{addrfield}{backgroundimage}\ChangedAt{v3.03}{\Class{scrlttr2}}
+und \OptionValue{addrfield}{image} wird eine Abbildung in das Adressfenster
+gesetzt. Diese ist in Variable \Variable{addresseeimage} abgelegt. Während bei
+Einstellung \OptionValue{addrfield}{image} außer dieser Abbildung nichts
+gesetzt wird, wird bei Einstellung \OptionValue{addrfield}{backgroundimage}
+zusätzlich noch die Anschrift aus dem obligatorischen Argument der
+\Environment{letter}-Umgebung ausgegeben.  \OptionValue{addrfield}{true}.
+
+Die Anordnung des Port-Payé-Kopfes bzw. der Port-Payé-Anschrift wird über
+die Pseudolängen \PLength{toaddrindent}, \PLength{PPheadwidth} und
+\PLength{PPheadheight} bestimmt. Die Anordnung der Data-Matrix über die
+Pseudolänge \PLength{PPdatamatrixvskip}.
+
+Es wird an dieser Stelle ausdrücklich darauf hingewiesen, dass \KOMAScript{}
+selbst keine externen Abbildungen setzen kann, sollen also über die Variablen
+\Variable{addresseeimage} oder \Variable{PPdatamatrix} externe Abbildungen
+gesetzt werden, so ist beispielsweise das Grafikpaket
+\Package{graphics}\IndexPackage{graphics} oder
+\Package{graphicx}\IndexPackage{graphicx} zu laden und in den Variablen dessen
+Anweisung \Macro{includegraphics} zu verwenden.%
+\EndIndex{Variable}{addresseeimage}%
+\EndIndex{Variable}{PPdatamatrix}%
 %
 \EndIndex{Option}{addrfield~=\PName{Ein-Aus-Wert}}%
+\EndIndex{Option}{priority~=\PName{Priorität}}%
 %
 \EndIndex{}{Anschrift}
 
