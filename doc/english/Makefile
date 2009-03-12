@@ -50,7 +50,7 @@ include $(DOCDIR)Makefile.guide
 # NOTE: Remove these rules after real translation of tocbasic.tex 
 #       is available.
 tocbasic.tex: ../../tocbasic.tex
-	$(SYMLINK) $< .
+	if [ -L $@ ] || ! [ -f $@ ]; then $(SYMLINK) $< .; else touch $@; fi
 
 ../../tocbasic.tex: ../../tocbasic.dtx
 	cd ../.. && tex \\nonstopmode\\input tocbasic.dtx
