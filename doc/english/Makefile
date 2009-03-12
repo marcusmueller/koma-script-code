@@ -46,5 +46,15 @@ LANGUAGELONG     = english
 
 include $(DOCDIR)Makefile.guide
 
+# ----------------------------------------------------------------------
+# NOTE: Remove these rules after real translation of tocbasic.tex 
+#       is available.
+tocbasic.tex: ../../tocbasic.tex
+	$(SYMLINK) $< .
+
+../../tocbasic.tex: ../../tocbasic.dtx
+	cd ../.. && tex \\nonstopmode\\input tocbasic.dtx
+# ----------------------------------------------------------------------
+
 #
 # end of file `Makefile'
