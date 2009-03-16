@@ -106,6 +106,7 @@ CLS_MAIN	= scrbook.cls \
 		  tocbasic.sty \
 		  tocstyle.sty \
 		  scrextend.sty \
+		  scrhack.sty \
 	          DIN.lco \
 		  DINmtext.lco \
 		  SN.lco \
@@ -149,6 +150,7 @@ CLS_MAIN_DTX    = scrbeta.dtx \
 		  scrlettr.dtx \
 		  scrlogo.dtx \
 	          scrextend.dtx \
+                  scrhack.dtx \
 		  scrjura.dtx \
 		  tocbasic.dtx \
 		  tocstyle.dtx
@@ -170,7 +172,7 @@ CLS_MAIN_SUBINS	= scrlfile.ins scraddr.ins scrlettr.ins scrpage.ins \
 
 ALPHA_INS       = tocstyle.dtx tocbasic.dtx scrjura.dtx
 
-ALPHA_DOC       = tocstyle.pdf scrjura.pdf
+ALPHA_DOC       = tocstyle.pdf scrjura.pdf scrhack.pdf
 
 ALPHA_DTX       = $(subst .pdf,.dtx,$(ALPHA_DOC))
 
