@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2008/12/08 v1.3c internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2009/03/16 v1.3d internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -913,8 +913,8 @@
   \marginline{\footnotesize\fbox{\strut#1}}%
   \begingroup
     \let\@tempa\@empty
-    \ifstr{#1}{v2.9i}{\def\@tempa{v2.90i=}}%
-    \ifstr{#1}{v2.9t}{\def\@tempa{v2.90t=}}%
+    \ifstr{#1}{v2.9i}{\def\@tempa{v2.90i=}}{}%
+    \ifstr{#1}{v2.9t}{\def\@tempa{v2.90t=}}{}%
     \let\and\ignorespaces
     \def\Package##1{%
       \glossary{##1=\string\Package{##1}>\@tempa#1|indexrm}%
