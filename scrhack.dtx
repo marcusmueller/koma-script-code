@@ -1,4 +1,4 @@
-% \CheckSum{365}
+% \CheckSum{472}
 % \iffalse meta-comment
 % ======================================================================
 % scrhack.dtx
@@ -62,7 +62,7 @@
 %   Right brace   \}     Tilde         \~}
 %
 % \iffalse
-%%% From File: tocbasic.dtx
+%%% From File: scrhack.dtx
 %<package&identify>%%% using: package,identify
 %<package&option>%%% using: package,option
 %<package&body>%%% using: package,body
@@ -72,16 +72,18 @@
 \ProvidesFile{scrhack.dtx}
 %</dtx>
 %<*dtx|manual>
-             [2009/03/16 v3.03 KOMA-Script (hacking other packages)]
+             [2009/03/17 v3.03 KOMA-Script (hacking other packages)]
 %</dtx|manual>
 %<package&identify>\ProvidesPackage{scrhack}
 %<hyperref&identify>\ProvidesFile{hyperref.hck}
 %<float&identify>\ProvidesFile{float.hck}
+%<listings&identify>\ProvidesFile{listings.hck}
 %<identify>                [\KOMAScriptVersion\space
 %<package&identify>                  package (hacking other packages)]
 %<hack&identify>                  hacking package
 %<hyperref&identify>                  hyperref]
 %<float&identify>                  float]
+%<listings&identify>                  listings]
 %<*dtx>
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[latin1]{inputenc}
@@ -196,7 +198,7 @@ compatibility of \KOMAScript\ and package \Package{float}, but also improves
 the compatibility of packages \Package{babel} and \Package{float}.
 
 Note: A significant change with \Package{scrhack} is, that \KOMAScript{} options
-like \OptionValue{lists=totoc} or \OptionValue{lists=totocnumbered} does only
+like \OptionValue{lists}{totoc} or \OptionValue{lists}{totocnumbered} does only
 change the behaviour of float listings, that are already defined using
 \Macro{newfloat} \emph{before} using such an option!
 
@@ -210,6 +212,48 @@ with option \OptionValue{float}{false}. You may also switch of the
 \Package{float} hack using \Macro{KOMAoptions}\PParameter{float=false} or
 \Macro{KOMAoption}\PParameter{float}\PParameter{false} somewhere after loading
 package \Package{scrhack}, but before loading package \Package{float}.
+
+\section{The \Package{listings} hack}
+\label{sec:scrhack.listings}
+
+Package \Package{listings} uses macros \Macro{float@listhead} to set the
+headings of a float listing, if defined, and \Macro{float@addtolists} to add
+informations to all float listings. These macros where proposed by the
+\KOMAScript{} author for some years. In theory those macros may be used by
+several class and package authors to deligate some parts of the creation of a
+float listing to the class. This would increase the compatiblity of packages
+and classes. But unfortunaltly some package authors, even the author of
+package \Package{float}, impemented the commands in such a way, that these
+packages may become incompatible to each other.
+
+Because of this \KOMAScript\ stopped support for \Macro{float@addtolists} and
+\Macro{float@listhead} with version 3. Instead of this \KOMAScript\ supports
+several improvements for package authors using \KOMAScript\ package
+\Package{tocbasic}.
+
+Package \Package{scrhack} redefines some macros of package \Package{listings} to
+not longer use \Macro{float@addtolists} and \Macro{float@listhead} but use the
+interface of package \Package{tocbasic}. This does not only improve the
+compatibility of \KOMAScript\ and package \Package{listings}, but also improves
+the compatibility of packages \Package{babel} and \Package{listings}.
+
+Note: A significant change with \Package{scrhack} is, that \KOMAScript{} options
+like \OptionValue{lists}{totoc} or \OptionValue{lists}{totocnumbered} does only
+change the behaviour of \Macro{listoflistings}, if they are set after loading
+package \Package{listings}.
+
+% \iffalse
+\begin{Declaration}
+  \KOption{listings}{switch}
+\end{Declaration}
+% \fi
+You may switch of the \Package{listings} hack loading package
+\Package{scrhack} with option \OptionValue{listings}{false}. You may also
+switch of the \Package{listings} hack using
+\Macro{KOMAoptions}\PParameter{listings=false} or
+\Macro{KOMAoption}\PParameter{listings}\PParameter{false} somewhere after
+loading package \Package{scrhack}, but before loading package
+\Package{listings}.
 
 % \iffalse
 %</manual|dtx>
@@ -400,7 +444,7 @@ package \Package{scrhack}, but before loading package \Package{float}.
 \@scrhack@floattrue
 \AfterPackage*{float}{%
   \KOMA@key[.scrhack.sty]{float}{%
-    \PackageWarning{float}{option `float' ignored}%
+    \PackageWarning{scrhack}{option `float' ignored}%
   }%
   \if@scrhack@float\scr@hack@load\@pkgextension{float}\fi
 }
@@ -451,6 +495,7 @@ package \Package{scrhack}, but before loading package \Package{float}.
         \@starttoc{\@nameuse{ext@#1}}%
         \endgroup}}%
   }{%
+    \RequirePackage{tocbasic}%
     \PackageInfo{scrhack}{redefining \string\newfloat}%
     \renewcommand\newfloat[3]{%
       \ifattoclist{#3}{%
@@ -469,10 +514,10 @@ package \Package{scrhack}, but before loading package \Package{float}.
         \floatplacement{#1}{#2}%
         \@ifundefined{fname@#1}{\floatname{#1}{#1}}{}%
         \expandafter\edef\csname ftype@#1\endcsname{\value{float@type}}%
-        \addtocounter{float@type}{\value{float@type}}%
+        \addtocounter{float@type}{\value{float@type}}
         \restylefloat{#1}%
         \expandafter\edef\csname fnum@#1\endcsname%
-        {\expandafter\noexpand\csname fname@#1\endcsname{}%
+        {\expandafter\noexpand\csname fname@#1\endcsname{}
           \expandafter\noexpand\csname the#1\endcsname}%
         \@ifnextchar[%]
         {\float@newx{#1}}%
@@ -520,6 +565,117 @@ package \Package{scrhack}, but before loading package \Package{float}.
 %<*package&option>
 % \fi
 %
+%
+% \subsection{Der \textsf{listings}-Hack}
+%
+% Das \textsf{listings}-Paket verwendet das Makro \cs{float@listhead} zum
+% Setzen der Überschriften. Dies wird seit \KOMAScript~3 nicht mehr empfohlen
+% und fliegt demnächst komplett aus der Unterstützung. Stattdessen wird
+% empfohlen, dass Pakete \textsf{tocbasic} unterstützen. Der Aufwand dafür ist
+% sehr gering und wird mit vielen neuen Möglichkeiten belohnt.
+%
+% Dieser Hack rüstet die \textsf{tocbasic}-Unterstützung für \textsf{listings}
+% nach.
+%
+% \begin{option}{listings}
+%    \begin{macrocode}
+\KOMA@ifkey{listings}{@scrhack@listings}%
+\@scrhack@listingstrue
+\AfterPackage*{listings}{%
+  \KOMA@key[.scrhack.sty]{listings}{%
+    \PackageWarning{scrhack}{option `listings' ignored}%
+  }%
+  \if@scrhack@listings\scr@hack@load\@pkgextension{listings}\fi
+}
+%    \end{macrocode}
+% \end{option}
+%
+% \iffalse
+%</package&option>
+%<*listings&body>
+% \fi
+%
+% \begin{macro}{\scr@do@hack@listings}
+% \begin{macro}{\lstlistoflistings}
+% Über dieses Macro wird das Verzeichnis der Listings gesetzt. Die gesamte
+% Funktionalität dafür kann \Package{tocbasic} überlassen werden.
+% \begin{macro}{\float@addtolists}
+% Diese Anweisung wird nicht länger benötigt und daher auf die ursprüngliche
+% Definition zurückgesetzt. Da \Package{listings} ihre Definition mit
+% \Macro{AtBeginDocument} verzögert, muss dies hier ebenfalls geschehen.
+%    \begin{macrocode}
+\newcommand*{\scr@do@hack@listings}{%
+  \RequirePackage{tocbasic}%
+  \addtotoclist[float]{lol}%
+  \setuptoc{lol}{chapteratlist}%
+  \PackageInfo{scrhack}{redefining \string\lstlistoflistings}%
+  \renewcommand*{\lstlistoflistings}{\listoftoc[{\lstlistlistingname}]{lol}}%
+  \AtBeginDocument{%
+    \scr@ifexpected{\float@addtolists}{%
+      \def\float@addtolists##1{\addtocontents{lol}{##1}}%
+    }{%
+      \PackageInfo{scrhack}{undefining \string\float@addtolists}%
+      \let\float@addtolists\relax
+    }{%
+      \scr@ifexpected{\float@addtolists}{%
+        \def\float@addtolists##1{\addtocontents{lol}{##1}%
+          \orig@float@addtolists{##1}}%
+      }{%
+        \PackageInfo{scrhack}{setting \string\float@addtolists\MessageBreak
+          to \string\orig@float@addtolists}%
+        \let\float@addtolists\orig@float@addtolists
+      }{%
+        \PackageWarningNoLine{scrhack}{unkown \string\float@addtolists\space
+          definition found!\MessageBreak
+          Maybe you are using a unsupported listings version}%
+      }%
+    }%
+  }%
+  \let\scr@do@hack@listings\relax
+}
+\scr@ifexpected{\lstlistoflistings}{%
+  \def\lstlistoflistings{\bgroup
+    \let\contentsname\lstlistlistingname
+    \let\lst@temp\@starttoc \def\@starttoc##1{\lst@temp{lol}}%
+    \tableofcontents \egroup}%
+}{%
+  \scr@do@hack@listings
+}{%
+  \scr@ifexpected{\lstlistoflistings}{%
+    \def\lstlistoflistings{%
+      \begingroup
+        \@ifundefined{@restonecoltrue}{}{%
+          \if@twocolumn
+            \@restonecoltrue\onecolumn
+          \else
+            \@restonecolfalse
+          \fi
+        }%
+        \float@listhead{\lstlistlistingname}%
+        \parskip\z@\parindent\z@\parfillskip \z@ \@plus 1fil%
+        \@starttoc{lol}%
+        \@ifundefined{@restonecoltrue}{}{%
+          \if@restonecol\twocolumn\fi
+        }%
+      \endgroup
+    }%
+  }{%
+    \scr@do@hack@listings
+  }{%
+    \PackageWarningNoLine{scrhack}{unknown \string\lstlistoflistings\space
+      definition found!\MessageBreak
+      Maybe you are using a unsupported listings version}%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \iffalse
+%</listings&body>
+%<*package&option>
+% \fi
 %
 % \subsection{Optionen ausführen}
 %
