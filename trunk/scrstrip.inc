@@ -165,8 +165,10 @@ English and German manuals are part of KOMA-Script bundle.
 See `README'.
 
 The KOMA-Script bundle (but maybe not this file) was based upon the
-LaTeX2.09 Script family created by Frank Neukam 1993 and the LaTeX2e
-standard classes created by The LaTeX3 Project 1994-1996.
+LaTeX 2.09 Script family created by Frank Neukam 1993 and the LaTeX2e
+standard classes created by The LaTeX3 Project 1994-1996.  You may
+find a complete unmodified copy of LaTeX2e at 
+<http://www.ctan.org/pub/tex-archive/macros/latex/base/>.
 
 \endpreamble
 
@@ -174,6 +176,4 @@ standard classes created by The LaTeX3 Project 1994-1996.
 
 %%% Local Variables:
 %%% mode: latex
-%%% mode: font-lock
-%%% TeX-master: f
 %%% End:
