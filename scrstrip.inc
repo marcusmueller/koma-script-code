@@ -15,6 +15,10 @@
 %
 % The Current Maintainer and author of this work is Markus Kohm.
 %
+% In particular, NO PERMISSION is granted to modify the contents of this
+% file since it contains the legal notices that are placed in the files
+% it generates.
+%
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrstrip.inc
@@ -31,6 +35,10 @@
 % (allein durch den Autor verwaltet).
 %
 % Der Aktuelle Verwalter und Autor dieses Werkes ist Markus Kohm.
+%
+% Als Besonderheit: Es NICHT GESTATTET den Inhalt dieser Datei zu 
+% aendern, da sie rechtliche Hinweise enthaelt, die in die erzeugten
+% Dateien eingefuegt werden.
 % 
 % Dieses Werk besteht aus den in manifest.txt aufgefuehrten Dateien.
 % ======================================================================
