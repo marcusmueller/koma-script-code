@@ -24,6 +24,8 @@
 % scrstrip.inc
 % Copyright (c) Markus Kohm, 2002-2009
 %
+% Diese Datei ist Teil des LaTeX2e-KOMA-Script-Pakets.
+%
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
 % Die neuste Version dieser Lizenz ist
