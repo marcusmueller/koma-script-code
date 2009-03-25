@@ -1,10 +1,11 @@
-% \CheckSum{296}
+% \CheckSum{322}
 % \iffalse meta-comment
 % ======================================================================
 % scrlfile.dtx
 % Copyright (c) Markus Kohm, 2002-2009
 %
-% This file is part of the LaTeX2e KOMA-Script bundle.
+% This file is part of the work `scrlfile' which is part of the LaTeX2e
+% KOMA-Script bundle.
 %
 % This work may be distributed and/or modified under the conditions of
 % the LaTeX Project Public License, version 1.3c of the license.
@@ -17,10 +18,14 @@
 %
 % The Current Maintainer and author of this work is Markus Kohm.
 %
-% This work consists of all files listed in manifest.txt.
+% This work consists of files `scrlfile.dtx', `scrlfile.ins' and 
+% `scrlogo.dtx' at least.
 % ----------------------------------------------------------------------
 % scrlfile.dtx
 % Copyright (c) Markus Kohm, 2002-2009
+%
+% Diese Datei ist Teil des Werks `scrlfile', das wiederum Teil des
+% LaTeX2e KOMA-Script Pakets ist.
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -34,7 +39,8 @@
 %
 % Der Aktuelle Verwalter und Autor dieses Werkes ist Markus Kohm.
 % 
-% Dieses Werk besteht aus den in manifest.txt aufgefuehrten Dateien.
+% Dieses Werk besteht mindestens aus den Dateien `scrlfile.dtx',
+% `scrlfile.ins' und `scrlogo.dtx'.
 % ======================================================================
 % \fi
 %
@@ -58,7 +64,7 @@
 %%% From File: scrlfile.dtx
 %<*driver|scrlfile|load>
 % \fi
-\def\scrlfileversion{2008/07/09 v3.00}
+\def\scrlfileversion{2009/03/25 v3.03}
 % \iffalse
 %</driver|scrlfile|load>
 %<*driver>
@@ -382,6 +388,16 @@
 % does any typesetting since the result of \cs{BeforeClosingMainAux}
 % would be unpredictable.
 %
+% \DescribeMacro{\AfterReadingMainAux}
+% The command \cs{AfterReadingfMainAux}\marg{instructions} works similar to
+% \cs{BeforeClosingMainAux}, but instead of processing instructions before
+% closing the main aux-file, they will be processed after reading the main
+% aux-file at \cs{begin\{document\}}.
+%
+% The \cs{AfterReadingMainAux} hook should not be used for code that does any
+% typesetting since the result of \cs{AfterReadingMainAux} would be
+% unprecitable.
+%
 %
 % \StopEventually{\PrintIndex\PrintChanges}
 %
@@ -663,9 +679,11 @@
 %  \end{macro}
 %  \end{macro}
 %
-%  \begin{macro}{\BeforeClosingMainAux}
-%    \changes{v2.95}{2002/09/03}{new}
-% This is completly different. First we have to establish a new hook
+% \begin{macro}{\BeforeClosingMainAux}
+%   \changes{v2.95}{2002/09/03}{new}
+% \begin{macro}{\AfterReadingMainAux}
+%   \changes{v3.03}{2009/03/25}{new}
+% These are completly different. First we have to establish a new hook
 % at \cs{end\{document\}}, just after closing the group and after the
 % final \cs{clearpage}.
 %    \begin{macrocode}
@@ -681,15 +699,25 @@
         \scr@restore@newpage
         \let\clearpage=\scr@saved@clearpage}%
     \fi%
+    \let\scr@saved@dofilelist\@dofilelist
+    \def\@dofilelist{%
+      \scr@hook@acma
+      \let\@dofilelist\scr@saved@dofilelist
+      \scr@saved@dofilelist
+    }%
   }%
 }
 %    \end{macrocode}
 % \begin{macro}{\scr@saved@checkend}
 %   \changes{v2.95}{2002/09/03}{new (internal)}
-% You may see above, that we need a save-to macro.
+% \begin{macro}{\scr@saved@dofilelist}
+%   \changes{v3.03}{2009/03/25}{new}
+% You may see above, that we need save-to macros.
 %    \begin{macrocode}
 \newcommand*{\scr@saved@checkend}{}
+\newcommand*{\scr@saved@dofilelist}{}
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \begin{macro}{\scr@redefine@newpage}
 %   \changes{v3.00}{2008/07/09}{new (internal)}
@@ -739,15 +767,19 @@
 % \end{macro}
 % \begin{macro}{\scr@hook@bcma}
 %   \changes{v2.95}{2002/09/03}{new (internal)}
-% We also need a macro, that saves the commands at the hook and is
-% extendable using \cs{g@addto@macro}. Here we also warn, if we detect
-% one more \cs{newpage}\,---\,maybe at a \cs{clearpage} or
-% \cs{cleardoublepage}.
+% \begin{macro}{\scr@hook@acma}
+%   \changes{v3.03}{2009/03/25}{new (internal)}
+% We also need macros, that saves the commands at the hooks and are
+% extendable using \cs{g@addto@macro}.
 %    \begin{macrocode}
 \newcommand*{\scr@hook@bcma}{}
+\newcommand*{\scr@hook@acma}{}
 %    \end{macrocode}
 %  \end{macro}
-% Now we are able to write the user command.
+%  \end{macro}
+% Now we are able to write the user command. Here we also warn, if we detect
+% one more \cs{newpage}\,---\,maybe at a \cs{clearpage} or
+% \cs{cleardoublepage}.
 %    \begin{macrocode}
 \newcommand*{\BeforeClosingMainAux}{%
   \ifx\scr@hook@bcma\@empty
@@ -758,8 +790,17 @@
   \fi
   \g@addto@macro\scr@hook@bcma%
 }
+\newcommand*{\AfterReadingMainAux}{%
+  \ifx\scr@hook@acma\@empty
+    \gdef\scr@hook@acma{%
+      \renewcommand*{\AfterReadingMainAux}[1]{####1}%
+    }%
+  \fi
+  \g@addto@macro\scr@hook@acma%
+}
 %    \end{macrocode}
-%  \end{macro}
+% \end{macro}
+% \end{macro}
 %
 % \Finale
 %
