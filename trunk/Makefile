@@ -107,6 +107,9 @@ CLS_MAIN	= scrbook.cls \
 		  tocstyle.sty \
 		  scrextend.sty \
 		  scrhack.sty \
+		  float.hak \
+		  hyperref.hak \
+		  listings.hak \
 	          DIN.lco \
 		  DINmtext.lco \
 		  SN.lco \
