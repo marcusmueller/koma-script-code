@@ -115,6 +115,7 @@ CLS_MAIN	= scrbook.cls \
 		  SN.lco \
 	 	  SNleft.lco \
 		  KOMAold.lco \
+		  NF.lco \
 		  NipponEH.lco \
 		  NipponEL.lco \
 		  NipponLH.lco \
