@@ -110,12 +110,14 @@ CLS_MAIN	= scrbook.cls \
 		  float.hak \
 		  hyperref.hak \
 		  listings.hak \
+		  visualize.lco \
 	          DIN.lco \
 		  DINmtext.lco \
 		  SN.lco \
 	 	  SNleft.lco \
 		  KOMAold.lco \
 		  NF.lco \
+		  USletter2w.lco \
 		  NipponEH.lco \
 		  NipponEL.lco \
 		  NipponLH.lco \
