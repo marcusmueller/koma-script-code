@@ -45,7 +45,7 @@
 %
 % ============================================================================
 
-\ProvidesFile{scrlttr2-experts.tex}[2009/04/21 KOMA-Script guide (chapter: scrlttr2 for experts)]
+\ProvidesFile{scrlttr2-experts.tex}[2009/06/30 KOMA-Script guide (chapter: scrlttr2 for experts)]
 
 \chapter{Zusätzliche Informationen zur 
   Briefklasse \Class{scrlttr2}}
@@ -582,7 +582,7 @@ erwähnt wurde, kann in den vordefinierten Briefköpfen eine Linie im oder unter
 dem Absender gesetzt werden. Hat die Pseudolänge \PLength{fromrulewidth} die
 Länge 0, so wird dabei die Länge dieser Linie automatisch bestimmt. Dies ist
 die Voreinstellung bei den vordefinierten \File{lco}-Dateien. Der Wert kann
-mit \Macro{\@setplength} (siehe
+mit \Macro{@setplength} (siehe
 \autopageref{desc:scrlttr2-experts.cmd.@setplength}) in eigenen
 \File{lco}-Dateien aber auch abweichend gesetzt werden. Die voreingestellte
 Dicke\ChangedAt{v2.97c}{\Class{scrlttr2}}, \PLength{fromrulethickness}, der
@@ -1169,26 +1169,33 @@ funktionieren.
 Obwohl jedes von \Package{typearea} einstellbare Format verwendbar ist, kann
 es bei der Ausgabe der ersten Briefseite mit manchen Formaten zu unerwünschten
 Ergebnissen kommen. Das liegt aber nicht am Konzept der Klasse, sondern daran,
-dass derzeit nur Parametersätze für ISO A4 existieren. Leider gibt es keine
-allgemein gültigen Regeln, um die Position von Anschriftfeldern und Ähnlichem
-für beliebige Papierformate zu berechnen. Es ist jedoch möglich, auch für
-andere Papierformate Parametersätze zu erstellen.%
+dass derzeit hauptsächlich Parametersätze für ISO A4 existieren. Leider gibt
+es keine allgemein gültigen Regeln, um die Position von Anschriftfeldern und
+Ähnlichem für beliebige Papierformate zu berechnen. Es ist jedoch möglich,
+auch für andere Papierformate Parametersätze zu erstellen.%
 \EndIndex{}{Papierformat>Beschraenkungen=Beschränkungen}%
 
+
+\subsection{Überwachung des Papierformats}
+\label{sec:scrlttr2-experts.papersize}
+
+Derzeit existieren Parametersätze und \File{lco}-Dateien für A4-Papier und
+letter-Papier. Die Klasse \Class{scrlttr2} versteht aber theoretisch sehr viel
+mehr Papierformate. Daher ist es notwendig zu überwachen, ob die korrekte
+Papiergröße eingestellt ist.
 
 \begin{Declaration}
   \Macro{LetterOptionNeedsPapersize}%
     \Parameter{Optionsname}\Parameter{Papiergröße}
 \end{Declaration}
 \BeginIndex{Cmd}{LetterOptionNeedsPapersize}%
-Derzeit existieren nur Parametersätze und \File{lco}-Dateien für
-A4-Papier. Damit man bei Verwendung einer anderen
-\PName{Papiergröße}\Index{Papierformat} zumindest gewarnt wird, ist in
-jeder mit \KOMAScript{} ausgelieferten \File{lco}-Datei eine Anweisung
-\Macro{LetterOptionNeedsPapersize} zu finden. Als erstes Argument wird
-dabei der Name der \File{lco}-Datei ohne die Endung »\File{.lco}«
-übergeben. Als zweites Argument wird die Papiergröße übergeben, für
-die diese \File{lco}-Datei gedacht ist.
+Damit man bei Verwendung einer in der \File{lco}-Datei nicht
+vorgesehenen \PName{Papiergröße}\Index{Papierformat} zumindest gewarnt wird,
+sind in den mit \KOMAScript{} ausgelieferten \File{lco}-Dateien Anweisungen
+\Macro{LetterOptionNeedsPapersize} zu finden. Als erstes Argument wird dabei
+der Name der \File{lco}-Datei ohne die Endung »\File{.lco}« übergeben. Als
+zweites Argument wird die Papiergröße übergeben, für die diese
+\File{lco}-Datei gedacht ist.
 
 Werden nacheinander mehrere \File{lco}-Dateien geladen, so kann jede dieser
 \File{lco}-Dateien eine Anweisung \Macro{LetterOptionNeedsPapersize}
@@ -1228,6 +1235,191 @@ und auch das Beispiel überspringen.
 \end{Example}
 %
 \EndIndex{Cmd}{LetterOptionNeedsPapersize}%
+
+\subsection{Positionen sichtbar machen}
+\label{sec:scrlttr2-experts.visualize}
+\BeginIndex{Option}{visualize}
+
+Wenn man selbst \File{lco}-Dateien entwickelt, beispielsweise umd die
+Positionen von verschiedenen Feldern des Briefbogens an eigene Wünsche oder
+Notwendigkeiten anzupassen, ist es hilfreich, wenn zumindest einige Elemente
+unmittelbar sichtbar gemacht werden können. Zu diesem Zweck existiert die
+\File{lco}-Datei
+\File{visualize.lco}\ChangedAt{v3.03}{\Class{scrlttr2}}. Diese kann wie jede
+\File{lco}-Datei geladen werden. Allerdings ist das Laden dieser \emph{Letter
+  Class Option} auf die Dokumentpräambel beschränkt und seine Auswirkungen
+können nicht wieder rückgängig gemacht werden. Die \File{lco}-Datei selbst
+bedient sich der Pakete \Package{eso-pic}\IndexPackage{eso-pic} und
+\Package{graphicx}\IndexPackage{graphicx}, die nicht zu \KOMAScript{} gehören.
+
+Es wird darauf hingewiesen, dass \Option{visualize} bisher nur in einer
+Beta-Version existiert. Das bedeutet insbesondere, dass es keinen Support
+dafür gibt und sich noch alles ändern kann. Da die Datei aber ohnehin nicht
+für Produktionssysteme genutzt werden sollte, sondern in erste Linie der
+Entwicklung eigener Parametersätze dient, sollte das die Verwendbarkeit nicht
+verhindern.
+
+\begin{Declaration}
+  \Macro{showfields}\Parameter{Feldliste}
+\end{Declaration}
+\BeginIndex{Cmd}{showfields}%
+Mit dieser Anweisung kann die Visualisierung von Feldern des Briefbogens
+aktiviert werden. Das Argument \PName{Feldliste} ist dabei eine durch Komma
+separierte Liste der Feldern, die visualisiert werden sollen. Folgende Felder
+werden derzeit unterstützt:
+\begin{description}
+\item[test] -- ein Testfeld der Größe 10\Unit{cm} auf 15\Unit{cm}, das jeweils
+  1\Unit{cm} vom oberen und linken Papierrand entfernt ist. Dieses Testfeld
+  existiert zu Debuggingzwecken. Es dient als Vergleichsmaß für den Fall, dass
+  im Dokumenterstellungsprozess die Maße verfälscht werden.
+\item[head] -- der Kopfbereich des Briefbogens. Es handelt sich hier um ein nach
+  unten offenes Feld.
+\item[foot] -- der Fußbereich des Briefbogens. Es handelt sich hier um ein nach
+  unten offenes Feld.
+\item[address] -- das Anschriftfenster.
+\item[location] -- das Feld der Absenderergänzung.
+\item[refline] -- die Geschäftszeile. Es handelt sich hier um ein nach unten
+  offenes Feld.
+\end{description}%
+\BeginIndex{FontElement}{field}%
+Mit Hilfe der Anweisungen \Macro{setkomafont} und \Macro{addtokomafont} (siehe
+\autoref{sec:scrlttr2.textmarkup},
+\autopageref{desc:scrlttr2.cmd.setkomafont}) für das
+Element \FontElement{field} kann die Farbe der Visualisierung geändert
+werden. Voreingestellt ist \Macro{normalcolor}.%
+\EndIndex{FontElement}{field}%
+%
+\EndIndex{Cmd}{showfields}
+
+\begin{Declaration}
+  \Macro{setshowstyle}\Parameter{Visualsisierungsstil}\\
+  \Macro{edgesize}
+\end{Declaration}
+\BeginIndex{Cmd}{setshowstyle}%
+\BeginIndex{Cmd}{edgesize}
+In der Voreinstellung werden die einzelnen Felder durch Umgrenzungslinien
+markiert. Dies entspricht dem \PName{Visualisierungsstil} \PValue{frame}. Nach
+unten offene Felder werden dabei nicht komplett umrahmt, sondern unten offen
+mit kleinen Pfeilen nach unten dargestellt. Als Alternative hierzu steht auch
+der \PName{Visualisierungsstil} \PValue{rule} zur Verfügung. Dabei wird das
+Feld farbig hinterlegt. Hierbei kann nicht zwischen geschlossenen und nach
+unten offenen Feldern unterschieden werden. Stattdessen werden nach unten
+offene Felder mit einer Mindesthöhe dargestellt. Der dritte verfügbare
+\PName{Visualisierungsstil} ist \PValue{edge}. Dabei werden die Ecken der
+Felder markiert. Bei nach unten offenen Feldern entfallen dabei die unteren
+Eckmarkierungen. Die Größe der Eckmarkierungen ist im Makro \Macro{edgesize}
+abgelegt und mit 1\Unit{ex} voreingestellt.
+\EndIndex{Cmd}{edgesize}
+\EndIndex{Cmd}{setshowstyle}
+
+\begin{Declaration}
+  \Macro{showenvelope}(\PName{Breite},\PName{Höhe})%
+                      (\PName{HOffset},\PName{VOffset})\OParameter{Zusatz}\\
+  \Macro{showISOenvelope}\Parameter{Format}\OParameter{Zusatz}\\
+  \Macro{showUScommercial}\Parameter{Format}\OParameter{Zusatz}\\
+  \Macro{showUScheck}\OParameter{Zusatz}\\
+  \Macro{unitfactor}
+\end{Declaration}
+\BeginIndex{Cmd}{showenvelope}%
+\BeginIndex{Cmd}{showISOenvelope}%
+\BeginIndex{Cmd}{showUScommercial}%
+\BeginIndex{Cmd}{showUScheck}%
+\BeginIndex{Cmd}{unitfactor}%
+Diese Anweisungen dienen dazu eine Seite mit einer Zeichnung eines Umschlags
+auszugeben. Der Umschlag wird dabei immer um 90° gedreht auf einer eigenen
+Seite im Maßstab~1:1 ausgegeben. Das Anschriftfenster wird automatisch aus den
+aktuellen Daten für die Anschriftposition auf dem Briefbogen,
+\PLength{toaddrvpos}, \PLength{toaddrheight}, \PLength{toaddrwidth} und
+\PLength{toaddrhpos}, erzeugt. Hierfür ist es notwendig zu wissen, um welchen
+Wert der gefaltete Briefbogen auf jeder Seite kleiner als die
+\PName{Breite} und \PName{Höhe} des Briefbogens ist. Sind diese beiden Werte,
+\PName{HOffset} und \PName{VOffset}, bei \Macro{showenvelope} nicht angegeben,
+so wird versucht, sie aus den Faltmarken und der Papiergröße selbst zu
+berechnen.
+
+Die übrigen Anweisungen basieren auf \Macro{showenvelope}. Mit
+\Macro{showISOenvelope} kann ein ISO-Umschlag im \PName{Format} C4, C5, C5/6,
+DL (auch bekannt als C5/6) oder C6 erzeugt werden. Mit
+\Macro{showUScommercial} wird hingegen ein US-Commercial-Umschlag im
+\PName{Format} 9 oder 10 ausgegeben. \Macro{showUScheck} schließlich ist für
+Umschläge im US-Check-Format zuständig.
+
+\BeginIndex{FontElement}{letter}%
+Innerhalb des Umschlags wird die Lage des Briefbogens gestrichtelt
+angedeutet. Die dabei verwendete Farbe kann mit Hilfe der Anweisungen
+\Macro{setkomafont} und \Macro{addtokomafont} (siehe
+\autoref{sec:scrlttr2.textmarkup},
+\autopageref{desc:scrlttr2.cmd.setkomafont}) für das Element
+\FontElement{letter} verändert werden. Voreingstellt ist \Macro{normalcolor}.%
+\EndIndex{FontElement}{letter}
+
+\BeginIndex{FontElement}{measure}%
+Die Umschlagzeichnung wird automatisch bemaßt. Die Farbe der Bemaßung und die
+Größe deren Beschriftung kann mit Hilfe der Anweisungen \Macro{setkomafont}
+und \Macro{addtokomafont} (siehe \autoref{sec:scrlttr2.textmarkup},
+\autopageref{desc:scrlttr2.cmd.setkomafont}) für das Element
+\FontElement{measure} verändert werden. Voreingstellt ist hier
+\Macro{normalcolor}. Die Bemaßung erfolgt in Vielfachen von
+\Length{unitlength} mit einer maximalen Genauigkeit von
+$1/\Macro{unitfactor}$, wobei die Genauigkeit der \TeX-Arithmetik die
+tatsächliche Grenze darstellt. Voreingestellt ist 1. Eine Umdefinierung ist
+mit \Macro{renewcommand} möglich.%
+\EndIndex{FontElement}{measure}
+
+\begin{Example}
+  Es wird ein Beispielbrief im Format ISO~A4 erzeugt. Die unterstützten Felder
+  sollen zwecks Überprüfung ihrer Position mit gelben Rahmenlinien markiert
+  werden. Desweiteren soll die Position des Fensters in einem Umschlag der
+  Größe~DL mit Hilfe einer Zeichnung überprüft werden. Die Maßlinien in dieser
+  Zeichnung sollen rot und die Maßzahlen in kleinerer Schrift ausgegeben
+  werden, wobei die Maßzahlen in cm mit einer Genauigkeit von 1\Unit{mm}
+  ausgegeben werden sollen. Der gestrichelte Briefbogen im Umschlag soll
+  hingegen grün eingefärbt werden.
+  \begin{lstcode}
+\documentclass[visualize]{scrlttr2}
+\usepackage{xcolor}
+\setkomafont{field}{\color{yellow}}
+\setkomafont{measure}{\color{red}\small}
+\setkomafont{letter}{\color{green}}
+\showfields{head,address,location,refline,foot}
+\usepackage[ngerman]{babel}
+\usepackage{lipsum}
+\begin{document}
+\setkomavar{fromname}{Peter Musterfrau}
+\setkomavar{fromaddress}{Hinter dem Tal 2\\
+                         54321 Musterheim}
+\begin{letter}{%
+    Petra Mustermann\\
+    Vor dem Berg 1\\
+    12345 Musterhausen%
+  }
+\opening{Hallo,}
+\lipsum[1]
+\closing{Bis dann}
+\end{letter}
+\setlength{\unitlength}{1cm}
+\renewcommand*{\unitfactor}{10}
+\showISOenvelope{DL}
+\end{document}
+  \end{lstcode}
+  Auf der ersten Seite findet sich nun der Briefbogen, auf der zweiten Seite
+  wird die Zeichnung des Umschlags ausgegeben.
+\end{Example}
+
+Bezüglich der Bemaßung ist zu beachten, dass ungünstige Kombinationen von
+\Length{unitlength} und \Macro{unitfactor} sehr schnell einen \TeX-Fehler der
+Art \emph{arthmetic overflow} provozieren. Ebenso kann es geschehen, dass
+ausgegebene Maßzahlen geringfügig vom tatsächlichen Wert abweichen. Beides
+sind keine Fehler von \Option{visualize}, sondern lediglich
+Implementierungsgrenzen.
+%
+\EndIndex{Cmd}{unitfactor}%
+\EndIndex{Cmd}{showUScheck}
+\EndIndex{Cmd}{showUScommercial}
+\EndIndex{Cmd}{showISOenvelope}
+\EndIndex{Cmd}{showenvelope}
+%
+\EndIndex{Option}{visualize}%
 %
 \EndIndex{File}{lco}%
 
