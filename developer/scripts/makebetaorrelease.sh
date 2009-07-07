@@ -31,7 +31,7 @@ fi
 if ! grep 'scr@v@'"${versionstr}" scrkcomp.dtx; then
     cp -f scrkcomp.dtx scrkcomp.dtx~
     sed 's!\(\\begin{macro}{\\scr@v@last}\)!\\begin{macro}{\\scr@v@'"${versionstr}"'}\n%   \\changes{v'"${versionstr}"'}{'"${datestr}"'}{Neues Macro}\n% \1!' scrkcomp.dtx > scrkcomp.dtx.tmp
-    sed '/^\\@namedef{scr@v@last}{[0-9]*} *$/{N;s!^\\@namedef{scr@v@last}{\([0-9]\)*} *\n%    \\end{macrocode}!\\@namedef{scr@v@'"${versionstr}"'}{\1}\n\0\n% \\end{macro}!}' scrkcomp.dtx.tmp > scrkcomp.dtx
+    sed '/^\\@namedef{scr@v@last}{[0-9]*} *$/{N;s!^\\@namedef{scr@v@last}{\([0-9]*\)} *\n%    \\end{macrocode}!\\@namedef{scr@v@'"${versionstr}"'}{\1}\n\0\n% \\end{macro}!}' scrkcomp.dtx.tmp > scrkcomp.dtx
     curr_checksum=`head -1 scrkcomp.dtx | grep -o '[0-9]\+'`
     new_checksum=$(( ${curr_checksum} + 1 ))
     sed 's/^\(% *\\CheckSum{\).*\(}.*\)$/\1'${new_checksum}'\2/' scrkcomp.dtx > scrkcomp.dtx.tmp
