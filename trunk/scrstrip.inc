@@ -167,7 +167,8 @@ The list of files belonging to KOMA-Script distribution is given in
 the file `manifest.txt'.  See also `lppl.txt' or `lppl-de.txt' for 
 additional information.
 
-If this file is a beta version, you are not allowed to distribute it.
+If this file is a beta version, you may not be allowed to distribute 
+it.  Look at the comments below to see if this is the case.
 
 English and German manuals are part of KOMA-Script bundle. 
 ----------------------------------------------------------
