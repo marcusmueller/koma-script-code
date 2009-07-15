@@ -178,7 +178,10 @@
     \addtolength{\@tempdimc}{1in}%
     \setheadwidth[-\@tempdimc]{paper}%
     \pagestyle{scrheadings}%
-    \hypersetup{colorlinks}%
+    % Entweder:
+    \hypersetup{colorlinks}% 
+    % oder:
+%    \hypersetup{pdfborderstyle={/S/U/W 1}}%
     \let\orig@maketitle\maketitle
     \def\maketitle{%
       \begingroup
