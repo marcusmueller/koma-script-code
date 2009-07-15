@@ -214,7 +214,7 @@
     \csname ifCommon#1\endcsname
   }{}%
   \csname Common#1true\endcsname
-  \input{common.tex}%
+  \input{common-#2.tex}%
   \csname Common#1false\endcsname
 }
 \newcommand*{\IfCommon}[1]{%
