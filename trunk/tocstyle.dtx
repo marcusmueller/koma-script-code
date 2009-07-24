@@ -208,6 +208,11 @@ THERE IS NO SUPPORT, IF YOU USE THIS PACKAGE!
 %<*driver>
 \documentclass{scrdoc}
 \usepackage[ngerman,english]{babel}
+\usepackage{listings}
+\lstnewenvironment{lstcode}[1][]{%
+  \lstset{language=[LaTeX]TeX,basicstyle=\ttfamily\small,#1}%
+}{}
+
 \usepackage{tocstyle}
 \usetocstyle[toc]{nopagecolumn}
 \CodelineIndex
@@ -706,21 +711,203 @@ You may do this using \Macro{newtocstyle}\OParameter{parent
 %\fi
 If you used the optional argument \PName{parent style} all features of the
 parent style will be part of the new style, before overwriting them with the
-features of the \Macro{settocstylefeature}-commands. You should not use any
-other commands at the last argument. But at \Macro{newtocstyle} the command
-\Macro{settocfeature} becomes an alias for \Macro{settocstylefeature} to
-avoid to much mistakes.
+features of the \PName{\Macro{settocstylefeature}-commands}. You should not
+use any other commands at the last argument. But at \Macro{newtocstyle} the
+command \Macro{settocfeature} becomes an alias for \Macro{settocstylefeature}
+to avoid to much mistakes.
 
 The second optional argument is a comma seperated list of feature names. If it
 is used, these features of the parent style (and all ancestors of the parent)
 will not be part of the new style.
 %\iffalse
-\BeginIndex{Macro}{\newtocstyle}%
+\EndIndex{Macro}{\newtocstyle}%
 %\fi
-%
+
+%\iffalse
+\begin{Description}
+  \Macro{aliastoc}\Parameter{original-TOC}\Parameter{alias-TOC}
+\end{Description}%
+\BeginIndex{Macro}{\aliastoc}%
+You
+%</doc>
+%<*dtx>
+%\fi
+\DescribeMacro{\aliastoc}
+Using \Macro{aliastoc}\Parameter{original-TOC}\Parameter{alias-TOC} you
+%\iffalse
+%</dtx>
+%<*doc>
+%\fi
+may define an alias for a TOC. The first argument is the original TOC for that
+the second argument should be the alias. An alias-TOC will be processed
+with all settings, that were done for the original-TOC. Internally this
+command is used as default for the optional, first argument of
+\Macro{showtoc}.%
+%\iffalse
+\EndIndex{Macro}{\aliastoc}
+%\fi
+
+\section{Processing a TOC}
+\label{sec:tocstyle.processing}
+
+While \LaTeX{} inputs a toc file it processes the commands of the TOC.  These
+commands mainly produce the entries of the toc.  Some commands are only
+available or valid while a TOC is processed.  But be carefull: Some of these
+are read-only commands.  Changing such a read-only command may result in
+various errors!
+
+%\iffalse
+\begin{Description}
+  \Macro{@starttoc}\Parameter{TOC}\\
+  \Macro{showtoc}\OParameter{preprocession}\Parameter{TOC}
+\end{Description}%
+\BeginIndex{Macro}{\@starttoc}%
+\BeginIndex{Macro}{\showtoc}%
+%</doc>
+%<*dtx>
+%\fi
+\DescribeMacro{\@starttoc}%
+\DescribeMacro{\showtoc}%
+%\iffalse
+%</dtx>
+%<*doc>
+%\fi
+The internal comand \Macro{@startoc} is defined by the \LaTeX{} kernel. It is
+used by package and class authors to build commands like
+\Macro{tableofcontents} or \Macro{listoffigures}. Without using it you will
+not get a toc file. \Package{tocstyle} redefines it, to add pre- and
+post-processing commands. The original definition found by \Package{tocstyle}
+will be used inside the redefinition.
+
+\Macro{showtoc}%
+%\iffalse
+%</doc>
+%<*dtx>
+%\fi
+\OParameter{preprocession}\Parameter{TOC}%
+%\iffalse
+%</dtx>
+%<*doc>
+%\fi
+\ is an addition of \texttt{tocstyle}. Using it will procude a copy of TOC and
+process this copy. The copy will be done just after creating the original
+TOC. The copy will be an alias for the original file. The extension of the
+copy is the generated alias if \PName{TOC}. You may generate the alias using
+\Macro{aliastoc} at the optional argument of \Macro{showtoc}. The default for
+this optional argument will be
+\Macro{aliastoc}\Macro{tocstyleTOC}\Macro{tocstyleAliasTOC} and the default
+alias \Macro{tocstyleAliasTOC} will be \Macro{tocstyleTOC} extended by a
+number.
+%\iffalse
+\begin{example}
+%\fi
+The first TOC example at \autoref{sec:tocstyle.options} was made using
+\begin{lstcode}
+  \showtoc[{%
+    \aliastoc{\tocstyleTOC}{toc}%
+    \usetocstyle[toc]{standard}%
+    \settocfeature[toc]{raggedhook}{\raggedright}%
+    \selecttocstyleoption{tocgraduated}%
+  }]{toc}
+\end{lstcode}
+If you want to show a copy the table of contents, that shows only depth~1 of
+the headlines you may simply use:
+\begin{lstcode}
+  \showtoc[{%
+    \expandafter\value{tocdepth}=1\relax
+    \aliastoc{\tocstyleTOC}{toc}%
+  }]{toc}
+\end{lstcode}
+or
+\begin{lstcode}
+  \newcounter{savedtocdepth}
+  \setcounter{savedtocdepth}{\value{tocdepth}}
+  \setcounter{tocdepth}{1}
+  \showtoc{toc}
+  \setcounter{tocdepth}{\value{savedtocdepth}}
+\end{lstcode}
+%\iffalse
+\end{example}%
+\EndIndex{Macro}{\showtoc}
+%\fi
+
+%\iffalse
+\begin{Description}
+  \Macro{tocstyleTOC}\\
+  \Macro{tocstyleAliasTOC}
+\end{Description}%
+\BeginIndex{Macro}{\tocstyleTOC}%
+\BeginIndex{Macro}{\tocstyleAliasTOC}%
+%</doc>
+%<*dtx>
+%\fi
+\DescribeMacro{\tocstyleTOC}%
+\DescribeMacro{\tocstyleAliasTOC}%
+%\iffalse
+%</dtx>
+%<*doc>
+%\fi
+These are read-only macros. While processing a TOC using \Macro{@starttoc} or
+\Macro{showtoc}, \Macro{tocstyleAliasTOC} is the shortcut, that is valid for
+the features and \Macro{tocstyleTOC} is valid for the file extension to be
+used.%
+%\iffalse
+\EndIndex{Macro}{\tocstyleAliasTOC}%
+\EndIndex{Macro}{\tocstyleTOC}
+%\fi
+
+%\iffalse
+\begin{Description}
+  \Macro{tocstyledepth}
+\end{Description}%
+\BeginIndex{Macro}{\tocstyledepth}%
+%</doc>
+%<*dtx>
+%\fi
+\DescribeMacro{\tocstyledepth}
+%\iffalse
+%</dtx>
+%<*doc>
+%\fi
+This is a read-only macro. While processing a single toc entry with
+\Macro{@dottedtocline} this is the depth (first argument of
+\Macro{@dottedtocline}) of this entry. Most users will never need this, but it
+is often used internaly. Because of this \emph{you should never change it!}%
+%\iffalse
+\EndIndex{Macro}{\tocstyledepth}
+%\fi
+
+%\iffalse
+\begin{Description}
+  \Macro{iftochasdepth}\Parameter{TOC}\Parameter{depth}\Parameter{true}%
+  \Parameter{false}
+\end{Description}
+\BeginIndex{Macro}{\iftochasdepth}%
+You
+%</doc>
+%<*dtx>
+%\fi
+\DescribeMacro{\iftochasdepth}
+Using \Macro{iftochasdepth}\Parameter{TOC}\Parameter{depth}\Parameter{true}%
+  \Parameter{false} you
+%\iffalse
+%</dtx>
+%<*doc>
+%\fi
+may test, if an entry of a given depth was already output to a TOC. If so
+the commands of argument \PName{true} will be processed. If not so the
+commands of argument \PName{false} will be processed.%
+%\iffalse
+\EndIndex{Macro}{\iftochasdepth}
+%\fi
+
+\section{Configuration file}
+\label{sec:tocstyle.cfg}
+
 There's another feature for new toc styles. If there's a file
 \File{tocstyle.cfg} it will be loaded at the end of the package. This is
 usefull to define your own toc styles.
+
 %
 %\iffalse
 %</doc>
