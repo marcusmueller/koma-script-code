@@ -58,7 +58,7 @@
 %%% From File: scrklco.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrklco.dtx}[2009/07/24 v3.04a KOMA-Script (letter class options)]
+\ProvidesFile{scrklco.dtx}[2009/11/09 v3.05 KOMA-Script (letter class options)]
 % \iffalse
 \documentclass{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -855,10 +855,29 @@
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\showfield@head}
+%   \changes{v3.05}{2009/11/09}{neue Pseudo-Länge \texttt{firstheadhpos}
+%     beachtet}
 % das Feld \texttt{head} für den Kopfbereich des Briefbogens:
 %    \begin{macrocode}
 \newcommand*{\showfield@head}{%
-  \showfield{\dimexpr (\paperwidth-\useplength{firstheadwidth})/2\relax}%
+  \ifdim\useplength{firstheadhpos}<\paperwidth
+    \ifdim \useplength{firstheadhpos}>-\paperwidth
+      \ifdim \useplength{firstheadhpos}<\z@
+        \setlength\@tempskipa{\paperwidth}%
+        \addtolengthplength{\@tempskipa}{firstheadhpos}%
+        \addtolengthplength[-]{\@tempskipa}{firstheadwidth}%
+      \else
+        \setlength{\@tempskipa}{\useplength{firstheadhpos}}%
+      \fi
+    \else
+      \setlength\@tempskipa{\oddsidemargin}%
+      \addtolength\@tempskipa{1in}%
+    \fi
+  \else
+    \setlength\@tempskipa{.5\paperwidth}%
+    \addtolengthplength[-.5]{\@tempskipa}{firstheadwidth}%
+  \fi
+  \showfield{\@tempskipa}%
             {\useplength{firstheadvpos}}%
             {\useplength{firstheadwidth}}%
             {-\headheight}%
@@ -866,10 +885,29 @@
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\showfield@foot}
+%   \changes{v3.05}{2009/11/09}{neue Pseudo-Länge \texttt{firstfoothpos}
+%     beachtet}
 % das Feld \texttt{foot} für den Fußbereich des Briefbogens:
 %    \begin{macrocode}
 \newcommand*{\showfield@foot}{%
-  \showfield{\dimexpr (\paperwidth-\useplength{firstfootwidth})/2\relax}%
+  \ifdim\useplength{firstfoothpos}<\paperwidth
+    \ifdim \useplength{firstfoothpos}>-\paperwidth
+      \ifdim \useplength{firstfoothpos}<\z@
+        \setlength\@tempskipa{\paperwidth}%
+        \addtolengthplength{\@tempskipa}{firstfoothpos}%
+        \addtolengthplength[-]{\@tempskipa}{firstfootwidth}%
+      \else
+        \setlength{\@tempskipa}{\useplength{firstfoothpos}}%
+      \fi
+    \else
+      \setlength\@tempskipa{\oddsidemargin}%
+      \addtolength\@tempskipa{1in}%
+    \fi
+  \else
+    \setlength\@tempskipa{.5\paperwidth}%
+    \addtolengthplength[-.5]{\@tempskipa}{firstfootwidth}%
+  \fi
+  \showfield{\@tempskipa}%
             {\useplength{firstfootvpos}}%
             {\useplength{firstfootwidth}}%
             {-\baselineskip}%
