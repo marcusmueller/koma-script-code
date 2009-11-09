@@ -1,4 +1,4 @@
-% \CheckSum{484}
+% \CheckSum{485}
 % \iffalse meta-comment
 % ======================================================================
 % scrhack.dtx
@@ -72,7 +72,7 @@
 \ProvidesFile{scrhack.dtx}
 %</dtx>
 %<*dtx|manual>
-             [2009/08/05 v3.04b KOMA-Script (hacking other packages)]
+             [2009/11/09 v3.04b KOMA-Script (hacking other packages)]
 %</dtx|manual>
 %<package&identify>\ProvidesPackage{scrhack}
 %<hyperref&identify>\ProvidesFile{hyperref.hak}
@@ -156,9 +156,9 @@ the anchor for links and bookmarks are set after the headings. The anchors for
 numbered headings are always set before the headings.
 
 Package \Package{scrhack} redefines some macros of some hyperref driver files,
-e.g., \File{hpdftex.def}, while execution of
-\Macro{begin}\PParameter{document}. With this redefinitions the anchor of not
-numbered headings will be set always before the headings, too.
+e.g., \File{hpdftex.def}, after loading the hyperref driver file. With this
+redefinitions the anchor of not numbered headings will be set always before
+the headings, too.
 
 % \iffalse
 \begin{Declaration}
@@ -170,8 +170,8 @@ You may switch of the \Package{hyperref} hack loading package
 switch of the \Package{hyperref} hack using
 \Macro{KOMAoptions}\PParameter{hyperref=false} or
 \Macro{KOMAoption}\PParameter{hyperref}\PParameter{false} somewhere after
-loading package \Package{scrhack}, but before
-\Macro{begin}\PParameter{document}.
+loading package \Package{scrhack}, but before loading the hyperref driver
+package, that is by default after loading the package.
 
 \section{The \Package{float} hack}
 \label{sec:scrhack.float}
@@ -352,11 +352,25 @@ loading package \Package{scrhack}, but before loading package
 \@scrhack@hyperreftrue
 %</package&option>
 %<*package&body>
-\AtBeginDocument{%
-  \KOMA@key[.scrhack.sty]{hyperref}{%
-    \PackageWarning{scrhack}{option `hyperref=#1' ignored}%
+%    \end{macrocode}
+% \changes{v3.04b}{2009/11/09}{\textsf{hyperref}-Hack wird früher geladen}
+% Hier muss ein wenig trickreicher gearbeitet werden, weil \textsf{hyperref}
+% die Treiberdatei per \cs{AtEndOfPackage} lädt und der Hack erst danach
+% installiert werden darf. Mit \cs{AfterPackage*} alleine, würde der Hack aber
+% vor dem Laden der Treiberdatei installiert. Dafür können wir aber sicher
+% sein, dass ein innerhalb von \cs{AfterPackage*} aufgerufenes
+% \cs{AtEndOfPackage} garantiert nach dem Laden der Treiberdatei ausgeführt
+% wird. Das funktioniert auch noch, wenn \textsf{hyperref} bereits geladen
+% wurde. In dem Fall wird der Code einfach nach dem Ende von \textsf{scrhack}
+% statt nach dem Ende von \textsf{hyperref} ausgeführt.
+%    \begin{macrocode}
+\AfterPackage*{hyperref}{%
+  \AtEndOfPackage{%
+    \KOMA@key[.scrhack.sty]{hyperref}{%
+      \PackageWarning{scrhack}{option `hyperref=#1' ignored}%
+    }%
+    \if@scrhack@hyperref\scr@hack@load\@pkgextension{hyperref}\fi
   }%
-  \if@scrhack@hyperref\scr@hack@load\@pkgextension{hyperref}\fi
 }
 %</package&body>
 %    \end{macrocode}
