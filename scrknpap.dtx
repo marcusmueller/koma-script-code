@@ -1,4 +1,4 @@
-% \CheckSum{2830}
+% \CheckSum{2896}
 % \iffalse meta-comment
 % ======================================================================
 % scrknpap.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrknpap.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrknpap.dtx}[2009/06/30 v3.03b KOMA-Script (note-paper)]
+\ProvidesFile{scrknpap.dtx}[2009/11/09 v3.05 KOMA-Script (note-paper)]
 % \iffalse
 \documentclass{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -1441,7 +1441,15 @@
 \@newplength{firstfootwidth}
 %    \end{macrocode}
 % \end{macro}
-% \begin{macro}{\set@ltr@len@firstheadvspos}
+% \begin{macro}{\ltr@len@firstfoothpos}
+%   \changes{v3.05}{2009/11/09}{Neu}
+% Abstand des Kopfes vom linken Rand der Seite.
+%    \begin{macrocode}
+\@newplength{firstfoothpos}
+\@setplength{firstfoothpos}{\maxdimen}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\ltr@len@firstheadvspos}
 %   \changes{v2.8q}{2001/10/06}{Neu}
 % Abstand des Kopfes der ersten Seite von der Papieroberkante.
 %    \begin{macrocode}
@@ -1453,6 +1461,14 @@
 % Breite des Kopfes der ersten Seite.
 %    \begin{macrocode}
 \@newplength{firstheadwidth}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\ltr@len@firstheadhpos}
+%   \changes{v3.05}{2009/11/09}{Neu}
+% Abstand des Kopfes vom linken Rand der Seite.
+%    \begin{macrocode}
+\@newplength{firstheadhpos}
+\@setplength{firstheadhpos}{\maxdimen}
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\ltr@len@fromrulewidth}
@@ -1746,6 +1762,8 @@
 %   \changes{v2.9l}{2003/01/23}{Positionierung verbessert}
 %   \changes{v2.97e}{2007/11/22}{Optionen \texttt{firsthead} und
 %     \texttt{firstfoot} beachten}
+%   \changes{v3.05}{2009/11/09}{neue Pseudo-L‰nge \texttt{firstheadhpos}
+%     beachtet}
 % Ab Version 2.8n werden Kopf und Fuﬂ der ersten Seite nicht mehr per
 % Seitenstil \texttt{firstpage} gesetzt, sondern mit einem speziellen
 % Feld. Dabei wird auch beachtet, dass dieses Feld im Kopf eine bestimmte aber
@@ -1758,8 +1776,33 @@
     \move@topt\vskip\useplength{firstheadvpos}%
     \vb@t@z{%
       \rlap{\move@topl
-        \setlength\@tempskipa{.5\paperwidth}%
-        \addtolengthplength[-.5]{\@tempskipa}{firstheadwidth}%
+%    \end{macrocode}
+% Wenn \texttt{firstheadhpos} positiv und kleiner als die Seitenbreite ist,
+% dann ist es der Abstand des Kopfes vom linken Rand.
+% Wenn \texttt{firstheadhpos} negativ und betragsm‰ﬂig kleiner als die
+% Seitenbreite ist, dann ist es der Abstand des Kopfes vom rechten Rand.
+% Wenn \texttt{firstheadhpos} grˆﬂer als die Seitenbreite ist, dann wird der
+% Kopf zentriert.
+% Wenn \texttt{firstheadhpos} kleiner als die negative Seitenbreite ist, dann
+% wird der Kopf am linken Rand des Satzspiegels ausgerichtet.
+%    \begin{macrocode}
+        \ifdim\useplength{firstheadhpos}<\paperwidth
+          \ifdim \useplength{firstheadhpos}>-\paperwidth
+            \ifdim \useplength{firstheadhpos}<\z@
+              \setlength\@tempskipa{\paperwidth}%
+              \addtolengthplength{\@tempskipa}{firstheadhpos}%
+              \addtolengthplength[-]{\@tempskipa}{firstheadwidth}%
+            \else
+              \setlength{\@tempskipa}{\useplength{firstheadhpos}}%
+            \fi
+          \else
+            \setlength\@tempskipa{\oddsidemargin}%
+            \addtolength\@tempskipa{1in}%
+          \fi
+        \else
+          \setlength\@tempskipa{.5\paperwidth}%
+          \addtolengthplength[-.5]{\@tempskipa}{firstheadwidth}%
+        \fi
         \hskip\@tempskipa
         \vbox{\hsize\useplength{firstheadwidth}%
           \setlength{\@tempskipa}{\useplength{toaddrvpos}}%
@@ -1787,9 +1830,34 @@
     \typeout{Foot of first page}%
     \vb@t@z{%
       \rlap{\move@topl
-        \setlength\@tempskipa{.5\paperwidth}%
-        \addtolengthplength[-.5]{\@tempskipa}{firstfootwidth}%
-        \hskip\@tempskipa%
+%    \end{macrocode}
+% Wenn \texttt{firstfoothpos} positiv und kleiner als die Seitenbreite ist,
+% dann ist es der Abstand des Kopfes vom linken Rand.
+% Wenn \texttt{firstfoothpos} negativ und betragsm‰ﬂig kleiner als die
+% Seitenbreite ist, dann ist es der Abstand des Kopfes vom rechten Rand.
+% Wenn \texttt{firstfoothpos} grˆﬂer als die Seitenbreite ist, dann wird der
+% Kopf zentriert.
+% Wenn \texttt{firstfoothpos} kleiner als die negative Seitenbreite ist, dann
+% wird der Kopf am linken Rand des Satzspiegels ausgerichtet.
+%    \begin{macrocode}
+         \ifdim\useplength{firstfoothpos}<\paperwidth
+          \ifdim \useplength{firstfoothpos}>-\paperwidth
+            \ifdim \useplength{firstfoothpos}<\z@
+              \setlength\@tempskipa{\paperwidth}%
+              \addtolengthplength{\@tempskipa}{firstfoothpos}%
+              \addtolengthplength[-]{\@tempskipa}{firstfootwidth}%
+            \else
+              \setlength{\@tempskipa}{\useplength{firstfoothpos}}%
+            \fi
+          \else
+            \setlength\@tempskipa{\oddsidemargin}%
+            \addtolength\@tempskipa{1in}%
+          \fi
+        \else
+          \setlength\@tempskipa{.5\paperwidth}%
+          \addtolengthplength[-.5]{\@tempskipa}{firstfootwidth}%
+        \fi
+        \hskip\@tempskipa
         \vbox{\hsize\useplength{firstfootwidth}%
           \vskip\useplength{firstfootvpos}%
 %    \end{macrocode}
