@@ -1,4 +1,4 @@
-% \CheckSum{1662}
+% \CheckSum{1666}
 % \iffalse meta-comment
 % ======================================================================
 % tocstyle.dtx
@@ -203,7 +203,7 @@ THERE IS NO SUPPORT, IF YOU USE THIS PACKAGE!
 %<driver>\ProvidesFile{tocstyle.drv}
 %<doc>\ProvidesFile{tocstyle.tex}
 %<*dtx|package|driver|doc>
-  [2008/10/20 v0.2c-alpha LaTeX2e KOMA-Script package (versatile toc styles)]
+  [2009/11/09 v0.2d-alpha LaTeX2e KOMA-Script package (versatile toc styles)]
 %</dtx|package|driver|doc>
 %<*driver>
 \documentclass{scrdoc}
@@ -1212,27 +1212,29 @@ usefull to define your own toc styles.
 %    \begin{macrocode}
       \parskip \z@ \parindent \z@ \leftskip \z@ \rightskip \z@
       \tocstyle@feature@raggedhook
-%     \end{macrocode}
+%    \end{macrocode}
 % Set number indent to \cs{@tempdimb} and text indent to \cs{@tempdima}.
-%     \begin{macrocode}
+%    \begin{macrocode}
       \@tempdima #3\relax
       \@tempdimb #2\relax
-%<trace>      \typeout{m (\tocstyleTOC, \tocstyledepth): \the\@tempdima}%
-%     \end{macrocode}
-% Calc auto lengths
+%<trace>      \typeout{number indent by \string\l@... (\tocstyleTOC, \tocstyledepth): \space\the\@tempdimb}%
+%<trace>      \typeout{text indent by \string\l@... (\tocstyleTOC, \tocstyledepth): \space\the\@tempdima}%
+%    \end{macrocode}
+% \changes{v0.2d}{2009/11/09}{fix: use of max-values}
+% Calc auto lengths. Use max. of last run of parents if available.
 %     \begin{macrocode}
       \ifnum #1>\z@\relax
         \@tempcnta #1\relax \advance\@tempcnta \m@ne
-        \ifcsname tocstyle@skipwidth@\tocstyleTOC @\the\@tempcnta\endcsname
-          \ifcsname tocstyle@numwidth@\tocstyleTOC @\the\@tempcnta\endcsname
+        \ifcsname tocstyle@maxskipwidth@\tocstyleTOC @\the\@tempcnta\endcsname
+          \ifcsname tocstyle@maxnumwidth@\tocstyleTOC @\the\@tempcnta\endcsname
             \@tempdimb 
-            \csname tocstyle@skipwidth@\tocstyleTOC @\the\@tempcnta\endcsname
+            \csname tocstyle@maxskipwidth@\tocstyleTOC @\the\@tempcnta\endcsname
             \advance\@tempdimb
-            \csname tocstyle@numwidth@\tocstyleTOC @\the\@tempcnta\endcsname
+            \csname tocstyle@maxnumwidth@\tocstyleTOC @\the\@tempcnta\endcsname
           \fi
         \fi
       \fi
-%<trace>      \typeout{C (\tocstyleTOC, \tocstyledepth): \the\@tempdimb}%
+%<trace>      \typeout{number indent by parent (\tocstyleTOC, \tocstyledepth): \space\the\@tempdimb}%
       \ifcsname tocstyle@skipwidth@\tocstyleTOC @#1\endcsname
         \ifdim \@tempdimb>
         \csname tocstyle@skipwidth@\tocstyleTOC @#1\endcsname\relax
@@ -1252,11 +1254,11 @@ usefull to define your own toc styles.
           \@tempdima \csname tocstyle@maxnumwidth@\tocstyleTOC @#1\endcsname
           \relax
         \fi
-%<trace>        \typeout{a (\tocstyleTOC, \tocstyledepth): \the\@tempdima}%
-%<trace>        \typeout{A (\tocstyleTOC, \tocstyledepth): \the\@tempdimb}%
+%<trace>        \typeout{text indent calculated (\tocstyleTOC, \tocstyledepth): \the\@tempdima}%
+%<trace>        \typeout{number indent calculated (\tocstyleTOC, \tocstyledepth): \the\@tempdimb}%
       \else
         \@tempdimb #2\relax
-%<trace>        \typeout{M (\tocstyleTOC, \tocstyledepth): \the\@tempdimb}%
+%<trace>        \typeout{number indent explicite (\tocstyleTOC, \tocstyledepth): \the\@tempdimb}%
       \fi
       \ifcsname tocstyle@unumwidth@\tocstyleTOC @\endcsname
         \ifdim \@tempdima>
@@ -1274,10 +1276,10 @@ usefull to define your own toc styles.
           \@tempdima \csname tocstyle@maxunumwidth@\tocstyleTOC @\endcsname
           \relax
         \fi
-%<trace>        \typeout{s (\tocstyleTOC, \tocstyledepth): \the\@tempdima}%
-%<trace>        \typeout{S (\tocstyleTOC, \tocstyledepth): \the\@tempdimb}%
+%<trace>        \typeout{text noindent (\tocstyleTOC, \tocstyledepth): \the\@tempdima}%
+%<trace>        \typeout{number noindent (\tocstyleTOC, \tocstyledepth): \the\@tempdimb}%
       \fi
-%     \end{macrocode}
+%    \end{macrocode}
 % Advance instead of set, because of the hook above:
 %    \begin{macrocode}
       \advance\parindent \@tempdimb\@afterindenttrue
