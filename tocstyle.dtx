@@ -1,4 +1,4 @@
-% \CheckSum{1641}
+% \CheckSum{1667}
 % \iffalse meta-comment
 % ======================================================================
 % tocstyle.dtx
@@ -1687,9 +1687,27 @@ usefull to define your own toc styles.
 % \end{macro}
 %
 % \begin{macro}{tocstyle@set@width}
+%   \changes{v3.05}{2009/11/11}{improve handling of standard classes}
+% Some classes do not use \cs{numberline}. This may result in negativ widths
+% (esp. negativ skips). Following special handling of negativ values improves
+% the toc handling of the standard classes. Nevertheless indentation of not
+% numbered entries does not work with such classes!
 %    \begin{macrocode}
 \newcommand*{\tocstyle@set@width}[4]{%
-  \expandafter\gdef\csname tocstyle@max#1width@#2@#3\endcsname{#4}%
+  \iftocstyle@indentnotnumbered
+    \ifdim #4<\z@
+      \expandafter\gdef\csname tocstyle@max#1width@#2@#3\endcsname{%
+        \dimexpr #4/2\relax}%
+    \else
+      \expandafter\gdef\csname tocstyle@max#1width@#2@#3\endcsname{#4}%
+    \fi
+  \else
+    \ifdim #4<\z@
+      \expandafter\gdef\csname tocstyle@max#1width@#2@#3\endcsname{\z@}%
+    \else
+      \expandafter\gdef\csname tocstyle@max#1width@#2@#3\endcsname{#4}%
+    \fi
+  \fi
 }
 %    \end{macrocode}
 % \end{macro}
