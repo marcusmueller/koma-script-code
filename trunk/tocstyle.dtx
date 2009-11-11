@@ -1,4 +1,4 @@
-% \CheckSum{1666}
+% \CheckSum{1641}
 % \iffalse meta-comment
 % ======================================================================
 % tocstyle.dtx
@@ -1068,6 +1068,25 @@ usefull to define your own toc styles.
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{option}{chapter}
+% \changes{v3.05}{2009/11/11}{New}
+% \begin{option}{nochapter}
+% \changes{v3.05}{2009/11/11}{New}
+% \begin{macro}{\iftochaschapter}
+% \changes{v3.05}{2009/11/11}{New}
+% Do we have \cs{chapter} and \cs{l@chapter}?
+%    \begin{macrocode}
+\newif\iftochaschapter\tochaschapterfalse
+\ifcsname l@chapter\endcsname
+  \ifcsname chapter\endcsname
+    \tochaschaptertrue
+  \fi
+\fi
+%    \end{macrocode}
+% \end{macro}
+% \end{option}
+% \end{option}
+%
 % \begin{option}{tocbreaksstrict}
 % \begin{option}{tocbreakscareless}
 % Switch on extended pernalties.
@@ -1395,6 +1414,7 @@ usefull to define your own toc styles.
 % \subsubsection{Redefining Class Macros}
 %
 % \begin{macro}{\l@part}
+%   \changes{v2.4}{2009/11/11}{part level is always -1}
 % \begin{macro}{\l@chapter}
 % \begin{macro}{\l@section}
 % \begin{macro}{\l@subsection}
@@ -1407,13 +1427,8 @@ usefull to define your own toc styles.
 %    \begin{macrocode}
 \AtBeginDocument{%
   \ifcsname l@part\endcsname
-    \ifcsname l@chapter\endcsname
-      \setbox\@tempboxa\vbox{\hsize\maxdimen
-        \l@part{\tocstyle@l@define{part}{-1}}{}}%
-    \else
-      \setbox\@tempboxa\vbox{\hsize\maxdimen
-        \l@part{\tocstyle@l@define{part}{0}}{}}%
-    \fi
+    \setbox\@tempboxa\vbox{\hsize\maxdimen
+      \l@part{\tocstyle@l@define{part}{-1}}{}}%
   \fi
   \ifcsname l@chapter\endcsname
     \setbox\@tempboxa\vbox{\hsize\maxdimen
@@ -2042,8 +2057,7 @@ usefull to define your own toc styles.
       \ifx\tocstyleAliasTOC\@tempa\aftergroup\bfseries\fi
     \endgroup
   }%
-  \begingroup\expandafter\expandafter\expandafter\endgroup
-  \expandafter\ifx\csname l@chapter\endcsname\relax
+  \iftochaschapter\else
     \settocfeature[1]{entryvskip}{1em\@plus\p@}%
     \settocfeature[1]{leaders}{\hfill}%
     \settocfeature[1]{entryhook}{%
@@ -2069,8 +2083,7 @@ usefull to define your own toc styles.
         \ifx\tocstyleAliasTOC\@tempa\aftergroup\sffamily\bfseries\fi
       \endgroup
     }%
-    \begingroup\expandafter\expandafter\expandafter\endgroup
-    \expandafter\ifx\csname l@chapter\endcsname\relax
+    \iftochaschapter\else
       \settocfeature[1]{entryvskip}{1em\@plus\p@}%
       \settocfeature[1]{leaders}{\hfill}%
       \settocfeature[1]{entryhook}{%
@@ -2095,8 +2108,7 @@ usefull to define your own toc styles.
         \ifx\tocstyleAliasTOC\@tempa\aftergroup\sectfont\fi
       \endgroup
     }%
-    \begingroup\expandafter\expandafter\expandafter\endgroup
-    \expandafter\ifx\csname l@chapter\endcsname\relax
+    \iftochaschapter\else
       \settocfeature[1]{entryvskip}{1em\@plus\p@}%
       \settocfeature[1]{leaders}{\hfill}%
       \settocfeature[1]{entryhook}{%
