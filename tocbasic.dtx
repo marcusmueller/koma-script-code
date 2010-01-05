@@ -1,4 +1,4 @@
-% \CheckSum{656}
+% \CheckSum{706}
 % \iffalse meta-comment
 % ======================================================================
 % tocbasic.dtx
@@ -66,7 +66,7 @@
 %%% From File: tocbasic.dtx
 %<*dtx|package|driver|doc|load>
 % \fi
-\def\tocbasicversion{2009/06/08 v3.03b}
+\def\tocbasicversion{2010/01/05 v3.04b}
 % \iffalse
 %</dtx|package|driver|doc|load>
 %<*dtx>
@@ -1483,17 +1483,37 @@ be defined and used in \Macro{tocbasic@listhead}.
 % \end{macro}
 % \end{macro}
 % \begin{macro}{\BeforeStartingTOC}
+%   \changes{3.04b}{2010/01/05}{fix: define the hook if not already defined}
 % \begin{macro}{\AfterStartingTOC}
+%   \changes{3.04b}{2010/01/05}{fix:define the hook if not already defined}
 %   These are the commands to add code to the general or individual hooks. If
 %   the first, optional argument was given, the second, mandatory argument
 %   will be added to the individual hook, otherwise the general hook will be
 %   extended.
 %    \begin{macrocode}
 \newcommand{\BeforeStartingTOC}[2][]{%
-  \expandafter\g@addto@macro\csname tb@#1@before@hook\endcsname{#2}%
+  \ifx\relax#1\relax
+    \g@addto@macro\tocbasic@@before@hook{#2}%
+  \else
+    \scr@ifundefinedorrelax{tb@#1@before@hook}{%
+      \PackageInfo{tocbasic}{defining new hook before starting `#1'}%
+      \expandafter\global\expandafter\let\csname tb@#1@before@hook\endcsname
+      \@empty
+    }{}%
+    \expandafter\g@addto@macro\csname tb@#1@before@hook\endcsname{#2}%
+  \fi
 }
 \newcommand{\AfterStartingTOC}[2][]{%
-  \expandafter\g@addto@macro\csname tb@#1@after@hook\endcsname{#2}%
+  \ifx\relax#1\relax
+    \g@addto@macro\tocbasic@@after@hook{#2}%
+  \else
+    \scr@ifundefinedorrelax{tb@#1@after@hook}{%
+      \PackageInfo{tocbasic}{defining new hook after starting `#1'}%
+      \expandafter\global\expandafter\let\csname tb@#1@after@hook\endcsname
+      \@empty
+    }{}%
+    \expandafter\g@addto@macro\csname tb@#1@after@hook\endcsname{#2}%
+  \fi
 }
 %    \end{macrocode}
 % \end{macro}
@@ -1638,16 +1658,28 @@ be defined and used in \Macro{tocbasic@listhead}.
 }
 %    \end{macrocode}
 % \begin{macro}{\BeforeTOCHead}
+%   \changes{3.04b}{2010/01/05}{fix: define the hook if not already defined}
 % \begin{macro}{\AfterTOCHead}
+%   \changes{3.04b}{2010/01/05}{fix: define the hook if not already defined}
 %   These are the commands to add code to the general or individual hooks. If
 %   the first, optional argument was given, the second, mandatory argument
 %   will be added to the individual hook, otherwise the general hook will be
 %   extended.
 %    \begin{macrocode}
 \newcommand{\BeforeTOCHead}[2][]{%
+  \scr@ifundefinedorrelax{tb@#1@beforehead@hook}{%
+    \PackageInfo{tocbasic}{defining new hook before heading of `#1'}%
+    \expandafter\global\expandafter\let\csname tb@#1@beforehead@hook\endcsname
+    \@empty
+  }{}%
   \expandafter\g@addto@macro\csname tb@#1@beforehead@hook\endcsname{#2}%
 }
 \newcommand{\AfterTOCHead}[2][]{%
+  \scr@ifundefinedorrelax{tb@#1@afterhead@hook}{%
+    \PackageInfo{tocbasic}{defining new hook after heading of `#1'}%
+    \expandafter\global\expandafter\let\csname tb@#1@afterhead@hook\endcsname
+    \@empty
+  }{}%
   \expandafter\g@addto@macro\csname tb@#1@afterhead@hook\endcsname{#2}%
 }
 %    \end{macrocode}
