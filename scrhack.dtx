@@ -1,8 +1,8 @@
-% \CheckSum{485}
+% \CheckSum{489}
 % \iffalse meta-comment
 % ======================================================================
 % scrhack.dtx
-% Copyright (c) Markus Kohm, 2009
+% Copyright (c) Markus Kohm, 2008-2010
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -23,7 +23,7 @@
 % of TeX would generate the implementation documentation.
 % ----------------------------------------------------------------------
 % scrhack.dtx
-% Copyright (c) Markus Kohm, 2008-2009
+% Copyright (c) Markus Kohm, 2008-2010
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -72,7 +72,7 @@
 \ProvidesFile{scrhack.dtx}
 %</dtx>
 %<*dtx|manual>
-             [2009/12/15 v3.04c KOMA-Script (hacking other packages)]
+             [2010/01/26 v3.04d KOMA-Script (hacking other packages)]
 %</dtx|manual>
 %<package&identify>\ProvidesPackage{scrhack}
 %<hyperref&identify>\ProvidesFile{hyperref.hak}
@@ -146,14 +146,15 @@ individual packages.
 \section{The \Package{hyperref} hack}
 \label{sec:scrhack.hyperref}
 
-Package \Package{hyperref} does behave different at part, chapter, and section
-headings that get no number. If they get no number, because of to low counter
-\counter{secnumdepth} \Package{hyperref} sets an anchor for links and
-bookmarks before the heading. Same would be, if the headings have a
-number. But if the headings get no number because of usage of the star version
-of the commands, e.g., \Macro{part*}, \Macro{chapter*} or \Macro{section*},
-the anchor for links and bookmarks are set after the headings. The anchors for
-numbered headings are always set before the headings.
+Before version~6.79h package \Package{hyperref} does behave different at part,
+chapter, and section headings that get no number. If they get no number,
+because of to low counter \counter{secnumdepth} \Package{hyperref} sets an
+anchor for links and bookmarks before the heading. Same would be, if the
+headings have a number. But if the headings get no number because of usage of
+the star version of the commands, e.g., \Macro{part*}, \Macro{chapter*} or
+\Macro{section*}, the anchor for links and bookmarks are set after the
+headings. The anchors for numbered headings are always set before the
+headings.
 
 Package \Package{scrhack} redefines some macros of some hyperref driver files,
 e.g., \File{hpdftex.def}, after loading the hyperref driver file. With this
@@ -365,11 +366,17 @@ loading package \Package{scrhack}, but before loading package
 % statt nach dem Ende von \textsf{hyperref} ausgeführt.
 %    \begin{macrocode}
 \AfterPackage*{hyperref}{%
-  \AtEndOfPackage{%
-    \KOMA@key[.scrhack.sty]{hyperref}{%
-      \PackageWarning{scrhack}{option `hyperref=#1' ignored}%
+  \@ifpackagelater{hyperref}{2009/11/24}{%
+    \PackageInfo{scrhack}{hyperref hack deactivated because of\MessageBreak
+      detection of hyperref version, that doesn't\MessageBreak
+      need that hack,}%
+  }{%
+    \AtEndOfPackage{%
+      \KOMA@key[.scrhack.sty]{hyperref}{%
+        \PackageWarning{scrhack}{option `hyperref=#1' ignored}%
+      }%
+      \if@scrhack@hyperref\scr@hack@load\@pkgextension{hyperref}\fi
     }%
-    \if@scrhack@hyperref\scr@hack@load\@pkgextension{hyperref}\fi
   }%
 }
 %</package&body>
