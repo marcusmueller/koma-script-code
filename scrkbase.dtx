@@ -1,8 +1,8 @@
-% \CheckSum{1277}
+% \CheckSum{1280}
 % \iffalse meta-comment
 % ======================================================================
 % scrkbase.dtx
-% Copyright (c) Markus Kohm, 2002-2009
+% Copyright (c) Markus Kohm, 2002-2010
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrkbase.dtx
-% Copyright (c) Markus Kohm, 2002-2009
+% Copyright (c) Markus Kohm, 2002-2010
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -58,7 +58,7 @@
 %%% From File: scrkbase.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkbase.dtx}[2009/11/28 v3.04b KOMA-Script (basics)]
+\ProvidesFile{scrkbase.dtx}[2010/01/29 v3.04b KOMA-Script (basics)]
 % \iffalse
 %</driver>
 %<package&option>\ProvidesPackage{%
@@ -413,7 +413,7 @@
 %   \changes{v2.97c}{2007/04/18}{neu (intern)}
 % Es werden zwei interne Makros benötigt, um zu testen, ob eine entsprechende
 % keyval-Option definiert ist. Grund der Übung ist, dass sowohl das
-% Familienargument als auch die Options selbst expandiert werden muss.
+% Familienargument als auch die Option selbst expandiert werden muss.
 %    \begin{macrocode}
 \newcommand*{\scr@optiontest}[2]{%
   \edef\reserved@a{\noexpand\scr@pti@ntest{#1}#2=\noexpand\@nil}%
@@ -620,12 +620,13 @@
 %
 %  \begin{macro}{\ifstr}
 %    \changes{v2.95}{2004/07/20}{if- und then-Teil werden nicht gefressen}
+%    \changes{v3.04b}{2010/01/29}{\cs{edef} durch \cs{protected@edef} ersetzt}
 % Dieses Makro vergleicht zwei Tokenfolgen. Eigentlich müsste es also
 % eher \cs{ifequal} oder ähnlich heißen.
 %    \begin{macrocode}
 %<*base>
 \newcommand\ifstr[2]{%
-  \begingroup\edef\@tempa{#1}\edef\@tempb{#2}%
+  \begingroup\protected@edef\@tempa{#1}\protected@edef\@tempb{#2}%
   \ifx\@tempa\@tempb
     \endgroup\expandafter\@firstoftwo
   \else
@@ -982,7 +983,8 @@
 % \subsection{Definition von KOMA-\textsf{keyval}-Schlüsseln (Hauptteil)}
 %
 % \begin{macro}{\FamilyExecuteOptions}
-%   \changes{v3.00}{Neue Anweisung}
+%   \changes{v3.00}{2008/04/30}{Neue Anweisung}
+%   \changes{v3.04b}{2010/01/29}{\cs{edef} durch \cs{protected@edef} ersetzt}
 % Entspriche \cs{ExecuteOptions} jedoch \textsf{keyval}-Optionen.
 %    \begin{macrocode}
 %<*base>
@@ -991,12 +993,12 @@
     \@for\scr@key@atlist:=#3\do{%
       \expandafter\scr@key@split@name@value\scr@key@atlist==\@nil
       \scr@ifundefinedorrelax{KV@#2@\scr@key@name}{}{%
-        \edef\reserved@a{\noexpand\setkeys{#2}{\scr@key@atlist}%
+        \protected@edef\reserved@a{\noexpand\setkeys{#2}{\scr@key@atlist}%
         }%
         \reserved@a
       }%
       \scr@ifundefinedorrelax{KV@#2#1@\scr@key@name}{}{%
-        \edef\reserved@a{%
+        \protected@edef\reserved@a{%
           \noexpand\setkeys{#2#1}{\scr@key@atlist}%
         }%
         \reserved@a
@@ -1048,6 +1050,7 @@
 }
 % \begin{macro}{\Family@Options}
 %   \changes{v3.00}{2008/04/30}{Neues Makro (intern)}
+%   \changes{v3.04b}{2010/01/29}{\cs{edef} durch \cs{protected@edef} ersetzt}
 % Das interne Macro \cs{Family@Options} macht die eigentliche Arbeit. Das
 % erste Argument ist dabei die Familie. Das zweite Argument ist die Liste der
 % Optionen, das zweite Code, der im Fehlerfall ausgeführt werden soll. Dabei
@@ -1074,11 +1077,11 @@
     \@for\@tempa:=\@tempa\do{%
       \scr@ifundefinedorrelax{KV@\@tempa @\scr@key@name}{}{%
         \scr@key@found@true
-        \edef\reserved@a{\noexpand\setkeys{\@tempa}{\scr@key@atlist}%
-          \noexpand\edef\noexpand\@tempa{\@tempa}%
-          \noexpand\edef\noexpand\scr@key@atlist{\scr@key@atlist}%
-          \noexpand\edef\noexpand\scr@key@name{\scr@key@name}%
-          \noexpand\edef\noexpand\scr@key@value{\scr@key@value}%
+        \protected@edef\reserved@a{\noexpand\setkeys{\@tempa}{\scr@key@atlist}%
+          \noexpand\def\noexpand\@tempa{\@tempa}%
+          \noexpand\def\noexpand\scr@key@atlist{\scr@key@atlist}%
+          \noexpand\def\noexpand\scr@key@name{\scr@key@name}%
+          \noexpand\def\noexpand\scr@key@value{\scr@key@value}%
         }%
         \reserved@a
       }%
@@ -1127,6 +1130,7 @@
 %   \changes{v3.00}{2008/04/30}{Neue Anweisung}
 % \begin{macro}{\Family@Option}
 %   \changes{v3.00}{2008/04/30}{Neu (intern)}
+%   \changes{v3.04b}{2010/01/29}{\cs{edef} durch \cs{protected@edef} ersetzt}
 % Im Gegensatz zu \cs{FamilyOptions} kann man mit dieser Anweisung nur eine
 % einzige Option setzen. Dafür kann man gleich mehrere durch Komma getrennte
 % Argumente für diese Option setzen. Das erste obligatorische Argument ist
@@ -1163,12 +1167,12 @@
     \let\reserved@a\@empty
     \@for\@tempa:=#3\do{%
       \expandafter\KV@@sp@def\expandafter\@tempa\expandafter{\@tempa}%
-      \edef\reserved@a{\reserved@a,\scr@key@name=\@tempa}%
+      \protected@edef\reserved@a{\reserved@a,\scr@key@name=\@tempa}%
     }%
     \ifx\reserved@a\@empty
-      \edef\reserved@a{\noexpand\setkeys{\@tempb}{\scr@key@name}}%
+      \protected@edef\reserved@a{\noexpand\setkeys{\@tempb}{\scr@key@name}}%
     \else
-      \edef\reserved@a{%
+      \protected@edef\reserved@a{%
         \noexpand\setkeys{\@tempb}{\expandafter\@gobble\reserved@a}}%
     \fi
     \reserved@a
