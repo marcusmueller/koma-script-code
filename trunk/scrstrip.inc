@@ -1,6 +1,6 @@
 % ======================================================================
 % scrstrip.inc
-% Copyright (c) Markus Kohm, 2002-2009
+% Copyright (c) Markus Kohm, 2002-2010
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -22,7 +22,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrstrip.inc
-% Copyright (c) Markus Kohm, 2002-2009
+% Copyright (c) Markus Kohm, 2002-2010
 %
 % Diese Datei ist Teil des LaTeX2e-KOMA-Script-Pakets.
 %
@@ -148,7 +148,7 @@
 
 \preamble
 
-Copyright (c) 1994-2009
+Copyright (c) 1994-2010
 Markus Kohm and any individual authors listed elsewhere in this file.
 
 This file was generated from file(s) of the KOMA-Script bundle.
