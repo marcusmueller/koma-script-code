@@ -2,7 +2,7 @@
 % \iffalse
 % ======================================================================
 % plength.dtx
-% Copyright (c) Markus Kohm, 2005-2009
+% Copyright (c) Markus Kohm, 2005-2010
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % plength.dtx
-% Copyright (c) Markus Kohm, 2005-2009
+% Copyright (c) Markus Kohm, 2005-2010
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -84,7 +84,7 @@
 %
 %<*driver>
 %    \begin{macrocode}
-\ProvidesFile{plength.drv}[2007/09/02 plength MetaPost graphics]
+\ProvidesFile{plength.drv}[2010/02/09 plength MetaPost graphics]
 \documentclass{ltxdoc}
 \usepackage{ngerman}
 \usepackage[latin1]{inputenc}
@@ -96,8 +96,8 @@
 % \fi
 %
 % \title{MetaPost-Grafiken für das Briefkapitel}
-% \author{Stephan Henig}
-% \date{2005-08-30}
+% \author{Stephan Hennig und Markus Kohm}
+% \date{2010-02-09}
 % \maketitle
 %
 % Es werden diverse Dateien erzeugt: \texttt{plenDINde.mp},
@@ -275,6 +275,10 @@ begingroup
   plength[28]=btex \plength{}locheight etex;
   plength[29]=btex \plength{}subjectaftervskip etex;
   plength[30]=btex \plength{}+subjectbeforevskip etex;
+  plength[31]=btex \plength{}firstfoothpos etex;
+  plength[32]=btex \plength{}-firstfoothpos etex;
+  plength[33]=btex \plength{}firstheadhpos etex;
+  plength[34]=btex \plength{}-firstheadhpos etex;
 endgroup
 enddef;
 
@@ -928,6 +932,14 @@ begingroup
   pickup pencircle scaled hilfsstrichstaerke;
   drawoptions(withcolor drawcolor);
 %    \end{macrocode}
+% \texttt{firstheadhpos}:
+%    \begin{macrocode}
+  if firstheadhpos > 0 :
+    hmeasure((0,firstheadvpos), firstheadhpos, plength[33], (12pt,0pt), top);
+  else :
+    hmeasure((0,firstheadvpos), -firstheadhpos, plength[34], (12pt,0pt), top);
+  fi
+%    \end{macrocode}
 % \texttt{firstheadwidth}:
 %    \begin{macrocode}
   hmeasure((firstheadhpos,firstheadvpos), firstheadwidth, plength[6], origin, 
@@ -1004,6 +1016,14 @@ begingroup
   hmeasure((1in+oddsidemargin,sigvpos+0.5*(sigheight+tickhoehe)), sigindent, 
            plength[13], (-0.5*sigindent,0pt), lft);
 %    \end{macrocode}
+% \texttt{firstfoothpos}:
+%    \begin{macrocode}
+  if firstfoothpos > 0 :
+    hmeasure((0,firstfootvpos+firstfootheight+tickhoehe), firstfoothpos, plength[31], (12pt,0pt), bot);
+  else :
+    hmeasure((firstfootwidth-firstfoothpos,firstfootvpos+firstfootheight+tickhoehe), -firstfoothpos, plength[32], (12pt,0pt), bot);
+  fi
+%    \end{macrocode}
 % \texttt{firstfootwidth}:
 %    \begin{macrocode}
   hmeasure((firstfoothpos,firstfootvpos), firstfootwidth, plength[4], origin, 
@@ -1050,7 +1070,11 @@ begingroup
 %    \end{macrocode}
 % \texttt{firstheadvpos}:
 %    \begin{macrocode}
-  dmeasure((firstheadhpos-2*tickhoehe,firstheadvpos), plength[5], origin, rt);
+  if firstheadhpos < 0 :
+    dmeasure((-firstheadhpos-2*tickhoehe,firstheadvpos), plength[5], origin, rt);
+  else :
+    dmeasure((firstheadhpos+firstheadwidth,firstheadvpos), plength[5], origin, lft);
+  fi
 %    \end{macrocode}
 % \texttt{toaddrvpos}:
 %    \begin{macrocode}
