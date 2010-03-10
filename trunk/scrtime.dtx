@@ -1,4 +1,4 @@
-% \CheckSum{278}
+% \CheckSum{228}
 % \iffalse
 % ======================================================================
 % scrtime.dtx 
@@ -56,17 +56,19 @@
 %
 % \iffalse
 %%% From File: scrtime.dtx
-%<*dtx>
-\ProvidesFile{scrtime.dtx}
-%</dtx>
-%<scrtime|scrdate>\NeedsTeXFormat{LaTeX2e}[1995/12/01]
-%<driver>\ProvidesFile{scrtime.drv}
-%<scrtime>\ProvidesPackage{scrtime}
-%<scrdate>\ProvidesPackage{scrdate}
-                [2009/01/01 v1.1p LaTeX2e KOMA-Script
-%<scrtime|scrdate>                 package]
 %<*driver>
-                 driver]
+% \fi
+\ProvidesFile{scrtime.dtx}[2010/03/10 v3.05a KOMA-Script 
+  (packages scrtime and scrdate)]
+% \iffalse
+%</driver>
+%<package&identify>\NeedsTeXFormat{LaTeX2e}[1995/12/01]
+%<package&identify&scrtime>\ProvidesPackage{scrtime}[%
+%<package&identify&scrdate>\ProvidesPackage{scrdate}[%
+%<package&identify>  \KOMAScriptVersion\space package (%
+%<package&identify&scrtime>  time of LaTeX run)]
+%<package&identify&scrdate> day of the week)]
+%<*driver>
 \documentclass{scrdoc}
 \usepackage[german,english]{babel}
 \usepackage[latin1]{inputenc}
@@ -97,20 +99,35 @@
 %
 % \section{Introduction}
 %
-% See the \KOMAScript{} guide for informations abouthow to use the package.
+% See the \KOMAScript{} guide for informations about how to use the package.
 %
 % \StopEventually{\PrintIndex\PrintChanges}
 %
 % \section{Implementation}
 %
-% \subsection{Time-macros}
+% \subsection{Options}
 %
-%    \begin{macrocode}
+% \iffalse
+%<*option>
+% \fi
+% Since version~1.2 both packages use \textsf{scrkbase} for options and
+% additional features.
+%
+%
+% \subsubsection{Options of \textsf{scrtime}}
+%
+% \iffalse
 %<*scrtime>
-%    \end{macrocode}
+% \fi
 %
-% \subsubsection{Options}
-% \changes{v1.1b}{1995/02/15}{Options \texttt{12h} and \texttt{24h} added.}
+% \begin{option}{12h}
+%   \changes{v1.1b}{1995/02/15}{Option \texttt{12h} added.}
+%   \changes{v1.2}{2010/03/10}{Option uses \textsf{scrkbase}.}
+% \begin{option}{24h}
+%   \changes{v1.1b}{1995/02/15}{Option \texttt{24h} added.}
+%   \changes{v1.2}{2010/03/10}{Option is deprecated.}
+% \begin{macro}{\if@Hxii}
+%   \changes{v1.1b}{1995/02/15}{new switch}
 % There are two the two Options |24h| and |12h|. We need a switch to
 % distinguish.
 %    \begin{macrocode}
@@ -119,17 +136,31 @@
 %
 % So the Options are simple.
 %    \begin{macrocode}
-\DeclareOption{12h}{\@Hxiitrue}
-\DeclareOption{24h}{\@Hxiifalse}
+\KOMA@ifkey{12h}{@Hxii}
+\KOMA@DeclareDeprecatedOption[scrtime]{24h}{12h=false}
 %    \end{macrocode}
 %
-% Default is 24h-mode.
+% Currently only \textsf{scrtime} uses options, so only \textsf{scrtime} needs
+% to process them.
 %    \begin{macrocode}
-\ExecuteOptions{24h}
-\ProcessOptions
+\KOMAProcessOptions\relax
 %    \end{macrocode}
 %
-% \subsubsection{Macros}
+% \iffalse
+%</scrtime>
+%</option>
+% \fi
+%
+% \subsection{Macros}
+%
+% \iffalse
+%<*body>
+% \fi
+%
+% \subsubsection{Macros of \textsf{scrtime}}
+% \iffalse
+%<*scrtime>
+% \fi
 % We use |\@tempcnta| and |\@tempcntb| but we know, that this is not
 % a very good idea.
 %
@@ -176,85 +207,131 @@
 %  \end{macro}
 %
 %
-% That's it:
-%    \begin{macrocode}
+% \iffalse
 %</scrtime>
-%    \end{macrocode}
+% \fi
 %
 %
-% \subsection{Date-macros}
+% \subsubsection{Macros of \textsf{scrdate}}
 %
-%    \begin{macrocode}
+% \iffalse
 %<*scrdate>
-%    \end{macrocode}
+% \fi
 %
 % \changes{v1.1a}{1995/02/12}{Changed simply all but the user-interface.}
-% To handle them, we need counters. We use the same as in \texttt{scrtime}.
+% \changes{v3.05a}{2010/03/10}{Changed simply everything.}
+% Since version~3.05a \textsf{scrdate} was rewritten.  First step was to make
+% more macros full expandable to provide \cs{MakeUppercase} and
+% \cs{MakeLowercase}. Second was to extend the user interface by some new
+% functionality.
 %
-%  \begin{macro}{\todaysname}
-% This is not so easy. First we have to calculate how many days they are
-% from 1st January 1980.
+% \begin{macro}{\CenturyPart}
+%   \changes{v3.05a}{2010/03/10}{New}
+% This is the century part of a year number and so only a shortcut to
+% |\XdivY{...}{100}|, that is defined at \textsf{scrbase}.
 %    \begin{macrocode}
-\newcommand\todaysname{%
-  \begingroup%
-  \@tempcnta=\year
-  \@tempcntb=1 % 1. Januar 1980 war ein Dienstag
-  \ifnum\@tempcnta<1980 unknown\else%
-    \advance\@tempcnta by-1980%
-    \@whilenum\@tempcnta>3\do%
-    {\advance\@tempcntb by5\advance\@tempcnta by-4}%
-    \ifnum\@tempcnta=0%
-      \ifnum\month>2\advance \@tempcntb by1\fi%
-    \else%
-      \advance\@tempcntb by\@tempcnta%
-      \advance\@tempcntb by1
-    \fi%
-    \ifcase\month\or\or\advance\@tempcntb3%  Jan =  28 + 3
-                    \or\advance\@tempcntb3% +Feb =  56 + 3
-                    \or\advance\@tempcntb6% +Mar =  84 + 6
-                    \or\advance\@tempcntb1% +Apr = 119 + 1
-                    \or\advance\@tempcntb4% +May = 147 + 4
-                    \or\advance\@tempcntb6% +Jun = 175 + 6
-                    \or\advance\@tempcntb2% +Jul = 210 + 2
-                    \or\advance\@tempcntb5% +Aug = 238 + 5
-                    \or%                    +Sep = 273 + 0
-                    \or\advance\@tempcntb3% +Oct = 301 + 3
-                    \or\advance\@tempcntb5% +Nov = 329 + 5
-    \fi%
-    \advance\@tempcntb by\day%
-    \advance\@tempcntb by-1% die Zaehlung beginnt bei 0
-    \@whilenum\@tempcntb>6\do%
-    {\advance\@tempcntb by-7}%
+\newcommand*{\CenturyPart}[1]{\XdivY{#1}{100}}
 %    \end{macrocode}
-% Now we can say which day it is.
-%    \begin{macrocode}
-    \@dayname{\@tempcntb}%
-  \fi\endgroup}
-%    \end{macrocode}
-%  \end{macro}
+% \end{macro}
 %
-%  \begin{macro}{\nameday}
+% \begin{macro}{\DecadePart}
+%   \changes{v3.05a}{2010/03/10}{New}
+% This is the year number withoud the century part and therefrso only a
+% shortcut to |\XmodY{...}{100}|, that is defined at \textsf{scrbase}.
+%    \begin{macrocode}
+\newcommand*{\DecadePart}[1]{\XmodY{#1}{100}}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\@GaussYear}
+%   \changes{v3.05a}{2010/03/10}{New (internal)}
+% At the Gauss calculation of the day of the week January and February relates
+% to the year before. This macro does the correction for any date.
+%    \begin{macrocode}
+\newcommand*{\@GaussYear}[3]{%
+  \ifcase #2
+    \PackageError{scrdate}{month out of range}{%
+      You've asked for the Gauss year of ISO date #1-#2-#3,\MessageBreak
+      this means, that month hat invalid value '#2'.}%
+  \or
+    \numexpr #1 - 1\relax
+  \or
+    \numexpr #1 - 1\relax
+  \else
+    #1
+  \fi
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\DayNumber}
+%   \changes{v3.05a}{2010/03/10}{New}
+% Returns the numerical value of the day of week. Note, that Sunday is 0,
+% Monday is 1, \dots, Saturday is 6. We use the Gauss calculation of the day
+% of the week. First argument is the year, second the month and last the day
+% of the month.
+%    \begin{macrocode}
+\newcommand*{\DayNumber}[3]{%
+  \XmodY{%
+    \numexpr #3 
+           + \ifcase #2
+               \PackageError{scrdate}{month out of range}{%
+                 You've asked for the dayname of ISO date #1-#2-#3,\MessageBreak
+                 this means, that month hat invalid value '#2'.}%
+             \or 28 \or 31 \or 2 \or 5 \or 7 \or 10 \or 12 \or 15 \or 18 
+             \or 20 \or 23 \or 25
+             \else
+               \PackageError{scrdate}{month out of range}{%
+                 You've asked for the dayname of ISO date #1-#2-#3,\MessageBreak
+                 this means, that month hat invalid value '#2'.}%
+             \fi
+           + \DecadePart{\@GaussYear{#1}{#2}{#3}}
+           + \XdivY{\DecadePart{\@GaussYear{#1}{#2}{#3}}}{4}
+           + \XdivY{\CenturyPart{\@GaussYear{#1}{#2}{#3}}}{4}
+           - 2 * \CenturyPart{\@GaussYear{#1}{#2}{#3}} \relax
+  }{7}%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\DayName}
+%   \changes{v3.05a}{2010/03/10}{New}
+% Returns the name of the day of the week. Arguments like \cs{DayNumber}.
+%    \begin{macrocode}
+\newcommand*{\DayName}[3]{\@dayname{\DayNumber{#1}{#2}{#3}}}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\todaysname}
+%   \changes{v3.05a}{2010/03/10}{Rewritten}
+% Using \cs{DayName} this is very, very simple.
+%    \begin{macrocode}
+\newcommand*{\todaysname}{\DayName{\year}{\month}{\day}}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\nameday}
+%   \changes{v3.05a}{2010/03/10}{Not longer \cs{long}}
 % We simply have to redefine |\todaysname|
 %    \begin{macrocode}
-\newcommand\nameday[1]{\renewcommand\todaysname{#1}}
+\newcommand\nameday[1]{\renewcommand*{\todaysname}{#1}}
 %    \end{macrocode}
-%  \end{macro}
+% \end{macro}
 %
-%  \begin{macro}{\newdaylanguage}
+% \begin{macro}{\newdaylanguage}
+%   \changes{v3.05a}{2010/03/10}{Sunday is 0}
 % We write a macro to define the name of the days.
-% \changes{v1.1e}{1996/12/07}{Bernd's expandafter-trick to not define
-%                             a new language.}
-%  \begin{macro}{\scrdate@languagenamewarning}
+%   \begin{macro}{\scrdate@languagenamewarning}
 % But before this, we have to define a once only warning.
 %    \begin{macrocode}
-\newcommand*\scrdate@languagenamewarning{
+\newcommand*\scrdate@languagenamewarning{%
   \PackageWarningNoLine{scrdate}
     {\string\languagename\space not
      defined, using \string\language.\MessageBreak
      This may result in use of wrong language!\MessageBreak
      You should use a compatible language
      package\MessageBreak
-     (e.g. `Babel', `german', `french', ...)}
+     (e.g. `Babel', `german', `french', ...)}%
   \let\scrdate@languagenamewarning\relax}
 %    \end{macrocode}
 %  \end{macro}
@@ -264,43 +341,38 @@
 % First we check, if the language is defined at the format, the user uses.
 % If it is not defined, we do not define the name of the days and warn.
 %    \begin{macrocode}
-  \begingroup\expandafter\expandafter\expandafter\endgroup
-  \expandafter\ifx\csname l@#1\endcsname\relax
-    \PackageWarningNoLine{scrdate}{Language #1\space not defined.\MessageBreak
-                                  \protect\dayname@#1\space skipped!}
+  \scr@ifundefinedorrelax{l@#1}{%
+    \PackageInfo{scrdate}{Language #1\space not defined.\MessageBreak
+                          \protect\dayname@#1\space skipped!}%
 %    \end{macrocode}
 % \changes{v1.1c}{1995/05/24}{missing \cs{end\{macrocode\}} added.}
 % If it is defined, we define the name-selection-macro
 % |\dayname@|\emph{language}.
 % First we define the new macro |\dayname@|\emph{language}:
+% \changes{v3.05a}{2010/03/10}{Group removed.}
 %    \begin{macrocode}
-  \else
+  }{%
     \@namedef{dayname@#1}##1{%
-      \begingroup%
-        \@tempcnta ##1%
-        \ifcase\@tempcnta%
-          #2\or #3\or #4\or #5\or #6\or #7\or #8\fi\endgroup%
-    }
+        \ifcase ##1
+          #8\or #2\or #3\or #4\or #5\or #6\or #7\fi%
+    }%
 %    \end{macrocode}
 % Then we define, what to do at |\begin{document}|:
 %    \begin{macrocode}
-    \AtBeginDocument{
+    \AtBeginDocument{%
 %    \end{macrocode}
 % There we first have to test, if |\date|\emph{language} is defined
 % (e.g. using |german.sty|). If not, we have to warn once more.
-% \changes{v1.1e}{1996/12/07}{Bernd's expandafter-trick to not define
-%                             new \cs{date}\emph{language}.}
 %    \begin{macrocode}
-      \begingroup\expandafter\expandafter\expandafter\endgroup
-      \expandafter\ifx\csname date#1\endcsname\relax
+      \scr@ifundefinedorrelax{date#1}{%
         \PackageWarningNoLine{scrdate}
                              {\protect\date#1\space not defined.\MessageBreak
                               \protect\todaysname maybe can't use
-                              \protect\dayname@#1!}
+                              \protect\dayname@#1!}%
 %    \end{macrocode}
 % But if it is defined, we can use it
 %    \begin{macrocode}
-      \else
+      }{%
 %    \end{macrocode}
 % There we first save |\date|\emph{language} as |\D@date|\emph{language}.
 % This is a bit tricky, but I think, you'll understand it.
@@ -322,18 +394,18 @@
         \@ifundefined{languagename}{
           \scrdate@languagenamewarning
           \ifnum\language=\@nameuse{l@#1}
-            \@nameuse{date#1}
-          \fi}{
-          \@ifundefined{date\languagename}
-            {}
-            {\@nameuse{date\languagename}}
-        }
-      \fi
-    }
-  \fi
+            \@nameuse{date#1}%
+          \fi}{%
+          \@ifundefined{date\languagename}%
+            {}%
+            {\@nameuse{date\languagename}}%
+        }%
+      }%
+    }%
+  }%
 }
 %    \end{macrocode}
-%  \end{macro}
+% \end{macro}
 %
 %  \begin{macro}{\@dayname}
 % This should be named selecting the language. Since I changed the definitions
@@ -424,11 +496,9 @@
 % \changes{v1.1g}{1997/06/21}{correct name is ``tuesday''.}
 %    \begin{macrocode}
 \def\@dayname#1{%
-  \begingroup%
-    \@tempcnta #1%
-    \ifcase\@tempcnta%
-      Monday\or Tuesday\or Wednesday\or Thursday\or
-      Friday\or Saturday\or Sunday\fi\endgroup%
+  \ifcase #1
+    Monday\or Tuesday\or Wednesday\or Thursday\or
+    Friday\or Saturday\or Sunday\fi%
 }
 %    \end{macrocode}
 %  \end{macro}
@@ -443,10 +513,10 @@
            {}
 %    \end{macrocode}
 %
-% That's it:
-%    \begin{macrocode}
+% \iffalse
 %</scrdate>
-%    \end{macrocode}
+%</body>
+% \fi
 %
 % \Finale
 %
