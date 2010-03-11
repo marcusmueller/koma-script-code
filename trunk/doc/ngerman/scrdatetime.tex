@@ -45,51 +45,205 @@
 %
 % ============================================================================
 
-\ProvidesFile{scrdatetime.tex}[{2009/01/01 KOMA-Script guide (chapter:
+\ProvidesFile{scrdatetime.tex}[{2010/03/11 KOMA-Script guide (chapter:
   scrdate, scrtime)}]
 
 \chapter{Wochentag und Uhrzeit mit \Package{scrdate} und \Package{scrtime}}
 \labelbase{datetime}
 
 Zu \KOMAScript{} gehören auch zwei Pakete, um den Umgang mit
-Datum\Index{Datum} und Zeit\Index{Zeit} über die beiden
-Standardbefehle \Macro{today} und \Macro{date} hinaus zu
-erweitern. Ebenso wie die anderen Pakete aus {\KOMAScript} können
-diese Pakete auch mit den Standardklassen verwendet werden.
+Datum\Index{Datum} und Zeit\Index{Zeit} über die beiden Standardbefehle
+\Macro{today} und \Macro{date} hinaus zu erweitern. Ebenso wie die anderen
+Pakete aus {\KOMAScript} können diese Pakete auch mit den Standardklassen
+verwendet werden.
 
-\section{Der aktuelle Wochentag mit \Package{scrdate}}
+Ab \KOMAScript~3.05a\ChangedAt{v3.05a}{\Package{scrdate}\and\Package{scrtime}}
+verwenden diese Pakete die gemeinsame Versionsnummerierung von
+\KOMAScript{}. Begründet ist dies darin, dass sie auf eine bestimmte Version
+von \Package{scrkbase} und \Package{scrbase} angewiesen sind.
+
+
+\section{Der Wochentag mit \Package{scrdate}}
 \label{sec:datetime.scrdate}
 \BeginIndex{Package}{scrdate}
 
-Das erste Problem ist die Frage nach dem aktuellen Wochentag. Dieses kann mit
-Hilfe des Pakets \Package{scrdate} gelöst werden.
+Mit Version~3.05a wurde der Funktionsumfang dieses Pakets erheblich
+erweitert. Neben dem aktuellen Wochentag\Index{Wochentag} kann dieses Paket
+nun den Wochentag jedes beliebigen Datums im Gregorianischen Kalender
+bestimmen.
 
-\BeginIndex{Cmd}{todaysname}%
+\BeginIndex{Cmd}{CenturyPart}%
+\BeginIndex{Cmd}{DecadePart}%
 \begin{Declaration}
-  \Macro{todaysname}
+  \Macro{CenturyPart}\Parameter{Jahr}\\%
+  \Macro{DecadePart}\Parameter{Jahr}%
 \end{Declaration}%
-Bekanntlich erhält man mit \Macro{today}\IndexCmd{today} das aktuelle
-Datum in der landestypischen Schreibweise. \Package{scrdate} bietet
-mit \Macro{todaysname} eine Anweisung, um den aktuellen Wochentag zu
-erhalten.
+Die\ChangedAt{v3.05a}{\Package{scrdate}} Anweisung \Macro{CenturyPart} ergibt
+den Wert der Jahrhundert-Stellen eines Jahres. Die Anweisung
+\Macro{DecadePart} ergibt hingegen den Wert der übrigen Stellen, also der
+Einer und Zehner. Dabei darf die Jahreszahl beliebig viele Stellen aufweisen.
+Der Wert kann direkt zur Zuweisung an einen Zähler oder für Berechnungen mit
+Hilfe von \Macro{numexpr}\IndexCmd{numexpr} verwendet werden. Für die Ausgabe
+als arabische Zahl ist \Macro{the}\IndexCmd{the} voran zu stellen.
 
 \begin{Example}
-  Sie wollen in Ihrem Dokument ausgeben, an welchem Tag es mit
-  \LaTeX{} in eine \File{DVI}-Datei übersetzt wurde. Sie schreiben
-  dazu
+  Sie wollen berechnen, in welchem Jahrhundert das aktuelle Jahr liegt und
+  dies ausgeben.
 \begin{lstcode}
-  Dieses Dokument entstand an einem {\todaysname}.
+  Das Jahr \the\year\ ist das Jahr 
+  \the\DecadePart{\year} des 
+  \the\numexpr \CenturyPart{\year}+1\relax. 
+  Jahrhunderts.
 \end{lstcode}
-  und erhalten beispielsweise:
+  Als Ergebnis erhalten Sie:
   \begin{quote}
-    Dieses Dokument entstand an einem {\todaysname}.
+    Das Jahr \the\year\ ist das Jahr \the\DecadePart{\year} des \the\numexpr
+    \CenturyPart{\year}+1\relax.  Jahrhunderts.
+  \end{quote}
+\end{Example}%
+
+Bitte beachten Sie, dass hier die Zählweise verwendet wird, bei der das Jahr
+2000 das Jahr~0 -- also das erste Jahr -- des 21.~Jahrhunderts ist.%
+\EndIndex{Cmd}{DecadePart}%
+\EndIndex{Cmd}{CenturyPart}%
+
+\BeginIndex{Cmd}{DayNumber}%
+\BeginIndex{Cmd}{ISODayNumber}%
+\begin{Declaration}
+  \Macro{DayNumber}\Parameter{Jahr}\Parameter{Monat}\Parameter{Tag}\\%
+  \Macro{ISODayNumber}\Parameter{ISO-Datum}%
+\end{Declaration}%
+Diese\ChangedAt{v3.05a}{\Package{scrdate}} beiden Anweisungen geben den Wert
+der Nummer des Wochentags\Index{Wochentag} zu einem Datum zurück. Sie
+unterscheiden sich nur in der Art der Angabe des Datums. Während bei
+\Macro{DayNumber} Jahr, Monat und Tag des gewünschten Datums eigene Parameter
+sind, wird bei \Macro{ISODayNumber} das Datum in ISO-Schreibweise,
+\PName{Jahr}\texttt{-}\PName{Monat}\texttt{-}\PName{Tag} angegeben. Dabei
+spielt es keine Rolle, ob Monat und Tag ein- oder zweistellig angegeben
+werden. Der Wert kann direkt zur Zuweisung an einen Zähler oder für
+Berechnungen mit Hilfe von \Macro{numexpr}\IndexCmd{numexpr} verwendet
+werden. Für die Ausgabe als arabische Zahl ist \Macro{the}\IndexCmd{the} voran
+zu stellen.
+
+\begin{Example}
+  Sie wollen die Nummer des Wochentags des 24.~Dezembers~2027 wissen.
+\begin{lstcode}
+  Der 24.~Dezember~2027 hat die Wochentagsnummer 
+  \the\ISODayNumber{2027-12-24}.
+\end{lstcode}
+  Als Ergebnis erhalten Sie:
+  \begin{quote}
+    Der 24.~Dezember~2027 hat die Wochentagsnummer 
+    \the\ISODayNumber{2027-12-24}.
   \end{quote}
 \end{Example}
 
-Es sei darauf hingewiesen, dass das Paket natürlich nicht deklinieren
-kann. Gespeichert sind die Wochentage im Nominativ Singular, wie er
-beispielsweise für eine Datumsangabe in Briefen benötigt wird. Obiges Beispiel
-funktioniert daher nur sprachabhängig und eher zufällig.
+Als Besonderheit ist es sogar möglich, von einem vorgegebenen Datum eine
+gewünschte Anzahl an Tagen in die Zukunft oder Vergangenheit zu gehen.
+\begin{Example}
+  Sie wollen die Nummer des Wochentags wissen, den wir in 12~Tagen haben und
+  den wir 24~Tage vor dem 24.~Dezember~2027 hatten.
+\begin{lstcode}
+  In 12~Tagen haben wir die Wochentagsnummer
+  \the\DayNumber{\year}{\month}{\day+12} und
+  12~Tage vor dem 24.~Dezember~2027 war es
+  die Nummer \the\ISODayNumber{2027-12-24-24}.
+\end{lstcode}
+  Als Ergebnis erhalten Sie beispielsweise:
+  \begin{quote}
+  In 12~Tagen haben wir die Wochentagsnummer
+  \the\DayNumber{\year}{\month}{\day+12} und
+  12~Tage vor dem 24.~Dezember~2027 war es
+  die Nummer \the\ISODayNumber{2027-12-24-24}.
+  \end{quote}
+\end{Example}
+
+Die Wochentage werden dabei wie folgt nummeriert: Sonntag\,=\,0, Montag\,=\,1,
+Dienstag\,=\,2, Mittwoch\,=\,3, Donnerstag\,=\,4, Freitag\,=\,5 und
+Samstag\,=\,6.%
+%
+\EndIndex{Cmd}{DayNumber}%
+\EndIndex{Cmd}{ISODayNumber}%
+
+
+\BeginIndex{Cmd}{DayNameByNumber}%
+\BeginIndex{Cmd}{DayName}%
+\BeginIndex{Cmd}{ISODayName}%
+\begin{Declaration}
+  \Macro{DayNameByNumber}\Parameter{Wochentagsnummer}\\%
+  \Macro{DayName}\Parameter{Jahr}\Parameter{Monat}\Parameter{Tag}\\%
+  \Macro{ISODayName}\Parameter{ISO-Datum}%
+\end{Declaration}%
+Üblicherweise\ChangedAt{v3.05a}{\Package{scrdate}} ist man weniger an der
+Nummer eines Wochentags als dem Namen des Wochentags interessiert. Die
+Anweisung \Macro{DayNameByNumber} liefert daher den Namen des Wochentags zu
+einer Wochentagsnummer zurück, die man beispielweise mit einer der beiden
+zuvor erklärten Anweisungen \Macro{DayNumber} oder \Macro{ISODayNumber}
+bestimmt hat. Die beiden Anweisungen \Macro{DayName} und \Macro{ISODayName}
+liefern entsprechend den Wochentag zu einem bestimmten Datum.
+
+\begin{Example}
+   Sie wollen den Wochentags des 24.~Dezembers~2027 wissen.
+\begin{lstcode}
+  Der 24.~Dezember~2027 ist ein 
+  \ISODayName{2027-12-24}.
+\end{lstcode}
+  Als Ergebnis erhalten Sie:
+  \begin{quote}
+    Der 24.~Dezember~2027 ist ein \ISODayName{2027-12-24}.
+  \end{quote}
+\end{Example}
+ 
+Als Besonderheit ist es auch hier möglich, in gewissem Umfang Berechnungen
+anzustellen:
+\begin{Example}
+  Sie wollen den Wochentag wissen, den wir in 12~Tagen haben und
+  den wir 24~Tage vor dem 24.~Dezember~2027 hatten.
+\begin{lstcode}
+  In 12~Tagen haben wir einen 
+  \DayName{\year}{\month}{\day+12} und
+  12~Tage vor dem 24.~Dezember~2027 ist ein
+  \ISODayName{2027-12-24-12}, während
+  zwei Wochen und drei Tage nach
+  einem Mittwoch ein \DayNameByNumber{3+2*7+3}
+  folgt.
+\end{lstcode}
+  Als Ergebnis erhalten Sie beispielsweise:
+  \begin{quote}
+  In 12~Tagen haben wir einen 
+  \DayName{\year}{\month}{\day+12} und
+  12~Tage vor dem 24.~Dezember~2027 ist ein
+  \ISODayName{2027-12-24-12}, während
+  zwei Wochen und drei Tage nach
+  einem Mittwoch ein \DayNameByNumber{3+2*7+3}
+  folgt.
+  \end{quote}
+\end{Example}%
+%
+\EndIndex{Cmd}{ISODayName}%
+\EndIndex{Cmd}{DayName}%
+\EndIndex{Cmd}{DayNameByNumber}%
+
+
+\BeginIndex{Cmd}{todaysname}%
+\BeginIndex{Cmd}{todaysnumber}%
+\begin{Declaration}
+  \Macro{ISOToday}\\%
+  \Macro{IsoToday}\\
+  \Macro{todaysname}\\%
+  \Macro{todaysnumber}
+\end{Declaration}%
+In den bisherigen Beispielen dieses Abschnitts wurde das aktuelle Datum immer
+recht umständlich über die \TeX-Register \Macro{year}\IndexCmd{year},
+\Macro{month}\IndexCmd{month}, \Macro{day}\IndexCmd{day} bestimmt. Die
+Anweisungen \Macro{ISOToday} und \Macro{IsoToday} liefern direkt das aktuelle
+Datum in ISO-Schreibweise. Sie unterscheiden sich lediglich darin, dass
+\Macro{ISOToday} Monat und Tag immer zweistellig ausgibt, während
+\Macro{IsoToday} Monat und Tag bei Werten kleiner 10 einstellig ausgibt. Die
+Anweisung \Macro{todaysname} bietet direkt den aktuellen Wochentag, während
+\Macro{todaysnumber} den Wert des aktuellen Wochentags liefert. Näheres zur
+Verwendung dieses Wertes ist den obigen Erklärungen zu den Anweisungen
+\Macro{DayNumber} und \Macro{ISODayNumber} zu entnehmen.
 
 \begin{Explain}
   \begin{labeling}{\textbf{Tipp:}}
@@ -97,13 +251,18 @@ funktioniert daher nur sprachabhängig und eher zufällig.
     benötigen, weil das in der entsprechenden Sprache innerhalb des Satzes so
     üblich ist, können Sie das erreichen, obwohl die Namen der Wochentage in
     \Package{scrdate} alle groß geschrieben sind. Greifen Sie mit
-    \begin{lstcode}
+    \begin{lstcode}[belowskip=-\baselineskip]
   \Macro{MakeLowercase}\PParameter{\Macro{todaysname}}
     \end{lstcode}
     einfach auf die \LaTeX-Anweisung \Macro{MakeLowercase} zurück. Diese
-    wandelt ihr Argument komplett in Kleinbuchstaben.
-  \end{labeling}
-\end{Explain}
+    wandelt ihr Argument komplett in Kleinbuchstaben. Natürlich funktioniert
+    dieser Tipp auch für die Anweisungen
+    \Macro{DayNameByNumber}\IndexCmd{DayNameByNumber},
+    \Macro{DayName}\IndexCmd{DayName} und
+    \Macro{ISODayName}\IndexCmd{ISODayName}.%
+  \end{labeling}%
+\end{Explain}%
+\EndIndex{Cmd}{todaysnumber}%
 \EndIndex{Cmd}{todaysname}
 
 
@@ -126,18 +285,21 @@ direkt geändert werden kann, setzt \Macro{nameday} die Ausgabe von
     Dieses Dokument entstand an einem {\todaysname}.
   \end{quote}
 \end{Example}
+Für \Macro{ISOToday} und \Macro{IsoToday} existieren keine entsprechenden
+Anweisungen.%
 \EndIndex{Cmd}{nameday}
 
+
+\minisec{Wochentage in unterschiedlichen Sprachen}
 Das \Package{scrdate}-Paket beherrscht derzeit die Sprachen Englisch (english
 und USenglish), Deutsch (german, ngerman und austrian), Französisch (french),
 Italienisch (italian), Spanisch (spanish), Kroatisch (croatian), Finnisch
 (finnish) und Norwegisch (norsk), kann aber auch für andere Sprachen
 konfiguriert werden. Näheres dazu entnehme man \File{scrdate.dtx}.
 
-Bei der aktuellen Version ist es egal, ob \Package{scrdate} vor oder
-nach \Package{german}\IndexPackage{german},
-\Package{babel}\IndexPackage{babel} oder ähnlichen Paketen geladen
-wird, in jedem Falle wird die korrekte Sprache
+Bei der aktuellen Version ist es egal, ob \Package{scrdate} vor oder nach
+\Package{german}\IndexPackage{german}, \Package{babel}\IndexPackage{babel}
+oder ähnlichen Paketen geladen wird, in jedem Falle wird die korrekte Sprache
 gewählt.
 
 \begin{Explain}
@@ -155,7 +317,7 @@ gewählt.
 \label{sec:datetime.scrtime}
 \BeginIndex{Package}{scrtime}
 
-Das zweite Problem ist die Frage nach der aktuellen Zeit. Dieses kann mit
+Ein anderes Problem ist die Frage nach der aktuellen Zeit. Dieses kann mit
 Hilfe des Pakets \Package{scrtime} gelöst werden.
 
 
@@ -221,22 +383,40 @@ festgelegt wurde.%
 \EndIndex{Cmd}{settime}
 
 
-\BeginIndex{Option}{12h}\BeginIndex{Option}{24h}%
+\BeginIndex{Option}{12h~=\PName{Ein-Aus-Wert}}%
+\BeginIndex{Option}{24h}%
 \begin{Declaration}
-  \Option{12h}\\
-  \Option{24h}
+  \KOption{12h}\PName{Ein-Aus-Wert}
 \end{Declaration}%
-Mit den Optionen \Option{12h} und \Option{24h} kann ausgewählt
-werden, ob die Zeit bei \Macro{thistime} und \Macro{thistime*} im
-12-Stunden- oder 24-Stunden-Format ausgegeben werden soll.
-Voreingestellt ist \Option{24h}%
+Mit der Option \Option{12h}\ChangedAt{v3.05a}{\Package{scrtime}} kann gewählt
+werden, ob die Zeit bei \Macro{thistime} und \Macro{thistime*} im 12-Stunden-
+oder 24-Stunden-Format ausgegeben werden soll. Als \PName{Ein-Aus-Wert} kann
+dabei einer der Standardwerte für einfache Schalter aus
+\autoref{tab:truefalseswitch}, \autopageref{tab:truefalseswitch} verwendet
+werden. Wird die Option ohne Wert-Angabe verwendet, so wird der Wert
+\PValue{true} angenommen, also auf das 12-Stunden-Format geschaltet.
+Voreingestellt ist hingegen das 24-Stunden-Format.%
 %\footnote{Leider beherrscht das \Package{scrtime}-Paket noch nicht die
 %  Sternzeit nach \textsc{StarTrek}\Index{StarTrek}, ein echter
 %  Mangel!}
-. %
-Die Option verliert bei einem Aufruf von \Macro{settime} ebenfalls ihre
-Gültigkeit.%
-\EndIndex{Option}{12h}\EndIndex{Option}{24h}
+
+Die Option kann wahlweise als Klassenoption bei \Macro{documentclass}, als
+Paketoption bei \Macro{usepackage} oder auch nach dem Laden von
+\Package{scrtime} per \Macro{KOMAoptions} oder \Macro{KOMAoption} (siehe
+beispielsweise \autoref{sec:typearea.options},
+\autopageref{desc:typearea.cmd.KOMAoptions}) gesetzt werden.
+
+Die Option verliert bei einem Aufruf von \Macro{settime} ihre Gültigkeit. Die
+Uhrzeit wird nach Verwendung dieser Anweisung nur noch mit dem dort
+angegebenen Wert im dort verwendeten Format ausgegeben.
+
+Rein aus Gründen der Kompatibilität zu früheren Versionen von
+\Package{scrtime} wird bei \Macro{documentclass} und \Macro{usepackage} auch
+noch die Option \Option{24h} zur Umschaltung auf das 24-Stunden-Format
+unterstützt. Deren Verwendung wird jedoch nicht mehr empfohlen.%
+\EndIndex{Option}{12h~=\PName{Ein-Aus-Wert}}%
+\EndIndex{Option}{24h}%
+%
 \EndIndex{Package}{scrtime}
 
 %%% Local Variables:
