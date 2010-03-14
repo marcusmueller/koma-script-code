@@ -45,7 +45,7 @@
 %
 % ============================================================================
 
-\ProvidesFile{scrlfile.tex}[2008/07/31 KOMA-Script guide (chapter: scrlfile)]
+\ProvidesFile{scrlfile.tex}[2010/03/14 KOMA-Script guide (chapter: scrlfile)]
 
 \chapter{Paketabhängigkeiten mit \Package{scrlfile} 
   beherrschen}
@@ -313,10 +313,12 @@ Optionen \Option{dvips} oder \Option{pdftex}, eingefügt werden.%
 
 
 \BeginIndex{Cmd}{BeforeClosingMainAux}%
+\BeginIndex{Cmd}{AfterReadingMainAux}%
 \begin{Declaration}
-  \Macro{BeforeClosingMainAux}\Parameter{Anweisungen}
+  \Macro{BeforeClosingMainAux}\Parameter{Anweisungen}\\
+  \Macro{AfterReadingMainAux}\Parameter{Anweisungen}
 \end{Declaration}
-Diese Anweisung unterscheidet sich in einem Detail von den zuvor erklärten
+Diese Anweisungen unterscheidet sich in einem Detail von den zuvor erklärten
 Anweisungen. Jene ermöglichen Aktionen vor und nach dem Laden von
 Dateien. Dies ist hier nicht der Fall. Paketautoren haben des Öfteren das
 Problem, dass Sie Anweisungen in die \File{aux}-Datei schreiben wollen,
@@ -381,12 +383,23 @@ mehr führt oder wenn \Macro{clearpage} innerhalb einer
 \Macro{AtEndDocument}-Anweisung verwendet wurde.
 
 Es gibt jedoch für \Macro{BeforeClosingMainAux} eine Einschränkung: Im
-Argument \Macro{Anweisungen} sollte niemals eine Satzanweisung verwendet
-werden. Es darf also keinesfalls mit \Macro{BeforeClosingMainAux} etwas
-gesetzt werden! Wird diese Einschränkung nicht beachtet, so ist das Ergebnis
-noch unvorhersehbarer als bei den gezeigten Problemen mit
-\Macro{AtEndDocument}.%
+Argument \Macro{Anweisungen} sollte keine eine Satzanweisung verwendet
+werden. Es darf also mit \Macro{BeforeClosingMainAux} kein zusätzliches
+Material gesetzt werden! Wird diese Einschränkung nicht beachtet, so ist das
+Ergebnis ebenso unvorhersehbarer wie bei den gezeigten Problemen mit
+\Macro{AtEndDocument}.
+
+Die Anweisung \Macro{AfterReadingMainAux}\ChangedAt{v3.03}{\Package{scrlfile}}
+führt sogar \PName{Anweisungen} nach dem Schließen und Einlesen der
+\File{aux}-Datei innerhalb von \Macro{end}\PParameter{document} aus. Dies ist
+nur in einigen wenigen, sehr seltenen Fällen sinnvoll, beispielsweise, wenn
+man statistische Informationen in die \File{log}-Datei schreiben will, die
+erst nach dem Einlesen der \File{aux}-Datei gültig sind oder zur
+Implementierung zusätzlicher \emph{Rerun}-Aufforderungen. Satzanweisungen sind
+an dieser Stelle noch kritischer zu betrachten als bei
+\Macro{BeforeClosingMainAux}.%
 %
+\EndIndex{Cmd}{AfterReadingMainAux}%
 \EndIndex{Cmd}{BeforeClosingMainAux}%
 
 
@@ -402,13 +415,13 @@ aber auch möglich, eine ganz andere Datei als die angeforderte einzulesen.
 \begin{Declaration}
   \Macro{ReplaceInput}\Parameter{Dateiname}\Parameter{Ersatzdatei}
 \end{Declaration}
-Mit dieser Anweisung wird eine Ersetzung der Datei mit dem als erstes
-angegebenen \PName{Dateiname} definiert. Wenn \LaTeX{} anschließend angewiesen
-wird, diese Datei zu laden, wird stattdessen die \PName{Ersatzdatei}
-geladen. Die Definition der Ersatzdatei wirkt sich auf alle Dateien aus, die
-vom Anwender oder intern von \LaTeX{} mit Hilfe von \Macro{InputIfFileExists}
-geladen werden. Dazu ist es allerdings erforderlich, dass \Package{scrlfile}
-diese Anweisung umdefiniert.
+Mit\ChangedAt{v2.96}{\Package{scrlfile}} dieser Anweisung wird eine Ersetzung
+der Datei mit dem als erstes angegebenen \PName{Dateiname} definiert. Wenn
+\LaTeX{} anschließend angewiesen wird, diese Datei zu laden, wird stattdessen
+die \PName{Ersatzdatei} geladen. Die Definition der Ersatzdatei wirkt sich auf
+alle Dateien aus, die vom Anwender oder intern von \LaTeX{} mit Hilfe von
+\Macro{InputIfFileExists} geladen werden. Dazu ist es allerdings erforderlich,
+dass \Package{scrlfile} diese Anweisung umdefiniert.
 
 \begin{Example}
   Sie wollen, dass an Stelle der Datei \File{\Macro{jobname}.aux}, die Datei
@@ -448,9 +461,10 @@ der Klasse passen. Eine Lösung dieses Problems finden Sie nachfolgend.
   \Macro{ReplaceClass}\Parameter{Klasse}\Parameter{Ersatzklasse}\\
   \Macro{ReplacePackage}\Parameter{Paket}\Parameter{Ersatzpaket}
 \end{Declaration}
-Eine Klasse oder ein Paket sollte niemals mit Hilfe von \Macro{ReplaceInput}
-ersetzt werden. In diesem Fall würde \LaTeX{} eine Warnung über nicht
-übereinstimmende Klassen- oder Paketnamen melden.
+Eine\ChangedAt{v2.96}{\Package{scrlfile}} Klasse oder ein Paket sollte niemals
+mit Hilfe von \Macro{ReplaceInput} ersetzt werden. In diesem Fall würde
+\LaTeX{} eine Warnung über nicht übereinstimmende Klassen- oder Paketnamen
+melden.
 \begin{Example}
   Sie ersetzen das Paket \Package{fancyhdr} leichtfertig durch das nicht
   kompatible Paket \Package{scrpage2}, indem Sie
