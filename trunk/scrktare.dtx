@@ -1,4 +1,4 @@
-% \CheckSum{1890}
+% \CheckSum{1924}
 % \iffalse meta-comment
 % ======================================================================
 % scrktare.dtx
@@ -133,10 +133,10 @@
 % Auswertung der Optionen zu definieren. Ich mache das hier vor der
 % Deklaration der Optionen.
 %
-%  \begin{macro}{\SetDIVList}
-%    \changes{v2.1a}{1994/10/28}{neu}
-%    \changes{v2.6}{2000/01/04}{\cs{ta@divlist} enthält Werte für
-%      Schriftgrößen ab 1pt}
+% \begin{macro}{\SetDIVList}
+%   \changes{v2.1a}{1994/10/28}{neu}
+%   \changes{v2.6}{2000/01/04}{\cs{ta@divlist} enthält Werte für
+%     Schriftgrößen ab 1pt}
 % Der Befehl \cs{SetDIVList} tut nichts weiter als die innere Variable
 % für die schriftgrößenabhängige \emph{DIV}-Liste \cs{ta@divlist} neu
 % zu definieren. Dabei können \emph{DIV}-Werte für Größen ab 10\,pt
@@ -144,29 +144,50 @@
 %    \begin{macrocode}
 \newcommand*\SetDIVList[1]{\def\ta@divlist{{}{}{}{}{}{}{}{}{}#1}}
 %    \end{macrocode}
-%  \end{macro}
+% \end{macro}
 %
-%  \begin{macro}{\SetXDIVList}
-%    \changes{v2.6}{2000/01/04}{neu}
+% \begin{macro}{\SetXDIVList}
+%   \changes{v2.6}{2000/01/04}{neu}
 % Da mit \cs{SetDIVList} aus Kompatibilitätsgründen nur Werte für
 % Größen ab 10\,pt gesetzt werden können, wird für Werte ab 1\,pt
 % ein neuer Befehl benötigt.
 %    \begin{macrocode}
 \newcommand*\SetXDIVList[1]{\def\ta@divlist{#1}}
 %    \end{macrocode}
-%  \end{macro}
+% \end{macro}
 %
-%  \begin{Length}{\ta@bcor}
-%  \changes{v2.2a}{1995/01/25}{Definition der Dimension wegen der
-%    Option \texttt{BCOR} vorgezogen}
-%  \changes{v2.7g}{2001/04/17}{\cs{newlength} and Stelle von
-%    \cs{newdimen} für die Definition verwendet}
+% \begin{Length}{\ta@bcor}
+%   \changes{v2.2a}{1995/01/25}{Definition der Dimension wegen der
+%     Option \texttt{BCOR} vorgezogen}
+%   \changes{v2.7g}{2001/04/17}{\cs{newlength} and Stelle von
+%     \cs{newdimen} für die Definition verwendet}
 % Dimension für die Bindekorrektur reservieren. Diese wird implizit
 % zu 0\,pt initialisiert.
 %    \begin{macrocode}
 \newlength{\ta@bcor}
 %    \end{macrocode}
-%  \end{Length}
+% \begin{macro}{\set@ta@bcor}
+% \begin{macro}{\init@ta@bcor}
+%   \changes{v3.05a}{2010/03/18}{Bindekorrektur mit \textsf{geometry}
+%     austauschen}
+% Diese Makro dienen dem Datenaustausch mit \textsf{geometry}:
+%    \begin{macrocode}
+\newcommand*{\set@ta@bcor}[1]{%
+  \setlength{\ta@bcor}{#1}%
+  \renewcommand*{\init@ta@bcor}{}%
+}
+\newcommand*{\init@ta@bcor}{%
+  \expandafter\ifnum \@nameuse{scr@v@3.05a}>\scr@ta@compatibility\else
+    \scr@ifundefinedorrelax{Gm@bindingoffset}{}{%
+      \setlength{\ta@bcor}{\Gm@bindingoffset}%
+    }%
+  \fi
+  \renewcommand*{\init@ta@bcor}{}%
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{Length}
 %
 %  \begin{macro}{\ta@div}
 %    \changes{v2.2a}{1995/01/25}{Definition wegen der Option
@@ -209,7 +230,7 @@
 % \cs{ProcessOptions}).
 %    \begin{macrocode}
 %<class>      \PassOptionsToPackage{BCOR#2}{typearea}%
-%<package>      \ifdimen{#2}{\setlength{\ta@bcor}{#2}}{\scr@pti@nerr@r}%
+%<package>      \ifdimen{#2}{\set@ta@bcor{#2}}{\scr@pti@nerr@r}%
 %    \end{macrocode}
 % In allen anderen Fällen ist es nicht diese Option, dann wird ein
 % Fehler ausgegeben. Stattdessen könnte hier auch auf weitere Optionen
@@ -613,7 +634,7 @@
 %    \begin{macrocode}
 \KOMA@key{BCOR}{%
   \edef\@tempa{#1}\edef\@tempb{current}\ifx\@tempa\@tempb\else
-    \setlength{\ta@bcor}{#1}%
+    \set@ta@bcor{#1}%
   \fi
 }
 %    \end{macrocode}
@@ -1276,6 +1297,7 @@
 %   entsprechen, werden nicht explizit gesetzt}
 % \changes{v2.97c}{2007/07/18}{Option \texttt{twoside} wird explizit passend
 %   gesetzt}
+% \changes{v3.05a}{2010/03/18}{\cs{init@ta@bcor} wird aufgerufen}
 %    \begin{macrocode}
 \KOMAExecuteOptions{paper=A4}
 \if@twoside
@@ -1288,6 +1310,15 @@
   \KOMAExecuteOptions{twoside=false}
 \fi
 \KOMAProcessOptions\relax
+\init@ta@bcor
+\expandafter\ifnum \@nameuse{scr@v@3.05a}>\scr@ta@compatibility\relax\else
+  \scr@ifundefinedorrelax{Gm@bindingoffset}{%
+    \PassOptionsToPackage{bindingoffset=\ta@bcor}{geometry}%
+  }{%
+    \Gm@bindingoffset=\ta@bcor
+  }%
+  \AfterPackage*{geometry}{\let\ta@bcor\Gm@bindingoffset}%
+\fi
 %    \end{macrocode}
 %
 %
@@ -1369,7 +1400,7 @@
 %  \begin{Length}{\ta@vblk}
 %  \begin{Length}{\ta@temp}
 % Diese Größsenparameter und werden intern für verschiedene Befehle
-% benötigt. (Die Zähler \cs{ta@bcor} und \cs{ta@div} werden bereits
+% benötigt. (Die Länge \cs{ta@bcor} und der Zähler \cs{ta@div} werden bereits
 % bei der Optionenauswertung benötigt und sind deshalb vorgezogen.)
 %    \begin{macrocode}
 \newlength{\ta@hblk}
@@ -1789,7 +1820,7 @@
     \fi
   }%
   \edef\@tempa{#1}\edef\@tempb{current}\ifx\@tempa\@tempb\else
-    \setlength{\ta@bcor}{#1}%
+    \set@ta@bcor{#1}%
   \fi
   \edef\@tempa{#2}%
   \def\@tempb{last}\ifx\@tempa\@tempb\let\@tempa=\@lastdiv
