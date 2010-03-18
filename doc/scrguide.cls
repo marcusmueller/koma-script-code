@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2009/03/16 v1.3d internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2010/03/18 v1.3e internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -118,6 +118,7 @@
 \RequirePackage{amsmath}
 \RequirePackage{listings}
 \RequirePackage{multicol}
+\RequirePackage{marginnote}
 \RequirePackage{xcolor,tocstyle}% hyperref needs xcolor with tocstyle
 \RequirePackage[\uselanguage]{hyperref}
 %    \end{macrocode}
@@ -913,7 +914,7 @@
 %     Don't use the glossary, use a file by my own.}
 %    \begin{macrocode}
 \providecommand*{\ChangedAt}[2]{%
-  \marginline{\footnotesize\fbox{\strut#1}}%
+  \marginnote{\footnotesize\fbox{\strut#1}}%
   \begingroup
     \let\@tempa\@empty
     \ifstr{#1}{v2.9i}{\def\@tempa{v2.90i=}}{}%
