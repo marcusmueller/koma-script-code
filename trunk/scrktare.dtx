@@ -1,4 +1,4 @@
-% \CheckSum{1890}
+% \CheckSum{1911}
 % \iffalse meta-comment
 % ======================================================================
 % scrktare.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrktare.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrktare.dtx}[2009/02/14 v3.02c KOMA-Script (type area)]
+\ProvidesFile{scrktare.dtx}[2010/03/18 v3.05a KOMA-Script (type area)]
 % \iffalse
 %</driver>
 %<package&identify>\ProvidesPackage{typearea}[%
@@ -776,6 +776,7 @@
 %   \changes{v2.7g}{2001/04/17}{neue Option}
 %   \changes{v2.95}{2002/08/27}{neu implementiert}
 %   \changes{v3.02c}{2009/02/14}{neuer Wert \texttt{false}}
+%   \changes{v3.05a}{2010/03/18}{neuer Wert \texttt{dvipdfmx}}
 % Diese Option ist nun das zentrale Element für die Übermittlung der
 % Seitengröße an pdf\TeX, \texttt{dvips} oder V\TeX. Sie wird auch von
 % den obsoleten Optionen verwendet. Die Werte und ihre Bedeutung:
@@ -789,6 +790,8 @@
 %   ausgegeben, falls \texttt{dvi}-Ausgabe erwartet wird oder
 %   \cs{if@dvips} erfüllt ist. Führt zu einer Warnung, wenn sie mehr
 %   als einmal oder nach der Präambel verwendet wird.
+% \item[\texttt{dvipdfmx}] das \cs{special} für \texttt{dvipdfmx} wird
+%   ausgegeben, falls \texttt{dvi}-Ausgabe erwartet wird.
 % \item[\texttt{false}] die automatische Anpassung bei Änderungen innerhalb
 %   des Dokuments abschalten.
 % \item[\texttt{pdftex}] \cs{pdfpagewidth} und \cs{pdfpageheight}
@@ -799,7 +802,7 @@
   \begingroup
     \KOMA@set@ncmdkey{pagesize}{@tempa}{%
       {off}{-1},{no}{-1},{false}{-1},%
-      {auto}{0},{automedia}{1},{dvips}{2},{pdftex}{3}%
+      {auto}{0},{automedia}{1},{dvips}{2},{pdftex}{3},{dvipdfmx}{4}%
     }{#1}%
     \ifcase\number\@tempa\relax
       \endgroup
@@ -816,6 +819,9 @@
     \or
       \endgroup
       \set@pdftexpagesize
+    \or
+      \endgroup
+      \set@dvipdfmxpagesize
   \fi
   \edef\@pagesizelast{#1}%
 }
@@ -829,6 +835,8 @@
 %   \changes{v3.02c}{2009/02/14}{funktioniert auch im Dokument}
 % \begin{macro}{\setnot@dvipspagesize}
 %   \changes{v2.95}{2002/08/27}{neu (intern)}
+% \begin{macro}{\set@dvipdfmxpagesize}
+%   \changes{v3.05a}{2010/03/18}{neu (intern)}
 % \begin{macro}{\set@vtexpagesize}
 %   \changes{v2.95}{2002/08/27}{neu (intern)}
 % \begin{macro}{\scr@updatedvipspagesize}
@@ -879,6 +887,14 @@
       `pagesize=automedia' or `pagesize=dvips'\MessageBreak
       may be used only once at preamble.\MessageBreak
       Option ignored%
+    }%
+  }{}%
+}
+\newcommand*{\set@dvipdfmxpagesize}{%
+  \scr@ifdvioutput{%
+    \AtBeginDocument{\AtBeginDvi{%
+        \special{papersize=\the\paperwidth,\the\paperheight}%
+      }%
     }%
   }{}%
 }
@@ -958,12 +974,18 @@
   \else
     \let\set@dvipspagesize=\setnot@dvipspagesize
   \fi
+  \renewcommand*{\set@dvipdfmxpagesize}{%
+    \scr@ifdvioutput{%
+      \special{papersize=\the\paperwidth,\the\paperheight}%
+    }{}%
+  }%
   \renewcommand*{\set@vtexpagesize}{%
     \ifnotundefined{mediawith}{\mediawidth=\paperwidth}{}%
     \ifnotundefined{mediaheight}{\mediaheight=\paperheight}{}%
   }%
 }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}

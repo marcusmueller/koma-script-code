@@ -46,7 +46,7 @@
 % ======================================================================
 
 
-\ProvidesFile{typearea.tex}[2009/01/06 KOMA-Script guide (chapter: typearea)]
+\ProvidesFile{typearea.tex}[2010/03/18 KOMA-Script guide (chapter: typearea)]
 \chapter{Satzspiegelberechnung mit \Package{typearea.sty}}
 \labelbase{typearea}
 
@@ -1428,26 +1428,60 @@ Option \Option{DIV} mit den Werten \PValue{last} oder \PValue{current} (siehe
   Information. Als Lösung des Problems verwendet der entsprechende Treiber
   eine voreingestellte Papiergröße, die der Anwender entweder per Option oder
   durch entsprechende Angabe in der {\TeX}-Quelldatei verändern kann. Bei
-  Verwendung des DVI-Treibers \File{dvips} kann diese Angabe in Form einer
-  \Macro{special}-Anweisung erfolgen. Bei {pdf\TeX} oder {V\TeX} werden
-  stattdessen zwei Längen entsprechend gesetzt.
+  Verwendung des DVI-Treibers \File{dvips} oder \File{dvipdfm} kann diese
+  Angabe in Form einer \Macro{special}-Anweisung erfolgen. Bei {pdf\TeX} oder
+  {V\TeX} werden stattdessen zwei Längen entsprechend gesetzt.
 \end{Explain}
-Mit der Option \OptionValue{pagesize}{dvips}\IndexOption{pagesize~=dvips} wird
-erreicht, dass die Papiergröße als \Macro{special} in die DVI-Datei
-geschrieben wird. Dieses \Macro{special} wird beispielsweise von \File{dvips}
-ausgewertet. Demgegenüber schreibt die Option \OptionValue{pagesize}{pdftex}
-die Papiergröße am Anfang des Dokuments in die {pdf\TeX}-Seitenregister,
-\Length{pdfpagewidth}\IndexLength{pdfpagewidth} und
-\Length{pdfpageheight}\IndexLength{pdfpageheight}, so dass später beim
-Betrachten der erzeugten PDF-Datei das korrekte Format angegeben wird. Die
-Option \OptionValue{pagesize}{auto} verhält sich flexibler und verwendet je
-nachdem, ob eine PDF- oder eine DVI-Datei ausgegeben wird, den Mechanismus der
-Option \OptionValue{pagesize}{dvips} oder der Option
-\OptionValue{pagesize}{pdftex}. Mit Option \OptionValue{pagesize}{automedia}
-werden ggf. auch \Length{mediawidth} und \Length{mediaheight} passend
-gesetzt. Damit wird auch {V\TeX} berücksichtigt. Bei Verwendung der Option
-\Option{pagesize} ohne Angabe eines \PName{Ausgabetreiber} wird \PValue{auto}
-eingesetzt.
+Mit der Option \Option{pagesize} kann eingestellt werden, für welchen
+Ausgabetreiber die Papiergröße in das Ausgabedokument geschrieben wird. Die
+unterstützten Ausgabetreiber sind \autoref{tab:typearea.outputdriver} auf
+\autopageref{tab:typearea.outputdriver} zu entnehmen. Voreingestellt ist
+\OptionValue{pagesize}{false}. Die Verwendung der Option in der Form
+\Option{pagesize}\IndexOption{pagesize} ohne Angabe eines Werts entspricht
+\OptionValue{pagesize}{auto}.
+
+\begin{table}
+  \caption{Ausgabetreiber für Option \KOption{pagesize}\PName{Ausgabetreiber}}
+  \begin{desctabular}
+    \pventry{auto}{Falls die pdf\TeX-spezifischen Register
+      \Macro{pdfpagewidth}\IndexLength{pdfpagewidth} und
+      \Macro{pdfpageheight}\IndexLength{pdfpageheight} vorhanden sind, wird
+      der Ausgabetreiber \PValue{pdftex} aktiviert. Zusätzlich wird auch der
+      Ausgabetreiber \PValue{dvips} verwendet.\IndexOption{pagesize~=auto}}%
+    \pventry{automedia}{Dies entspricht dem Ausgabetreiber
+      \PValue{auto}. Allerdings werden zusätzlich auch noch die
+      \mbox{V\TeX}-spezifischen Register
+      \Macro{mediawidth}\IndexLength{mediawidth} und
+      \Macro{mediaheight}\IndexLength{mediaheight} gesetzt, falls diese
+      definiert sind.\IndexOption{pagesize~=automedia}}%
+    \entry{\PValue{false}, \PValue{no}, \PValue{off}}{%
+      Die Papiergröße wird nicht an den Ausgabetreiber
+      gemeldet.\IndexOption{pagesize~=false}}%
+    \pventry{dvipdfmx}{\ChangedAt{v3.05a}{\Package{typearea}}Die Papiergröße
+      wird als
+      \Macro{special}\PParameter{pagesize=\PName{Breite},\PName{Höhe}} in die
+      DVI-Datei geschrieben. Der Name des Ausgabetreibers kommt daher, dass
+      das Programm \File{dvipdfmx} eine Papierformatumschaltung über diese
+      Anweisung auch innerhalb des Dokuments
+      erlaubt.\IndexOption{pagesize~=dvipdfmx}}%
+    \pventry{dvips}{Innerhalb der Dokumentpräambel wird die Papiergröße über
+      \Macro{special}\PParameter{pagesize=\PName{Breite},\PName{Höhe}} in das
+      Dokument geschrieben. Da das Programm \File{dvips} keine
+      Papierformatumschaltung innerhalb des Dokuments unterstützt, wird bei
+      Bedarf im Dokument ein recht unsauberer Hack verwendet, um die
+      Umschaltung nach Möglichkeit dennoch zu
+      erreichen. Papierformatumschaltung nach der Dokumentprämbel bei
+      gleichzeitiger Verwendung des Ausgabetreibers \PValue{dvips} erfolgen
+      daher auf eigene Gefahr!\IndexOption{pagesize~=dvips}}%
+    \pventry{pdftex}{Die Papiergröße wird über die pdf\TeX-spezifischen
+      Register \Macro{pdfpagewidth}\IndexLength{pdfpagewidth} und
+      \Macro{pdfpageheight}\IndexLength{pdfpageheight} in gesetzt. Dies ist
+      auch jederzeit innerhalb des Dokuments problemlos
+      möglich.\IndexOption{pagesize~=pdftex}}%
+  \end{desctabular}
+  \label{tab:typearea.outputdriver}
+\end{table}
+
 \begin{Example}
   Angenommen, es soll ein Dokument sowohl als DVI-Datei verwendet
   werden, als auch eine Online-Version im PDF-Format erstellt
