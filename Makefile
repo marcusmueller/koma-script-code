@@ -174,8 +174,7 @@ CLS_MAIN_DVI	= scrsource.dvi
 
 CLS_MAIN_INS	= scrmain.ins
 
-CLS_MAIN_SUBINS	= scrlfile.ins scraddr.ins scrlettr.ins scrpage.ins \
-		  scrtime.ins
+CLS_MAIN_SUBINS	= scrlfile.ins scraddr.ins scrlettr.ins scrpage.ins
 
 ALPHA_INS       = tocstyle.dtx tocbasic.dtx scrjura.dtx
 
