@@ -1,4 +1,4 @@
-% \CheckSum{1240}
+% \CheckSum{1248}
 % \iffalse meta-comment
 % ======================================================================
 % scrjura.dtx
@@ -74,7 +74,7 @@
 %<driver>\ProvidesFile{scrjura.drv}
 %<package>\ProvidesPackage{scrjura}
 %<*dtx|package|driver>
-                [2010/04/05 v0.5b beta
+                [2010/04/26 v0.5c beta
 %</dtx|package|driver>
 %<driver>                 (driver)%
 %<package>                (package)%
@@ -1277,15 +1277,20 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % \end{macro}
 % \end{Counter}
 % \end{macro}
+%   \changes{0.5c}{2010/04/26}{erstes Argument von \cs{newmaxpar} und zweites
+%     Argument von \cs{getmaxpar} ist \texttt{contract} nicht
+%     \texttt{contractpars}}
+%   \changes{0.5c}{2010/04/26}{\cs{contract@Paragraphformat} expandiert beim
+%     Schreiben zu seinem Argument}
 %    \begin{macrocode}
 \newcommand*{\contract@everypar}{%
   \ifparnumber
     \refstepcounter{par}%
     \refstepcounter{sentence}%
     \begingroup
-      \protected@write\@auxout{}{%
-        \string\newmaxpar{contractpars}{\theSubParagraph}{\arabic{par}}}%
-      \getmaxpar\@tempa{contractpars}{\theSubParagraph}%
+      \protected@write\@auxout{\let\contract@Paragraphformat\@firstofone}{%
+        \string\newmaxpar{contract}{\theSubParagraph}{\arabic{par}}}%
+      \getmaxpar\@tempa{contract}{\theSubParagraph}%
       \typeout{Stored max is \@tempa}%
       \ifnum \@tempa>\@ne
         \parformat\nobreakspace
@@ -1733,6 +1738,9 @@ standard classes created by The LaTeX3 Project 1994-1996.
 %
 % \begin{macro}{\newmaxpar}
 % \begin{macro}{\getmaxpar}
+%   \changes{v0.5c}{2010/04/26}{\cs{protected@edef} durch \cs{edef} ersetzt}
+%   \changes{v0.5c}{2010/04/26}{\cs{\#2@Paragraphformat} expandiert zu seinem
+%     Argument}
 % Noch zwei Hilfsmakros, um Zähler in der aux-Datei zwischenzuspeichern und
 % auch dann Werte zu holen, wenn sie nicht in der aux-Datei stehen.
 %    \begin{macrocode}
@@ -1744,7 +1752,8 @@ standard classes created by The LaTeX3 Project 1994-1996.
 }
 \newcommand*{\getmaxpar}[3]{%
   \begingroup
-    \protected@edef\@tempa{#3}%
+    \expandafter\let\csname #2@Paragraphformat\endcsname\@firstofone
+    \edef\@tempa{#3}%
     \@onelevel@sanitize\@tempa
     \expandafter\ifx \csname max@#2@\@tempa\endcsname\relax
       \edef\@tempa{\endgroup\edef\noexpand#1{\expandafter\the\value{par}}}%
