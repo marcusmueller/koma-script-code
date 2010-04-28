@@ -1,4 +1,4 @@
-% \CheckSum{1256}
+% \CheckSum{1272}
 % \iffalse meta-comment
 % ======================================================================
 % scrjura.dtx
@@ -864,9 +864,20 @@ standard classes created by The LaTeX3 Project 1994-1996.
 \KOMAProcessOptions\relax
 %    \end{macrocode}
 %
+% \begin{macro}{\jura@env@type}
+%   \changes{v0.5d}{2010/04/28}{neu (intern)}
+% Dieses Makro wird in Abhängigkeit der gerade aktiven
+% \textsf{scrjura}-Umgebung definiert.
+%    \begin{macrocode}
+\newcommand*{\jura@env@type}{}
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{environment}{contract}
 % \begin{macro}{\contract}
-%   \changes{v0.5d}{2010/04/28}{missing error message added}
+%   \changes{v0.5d}{2010/04/28}{fehlende Fehlermeldung ergänzt}
+%   \changes{v0.5d}{2010/04/28}{Umgebung definiert sich nicht mehr selbst um}
+%   \changes{v0.5d}{2010/04/28}{\cs{jura@env@type} wird gesetzt}
 % Die Umgebung \texttt{contract} wird als Anweisung \cs{contract}
 % definiert. Nichts desto trotz handelt es sich dabei um eine Umgebung und
 % sollte sie immer als Umgebung verwendet werden!
@@ -876,21 +887,23 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % Unterbrechung.
 %    \begin{macrocode}
 \newcommand*{\contract}{%
-  \renewcommand*{\contract}{%
+  \ifx\jura@env@type\@empty
+    \let\@doendpe\contract@doendpe
+    \let\Paragraph\contract@paragraph
+    \let\c@Paragraph\c@contractParagraph
+    \edef\cl@Paragraph{\cl@Paragraph\cl@contractParagraph}%
+    \let\SubParagraph\contract@subparagraph
+    \let\c@SubParagraph\c@contractSubParagraph
+    \edef\cl@SubParagraph{\cl@SubParagraph\cl@contractSubParagraph}%
+    \let\Par\contract@everypar
+    \let\Sentence\contract@sentence
+    \renewcommand*{\jura@env@type}{contract}%
+  \else
     \PackageError{contract}{nested `contract' detected}{%
       You may not use a `contract' environment inside\MessageBreak
-      another `contract' environment or after loading\MessageBreak
-      package `scrjura' with option `contract'!}%
-  }%
-  \let\@doendpe\contract@doendpe
-  \let\Paragraph\contract@paragraph
-  \let\c@Paragraph\c@contractParagraph
-  \edef\cl@Paragraph{\cl@Paragraph\cl@contractParagraph}%
-  \let\SubParagraph\contract@subparagraph
-  \let\c@SubParagraph\c@contractSubParagraph
-  \edef\cl@SubParagraph{\cl@SubParagraph\cl@contractSubParagraph}%
-  \let\Par\contract@everypar
-  \let\Sentence\contract@sentence
+      a `\jura@env@type' environment or after loading\MessageBreak
+      package `scrjura' with option `\jura@env@type'!}%
+  \fi
 }
 \let\if@jura@skiphyperref\iftrue
 \let\cl@Paragraph\@empty
@@ -1252,6 +1265,22 @@ standard classes created by The LaTeX3 Project 1994-1996.
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}{\jura@usetype}
+%   \changes{v0.5d}{2010/04/28}{neu (intern)}
+% In der Voreinstellung macht das erst einmal gar nichts, außer dass es robust
+% ist und \cs{jura@@usetype} aufruft.
+% \begin{macro}{\jura@@usetype}
+%   \changes{v0.5d}{2010/04/28}{neu (intern)}
+% Das wiederum ist nicht robust und kann dadurch einfacher umdefiniert
+% werden. In der Voreinstellung macht das dann wirklich nichts, außer das
+% Argument zu fressen.
+%    \begin{macrocode}
+\DeclareRobustCommand*{\jura@usetype}[1]{\jura@@usetype{#1}}
+\newcommand*{\jura@@usetype}[1]{}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
 % \begin{macro}{\contract@everypar}
 % |\jura@everpar| für Verträge.
 % \begin{macro}{\ifparnumber}
@@ -1259,6 +1288,8 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % \begin{macro}{\thepar}
 % \begin{macro}{\theHpar}
 % \begin{macro}{\p@par}
+%   \changes{v0.5d}{2010/04/28}{\cs{jura@usetype} mit Argument
+%     \cs{jura@env@type} eingefügt}
 % Der Schalter gibt an, ob überhaupt mit Absatznummern gearbeitet werden
 % soll. Sind Absatznummern deaktiviert, werden auch keine manuellen
 % Absatznummern gesetzt. Die Absätze werden dann auch nicht gezählt. Ansonsten
@@ -1272,7 +1303,7 @@ standard classes created by The LaTeX3 Project 1994-1996.
 \renewcommand*{\thepar}{\arabic{par}}
 \newcommand*{\theHpar}{\theH@AbsParagraph-\Roman{par}}
 \newcommand*{\parformat}{(\thepar)}
-\renewcommand*\p@par{{\theSubParagraph\jura@separator{\nobreakspace}}}
+\renewcommand*\p@par{{\jura@usetype{\jura@env@type}\theSubParagraph\jura@separator{\nobreakspace}}}
 \@addtoreset{par}{Paragraph}
 \@addtoreset{par}{SubParagraph}
 %    \end{macrocode}
