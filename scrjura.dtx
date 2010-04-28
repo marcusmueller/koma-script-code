@@ -1,4 +1,4 @@
-% \CheckSum{1248}
+% \CheckSum{1256}
 % \iffalse meta-comment
 % ======================================================================
 % scrjura.dtx
@@ -74,7 +74,7 @@
 %<driver>\ProvidesFile{scrjura.drv}
 %<package>\ProvidesPackage{scrjura}
 %<*dtx|package|driver>
-                [2010/04/26 v0.5c beta
+                [2010/04/28 v0.5d beta
 %</dtx|package|driver>
 %<driver>                 (driver)%
 %<package>                (package)%
@@ -866,6 +866,7 @@ standard classes created by The LaTeX3 Project 1994-1996.
 %
 % \begin{environment}{contract}
 % \begin{macro}{\contract}
+%   \changes{v0.5d}{2010/04/28}{missing error message added}
 % Die Umgebung \texttt{contract} wird als Anweisung \cs{contract}
 % definiert. Nichts desto trotz handelt es sich dabei um eine Umgebung und
 % sollte sie immer als Umgebung verwendet werden!
@@ -876,7 +877,10 @@ standard classes created by The LaTeX3 Project 1994-1996.
 %    \begin{macrocode}
 \newcommand*{\contract}{%
   \renewcommand*{\contract}{%
-    \contract@nest@error{contract}%
+    \PackageError{contract}{nested `contact' detected}{%
+      You may not use a `contact' environment inside\MessageBreak
+      another `contract' environment or after loading\MessageBreak
+      package `scrjura' with option `contract'!}%
   }%
   \let\@doendpe\contract@doendpe
   \let\Paragraph\contract@paragraph
@@ -1640,33 +1644,37 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % \end{macro}
 %
 % \begin{macro}{\parciteformat}
+%   \changes{v0.5d}{2010/04/28}{argument moved}
 % Zitierstil für Absätze.
 %    \begin{macrocode}
 \DeclareRobustCommand*{\par@cite}[1]{\parciteformat{#1}}
 \newcommand*{\parciteformat}[1]{%
   \ifcase \parcite@format
-    \parlongformat{#1}%
+    \expandafter\parlongformat
   \or
-    \parshortformat{#1}%
+    \expandafter\parshortformat
   \or
-    \parnumericformat{#1}%
+    \expandafter\parnumericformat
   \fi
+  {#1}%
 }
 %    \end{macrocode}
 % \end{macro}
 %
 % \begin{macro}{\sentenceciteformat}
+%   \changes{v0.5d}{2010/04/28}{argument moved}
 % Zitierstil für Sätze. In der Voreinstellung ist das |\@arabic|.
 %    \begin{macrocode}
 \DeclareRobustCommand*{\sentence@cite}[1]{\sentenceciteformat{#1}}
 \newcommand*{\sentenceciteformat}[1]{%
   \ifcase \sentencecite@format
-    \sentencelongformat{#1}%
+    \expandafter\sentencelongformat
   \or
-    \sentenceshortformat{#1}%
+    \expandafter\sentenceshortformat
   \or
-    \sentencenumericformat{#1}%
+    \expandafter\sentencenumericformat
   \fi
+  {#1}%
 }
 %    \end{macrocode}
 % \end{macro}
