@@ -1,4 +1,4 @@
-% \CheckSum{361}
+% \CheckSum{399}
 % \iffalse meta-comment
 % ======================================================================
 % scrkliof.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkliof.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkliof.dtx}[2010/05/18 v3.06 KOMA-Script (lists of)]
+\ProvidesFile{scrkliof.dtx}[2010/06/02 v3.06 KOMA-Script (lists of)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -228,6 +228,10 @@
 %
 % \begin{option}{listof}
 %   \changes{v2.98c}{2008/03/05}{Neue Option}
+%   \changes{v3.06}{2010/06/02}{Alle über \textsf{tocbasic} realisierten
+%     Einstellungen wirken sich auch auf Verzeichnisse des Besitzers
+%     \texttt{float} aus, die erst später unter Kontrolle von
+%     \textsf{tocbasic} gestellt werden.}
 % Dies ist die zentrale Option für die Gleitumgebungsverzeichnisse.
 %    \begin{macrocode}
 \KOMA@key{listof}{%
@@ -283,12 +287,20 @@
       \unsettoc{\@currext}{numbered}%
       \unsettoc{\@currext}{totoc}%
     }%
+    \AtAddToTocList[float]{%
+      \unsettoc{\@currext}{numbered}%
+      \unsettoc{\@currext}{totoc}%
+    }%
   \or% totoc
     \renewcommand*{\float@@listhead}{%
 %<article>    \addsec
 %<report|book>    \addchap
     }%
     \doforeachtocfile[float]{%
+      \unsettoc{\@currext}{numbered}%
+      \setuptoc{\@currext}{totoc}%
+    }%
+    \AtAddToTocList[float]{%
       \unsettoc{\@currext}{numbered}%
       \setuptoc{\@currext}{totoc}%
     }%
@@ -301,6 +313,10 @@
       \setuptoc{\@currext}{numbered}%
       \setuptoc{\@currext}{totoc}%
     }%
+    \AtAddToTocList[float]{%
+      \setuptoc{\@currext}{numbered}%
+      \setuptoc{\@currext}{totoc}%
+    }%
   \or% flat
     \@dynlisttrue
   \or% graduated
@@ -309,9 +325,21 @@
     \doforeachtocfile[float]{%
       \setuptoc{\@currext}{leveldown}%
     }%
+    \AtAddToTocList[float]{%
+      \setuptoc{\@currext}{leveldown}%
+    }%
   \or% entryprefix
     \@dynlisttrue
     \doforeachtocfile[float]{%
+      \BeforeStartingTOC[\@currext]{%
+        \scr@ifundefinedorrelax{listof\@currext entryname}{}{%
+          \expandafter\def\expandafter\numberline@prefix
+          \expandafter{\csname listof\@currext entryname\endcsname
+            \nobreakspace}%
+        }%
+      }%
+    }%
+    \AtAddToTocList[float]{%
       \BeforeStartingTOC[\@currext]{%
         \scr@ifundefinedorrelax{listof\@currext entryname}{}{%
           \expandafter\def\expandafter\numberline@prefix
@@ -415,6 +443,21 @@
 % Einige Definitionen werden von unterschiedlichen Verzeichnissen
 % verwendet. Diese sind hier zu finden.
 %
+% \changes{v3.06}{2010/06/02}{einschalten des \texttt{tocbasic}-Features
+%   \texttt{chapteratlist} in die Datei \texttt{scrkliof.dtx} verschoben}
+% Bei Büchern wird für jedes Verzeichnis des Besitzers \texttt{float} das
+% Feature \texttt{chapteratlist} gesetzt. Das gilt auch für solche
+% Verzeichnisse, die noch gar nicht definiert sind.
+%    \begin{macrocode}
+%<*book|report>
+\doforeachtocfile[float]{%
+  \setuptoc{\@currext}{chapteratlist}%
+}
+\AtAddToTocList[float]{%
+  \setuptoc{\@currext}{chapteratlist}%
+}
+%</book|report>
+%    \end{macrocode}
 % \begin{macro}{\numberline}
 %   \changes{v2.3c}{1995/08/06}{\cs{numberline} umdefiniert}
 %   \changes{v3.06}{2010/05/18}{Verwendung von \cs{numberline@prefix} und
