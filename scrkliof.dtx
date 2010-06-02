@@ -1,4 +1,4 @@
-% \CheckSum{331}
+% \CheckSum{361}
 % \iffalse meta-comment
 % ======================================================================
 % scrkliof.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkliof.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkliof.dtx}[2009/08/05 v3.04b KOMA-Script (lists of)]
+\ProvidesFile{scrkliof.dtx}[2010/05/18 v3.06 KOMA-Script (lists of)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -257,14 +257,21 @@
 %    \begin{macrocode}
     {leveldown}{5},
 %    \end{macrocode}
+%   \changes{v3.06}{2010/05/18}{neuer Wert \texttt{entryprefix}}
+% Dann gibt es eine Option, mit der die Einträge in die Verzeichnisse mit
+% einem Prefix versehen werden können, soweit ein solcher Prefix
+% existiert. Dieser Wert beinhaltet gleichzeitig auch den Wert \texttt{flat}.
+%    \begin{macrocode}
+    {entryprefix}{6},
+%    \end{macrocode}
 % Dann gibt es Optionen, für die Unterteilung auf Kapitelebene. Allerdings nur
 % für \textsf{scrbook} und \textsf{scrreprt}.
 %    \begin{macrocode}
 %<*book|report>
-    {chapterentry}{6},{withchapterentry}{6},%
-    {nochaptergap}{7},{ignorechapter}{7},%
-    {chaptergapsmall}{8},{smallchaptergap}{8},%
-    {chaptergapline}{9},{onelinechaptergap}{9}%
+    {chapterentry}{7},{withchapterentry}{7},%
+    {nochaptergap}{8},{ignorechapter}{8},%
+    {chaptergapsmall}{9},{smallchaptergap}{9},%
+    {chaptergapline}{10},{onelinechaptergap}{10}%
 %</book|report>
   }{#1}%
   \ifcase \@tempa\relax
@@ -301,6 +308,17 @@
   \or% leveldown
     \doforeachtocfile[float]{%
       \setuptoc{\@currext}{leveldown}%
+    }%
+  \or% entryprefix
+    \@dynlisttrue
+    \doforeachtocfile[float]{%
+      \BeforeStartingTOC[\@currext]{%
+        \scr@ifundefinedorrelax{listof\@currext entryname}{}{%
+          \expandafter\def\expandafter\numberline@prefix
+          \expandafter{\csname listof\@currext entryname\endcsname
+            \nobreakspace}%
+        }%
+      }%
     }%
 %<*book|report>
   \or% chapterentry
@@ -397,16 +415,53 @@
 % Einige Definitionen werden von unterschiedlichen Verzeichnissen
 % verwendet. Diese sind hier zu finden.
 %
-%  \begin{macro}{\numberline}
-%    \changes{v2.3c}{1995/08/06}{\cs{numberline} umdefiniert}
+% \begin{macro}{\numberline}
+%   \changes{v2.3c}{1995/08/06}{\cs{numberline} umdefiniert}
+%   \changes{v3.06}{2010/05/18}{Verwendung von \cs{numberline@prefix} und
+%     \cs{numberline@postfix}}
 % Dieses Makro wird indirekt im Inhaltsverzeichnis verwendet und muss
 % umdefiniert werden, um Duden, 20.~Auflage, Regel~5 und Regel~6 zu
 % implementieren.
 %    \begin{macrocode}
 \renewcommand*{\numberline}[1]{%
-  \hb@xt@\@tempdima{#1\autodot\hfil}}
+  \numberline@box{%
+    \numberline@prefix\numberline@numberformat{#1}\numberline@postfix
+  }%
+}
 %    \end{macrocode}
-%  \end{macro}
+% \begin{macro}{\numberline@prefix}
+%   \changes{v3.06}{2010/05/18}{neu (intern)}
+% Das ist in der Voreinstellung einfach leer. Es könnte verwendet werden, um
+% etwas vor die Nummer zu setzen oder die Nummer rechtsbündig zu setzen.
+%    \begin{macrocode}
+\newcommand*{\numberline@prefix}{}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\numberline@postfix}
+%   \changes{v3.06}{2010/05/18}{neu (intern)} 
+% Das ist in der Voreinstellung einfach \cs{hfil} und dient dazu die Nummer
+% linksbündig zu platzieren.
+%    \begin{macrocode}
+\newcommand*{\numberline@postfix}{\hfil}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\numberline@numberformat}
+%   \changes{v3.06}{2010/05/18}{neu (intern)}
+% Das dient in der Voreinstellung dazu, Regel~5 und 6 aus der 20.~Auflage des
+% DUDENs umzusetzen.
+%    \begin{macrocode}
+\newcommand*{\numberline@numberformat}[1]{#1\autodot}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\numberline@box}
+%   \changes{v3.06}{2010/05/18}{neu (intern)} 
+% Das dient in der Voreinstellung dazu, die Gliederungsnummer in eine Box zu
+% setzen.
+%    \begin{macrocode}
+\newcommand*{\numberline@box}[1]{\hb@xt@\@tempdima{#1}}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
 %
 %  \begin{macro}{\@pnumwidth}
 %  \begin{macro}{\@tocrmarg}
@@ -434,15 +489,15 @@
 % Dieses Makro führt im Falle von \texttt{tocleft} oder
 % \texttt{listsleft} am Anfang eines Verzeichnisses alle notwendigen
 % Änderungen durch, um das Verzeichnis entsprechend zu handhaben.
-%  \begin{macro}{\scr@dottedtocline}
-%    \changes{v2.9k}{2003/01/03}{auch das dritte Argument wird ge"andert}
-%  \begin{macro}{\scr@numberline}
-%  \begin{macro}{\last@l@number}
+% \begin{macro}{\scr@dottedtocline}
+%   \changes{v2.9k}{2003/01/03}{auch das dritte Argument wird ge"andert}
+% \begin{macro}{\scr@numberline}
+%   \changes{v3.06}{2010/05/18}{nicht länger benötigt}
+% \begin{macro}{\last@l@number}
 % Dafür werden ein paar Hilfsmakros benötigt, die vorsichtshalber
 % global vordefiniert werden.
 %    \begin{macrocode}
 \newcommand*{\scr@dottedtocline}{}
-\newcommand*{\scr@numberline}{}
 \newcommand*{\last@l@number}{}
 %    \end{macrocode}
 %  \end{macro}
@@ -455,7 +510,7 @@
 %  \begin{macro}{\set@l@number}
 %    \changes{v2.8q}{2001/11/14}{neu (intern)}
 % Dieses Makro ist dafür verantwortlich, dass zum einen \cs{@tempdima}
-% für den Aufruf von \cs{numberline} auf den richtigen Wert gesetzt
+% für den Aufruf von \cs{numberline@box} auf den richtigen Wert gesetzt
 % wird, zum anderen wird die aktuelle größte Breite der Nummer hier
 % angepasst.
 %    \begin{macrocode}
@@ -468,20 +523,21 @@
   \ifdim\@tempdima >\last@l@number \else
     \setlength{\@tempdima}{\last@l@number}%
   \fi%
-  }
+}
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
 % Kommen wir endlich zu \cs{before@starttoc}:
-%    \changes{v2.95a}{2006/07/12}{Initialisierung im \cs{@empty}-Fall}
+%   \changes{v2.95a}{2006/07/12}{Initialisierung im \cs{@empty}-Fall}
+%   \changes{v3.06}{2010/05/18}{statt \cs{numberline} wird \cs{numberline@box}
+%     umdefiniert} 
 %    \begin{macrocode}
 \newcommand*{\before@starttoc}[1]{
   \let\scr@dottedtocline=\@dottedtocline
   \renewcommand*{\@dottedtocline}[3]{%
     \scr@dottedtocline{##1}{\z@}{\last@l@number}}%
-  \let\scr@numberline=\numberline
-  \renewcommand*{\numberline}[1]{%
-    \set@l@number{##1}\scr@numberline{##1}}%
+  \renewcommand*{\numberline@box}[1]{%
+    \set@l@number{##1}\hb@xt@\@tempdima{##1}}%
   \gdef\@l@number{\z@}%
   \@ifundefined{#1@l@number}{%
     \def\last@l@number{2em}%
@@ -692,8 +748,10 @@
 %    \begin{macrocode}
 \newcommand*\listfigurename{List of Figures}
 \newcommand*\listoflofname{\listfigurename}
+\newcommand*\listoflofentryname{\figurename}
 \newcommand*\listtablename{List of Tables}
 \newcommand*\listoflotname{\listtablename}
+\newcommand*\listoflotentryname{\tablename}
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
