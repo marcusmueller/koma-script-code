@@ -1,4 +1,4 @@
-% \CheckSum{706}
+% \CheckSum{1120}
 % \iffalse meta-comment
 % ======================================================================
 % tocbasic.dtx
@@ -66,7 +66,7 @@
 %%% From File: tocbasic.dtx
 %<*dtx|package|driver|doc|load>
 % \fi
-\def\tocbasicversion{2010/01/05 v3.04b}
+\def\tocbasicversion{2010/06/02 v3.06}
 % \iffalse
 %</dtx|package|driver|doc|load>
 %<*dtx>
@@ -355,7 +355,14 @@ part of all distributions of \LaTeX{} version~2005/12/01 or later.
 This package was made to be used by class and package authors.  Because of
 this the package has no options.  If different packages would load it with
 different options a option clash would be the result.  So using options
-would'nt be a good idea.
+wouldn't be a good idea.
+
+This package may be used by by other class and package authors.  It is also
+allowed to distribute it without the main part of \KOMAScript{} (see
+section~\ref{sec:tocbasic.legalnote}.  Because of this, it does not use any
+\KOMAScript{} package, that isn't allowed to be distributed without the main
+part of \KOMAScript{}, too.  Currently \Package{tocbasic} does only need
+package \Package{keyval} from the graphics bundle.
 
 There are two kind of commands.  The first kind are basic command.  Those
 are used to inform other packages about the extensions used for files that
@@ -505,7 +512,7 @@ Command \Macro{AtAddToTocList}\OParameter{owner}\Parameter{commands}
 % \fi
 adds the \PName{commands} to a internal list of commands, that should be
 processed, if a toc-file with the given \PName{owner} will be added to the
-list of known extensions using \Macro{addtoloclist}.  If you omit the optional
+list of known extensions using \Macro{addtotoclist}.  If you omit the optional
 argument, \Package{tocbasic} tries to find out the filename of the current
 processed class or package and stores this as owner.  This will fail if
 \Macro{AtAddToTocList} was not used, loading a class or package but using a
@@ -965,6 +972,87 @@ will be.
 % \fi
 
 
+\subsection{Generating new Lists of and new Floats}
+\label{sec:tocbasic.highlevel}
+
+There is one simple command to generate either a new list of foo or a new list
+of a new float.
+
+% \iffalse
+%<*dtx>
+% \fi
+\DescribeMacro{\DeclareNewTOC}
+Command
+% \iffalse
+%</dtx>
+\begin{Declaration}
+% \fi
+  \Macro{DeclareNewTOC}\OParameter{options}\Parameter{extension}
+% \iffalse
+\end{Declaration}
+\BeginIndex{Cmd}{DeclareNewTOC}%
+This command
+% \fi
+declares at least a new list of \PName{extension}. Depending on the
+\PName{options} it may also define a new float. The mandatory argument
+\PName{extension} is the extension of the help file for that list. See the
+prior sections for more informations about this. The optional parameter
+\PName{options} is a comma separated list of \emph{key}=\emph{value}
+pairs.
+\begin{description}
+\item[\normalfont\PValue{owner}=\PName{string}]\hfill\\*
+  The owner as described in the sections before. If no owner was given owner
+  \PValue{float} will be used.
+\item[\normalfont\PValue{type}=\PName{string}]\hfill\\*
+  sets the type of the new declared list. The type will be used e.g. to
+  defined a \Macro{listof}\PName{string}. If no type is set up the extension
+  from the mandatory argument will be used.
+\item[\normalfont\PValue{types}=\PName{string}]\hfill\\*
+  the plural of the type. If no plural was given the value of \PValue{type}
+  with postfix ``s'' will be used.
+\item[\normalfont\PValue{name}=\PName{string}]\hfill\\*
+  The name of an element. If no name is given, the value of \PValue{type} with
+  upper case first char will be used.
+\item[\normalfont\PValue{listname}=\PName{string}]\hfill\\*
+  The name of the list of foo. If not given the value of \PValue{types} with
+  upper case first char prefixed by ``List of '' will be used.
+\item[\normalfont\PValue{forcenames}]\hfill\\*
+  If set, the names will be even defined, if they where already defined
+  before.
+\item[\normalfont\PValue{level}=\PName{number}]\hfill\\*
+  The level of the entries of that list. If not given level 1 will be used
+  like standard classes use for entries to list of figures or list of tables.
+\item[\normalfont\PValue{indent}=\PName{length}]\hfill\\*
+  The indent value for the entries of that list. If not given, 1\,em will be
+  used like standard classes use for entries to list of figures or list of
+  tables.
+\item[\normalfont\PValue{hang}=\PName{length}]\hfill\\*
+  The amount of the hanging indent of the entries for that list. If not given,
+  1.5\,em will be used like standard classes use for entries to list of
+  figures or list of tables.
+\item[\normalfont\PValue{float}]\hfill\\*
+  If set, float environments for that type will be defined. The names of the
+  environments are the value of \PName{type} and for double column floats the
+  value of \PName{type} with postfix ``\PValue{*}''.
+\item[\normalfont\PValue{floattype}=\PName{number}]\hfill\\*
+  The numericle float type of the defined floats. Float types with common bits
+  cannot be reordered. At the standard classes figures has float type 1 and
+  tables has float type 2. If no float type was given, 16 will be used.
+\item[\normalfont\PValue{floatpos}=\PName{float positions}]\hfill\\*
+  The default floating-position of the float. If no float position was given,
+  ``tbp'' will be used like the standard classes do for figures and tables.
+\item[\normalfont\PValue{nonfloat}]\hfill\\*
+  If set, a non floating environment will be defined. The name of the
+  environment is the value of \PName{type} with postfix ``\PValue{-}''.
+\item[\normalfont\PValue{counterwithin}=\PName{parent counter}]\hfill\\*
+  If you define a float or nonfloat, the captions will be numbered. You may
+  declare another counter to be the parent counter. In this case, the parent
+  counter will be set before the float counter and the float counter will be
+  reset whenever the parent counter is increased using \Macro{stepcounter}
+  oder \Macro{refstepcounter}.
+\end{description}
+
+
 \subsection{Internal Commands for Class and Package Authors}
 \label{sec:tocbasic.internals}
 
@@ -1143,6 +1231,20 @@ be defined and used in \Macro{tocbasic@listhead}.
 % authors not by users. So the package will be loaded using
 % \Macro{RequiresPackage}. Using different options by different packages would
 % result in an option clash.
+%    \begin{macrocode}
+\ProcessOptions\relax
+%    \end{macrocode}
+%
+%
+% \subsection{Required Packages}
+% \label{sec:packages}
+%
+% Currently only graphics bundle's package \Package{keyval} is needed.
+%    \begin{macrocode}
+\RequirePackage{keyval}
+%    \end{macrocode}
+% We load it after processing the options, because we don't need it for
+% processing options.
 %
 %
 % \subsection{Having a List of All Tocs}
@@ -1798,6 +1900,344 @@ be defined and used in \Macro{tocbasic@listhead}.
   }%
 }
 %    \end{macrocode}
+% \end{macro}
+%
+%
+% \section{High Level Interface for Generating New TOCs and Floats}
+% \label{sec:newfloats}
+%
+% \begin{macro}{\DeclareNewTOC}
+%   \changes{v3.06}{2010/06/01}{new high level command}%
+%   This command defines only a new TOC and a new caption command for this
+%   TOC.  It does not define a new foat unless option float was set!  It does
+%   not define a new nonfloat unless option nonfloat was set!  The optional
+%   argument is used to set up several settings using \Package{keyval}.  The
+%   mandatory argument is the shortcut.  The default type is the shortcut.
+%   The extension is the shortcut.  The default owner is ``\texttt{float}''.
+%
+%   But first of all, we define the options used by the optional argument:
+%   The type of list is used for environment and counter names and as part of
+%   several internal and user macros.
+%    \begin{macrocode}
+\define@key{tocbasic}{type}{%
+  \tb@ifvalueisnotempty{type}{#1}{\edef\tb@nt@type{#1}}%
+}
+%    \end{macrocode}
+%   If a counter will be defined, this counter may depend on another counter
+%   (like figure counter depends on chapter counter at book classes). If the
+%   value is empty, the counter does not depend on any other counter.
+%    \begin{macrocode}
+\define@key{tocbasic}{counterwithin}{%
+  \edef\tb@nt@counterwithin{#1}%
+}
+%    \end{macrocode}
+%   Sometimes the plural of the type is needed and may be defined by a
+%   seperate option.
+%    \begin{macrocode}
+\define@key{tocbasic}{types}{%
+  \tb@ifvalueisnotempty{types}{#1}{\edef\tb@nt@types{#1}}%
+}
+%    \end{macrocode}
+%   Don't tell the user, that the mandatory argument of the command may be
+%   overloaded by this option. This was only done to simplify the definition.
+%    \begin{macrocode}
+\define@key{tocbasic}{extension}{%
+  \tb@ifvalueisnotempty{extension}{#1}{\edef\tb@nt@ext{#1}}%
+}
+%    \end{macrocode}
+%   The owner of the new list extension.
+%    \begin{macrocode}
+\define@key{tocbasic}{owner}{%
+  \tb@ifvalueisnotempty{owner}{#1}{\edef\tb@nt@owner{#1}}%
+}
+%    \end{macrocode}
+%   We need a name/term for the entries of the new list. This may e.g. be used
+%   for |caption| output. A |\<type>name| will also be defined.
+%    \begin{macrocode}
+\define@key{tocbasic}{name}{%
+  \tb@ifvalueisnotempty{name}{#1}{\edef\tb@nt@name{#1}}%
+}
+%    \end{macrocode}
+%   The list itself has a heading. A |\list<type>name| will also be defined.
+%    \begin{macrocode}
+\define@key{tocbasic}{listname}{%
+  \tb@ifvalueisnotempty{listname}{#1}{\edef\tb@nt@listname{#1}}%
+}
+%    \end{macrocode}
+% \begin{macro}{\iftb@forcenames}
+%   \changes{v3.06}{2010/06/01}{new internal}
+%   The |\...name| commands will only be defined, if they are not already
+%   defined. But some users may want to define their own names even if there
+%   are already definitions. So this boolean option may switch to force the
+%   definition.
+%    \begin{macrocode}
+\newif\iftb@forcenames
+\define@key{tocbasic}{forcenames}[true]{%
+  \lowercase{\tb@boolkey{#1}}{forcenames}%
+}
+%    \end{macrocode}
+% \end{macro}
+%   Each entry to a TOC/list of has a numeric level. You may set up your own
+%   level.
+%    \begin{macrocode}
+\define@key{tocbasic}{level}{%
+  \tb@ifvalueisnotempty{level}{#1}{\tb@numkey\tb@nt@level{#1}}%
+}
+%    \end{macrocode}
+%   Earch entry of a TOC/list of is idented on the left side. This is the
+%   amount of the indention of the number part.
+%    \begin{macrocode}
+\define@key{tocbasic}{indent}{%
+  \tb@ifvalueisnotempty{indent}{#1}{\tb@dimkey\tb@nt@indent{#1}}%
+}
+%    \end{macrocode}
+%   Earch entry of a TOC/list of is idented on the left side. This is the
+%   amount of the indention of the text of the entry.
+%    \begin{macrocode}
+\define@key{tocbasic}{hang}{%
+  \tb@ifvalueisnotempty{hang}{#1}{\tb@dimkey\tb@nt@hang{#1}}%
+}
+%    \end{macrocode}
+% \begin{macro}{\iftb@float}
+%   \changes{v3.06}{2010/06/01}{new internal}
+%   This boolean indicates, that float environments should also be defined.
+%    \begin{macrocode}
+\newif\iftb@float
+\define@key{tocbasic}{float}[true]{%
+  \lowercase{\tb@boolkey{#1}}{float}%
+}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\iftb@nonfloat}
+%   \changes{v3.06}{2010/06/01}{new internal}
+%   This boolean indicates, that non-float environment should also be
+%   defined. The environment has the postfix ``-''.
+%    \begin{macrocode}
+\newif\iftb@nonfloat
+\define@key{tocbasic}{nonfloat}[true]{%
+  \lowercase{\tb@boolkey{#1}}{nonfloat}%
+}
+%    \end{macrocode}
+% \end{macro}
+%   Simply the value for the |\ftype@...| macro. It has to be
+%   $1<=\textrm{value}<=31$.
+%    \begin{macrocode}
+\define@key{tocbasic}{floattype}{%
+  \tb@ifvalueisnotempty{floattype}{#1}{\tb@numkey\tb@nt@floattype{#1}}%
+}
+%    \end{macrocode}
+%   Simply the value for the |\fps@...| macro.
+%    \begin{macrocode}
+\define@key{tocbasic}{floatpos}{%
+  \tb@ifvalueisnotempty{floatpos}{#1}{\edef\tb@nt@floatpos{#1}}%
+}
+%    \end{macrocode}
+%  Now the command to define a new list and maybe float or nonfloat.
+%    \begin{macrocode}
+\newcommand*{\DeclareNewTOC}[2][]{%
+  \tb@floatfalse
+  \tb@nonfloatfalse
+  \tb@forcenamesfalse
+  \def\tb@nt@floattype{\tb@nt@autofloattype}%
+  \def\tb@nt@floatpos{tbp}%
+  \def\tb@nt@ext{#2}%
+  \def\tb@nt@type{#2}%
+  \def\tb@nt@types{\tb@nt@type s}%
+  \def\tb@nt@owner{float}%
+  \def\tb@nt@name{\expandafter\MakeUppercase\tb@nt@type}%
+  \def\tb@nt@listname{List of \expandafter\MakeUppercase\tb@nt@types}%
+  \def\tb@nt@level{1}%
+  \def\tb@nt@indent{1em}%
+  \def\tb@nt@hang{1.5em}%
+  \let\tb@nt@counterwithin\@empty%
+  \setkeys{tocbasic}{#1}%
+%    \end{macrocode}
+%   First of all, every TOC needs a extension, that should be added to the
+%   list of known extensions.
+%    \begin{macrocode}
+  \expandafter\newcommand\csname ext@\tb@nt@type\endcsname{}%
+  \expandafter\let\csname ext@\tb@nt@type\endcsname\tb@nt@ext
+  \addtotoclist[\tb@nt@owner]{\csname ext@\tb@nt@type\endcsname}%
+%    \end{macrocode}
+% Then we need the TOC itself with a name:
+%    \begin{macrocode}
+  \@ifundefined{\tb@nt@type name}{%
+    \expandafter\let\csname \tb@nt@type name\endcsname\tb@nt@name
+  }{%
+    \iftb@forcenames
+      \expandafter\let\csname \tb@nt@type name\endcsname\tb@nt@name
+    \fi
+  }%
+  \@ifundefined{list\tb@nt@type name}{%
+    \expandafter\let\csname list\tb@nt@type name\endcsname\tb@nt@listname
+  }{%
+    \iftb@forcenames
+      \expandafter\let\csname list\tb@nt@type name\endcsname\tb@nt@listname
+    \fi
+  }%
+  \expandafter\newcommand\csname listof\tb@nt@ext name\expandafter\endcsname
+    \expandafter{\csname list\tb@nt@type name\endcsname}%
+  \begingroup\edef\@tempa{\endgroup
+    \noexpand\newcommand*\csname listof\tb@nt@types\endcsname{%
+      \noexpand\listoftoc{\tb@nt@ext}%
+    }%
+  }\@tempa
+%    \end{macrocode}
+% The list entry:
+%    \begin{macrocode}
+  \begingroup\edef\@tempa{\endgroup
+    \noexpand\newcommand*\csname l@\tb@nt@type\endcsname{%
+      \noexpand\@dottedtocline{\tb@nt@level}{\tb@nt@indent}{\tb@nt@hang}%
+    }%
+  }\@tempa
+%    \end{macrocode}
+% The setup command:
+%    \begin{macrocode}
+  \begingroup\edef\@tempa{\endgroup
+    \noexpand\newcommand*\csname setup\tb@nt@types\endcsname{%
+      \noexpand\setuptoc{\tb@nt@ext}%
+    }%
+  }\@tempa
+  \@tempswafalse
+%    \end{macrocode}
+% The float environments:
+%    \begin{macrocode}
+  \iftb@float
+    \expandafter\newcommand\expandafter*\csname fps@\tb@nt@type\expandafter
+    \endcsname{\tb@nt@floatpos}%
+    \expandafter\newcommand\expandafter*\csname ftype@\tb@nt@type\expandafter
+    \endcsname{\tb@nt@floattype}%
+    \begingroup
+     \edef\@tempa{%
+       \noexpand\endgroup
+       \noexpand\newenvironment{\tb@nt@type}{%
+         \noexpand\@float{\tb@nt@type}%
+       }{%
+         \noexpand\end@float
+       }%
+       \noexpand\newenvironment{\tb@nt@type*}{%
+         \noexpand\@dblfloat{\tb@nt@type}%
+       }{%
+         \noexpand\end@dblfloat
+       }%
+     }%
+    \@tempa
+    \@tempswatrue
+  \fi
+%    \end{macrocode}
+% The nonfloat environment:
+%    \begin{macrocode}
+  \iftb@nonfloat
+    \begingroup
+      \edef\@tempa{%
+        \noexpand\endgroup
+        \noexpand\newenvironment{\tb@nt@type-}{%
+          \noexpand\trivlist\noexpand\item\noexpand\relax
+          \noexpand\minipage{\noexpand\linewidth}%
+          \noexpand\def\noexpand\@captype{\tb@nt@type}%
+        }{%
+          \noexpand\endminipage\noexpand\endtrivlist
+        }%
+      }%
+    \@tempa
+    \@tempswatrue
+  \fi
+%    \end{macrocode}
+% The counter of float and nonfloat environments:
+%    \begin{macrocode}
+  \if@tempswa
+    \@ifundefined{c@\tb@nt@type}{%
+      \newcounter{\tb@nt@type}%
+    }{%
+      \PackageWarning{tocbasic}{using already defined counter `\tb@nt@type'}%
+    }%
+    \ifx\tb@nt@counterwithin\@empty\else
+      \@addtoreset{\tb@nt@type}{\tb@nt@counterwithin}%
+      \begingroup\edef\@tempa{%
+        \noexpand\endgroup
+        \noexpand\renewcommand*\expandafter\noexpand
+        \csname the\tb@nt@type\endcsname{%
+          \expandafter\noexpand\csname the\tb@nt@counterwithin\endcsname
+          .\noexpand\arabic{\tb@nt@type}%
+        }%
+      }\@tempa
+    \fi
+    \begingroup
+      \edef\@tempa{%
+        \noexpand\endgroup
+        \noexpand\newcommand*\expandafter\noexpand
+        \csname \tb@nt@type format\endcsname{%
+          \expandafter\noexpand\csname \tb@nt@type name\endcsname
+          \noexpand\nobreakspace
+          \expandafter\noexpand\csname the\tb@nt@type\endcsname
+          \csname autodot\endcsname
+        }%
+        \noexpand\newcommand*\expandafter\noexpand
+        \csname fnum@\tb@nt@type\endcsname{%
+          \expandafter\noexpand\csname \tb@nt@type format\endcsname
+        }%
+      }%
+    \@tempa
+  \fi
+}
+%    \end{macrocode}
+% \begin{macro}{\tb@ifvalueisnotempty}
+%   \changes{v3.06}{2010/05/21}{new internal}%
+%   This is only a helper for defining some of the keys.
+%    \begin{macrocode}
+\newcommand*{\tb@ifvalueisnotempty}[2]{%
+  \begingroup
+    \edef\@tempa{#2}\ifx\@tempa\@empty
+      \PackageError{tocbasic}{empty value for key `#1'}{%
+        The argument of key `#1' may not by empty!}%
+      \aftergroup\@gobble
+    \else
+      \aftergroup\@firstofone
+    \fi
+  \endgroup
+}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\tb@boolkey}
+%   \changes{v3.06}{2010/05/21}{new internal}%
+%   This is only a helper for boolean keys.
+%    \begin{macrocode}
+\newcommand*{\tb@boolkey}[2]{%
+  \csname tb@#2\ifx\relax#1\relax true\else#1\fi\endcsname
+}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\tb@dimkey}
+%   \changes{v3.06}{2010/05/21}{new internal}%
+%   This is only a helper for dimension keys.
+%    \begin{macrocode}
+\newcommand*{\tb@dimkey}[2]{%
+  \begingroup
+    \@defaultunits\@tempdima#2pt\relax\@nnil
+    \edef\@tempa{\noexpand\endgroup\noexpand\def\noexpand#1{\the\@tempdima}}
+  \@tempa
+}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\tb@dimkey}
+%   \changes{v3.06}{2010/05/21}{new internal}%
+%   This is only a helper for numerical keys.
+%    \begin{macrocode}
+\newcommand*{\tb@numkey}[2]{%
+  \begingroup
+    \afterassignment\remove@to@nnil\@tempcnta#2\relax\@nnil
+    \edef\@tempa{\noexpand\endgroup\noexpand\def\noexpand#1{\the\@tempcnta}}
+  \@tempa
+}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\tb@nt@autofloattype}
+%   \changes{v3.06}{2010/06/01}{new internal}
+%   This macro saves the float type for auto generated float types.
+%    \begin{macrocode}
+\newcommand*{\tb@nt@autofloattype}{16}
+%    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
 % \iffalse
