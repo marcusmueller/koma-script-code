@@ -45,7 +45,7 @@
 %
 % ======================================================================
 
-\ProvidesFile{tocbasic.tex}[2010/01/05 KOMA-Script package tocbasic]
+\ProvidesFile{tocbasic.tex}[2010/06/02 KOMA-Script package tocbasic]
 
 \chapter{Verzeichnisse verwalten mit Hilfe von \Package{tocbasic}}
 \labelbase{tocbasic}
@@ -953,9 +953,175 @@ Dateierweiterung \File{lor} verwendet wird, so genügt
 \end{lstcode}
 um eine als Argument an \Macro{setupremarkboxes} übergebene Liste von
 Eigenschaften direkt als Liste von Eigenschaften für \File{lor} zu setzen.
+
+
+\section{Alles mit einer Anweisung}
+\label{sec:tocbasic.declarenewtoc}
+
+Das Beispiel aus dem vorherigen Abschnitt hat gezeigt, dass es mit mit
+\Package{tocbasic} recht einfach ist, eigene Gleitumgebungen mit eigenen
+Verzeichnissen zu definieren. In diesem Beispiel wird gezeigt, dass es sogar
+noch einfacher gehen kann.
+
+\begin{Declaration}
+  \Macro{DeclareNewTOC}\OParameter{Optionenliste}\Parameter{Dateierweiterung}%
+\end{Declaration}%
+\BeginIndex{Cmd}{DeclareNewTOC}%
+Mit\ChangedAt{v3.06}{\Package{tocbasic}} dieser Anweisung wird in einem
+einzigen Schritt ein neues Verzeichnis, dessen Überschrift und die Bezeichnung
+für die Einträge unter Kontrolle von \Package{tocbasic} definiert. Optional
+können dabei gleichzeitig gleitende oder nicht gleitende Umgebungen definiert
+werden, innerhalb derer \Macro{caption} Einträge für dieses neue Verzeichnis
+erzeugt.
+
+\PName{Dateierweiterung} definiert dabei die Dateiendung der Hilfsdatei, die
+das Verzeichnis represäntiert, wie dies in \autoref{sec:tocbasic.basics}
+bereits erläutert wurde. Dieser Parameter muss angegeben werden und darf nicht
+leer sein!
+
+\PName{Optionenliste} ist eine durch Komma getrennte Liste von Optionen, wie
+dies auch von \Macro{KOMAoptions} (siehe \autoref{sec:typearea.options})
+bekannt ist. Diese Optionen können jedoch \emph{nicht} mit
+\Macro{KOMAoptions}\IndexCmd{KOMAoptions} gesetzt werden! Eine Übersicht über
+die möglichen Optionen bietet \autoref{tab:tocbasic.DeclareNewTOC-options}.
+
+\begin{desctable}
+  \caption{Optionen für die Anweisung
+    \Macro{DeclareNewTOC}\label{tab:tocbasic.DeclareNewTOC-options}}%
+  \ChangedAt{v3.06}{\Package{tocbasic}}\\
+  \Endfirsthead%
+  \caption[]{Optionen für die Anweisung
+    \Macro{DeclareNewTOC} (\emph{Fortsetzung})}\\
+  \Endhead%
+  \standardfoot%
+  \entry{\KOption{counterwithin}\PName{\LaTeX-Zähler}}{%
+    Falls eine neue Gleitumgebung oder eine nicht gleitende Umgebung definiert
+    wird, so wird für diese auch ein neuer Zähler
+    \Counter{\PName{Eintragstyp}} (siehe Option \Option{type})
+    angelegt. Dieser Zähler kann in gleicher Weise wie beispielsweise der
+    Zähler \Counter{figure} bei \Class{book}-Klassen von Zähler
+    \Counter{chapter} abhängt von einem \LaTeX-Zähler ahängig gemacht
+    werden.}%
+  \entry{\Option{float}}{%
+    Es wird nicht nur ein neuer Verzeichnistyp definiert, sondern auch
+    Gleitumgebungen \Environment{\PName{Eintragstyp}} (siehe Option
+    \Option{type}) und \Environment{\PName{Eintragstyp}*}
+    (vgl. \Environment{figure} und \Environment{figure*}).}%
+  \entry{\KOption{floatpos}\PName{Gleitverhalten}}{%
+    Jede Gleitumgebung hat ein voreingestelltes \PName{Gleitverhalten}, das
+    über das optionale Argument der Gleitumgebung überladen werden kann. Mit
+    dieser Option wird das \PName{Gleitverhalten} für die optional erstellbare
+    Gleitumgebung (siehe Option \Option{float}) festgelegt. Die Syntax und
+    Semantik ist dabei mit der des optionalen Arguments für die Gleitumgebung
+    identisch. Wird die Option nicht verwendet, so ist das voreingestellte
+    Gleitverhalten \texttt{tbp}, also \emph{top}, \emph{bottom},
+    \emph{page}.}%
+  \entry{\KOption{floattype}\PName{Gleittyp}}{%
+    Jede Gleitumgebung hat einen numerischen Typ. Gleitumgebungen, bei denen
+    in diesem \PName{Gleittyp} nur unterschiedliche Bits gesetzt sind, können
+    sich gegenseitig überholen. Die Gleitumgebungen \Environment{figure} und
+    \Environment{table} haben normalerweise die Typen 1 und 2, können sich
+    also gegenseitig überholen. Es sind Typen von 1 bis 31 (alle Bits gesetzt,
+    kann also keinen anderen Typ überholen und von keinem anderen Typen
+    überholt werden) zulässig. Wird kein Typ angegeben, so wird mit 16 der
+    höchst mögliche Ein-Bit-Typ verwendet.}%
+  \entry{\Option{forcenames}}{%
+    Siehe Option \Option{name} und \Option{listname}.}%
+  \entry{\KOption{hang}\PName{Einzug}}{%
+    Mehrzeilige Verzeichniseinträge in hierarchisch angeordneten
+    Verzeichnissen besitzen ab der zweiten Zeile einen Einzug von
+    links. Dieser Einzug wird auch für die Position des Textes in der ersten
+    Zeile eines nummerierten Eintrags verwendet. Der Wert des Einzugs kann
+    über diese Option bestimmt werden. Ohne diese Option wird als
+    \PName{Einzug} 1,5\Unit{em} verwendet.}%
+  \entry{\KOption{indent}\PName{Einzug}}{%
+    In der hierarchischen Form besitzt jeder Verzeichniseintrag einen Einzug
+    von links. Der Wert des Einzugs kann über diese Option bestimmt
+    werden. Ohne diese Option wird als \PName{Einzug} 1\Unit{em} verwendet.}%
+  \entry{\KOption{level}\PName{Gliederungsebene}}{%
+    Jeder Eintrag in ein Verzeichnis hat eine nummerische
+    \PName{Gliederungsebene}, die über diese Option gesetzt werden kann. Ist
+    diese Option nicht angegeben, so wird der Standardwert 1 verwendet.}%
+  \entry{\KOption{listname}\PName{Verzeichnistitel}}{%
+    Jedes Verzeichnis hat eine Überschrift, die durch diese Option bestimmt
+    werden kann. Ist die Option nicht angegeben, so wir als Verzeichnistitel
+    »\texttt{List of \PName{Mehrzahl des Eintragstyps}}« (siehe Option
+    \PName{types}) verwendet, wobei das erste Zeichen der \PName{Mehrzahl des
+      Eintragstyps} in einen Großbuchstaben gewandelt wird. Es wird auch ein
+    Makro \Macro{list\PName{Eintragstyp}name} mit diesem Wert definiert, der
+    jederzeit geändert werden kann. Dieses Makro wird jedoch nur definiert,
+    wenn es nicht bereits definiert ist oder zusätzlich Option
+    \Option{forcenames} gesetzt ist.}%
+  \entry{\KOption{name}\PName{Eintragsname}}{%
+    Sowohl als optionaler Präfix für die Einträge im Verzeichnis als auch für
+    die Beschriftung in einer Gleitumgebung (siehe Option \Option{float}) oder
+    einer nicht gleitenden Umgebung (siehe Option \Option{nonfloat}) wird ein
+    Name für einen Eintrag in das Verzeichnis benötigt. Ohne diese Option wird
+    als \PName{Eintragsname} der \PName{Eintragstyp} (siehe Option
+    \Option{type}) verwendet, bei dem das erste Zeichen in einen
+    Großbuchstaben gewandelt wird. Es wird auch ein Makro
+    \Macro{\PName{Eintragstyp}name} mit diesem Wert definiert, der jederzeit
+    geändert werden kann. Dieses Makro wird jedoch nur definiert, wenn es
+    nicht bereits definiert ist oder zusätzlich Option \Option{forcenames}
+    gesetzt ist.}%
+  \entry{\Option{nonfloat}}{%
+    Es wird nicht nur ein neuer Verzeichnistyp definiert, sondern auch eine
+    nicht gleitende Umgebungen \Environment{\PName{Eintragstyp}-} (siehe
+    Option \Option{type}), die ähnlich wie eine Gleitumgebung verwendet werden
+    kann, jedoch nicht gleitet und auch nicht die Grenzen der aktuell gültigen
+    Umgebung durchbricht.}%
+  \entry{\KOption{owner}\PName{Besitzer}}{%
+    Jedes neue Verzeichnis hat bei \Package{tocbasic} einen Besitzer (siehe
+    \autoref{sec:tocbasic.basics}). Dieser kann hier angegeben werden. Ist
+    kein Besitzer angegeben, so wird der Besitzer »\PValue{float}« verwendet,
+    den auch die \KOMAScript-Klassen für das Abbildungs- und das
+    Tabellenverzeichnis verwenden.}%
+  \entry{\KOption{type}\PName{Eintragstyp}}{%
+    \PName{Eintragstyp} gibt den Typ der Einträge in das entsprechende
+    Verzeichnis an. Der Typ wird auch als Basisname für verschiedene Makros
+    und gegebenenfalls Umgebungen und Zähler verwendet. Er sollte daher nur
+    aus Buchstaben bestehen. Wird diese Option nicht verwendet, so wird für
+    \PName{Eintragstyp} die \PName{Dateierweiterung} aus dem obligatorischen
+    Argument verwendet.}%
+  \entry{\KOption{types}\PName{Mehrzahl des Eintragstyps}}{%
+    An verschiedenen Stellen wird auch die Mehrzahlform des Eintragstyps
+    verwendet, beispielsweise um eine Anweisung \Macro{listof\PName{Mehrzahl
+        des Eintragstyps}} zu definieren. Wird diese Option nicht verwendet,
+    so wird als \PName{Mehrzahl des Eintragstyps} einfach
+    »\PName{Eintragstyp}s« verwendet.}%
+\end{desctable}
+
+\begin{Example}
+  Das Beispiel aus \autoref{sec:tocbasic.example} kann mit Hilfe der neuen
+  Anweisung deutlich verkürzt werden:
+\begin{lstcode}
+  \DeclareNewTOC[%
+    type=remarkbox,%
+    types=remarkboxes,%
+    float,% Es sollen Gleitumgebungen definiert werden.
+    floattype=4,%
+    name=Merksatz,%
+    listname={Verzeichnis der Merks\"atze}%
+  ]{lor}
+  \setuptoc{lor}{chapteratlist}
+\end{lstcode}
+  Damit sind dann neben den Umgebungen \Environment{remarkbox} und
+  \Environment{remarkbox*} auch der Zähler \Counter{remarkbox} und die
+  Anweisungen \Macro{theremarkbox}, \Macro{remarkboxformat},
+  \Macro{remarkboxname}, \Macro{listremarkboxname}, \Macro{listofremarkboxes}
+  und einige intern verwendete Anweisungen mit Bezug auf die Dateiendung
+  \File{lor} definiert. Soll der Gleitumgebungstyp dem Paket überlassen
+  werden, so kann Option \Option{floattype} im Beispiel zusätzlich
+  entfallen. Wird zusätzlich die Option \Option{nonfloat} angegeben, so wird
+  zusätzlich ein Umgebung \Environment{remarkbox-} definiert, in der ebenfalls
+  \Macro{caption}\IndexCmd{caption} verwendet werden kann, die jedoch nicht
+  gleitet.%
+\end{Example}%
+%
+\EndIndex{Cmd}{DeclareNewTOC}%
+
 %
 \EndIndex{Package}{tocbasic}%
-
 
 \endinput
 
