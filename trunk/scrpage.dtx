@@ -1,4 +1,4 @@
-% \CheckSum{2602}
+% \CheckSum{2695}
 % \iffalse
 % ======================================================================
 % scrpage.dtx
@@ -65,7 +65,7 @@
 %<v1>\ProvidesPackage{scrpage}[2008/02/29 v1.3e KOMA-Script
 %<v2>\ProvidesPackage{scrpage2}
 %<*!v1>
-                [2009/11/11 v2.4 LaTeX2e KOMA-Script
+                [2010/04/22 v2.5 LaTeX2e KOMA-Script
 %</!v1>
 %<scrpage>                 package]
 %<*driver>
@@ -751,7 +751,7 @@
 %  \end{macro}
 %  \end{macro}
 %
-%  \begin{macro}{\defpagestyle}
+% \begin{macro}{\defpagestyle}
 % First we define the simple definition-interface. There's no test, if
 % the pagestyle's defined twice.
 %
@@ -765,7 +765,8 @@
   {\@defpagestyle[-]}%
   {\@defpagestyle[+]}}
 %    \end{macrocode}
-% Now the we can define the head and the foot. First at twoside-mode:
+% \begin{macro}{\@defpagestyle}
+% Now the we can define the head and the foot.
 % \changes{v1.0b}{1995/05/25}{Dot deleted after number at
 %   chapter- and sectionmark}
 % \changes{v1.0b}{1995/05/25}{Use CJK at \cs{chaptermark},
@@ -776,11 +777,16 @@
 % \changes{v2.1a}{2002/10/30}{Use \cs{if@automark}}
 % \changes{v2.2d}{2007/06/14}{Support of article-classes with
 %   \cs{if@mainmatter}}
+% \changes{v2.5}{2010/04/22}{moved \cs{if@twoside} inside of definition}
+% Before version 2.5 we have distinguished one- and two-side definitions while
+% loading the package and have had all the definitions of \cs{@mkboth},
+% \cs{chaptermark}, \cs{sectionmark}, and \cs{subsectionmark} at the
+% definition of the page style. This was a lot of code:
 %    \begin{macrocode}
+%<*v1>
 \if@twoside
   \def\@defpagestyle[#1]#2#3#4{%
     \expandafter\def\csname ps@#2\endcsname{%
-%<*v1>
       \def\@tempa{+}%
       \def\@tempb{#1}%
       \ifx\@tempa\@tempb
@@ -813,19 +819,13 @@
         \fi
         \def\sectionmark####1{}%
       \fi
-%</v1>
-%<!v1>      \if@automark\let\@mkboth\markboth\else\let\@mkboth\@gobbletwo\fi
       \def@twosidehead#3
       \def@twosidefoot#4
     }
   }
 \else
-%    \end{macrocode}
-% Then the oneside-mode:
-%    \begin{macrocode}
   \def\@defpagestyle[#1]#2#3#4{%
     \expandafter\def\csname ps@#2\endcsname{%
-%<*v1>
       \def\@tempa{+}%
       \def\@tempb{#1}%
       \ifx\@tempa\@tempb
@@ -850,192 +850,241 @@
         \fi
         \def\sectionmark####1{}%
       \fi
-%</v1>
-%<!v1>      \if@automark\let\@mkboth\markboth\else\let\@mkboth\@gobbletwo\fi
       \def@onesidehead#3
       \def@onesidefoot#4
     }
   }
 \fi
+%</v1>
 %    \end{macrocode}
-%  \begin{macro}{\def@twosidehead}
-% \changes{v1.3}{2001/03/30}{Use of \cs{@headwidth} instead of
-%                            \cs{textwidth}} 
-% \changes{v2.0}{2001/04/20}{Thickness and length of the lines are
-%                            optional}
-% \changes{v2.0j}{2001/08/18}{Use of \cs{scr@nouppercase}}
-% This was real simple, but we already have to do the real definition
-% of the heads and foots. First the twosided head:
+% Since version~2.5 the difference of one- and two-side is made at the
+% definition of the heads and foots themself and \cs{chaptermark},
+% \cs{sectionmark}, and \cs{subsectionmark} are defined by \cs{automark} and
+% \cs{manualmark}. So the code is much easier.
 %    \begin{macrocode}
 %<*v2>
-\def\def@twosidehead{%
-  \@ifnextchar(%)
-  {\def@@twosidehead}%
-  {\def@@twosidehead(\scr@headabove@linelength,%
-                     \scr@headabove@linethickness)}}
-\def\def@@twosidehead(#1,#2)#3#4#5{%
-  \@ifnextchar(%)
-  {\def@@@twosidehead({#1},{#2}){#3}{#4}{#5}}%
-  {\def@@@twosidehead({#1},{#2}){#3}{#4}{#5}%
-                     (\scr@headbelow@linelength,%
-                      \scr@headbelow@linethickness)}}
-\def\def@@@twosidehead(#1,#2)#3#4#5(#6,#7){%
+\def\@defpagestyle[#1]#2#3#4{%
+  \expandafter\def\csname ps@#2\endcsname{%
+    \if@automark\let\@mkboth\markboth\else\let\@mkboth\@gobbletwo\fi
+    \def@head#3
+    \def@foot#4
+  }%
+}
 %</v2>
-%<v1>\def\def@twosidehead(#1,#2)#3#4#5(#6,#7){%
+%    \end{macrocode}
+% \begin{macro}{\def@twosidehead}
+%   \changes{v2.5}{2010/04/22}{replaced by \cs{\def@head}}
+% \begin{macro}{\def@@twosidehead}
+%   \changes{v1.3}{2001/03/30}{Use of \cs{@headwidth} instead of
+%     \cs{textwidth}}
+%   \changes{v2.5}{2010/04/22}{replaced by \cs{\def@@head}}
+%    \begin{macrocode}
+%<*v1>
+\def\def@twosidehead(#1,#2)#3#4#5(#6,#7){%
   \def\@evenhead{\let\headmark\leftmark%
     \hss\hskip\@evenheadshift\vbox{\hsize=\@headwidth\relax%
       \hf@rule{#1}{#2}{\@headwidth}%
-%<v2>      {headabove}%
       \vskip#2
       \vskip\baselineskip
       \hb@xt@\@headwidth{{%
-%<v2>          \scr@nouppercase
           \headfont\strut #3}}%
       \hf@rule{#6}{#7}{\@headwidth}%
-%<v2>      {headbelow}%
   }\hskip\@oddheadshift\hss}%
   \def\@oddhead{\let\headmark\rightmark
     \hss\hskip\@oddheadshift\vbox{\hsize=\@headwidth\relax
       \hf@rule{#1}{#2}{\@headwidth}%
-%<v2>      {headabove}%
       \vskip#2%
       \vskip\baselineskip
       \hb@xt@\@headwidth{{%
-%<v2>          \scr@nouppercase
           \headfont\strut #4}}%
       \hf@rule{#6}{#7}{\@headwidth}%
-%<v2>      {headbelow}%
   }\hskip\@evenheadshift\hss}%
 }
-%    \end{macrocode}
-%  \end{macro}
-%  \begin{macro}{\def@onesidehead}
-% \changes{v1.3}{2001/03/30}{Use of \cmd\@headwidth instead of
-%                            \cmd\textwidth} 
-% \changes{v2.0}{2001/04/20}{Thickness and length of the lines are
-%                            optional}  
-% \changes{v2.0j}{2001/08/18}{Use of \cs{scr@nouppercase}}
-%  \begin{macro}{\def@@onesidehead}
-%  \begin{macro}{\def@@@onesidehead}
-% \changes{v2.0l}{2001/09/30}{\cs{@oddheadshift} am Ende durch
-%                             \cs{@evenheadshift} ersetzt}
+%</v1>
+% \end{macro}
+% \end{macro}
+% \begin{macro}{\def@onesidehead}
+%   \changes{v1.3}{2001/03/30}{Use of \cmd\@headwidth instead of
+%     \cs{textwidth}}
+%   \changes{v2.5}{2010/04/22}{replaced by \cs{\def@head}}
+% \begin{macro}{\def@@onesidehead}
+%   \changes{v2.5}{2010/04/22}{replaced by \cs{\def@@head}}
+% \begin{macro}{\def@@@onesidehead}
+%   \changes{v2.5}{2010/04/22}{replaced by \cs{\def@@@head}}
 % Next the onesided head:
 %    \begin{macrocode}
-%<*v2>
-\def\def@onesidehead{%
-  \@ifnextchar(%)
-  {\def@@onesidehead}%
-  {\def@@onesidehead(\scr@headabove@linelength,%
-                     \scr@headabove@linethickness)}}
-\def\def@@onesidehead(#1,#2)#3#4#5{%
-  \@ifnextchar(%)
-  {\def@@@onesidehead({#1},{#2}){#3}{#4}{#5}}%
-  {\def@@@onesidehead({#1},{#2}){#3}{#4}{#5}%
-                     (\scr@headbelow@linelength,%
-                      \scr@headbelow@linethickness)}}
-\def\def@@@onesidehead(#1,#2)#3#4#5(#6,#7){%
-%</v2>
-%<v1>\def\def@onesidehead(#1,#2)#3#4#5(#6,#7){%
+%<*v1>
+\def\def@onesidehead(#1,#2)#3#4#5(#6,#7){%
   \def\@evenhead{}%
   \def\@oddhead{\let\headmark\rightmark
     \hss\hskip\@oddheadshift\vbox{\hsize=\@headwidth\relax
       \hf@rule{#1}{#2}{\@headwidth}%
-%<v2>      {headabove}%
       \vskip#2%
       \vskip\baselineskip
       \hb@xt@\@headwidth{{%
-%<v2>          \scr@nouppercase
           \headfont\strut #5}}%
       \hf@rule{#6}{#7}{\@headwidth}%
-%<v2>      {headbelow}%
   }\hskip\@evenheadshift\hss}%
 }
+%</v1>
 %    \end{macrocode}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
-%  \begin{macro}{\def@twosidefoot}
-% \changes{v2.0}{2001/04/20}{Thickness and length of the lines are
-%                            optional}  
-% \changes{v1.3}{2001/03/30}{Use of \cmd\@footwidth instead of
-%                            \cmd\textwidth} 
-%  \begin{macro}{\def@@twosidefoot}
-%  \begin{macro}{\def@@@twosidefoot}
-% \changes{v2.0j}{2001/08/18}{Use of \cs{scr@nouppercase}}
-% \changes{v2.2f}{2008/02/14}{Use of \cs{footfont}}
-% And last twosided and onesided foot:
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \begin{macro}{\def@twosidefoot}
+%   \changes{v1.3}{2001/03/30}{Use of \cmd\@footwidth instead of
+%     \cs{textwidth}}
+%   \changes{v2.5}{2010/04/22}{replaced by \cs{\def@foot}}
+% \begin{macro}{\def@@twosidefoot}
+%   \changes{v2.5}{2010/04/22}{replaced by \cs{\def@@foot}}
+% \begin{macro}{\def@@@twosidefoot}
+%   \changes{v2.5}{2010/04/22}{replaced by \cs{\def@@@foot}}
+% Next the twosided foot:
 %    \begin{macrocode}
-%<*v2>
-\def\def@twosidefoot{%
-  \@ifnextchar(%)
-  {\def@@twosidefoot}
-  {\def@@twosidefoot(\scr@footabove@linelength,%
-                     \scr@footabove@linethickness)}}
-\def\def@@twosidefoot(#1,#2)#3#4#5{%
-  \@ifnextchar(%)
-  {\def@@@twosidefoot({#1},{#2}){#3}{#4}{#5}}%
-  {\def@@@twosidefoot({#1},{#2}){#3}{#4}{#5}%
-                     (\scr@footbelow@linelength,%
-                      \scr@footbelow@linethickness)}}
-\def\def@@@twosidefoot(#1,#2)#3#4#5(#6,#7){%
-%</v2>
-%<v1>\def\def@twosidefoot(#1,#2)#3#4#5(#6,#7){%
+%<*v1>
+\def\def@twosidefoot(#1,#2)#3#4#5(#6,#7){%
   \def\@evenfoot{\let\headmark\leftmark
     \hss\hskip\@evenfootshift\vbox{\hsize=\@footwidth\relax
       \topfoot@rule{#1}{#2}\hb@xt@\@footwidth{{%
-%<v2>          \scr@nouppercase
           \headfont\footfont\strut #3}}%
       \botfoot@rule{#6}{#7}}\hskip\@oddfootshift\hss}%
   \def\@oddfoot{\let\headmark\rightmark
     \hss\hskip\@oddfootshift\vbox{\hsize=\@footwidth\relax
       \topfoot@rule{#1}{#2}\hb@xt@\@footwidth{{%
-%<v2>          \scr@nouppercase
           \headfont\footfont\strut #4}}%
       \botfoot@rule{#6}{#7}}\hskip\@evenfootshift\hss}%
 }
+%</v1>
 %    \end{macrocode}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
-%  \begin{macro}{\def@onesidefoot}
-% \changes{v1.3}{2001/03/30}{Use of \cmd\@footwidth instead of
-%                            \cmd\textwidth} 
-% \changes{v2.0}{2001/04/20}{Thickness and length of the lines are
-%                            optional}  
-% \changes{v2.0j}{2001/08/18}{Use of \cs{scr@nouppercase}}
-%  \begin{macro}{\def@@onesidefoot}
-%  \begin{macro}{\def@@@onesidefoot}
-% \changes{v2.0l}{2001/09/30}{\cs{vbox} bereits nach der Linie beendet}
-% \changes{v2.2f}{2008/02/14}{Use of \cs{footfont}}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \begin{macro}{\def@onesidefoot}
+%   \changes{v1.3}{2001/03/30}{Use of \cmd\@footwidth instead of
+%     \cs{textwidth}}
+%   \changes{v2.5}{2010/04/22}{replaced by \cs{\def@foot}}
+% \begin{macro}{\def@@onesidefoot}
+%   \changes{v2.5}{2010/04/22}{replaced by \cs{\def@@foot}}
+% \begin{macro}{\def@@@onesidefoot}
+%   \changes{v2.5}{2010/04/22}{replaced by \cs{\def@@@foot}}
 %    \begin{macrocode}
-%<*v2>
-\def\def@onesidefoot{%
-  \@ifnextchar(%)
-  {\def@@onesidefoot}%
-  {\def@@onesidefoot(\scr@footabove@linelength,%
-                     \scr@footabove@linethickness)}}
-\def\def@@onesidefoot(#1,#2)#3#4#5{%
-  \@ifnextchar(%)
-  {\def@@@onesidefoot({#1},{#2}){#3}{#4}{#5}}%
-  {\def@@@onesidefoot({#1},{#2}){#3}{#4}{#5}%
-                     (\scr@footbelow@linelength,%
-                      \scr@footbelow@linethickness)}}
-\def\def@@@onesidefoot(#1,#2)#3#4#5(#6,#7){%
-%</v2>
-%<v1>\def\def@onesidefoot(#1,#2)#3#4#5(#6,#7){%
+%<*v1>
+\def\def@onesidefoot(#1,#2)#3#4#5(#6,#7){%
   \def\@evenfoot{}%
   \def\@oddfoot{\let\headmark\rightmark
     \hss\hskip\@oddfootshift\vbox{\hsize=\@footwidth\relax
       \topfoot@rule{#1}{#2}\hb@xt@\@footwidth{{%
-%<v2>          \scr@nouppercase
           \headfont\footfont\strut #5}}
       \botfoot@rule{#6}{#7}}\hskip\@evenfootshift\hss}%
 }
+%</v1>
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
 %  \end{macro}
-%  \end{macro}
+
+% \begin{macro}{\def@head}
+%   \changes{v2.5}{2010/04/22}{new (internal)}
+% \begin{macro}{\def@@head}
+%   \changes{v2.0}{2001/04/20}{Thickness and length of the lines are
+%     optional}
+%   \changes{v2.0j}{2001/08/18}{Use of \cs{scr@nouppercase}}
+%   \changes{v2.5}{2010/04/22}{new (internal)}
+% This was real simple, but we already have to do the real definition
+% of the heads and foots. First the head:
+%    \begin{macrocode}
+%<*v2>
+\def\def@head{%
+  \@ifnextchar(%)
+  {\def@@head}%
+  {\def@@head(\scr@headabove@linelength,%
+              \scr@headabove@linethickness)}}
+\def\def@@head(#1,#2)#3#4#5{%
+  \@ifnextchar(%)
+  {\def@@@head({#1},{#2}){#3}{#4}{#5}}%
+  {\def@@@head({#1},{#2}){#3}{#4}{#5}%
+              (\scr@headbelow@linelength,%
+               \scr@headbelow@linethickness)}}
+\def\def@@@head(#1,#2)#3#4#5(#6,#7){%
+  \def\@evenhead{%
+    \if@twoside
+      \let\headmark\leftmark%
+      \hss\hskip\@evenheadshift\vbox{\hsize=\@headwidth\relax%
+        \hf@rule{#1}{#2}{\@headwidth}{headabove}%
+        \vskip#2
+        \vskip\baselineskip
+        \hb@xt@\@headwidth{{%
+            \scr@nouppercase
+            \headfont\strut #3}}%
+        \hf@rule{#6}{#7}{\@headwidth}{headbelow}%
+      }\hskip\@oddheadshift\hss
+    \fi
+  }%
+  \def\@oddhead{\let\headmark\rightmark
+    \hss\hskip\@oddheadshift\vbox{\hsize=\@headwidth\relax
+      \hf@rule{#1}{#2}{\@headwidth}{headabove}%
+      \vskip#2%
+      \vskip\baselineskip
+      \hb@xt@\@headwidth{{%
+          \scr@nouppercase
+          \headfont\strut \if@twoside #4\else #5\fi}}%
+      \hf@rule{#6}{#7}{\@headwidth}{headbelow}%
+  }\hskip\@evenheadshift\hss}%
+}
+%</v2>
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \begin{macro}{\def@foot}
+%   \changes{v2.0}{2001/04/20}{Thickness and length of the lines are
+%     optional}  
+%   \changes{v1.3}{2001/03/30}{Use of \cmd\@footwidth instead of
+%     \cs{textwidth}}
+%   \changes{v2.5}{2010/04/22}{new (internal)}
+% \begin{macro}{\def@@foot}
+%   \changes{v2.5}{2010/04/22}{new (internal)}
+% \begin{macro}{\def@@@foot}
+%   \changes{v2.0j}{2001/08/18}{Use of \cs{scr@nouppercase}}
+%   \changes{v2.2f}{2008/02/14}{Use of \cs{footfont}}
+%   \changes{v2.5}{2010/04/22}{new (internal)}
+% And last twosided and onesided foot:
+%    \begin{macrocode}
+%<*v2>
+\def\def@foot{%
+  \@ifnextchar(%)
+  {\def@@foot}
+  {\def@@foot(\scr@footabove@linelength,%
+                     \scr@footabove@linethickness)}}
+\def\def@@foot(#1,#2)#3#4#5{%
+  \@ifnextchar(%)
+  {\def@@@foot({#1},{#2}){#3}{#4}{#5}}%
+  {\def@@@foot({#1},{#2}){#3}{#4}{#5}%
+                     (\scr@footbelow@linelength,%
+                      \scr@footbelow@linethickness)}}
+\def\def@@@foot(#1,#2)#3#4#5(#6,#7){%
+  \def\@evenfoot{%
+    \if@twoside
+      \let\headmark\leftmark
+      \hss\hskip\@evenfootshift\vbox{\hsize=\@footwidth\relax
+        \topfoot@rule{#1}{#2}\hb@xt@\@footwidth{{%
+            \scr@nouppercase
+            \headfont\footfont\strut #3}}%
+        \botfoot@rule{#6}{#7}}\hskip\@oddfootshift\hss
+    \fi
+  }%
+  \def\@oddfoot{\let\headmark\rightmark
+    \hss\hskip\@oddfootshift\vbox{\hsize=\@footwidth\relax
+      \topfoot@rule{#1}{#2}\hb@xt@\@footwidth{{%
+          \scr@nouppercase
+          \headfont\footfont\strut \if@twoside #4\else #5\fi}}%
+      \botfoot@rule{#6}{#7}}\hskip\@evenfootshift\hss}%
+}
+%</v2>
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 %
 % We now define the rules used at head and foot.
 %  \begin{macro}{\topfoot@rule}
