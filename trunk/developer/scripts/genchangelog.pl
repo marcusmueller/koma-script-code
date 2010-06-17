@@ -202,14 +202,16 @@ sub wanted {
     my $text = "";
     
     if ( $File::Find::name =~ /\/(auto|\.svn)(\/|\z)/ or
-	$File::Find::name =~ /(\.(tmp|log|aux|toc|lof|lot|ind|idx|ilg|glo|chn|out|bbl|blg)|~)\z/ ) {
-	return;
-    }
-    if ( $opt_ignoretestsuite &&
-	 ( ( $File::Find::name =~ /\/testsuite\// ) ||
-	   ( $File::Find::name =~ /\/testsuite$/ ) ||
-	   ( $File::Find::name =~ /^testsuite\// ) ) ) {
-	return;
+	 $File::Find::name =~ /\/test/ or
+	 $File::Find::name =~ /\/letter-.*/ or
+	 $File::Find::name =~ /(\.(pdf|dvi|mp|sty|clo|lco|tmp|log|aux|toc|lof|lot|ind|idx|ilg|glo|chn|out|bbl|blg)|~)\z/ ) {
+	if ( ( $File::Find::name =~ /\/testsuite\// ) ||
+	     ( $File::Find::name =~ /\/testsuite$/ ) ||
+	     ( $File::Find::name =~ /^testsuite\// ) ) {
+	    return if $opt_ignoretestsuite;
+	} else {
+	    return;
+	}
     }
     if ( $opt_ignoredeveloper &&
 	 ( ( $File::Find::name =~ /\/developer\// ) ||
