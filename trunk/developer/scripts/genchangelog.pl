@@ -201,10 +201,12 @@ sub wanted {
     my @info;
     my $text = "";
     
+    # changes of some files should not be part of the ChangeLog or are never
+    # part of the SVN repository
     if ( $File::Find::name =~ /\/(auto|\.svn)(\/|\z)/ or
 	 $File::Find::name =~ /\/test/ or
-	 $File::Find::name =~ /\/letter-.*/ or
-	 $File::Find::name =~ /(\.(pdf|dvi|mp|sty|clo|lco|tmp|log|aux|toc|lof|lot|ind|idx|ilg|glo|chn|out|bbl|blg)|~)\z/ ) {
+	 $File::Find::name =~ /\/(diff|letter-)/ or
+	 $File::Find::name =~ /(\.(svn|gz|zip|pdf|dvi|mp|sty|clo|lco|tmp|log|aux|toc[0-9]*|lof|lot|ind|idx|ilg|glo|chn|out|bbl|blg)|~)\z/ ) {
 	if ( ( $File::Find::name =~ /\/testsuite\// ) ||
 	     ( $File::Find::name =~ /\/testsuite$/ ) ||
 	     ( $File::Find::name =~ /^testsuite\// ) ) {
