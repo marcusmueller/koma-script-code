@@ -98,7 +98,7 @@ STATIC_DOC_SRC  = koma-script.html
 STATIC_DOC_LINKS= komascript.html komascr.html \
 		  scrbook.html scrreprt.html scrartcl.html scrlttr2.html \
 		  typearea.html scrpage2.html scraddr.html scrlfile.html \
-		  scrtime.html scrdate.html
+		  scrtime.html scrdate.html tocbasic.html scrbase.html
 
 DOC_SRC		= scrguide.cls scrguide.ist scrguide.gst \
 	          guide.tex guide.bib plength.dtx
