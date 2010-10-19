@@ -200,7 +200,7 @@ THERE IS NO SUPPORT, IF YOU USE THIS PACKAGE!
 %<driver>\ProvidesFile{scrwfile.drv}
 %<doc>\ProvidesFile{scrwfile.tex}
 %<*dtx|(package&identify)|driver|doc>
-  [2010/10/01 v0.1-alpha LaTeX2e KOMA-Script package (write and clone files)]
+  [2010/10/19 v0.1a-alpha LaTeX2e KOMA-Script package (write and clone files)]
 %</dtx|(package&identify)|driver|doc>
 %<*driver>
 \documentclass{scrdoc}
@@ -470,21 +470,21 @@ THERE IS NO SUPPORT, IF YOU USE THIS PACKAGE!
 % Every patch should be minimum invasive, so that it does almost nothing to
 % files, that are not under \textsf{scrwfile}'s control.
 %
-% \begin{macro}{\tst@if@only}
+% \begin{macro}{\scrwfile@if@only}
 % First of all we check, if the file should be handled by \textsf{scrwfile}.
 %    \begin{macrocode}
-\newcommand*{\tst@if@only}[1]{%
+\newcommand*{\scrwfile@if@only}[1]{%
   \begingroup
-    \scr@ifundefinedorrelax{tst@only}{\@tempswatrue}{%
+    \scr@ifundefinedorrelax{scrwfile@only}{\@tempswatrue}{%
       \@tempswafalse
       \edef\reserved@b{#1}%
-      \@for\reserved@a:=\tst@only\do
+      \@for\reserved@a:=\scrwfile@only\do
         {\ifx\reserved@a\reserved@b\@tempswatrue\fi}%
     }%
     \if@tempswa
-      \scr@ifundefinedorrelax{tst@never}{}{%
+      \scr@ifundefinedorrelax{scrwfile@never}{}{%
         \edef\reserved@b{#1}%
-        \@for\reserved@a:=\tst@only\do
+        \@for\reserved@a:=\scrwfile@only\do
           {\ifx\reserved@a\reserved@b\@tempswafalse\fi}%
       }%
     \fi
@@ -498,53 +498,55 @@ THERE IS NO SUPPORT, IF YOU USE THIS PACKAGE!
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\tst@starttoc}
-% \begin{macro}{\tst@@starttoc}
+% \begin{macro}{\scrwfile@starttoc}
+% \begin{macro}{\scrwfile@@starttoc}
 % This is the internal redefinition of |\@starttoc|. First of all test, if it
 % should be used, then use it or not.
 %    \begin{macrocode}
-\newcommand*{\tst@starttoc}[1]{%
-  \tst@if@only{#1}{\tst@@starttoc}{\tst@saved@starttoc}{#1}%
+\newcommand*{\scrwfile@starttoc}[1]{%
+  \scrwfile@if@only{#1}{\scrwfile@@starttoc}{\scrwfile@saved@starttoc}{#1}%
 }
-\newcommand*{\tst@@starttoc}[1]{%
+\newcommand*{\scrwfile@@starttoc}[1]{%
 %<trace>  \typeout{Use my own \string\@starttoc\space for #1}%
   \begingroup
     \if@filesw
-      \xdef\tst@writefilelist{\tst@writefilelist,#1}%
+      \xdef\scrwfile@writefilelist{\scrwfile@writefilelist,#1}%
     \fi
     \@fileswfalse
-    \tst@saved@starttoc{#1}%
+    \scrwfile@saved@starttoc{#1}%
   \endgroup
 }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}{\tst@writefile}
-% \begin{macro}{\tst@@writefile}
-% \begin{macro}{\tst@wrtout}
-% \begin{macro}{\tst@writefilelist}
+% \begin{macro}{\scrwfile@writefile}
+% \begin{macro}{\scrwfile@@writefile}
+% \begin{macro}{\scrwfile@wrtout}
+% \begin{macro}{\scrwfile@writefilelist}
 % This is the internal redefinition of |\@writefile|. First of all test, if it
 % should be used, then use it or not.
 %    \begin{macrocode}
-\newcommand*{\tst@writefile}[1]{%
-  \tst@if@only{#1}{\tst@@writefile}{\tst@saved@writefile}{#1}%
+\newcommand*{\scrwfile@writefile}[1]{%
+  \scrwfile@if@only{#1}{\scrwfile@@writefile}{\scrwfile@saved@writefile}{#1}%
 }
-\newcommand{\tst@@writefile}[2]{%
+\newcommand{\scrwfile@@writefile}[2]{%
 %<trace>  \typeout{Use my own \string\@writefile\space for #1}%
-  \ifnum\tst@wrtout>0
+  \ifnum\scrwfile@wrtout>0
     \begingroup
       \@temptokena{#2}%
-      \immediate\write\tst@wrtout{\string\@writefile{#1}{\the\@temptokena}}%
+      \immediate\write\scrwfile@wrtout{%
+        \string\@writefile{#1}{\the\@temptokena}%
+      }%
 %    \end{macrocode}
 % This was the entry for the real file. But we also may have clone files:
 %    \begin{macrocode}
-      \tst@process@clones{#1}%
+      \scrwfile@process@clones{#1}%
     \endgroup
   \fi
 }
-\chardef\tst@wrtout\z@
-\newcommand*{\tst@writefilelist}{}
+\chardef\scrwfile@wrtout\z@
+\newcommand*{\scrwfile@writefilelist}{}
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -553,26 +555,26 @@ THERE IS NO SUPPORT, IF YOU USE THIS PACKAGE!
 %
 % \begin{macro}{\@writefile}
 % We have to add single handle feature and clone file feature to this.
-% \begin{macro}{\tst@saved@writefile}
+% \begin{macro}{\scrwfile@saved@writefile}
 % This is the original definition, that will be used, if the file is not under
 % \texttt{scrwfile}'s control.
 %    \begin{macrocode}
-\newcommand*{\tst@saved@writefile}{}
+\newcommand*{\scrwfile@saved@writefile}{}
 \BeforeClosingMainAux{%
-  \ifx\tst@writefilelist\@empty\else
-    \let\tst@saved@writefile\@writefile
-    \let\tst@wrtout\@partaux
-    \immediate\openout\tst@wrtout \jobname.wrt
-    \let\@writefile\tst@writefile
+  \ifx\scrwfile@writefilelist\@empty\else
+    \let\scrwfile@saved@writefile\@writefile
+    \let\scrwfile@wrtout\@partaux
+    \immediate\openout\scrwfile@wrtout \jobname.wrt
+    \let\@writefile\scrwfile@writefile
   \fi
 }
 \AfterReadingMainAux{%
-  \ifx\tst@writefilelist\@empty\else
-    \immediate\closeout\tst@wrtout
-    \chardef\tst@wrtout\z@
+  \ifx\scrwfile@writefilelist\@empty\else
+    \immediate\closeout\scrwfile@wrtout
+    \chardef\scrwfile@wrtout\z@
     \begingroup
-      \let\@writefile\tst@saved@writefile
-      \@for\@currext:=\tst@writefilelist\do{%
+      \let\@writefile\scrwfile@saved@writefile
+      \@for\@currext:=\scrwfile@writefilelist\do{%
         \begingroup
           \ifx\@currext\@empty\else
             \scr@ifundefinedorrelax{tf@\@currext}{%
@@ -594,13 +596,13 @@ THERE IS NO SUPPORT, IF YOU USE THIS PACKAGE!
 %
 % \begin{macro}{\@starttoc}
 % We have to add single handle feature to this.
-% \begin{macro}{\tst@saved@starttoc}
+% \begin{macro}{\scrwfile@saved@starttoc}
 % This is the original definition, that will be used, if the file is not under
 % \texttt{scrwfile}'s control.
 %    \begin{macrocode}
-\newcommand*{\tst@saved@starttoc}{}
-\let\tst@saved@starttoc\@starttoc
-\let\@starttoc\tst@starttoc
+\newcommand*{\scrwfile@saved@starttoc}{}
+\let\scrwfile@saved@starttoc\@starttoc
+\let\@starttoc\scrwfile@starttoc
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -611,13 +613,13 @@ THERE IS NO SUPPORT, IF YOU USE THIS PACKAGE!
 % \textsf{scrwfile} may clone a TOC, that means, every entry to one file will
 % be copied to other files too.  You must not clone recursivly!
 %
-% \begin{macro}{\tst@process@clones}
+% \begin{macro}{\scrwfile@process@clones}
 %    \begin{macrocode}
-\newcommand*{\tst@process@clones}[1]{%
-  \scr@ifundefinedorrelax{tst@clone@#1}{}{%
+\newcommand*{\scrwfile@process@clones}[1]{%
+  \scr@ifundefinedorrelax{scrwfile@clone@#1}{}{%
     \begingroup
       \let\@@protect\protect\let\protect\@empty\afterassignment\restore@protect
-      \edef\reserved@b{\csname tst@clone@#1\endcsname}%
+      \edef\reserved@b{\csname scrwfile@clone@#1\endcsname}%
       \edef\reserved@c{,#1}%
       \@for \reserved@a:=\reserved@b\do {%
         \@tempswatrue
@@ -626,7 +628,7 @@ THERE IS NO SUPPORT, IF YOU USE THIS PACKAGE!
         }%
         \if@tempswa
 %<trace>          \typeout{clone entry from `#1' to `\reserved@a'}%
-          \immediate\write\tst@wrtout{%
+          \immediate\write\scrwfile@wrtout{%
             \string\@writefile{\reserved@a}{\the\@temptokena}%
           }%
           \edef\reserved@c{\reserved@c,\reserved@a}%
@@ -649,18 +651,20 @@ THERE IS NO SUPPORT, IF YOU USE THIS PACKAGE!
 % extensions.
 %    \begin{macrocode}
 \newcommand*{\TOCclone}[3][]{%
-  \scr@ifundefinedorrelax{tst@clone@#2}{%
-    \expandafter\protected@edef\csname tst@clone@#2\endcsname{%
-      #3,\protect\csname tst@clone@#3\endcsname
+  \scr@ifundefinedorrelax{scrwfile@clone@#2}{%
+    \expandafter\protected@edef\csname scrwfile@clone@#2\endcsname{%
+      #3,\protect\csname scrwfile@clone@#3\endcsname
     }%
   }{%
-    \edef\reserved@b{\csname tst@clone@#2\endcsname}%
-    \expandafter\protected@edef\csname tst@clone@#2\endcsname{%
-      \csname tst@clone@#2\endcsname,#3,\protect\csname tst@clone@#3\endcsname
+    \edef\reserved@b{\csname scrwfile@clone@#2\endcsname}%
+    \expandafter\protected@edef\csname scrwfile@clone@#2\endcsname{%
+      \csname scrwfile@clone@#2\endcsname,%
+      #3,%
+      \protect\csname scrwfile@clone@#3\endcsname
     }%
   }%
-  \scr@ifundefinedorrelax{tst@clone@#3}{%
-    \expandafter\let\csname tst@clone@#3\endcsname\@empty
+  \scr@ifundefinedorrelax{scrwfile@clone@#3}{%
+    \expandafter\let\csname scrwfile@clone@#3\endcsname\@empty
   }{}%
   \ifattoclist{#3}{%
     \PackageWarning{scrwfile}{`#3' already under control of
