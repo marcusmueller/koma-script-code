@@ -77,14 +77,72 @@
 % \iffalse
 %%% From File: scrwfile.dtx
 %<*dtx>
-% \fi
 \def\LaTeXformat{LaTeX2e}
-\let\ifbeta=\iffalse
-\ifx\fmtname\LaTeXformat\else
-% \iffalse
+\ifx\fmtname\LaTeXformat
+  \makeatletter
+    \let\saved@@end\@@end
+    \def\@@end{\csname fi\endcsname\saved@@end}
+  \makeatother
+  \ProvidesFile{scrwfile.dtx}
+%</dtx>
+%<(package&identify)|driver>\NeedsTeXFormat{LaTeX2e}[1995/06/01]
+%<package&identify>\ProvidesPackage{scrwfile}
+%<driver>\ProvidesFile{scrwfile.drv}
+%<doc>\ProvidesFile{scrwfile.tex}
+%<*dtx|(package&identify)|driver|doc>
+  [2010/10/19 v0.1b-alpha LaTeX2e KOMA-Script package (write and clone files)]
+%</dtx|(package&identify)|driver|doc>
+%<*driver>
+  \documentclass{scrdoc}
+  \usepackage[ngerman,english]{babel}
+  \usepackage{listings}
+  \lstnewenvironment{lstcode}[1][]{%
+    \lstset{language=[LaTeX]TeX,basicstyle=\ttfamily\small,#1}%
+  }{}
+
+  \CodelineIndex
+  \RecordChanges
+  \GetFileInfo{scrwfile.dtx}
+  \title{The \KOMAScript{} package \texttt{scrwfile}%
+    \footnote{This is version \fileversion\ of file \texttt{\filename}.}}
+  \date{\filedate}
+  \author{Markus Kohm}
+  
+  \newenvironment{Explain}{\par}{\par}
+  \let\Macro\cs
+  \let\Package\textsf
+  \let\File\texttt
+  \let\Option\texttt
+  \let\Counter\texttt
+  \let\ShowOutput\quote
+  \let\endShowOutput\endquote
+  \let\Parameter\marg
+  \let\OParameter\oarg
+  \newcommand\PParameter[1]{\mbox{\texttt{\{#1\}}}}
+  \let\PName\meta
+  \let\PValue\texttt
+  \providecommand*{\autoref}[1]{\expandafter\AUTOREF#1:}
+  \newcommand*{\AUTOREF}{}
+  \makeatletter
+  \def\AUTOREF#1:#2:{%
+    \edef\@tempa{#1}%
+    \edef\@tempb{tab}\ifx\@tempa\@tempb table~\fi
+    \edef\@tempb{sec}\ifx\@tempa\@tempb section~\fi
+    \ref{#1:#2}%
+  }
+  \makeatother
+
+  \begin{document}
+  \maketitle
+  \DocInput{\filename}
+  \end{document}
+%</driver>
+%<*dtx>
+\fi
+% Now the installation driver:
 %</dtx>
 %<*insfile>
-% \fi
+\expandafter\let\expandafter\ifbeta\csname iffalse\endcsname
 \def\batchfile{scrwfile.dtx}
 \input docstrip.tex
 \ifToplevel{%
@@ -145,7 +203,7 @@ THERE IS NO SUPPORT, IF YOU USE THIS PACKAGE!
 
 \generate{\usepreamble\defaultpreamble
   \file{scrwfile.sty}{%
-    \ifbeta\from{scrbeta.dtx}{package,scrwfile}\fi
+    \ifx\ifbeta\iftrue\from{scrbeta.dtx}{package,scrwfile}\fi
     \from{scrwfile.dtx}{package,trace,scrwfile,identify,option,body}%
     \from{scrlogo.dtx}{trace,logo}%
   }%
@@ -186,68 +244,10 @@ THERE IS NO SUPPORT, IF YOU USE THIS PACKAGE!
   \Msg{*}
   \Msg{**********************************************************************}
 }
-% \iffalse
+
 %</insfile>
 %<*dtx>
-% \fi
-  \def\ProvidesFile{\csname fi\endcsname\csname endinput\endcsname}
-\fi
-\ProvidesFile{scrwfile.dtx}
-% \iffalse
-%</dtx>
-%<(package&identify)|driver>\NeedsTeXFormat{LaTeX2e}[1995/06/01]
-%<package&identify>\ProvidesPackage{scrwfile}
-%<driver>\ProvidesFile{scrwfile.drv}
-%<doc>\ProvidesFile{scrwfile.tex}
-%<*dtx|(package&identify)|driver|doc>
-  [2010/10/19 v0.1a-alpha LaTeX2e KOMA-Script package (write and clone files)]
-%</dtx|(package&identify)|driver|doc>
-%<*driver>
-\documentclass{scrdoc}
-\usepackage[ngerman,english]{babel}
-\usepackage{listings}
-\lstnewenvironment{lstcode}[1][]{%
-  \lstset{language=[LaTeX]TeX,basicstyle=\ttfamily\small,#1}%
-}{}
-
-\usepackage{scrwfile}
-\CodelineIndex
-\RecordChanges
-\GetFileInfo{scrwfile.dtx}
-\title{The \KOMAScript{} package \texttt{scrwfile}%
-  \footnote{This is version \fileversion\ of file \texttt{\filename}.}}
-\date{\filedate}
-\author{Markus Kohm}
-
-\newenvironment{Explain}{\par}{\par}
-\let\Macro\cs
-\let\Package\textsf
-\let\File\texttt
-\let\Option\texttt
-\let\Counter\texttt
-\let\ShowOutput\quote
-\let\endShowOutput\endquote
-\let\Parameter\marg
-\let\OParameter\oarg
-\newcommand\PParameter[1]{\mbox{\texttt{\{#1\}}}}
-\let\PName\meta
-\let\PValue\texttt
-\providecommand*{\autoref}[1]{\expandafter\AUTOREF#1:}
-\newcommand*{\AUTOREF}{}
-\makeatletter
-\def\AUTOREF#1:#2:{%
-  \edef\@tempa{#1}%
-  \edef\@tempb{tab}\ifx\@tempa\@tempb table~\fi
-  \edef\@tempb{sec}\ifx\@tempa\@tempb section~\fi
-  \ref{#1:#2}%
-}
-\makeatother
-
-\begin{document}
-  \maketitle
-  \DocInput{\filename}
-\end{document}
-%</driver>
+\csname endinput\endcsname
 % \fi
 %
 % \selectlanguage{english}
@@ -264,7 +264,7 @@ THERE IS NO SUPPORT, IF YOU USE THIS PACKAGE!
 %   index and several other packages, e.g., \Package{hyperref} needs write
 %   handles too. Loading \Package{scrwfile} minimizes the need of write
 %   handles for list of floats or tables of contents. Additionally it allowes
-%   to clone entries to one file to other other files.
+%   to clone entries from one file to another files.
 % \end{abstract}
 %
 % \tableofcontents
@@ -392,7 +392,9 @@ THERE IS NO SUPPORT, IF YOU USE THIS PACKAGE!
 % detailed table of contents. The detailed one produces an entry at the short
 % one but this entry will not be part of the detailed table of contents.
 % 
-%
+%\iffalse
+%</dtx>
+%\fi
 %
 % \StopEventually{%
 %   \clearpage
