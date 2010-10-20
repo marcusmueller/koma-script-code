@@ -234,7 +234,7 @@ bindist:dist
 	chmod -R a+w $(DISTDIR)
 ifdef PREPARERELEASE
 	$(foreach dtxins,$(DTX_IS_INS),\
-	          sed -i -e 's/{trace,/{/g;s/\(\\let\\ifbeta=\\if\)true/\1false/;s/\(\\expandafter\\let\\expandafter\\ifbeta\\csname if\)true/\1false' $(DISTDIR)/$(dtxins) && ) :
+	          sed -i -e 's/{trace,/{/g;s/\(\\let\\ifbeta=\\if\)true/\1false/;s/\(\\expandafter\\let\\expandafter\\ifbeta\\csname if\)true/\1false/' $(DISTDIR)/$(dtxins) && ) :
 	developer/scripts/preparerelease.sh 2 $(notdir $(DISTDIR))
 endif
 	$(CD) $(notdir $(DISTDIR)) && \
