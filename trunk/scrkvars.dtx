@@ -1,4 +1,4 @@
-% \CheckSum{151}
+% \CheckSum{157}
 % \iffalse meta-comment
 % ======================================================================
 % scrkvars.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkvars.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkvars.dtx}[2009/03/04 v3.03 KOMA-Script (koma variables)]
+\ProvidesFile{scrkvars.dtx}[2010/10/28 v3.08 KOMA-Script (koma variables)]
 % \iffalse
 \documentclass{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -112,8 +112,8 @@
 %
 % \subsection{Anweisungen zum Anlegen und Verwenden von Variablen}
 %
-%  \begin{macro}{\newkomavar}
-%    \changes{v2.8q}{2002/01/14}{Neu}
+% \begin{macro}{\newkomavar}
+%   \changes{v2.8q}{2002/01/14}{Neu}
 % Es wird
 % zwischen zwei Arten von Feldern unterschieden:
 % \begin{itemize}
@@ -123,7 +123,7 @@
 % Felder können aber auch nachträglich zur Geschäftszeile
 % hinzugefügt werden. Die Sternvariante von \cs{newkomavar} führt
 % dies jedoch automatisch durch.
-%  \begin{macro}{\@newkomavar}
+% \begin{macro}{\@newkomavar}
 % Da mit einer Sternvariante gearbeitet wird, wird ein Hilfsmakro
 % benötigt. Das Makro erhält ein optionales und
 % ein obligatorisches Argument. Das optionale Argument ist dabei die
@@ -145,47 +145,51 @@
       \fi%
       \expandafter\let\csname scr@#2@var\endcsname=\@empty
       \if@tempswa\addtoreffields{#2}\fi
-      }{%
+    }{%
       \ClassError{%
         scrlttr2%
-        }{%
+      }{%
         This should never happen%
-        }{%
+      }{%
         The contents of the KOMA-Script variable `#2'\MessageBreak
         is undefined, but the name of the variable is
         defined.\MessageBreak
         This should never happen. So someone crashs me!%
-        }%
-      }%
-    }{%
-    \ClassError{%
-      scrlttr2%
-      }{%
-      Variable `#2' already defined%
-      }{%
-      I'll ignore this command, if you'll continue.%
       }%
     }%
-  }
+  }{%
+    \ClassError{%
+      scrlttr2%
+    }{%
+      Variable `#2' already defined%
+    }{%
+      I'll ignore this command, if you'll continue.%
+    }%
+  }%
+}
 %    \end{macrocode}
-%  \end{macro}
-%  \end{macro}
+% \end{macro}
+% \end{macro}
 %
-%  \begin{macro}{\setkomavar}
-%    \changes{v2.8q}{2002/01/14}{Neu}
+% \begin{macro}{\setkomavar}
+%   \changes{v2.8q}{2002/01/14}{Neu}
+%   \changes{v3.08}{2010/10/28}{\cs{scr@\emph{Name}@postsetname}
+%     und \cs{scr@\emph{Name}@postsetvar}}
 % Natürlich wird auch ein Befehl benötigt, um die Feldvariablen
 % zu setzen und ihnen ggf. einen neuen Namen für die Ausgabe zu
 % geben. Der \emph{Name} der Feldvariable wird als obligatorisches
-% erstes Argument übergeben.
-%  \begin{macro}{\@setkomavar}
-%    \changes{v2.8q}{2002/01/14}{Neu}
+% erstes Argument übergeben. Zusätzlich zum Setzen von Ausgabename oder Wert
+% werden ggf. auch die Hooks \cs{scr@\emph{Name}@postsetname}
+% bzw. \cs{scr@\emph{Name}@postsetvar} ausgeführt.
+% \begin{macro}{\@setkomavar}
+%   \changes{v2.8q}{2002/01/14}{Neu}
 % Da dann zwischen einer Sternvariante und einer normalen
 % unterschieden werden soll wird ein Hilfsmakro benötigt.
-%  \begin{macro}{\@setkomaname}
-%    \changes{v2.8q}{2002/01/14}{Neu}
+% \begin{macro}{\@setkomaname}
+%   \changes{v2.8q}{2002/01/14}{Neu}
 % Die Sternvariante definiert nur den Ausgabename neu.
-%  \begin{macro}{\@@setkomavar}
-%    \changes{v2.8q}{2002/01/14}{Neu}
+% \begin{macro}{\@@setkomavar}
+%   \changes{v2.8q}{2002/01/14}{Neu}
 % Da in der normalen Variante nach dem Stern ein optionales Argument
 % folgen kann, wird mit einem weiteren Hilfsmakro gearbeitet. Der
 % \emph{Ausgabename} wird dabei als optionales, zweites Argument
@@ -200,23 +204,26 @@
 \newcommand*{\@setkomaname}[2]{%
   \@ifundefined{scr@#1@var}{%
     \@komavar@err{set}{#1}%
-    }{%
+  }{%
     \@namedef{scr@#1@name}{#2}%
-    }%
-  }
+    \csname scr@#1@postsetname\endcsname
+  }%
+}
 \newcommand*{\@@setkomavar}{}
 \long\def\@@setkomavar#1[#2]#3{%
   \@ifundefined{scr@#1@var}{%
     \@komavar@err{set}{#1}%
-    }{%
+  }{%
     \@namedef{scr@#1@var}{#3}%
+    \csname scr@#1@postsetvar\endcsname
     \begingroup
       \def\@tempa{#2}\def\@tempb{\relax}%
       \ifx\@tempa\@tempb\endgroup\else
       \endgroup\@namedef{scr@#1@name}{#2}%
+      \csname scr@#1@postsetname\endcsname
     \fi
-    }%
-  }
+  }%
+}
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
