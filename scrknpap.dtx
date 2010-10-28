@@ -1,4 +1,4 @@
-% \CheckSum{2893}
+% \CheckSum{2971}
 % \iffalse meta-comment
 % ======================================================================
 % scrknpap.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrknpap.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrknpap.dtx}[2010/07/29 v3.06a KOMA-Script (note-paper)]
+\ProvidesFile{scrknpap.dtx}[2010/10/28 v3.08 KOMA-Script (note-paper)]
 % \iffalse
 \documentclass{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -827,19 +827,36 @@
 %
 % \begin{macro}{\firsthead}
 %   \changes{v2.8q}{2002/01/28}{\cs{@alignfrom} auf 10000 gesetzt}
+%   \changes{v3.08}{2010/10/28}{der Kopf des Briefbogens wird über eine
+%     Variable realisiert}
 % \begin{macro}{\@firsthead}
+%   \changes{v3.08}{2010/10/28}{der Kopf des Briefbogens wird über eine
+%     Variable realisiert}
 % \begin{macro}{\@gen@firsthead}
 %   \changes{v2.8q}{2002/01/28}{Neu}
 %   \changes{v2.97c}{2007/05/08}{Dicke der Linie konfigurierbar}
 %   \changes{v2.97c}{2007/05/08}{Schrift (Farbe) der Linie konfigurierbar}
 %   \changes{v3.06a}{2010/07/29}{Verwendung des Font-Elements
 %     \texttt{fromrule} eingefügt}
+%   \changes{v3.08}{2010/10/28}{der Kopf des Briefbogens wird über eine
+%     Variable realisiert}
+% \begin{KOMAvar}{firsthead}
+%   \changes{v3.08}{2010/10/28}{Neu}
 % Bei \texttt{scrlttr2} gibt es die üblichen Seitenstile, allerdings
 % ist deren Verhalten etwas anders als gewohnt. Dies ist in den
 % Besonderheiten für Briefen begründet. Zunächst die Voreinstellung für
 % Briefbögen.
 %    \begin{macrocode}
-\newcommand*{\@firsthead}{\noindent%
+\newcommand*{\@firsthead}{%
+  \ClassWarning{scrlttr2}{%
+    Deprecated usage of \string\@firsthead.\MessageBreak
+    \string\usekomavar{firsthead} should be used\MessageBreak
+    instead of \string\@firsthead
+  }%
+  \usekomavar{firsthead}%
+}
+\newkomavar{firsthead}
+\setkomavar{firsthead}{%
   \parbox[b]{\useplength{firstheadwidth}}%
   {\centering\usekomafont{fromaddress}{%
       \ifkomavarempty{fromname}{}{%
@@ -853,7 +870,22 @@
     }%
   }%
 }
+%    \end{macrocode}
+% \end{KOMAvar}
+% \begin{macro}{\scr@firsthead@postsetvar}
+%   \changes{v3.08}{2010/10/28}{Neu (intern)}
+% Über dieses Makro wird jeweils nach dem Setzen der Variable die Ausrichtung
+% auf manuell umgeschaltet. Das darf deshalb auch erst nach dem erstmaligen
+% Setzen definiert werden!
+%    \begin{macrocode}
+\newcommand*{\scr@firsthead@postsetvar}{%
+  \renewcommand*{\@alignfrom}{10000}%
+}
+%    \end{macrocode}
+% \end{macro}
+%    \begin{macrocode}
 \newcommand*{\@gen@firsthead}{%
+%    \end{macrocode}
 % Damit wird ggf. die Kopfzeile der ersten Seite umdefiniert, nämlich dann,
 % wenn dies per Option aktiviert wurde.
 %    \begin{macrocode}
@@ -865,7 +897,7 @@
 % \emph{parbox}, in der der Text linksbündig angeordnet wird. Diese
 % Box soll über die gesamte Breite gehen dürfen:
 %    \begin{macrocode}
-    \renewcommand*{\@firsthead}{\noindent
+    \setkomavar{firsthead}{%
       \parbox[b]{\textwidth}{\raggedright
 %    \end{macrocode}
 % Zuerst wird der Name gesetzt. Dabei soll eine eigene Schriftart für
@@ -940,6 +972,7 @@
         \llap{\usekomavar{fromlogo}}%
       \fi
     }%
+    \renewcommand*{\@alignfrom}{0}%
 %    \end{macrocode}
 % Damit ist die Definition des linksbündigen Absenders abgeschlossen.
 % Es geht weiter mit dem zentrierten Absender. Dieser hat als
@@ -948,7 +981,7 @@
 % das location-Feld, daher wird dieser Fall auch dort behandelt.
 %    \begin{macrocode}
   \or
-    \renewcommand*{\@firsthead}{\noindent
+    \setkomavar{firsthead}{%
       \parbox[b]{\textwidth}{\centering
         {\usekomafont{fromname}\strut\ignorespaces
           \usekomavar{fromname}%
@@ -984,13 +1017,14 @@
         }%
       }%
     }%
+    \renewcommand*{\@alignfrom}{1}%
 %    \end{macrocode}
 % Damit ist die Definition des zentrierten Absenders abgeschlossen. Es
 % geht weiter mit dem rechtsbündigen Absender. Das ganze wird einfach
 % beim linksbündigen Absender abgeschaut.
 %    \begin{macrocode}
   \or
-    \renewcommand*{\@firsthead}{\noindent
+    \setkomavar{firsthead}{%
       \if@logo
         \rlap{\usekomavar{fromlogo}}%
       \fi
@@ -1033,6 +1067,7 @@
         }%
       }%
     }%
+    \renewcommand*{\@alignfrom}{2}%
 %    \end{macrocode}
 % Damit ist die Umdefinierung beendet. In allen anderen Fällen wird
 % der Kopf nicht verändert.
@@ -1045,9 +1080,13 @@
 %
 % Der Benutzer kann die Voreinstellung mit einer einfachen Anweisung ändern:
 %    \begin{macrocode}
-\newcommand{\firsthead}[1]{%
-  \renewcommand*{\@alignfrom}{10000}%
-  \renewcommand*{\@firsthead}{\noindent#1}%
+\newcommand{\firsthead}{%
+  \ClassWarning{scrlttr2}{%
+    Deprecated usage of \string\firsthead.\MessageBreak
+    You should use \string\setkomavar{firsthead}\MessageBreak
+    instead of \string\firsthead
+  }
+  \setkomavar{firsthead}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -1495,18 +1534,38 @@
 % \subsubsection{Fuß des Briefbogens}
 %
 % \begin{macro}{\firstfoot}
+%   \changes{v3.08}{2010/10/28}{der Fuß des Briefbogens wird über eine
+%     Variable realisiert}
 % \begin{macro}{\@firstfoot}
+%   \changes{v3.08}{2010/10/28}{der Fuß des Briefbogens wird über eine
+%     Variable realisiert}
+% \begin{KOMAvar}{firstfoot}
+%   \changes{v3.08}{2010/10/28}{Neu}
 %    \begin{macrocode}
 % Der Fuß des Briefbogens ist in der Voreinstellung leer.
-\newcommand*{\@firstfoot}{}
-%    \end{macrocode}
-% \end{macro}
-% Dies kann jedoch über eine einfache Benutzeranweisung geändert werden:
-%    \begin{macrocode}
-\newcommand{\firstfoot}[1]{%
-  \renewcommand*{\@firstfoot}{\noindent#1}%
+\newkomavar{firstfoot}
+\newcommand*{\@firstfoot}{%
+  \ClassWarning{scrlttr2}{%
+    Deprecated usage of \string\@firstfoot.\MessageBreak
+    \string\usekomavar{firstfoot} should be used\MessageBreak
+    instead of \string\@firstfoot
+  }%
+  \usekomavar{firstfoot}%
 }
 %    \end{macrocode}
+% Dies kann jedoch über eine einfache Benutzeranweisung geändert werden:
+%    \begin{macrocode}
+\newcommand{\firstfoot}{%
+  \ClassWarning{scrlttr2}{%
+    Deprecated usage of \string\firstfoot.\MessageBreak
+    You should use \string\setkomavar{firstfoot}\MessageBreak
+    instead of \string\firstfoot
+  }
+  \setkomavar{firstfoot}%
+}
+%    \end{macrocode}
+% \end{KOMAvar}
+% \end{macro}
 % \end{macro}
 %
 %
@@ -1820,8 +1879,9 @@
 %    \begin{macrocode}
           \setlength{\textwidth}{\useplength{firstheadwidth}}%
           \setlength{\parfillskip}{\z@ \@plus 1fil}%
-          \@savevbox{\@tempskipa}{\@firsthead\vskip \z@ \@plus .00001fil}%
-          {head of first page}{firstheadvpos}{\firsthead}%
+          \@savevbox{\@tempskipa}{\noindent\usekomavar{firsthead}%
+            \vskip \z@ \@plus .00001fil}%
+          {head of first page}{firstheadvpos}{\setkomavar}%
         }%
       }%
     }%
@@ -1872,7 +1932,8 @@
 %    \begin{macrocode}
           \setlength{\textwidth}{\useplength{firstfootwidth}}%
           \setlength{\parfillskip}{\z@ \@plus 1fil}%
-          \vbox{\hsize\useplength{firstfootwidth}\@firstfoot}%
+          \vbox{\hsize\useplength{firstfootwidth}\noindent
+            \usekomavar{firstfoot}}%
         }%
       }%
     }%
@@ -2729,10 +2790,25 @@
 % definiert werden.
 %
 % \begin{macro}{\nexthead}
+%   \changes{v3.08}{2010/10/28}{der Kopf der Folgeseiten wird über eine
+%     Variable realisiert}
 % \begin{macro}{\@nexthead}
+%   \changes{v3.08}{2010/10/28}{der Kopf der Folgeseiten wird über eine
+%     Variable realisiert}
+% \begin{KOMAvar}{nexthead}
+%   \changes{v3.08}{2010/10/28}{Neu}
 % Die Voreinstellung ist ebenfalls von Optionen abhängig.
 %    \begin{macrocode}
 \newcommand*{\@nexthead}{%
+  \ClassWarning{scrlttr2}{%
+    Deprecated usage of \string\@nexthead.\MessageBreak
+    \string\usekomavar{nexthead} should be used\MessageBreak
+    instead of \string\@nexthead
+  }%
+  \usekomavar{nexthead}%
+}
+\newkomavar{nexthead}
+\setkomavar{nexthead}{%
   \rlap{\parbox[c]{\textwidth}{\raggedright\strut
       \ifnum\@pageat=0\pagemark\else\leftmark\fi\strut}}%
   \parbox[c]{\textwidth}{%
@@ -2756,12 +2832,18 @@
       \fi\strut}}%
 }%
 %    \end{macrocode}
+% \end{KOMAvar}
 % \end{macro}
 % Die Voreinstellung ist wiederum mit einer einfachen Benutzeranweisung
 % änderbar.
 %    \begin{macrocode}
-\newcommand{\nexthead}[1]{%
-  \renewcommand*{\@nexthead}{\noindent#1}%
+\newcommand{\nexthead}{%
+  \ClassWarning{scrlttr2}{%
+    Deprecated usage of \string\nexthead.\MessageBreak
+    You should use \string\setkomavar{nexthead}\MessageBreak
+    instead of \string\nexthead
+  }
+  \setkomavar{\nexthead}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -2770,11 +2852,26 @@
 % \subsubsection{Fuß des Briefpapiers}
 %
 % \begin{macro}{\nextfoot}
+%   \changes{v3.08}{2010/10/28}{der Fuß der Folgeseiten wird über eine
+%     Variable realisiert}
 % \begin{macro}{\@nextfoot}
+%   \changes{v3.08}{2010/10/28}{der Fuß der Folgeseiten wird über eine
+%     Variable realisiert}
+% \begin{KOMAvar}{nextfoot}
+%   \changes{v3.08}{2010/10/28}{Neu}
 % Je nach Optioneneinstellung kann sich die Seitenmarke in der Voreinstellung
 % auch im Fuß befinden.
 %    \begin{macrocode}
 \newcommand*{\@nextfoot}{%
+  \ClassWarning{scrlttr2}{%
+    Deprecated usage of \string\@nextfoot.\MessageBreak
+    \string\usekomavar{nextfoot} should be used\MessageBreak
+    instead of \string\@nextfoot
+  }%
+  \usekomavar{nextfoot}%
+}
+\newkomavar{nextfoot}
+\setkomavar{nextfoot}{%
   \ifnum\@pageat>2
     \parbox[c]{\textwidth}{%
       \ifcase\@pageat\or\or\or\raggedright\or\centering\or\raggedleft\fi
@@ -2783,11 +2880,17 @@
   \fi
 }
 %    \end{macrocode}
+% \end{KOMAvar}
 % \end{macro}
 % Auch diese Einstellung ist per Benutzeranweisung leicht zu ändern.
 %    \begin{macrocode}
-\newcommand{\nextfoot}[1]{%
-  \renewcommand*{\@nextfoot}{\noindent#1}%
+\newcommand{\nextfoot}{%
+  \ClassWarning{scrlttr2}{%
+    Deprecated usage of \string\nextfoot.\MessageBreak
+    You should use \string\setkomavar{nextfoot}\MessageBreak
+    instead of \string\nextfoot
+  }
+  \setkomavar{nextfoot}%
 }
 %    \end{macrocode}
 % \end{macro}
