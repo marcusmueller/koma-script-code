@@ -1,4 +1,4 @@
-% \CheckSum{346}
+% \CheckSum{508}
 % \iffalse meta-comment
 % ======================================================================
 % scrlfile.dtx
@@ -64,7 +64,7 @@
 %%% From File: scrlfile.dtx
 %<*driver|scrlfile|load>
 % \fi
-\def\scrlfileversion{2010/09/30 v3.08}
+\def\scrlfileversion{2010/11/04 v3.08}
 % \iffalse
 %</driver|scrlfile|load>
 %<*driver>
@@ -346,6 +346,20 @@
 % 
 % Note: To replace classes you have to load \textsf{scrlfile} using
 % \cs{RequirePackage} before loading the class.
+%
+% \DescribeMacro{\PreventPackageFromLoading}
+% \DescribeMacro{\ResetPreventPackageFromLoading}
+% \DescribeMacro{\StorePreventPackageFromLoading}
+% The command \cs{PreventPackageFromLoading}\marg{package list}
+% does not replace a package by another but prevents packages from beeing
+% loaded even if they should be loaded using \cs{RequirePackage} or
+% \cs{usepackage}. The \meta{package list} is a comma seperated list of
+% packages, that should never be loaded. If you use the command several times,
+% the later \meta{package lists} will be added to the already existing. You
+% may use \cs{ResetPreventPackageFromLoading} to clean the \meta{package
+% list}. If you need to know the packages at the \meta{package list}, you may
+% use \cs{StorePackageFromLoading}\marg{command} to store the current list at
+% macro \meta{command}.
 %
 % \DescribeMacro{\BeforeClosingMainAux}
 % The command \cs{BeforeClosingMainAux}\marg{instructions}
@@ -678,6 +692,145 @@
 %  \end{macro}
 %  \end{macro}
 %  \end{macro}
+%
+% \begin{macro}{\PreventPackageFromLoading}
+%  \changes{v3.08}{2010/11/04}{New}
+% \begin{macro}{\scrlfile@excludedpackages}
+%  \changes{v3.08}{2010/11/04}{New (internal)}
+% \begin{macro}{\scrlfile@saved@RequirePackage}
+%  \changes{v3.08}{2010/11/04}{New (internal)}
+%    \begin{macrocode}
+\newcommand*{\scrlfile@excludedpackages}{}
+\let\scrlfile@excludedpackages\@empty
+\newcommand*{\scrlfile@saved@RequirePackage}{}
+\newcommand*{\PreventPackageFromLoading}[1]{%
+%    \end{macrocode}
+% We do nothing, if the argument was empty:
+%    \begin{macrocode}
+  \edef\reserved@b{#1}%
+  \ifx \reserved@b\@empty
+    \PackageWarning{scrlfile}{%
+      \string\PreventPackageFromLoading\space with empty argument\MesageBreak
+      ignored%
+    }%
+  \else
+%    \end{macrocode}
+% If the argument was not empty we first need to patch \cs{RequirePackage} and
+% maybe \cs{usepackage} too.
+%    \begin{macrocode}
+    \ifx\scrlfile@excludedpackages\@empty
+      \let\scrlfile@saved@RequirePackage\RequirePackage
+      \let\RequirePackage\scrlfile@RequirePackage
+      \def\reserved@a#1{%  
+        \@latex@error
+        {\noexpand \usepackage before \string\documentclass}%
+        {\noexpand \usepackage may only appear in the document
+          preamble, i.e.,\MessageBreak
+          between \noexpand\documentclass and
+          \string\begin{document}.}%
+        \@gobble}%
+      \ifx\reserved@a\usepackage\else
+        \ifx\usepackage\scrlfile@saved@RequirePackage\else
+          \PackageWarning{scrlfile}{%
+            Maybe serious problem: unexpected definition of\MessageBreak
+            \string\usepackage
+          }%
+        \fi
+        \let\usepackage\RequirePackage
+      \fi
+    \fi
+%    \end{macrocode}
+% We have to test, if a package was already loaded. Only not yet loaded
+% packages will be added to the exclusion list. Empty arguments will be
+% ignored.
+%    \begin{macrocode}
+    \expandafter\@for \expandafter\reserved@a\expandafter:\expandafter=%
+    \reserved@b\do {%
+      \ifx\reserved@a\@empty\else
+        \expandafter\@ifpackageloaded\expandafter{\reserved@a}{%
+          \PackageWarning{scrlfile}{%
+            package `\reserved@a' already loaded.\MessageBreak
+            Cannot prevent it from beeing loaded%
+          }%
+        }{%
+          \edef\scrlfile@excludedpackages{,\reserved@a}%
+        }%
+      \fi
+    }%
+%    \end{macrocode}
+% If the exclusion list is still empty (because all packages has been loaded
+% already), remove the patch:
+%    \begin{macrocode}
+    \ifx\scrlfile@excludedpackages\@empty
+      \ResetPreventPackageFromLoading
+    \fi
+  \fi
+}
+%    \end{macrocode}
+% \begin{macro}{\ResetPreventPackageFromLoading}
+%  \changes{v3.08}{2010/11/04}{New}
+% \begin{macro}{\StorePreventPackageFromLoading}
+%  \changes{v3.08}{2010/11/04}{New}
+% These two are very simple
+%    \begin{macrocode}
+\newcommand*{\ResetPreventPackageFromLoading}{%
+  \let\scrlfile@excludedpackages\@empty
+  \ifx\RequirePackage\scrlfile@RequirePackage
+    \ifx\usepackage\RequirePackage
+      \let\usepackage\scrlfile@saved@RequirePackage
+    \fi
+    \let\RequirePackage\scrlfile@saved@RequirePackage
+  \fi
+}
+\newcommand*{\StorePreventPackageFromLoading}[1]{%
+  \let#1\scrlfile@excludedpackages
+}
+%    \end{macrocode}
+% \begin{macro}{\scrlfile@RequirePackage}
+%   \changes{v3.08}{2010/11/04}{New (internal)}
+% This macro will replace \cs{RequirePackage} whenever the exlude list is not
+% empty
+%    \begin{macrocode}
+\newcommand*{\scrlfile@RequirePackage}[2][]{%
+  \let\reserved@c\@empty
+  \@for\reserved@b:=#2\do {%
+    \begingroup
+      \@tempswatrue
+      \@for\reserved@a:=\scrlfile@excludedpackages\do {%
+        \ifx\reserved@a\reserved@b
+          \PackageInfo{scrlfile}{Excluding package `\reserved@b'\MessageBreak
+            from loading}%
+          \@tempswafalse
+        \fi
+      }%
+      \if@tempswa
+        \xdef\reserved@c{\reserved@c,\reserved@b}%
+      \fi
+    \endgroup
+  }%
+  \ifx\reserved@c\@empty
+    \let\reserved@a\@gobbleopt
+  \else
+    \edef\reserved@a{\noexpand\scrlfile@saved@RequirePackage[#1]{%
+        \expandafter\@gobble\reserved@c\@empty}}%
+  \fi
+  \reserved@a
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\@gobbleopt}
+%   \changes{v3.08}{2010/11/04}{New (internal)}
+% Several packages may define this. We hope it is same every time.
+%    \begin{macrocode}
+\providecommand{\@gobbleopt}[1][]{}
+%    \end{macrocode}
+% \end{macro}
 %
 % \begin{macro}{\BeforeClosingMainAux}
 %   \changes{v2.95}{2002/09/03}{new}
