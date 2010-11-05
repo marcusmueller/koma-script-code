@@ -1,4 +1,4 @@
-% \CheckSum{1309}
+% \CheckSum{1322}
 % \iffalse meta-comment
 % ======================================================================
 % scrkbase.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkbase.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkbase.dtx}[2010/03/10 v3.05a KOMA-Script (basics)]
+\ProvidesFile{scrkbase.dtx}[2010/11/05 v3.08 KOMA-Script (basics)]
 % \iffalse
 %</driver>
 %<package&option>\ProvidesPackage{%
@@ -1100,8 +1100,24 @@
 %    \begin{macrocode}
 \newcommand*{\Family@Options}[3]{%
   \@for\scr@key@atlist:=#2\do{%
-    \expandafter\scr@key@split@name@value\scr@key@atlist==\@nil
 %    \end{macrocode}
+%   \changes{v3.08}{2010/11/05}{leere Argumente in der Optionenliste}
+% Auf vielfachen Wunsch und entgegen meiner Überzeugung, sind auch leere
+% Argumente in der Optionenliste erlaubt. Die erste Form wäre, wenn zwei
+% Kommas diret aufeinander folgen:
+%    \begin{macrocode}
+    \ifx\scr@key@atlist\@empty\else
+%    \end{macrocode}
+% Die zweite Möglichkeit wäre, dass noch Leerzeichen zwischen den Komma übrig
+% bleiben:
+%    \begin{macrocode}
+      \ifx\scr@key@atlist\space\else
+        \expandafter\scr@key@split@name@value\scr@key@atlist==\@nil
+%    \end{macrocode}
+% Die dritte Möglichkeit, dass auch noch ein Gleichheitszeichen übrig gelassen
+% wurde, werde ich aber nicht abfangen. Irgendwann müssen die Anwender auch
+% mal ihre Fehler einsehen und korrigieren!
+%
 % Dann wird in einer Schleife über alle Familien festgestellt, ob die Option
 % in einer Familie bekannt ist und ggf. ausgeführt.
 %    \begin{macrocode}
@@ -1200,7 +1216,14 @@
     \let\reserved@a\@empty
     \@for\@tempa:=#3\do{%
       \expandafter\KV@@sp@def\expandafter\@tempa\expandafter{\@tempa}%
-      \protected@edef\reserved@a{\reserved@a,\scr@key@name=\@tempa}%
+%    \end{macrocode}
+%   \changes{v3.08}{2010/11/05}{leere Argumente in der Werteliste}
+% Auf vielfachen Wunsch und entgegen meiner Überzeugung, sind auch leere
+% Argumente in der Werteliste erlaubt:
+%    \begin{macrocode}
+      \ifx\@tempa\@empty\else
+        \protected@edef\reserved@a{\reserved@a,\scr@key@name=\@tempa}%
+      \fi
     }%
     \ifx\reserved@a\@empty
       \protected@edef\reserved@a{\noexpand\setkeys{\@tempb}{\scr@key@name}}%
