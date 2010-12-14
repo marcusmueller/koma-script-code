@@ -58,7 +58,7 @@
 %%% From File: scrkbase.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkbase.dtx}[2010/11/05 v3.08 KOMA-Script (basics)]
+\ProvidesFile{scrkbase.dtx}[2010/12/14 v3.08 KOMA-Script (basics)]
 % \iffalse
 %</driver>
 %<package&option>\ProvidesPackage{%
@@ -1121,21 +1121,24 @@
 % Dann wird in einer Schleife über alle Familien festgestellt, ob die Option
 % in einer Familie bekannt ist und ggf. ausgeführt.
 %    \begin{macrocode}
-    \scr@key@found@false
-    \edef\@tempa{\csname #1@key@familylist\endcsname}%
-    \@for\@tempa:=\@tempa\do{%
-      \scr@ifundefinedorrelax{KV@\@tempa @\scr@key@name}{}{%
-        \scr@key@found@true
-        \protected@edef\reserved@a{\noexpand\setkeys{\@tempa}{\scr@key@atlist}%
-          \noexpand\def\noexpand\@tempa{\@tempa}%
-          \noexpand\def\noexpand\scr@key@atlist{\scr@key@atlist}%
-          \noexpand\def\noexpand\scr@key@name{\scr@key@name}%
-          \noexpand\def\noexpand\scr@key@value{\scr@key@value}%
+        \scr@key@found@false
+        \edef\@tempa{\csname #1@key@familylist\endcsname}%
+        \@for\@tempa:=\@tempa\do{%
+          \scr@ifundefinedorrelax{KV@\@tempa @\scr@key@name}{}{%
+            \scr@key@found@true
+            \protected@edef\reserved@a{%
+              \noexpand\setkeys{\@tempa}{\scr@key@atlist}%
+              \noexpand\def\noexpand\@tempa{\@tempa}%
+              \noexpand\def\noexpand\scr@key@atlist{\scr@key@atlist}%
+              \noexpand\def\noexpand\scr@key@name{\scr@key@name}%
+              \noexpand\def\noexpand\scr@key@value{\scr@key@value}%
+            }%
+            \reserved@a
+          }%
         }%
-        \reserved@a
-      }%
-    }%
-    \ifscr@key@found@\else#3\fi
+        \ifscr@key@found@\else#3\fi
+      \fi
+    \fi
   }%
 }
 %    \end{macrocode}
@@ -1302,8 +1305,8 @@
   \ifx\post@kopt@hook\relax
     \PackageWarning{scrkbase}{%
       \string\AfterKOMAoptions\space can only be used inside a\MessageBreak
-      KOMA-Script option that is called using \space\KOMAoptions.\MessageBreak
-      Because if this, command will be ignored%
+      KOMA-Script option that is called using \string\KOMAoptions.\MessageBreak
+      Because of this, command will be ignored%
     }%
     \expandafter\@gobbletwo
   \else
@@ -1634,6 +1637,7 @@
 \newcommand{\Family@String@Key}[4]{%
   \DefineFamilyKey[{#1}]{#2}{#3}{\def#4{##1}}%
 }
+%</base>
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
