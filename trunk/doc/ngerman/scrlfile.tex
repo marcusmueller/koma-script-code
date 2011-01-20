@@ -45,7 +45,7 @@
 %
 % ============================================================================
 
-\ProvidesFile{scrlfile.tex}[2010/03/14 KOMA-Script guide (chapter: scrlfile)]
+\ProvidesFile{scrlfile.tex}[2011/01/20 KOMA-Script guide (chapter: scrlfile)]
 
 \chapter{Paketabhängigkeiten mit \Package{scrlfile} 
   beherrschen}
@@ -556,6 +556,103 @@ mit Hilfe von \Macro{RequirePackage} vor der Klasse zu laden.
 %
 \EndIndex{Cmd}{ReplacePackage}%
 \EndIndex{Cmd}{ReplaceClass}%
+
+\section{Dateien gar nicht erst einlesen}
+\label{sec:scrlfile.prevent}
+
+Gerade\ChangedAt{v3.08}{\Package{scrlfile}} in Klassen und Paketen, die
+innerhalb von Firmen oder Instituten verwendet werden, findet man häufig, dass
+sehr viele Pakete nur deshalb geladen werden, weil die Anwender diese Pakete
+häufig verwenden. Wenn es dann mit einem dieser automatisch geladenen Paketen
+zu einem Problem kommt, muss man irgendwie das Laden des problematischen Paketes
+verhindern. Auch hier bietet \Package{scrlfile} eine einfache Lösung.
+
+\begin{Declaration}
+  \Macro{PreventPackageFromLoading}\Parameter{Paketliste}
+\end{Declaration}
+\BeginIndex{Cmd}{PreventPackageFromLoading}%
+Wird diese Anweisung\ChangedAt{v3.08}{\Package{scrlfile}} irgendwann vor dem
+Laden eines Paket mit \Macro{usepackage}\IndexCmd{usepackage},
+\Macro{RequirePackage}\IndexCmd{RequirePackage} oder
+\Macro{RequirePackageWithOptions}\IndexCmd{RequirePackageWithOptions}
+aufgerufen, so wird das Laden des Pakets effektiv verhindert, falls es in
+\PValue{Paketliste} zu finden ist.
+%
+\begin{Example}
+  Angenommen Sie arbeiten in einer Firma, in der alle Dokumente mit
+  Latin~Modern erzeugt werden. In der Firmenklasse, \Class{firmenci}, befinden
+  sich daher die Zeilen:
+  \begin{lstcode}
+  \RequirePackage[T1]{fontenc}
+  \RequirePackage{lmodern}
+  \end{lstcode}
+  Nun wollen Sie zum ersten Mal ein Dokument mit
+  X\kern-.125em\lower.5ex\hbox{\reflectbox{E}}\LaTeX{} oder Lua\LaTeX{}
+  setzen. Da hierbei ohnehin Latin-Modern voreingestellt ist und das Laden von
+  \Package{fontenc} eher störend wäre, wollen Sie das Laden beider Pakete
+  verhindern. Sie laden die Klasse deshalb nun in Ihrem eigenen Dokument wie
+  folgt:
+  \begin{lstcode}
+  \RequirePackage{scrlfile}
+  \PreventPackageFromLoading{fontenc,lmodern}
+  \documentclass{firmenci}
+  \end{lstcode}
+\end{Example}
+Wie im Beispiel zu sehen ist, kann man das Paket \Package{scrlfile} auch
+bereits vor der Klasse laden. In diesem Fall muss das Laden dann aber mit
+Hilfe von \Macro{RequirePackage}\IndexCmd{RequirePackage} erfolgen, da
+\Macro{usepackage} vor \Macro{documentclass} verboten ist.
+%
+\EndIndex{Cmd}{PreventPackageFromLoading}
+
+\begin{Declaration}
+  \Macro{StorePreventPackageFromLoading}\Parameter{\Macro{Anweisung}}\\
+  \Macro{ResetPreventPackageFromLoading}
+\end{Declaration}
+\BeginIndex{Cmd}{StorePreventPackageFromLoading}%
+\BeginIndex{Cmd}{ResetPreventPackageFromLoading}%
+\PName{Anweisung} wird mit Hilfe von
+\Macro{StorePreventPackageFromLoading}\ChangedAt{v3.08}{\Package{scrlfile}}
+als die aktuelle Liste der Pakete definiert, für die das Laden verhindert
+werden soll. Im Gegensatz dazu setzt
+\Macro{ResetPreventPackageFromLoading}\ChangedAt{v3.08}{\Package{scrlfile}}
+die Liste der Pakete, für die das Laden verhindert werden soll, zurück. Danach
+können wieder alle Pakete geladen werden.
+\begin{Example}
+  Angenommen, Sie sind innerhalb eines Pakets unbedingt auf das Laden eines
+  anderen Pakets angewiesen und wollen nicht, dass der Anwender das Laden
+  dieses Pakets mit
+  \Macro{PreventPackageFromLoading}\IndexCmd{PreventPackageFromLoading}
+  verhindern kann. Also setzen Sie die Paketliste für die Ausnahmen zuvor
+  zurück:
+  \begin{lstcode}
+  \ResetPreventPackageFromLoading
+  \RequirePackage{foo}
+  \end{lstcode}
+  Allerdings hat dies den Nachteil, dass ab diesem Zeitpunkt die komplette
+  Ausnahmeliste des Anwenders verloren ist. Also speichern Sie die Liste
+  zunächst zwischen und reaktivieren Sie später wieder:
+  \begin{lstcode}
+  \newcommand*{\Users@PreventList}{}%
+  \StorePreventPackageFromLoading\Users@PreventList
+  \ResetPreventPackageFromLoading
+  \RequirePackage{foo}
+  \PreventPackageFromLoading{\Users@PreventList}
+  \end{lstcode}
+  \Macro{StorePreventPackageFromLoading} würde die Anweisung
+  \Macro{Users@PreventList} auch dann definieren, wenn diese bereits
+  anderweitig definiert wäre. In diesem Beispiel wurde deshalb mit einem
+  vorherigen \Macro{newcommand*} sichergestellt, dass in diesem Fall zur
+  Sicherheit eine Fehlermeldung ausgegeben wird.
+\end{Example}
+An dieser Stelle sei darauf hingewiesen, dass Sie bei Manipulationen an der mit
+\Macro{StorePreventPackageFromLoading} zwischengespeicherten Liste selbst die
+Verantwortung für eine korrekte Wiederherstellbarkeit tragen. So muss die
+Liste unbedingt mit Komma separiert sein, sollte keine Leerzeichen oder
+Gruppenklammern enthalten und muss voll expandierbar sein.
+%
+\EndIndex{Cmd}{ResetPreventPackageFromLoading}%
+\EndIndex{Cmd}{StorePreventPackageFromLoading}%
 %
 \EndIndex{Package}{scrlfile}
 
