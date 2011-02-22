@@ -5,8 +5,15 @@
 
 datestr=`date +%Y/%m/%d`
 versionstr=`grep '\@CheckKOMAScriptVersion{' scrkvers.dtx | sed s/.*{// | cut -d' ' -f 2- | sed 's/ *KOMA-Script.*//; s/^v//'`
+
+force=false
+if [ "$1" == "--force" ]; then
+    shift
+    force=true
+fi
+
 if [ $# -lt 2 ]; then
-    echo "Usage: ${0##*/} <date> <version> [...]" >&2
+    echo "Usage: ${0##*/} [--force] <date> <version> [...]" >&2
     echo "Example: ${0##*/} $datestr $versionstr" >&2
     exit 1
 fi
@@ -24,8 +31,10 @@ done
 [ -z "$additional" ] || additional=" $additional"
 
 if svn status | grep '^M'; then
-    echo "There are still modified files!" >&2
-    exit 1
+    if [ "$force" != "true" ]; then
+	echo "There are still modified files!" >&2
+	exit 1
+    fi
 fi
 
 if ! grep 'scr@v@'"${versionstr}" scrkcomp.dtx; then
