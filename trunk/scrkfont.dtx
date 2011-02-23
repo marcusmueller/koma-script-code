@@ -1,4 +1,4 @@
-% \CheckSum{1835}
+% \CheckSum{2688}
 % \iffalse meta-comment
 % ======================================================================
 % scrkfont.dtx
@@ -58,8 +58,14 @@
 %%% From File: scrkfont.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkfont.dtx}[2011/02/22 v3.08b KOMA-Script (font selection)]
+\ProvidesFile{scrkfont.dtx}[2011/02/23 v3.09 KOMA-Script (font selection)]
+% \changes{v3.09}{2011/02/23}{Neues Paket \texttt{scrfontsizes}}
 % \iffalse
+%</driver>
+%<package&generator&identify>\ProvidesPackage{scrfontsizes}[%
+%<package&generator&identify>  \KOMAScriptVersion\space package 
+%<package&generator&identify>  (font size file generator)]
+%<*driver>
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
 \usepackage[latin1]{inputenc}
@@ -97,6 +103,23 @@
 %<*option>
 % \fi
 %
+% \subsection{Der Generator für Schriftgrößendateien}
+%
+% \iffalse
+%<*generator>
+% \fi
+% Ab Version 3.09 gibt es einen Generator für neue
+% Schriftgrößendateien. Dieser richtet sich vor allem an Klassenautoren und
+% bietet die Möglichkeit, eine eigene berechnete Schriftgrößendatei als
+% Grundlage für eine spezifisch angepasste Schriftgrößendateie zu erstellen.
+% Optionen besitzt dieser jedoch nicht. Daher reduziert sich der Optionenteil
+% auf ein einfaches
+%    \begin{macrocode}
+\ProcessOptions\relax
+%    \end{macrocode}
+% \iffalse
+%</generator>
+% \fi
 %
 % \subsection{Option zur Auswahl der Größe der Grundschrift}
 %
@@ -231,18 +254,33 @@
 %<*body>
 % \fi
 %
+% \subsection{Sicherstellen der Umgebung des Generators}
+%
+% \iffalse
+%<*generator>
+% \fi
+% Der Generator benötigt die Anweisung \cs{changefontsizes}, die entweder von
+% einer \KOMAScript-Klasse oder vom Paket \texttt{scrextend} bereitgestellt
+% wird:
+%    \begin{macrocode}
+\@ifundefined{changefontsizes}{\RequirePackage{scrextend}}{}
+%    \end{macrocode}
+% \iffalse
+%</generator>
+% \fi
+%
 % \subsection{Einlesen der Schriftgrößendatei}
 %
 % \changes{v2.6}{2000/01/04}{Einlesen der Schriftgrößen-Options-Datei
 %   funktioniert nun mit diversen Größen}
-% \changes{v2.98c}{2008/03/26}{Eigener \texttt{scrsize}-Datei definiert}
+% \changes{v2.98c}{2008/03/26}{Eigene \texttt{scrsize}-Dateien definiert}
 %
 % \iffalse
 %</body>
 %<*10pt|11pt|12pt>
 % \fi
 %
-% Trotzdem werden min. drei Schriftgrößendateien benötigt. Ab Version 2.98c
+% Es werden min. drei Schriftgrößendateien benötigt. Ab Version 2.98c
 % verwendet \KOMAScript{} vorzugsweise eigene Dateien, die auch noch zu einem
 % späteren Zeitpunkt geladen werden können.  Ansonsten sind diese Dateien
 % weitestgehend dem Quellcode der Standardklassen \texttt{classes.dtx}
@@ -818,6 +856,356 @@
 }
 %    \end{macrocode}
 % \end{macro}
+% \iffalse
+%</class|extend>
+%<*generator>
+% \fi
+% \begin{macro}{\generatefontfile}
+%   \changes{v3.09}{2011/02/23}{Neu}
+% Dies ist die zentrale Anweisung des neuen Generators. Es wird eine neue
+% Schriftgrößendatei ausgegeben. Der Name dieser Datei setzt sich aus dem
+% ersten obligaorischen Argument gefolgt von der Schriftgröße und der
+% Erweiterung \texttt{.clo} zusammen. Da Schriftgrößendateien, die mit
+% »\texttt{scrsize}« beginnen, \KOMAScript{} vorbehalten sind wird dieses
+% erste Argument verweigert.
+%    \begin{macrocode}
+\newcommand*{\generatefontfile}[1]{%
+  \ifstr{#1}{scrsize}{%
+    \ClassError{\KOMAClassName}{%
+      Font file name `scrsize' not allowed%
+    }{%
+      Font files with name `scrsize<fontsize>.clo' are reserved for
+      KOMA-Script.\MessageBreak
+      You should use another prefix and rename \string\@fontsizefilebase\space
+      either before\MessageBreak
+      loading a KOMA-Script class using one of \string\documentclass,
+      \string\LoadClass,\MessageBreak
+      or \string\LoadClassWithOptions\space or before loading package
+      `scrextend' using another\MessageBreak
+      class.}%
+    \@@@generatefontfile
+  }{%
+%    \end{macrocode}
+% Das zweite Argument ist optional. Ist es angegeben, so gibt es den
+% gewünschten Zeilenabstand an. Ist es nicht angegeben, so wird der
+% Zeilenabstand |\changefontsized| überlassen. Das dritte Argument ist
+% schließlich die gewünschte Schriftgröße.
+%    \begin{macrocode}
+    \@ifnextchar [{\@generatefontfile{#1}}{\@@generatefontfile{#1}}%
+  }%
+}
+%    \end{macrocode}
+% \begin{macro}{\@generatefontfile}
+%   \changes{v3.09}{2011/02/23}{Neu (intern)}
+% \begin{macro}{\@@generatefontfile}
+%   \changes{v3.09}{2011/02/23}{Neu (intern)}
+% Diese beiden Hilfsmakros werden benötigt, um Aufrufe von |\generatefontfile|
+% mit oder ohne optionales, zweites Argument zu behandeln. In jedem Fall wird
+% die gewünschte Schriftgröße innerhalb einer Gruppe mit Hilfe von
+% |\changefontsizes| bestimmt und dann eine Datei mit den dabei ermittelten
+% Einstellungen ausgegeben.
+%    \begin{macrocode}
+\newcommand*{\@generatefontfile}{}
+\def\@generatefontfile#1[#2]#3{%
+  \begingroup
+    \@ifundefined{setparsizes}{\setlength{\parskip}{0pt}}%
+                              {\setparsizes{0pt}{0pt}{0pt}}%
+    \changefontsizes[{#2}]{#3}%
+    \generate@fontfile{#1}{#3}%
+  \endgroup
+}
+\newcommand\@@generatefontfile[2]{%
+  \begingroup
+    \@ifundefined{setparsizes}{\setlength{\parskip}{0pt}}%
+                              {\setparsizes{0pt}{0pt}{0pt}}%
+    \changefontsizes{#2}%
+    \generate@fontfile{#1}{#2}%
+  \endgroup
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \begin{macro}{\@@@generatorfontfile}
+%   \changes{v3.09}{2011/02/23}{Neu (intern)}
+% Dieses Hilfsmakro wird hingegen im Fehlerfall aufgerufen, um die Ausgabe
+% einer Schriftgrößendatei zu verhindern.
+%    \begin{macrocode}
+\newcommand*{\@@@generatefontfile}[2][]{}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\@fontfile}
+%   \changes{v3.09}{2011/02/23}{Neu (intern)}
+% Da später die Verwendung von |\generatefontfile| noch auf die Präambel
+% beschränkt werden wird, ist es kein Problem hier |\@mainaux| für die Ausgabe
+% zu missbrauchen. Das funktioniert aber nur, weil |\@mainaux| erst innerhalb
+% von |\begin{document}| tatsächlich geöffnet wird. Die Dateisparsamkeit an
+% dieser Stelle ist also eigentlich ein ziemlich unsauberer Hack!
+%    \begin{macrocode}
+\newcommand*{\@fontfile}{}
+\let\@fontfile\@mainaux
+%    \end{macrocode}
+% \begin{macro}{\generate@fontfile}
+%   \changes{v3.09}{2011/02/23}{Neu (intern)}
+% Es wird nun eine Schriftgrößendatei ausgegeben. Dabei werden die aktuellen
+% Einstellungen verwendet. Dabei wird die Tatsache ausgenutzt, dass diese
+% Anweisung immer innerhalb einer Gruppe aufgerufen wird. Das erste Argument
+% ist der Dateinamenpräfix (also so etwas wie »\texttt{scrsize}«, das zweite
+% Argument die gewünschte Schriftgröße. Es ist zu beachten, dass alle Werte in
+% der Datei in pt angegeben werden, auch wenn die gewünschte Schriftgröße eine
+% ganz andere Einheit besitzt. Das macht schlicht die Arbeit etwas einfacher.
+%    \begin{macrocode}
+\newcommand*{\generate@fontfile}[2]{%
+  \def\@ind{\space\space}%
+  \immediate\openout\@fontfile #1#2.clo
+  \immediate\write\@fontfile{\@percentchar^^J%
+    \@percentchar\space This is file `#1#2.clo', generated with^^J%
+    \@percentchar\space scrfontsizes
+    \csname ver@scrfontsizes.sty\endcsname,^^J%
+    \@percentchar\space Copyright (c) Markus Kohm.^^J%
+    \@percentchar^^J%
+    \string\ProvidesFile{#1#2.clo}[%
+    \the\year/\ifnum\month<10 0\fi\the\month/\ifnum\day<10 0\fi\the\day%
+    \space generated font size class option (#2)]}%
+  \immediate\write\@fontfile{%
+    \string\def\string\normalsize{\@percentchar^^J%
+      \@ind\string\@setfontsize\string\normalsize{\f@size}{\f@baselineskip}%
+      \@percentchar^^J%
+      \@ind\string\abovedisplayskip\space \the\abovedisplayskip^^J%
+      \@ind\string\abovedisplayshortskip\space \the\abovedisplayshortskip^^J%
+      \@ind\string\belowdisplayskip\space \the\belowdisplayskip^^J%
+      \@ind\string\belowdisplayshortskip\space \the\belowdisplayshortskip^^J%
+      \@ind\string\let\string\@listi\string\@listI^^J%
+    }\@percentchar%
+  }%
+  \begingroup\small\@listi
+    \immediate\write\@fontfile{%
+      \string\def\string\small{\@percentchar^^J%
+        \@ind\string\@setfontsize\string\small{\f@size}{\f@baselineskip}%
+        \@percentchar^^J%
+        \@ind\string\abovedisplayskip\space \the\abovedisplayskip^^J%
+        \@ind\string\abovedisplayshortskip\space \the\abovedisplayshortskip^^J%
+        \@ind\string\belowdisplayskip\space \the\belowdisplayskip^^J%
+        \@ind\string\belowdisplayshortskip\space \the\belowdisplayshortskip^^J%
+        \@ind\string\def\string\@listi{\@percentchar^^J%
+          \@ind\@ind\string\leftmargin\string\leftmargini^^J%
+          \@ind\@ind\string\topsep \the\topsep^^J%
+          \@ind\@ind\string\parsep \the\parsep^^J%
+          \@ind\@ind\string\itemsep \string\parsep^^J%
+        \@ind}\@percentchar^^J%
+      }\@percentchar%
+    }%
+  \endgroup
+  \begingroup\footnotesize\@listi
+    \immediate\write\@fontfile{%
+      \string\def\string\footnotesize{\@percentchar^^J%
+        \@ind\string\@setfontsize\string\small{\f@size}{\f@baselineskip}%
+        \@percentchar^^J%
+        \@ind\string\abovedisplayskip\space \the\abovedisplayskip^^J%
+        \@ind\string\abovedisplayshortskip\space \the\abovedisplayshortskip^^J%
+        \@ind\string\belowdisplayskip\space \the\belowdisplayskip^^J%
+        \@ind\string\belowdisplayshortskip\space \the\belowdisplayshortskip^^J%
+        \@ind\string\def\string\@listi{\@percentchar^^J%
+          \@ind\@ind\string\leftmargin\string\leftmargini^^J%
+          \@ind\@ind\string\topsep \the\topsep^^J%
+          \@ind\@ind\string\parsep \the\parsep^^J%
+          \@ind\@ind\string\itemsep \string\parsep^^J%
+        \@ind}\@percentchar^^J%
+      }\@percentchar%
+    }%
+  \endgroup
+  \begingroup\scriptsize
+    \immediate\write\@fontfile{%
+      \string\def\string\scriptsize{%
+        \string\@setfontsize\string\scriptsize{\f@size}{\f@baselineskip}%
+      }\@percentchar%
+    }%
+  \endgroup
+  \begingroup\tiny
+    \immediate\write\@fontfile{%
+      \string\def\string\tiny{%
+        \string\@setfontsize\string\tiny{\f@size}{\f@baselineskip}%
+      }\@percentchar%
+    }%
+  \endgroup
+  \begingroup\large
+    \immediate\write\@fontfile{%
+      \string\def\string\large{%
+        \string\@setfontsize\string\large{\f@size}{\f@baselineskip}%
+      }\@percentchar%
+    }%
+  \endgroup
+  \begingroup\Large
+    \immediate\write\@fontfile{%
+      \string\def\string\Large{%
+        \string\@setfontsize\string\Large{\f@size}{\f@baselineskip}%
+      }\@percentchar%
+    }%
+  \endgroup
+  \begingroup\LARGE
+    \immediate\write\@fontfile{%
+      \string\def\string\LARGE{%
+        \string\@setfontsize\string\LARGE{\f@size}{\f@baselineskip}%
+      }\@percentchar%
+    }%
+  \endgroup
+  \begingroup\huge
+    \immediate\write\@fontfile{%
+      \string\def\string\huge{%
+        \string\@setfontsize\string\huge{\f@size}{\f@baselineskip}%
+      }\@percentchar%
+    }%
+  \endgroup
+  \begingroup\Huge
+    \immediate\write\@fontfile{%
+      \string\def\string\Huge{%
+        \string\@setfontsize\string\Huge{\f@size}{\f@baselineskip}%
+      }\@percentchar%
+    }%
+  \endgroup
+  \immediate\write\@fontfile{\string\normalsize}%
+  \immediate\write\@fontfile{%
+    \string\setlength{\string\footnotesep}{\the\footnotesep}\@percentchar
+  }%
+  \immediate\write\@fontfile{%
+    \string\setlength{\string\skip\string\footins}{\the\skip\footins}\@percentchar
+  }%
+  \immediate\write\@fontfile{%
+    \string\setlength{\string\floatsep}{\the\floatsep}\@percentchar
+  }%
+  \immediate\write\@fontfile{%
+    \string\setlength{\string\textfloatsep}{\the\textfloatsep}\@percentchar
+  }%
+  \immediate\write\@fontfile{%
+    \string\setlength{\string\intextsep}{\the\intextsep}\@percentchar
+  }%
+  \immediate\write\@fontfile{%
+    \string\setlength{\string\dblfloatsep}{\the\dblfloatsep}\@percentchar
+  }%
+  \immediate\write\@fontfile{%
+    \string\setlength{\string\dbltextfloatsep}{\the\dbltextfloatsep}\@percentchar
+  }%
+  \immediate\write\@fontfile{%
+    \string\setlength{\string\@fptop}{\the\@fptop}\@percentchar
+  }%
+  \immediate\write\@fontfile{%
+    \string\setlength{\string\@fpsep}{\the\@fpsep}\@percentchar
+  }%
+  \immediate\write\@fontfile{%
+    \string\setlength{\string\@fpbot}{\the\@fpbot}\@percentchar
+  }%
+  \immediate\write\@fontfile{%
+    \string\setlength{\string\@dblfptop}{\the\@dblfptop}\@percentchar
+  }%
+  \immediate\write\@fontfile{%
+    \string\setlength{\string\@dblfpsep}{\the\@dblfpsep}\@percentchar
+  }%
+  \immediate\write\@fontfile{%
+    \string\setlength{\string\@dblfpbot}{\the\@dblfpbot}\@percentchar
+  }%
+  \immediate\write\@fontfile{%
+    \string\setlength{\string\partopsep}{\the\partopsep}\@percentchar
+  }%
+  \begingroup
+    \@listi
+    \immediate\write\@fontfile{%
+      \string\def\string\@listi{\@percentchar^^J%
+        \@ind\string\leftmargin\string\leftmargini^^J%
+        \@ind\string\topsep \the\topsep^^J%
+        \@ind\string\parsep \the\parsep^^J%
+        \@ind\string\itemsep \string\parsep^^J%
+      }\@percentchar
+    }%
+  \endgroup
+  \immediate\write\@fontfile{%
+    \string\let\string\@listI\string\@listi
+  }%
+  \begingroup
+    \@listii
+    \immediate\write\@fontfile{%
+      \string\def\string\@listii{\@percentchar^^J%
+        \@ind\string\leftmargin\string\leftmarginii^^J%
+        \@ind\string\labelwidth\string\leftmarginii^^J%
+        \@ind\string\advance\string\labelwidth-\string\labelsep^^J%
+        \@ind\string\topsep \the\topsep^^J%
+        \@ind\string\parsep \the\parsep^^J%
+        \@ind\string\itemsep \string\parsep^^J%
+      }\@percentchar
+    }%
+  \endgroup
+  \begingroup
+    \@listiii
+    \immediate\write\@fontfile{%
+      \string\def\string\@listiii{\@percentchar^^J%
+        \@ind\string\leftmargin\string\leftmarginiii^^J%
+        \@ind\string\labelwidth\string\leftmarginiii^^J%
+        \@ind\string\advance\string\labelwidth-\string\labelsep^^J%
+        \@ind\string\topsep \the\topsep^^J%
+        \@ind\string\parsep \the\parsep^^J%
+        \@ind\string\partopsep \the\partopsep^^J%
+       \@ind\string\itemsep \string\topsep^^J%
+      }\@percentchar
+    }%
+  \endgroup
+  \begingroup
+    \@listiv
+    \immediate\write\@fontfile{%
+      \string\def\string\@listiv{\@percentchar^^J%
+        \@ind\string\leftmargin\string\leftmarginiv^^J%
+        \@ind\string\labelwidth\string\leftmarginiv^^J%
+        \@ind\string\advance\string\labelwidth-\string\labelsep^^J%
+      }\@percentchar
+    }%
+  \endgroup
+  \begingroup
+    \@listv
+    \immediate\write\@fontfile{%
+      \string\def\string\@listv{\@percentchar^^J%
+        \@ind\string\leftmargin\string\leftmarginv^^J%
+        \@ind\string\labelwidth\string\leftmarginv^^J%
+        \@ind\string\advance\string\labelwidth-\string\labelsep^^J%
+      }\@percentchar
+    }%
+  \endgroup
+  \begingroup
+    \@listvi
+    \immediate\write\@fontfile{%
+      \string\def\string\@listvi{\@percentchar^^J%
+        \@ind\string\leftmargin\string\leftmarginvi^^J%
+        \@ind\string\labelwidth\string\leftmarginvi^^J%
+        \@ind\string\advance\string\labelwidth-\string\labelsep^^J%
+      }\@percentchar
+    }%
+  \endgroup
+  \immediate\write\@fontfile{%
+    \string\@ifundefined{@list@extra}{}{\@percentchar^^J%
+      \@ind\string\l@addto@macro{\string\@listi}{\string\@list@extra}%
+      \@percentchar^^J%
+      \@ind\string\let\string\@listI=\string\@listi^^J%
+      \@ind\string\l@addto@macro{\string\@listii}{\string\@list@extra}%
+      \@percentchar^^J%
+      \@ind\string\l@addto@macro{\string\@listiii}{\string\@list@extra}%
+      \@percentchar^^J%
+      \@ind\string\l@addto@macro{\string\footnotesize}{\string\protect
+        \string\add@extra@listi{ftns}}\@percentchar^^J%
+      \@ind\string\l@addto@macro{\string\small}{\string\protect
+        \string\add@extra@listi{sml}}\@percentchar^^J%
+    }\@percentchar^^J%
+    \string\@listi^^J%
+    \string\endinput^^J%
+    \@percentchar^^J%
+    \@percentchar\space End of file `#1#2.clo'.
+  }
+  \immediate\closeout\@fontfile
+}
+\@onlypreamble\generatefontfile
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \iffalse
+%</generator>
+%<*class|extend>
+% \fi
 % \end{macro}
 % \end{macro}
 % \end{macro}
