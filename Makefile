@@ -110,6 +110,7 @@ CLS_MAIN	= scrbook.cls \
 		  float.hak \
 		  hyperref.hak \
 		  listings.hak \
+		  scrfontsizes.sty \
 		  visualize.lco \
 	          DIN.lco \
 		  DINmtext.lco \
