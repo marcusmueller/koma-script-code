@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# Copyright (c) Markus Kohm, 2006-2009
+# Copyright (c) Markus Kohm, 2006-2011
 #
 # This file prepares KOMA-Script for release.
 #
@@ -55,11 +55,12 @@ steptwo() {
     mv INSTALLD.tmp INSTALLD.txt
 
     versionpostfix=${version#* * }
+    year=`date '+%Y'`
 
     cat > README <<EOF
 
 KOMA-Script $version
-Copyright (c) Markus Kohm <komascript(at)gmx.info>, 1994-2009
+Copyright (c) Markus Kohm <komascript(at)gmx.info>, 1994-${year}
 
 This material is subject to the LaTeX Project Public License. See
 lppl.txt (english) or lppl-de.txt (german) for the details of that
