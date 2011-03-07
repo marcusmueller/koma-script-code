@@ -1,4 +1,4 @@
-% \CheckSum{2970}
+% \CheckSum{2990}
 % \iffalse meta-comment
 % ======================================================================
 % scrknpap.dtx
@@ -601,23 +601,45 @@
 % entspricht. Voreingestellt ist die Textbreite.
 % \begin{macro}{\if@refwide}
 %   \changes{v2.8n}{2001/09/08}{Neuer Schalter}
+%   \changes{v3.09}{2011/03/07}{Neue Werte: \texttt{dateleft},
+%     \texttt{dateright}, \texttt{nodate}}
 % \begin{macro}{\@refwidetrue}
 % \begin{macro}{\@refwidefalse}
 % Gespeichert wird die Information in einem Schalter.
+% \begin{macro}{\@datepos}
+%   \changes{v3.09}{2011/03/07}{Neu (intern)}
+%   Das Datum kann links oder rechts oder gar nicht gesetzt werden.
+%   Wo die Speicherung erfolgt wird in einem nummerischen Makro
+%   abglegt. Voreingestellt ist rechts.
 %    \begin{macrocode}
 \newif\if@refwide
+\newcommand*{\@datepos}{1}
 \KOMA@key{refline}[wide]{%
   \begingroup
-    \KOMA@set@ncmdkey{refline}{@tempa}{{wide}{0},{narrow}{1}}{#1}%
+    \KOMA@set@ncmdkey{refline}{@tempa}{{wide}{0},{narrow}{1},%
+    {dateleft}{2},{leftdate}{2},%
+    {dateright}{3},{rightdate}{3},%
+    {nodate}{4}%
+  }{#1}%
     \ifcase\@tempa
       \endgroup
       \@refwidetrue
-    \else
+    \or
       \endgroup
       \@refwidefalse
+    \or
+      \endgroup
+      \def\@datepos{2}%
+    \or
+      \endgroup
+      \def\@datepos{1}%
+    \or
+      \endgroup
+      \def\@datepos{0}%
     \fi
 }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -2482,6 +2504,14 @@
 %   \changes{v2.97c}{2007/05/14}{Neue Fontelemente}
 % Je nachdem, welche Felder definiert sind, muss eine geschäftsmäßiger
 % Standardbrief oder ein eher persönliches Aussehen gewählt werden.
+% \begin{macro}{\do@set@reffield}
+%   \changes{v3.09}{2011/03/06}{Neu (intern)}
+% Das ist ein \cs{do} für die Felder und bekommt innerhalb von
+% \cs{@datefield} unterschiedliche Bedeutungen. An dieser Stelle wird es daher
+% nur reserviert.
+%    \begin{macrocode}
+\newcommand*{\do@set@reffield}{}
+%    \end{macrocode}
 % \begin{macro}{\@set@reffield}
 % Einzelne Felder werden mit Hilfe dieses Makros gesetzt. Als Parameter wird
 % der Name des Feldes übergeben. Es wird dann davon ausgegangen, dass der
@@ -2502,6 +2532,20 @@
 }
 %    \end{macrocode}
 % \end{macro}
+% \begin{macro}{\@test@reffield}
+%   \changes{v3.09}{2011/03/06}{Neu (intern)}
+% Dieses Makro testet, ob ein Feld tatsächlich zu setzen ist und setzt
+% ggf. \cs{@tempswa}.
+%    \begin{macrocode}
+\newcommand*{\@test@reffield}[1]{%
+  \ifkomavarempty{#1}{}{%
+%<trace>    \if@tempswa\l@addto@macro\@tempa{, }\fi
+%<trace>    \l@addto@macro\@tempa{#1}%
+    \@tempswatrue
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
 % \begin{macro}{\@set@reffields}
 %   \changes{v2.8q}{2002/01/14}{Neu}
 % Dieses Makro enthält alle Aufrufe von \cs{@set@reffield}, die durchzuführen
@@ -2511,11 +2555,13 @@
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\addtoreffields}
+%   \changes{v3.09}{2011/03/06}{Verwendung von \cs{do@set@reffield} an Stelle
+%     von \cs{@set@reffield}}
 % Dieses Makro erwartet als obligatorisches Argument den Namen einer
 % KOMA-Script Variable. Der Befehl arbeitet lokal zur aktuellen Umgebung.
 %    \begin{macrocode}
 \newcommand*{\addtoreffields}[1]{%
-  \l@addto@macro{\@set@reffields}{\@set@reffield{#1}}%
+  \l@addto@macro{\@set@reffields}{\do@set@reffield{#1}}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -2562,6 +2608,8 @@
 %   \changes{v2.9l}{2003/01/28}{Berechnung von \texttt{refhpos} hinzugefügt}
 %   \changes{v2.95}{2006/03/23}{Absatzeinzug mit \cs{setparsizes} abschalten}
 %   \changes{v2.97c}{2007/05/14}{Neue Font-Elemente}
+%   \changes{v3.09}{2011/03/06}{\cs{do@set@reffield} muss initialisiert
+%     werden}
 %    \begin{macrocode}
 \newcommand*{\@datefield}{{%
     \setparsizes{\z@}{\z@}{\z@ plus 1fil}\par@updaterelative
@@ -2579,7 +2627,8 @@
         \@setplength{refhpos}{\oddsidemargin}%
         \@addtoplength{refhpos}{1in}%
       \fi
-    \else\ifdim\useplength{refhpos}=\z@
+    \else
+      \ifdim\useplength{refhpos}=\z@
         \begingroup
 %    \end{macrocode}
 % Wir bestimmen zunächst, um wieviel die Geschäftszeile schmaler ist als der
@@ -2616,63 +2665,67 @@
     \@tempswafalse
     \move@topt\vskip\useplength{refvpos}%
 %    \end{macrocode}
+% Jetzt kontrollieren wir, ob überhaupt etwas auszugeben ist:
+%    \begin{macrocode}
+    \@tempswafalse
+    \let\do@set@reffield\@test@reffield
+%<trace>    \let\@tempa\@empty
+    \@set@reffields
+    \ifcase \@datepos\else\@test@reffield{date}\fi
+    \if@tempswa
+%<trace>      \typeout{Reference line(s) with: \@tempa}%
+      \@tempswafalse
+%    \end{macrocode}
 % Jetzt erfolgt noch die Absatzeinzugkorrektur. Danach kommt die eigentliche
 % Arbeit.
 %    \begin{macrocode}
-    \rlap{\noindent\move@topl\hskip\useplength{refhpos}%
-      \vbox{\hsize\useplength{refwidth}%
-        \noindent\@set@reffields%
+      \rlap{\noindent\move@topl\hskip\useplength{refhpos}%
+        \vbox{\hsize\useplength{refwidth}%
+          \noindent
+          \ifnum \@datepos=2
+            \@set@reffields
+            \if@tempswa
+              \@tempswafalse
+              \@set@reffield{date}%
+            \fi
+          \fi
+          \let\do@set@reffield\@set@reffield
+          \@set@reffields%
+          \if@tempswa
+            \ifnum \@datepos=1 \@set@reffield{date}\fi%
 %    \end{macrocode}
 % Seit Version~2.97c wird hier auch noch getestet, ob die Geschäftszeile
 % möglicherweise mit zu großer Schrift gesetzt wird.
 %    \begin{macrocode}
-        \if@tempswa
-          \setbox0\hbox{\usekomafont{refname}\strutbox}%
-          \ifdim\ht0>\ht\strutbox
-            \ClassWarningNoLine{scrlttr}{%
-              Font element `refname' should not be larger than
-              \string\normalsize!}%
-          \fi
-          \setbox0\hbox{\usekomafont{refvalue}\strutbox}%
-          \ifdim\ht0>\ht\strutbox
-            \ClassWarningNoLine{scrlttr}{%
-              Font element `refvalue' should not be larger than
-              \string\normalsize!}%
-          \fi
-        \fi
-        \ifkomavarempty{date}{%
-          \if@tempswa
-            \typeout{Reference line(s): with fields but without date}%
+            \setbox0\hbox{\usekomafont{refname}\strutbox}%
+            \ifdim\ht0>\ht\strutbox
+              \ClassWarningNoLine{scrlttr}{%
+                Font element `refname' should not be larger than
+                \string\normalsize!}%
+            \fi
+            \setbox0\hbox{\usekomafont{refvalue}\strutbox}%
+            \ifdim\ht0>\ht\strutbox
+              \ClassWarningNoLine{scrlttr}{%
+                Font element `refvalue' should not be larger than
+                \string\normalsize!}%
+            \fi
           \else
-            \typeout{Reference line(s): no}%
-            \aftergroup\aftergroup\aftergroup\@tempswatrue
+            \ifcase \@datepos\else
+              \ifnum \@datepos=1 \enskip\hfill\fi
+              \ifkomavarempty{place}{}{%
+                \usekomavar{place}\usekomavar{placeseparator}}%
+              \usekomavar{date}%
+            \fi
           \fi
-          }{%
-          \if@tempswa
-            \typeout{Reference line(s): with fields and date}%
-            \settowidth{\@tempdima}{\strut
-              \usekomafont{refvalue}\usekomavar{date}}%
-            \setbox0\hbox{\usekomafont{refname}\usekomavar*{date}}%
-            \ifdim \@tempdima<\wd0\setlength{\@tempdima}{\wd0}\fi
-            \enskip\hfill
-            \parbox[t]{\@tempdima}{\noindent\raggedright%
-              \strut\box0\\\usekomafont{refvalue}\strut\usekomavar{date}}%
-          \else
-            \typeout{Reference line: only place and date}%
-            \enskip\hfill
-            \ifkomavarempty{place}{}{%
-              \usekomavar{place}\usekomavar{placeseparator}}%
-            \usekomavar{date}%
-            \@tempswatrue
-          \fi
-          }%
         }%
       }%
-    \if@tempswa\vskip-\baselineskip\fi
+%<trace>    \else\typeout{No reference line.}%
+    \fi
     \vskip\useplength{refaftervskip}%
   }%
 }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
 % \begin{macro}{\@maketitle}
