@@ -1,4 +1,4 @@
-% \CheckSum{514}
+% \CheckSum{550}
 % \iffalse meta-comment
 % ======================================================================
 % scrlfile.dtx
@@ -64,7 +64,7 @@
 %%% From File: scrlfile.dtx
 %<*driver|scrlfile|load>
 % \fi
-\def\scrlfileversion{2011/02/11 v3.08a}
+\def\scrlfileversion{2011/03/08 v3.09}
 % \iffalse
 %</driver|scrlfile|load>
 %<*driver>
@@ -246,8 +246,10 @@
 %
 % \DescribeMacro{\AfterClass}
 % \DescribeMacro{\AfterClass*}
+% \DescribeMacro{\AfterClass+}
 % \DescribeMacro{\AfterPackage}
 % \DescribeMacro{\AfterPackage*}
+% \DescribeMacro{\AfterPackage+}
 % The command \cs{AfterClass}\marg{class}\marg{instructions} and the
 % command \cs{AfterPackage}\marg{package}\marg{instructions} work the
 % same way like command \cs{AfterFile}.  The only difference is that
@@ -257,7 +259,9 @@
 % have to be omitted.  The starred versions execute the
 % \meta{instructions} not only next time the class or package is
 % loaded, but also immediately if the class or package has been loaded
-% already.
+% already. The plus versions differ from the starred versions by execution
+% first if loading of class of package has been finished. The difference is
+% only valid if A loads B and B uses one of the after commands for A.
 %
 % \DescribeMacro{\ReplaceInput}
 % The command \cs{ReplaceInput}\marg{name of file to be replaced}\marg{name of
@@ -633,10 +637,14 @@
 %  \begin{macro}{\BeforeClass}
 %  \begin{macro}{\AfterClass}
 %  \begin{macro}{\@AfterClass}
+%  \begin{macro}{\@@AfterClass}
+%    \changes{v3.09}{2011/03/08}{new (internal)}
 %  \begin{macro}{\@sAfterClass}
 %  \begin{macro}{\BeforePackage}
 %  \begin{macro}{\AfterPackage}
 %  \begin{macro}{\@AfterPackage}
+%  \begin{macro}{\@@AfterPackage}
+%    \changes{v3.09}{2011/03/08}{new (internal)}
 %  \begin{macro}{\@sAfterPackage}
 % These macros add stuff to a load-file-hook of a file, class or
 % package. First argument is the name of the file (with extension),
@@ -652,7 +660,16 @@
 \newcommand*{\BeforeClass}[1]{%
   \scr@set@load@hook{before}{#1.\@clsextension}}
 \newcommand*{\AfterClass}{%
-  \@ifstar {\@sAfterClass}{\@AfterClass}}
+  \@ifstar {\@sAfterClass}{\@ifnextchar +\@@AfterClass\@AfterClass}}
+\newcommand*{\@@AfterClass}[2]{%
+  \begingroup
+    \expandafter\ifx\csname #2.\@clsextension-h@@k\endcsname\relax
+      \aftergroup\@sAfterClass
+    \else
+      \aftergroup\@AfterClass
+    \fi
+  \endgroup{#2}%
+}
 \newcommand*{\@AfterClass}[1]{%
   \scr@set@load@hook{after}{#1.\@clsextension}}
 \newcommand*{\@sAfterClass}[1]{%
@@ -668,7 +685,16 @@
 \newcommand*{\BeforePackage}[1]{%
   \scr@set@load@hook{before}{#1.\@pkgextension}}
 \newcommand*{\AfterPackage}{%
-  \@ifstar {\@sAfterPackage}{\@AfterPackage}}
+  \@ifstar {\@sAfterPackage}{\@ifnextchar +\@@AfterPackage\@AfterPackage}}
+\newcommand*{\@@AfterPackage}[2]{%
+  \begingroup
+    \expandafter\ifx\csname #2.\@pkgextension-h@@k\endcsname\relax
+      \aftergroup\@sAfterPackage
+    \else
+      \aftergroup\@AfterPackage
+    \fi
+  \endgroup{#2}%
+}
 \newcommand*{\@AfterPackage}[1]{%
   \scr@set@load@hook{after}{#1.\@pkgextension}}
 \newcommand*{\@sAfterPackage}[1]{%
@@ -682,6 +708,8 @@
   {#1}%
 }
 %    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
 %  \end{macro}
 %  \end{macro}
 %  \end{macro}
