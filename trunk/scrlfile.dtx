@@ -1,4 +1,4 @@
-% \CheckSum{550}
+% \CheckSum{593}
 % \iffalse meta-comment
 % ======================================================================
 % scrlfile.dtx
@@ -64,7 +64,7 @@
 %%% From File: scrlfile.dtx
 %<*driver|scrlfile|load>
 % \fi
-\def\scrlfileversion{2011/03/08 v3.09}
+\def\scrlfileversion{2011/03/09 v3.09}
 % \iffalse
 %</driver|scrlfile|load>
 %<*driver>
@@ -247,9 +247,11 @@
 % \DescribeMacro{\AfterClass}
 % \DescribeMacro{\AfterClass*}
 % \DescribeMacro{\AfterClass+}
+% \DescribeMacro{\AfterClass!}
 % \DescribeMacro{\AfterPackage}
 % \DescribeMacro{\AfterPackage*}
 % \DescribeMacro{\AfterPackage+}
+% \DescribeMacro{\AfterPackage!}
 % The command \cs{AfterClass}\marg{class}\marg{instructions} and the
 % command \cs{AfterPackage}\marg{package}\marg{instructions} work the
 % same way like command \cs{AfterFile}.  The only difference is that
@@ -261,7 +263,22 @@
 % loaded, but also immediately if the class or package has been loaded
 % already. The plus versions differ from the starred versions by execution
 % first if loading of class of package has been finished. The difference is
-% only valid if A loads B and B uses one of the after commands for A.
+% only valid if A loads B and B uses one of the after commands for A. In all
+% cases the \meta{instructions} will be executed before \cs{AtEndOfClass} or
+% \cs{AtEndOfPackage} calls of the class or package if loading of the class or
+% package was finished not yet. To even execute the \marg{instructions} after
+% those, use the exclamation mark version.
+%
+% \DescribeMacro{\AfterAtEndOfClass}
+% \DescribeMacro{\AfterAtEndOfPackage}
+% The command \cs{AfterAtEndOfClass}\marg{class}\marg{instructions} and the
+% command \cs{AfterAtEndOfPackage}\marg{package}\marg{instructions} work like
+% \cs{AfterClass} and \cs{AfterPackage} but execute the \meta{instructions}
+% after \cs{AtEndOfClass} or \cs{AtEndOfPackage} instructions outside the
+% context of the class or package. There are no star, plus or exclamation mark
+% versions of these commands. Just use \cs{AfterClass!} or \cs{AfterPackage!}
+% if you want to execute the \meta{instructions} if the class or package has
+% been loaded already.
 %
 % \DescribeMacro{\ReplaceInput}
 % The command \cs{ReplaceInput}\marg{name of file to be replaced}\marg{name of
@@ -553,6 +570,7 @@
       \noexpand\@onefilewithoptions{\csname #1.#4-@aliasname\endcsname}}%
   \fi
   \scr@@onefilewithoptions[{#2}][{#3}]{#4}%
+  \scr@load@hook{lateafter}{#1.#4}%
 }
 %    \end{macrocode}
 %  \end{macro}
@@ -636,15 +654,21 @@
 %  \begin{macro}{\AfterFile}
 %  \begin{macro}{\BeforeClass}
 %  \begin{macro}{\AfterClass}
+%  \begin{macro}{\AfterAtEndOfClass}
 %  \begin{macro}{\@AfterClass}
 %  \begin{macro}{\@@AfterClass}
 %    \changes{v3.09}{2011/03/08}{new (internal)}
+%  \begin{macro}{\@@@AfterClass}
+%    \changes{v3.09}{2011/03/09}{new (internal)}
 %  \begin{macro}{\@sAfterClass}
 %  \begin{macro}{\BeforePackage}
 %  \begin{macro}{\AfterPackage}
+%  \begin{macro}{\AfterAtEndOfPackage}
 %  \begin{macro}{\@AfterPackage}
 %  \begin{macro}{\@@AfterPackage}
 %    \changes{v3.09}{2011/03/08}{new (internal)}
+%  \begin{macro}{\@@@AfterPackage}
+%    \changes{v3.09}{2011/03/09}{new (internal)}
 %  \begin{macro}{\@sAfterPackage}
 % These macros add stuff to a load-file-hook of a file, class or
 % package. First argument is the name of the file (with extension),
@@ -660,7 +684,22 @@
 \newcommand*{\BeforeClass}[1]{%
   \scr@set@load@hook{before}{#1.\@clsextension}}
 \newcommand*{\AfterClass}{%
-  \@ifstar {\@sAfterClass}{\@ifnextchar +\@@AfterClass\@AfterClass}}
+  \@ifstar {\@sAfterClass}{%
+    \@ifnextchar +\@@AfterClass{%
+      \@ifnextchar !\@@@AfterClass\@AfterClass
+    }%
+  }%
+}
+\newcommand*{\@@@AfterClass}[2]{%
+  \begingroup\ifx\csname #2.\@clsextension-h@@k\endcsname\relax
+    \aftergroup\@sAfterClass
+  \else
+    \aftergroup\AfterAtEndOfClass
+  \fi
+  \endgroup{#2}%
+}
+\newcommand*{\AfterAtEndOfClass}[1]{%
+  \scr@set@load@hook{lateafter}{#1.\@clsextension}}
 \newcommand*{\@@AfterClass}[2]{%
   \begingroup
     \expandafter\ifx\csname #2.\@clsextension-h@@k\endcsname\relax
@@ -685,7 +724,22 @@
 \newcommand*{\BeforePackage}[1]{%
   \scr@set@load@hook{before}{#1.\@pkgextension}}
 \newcommand*{\AfterPackage}{%
-  \@ifstar {\@sAfterPackage}{\@ifnextchar +\@@AfterPackage\@AfterPackage}}
+  \@ifstar {\@sAfterPackage}{%
+    \@ifnextchar +\@@AfterPackage{%
+      \@ifnextchar !\@@@AfterPackage\@AfterPackage
+    }%
+  }%
+}
+\newcommand*{\@@@AfterPackage}[2]{%
+  \begingroup\ifx\csname #2.\@pkgextension-h@@k\endcsname\relax
+    \aftergroup\@sAfterPackage
+  \else
+    \aftergroup\AfterAtEndOfPackage
+  \fi
+  \endgroup{#2}%
+}
+\newcommand*{\AfterAtEndOfPackage}[1]{%
+  \scr@set@load@hook{lateafter}{#1.\@pkgextension}}
 \newcommand*{\@@AfterPackage}[2]{%
   \begingroup
     \expandafter\ifx\csname #2.\@pkgextension-h@@k\endcsname\relax
@@ -708,6 +762,10 @@
   {#1}%
 }
 %    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
 %  \end{macro}
 %  \end{macro}
 %  \end{macro}
