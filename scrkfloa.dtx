@@ -1,4 +1,4 @@
-% \CheckSum{1146}
+% \CheckSum{1187}
 % \iffalse meta-comment
 % ======================================================================
 % scrkfloa.dtx
@@ -113,6 +113,18 @@
 % Einige Anweisungen und Einstellungen werden bereits benötigt, bevor die
 % Optionen abgearbeitet werden.
 %
+%  \begin{macro}{\if@captionabove}
+%    \changes{v2.8h}{2001/07/19}{neu}
+%    \changes{v3.09}{2011/03/23}{Initialisierung vor den Optionen}
+% Ob es sich bei \cs{caption} um eine Unter- oder Überschrift handelt und also
+% \cs{abovecaptionskip} davor und \cs{belowcaptionskip} danach steht
+% oder umgekehrt, wird über diesen Schalter gesteuert. Voreingestellt
+% sind Unterschriften.
+%    \begin{macrocode}
+\newif\if@captionabove\@captionabovefalse
+%    \end{macrocode}  
+%  \end{macro}
+%
 % \begin{macro}{\if@tablecaptionabove}
 %   \changes{v2.8h}{2001/07/19}{neu Option}
 %   \changes{v2.8k}{2001/08/15}{aus \texttt{typearea} in die Klassen
@@ -124,6 +136,21 @@
 % einem Schalter gespeichert.
 %    \begin{macrocode}
 \newif\if@tablecaptionabove\@tablecaptionabovefalse
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\if@figurecaptionabove}
+%   \changes{v3.09}{2011/03/23}{neu Option}
+% \begin{macro}{\@figurecaptionabovetrue}
+%   \changes{v3.09}{2011/03/23}{neu (intern)}
+% \begin{macro}{\@figurecaptionabovefalse}
+%   \changes{v3.09}{2011/03/23}{neu (intern)}
+% Die Einstellung, ob es Abbildungsüber- oder -unterschriften sind, wird in
+% einem Schalter gespeichert.
+%    \begin{macrocode}
+\newif\if@figurecaptionabove\@figurecaptionabovefalse
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -187,25 +214,41 @@
 %    \begin{macrocode}
 \KOMA@key{captions}{%
   \KOMA@set@ncmdkey{captions}{@tempa}{%
-    {tableheading}{0},%
-    {tableabove}{0},{abovetable}{0},{abovetabular}{0},{topattable}{0},%
-    {tablesignature}{1},%
-    {tablebelow}{1},{belowtable}{1},{belowtabular}{1},{bottomattable}{1},%
-    {oneline}{2},%
-    {nooneline}{3},%
-    {rightbeside}{4},{besideright}{4},%
-    {leftbeside}{5},{besideleft}{5},%
-    {innerbeside}{6},{besideinner}{6},%
-    {outerbeside}{7},{besideouter}{7},%
-    {topbeside}{8},{besidetop}{8},%
-    {centeredbeside}{9},{besidecentered}{9},%
-    {middlebeside}{9},{besidemiddle}{9},%
-    {bottombeside}{10},{besidebottom}{10}%
+    {headings}{0},{above}{0},{top}{0},%
+    {signature}{1},{below}{1},{bot}{1},{bottom}{1},%
+    {tableheading}{2},%
+    {tableabove}{2},{abovetable}{2},{abovetabular}{2},{topattable}{2},%
+    {tablesignature}{3},%
+    {tablebelow}{3},{belowtable}{3},{belowtabular}{3},{bottomattable}{3},%
+    {figureheading}{4},{figureabove}{4},{abovefigure}{4},{topatfigure}{4},%
+    {figuresignature}{5},{figurebelow}{5},{belowfigure}{5},{bottomatfigure}{5},%
+    {oneline}{6},%
+    {nooneline}{7},%
+    {rightbeside}{8},{besideright}{8},%
+    {leftbeside}{9},{besideleft}{9},%
+    {innerbeside}{10},{besideinner}{10},%
+    {outerbeside}{11},{besideouter}{11},%
+    {topbeside}{12},{besidetop}{12},%
+    {centeredbeside}{13},{besidecentered}{13},%
+    {middlebeside}{13},{besidemiddle}{13},%
+    {bottombeside}{14},{besidebottom}{14}%
   }{#1}%
   \ifcase \@tempa\relax
     \@tablecaptionabovetrue
+    \@figurecaptionabovetrue
+    \@captionabovetrue
   \or
     \@tablecaptionabovefalse
+    \@figurecaptionabovefalse
+    \@captionabovefalse
+  \or
+    \@tablecaptionabovetrue
+  \or
+    \@tablecaptionabovefalse
+  \or
+    \@figurecaptionabovetrue
+  \or
+    \@figurecaptionabovefalse
   \or
     \onelinecaptionstrue
   \or
@@ -352,16 +395,6 @@
 %    \begin{macrocode}
 \newcommand*{\captionformat}{:\ }
 %    \end{macrocode}
-%  \end{macro}
-%  \begin{macro}{\if@captionabove}
-%    \changes{v2.8h}{2001/07/19}{neu}
-% Ob es sich um eine Unter- oder Überschrift handelt und also
-% \cs{abovecaptionskip} davor und \cs{belowcaptionskip} danach steht
-% oder umgekehrt, wird über diesen Schalter gesteuert. Voreingestellt
-% sind Unterschriften.
-%    \begin{macrocode}
-\newif\if@captionabove\@captionabovefalse
-%    \end{macrocode}  
 %  \end{macro}
 %  \begin{macro}{\scr@caption}
 %    \changes{v2.8h}{2001/07/19}{neu (intern)}
@@ -1282,6 +1315,11 @@
 %
 % \begin{macro}{captionof}
 %   \changes{v3.05}{2009/07/08}{Neue Anweisung}
+%   \changes{v3.09}{2011/03/21}{Verwendung des internen \cs{scr@caption}}
+% \begin{macro}{captionaboveof}
+%   \changes{v3.09}{2011/03/21}{Neue Anweisung}
+% \begin{macro}{captionbelowof}
+%   \changes{v3.09}{2011/03/21}{Neue Anweisung}
 % Obwohl es inzwischen mehrere Pakete gibt, die diese Anweisung bereit
 % stellen, kommt es doch immer wieder zu Fehlern, weil einige Anwender diese
 % Pakete nicht nutzen. Also habe ich beschlossen, das selbst zu
@@ -1290,9 +1328,13 @@
 % Paket \textsf{caption} gibt es solche Probleme nicht, das dieses
 % \cs{captionof} ohnehin per \cs{def} definiert.
 %    \begin{macrocode}
-\newcommand*{\captionof}[1]{\def\@captype{#1}\caption}
+\newcommand*{\captionof}[1]{\def\@captype{#1}\scr@caption}
+\newcommand*{\captionaboveof}{\@captionabovetrue\captionof}
+\newcommand*{\captionbelowof}{\@captionabovefalse\captionof}
 \BeforePackage{capt-of}{\let\captionof\relax}
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 %
 %
@@ -1377,11 +1419,15 @@
 % zweispaltigem Satz siehe \texttt{classes.dtx} und \texttt{source2e}.
 %    \begin{macrocode}
 \newenvironment{figure}{%
+  \if@figurecaptionabove\let\caption\captionabove
+  \else\let\caption\captionbelow\fi
   \let\caption\captionbelow\@float{figure}%
 }{%
   \end@float
 }
 \newenvironment{figure*}{%
+  \if@figurecaptionabove\let\caption\captionabove
+  \else\let\caption\captionbelow\fi
   \let\caption\captionbelow\@dblfloat{figure}%
 }{%
   \end@dblfloat
