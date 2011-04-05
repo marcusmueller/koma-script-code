@@ -19,11 +19,13 @@ if svn status | grep '^M'; then
 fi
 
 head --lines=-1 releaselist.txt >releaselist.tmp
-revisionstr=`svn log -r HEAD | head -2 | tail -1 | cut -f 1 -d ' '`
+svn log -r HEAD >releaselist.tmp2
+revisionstr=`cat releaselist.tmp2 | head -2 | tail -1 | cut -f 1 -d ' '`
 revisionstr=${revisionstr#r}
 echo -e "${revisionstr}\t  ${datestr} v${versionstr} $*" >>releaselist.tmp
 tail -1 releaselist.txt >>releaselist.tmp
 mv -f releaselist.tmp releaselist.txt
+rm -f releaselist.tmp2
 
 echo "Do next:"
 echo "  svn ci releaselist.txt -m 'release ${datestr} v${versionstr} $*'"
