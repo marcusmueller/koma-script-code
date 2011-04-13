@@ -1,4 +1,4 @@
-% \CheckSum{1187}
+% \CheckSum{1199}
 % \iffalse meta-comment
 % ======================================================================
 % scrkfloa.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkfloa.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkfloa.dtx}[2011/04/02 v3.09 KOMA-Script (floats)]
+\ProvidesFile{scrkfloa.dtx}[2011/04/13 v3.09a KOMA-Script (floats)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -1318,6 +1318,8 @@
 % \begin{macro}{captionof}
 %   \changes{v3.05}{2009/07/08}{Neue Anweisung}
 %   \changes{v3.09}{2011/03/21}{Verwendung des internen \cs{scr@caption}}
+%   \changes{v3.09a}{2011/04/13}{Berücksichtigung von
+%     \texttt{captions=tableheading} und \texttt{captions=figureheading}}
 % \begin{macro}{captionaboveof}
 %   \changes{v3.09}{2011/03/21}{Neue Anweisung}
 % \begin{macro}{captionbelowof}
@@ -1328,9 +1330,16 @@
 % implementieren. Um die Kompatibilität mit \textsf{capt-of} nicht zu stören,
 % wird die Definition vor dme Laden jenes Pakets zurück genommen. Mit dem
 % Paket \textsf{caption} gibt es solche Probleme nicht, das dieses
-% \cs{captionof} ohnehin per \cs{def} definiert.
+% \cs{captionof} ohnehin per \cs{def} definiert. Allerdings berücksichtigt das
+% \cs{captionof} von \textsf{caption} und \textsf{capt-of} eventuell die
+% Einstellungen für darüber oder darunter nicht in gleicher Weise.
 %    \begin{macrocode}
-\newcommand*{\captionof}[1]{\def\@captype{#1}\scr@caption}
+\newcommand*{\captionof}[1]{\def\@captype{#1}%
+  \begingroup\expandafter\expandafter\expandafter\endgroup
+  \expandafter\ifx if@\@captype captionabove\endcsname\iftrue
+    \@captionabovetrue
+  \fi
+  \scr@caption}
 \newcommand*{\captionaboveof}{\@captionabovetrue\captionof}
 \newcommand*{\captionbelowof}{\@captionabovefalse\captionof}
 \BeforePackage{capt-of}{\let\captionof\relax}
