@@ -45,7 +45,7 @@
 %
 % ============================================================================
 
-\ProvidesFile{scrbookreportarticle.tex}[2011/04/02 KOMA-Script guide (chapter:
+\ProvidesFile{scrbookreportarticle.tex}[2011/04/13 KOMA-Script guide (chapter:
 scrbook, scrreprt, scrartcl)]
 
 \chapter{Die Hauptklassen \Class{scrbook}, \Class{scrreprt}, \Class{scrartcl}}
@@ -2729,13 +2729,120 @@ entnehmen.
 \end{lstcode}
   Das Ergebnis wäre bei Verwendung von \Macro{addkomafont} in diesem Fall
   übrigens gleich.
-\end{Example}
-%
-\EndIndex[indexother]{}{Schriftart}
+\end{Example}%
+\EndIndex[indexother]{}{Schriftart}%
 %
 \EndIndex{Cmd}{caption}%
 \EndIndex{Cmd}{captionabove}%
 \EndIndex{Cmd}{captionbelow}%
+
+\begin{Declaration}
+  \Macro{captionof}\Parameter{Objekttyp}\OParameter{Verzeichniseintrag}%
+  \Parameter{Titel}\\
+  \Macro{captionaboveof}\Parameter{Objekttyp}\OParameter{Verzeichniseintrag}%
+  \Parameter{Titel}\\
+  \Macro{captionbelowof}\Parameter{Objekttyp}\OParameter{Verzeichniseintrag}%
+  \Parameter{Titel}
+\end{Declaration}
+\BeginIndex{Cmd}{captionbelowof}%
+\BeginIndex{Cmd}{captionaboveof}%
+\BeginIndex{Cmd}{captionof}%
+Ähnlich wie die Pakete \Package{caption}\IndexPackage{caption} und
+\Package{capt-of}\IndexPackage{capt-of} bietet auch \KOMAScript{} die
+Anweisung \Macro{captionof}\ChangedAt{3.05}{\Class{scrbook}\and
+  \Class{scrreprt}\and \Class{scrartcl}} mit der man auch außerhalb einer
+Gleitumgebung oder in einer fremden Gleitumgebung einen entsprechenden Titel
+mit Eintrag in das jeweilige Verzeichnis setzen kann. Dabei muss im Gegensatz
+zu \Macro{caption} die Art des Gleitobjekts als zusätzliches erstes Argument
+angegeben werden.
+
+Im Gegensatz zu den genannten Paketen bietet \KOMAScript{} zusätzlich auch die
+Anweisungen \Macro{captionaboveof}\ChangedAt{3.09}{\Class{scrbook}\and
+  \Class{scrreprt}\and \Class{scrartcl}} und \Macro{captionbelowof}. Diese
+dienen als Gegenstücke zu \Macro{captionabove} und \Macro{captionbelow}.
+
+Darüber hinaus berücksichtigt\ChangedAt{3.09a}{\Class{scrbook}\and
+  \Class{scrreprt}\and \Class{scrartcl}} \Macro{captionof} auch die
+Einstellungen von Option \Option{captions} bezüglich der Formatierung des
+Titels als Über- oder Unterschrift. Diese Fähigkeit geht jedoch eventuell
+durch das Laden von Paketen wie \Package{capt-of} oder \Package{caption}
+verloren. Bei Verwendung von \Package{caption} ist die Anleitung zu diesem
+Paket zu beachten!%
+\begin{Example}
+  Angenommen, Sie wollen ein Gleitobjekt erstellen, bei dem eine Tabelle und
+  eine Abbildung nebeneinander stehen. Da es keine gemischten Gleitobjekte gibt,
+  verwenden Sie primär eine \Environment{figure}-Umgebung:
+\begin{lstcode}
+  \begin{figure}
+    \begin{minipage}{.5\linewidth}
+      \centering
+      \rule{4cm}{3cm}
+      \caption{Ein Rechteck}\label{fig:rechteck}
+    \end{minipage}%
+    \begin{minipage}{.5\linewidth}
+      \centering
+      \captionaboveof{table}[Maße des Rechtecks aus
+      Abbildung~\ref{fig:rechteck}]{Maße des Rechtecks}
+      \label{tab:rechteck}
+      \begin{tabular}{ll}
+        Breite: & 4\,cm\\
+        Höhe:   & 3\,cm
+      \end{tabular}
+    \end{minipage}
+  \end{figure}
+\end{lstcode}
+  Um Abbildung und Tabelle nebeneinander zu setzen, wurden zwei
+  \Environment{minipage}-Umgebungen verwendet. Wichtig ist hier das
+  Prozentzeichen nach der ersten \Environment{minipage}, ohne das ein
+  zusätzlicher Wortabstand zwischen die beiden
+  \Environment{minipage}-Umgebungen gesetzt würde. Die Abbildungsunterschrift
+  wurde ganz normal mit \Macro{caption} gesetzt. Für die Tabellenüberschrift
+  wurde jedoch \Macro{captionaboveof} verwendet. Als erstes Argument wurde
+  \PValue{table} angegeben. Dadurch weiß \KOMAScript{}, dass es sich um eine
+  Tabellenüberschrift handeln soll. Das optionale Argument setzt den Eintrag
+  in das Tabellenverzeichnis. Ohne das optionale Argument würde der als
+  letztes Argument angegebene Titel ebenfalls in das Tabellenverzeichnis
+  geschrieben. Während dieser Titel im Gleitobjekt selbst völlig ausreichend
+  ist, wäre er jedoch im Tabellenverzeichnis wenig aussagekräftig. Daher wird
+  hier für das Verzeichnis ein abweichender Titel über das optionale Argument
+  verwendet. Das Ergebnis der Bemühungen zeigt
+  \autoref{fig:maincls.captionaboveof}.%
+\end{Example}%
+In gleicher Weise, wie in obigem Beispiel eine Tabelle innerhalb einer
+Abbildungsumgebung gesetzt und mit einem Titel versehen wird, könnte man auch
+eine nicht gleitende Tabelle außerhalb jeder Gleitumgebung setzen. Auch dabei
+sollte in der Regel eine \Environment{minipage} verwendet werden, um zu
+verhindern, dass zwischen Überschrift und Tabelle ein Seitenumbruch erfolgen
+kann. Zusätzlich sollte man die \Environment{minipage} dann noch in eine
+\Environment{flushleft}-Umgebung einbetten, um einerseits einen gefälligen
+Abstand zum Text davor und dahinter zu erreichen, und andererseits den
+Absatzeinzug vor der \Environment{minipage} zu verhindern.%
+%
+\begin{figure}
+  \centering
+  \fbox{%
+    \begin{minipage}{.45\linewidth}
+      \centering
+      \rule{4cm}{3cm}
+      \caption[Beispiel: Ein Rechteck]{Ein Rechteck}\label{fig:maincls.rechteck}
+    \end{minipage}%
+    \begin{minipage}{.45\linewidth}
+      \centering
+      \captionaboveof{table}[Beispiel: Maße des Rechtecks aus
+      Abbildung~\ref{fig:maincls.rechteck}]{Maße des Rechtecks}
+      \label{tab:maincls.rechteck}
+      \begin{tabular}{ll}
+        Breite: & 4\,cm\\
+        Höhe:   & 3\,cm
+      \end{tabular}
+    \end{minipage}}
+  \caption[{Beispiel: Verwendung von \Macro{captionaboveof} innerhalb einer
+    fremden Gleitumgebung}]{Verwendung von \Macro{captionaboveof} innerhalb einer
+    fremden Gleitumgebung}\label{fig:maincls.captionaboveof}
+\end{figure}%
+\EndIndex{Cmd}{captionof}%
+\EndIndex{Cmd}{captionaboveof}%
+\EndIndex{Cmd}{captionbelowof}%
 
 
 \begin{Declaration}
