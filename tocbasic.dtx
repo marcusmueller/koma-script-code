@@ -1,4 +1,4 @@
-% \CheckSum{1211}
+% \CheckSum{1233}
 % \iffalse meta-comment
 % ======================================================================
 % tocbasic.dtx
@@ -66,7 +66,7 @@
 %%% From File: tocbasic.dtx
 %<*dtx|package|driver|doc|load>
 % \fi
-\def\tocbasicversion{2011/04/12 v3.09a}
+\def\tocbasicversion{2011/05/30 v3.09a}
 % \iffalse
 %</dtx|package|driver|doc|load>
 %<*dtx>
@@ -2195,6 +2195,7 @@ be defined and used in \Macro{tocbasic@listhead}.
   \@tempswafalse
 %    \end{macrocode}
 % The float environments:
+% \changes{v3.09a}{2011/05/30}{fixed: floats may have an optional argument}
 %    \begin{macrocode}
   \iftb@float
     \expandafter\newcommand\expandafter*\csname fps@\tb@nt@type\expandafter
@@ -2205,15 +2206,19 @@ be defined and used in \Macro{tocbasic@listhead}.
       \edef\@tempa{%
         \noexpand\endgroup
         \noexpand\newenvironment{\tb@nt@type}{%
-          \noexpand\@float{\tb@nt@type}%
-          \noexpand\csname \tb@nt@type @atbegin\noexpand\endcsname
+          \noexpand\@ifnextchar[%]
+          {\noexpand\tb@atbegin@after\noexpand\@float{\tb@nt@type}}%
+          {\noexpand\tb@atbegin@after\noexpand\@float{\tb@nt@type}%
+            [\expandafter\noexpand\csname fps@\tb@nt@type\endcsname]}%
         }{%
           \noexpand\csname \tb@nt@type @atend\noexpand\endcsname
           \noexpand\end@float
         }%
         \noexpand\newenvironment{\tb@nt@type*}{%
-          \noexpand\@dblfloat{\tb@nt@type}%
-          \noexpand\csname \tb@nt@type @atbegin\noexpand\endcsname
+          \noexpand\@ifnextchar[%]
+          {\noexpand\tb@atbegin@after\noexpand\@dblfloat{\tb@nt@type}}%
+          {\noexpand\tb@atbegin@after\noexpand\@dblfloat{\tb@nt@type}%
+            [\expandafter\noexpand\csname fps@\tb@nt@type\endcsname]}%
         }{%
           \noexpand\csname \tb@nt@type @atend\noexpand\endcsname
           \noexpand\end@dblfloat
@@ -2285,6 +2290,20 @@ be defined and used in \Macro{tocbasic@listhead}.
   \fi
 }
 %    \end{macrocode}
+% \begin{macro}{\tb@atbegin@after}
+%   \changes{v3.09a}{2011/05/30}{new internal}%
+%   Processes command \#1 with argument \#2 and optional argument \#3 and than
+%   \verb|\csname #2@atbegin\endcsname|. This is used to add
+%   \verb|csname #2@atbegin\endcsname| at begin part of a float (but after
+%   optional argument of the float).
+%    \begin{macrocode}
+\newcommand*{\tb@atbegin@after}[3]{}
+\def\tb@atbegin@after#1#2[#3]{%
+  #1{#2}[#3]%
+  \csname #2@atbegin\endcsname
+}
+%    \end{macrocode}
+% \end{macro}
 % \begin{macro}{\tb@ifvalueisnotempty}
 %   \changes{v3.06}{2010/05/21}{new internal}%
 %   This is only a helper for defining some of the keys.
