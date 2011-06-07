@@ -1,4 +1,4 @@
-% \CheckSum{1342}
+% \CheckSum{1351}
 % \iffalse meta-comment
 % ======================================================================
 % scrkbase.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkbase.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkbase.dtx}[2011/03/31 v3.08b KOMA-Script (basics)]
+\ProvidesFile{scrkbase.dtx}[2011/06/07 v3.09a KOMA-Script (basics)]
 % \iffalse
 %</driver>
 %<package&option>\ProvidesPackage{%
@@ -1082,44 +1082,46 @@
   }%
 }
 % \begin{macro}{\Family@Options}
-%   \changes{v3.00}{2008/04/30}{Neues Makro (intern)}
-%   \changes{v3.04b}{2010/01/29}{\cs{edef} durch \cs{protected@edef} ersetzt}
-% Das interne Macro \cs{Family@Options} macht die eigentliche Arbeit. Das
-% erste Argument ist dabei die Familie. Das zweite Argument ist die Liste der
-% Optionen, das zweite Code, der im Fehlerfall ausgeführt werden soll. Dabei
-% sind die Makros \cs{scr@key@atlist}, \cs{scr@key@name} und
-% \cs{scr@key@value} gültig und können verwendet werden.
+%   \changes{v3.00}{2008/04/30}{Neues Makro (intern)}%
+%   Das interne Macro \cs{Family@Options} macht die eigentliche Arbeit. Das
+%   erste Argument ist dabei die Familie. Das zweite Argument ist die Liste
+%   der Optionen, das zweite Code, der im Fehlerfall ausgeführt werden
+%   soll. Dabei sind die Makros \cs{scr@key@atlist}, \cs{scr@key@name} und
+%   \cs{scr@key@value} gültig und können verwendet werden.
 %
-% Anmerkung: Es wird nicht auf \textsf{xkeyval} und den dortigen Befehl
-% \cs{setkeys+} gesetzt, weil dieser die Optionen nicht in der Reihenfolge der
-% Optionen, sondern in der Reihenfolge der Familien ausführt. Das passt mir
-% aber hier gar nicht.
+%   Anmerkung: Es wird nicht auf \textsf{xkeyval} und den dortigen Befehl
+%   \cs{setkeys+} gesetzt, weil dieser die Optionen nicht in der Reihenfolge
+%   der Optionen, sondern in der Reihenfolge der Familien ausführt. Das passt
+%   mir aber hier gar nicht.
 %
-% In einer Schleife über alle Optionen werden die Optionen zunächst in Option
-% und Wert aufgespaltet.
+%   In einer Schleife über alle Optionen werden die Optionen zunächst in
+%   Option und Wert aufgespaltet.
 %    \begin{macrocode}
 \newcommand*{\Family@Options}[3]{%
   \@for\scr@key@atlist:=#2\do{%
 %    \end{macrocode}
-%   \changes{v3.08}{2010/11/05}{leere Argumente in der Optionenliste}
-% Auf vielfachen Wunsch und entgegen meiner Überzeugung, sind auch leere
-% Argumente in der Optionenliste erlaubt. Die erste Form wäre, wenn zwei
-% Kommas diret aufeinander folgen:
+%   \changes{v3.08}{2010/11/05}{leere Argumente in der Optionenliste}%
+%   Auf vielfachen Wunsch und entgegen meiner Überzeugung, sind auch leere
+%   Argumente in der Optionenliste erlaubt. Die erste Form wäre, wenn zwei
+%   Kommas diret aufeinander folgen:
 %    \begin{macrocode}
     \ifx\scr@key@atlist\@empty\else
 %    \end{macrocode}
-% Die zweite Möglichkeit wäre, dass noch Leerzeichen zwischen den Komma übrig
-% bleiben:
+%   Die zweite Möglichkeit wäre, dass noch Leerzeichen zwischen den Komma
+%   übrig bleiben:
 %    \begin{macrocode}
       \ifx\scr@key@atlist\space\else
         \expandafter\scr@key@split@name@value\scr@key@atlist==\@nil
 %    \end{macrocode}
-% Die dritte Möglichkeit, dass auch noch ein Gleichheitszeichen übrig gelassen
-% wurde, werde ich aber nicht abfangen. Irgendwann müssen die Anwender auch
-% mal ihre Fehler einsehen und korrigieren!
+%   Die dritte Möglichkeit, dass auch noch ein Gleichheitszeichen übrig
+%   gelassen wurde, werde ich aber nicht abfangen. Irgendwann müssen die
+%   Anwender auch mal ihre Fehler einsehen und korrigieren!
 %
-% Dann wird in einer Schleife über alle Familien festgestellt, ob die Option
-% in einer Familie bekannt ist und ggf. ausgeführt.
+%   Dann wird in einer Schleife über alle Familien festgestellt, ob die Option
+%   in einer Familie bekannt ist und ggf. ausgeführt.
+%   \changes{v3.04b}{2010/01/29}{\cs{edef} durch \cs{protected@edef} ersetzt}
+%   \changes{v3.09a}{2011/06/07}{weniger Expansion durch sinnvollen Gebrauch
+%     von \cs{unexpanded}}
 %    \begin{macrocode}
         \scr@key@found@false
         \edef\@tempa{\csname #1@key@familylist\endcsname}%
@@ -1127,11 +1129,16 @@
           \scr@ifundefinedorrelax{KV@\@tempa @\scr@key@name}{}{%
             \scr@key@found@true
             \protected@edef\reserved@a{%
-              \noexpand\setkeys{\@tempa}{\scr@key@atlist}%
-              \noexpand\def\noexpand\@tempa{\@tempa}%
-              \noexpand\def\noexpand\scr@key@atlist{\scr@key@atlist}%
-              \noexpand\def\noexpand\scr@key@name{\scr@key@name}%
-              \noexpand\def\noexpand\scr@key@value{\scr@key@value}%
+              \noexpand\setkeys{\@tempa}{%
+                \unexpanded\expandafter{\scr@key@atlist}}%
+              \noexpand\def\noexpand\@tempa{%
+                \unexpanded\expandafter{\@tempa}}%
+              \noexpand\def\noexpand\scr@key@atlist{%
+                \unexpanded\expandafter{\scr@key@atlist}}%
+              \noexpand\def\noexpand\scr@key@name{%
+                \unexpanded\expandafter{\scr@key@name}}%
+              \noexpand\def\noexpand\scr@key@value{%
+                \unexpanded\expandafter{\scr@key@value}}%
             }%
             \reserved@a
           }%
@@ -1221,11 +1228,14 @@
       \expandafter\KV@@sp@def\expandafter\@tempa\expandafter{\@tempa}%
 %    \end{macrocode}
 %   \changes{v3.08}{2010/11/05}{leere Argumente in der Werteliste}
-% Auf vielfachen Wunsch und entgegen meiner Überzeugung, sind auch leere
-% Argumente in der Werteliste erlaubt:
+%   \changes{v3.09a}{2011/06/07}{weniger Expansion durch sinnvollen Gebrauch
+%     von \cs{unexpanded}}
+%   Auf vielfachen Wunsch und entgegen meiner Überzeugung, sind auch leere
+%   Argumente in der Werteliste erlaubt:
 %    \begin{macrocode}
       \ifx\@tempa\@empty\else
-        \protected@edef\reserved@a{\reserved@a,\scr@key@name=\@tempa}%
+        \protected@edef\reserved@a{\reserved@a,%
+          \scr@key@name=\expandafter\unexpanded{\@tempa}}%
       \fi
     }%
     \ifx\reserved@a\@empty
