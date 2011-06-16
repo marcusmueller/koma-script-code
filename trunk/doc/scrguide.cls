@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2010/04/23 v1.3f internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2011/06/16 v1.4 internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -142,6 +142,7 @@
       ^^J%
     }%
     \newcommand*{\iffree}{\@firstoftwo}%
+    \newcommand*{\important}[1]{}%
     \shortversiontrue
     \newcommand*{\LoadNonFree}[2]{%
       \par
@@ -744,14 +745,17 @@
   \ifvmode\else\par\fi\small\addvspace{2\baselineskip}%
   \vspace{-\baselineskip}%
   \vspace{\z@ plus \baselineskip}%
-  \noindent\hspace{-1em}%
+  \noindent
+  \start@Declaration
   \tabular{|l|}\hline\ignorespaces
 }{%
-  \\\hline\endtabular\nobreak\par\nobreak
+  \\\hline\endtabular\nobreak\after@Declaration\nobreak\par\nobreak
   \vspace{1.5\baselineskip}\nobreak\vspace{-\baselineskip}\nobreak%
   \vspace{0pt minus .5\baselineskip}\nobreak%
   \aftergroup\@afterindentfalse\aftergroup\@afterheading
 }
+\newcommand*{\start@Declaration}{\hspace{-1em}}
+\newcommand*{\after@Declaration}{}
 %    \end{macrocode}
 % \end{environment}
 %
