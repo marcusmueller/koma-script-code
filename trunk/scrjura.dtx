@@ -1,4 +1,4 @@
-% \CheckSum{1298}
+% \CheckSum{1310}
 % \iffalse meta-comment
 % ======================================================================
 % scrjura.dtx
@@ -74,7 +74,7 @@
 %<driver>\ProvidesFile{scrjura.drv}
 %<package>\ProvidesPackage{scrjura}
 %<*dtx|package|driver>
-                [2010/06/07 v0.5d KOMA-Script for jurists
+                [2011/08/31 v0.5e KOMA-Script for jurists
 %</dtx|package|driver>
 %<driver>                 (driver)%
 %<package>                (package)%
@@ -788,6 +788,7 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % \begin{option}{markright}
 % \begin{option}{markboth}
 % \begin{macro}{\Paragraphmark}
+%   \changes{v0.5e}{2011/08/31}{Beachtung von \cs{MakeMarkcase}}
 %   Mit diesen Optionen wird |\Paragraphmark| so umdefiniert, dass es entweder
 %   ein |\markright| oder ein |\markboth| ausführt. Im Gegensatz zu
 %   |\chaptermark| etc. erwartet |\Paragraphmark| neben dem Titel auch noch
@@ -808,17 +809,26 @@ standard classes created by The LaTeX3 Project 1994-1996.
     \let\Paragraphmark\@gobble
   \or
     \endgroup
-    \renewcommand*{\Paragraphmark}[1]{\markright{##1}}%
-  \or
-    \endgroup
-    \renewcommand*{\Paragraphmark}[1]{\markboth{##1}{##1}}%
+    \renewcommand*{\Paragraphmark}[1]{%
+      \markright{\csname MakeMarkcase\endcsname{##1}}}%
   \or
     \endgroup
     \renewcommand*{\Paragraphmark}[1]{%
-      \ifx\@mkboth\@gobbletwo\else\markright{##1}\fi}%
+      \markboth{\csname MakeMarkcase\endcsname{##1}}%
+               {\csname MakeMarkcase\endcsname{##1}}}%
   \or
     \endgroup
-    \renewcommand*{\Paragraphmark}[1]{\@mkboth{##1}{##1}}%
+    \renewcommand*{\Paragraphmark}[1]{%
+      \ifx
+        \@mkboth\@gobbletwo
+      \else
+        \markright{\csname MakeMarkcase\endcsname{##1}}%
+      \fi}%
+  \or
+    \endgroup
+    \renewcommand*{\Paragraphmark}[1]{%
+      \@mkboth{\csname MakeMarkcase\endcsname{##1}}%
+              {\csname MakeMarkcase\endcsname{##1}}}%
   \else
     \endgroup
   \fi
