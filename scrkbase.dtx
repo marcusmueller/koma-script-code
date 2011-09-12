@@ -1,4 +1,4 @@
-% \CheckSum{1349}
+% \CheckSum{1381}
 % \iffalse meta-comment
 % ======================================================================
 % scrkbase.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkbase.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkbase.dtx}[2011/06/07 v3.09a KOMA-Script (basics)]
+\ProvidesFile{scrkbase.dtx}[2011/09/12 v3.10 KOMA-Script (basics)]
 % \iffalse
 %</driver>
 %<package&option>\ProvidesPackage{%
@@ -340,17 +340,20 @@
 %
 % \begin{macro}{\FamilyProcessOptions}
 %   \changes{v3.00}{2008/04/30}{Neue Anweisung}%
-% Diese Anweisung führt alle Optionen, sowohl normal deklarierte als auch
-% \textsf{keyval}-Optionen für eine angegebene Familie (2. Argument) und das
-% aktuelle Mitglied (1. optionales Argument) in der Reihenfolge, in der sie
-% verwendet wurden aus -- zuerst globale Optionen, dann lokale Optionen. Das
-% entspricht der Verwendung von \cs{ProcessOptions*} mit dem Unterschied,
-% dass eben auch die \textsf{keyval}-Optionen abgearbeitet
-% werden. \textsf{keyval}-Optionen, die keinem Mitglied zugeordnet, sondern
-% universell sind, werden dabei vor gleichnamigen \textsf{keyval}-Optionen
-% des aktuellen Mitglieds ausgeführt.
+% \begin{macro}{\scr@removeunused}
+%   \changes{v3.10}{2011/09/12}{neu (intern)}%
+%   Diese Anweisung führt alle Optionen, sowohl normal deklarierte als auch
+%   \textsf{keyval}-Optionen für eine angegebene Familie (2. Argument) und das
+%   aktuelle Mitglied (1. optionales Argument) in der Reihenfolge, in der sie
+%   verwendet wurden aus -- zuerst globale Optionen, dann lokale Optionen. Das
+%   entspricht der Verwendung von \cs{ProcessOptions*} mit dem Unterschied,
+%   dass eben auch die \textsf{keyval}-Optionen abgearbeitet
+%   werden. \textsf{keyval}-Optionen, die keinem Mitglied zugeordnet, sondern
+%   universell sind, werden dabei vor gleichnamigen \textsf{keyval}-Optionen
+%   des aktuellen Mitglieds ausgeführt.
 %    \begin{macrocode}
 %<*base>
+\newcommand*{\scr@removeunused}{}
 \newcommand*{\FamilyProcessOptions}[2][.\@currname.\@currext]{%
   \let\ds@\@empty
   \edef\@curroptions{\@ptionlist{\@currname.\@currext}}%
@@ -362,16 +365,20 @@
           \@use@ption
           \expandafter\let\csname ds@\CurrentOption\endcsname\@empty
         \else
+          \expandafter\def\expandafter\scr@removeunused\expandafter{%
+            \expandafter\def\expandafter\CurrentOption\expandafter{%
+              \CurrentOption}\@use@ption}%
           \scr@optiontest{#2}\CurrentOption{}{%
-            \@use@ption
             \@expandtwoargs\setkeys{#2}%
             \CurrentOption
+            \scr@removeunused
           }%
           \scr@optiontest{#2#1}\CurrentOption{}{%
-            \@use@ption
             \@expandtwoargs\setkeys{#2#1}%
             \CurrentOption
+            \scr@removeunused
           }%
+          \let\scr@removeunused\@empty
         \fi
       \fi
     }%
@@ -407,13 +414,15 @@
 }
 \@onlypreamble\FamilyProcessOptions
 %    \end{macrocode}
+% \end{macro}
 % \begin{macro}{\scr@optiontest}
-%   \changes{v2.97c}{2007/04/18}{neu (intern)}
+%   \changes{v2.97c}{2007/04/18}{neu (intern)}%
 % \begin{macro}{\scr@pti@ntest}
-%   \changes{v2.97c}{2007/04/18}{neu (intern)}
-% Es werden zwei interne Makros benötigt, um zu testen, ob eine entsprechende
-% keyval-Option definiert ist. Grund der Übung ist, dass sowohl das
-% Familienargument als auch die Option selbst expandiert werden muss.
+%   \changes{v2.97c}{2007/04/18}{neu (intern)}%
+%   Es werden zwei interne Makros benötigt, um zu testen, ob eine
+%   entsprechende keyval-Option definiert ist. Grund der Übung ist, dass
+%   sowohl das Familienargument als auch die Option selbst expandiert werden
+%   muss.
 %    \begin{macrocode}
 \newcommand*{\scr@optiontest}[2]{%
   \edef\reserved@a{\noexpand\scr@pti@ntest{#1}#2=\noexpand\@nil}%
@@ -428,16 +437,16 @@
 % \end{macro}
 %
 % \begin{macro}{\KOMAProcessOptions}
-%   \changes{v2.97c}{2007/04/18}{neu}
-%   \changes{v3.00}{2008/04/30}{kein optionales Argument mehr}
-% Diese Anweisung führt alle Optionen, sowohl normal deklarierte als auch
-% keyval-Optionen eines Pakets bzw. einer Klasse in der Reihenfolge, in der
-% sie verwendet wurden aus -- zuerst globale Optionen, dann lokale
-% Optionen. Das entspricht der Verwendung von \cs{ProcessOptions*} mit dem
-% Unterschied, dass eben auch die keyval-Optionen abgearbeitet
-% werden. keyval-Optionen, die keiner einzelnen Klasse und keinem einzelnen
-% Paket zugeordnet werden, werden dabei vor gleichnamigen eigenen
-% keyval-Optionen ausgeführt.
+%   \changes{v2.97c}{2007/04/18}{neu}%
+%   \changes{v3.00}{2008/04/30}{kein optionales Argument mehr}%
+%   Diese Anweisung führt alle Optionen, sowohl normal deklarierte als auch
+%   keyval-Optionen eines Pakets bzw. einer Klasse in der Reihenfolge, in der
+%   sie verwendet wurden aus -- zuerst globale Optionen, dann lokale
+%   Optionen. Das entspricht der Verwendung von \cs{ProcessOptions*} mit dem
+%   Unterschied, dass eben auch die keyval-Optionen abgearbeitet
+%   werden. keyval-Optionen, die keiner einzelnen Klasse und keinem einzelnen
+%   Paket zugeordnet werden, werden dabei vor gleichnamigen eigenen
+%   keyval-Optionen ausgeführt.
 %    \begin{macrocode}
 %<*koma>
 \newcommand*{\KOMAProcessOptions}{\FamilyProcessOptions{KOMA}}
@@ -1384,25 +1393,39 @@
 % \end{macro}
 %
 % \begin{macro}{\FamilyUnknownKeyValue}
-% Dieses Makro berichtet über Fehler wegen unbekannter Wertübergabe an
-% einen Schlüssel. Das erste Argument ist die Familie, das zweit der
-% Schlüssel, das dritte der Wert und das vierte die Liste der möglichen
-% Werte.
+%   \changes{v3.10}{2011/09/12}{no error while processing global options}%
+%   Dieses Makro berichtet über Fehler wegen unbekannter Wertübergabe an einen
+%   Schlüssel. Das erste Argument ist die Familie, das zweit der Schlüssel,
+%   das dritte der Wert und das vierte die Liste der möglichen Werte.
 %    \begin{macrocode}
 %<*base>
 \newcommand*{\FamilyUnknownKeyValue}[4]{%
-  \PackageError{%
-    scrbase%
-  }{%
-    option `#2' of family `#1' has no value `#3'%
-  }{%
-    You've tried to set option `#2' of family '#1' to value `#3'.\MessageBreak
-    But allowed values are only:\MessageBreak
-    #4\FamilyElseValues.\MessageBreak
-    See the manual of the class or package, that provides family
-    `#1'\MessageBreak
-    for more information about options and their values.%
-  }%
+  \ifx\scr@removeunused\@empty
+    \PackageError{%
+      scrbase%
+    }{%
+      option `#2' of family `#1' has no value `#3'%
+    }{%
+      You've tried to set option `#2' of family '#1' to value `#3'.\MessageBreak
+      But allowed values are only:\MessageBreak
+      #4\FamilyElseValues.\MessageBreak
+      See the manual of the class or package, that provides family
+      `#1'\MessageBreak
+      for more information about options and their values.%
+    }%
+  \else
+    \let\scr@removeunused\@empty
+    \PackageInfo{%
+      scrbase%
+    }{%
+      option `#2' of family `#1' has no value `#3'.\MessageBreak
+      Allowed values for option `#2' of family `#1'\MessageBreak
+      would be:\MessageBreak
+      #4\FamilyElseValues.\MessageBreak
+      Maybe another class or package provides this option.\MessageBreak
+      Global option ignored
+    }%
+  \fi
 }
 %</base>
 %    \end{macrocode}
