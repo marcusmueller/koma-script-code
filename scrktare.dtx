@@ -1,4 +1,4 @@
-% \CheckSum{1911}
+% \CheckSum{2031}
 % \iffalse meta-comment
 % ======================================================================
 % scrktare.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrktare.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrktare.dtx}[2011/01/25 v3.08a KOMA-Script (type area)]
+\ProvidesFile{scrktare.dtx}[2011/09/13 v3.10 KOMA-Script (type area)]
 % \iffalse
 %</driver>
 %<package&identify>\ProvidesPackage{typearea}[%
@@ -1702,6 +1702,65 @@
 %    \end{macrocode}
 %  \end{macro}
 %
+% \begin{macro}{\storeareas}
+%   \changes{v3.10}{2011/09/13}{neue Anweisung}%
+%   Die aktuellen Einstellungen können in einem Makro gespeichert
+%   werden. Dieses Makro kann anschließend genutzt werden, um die
+%   Einstellungen wieder her zu stellen.
+% \begin{macro}{\scr@grouplevel@test}
+%   \changes{v3.10}{2011/09/13}{neu (intern)}
+%    \begin{macrocode}
+\newcommand*{\scr@grouplevel@test}[1]{%
+  \ifcase\currentgrouptype\else
+    \PackageWarning{typearea}{%
+      \string#1\space used at group level
+      \the\currentgrouplevel.\MessageBreak
+      Using \string#1\space inside any group, e.g.\MessageBreak
+      environments, math mode, boxes, etc. may result in\MessageBreak
+      many type setting problems.\MessageBreak
+      You should move the command \string#1\MessageBreak
+      outside all groups%
+    }%
+  \fi
+}
+\newcommand*{\storeareas}[1]{%
+  \edef\reserved@a{%
+    \noexpand\newcommand*{\unexpanded{#1}}{%
+      \noexpand\scr@grouplevel@test\unexpanded{#1}%
+      \noexpand\paperheight=\the\paperheight\space
+      \noexpand\paperwidth=\the\paperwidth\space
+      \noexpand\topmargin=\the\topmargin\space
+      \noexpand\headheight=\the\headheight\space
+      \noexpand\headsep=\the\headsep\space
+      \noexpand\textheight=\the\textheight\space
+      \noexpand\vsize=\the\vsize\space
+      \noexpand\footskip=\the\footskip\space
+      \noexpand\@colht=\the\@colht\space
+      \noexpand\@colroom=\the\@colroom\space
+      \noexpand\textwidth=\the\textwidth\space
+      \noexpand\columnwidth=\the\columnwidth\space
+      \noexpand\hsize=\the\hsize\space
+      \noexpand\oddsidemargin=\the\oddsidemargin\space
+      \noexpand\evensidemargin=\if@twoside
+        \the\evensidemargin
+      \else
+        \the\oddsidemargin
+      \fi\space
+      \noexpand\linewidth=\the\linewidth\space
+      \noexpand\maxdepth=\the\maxdepth\space
+      \scr@ifundefinedorrelax{@pagesizelast}{}{%
+        \noexpand\KOMAoptions{pagesize=\@pagesizelast}}%
+      \noexpand\ta@div=\the\ta@div\space
+      \noexpand\ta@bcor=\the\ta@bcor\space
+      \noexpand\def\noexpand\@lastdiv{\@lastdiv}%
+    }%
+  }%
+  \reserved@a
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
 %  \begin{macro}{\ta@divfor}
 % Der Standardseitenspiegel ist abhängig von den mit \cs{SetDIVList}
 % vorgegebenen Einstellungen. Dazu muss aus einer eventuell
@@ -1771,45 +1830,34 @@
   \fi
 }
 %    \end{macrocode}
-%  \end{macro}
+% \end{macro}
 %
-%    \changes{v2.4g}{1996/11/04}{überflüssigen Kommentar gelöscht}
-%    \changes{v2.7g}{2001/04/17}{die neuen Werte \texttt{current},
-%      \texttt{default}, \texttt{calc}, \texttt{classic} werden
-%      verstanden} 
-%    \changes{v2.8q}{2001/11/06}{der Wert \texttt{last} wird
-%      verstanden}
-%    \changes{v2.96}{2006/08/21}{Warnung, wenn \cs{typearea} innerhalb einer
-%      Gruppe verwendet wird}
-% Die symbolischen Werte für das obligatorische Argument von
-% \cs{typearea} haben folgende Bedeutung:
-% \begin{center}\begin{tabular}{lll}
-%   Symbol           & Wert & Bedeutung \\\hline\\[-2ex]
-%   \texttt{calc}    & 2 & guten Wert berechnen \\
-%   \texttt{classic} & 3 & mittelalterlicher Buchseitenkanon \\
-%   \texttt{current} & --- & aktuellen Wert beibehalten \\
-%   \texttt{default} & 0 & Wert aus der Liste verwenden \\
-%   \texttt{last}    & --- & Argument des letzten Aufrufs verwenden \\
-%   \texttt{areaset} & --- & Satzspiegel beibehalten nur neu anordnen \\
-% \end{tabular}\end{center}
-% Das optionale Argument kennt hingegen nur den symbolischen Wert
-% \texttt{current}.
+%   \changes{v2.4g}{1996/11/04}{überflüssigen Kommentar gelöscht}
+%   \changes{v2.7g}{2001/04/17}{die neuen Werte \texttt{current},
+%     \texttt{default}, \texttt{calc}, \texttt{classic} werden
+%     verstanden} 
+%   \changes{v2.8q}{2001/11/06}{der Wert \texttt{last} wird
+%     verstanden}
+%   \changes{v2.96}{2006/08/21}{Warnung, wenn \cs{typearea} innerhalb einer
+%     Gruppe verwendet wird}
+%   \changes{v3.10}{2011/09/13}{Verwendung von \cs{scr@grouplevel@test}}
+%      
+%   Die symbolischen Werte für das obligatorische Argument von
+%   \cs{typearea} haben folgende Bedeutung:
+%   \begin{center}\begin{tabular}{lll}
+%       Symbol           & Wert & Bedeutung \\\hline\\[-2ex]
+%       \texttt{calc}    & 2 & guten Wert berechnen \\
+%       \texttt{classic} & 3 & mittelalterlicher Buchseitenkanon \\
+%       \texttt{current} & --- & aktuellen Wert beibehalten \\
+%       \texttt{default} & 0 & Wert aus der Liste verwenden \\
+%       \texttt{last}    & --- & Argument des letzten Aufrufs verwenden \\
+%       \texttt{areaset} & --- & Satzspiegel beibehalten nur neu anordnen \\
+%     \end{tabular}\end{center}
+%   Das optionale Argument kennt hingegen nur den symbolischen Wert
+%   \texttt{current}.
 %    \begin{macrocode}
 \newcommand*\typearea[2][\z@]{%
-  \scr@ifundefinedorrelax{currentgrouptype}{}{%
-    \ifcase\currentgrouptype\else
-      \PackageWarning{typearea}{%
-        \string\typearea\space used at group level
-        \the\currentgrouplevel.\MessageBreak
-        Using \string\typearea\space inside any group, e.g.\MessageBreak
-        environments, math mode, boxes, etc. may result in\MessageBreak
-        many type setting problems. Because of this you\MessageBreak
-        should never do this. You should move the
-        \string\typearea\MessageBreak
-        outside all groups%
-      }%
-    \fi
-  }%
+  \scr@grouplevel@test\typearea
   \edef\@tempa{#1}\edef\@tempb{current}\ifx\@tempa\@tempb\else
     \setlength{\ta@bcor}{#1}%
   \fi
