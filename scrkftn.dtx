@@ -1,4 +1,4 @@
-% \CheckSum{350}
+% \CheckSum{363}
 % \iffalse meta-comment
 % ======================================================================
 % scrkftn.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkftn.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkftn.dtx}[2010/09/14 v3.07 KOMA-Script (footnotes)]
+\ProvidesFile{scrkftn.dtx}[2011/09/13 v3.10 KOMA-Script (footnotes)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -99,14 +99,16 @@
 % \subsection{Option}
 %
 % \begin{option}{footnotes}
-%   \changes{v2.98c}{2008/02/01}{Neue Option für Mehrfachfußnoten}
-% Mehrfachfußnoten gibt es dann, wenn zu einer Textstelle mehrere Fußnoten
-% hintereinander gesetzt werden. Normalerweise werden die einfach ohne Abstand
-% hintereinander geklatscht. Man kann dann aber die beiden Fußnoten 1 und 2
-% beispielsweise nicht von der Fußnote 12 unterscheiden. Besser ist es, wenn
-% mehrere Fußnoten automatisch durch ein Trennzeichen getrennt
-% werden. Die Funktion ist \textsf{footmisc} entnommen und sollte inklusive
-% Ein- und Ausschalten auch zusammen mit diesem Paket funktionieren.
+%   \changes{v2.98c}{2008/02/01}{Neue Option für Mehrfachfußnoten}%
+%   \changes{v3.10}{2011/09/13}{\cs{let} durch \cs{def} ersetzt, damit die
+%     Option auch als Klassenoption funktioniert}%
+%   Mehrfachfußnoten gibt es dann, wenn zu einer Textstelle mehrere Fußnoten
+%   hintereinander gesetzt werden. Normalerweise werden die einfach ohne
+%   Abstand hintereinander geklatscht. Man kann dann aber die beiden Fußnoten
+%   1 und 2 beispielsweise nicht von der Fußnote 12 unterscheiden. Besser ist
+%   es, wenn mehrere Fußnoten automatisch durch ein Trennzeichen getrennt
+%   werden. Die Funktion ist \textsf{footmisc} entnommen und sollte inklusive
+%   Ein- und Ausschalten auch zusammen mit diesem Paket funktionieren.
 %    \begin{macrocode}
 \KOMA@key{footnotes}{%
   \ifx\@footnotemark\scr@saved@footnotemark
@@ -124,7 +126,7 @@
   \fi
   \ifstr{#1}{multiple}{%
     \let\@footnotemark\scr@footnotemark
-    \let\FN@mf@prepare\scr@mf@prepare
+    \def\FN@mf@prepare{\scr@mf@prepare}%
     \def\scr@footmisc@options{multiple}%
   }{%
     \ifstr{#1}{nomultiple}{%
@@ -447,7 +449,7 @@
 % \begin{macro}{\scr@saved@footnotetext}
 %   \changes{v2.98c}{2008/02/01}{Neu (intern)}
 %   \changes{v3.01a}{2008/11/22}{long}
-% Auch hier muss dafür gesorgt werden, dass die Markierung erfolgt.
+%   Auch hier muss dafür gesorgt werden, dass die Markierung erfolgt.
 %    \begin{macrocode}
 \newcommand{\scr@saved@footnotetext}{}
 \let\scr@saved@footnotetext\@footnotetext
@@ -456,11 +458,9 @@
   \csname FN@mf@prepare\endcsname
 }
 %    \end{macrocode}
-% \end{macro}
-% \end{macro}
 %
-% Es muss auch dafür gesorgt werden, dass \textsf{footmisc} nicht unnötig mit
-% Warnung um sich wirft.
+%   Es muss auch dafür gesorgt werden, dass \textsf{footmisc} nicht unnötig
+%   mit Warnung um sich wirft.
 %    \begin{macrocode}
 \BeforePackage{footmisc}{%
   \ifx\@footnotemark\scr@footnotemark
@@ -469,6 +469,26 @@
   \let\@footnotetext\scr@saved@footnotetext
 }
 %    \end{macrocode}
+%
+% \changes{v3.10}{2011/09/12}{Workaround für die zerstörerische Wirkung von
+%   \textsf{setspace}}%
+%   Außerdem zerstört das Paket \textsf{setspace} die Erweiterung von
+%   \cs{@footnotetext}. Deshalb schalten wir sie vor dem Paket lieber gleich ab
+%   und reaktivieren sie anschließend wieder:
+%    \begin{macrocode}
+\BeforePackage{setspace}{%
+  \let\@footnotetext\scr@saved@footnotetext
+}
+\AfterPackage{setspace}{%
+  \let\scr@saved@footnotetext\@footnotetext
+  \renewcommand{\@footnotetext}[1]{%
+    \scr@saved@footnotetext{#1}%
+    \csname FN@mf@prepare\endcsname
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
 %
 % \begin{macro}{\multiplefootnoteseparator}
 %   \changes{v2.98c}{2008/02/01}{Neu}
