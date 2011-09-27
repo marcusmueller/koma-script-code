@@ -1,4 +1,4 @@
-% \CheckSum{363}
+% \CheckSum{399}
 % \iffalse meta-comment
 % ======================================================================
 % scrkftn.dtx
@@ -526,16 +526,48 @@
 %    \end{macrocode}
 %  \end{macro}
 %
-% \changes{v2.4l}{1997/02/06}{Verwendung der neuen Makros zur
-%   Fuﬂnotengestaltgebung}
-%  \begin{macro}{\@makefnmark}
+%  \changes{v2.4l}{1997/02/06}{Verwendung der neuen Makros zur
+%    Fuﬂnotengestaltgebung}
+% \begin{macro}{\@makefnmark}
+%   \changes{v3.10}{2011/09/27}{\textsf{scrextend} redefines \cs{@makefnmark}
+%     to use \cs{thefootnotemark}}
 %    \begin{macrocode}
 %<*class>
 \deffootnote[1em]{1.5em}{1em}{\textsuperscript{\thefootnotemark}}
-\deffootnotemark{\textsuperscript{\thefootnotemark}}
 %</class>
+%<*package>
+\def\reserved@a{\hbox{\@textsuperscript{\normalfont\@thefnmark}}}
+\ifx\reserved@a\@makefnmark
+%</package>
+\deffootnotemark{\textsuperscript{\thefootnotemark}}
+%<*package>
+\else
+  \IfFileExists{etoolbox.sty}{%
+    \PackageInfo{scrextend}{%
+      unexpected definition of `\string\@makefnmark'.\MessageBreak
+      Trying to patch it%
+    }%
+    \RequirePackage{etoolbox}%
+    \patchcmd{\@makefnmark}{\@thefnmark}{\thefootnotemark}{%
+      \PackageInfo{scrextend}{patch seems to be successfull}%
+    }{%
+      \PackageWarning{scrextend}{%
+        patching `\string\@makefnmark' failed.\MessageBreak
+        Using hard coded redefinition%
+      }%
+      \deffootnotemark{\textsuperscript{\thefootnotemark}}%
+   }%
+  }{%
+    \PackageWarning{scrextend}{%
+      unexpected definition of `\string\@makefnmark'.\MessageBreak
+      Using hard coded redefintion%
+    }%
+    \deffootnotemark{\textsuperscript{\thefootnotemark}}%
+  }%
+\fi
+%</package>
 %    \end{macrocode}
-%  \end{macro}
+% \end{macro}
 %
 % \subsection{Fuﬂnotenreferenz}
 %
