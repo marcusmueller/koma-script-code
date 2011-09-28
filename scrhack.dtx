@@ -1,4 +1,4 @@
-% \CheckSum{489}
+% \CheckSum{675}
 % \iffalse meta-comment
 % ======================================================================
 % scrhack.dtx
@@ -72,17 +72,19 @@
 \ProvidesFile{scrhack.dtx}
 %</dtx>
 %<*dtx|manual>
-             [2010/01/26 v3.04d KOMA-Script (hacking other packages)]
+             [2011/09/28 v3.10 KOMA-Script (hacking other packages)]
 %</dtx|manual>
 %<package&identify>\ProvidesPackage{scrhack}
 %<hyperref&identify>\ProvidesFile{hyperref.hak}
 %<float&identify>\ProvidesFile{float.hak}
+%<floatrow&identify>\ProvidesFile{floatrow.hak}
 %<listings&identify>\ProvidesFile{listings.hak}
 %<identify>                [\KOMAScriptVersion\space
 %<package&identify>                  package (hacking other packages)]
 %<hack&identify>                  hacking package
 %<hyperref&identify>                  hyperref]
 %<float&identify>                  float]
+%<floatrow&identify>                  floatrow]
 %<listings&identify>                  listings]
 %<*dtx>
 \documentclass[halfparskip-]{scrdoc}
@@ -198,11 +200,6 @@ interface of package \Package{tocbasic}. This does not only improve the
 compatibility of \KOMAScript\ and package \Package{float}, but also improves
 the compatibility of packages \Package{babel} and \Package{float}.
 
-Note: A significant change with \Package{scrhack} is, that \KOMAScript{} options
-like \OptionValue{lists}{totoc} or \OptionValue{lists}{totocnumbered} does only
-change the behaviour of float listings, that are already defined using
-\Macro{newfloat} \emph{before} using such an option!
-
 % \iffalse
 \begin{Declaration}
   \KOption{float}{switch}
@@ -213,6 +210,43 @@ with option \OptionValue{float}{false}. You may also switch off the
 \Package{float} hack using \Macro{KOMAoptions}\PParameter{float=false} or
 \Macro{KOMAoption}\PParameter{float}\PParameter{false} somewhere after loading
 package \Package{scrhack}, but before loading package \Package{float}.
+
+\section{The \Package{floatrow} hack}
+\label{sec:scrhack.floatrow}
+
+Package \Package{floatrow} uses macros \Macro{float@listhead} to set the
+headings of a float listing and \Macro{float@addtolists} to add informations
+to all float listings. These macros where proposed by the \KOMAScript{} author
+for some years. In theory those macros may be used by several class and package
+authors to deligate some parts of the creation of a float listing to the
+class. This would increase the compatiblity of packages and classes. But
+unfortunately some package authors, even the author of package
+\Package{floatrow}, implemented the commands in such a way, that these packages
+will become incompatible to each other.
+
+Because of this \KOMAScript\ stopped support for \Macro{float@addtolists} and
+\Macro{float@listhead} with version 3. Instead of this \KOMAScript\ supports
+several improvements for package authors using \KOMAScript\ package
+\Package{tocbasic}.
+
+Package \Package{scrhack} redefines some macros of package \Package{floatrow}
+to not longer use \Macro{float@addtolists} and \Macro{float@listhead} but use
+the interface of package \Package{tocbasic}. This does not only improve the
+compatibility of \KOMAScript\ and package \Package{floatrow}, but also
+improves the compatibility of packages \Package{babel} and \Package{floatrow}.
+
+% \iffalse
+\begin{Declaration}
+  \KOption{floatrow}{switch}
+\end{Declaration}
+% \fi
+You may switch off the \Package{floatrow} hack loading package
+\Package{scrhack} with option \OptionValue{floatrow}{false}. You may also
+switch off the \Package{floatrow} hack using
+\Macro{KOMAoptions}\PParameter{floatrow=false} or
+\Macro{KOMAoption}\PParameter{floatrow}\PParameter{false} somewhere after
+loading package \Package{scrhack}, but before loading package
+\Package{floatrow}.
 
 \section{The \Package{listings} hack}
 \label{sec:scrhack.listings}
@@ -636,6 +670,139 @@ loading package \Package{scrhack}, but before loading package
     Maybe you are using a unsupported float version}%
 }
 %</float&body>
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% 
+%
+% \subsection{Der \textsf{floatrow}-Hack}
+%
+% Das \textsf{floatrow}-Paket verwendet das Makro \cs{float@listhead} zum
+% Setzen der Überschriften. Dies wird seit \KOMAScript~3 nicht mehr empfohlen
+% und fliegt demnächst komplett aus der Unterstützung. Stattdessen wird
+% empfohlen, dass Pakete \textsf{tocbasic} unterstützen. Der Aufwand dafür ist
+% sehr gering und wird mit vielen neuen Möglichkeiten belohnt.
+%
+% Dieser Hack rüstet die \textsf{tocbasic}-Unterstützung für \textsf{floatrow}
+% nach.
+%
+% \begin{option}{floatrow}
+%    \begin{macrocode}
+%<*package&option>
+\KOMA@ifkey{floatrow}{@scrhack@floatrow}%
+\@scrhack@floatrowtrue
+%</package&option>
+%<*package&body>
+\AfterPackage*{floatrow}{%
+  \KOMA@key[.scrhack.sty]{floatrow}{%
+    \PackageWarning{scrhack}{option `floatrow' ignored}%
+  }%
+  \if@scrhack@floatrow\scr@hack@load\@pkgextension{floatrow}\fi
+}
+%</package&body>
+%    \end{macrocode}
+% \end{option}
+%
+%
+% \begin{macro}{\DeclareNewFloatType}
+% Über die Anweisung \cs{DeclareNewFloatType} wird eine neue Gleitumgebung
+% definiert. Hier muss die neue Erweiterung aus dem dritten Argument
+% \textsf{tocbasic} bekannt gemacht werden.
+% \begin{macro}{\listof}
+% Über die Anweisung \cs{listof} wird ein Verzeichnis für Gleitumgebungen
+% ausgegeben. Hier muss schlicht die entsprechende Anweisung von
+% \textsf{tocbasic} verwendet werden.
+% \begin{macro}{\float@addtolists}
+% Diese Anweisung wird nicht länger benötigt und daher auf die ursprüngliche
+% Definition zurückgesetzt.
+%    \begin{macrocode}
+%<*floatrow&body>
+\scr@ifexpected{\DeclareNewFloatType}{%
+  \long\def\DeclareNewFloatType#1#2{\def\FB@captype{#1}%
+    \expandafter\edef\csname ftype@#1\endcsname{\the\c@float@type}%
+    \addtocounter{float@type}{\value{float@type}}%
+    \@namedef{#1name}{#1}\newcounter{#1}%
+    \expandafter\edef\csname fnum@#1\endcsname
+    {\expandafter\noexpand\csname #1name\endcsname\nobreakspace
+      \expandafter\noexpand\csname the#1\endcsname}%
+    \@namedef{the#1}{\arabic{#1}}\flnew@ext{lo#1}\@namedef{fps@#1}{tbp}%
+    \@namedef{l@#1}{\@dottedtocline{1}{1.5em}{2.3em}}%
+    \caption@setkeys[floatrow]{newfloat}{#2}\let\FR@tmp=\relax
+    \xdef\@tempa{\noexpand\flrow@types{\the\flrow@types \FR@tmp{#1}}}%
+    \@tempa}%
+}{%
+  \scr@ifexpected{\listof}{%
+    \def\listof#1#2{%  
+      \@ifundefined{ext@#1}{\flrow@error{Unknown float style `#1'}}{%
+        \expandafter\providecommand\csname l@#1\endcsname
+        {\@dottedtocline{1}{1.5em}{2.3em}}%
+        \float@listhead{#2}%
+        \begingroup\setlength{\parskip}{\z@}%
+        \@starttoc{\@nameuse{ext@#1}}%
+        \endgroup}}%
+  }{%
+    \RequirePackage{tocbasic}%
+    \PackageInfo{scrhack}{redefining \string\DeclareNewFloatType}%
+%    \end{macrocode}
+% Eigentlich wäre es besser, wie im \textsf{float}-Hack einen Test
+% vorzuschalten, ob die Dateiendung bereits in Gebrauch ist. Aber das würde
+% voraussetzen, dass die Reihenfolge der Anweisungen geändert wird. Dazu
+% stecke ich aber im Code von \textsf{floatrow} zu wenig
+% drin. (\emph{\foreignlanguage{english}{Note: It would be better to first
+%     test, if the new extension is already in use like done at the
+%     \textsf{float} hack. But I don't know the \textsf{floatrow} code good
+%     enough to make such a change!}})
+%    \begin{macrocode}
+    \renewcommand\DeclareNewFloatType[2]{\def\FB@captype{#1}%
+      \expandafter\edef\csname ftype@#1\endcsname{\the\c@float@type}%
+      \addtocounter{float@type}{\value{float@type}}%
+      \@namedef{#1name}{#1}\newcounter{#1}%
+      \expandafter\edef\csname fnum@#1\endcsname
+      {\expandafter\noexpand\csname #1name\endcsname\nobreakspace
+        \expandafter\noexpand\csname the#1\endcsname}%
+      \@namedef{the#1}{\arabic{#1}}\flnew@ext{lo#1}\@namedef{fps@#1}{tbp}%
+      \@namedef{l@#1}{\@dottedtocline{1}{1.5em}{2.3em}}%
+      \caption@setkeys[floatrow]{newfloat}{#2}\let\FR@tmp=\relax
+      \xdef\@tempa{\noexpand\flrow@types{\the\flrow@types \FR@tmp{#1}}}%
+      \@tempa
+      \xdef\@tempa{\noexpand\addtotoclist[float]{\@nameuse{ext@\FB@captype}}%
+        \noexpand\setuptoc{\@nameuse{ext@\FB@captype}}{chapteratlist}%
+      }%
+      \@tempa
+    }%
+    \PackageInfo{scrhack}{redefining \string\listof}%
+    \renewcommand*\listof[2]{%
+      \@ifundefined{ext@#1}{\flrow@error{Unknown float style `#1'}}{%
+        \@ifundefined{l@#1}{\expandafter\let\csname l@#1\endcsname\l@figure
+          \@ifundefined{l@#1}{%
+            \@namedef{l@#1}{\@dottedtocline{1}{1.5em}{2.3em}}}{}%
+        }{}%
+        \listoftoc[{#2}]{\csname ext@#1\endcsname}%
+      }%
+    }%
+    \scr@ifexpected{\float@addtolists}{%
+      \long\def\float@addtolists#1{%
+        \def\float@do##1{\addtocontents{##1}{#1}} \the\float@exts}%
+    }{%
+      \PackageInfo{scrhack}{undefining \string\float@addtolists}%
+      \let\float@addtolists\relax
+    }{%
+      \PackageWarningNoLine{scrhack}{unkown \string\float@addtolists\space
+        definition found!\MessageBreak
+        Maybe you are using a unsupported floatrow version}%
+    }%
+  }{%
+    \PackageWarningNoLine{scrhack}{unknown \string\listof\space
+      definition found!\MessageBreak
+      Maybe you are using a unsupported floatrow version}%
+  }%
+}{%
+  \PackageWarningNoLine{scrhack}{unknown \string\DeclareNewFloatType\space
+    definition found!\MessageBreak
+    Maybe you are using a unsupported floatrow version}%
+}
+%</floatrow&body>
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}

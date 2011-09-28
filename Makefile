@@ -109,6 +109,7 @@ CLS_MAIN	= scrbook.cls \
 		  scrextend.sty \
 		  scrhack.sty \
 		  float.hak \
+		  floatrow.hak \
 		  hyperref.hak \
 		  listings.hak \
 		  scrfontsizes.sty \
