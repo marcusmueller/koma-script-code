@@ -1,4 +1,4 @@
-% \CheckSum{570}
+% \CheckSum{608}
 % \iffalse meta-comment
 % ======================================================================
 % scrkpar.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkpar.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkpar.dtx}[2010/12/14 v3.08 KOMA-Script (paragraphs)]
+\ProvidesFile{scrkpar.dtx}[2011/09/28 v3.10 KOMA-Script (paragraphs)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -404,26 +404,41 @@
 % Spätestens ab Version~3.0 soll die Möglichkeit bestehen, |\parskip|,
 % |\parindent| und |\parfillskip| mit der Schriftgröße automatisch
 % anzupassen. Dazu muss |\selectfont| entsprechend erweitert werden.
-%  \begin{macro}{\scr@selectfont}
-%    \changes{v2.95}{2006/04/14}{neue Erweiterung}
-%  \begin{macro}{\scr@new@selectfont}
-%    \changes{v2.95}{2006/04/14}{neue Erweiterung}
+% \begin{macro}{\scr@selectfont}
+%   \changes{v2.95}{2006/04/14}{neue Erweiterung}
+%   \changes{v3.10}{2010/09/28}{\textsf{everysel}-Behandlung korrigiert}
+%   \changes{v3.10}{2010/09/28}{\textsf{tracefnt}-Behandlung hinzugefügt}
+% \begin{macro}{\scr@new@selectfont}
+%   \changes{v2.95}{2006/04/14}{neue Erweiterung}
+%   \changes{v3.10}{2010/09/28}{\textsf{everysel}-Behandlung korrigiert}
+%   \changes{v3.10}{2010/09/28}{\textsf{tracefnt}-Behandlung hinzugefügt}
 % Damit das auch bei Verwendung des \textsf{everysel}-Pakets funktioniert,
 % wird hier zusätzliche Vorsorge getroffen.
 %    \begin{macrocode}
-\newcommand*{\scr@selectfont}{}\let\scr@selectfont\selectfont
+\newcommand*{\scr@selectfont}{}
+\expandafter\let\expandafter\scr@selectfont\csname selectfont \endcsname
 \BeforePackage{everysel}{%
-  \ifx\selectfont\scr@new@selectfont\else
-    \ClassWarningNoLine{\KOMAClassName}{discard change of \string\selectfont}%
-  \fi
-  \let\selectfont\scr@selectfont
+  \AtBeginDocument{%
+    \expandafter\ifx\csname selectfont \endcsname\scr@new@selectfont\else
+      \ClassWarningNoLine{\KOMAClassName}{discard change of \string\selectfont}%
+    \fi
+    \expandafter\let\csname selectfont \endcsname\scr@selectfont
+  }%
 }
 \AfterPackage{everysel}{%
-  \g@addto@macro\selectfont{\par@update}%
-  \let\scr@new@selectfont\selectfont
+  \g@addto@macro\@EverySelectfont@Init{%
+    \expandafter\g@addto@macro\csname selectfont \endcsname{\par@update}%
+    \expandafter\let\expandafter\scr@new@selectfont\csname selectfont \endcsname
+  }%
 }
-\g@addto@macro\selectfont{\par@update}
-\newcommand*{\scr@new@selectfont}{}\let\scr@new@selectfont\selectfont
+\AfterPackage{tracefnt}{%
+  \expandafter\let\expandafter\scr@selectfont\csname selectfont \endcsname
+  \expandafter\g@addto@macro\csname selectfont \endcsname{\par@update}%
+  \expandafter\let\expandafter\scr@new@selectfont\csname selectfont \endcsname
+}
+\expandafter\g@addto@macro\csname selectfont \endcsname{\par@update}
+\newcommand*{\scr@new@selectfont}{}
+\expandafter\let\expandafter\scr@new@selectfont\csname selectfont \endcsname
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
