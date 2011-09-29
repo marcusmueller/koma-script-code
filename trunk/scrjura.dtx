@@ -1,4 +1,4 @@
-% \CheckSum{1343}
+% \CheckSum{1365}
 % \iffalse meta-comment
 % ======================================================================
 % scrjura.dtx
@@ -793,6 +793,33 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % \end{macro}
 % \end{option}
 %
+% \begin{option}{juratocnumberwidth}
+%   \changes{v0.6}{2011/09/29}{neu}
+% \begin{option}{juratocindent}
+%   \changes{v0.6}{2011/09/29}{neu}
+% \begin{macro}{\cpar@numberwidth}
+%   \changes{v0.6}{2011/09/29}{neu (intern)}
+% \begin{macro}{\cpar@indent}
+%   \changes{v0.6}{2011/09/29}{neu (intern)}
+% Der Einzug und die Breite der Nummer für Inhaltsverzeichniseinträge kann
+% über diese beiden Optionen bzw. Makros bestimmt werden.
+%    \begin{macrocode}
+\newcommand*{\cpar@numberwidth}{2em}
+\newcommand*{\cpar@indent}{1.5em}
+\KOMA@key{juratocnumberwidth}{%
+  \begingroup\setlength{\@tempdima}{#1}\endgroup
+  \renewcommand*{\cpar@numberwidth}{#1}%
+}
+\KOMA@key{juratocindent}{%
+  \begingroup\setlength{\@tempdima}{#1}\endgroup
+  \renewcommand*{\cpar@indent}{#1}%
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{option}
+% \end{option}
+%
 % \begin{option}{juratitlepagebreak}
 %   \changes{v0.5b}{2010/04/05}{neue Option}
 %   Mit dieser Option wird der Schalter |\if@juratitlepagebreak| auf |\iftrue|
@@ -1345,7 +1372,11 @@ standard classes created by The LaTeX3 Project 1994-1996.
 %    \begin{macrocode}
 \newcommand*{\l@cpar}[2]{%
   \ifnum\value{juratoclevel}>\value{tocdepth}\else
-    \@dottedtocline{\value{juratoclevel}}{1.5em}{2em}{#1}{#2}%
+    \scr@ifundefinedorrelax{bprot@dottedtocline}{%
+      \@dottedtocline
+    }{%
+      \bprot@dottedtocline
+    }{\value{juratoclevel}}{\cpar@indent}{\cpar@numberwidth}{#1}{#2}%
   \fi
 }
 %    \end{macrocode}
