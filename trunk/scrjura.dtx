@@ -1,4 +1,4 @@
-% \CheckSum{1318}
+% \CheckSum{1343}
 % \iffalse meta-comment
 % ======================================================================
 % scrjura.dtx
@@ -763,11 +763,33 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % \begin{option}{juratotoc}
 %   Mit dieser Option wird der Schalter |\if@juratotoc| auf |\iftrue| gesetzt.
 % \begin{macro}{\if@juratotoc}
-%   Mit dem Schalter wiederum wird erreicht, dass Paragraphen in das
+%   \changes{v0.6}{2011/09/29}{Schalter durch Zähler überflüssig}
+% \begin{Counter}{juratoclevel}
+%   \changes{v0.6}{2011/09/29}{Zählerdefinition verschoben}
+%   Mit dem Zähler wiederum wird erreicht, dass Paragraphen in das
 %   Inhaltsverzeichnis aufgenommen werden.
 %    \begin{macrocode}
-\KOMA@ifkey{juratotoc}{@juratotoc}
+\newcounter{juratoclevel}\setcounter{juratoclevel}{\@M}
+\KOMA@key{juratotoc}[true]{%
+  \begingroup
+    \newif\if@setjuratoclevel\@setjuratocleveltrue
+    \let\juratoclevel@@FamilyUnknownKeyValue\FamilyUnknownKeyValue
+    \renewcommand*{\FamilyUnknownKeyValue}[4]{%
+      \setcounter{juratoclevel}{#1}%
+      \@setjuratoclevelfalse
+    }%
+    \KOMA@set@ifkey{juratoclevel}{@tempswa}{#1}%
+    \if@setjuratoclevel
+      \if@tempswa
+        \setcounter{juratoclevel}{2}%
+      \else
+        \setcounter{juratoclevel}{\@M}%
+      \fi
+    \fi
+  \endgroup
+}
 %    \end{macrocode}
+% \end{Counter}
 % \end{macro}
 % \end{option}
 %
@@ -1322,19 +1344,11 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % Verzeichnis-Eintrag für einen Vertrags-Paragraphen.
 %    \begin{macrocode}
 \newcommand*{\l@cpar}[2]{%
-  \if@juratotoc
+  \ifnum\value{juratoclevel}>\value{tocdepth}\else
     \@dottedtocline{\value{juratoclevel}}{1.5em}{2em}{#1}{#2}%
   \fi
 }
 %    \end{macrocode}
-% \begin{Counter}{juratoclevel}
-%   Dieser Zähler gibt an, in welcher Ebene die Verzeichniseinträge für die
-%   Paragraphen erfolgen. Voreinstellung ist Ebene 2.
-%    \begin{macrocode}
-\newcounter{juratoclevel}
-\setcounter{juratoclevel}{2}%
-%    \end{macrocode}
-% \end{Counter}
 % \end{macro}
 %
 % \begin{macro}{\jura@separator}
