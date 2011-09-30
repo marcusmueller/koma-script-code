@@ -1,4 +1,4 @@
-% \CheckSum{1365}
+% \CheckSum{1381}
 % \iffalse meta-comment
 % ======================================================================
 % scrjura.dtx
@@ -74,7 +74,7 @@
 %<driver>\ProvidesFile{scrjura.drv}
 %<package>\ProvidesPackage{scrjura}
 %<*dtx|package|driver>
-                [2011/08/31 v0.6 KOMA-Script for jurists
+                [2011/09/30 v0.6 KOMA-Script for jurists
 %</dtx|package|driver>
 %<driver>                 (driver)%
 %<package>                (package)%
@@ -1027,6 +1027,7 @@ standard classes created by The LaTeX3 Project 1994-1996.
     \let\Par\contract@everypar
     \let\Sentence\contract@sentence
     \renewcommand*{\jura@env@type}{contract}%
+    \aliaskomafont{Paragraph}{contract.Paragraph}%
   \else
     \PackageError{contract}{nested `contract' detected}{%
       You may not use a `contract' environment inside\MessageBreak
@@ -1058,8 +1059,14 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % \begin{option}{title}
 % \begin{option}{head}
 % \begin{option}{entry}
+%   \changes{v0.6}{2011/09/30}{Option veraltet}
+% \begin{option}{tocentry}
+%   \changes{v0.6}{2011/09/30}{neue Option}
 % \begin{option}{nohead}
 % \begin{option}{noentry}
+%   \changes{v0.6}{2011/09/30}{Option veraltet}
+% \begin{option}{notocentry}
+%   \changes{v0.6}{2011/09/30}{neue Option}
 %   Der Titel, der Kolumnentitel und der Verzeichniseintrag des
 %   Paragraphen. Der Titel setzt dabei zunächst auch die anderen beiden. Man
 %   kann die beiden aber auf leer setzen. Insbesondere aber kann man sie mit
@@ -1070,11 +1077,25 @@ standard classes created by The LaTeX3 Project 1994-1996.
   \ifx\contract@entry\relax\def\contract@entry{\contract@title}\fi
   \ifx\contract@head\relax\def\contract@head{\contract@title}\fi
 }
-\define@key{contract}{entry}{\def\contract@entry{#1}}
-\define@key{contract}{noentry}[]{\let\contract@entry\relax}
+\define@key{contract}{entry}{%
+  \PackageWarning{scrjura}{deprecated option `entry'.\MessageBreak
+    You should use option `tocentry' instead of\MessageBreak
+    option `entry'%
+  }%
+  \def\contract@entry{#1}}
+\define@key{contract}{tocentry}{\def\contract@entry{#1}}
+\define@key{contract}{noentry}[]{%
+  \PackageWarning{scrjura}{deprecated option `noentry'.\MessageBreak
+    You should use option `notocentry' instead of\MessageBreak
+    option `noentry'%
+  }%
+  \let\contract@entry\relax}
+\define@key{contract}{notocentry}[]{\let\contract@entry\relax}
 \define@key{contract}{head}{\def\contract@head{#1}}
 \define@key{contract}{nohead}[]{\let\contract@head\relax}
 %    \end{macrocode}
+% \end{option}
+% \end{option}
 % \end{option}
 % \end{option}
 % \end{option}
@@ -1124,7 +1145,9 @@ standard classes created by The LaTeX3 Project 1994-1996.
 %   Das muss noch auf die Element-Schnittstelle von \KOMAScript{} umgestellt
 %   werden!
 %    \begin{macrocode}
-\newcommand*{\contract@paragraph@font}{\sffamily\bfseries\large\@hangfrom}
+\newkomafont{contract.Paragraph}{\sffamily\bfseries\large}
+\newcommand*{\contract@paragraph@font}{\usekomafont{contract.Paragraph}%
+  \@hangfrom}
 %    \end{macrocode}
 % \end{macro}
 % \begin{Counter}{@AbsParagraph}
@@ -1907,6 +1930,8 @@ standard classes created by The LaTeX3 Project 1994-1996.
 %
 % \begin{macro}{\newmaxpar}
 % \begin{macro}{\getmaxpar}
+%   \changes{v0.6}{2011/09/30}{Argument 3 muss mit \cs{protected@edef}
+%     expandiert werden}
 %   \changes{v0.5c}{2010/04/26}{\cs{protected@edef} durch \cs{edef} ersetzt}
 %   \changes{v0.5c}{2010/04/26}{\cs{\#2@Paragraphformat} expandiert zu seinem
 %     Argument}
@@ -1922,7 +1947,7 @@ standard classes created by The LaTeX3 Project 1994-1996.
 \newcommand*{\getmaxpar}[3]{%
   \begingroup
     \expandafter\let\csname #2@Paragraphformat\endcsname\@firstofone
-    \edef\@tempa{#3}%
+    \protected@edef\@tempa{#3}%
     \@onelevel@sanitize\@tempa
     \expandafter\ifx \csname max@#2@\@tempa\endcsname\relax
       \edef\@tempa{\endgroup\edef\noexpand#1{\expandafter\the\value{par}}}%
