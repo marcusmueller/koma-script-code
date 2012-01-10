@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# Copyright (c) Markus Kohm, 2002
+# Copyright (c) Markus Kohm, 2002-2012
 #
 # This file generates a template for german part of KOMA-Script.
 #

@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# Copyright (c) Markus Kohm, 2006-2011
+# Copyright (c) Markus Kohm, 2006-2012
 #
 # This file prepares KOMA-Script for release.
 #
