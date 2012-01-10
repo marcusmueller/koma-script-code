@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2011/06/16 v1.4 internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2011/10/18 v1.6 internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -79,12 +79,12 @@
 %    \begin{macrocode}
 \ExecuteOptions{pagereftolabel,lessindexnotes}
 \PassOptionsToClass{%
-  bibtotoc,
-  idxtotoc,
-  tablecaptionabove,
-  smallheadings,
-  cleardoubleplain,
-  version,
+  bibliography=totoc,
+  index=totoc,
+  captions=tableabove,
+  headings=small,
+  headings=optiontoheadandtoc,
+  version=last,
 }{scrguide}
 \ProcessOptions\relax
 %    \end{macrocode}
@@ -123,6 +123,7 @@
 \RequirePackage[\uselanguage]{hyperref}
 \RequirePackage[open,openlevel=0]{bookmark}% improved pdf bookmarks
 \RequirePackage{scrhack}
+\RequirePackage{mparhack}
 %    \end{macrocode}
 %
 %
@@ -142,7 +143,8 @@
       ^^J%
     }%
     \newcommand*{\iffree}{\@firstoftwo}%
-    \newcommand*{\important}[1]{}%
+    \newcommand*{\important}[2][]{}%
+    \newcommand*{\textnote}[2][]{}%
     \shortversiontrue
     \newcommand*{\LoadNonFree}[2]{%
       \par
@@ -154,9 +156,9 @@
     \usepackage{lmodern}%
     \@twosidefalse\@openrightfalse\@mparswitchfalse
     \RequirePackage{geometry}%
-    \geometry{papersize={140mm,210mm},%
-      includehead,includemp,reversemp,marginparwidth=2em,%
-      vmargin={2mm,4mm},hmargin=2mm}%
+    \geometry{papersize={180mm,210mm},%
+      includehead,includemp,reversemp,marginparwidth=4em,%
+      vmargin={1.5mm,3mm},hmargin=1.75mm}%
     \RequirePackage{xcolor}%
     \RequirePackage{scrpage2}%
     \clearscrheadfoot
@@ -502,9 +504,9 @@
 % \begin{macro}{\Class}
 % \begin{macro}{\Package}
 %   Some markup macros for files with special meanings.
-\DeclareRobustCommand*{\File}[1]{\texttt{#1}}
-\DeclareRobustCommand*{\Class}[1]{\textsfrm{#1}}
-\DeclareRobustCommand*{\Package}[1]{\textsfrm{#1}}
+\DeclareRobustCommand*{\File}[1]{\mbox{\texttt{#1}}}
+\DeclareRobustCommand*{\Class}[1]{\mbox{\textsfrm{#1}}}
+\DeclareRobustCommand*{\Package}[1]{\mbox{\textsfrm{#1}}}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -623,7 +625,7 @@
 %
 % \section{Math}
 %
-% I will not use real math. But there will be some »pseudo math code«. So I
+% I will not use real math. But there will be some Â»pseudo math codeÂ«. So I
 % need some macros for this.
 %
 % \begin{macro}{\Var}
@@ -839,13 +841,19 @@
 %   Output of the top of a page.
 %    \begin{macrocode}
 \newenvironment{XmpTopPage}
- {\begin{center}\setlength{\unitlength}{1mm}\begin{picture}(100,39)%
-   \thinlines
-     \qbezier(0,5)(25,7)(50,5)\qbezier(50,5)(75,3)(100,5)
-        \put(0,5){\line(0,1){34}}
-   \thicklines
-        \put(100,5){\line(0,1){34}}\put(0,39){\line(1,0){100}}
-   \small}{\end{picture}\end{center}\vspace{-1.5\baselineskip}}
+ {%
+   \begin{center}
+     \setlength{\unitlength}{.833mm}\begin{picture}(100,39)
+       \thinlines
+       \qbezier(0,5)(25,7)(50,5)\qbezier(50,5)(75,3)(100,5)
+       \put(0,5){\line(0,1){34}}
+       \thicklines
+       \put(100,5){\line(0,1){34}}\put(0,39){\line(1,0){100}}
+       \footnotesize
+ }{%
+     \end{picture}
+   \end{center}\vspace{-1.5\baselineskip}%
+}
 %    \end{macrocode}
 % \end{environment}
 %
@@ -853,13 +861,16 @@
 %   Output of the bottom of a page.
 %    \begin{macrocode}
 \newenvironment{XmpBotPage}
- {\begin{center}\setlength{\unitlength}{1mm}\begin{picture}(100,40)%
-   \thinlines
-     \qbezier(0,38)(25,40)(50,38)\qbezier(50,38)(75,36)(100,38)
-        \put(0,5){\line(0,1){33}}
-   \thicklines
-        \put(100,5){\line(0,1){33}}\put(0,5){\line(1,0){100}}
-   \small}{\end{picture}\end{center}\vspace{-1.5\baselineskip}}
+ {\begin{center}\setlength{\unitlength}{.833mm}\begin{picture}(100,40)%
+       \thinlines
+       \qbezier(0,38)(25,40)(50,38)\qbezier(50,38)(75,36)(100,38)
+       \put(0,5){\line(0,1){33}}
+       \thicklines
+       \put(100,5){\line(0,1){33}}\put(0,5){\line(1,0){100}}
+       \footnotesize
+}{%
+  \end{picture}\end{center}\vspace{-1.5\baselineskip}%
+}
 %    \end{macrocode}
 % \end{environment}
 %
@@ -867,7 +878,8 @@
 %   Output some text at \texttt{XmpTopPage} or \texttt{XmpBotPage}.
 %    \begin{macrocode}
 \newcommand{\XmpSetText}[2][\XmpText]{%
-        \put(#2){\makebox(0,0)[tl]{\parbox{70mm}{#1}}}}
+        \put(#2){\makebox(0,0)[tl]{\parbox{70\unitlength}{\parfillskip=0pt 
+              #1}}}}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -904,7 +916,7 @@
 %   should be noted, |\and| will be used to separate them.
 %    \begin{macrocode}
 \newcommand*{\OnlyAt}[1]{%
-  \marginline{\def\and{,\\}\footnotesize #1}%
+  \marginline{\def\and{,\\}\footnotesize #1\par}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -989,16 +1001,20 @@
 %   I need a length of local usage. I could have used |\@tempdima| or
 %   another local length from kernel. But I've decided not to try to find a
 %   unused length at \texttt{tabular} environment.
+% \begin{length}{\descdefaultindent}
+%   And I need a length of global usage.
 %    \begin{macrocode}
 \newlength{\descwidth}
+\newlength{\descdefaultindent}\setlength{\descdefaultindent}{2em}
 %    \end{macrocode}
+% \end{length}
 % \end{length}
 %   The definition of \texttt{desctabular} is very simple, because the main
 %   work will be done by a \emph{worker} macro that will be defined later.
 %    \begin{macrocode}
-\newenvironment{desctabular}[1][2em]{%
-  \start@desctab{#1}%
-  \tabular{lp{\descwidth}}
+\newenvironment{desctabular}[1][c]{%
+  \start@desctab{\descdefaultindent}%
+  \tabular[#1]{lp{\descwidth}}
   \toprule
 }{
   \addlinespace[-.5\normalbaselineskip]\bottomrule
@@ -1008,10 +1024,11 @@
 % \end{environment}
 %
 % \begin{environment}{desctable}
+%   \textbf{Deprecated! Use \texttt{desclist} instead of!}
 %   This is almost the same like \texttt{desctabular} but it uses a longtable
 %   to allow page breaks.
 %    \begin{macrocode}
-\newenvironment{desctable}[1][2em]{%
+\newenvironment{desctable}[1][\descdefaultindent]{%
   \onelinecaptionsfalse
   \start@desctab{#1}%
   \newcommand{\Endfirsthead}{\toprule\endfirsthead}%
@@ -1042,7 +1059,7 @@
   \setlength{\labelwidth}{\linewidth}%
   \addtolength{\labelwidth}{-2\tabcolsep}%
   \newcommand{\nentry}[2]{%
-    \multicolumn{2}{p{\labelwidth}}{\raggedright##1}\\*%
+    \multicolumn{2}{p{\labelwidth}}{\raggedright##1}\tabularnewline*%
     \hspace*{#1} & ##2\tabularnewline%
   }%
   \newcommand{\entry}[2]{\nentry{##1}{##2}[.5\baselineskip]}%
@@ -1061,6 +1078,126 @@
   }%
 }
 % \end{macro}
+%
+% \begin{environment}{desclist}
+%   This is similar to \texttt{desctable} but it has been build by single
+%   tabulars instead of longtable.
+% \begin{macro}{\desccaptionb@xfirst}
+% \begin{macro}{\desccaptionb@xother}
+% \begin{macro}{\descfootb@x}
+% \begin{macro}{\descentryb@x}
+% \begin{macro}{\desccaptiob@xnext}
+%    \begin{macrocode}
+\newsavebox\desccaptionb@xfirst
+\newsavebox\desccaptionb@xother
+\newsavebox\descfootb@x
+\newsavebox\descentryb@x
+\newif\ifdescpage@dd
+\newcommand*{\desccaptionb@xnext}{}
+\newcommand*{\abovecaptionskipcorrection}{}
+\newenvironment{desclist}[1][\descdefaultindent]{%
+  \par
+  \setparsizes{\z@}{\z@}{\z@\@plus 1fil}\selectfont%
+  \vskip\intextsep
+  \start@desctab{#1}%
+  \csname @desclistinithook\endcsname
+  \def\@captype{table}%
+  \newcommand{\desccaption}{\@dblarg{\@desccaption}}%
+  \newcommand{\@desccaption}[3][]{%
+    \setbox\desccaptionb@xfirst\vbox{%
+      \tabular{p{\labelwidth}}%
+        \multicolumn{1}{@{}p{\dimexpr\labelwidth+2\tabcolsep}@{}}{%
+          \captionaboveof{table}[##1]{##2}%
+        }\tabularnewline[\dimexpr \abovecaptionskip\abovecaptionskipcorrection\relax]
+        \toprule\tabularnewline
+      \endtabular
+      \vskip -\baselineskip
+    }%
+    \let\abovecaptionskipcorrection\@empty
+    \setbox\desccaptionb@xother\vbox{%
+      \tabular{p{\labelwidth}}
+      \multicolumn{1}{@{}p{\dimexpr\labelwidth+2\tabcolsep}@{}}{%
+        \@@makecaption\@firstofone{\fnum@table}{\ignorespaces ##3}%
+      }\tabularnewline[-\normalbaselineskip]
+      \addlinespace[\abovecaptionskip]
+        \toprule\tabularnewline
+      \endtabular
+      \vskip -\baselineskip
+    }%
+    \let\desccaptionb@xnext\desccaptionb@xfirst
+  }%
+  \setbox\descfootb@x\vbox{%
+    \tabular{p{\labelwidth}}%
+      \addlinespace[-.5\normalbaselineskip]\midrule
+      \addlinespace[-\dp\strutbox]
+      \raggedleft\dots\hspace*{-\tabcolsep}\tabularnewline
+    \endtabular
+  }%
+  \newcommand*{\entryskip}[1][]{%
+    \ifx\relax##1\relax\else\vskip##1\relax\fi
+  }%
+  \renewcommand{\nentry}[2]{%
+    \setbox\descentryb@x\vbox{%
+      \ifx\desccaptionb@xnext\desccaptionb@xfirst\copy\desccaptionb@xnext\fi
+      \tabular{lp{\descwidth}}%
+        \multicolumn{2}{p{\labelwidth}}{\raggedright##1}\tabularnewline
+        \hspace*{#1} & ##2\tabularnewline
+      \endtabular
+    }%
+    \begingroup
+      \dimen@ \ht\descentryb@x \advance \dimen@ \dp\descentryb@x
+      \advance \dimen@ \ht\descfootb@x \advance \dimen@ \dp\descfootb@x
+      \advance \dimen@ \baselineskip
+      \dimen@ii \pagegoal \advance \dimen@ii -\pagetotal
+      \typeout{TRACE: \the\dimen@>\the\dimen@ii?}%
+      \ifdim \dimen@>\dimen@ii
+        \typeout{TRACE: Break table}%
+        \ifx\desccaptionb@xnext\@empty
+          \csname @desclistentryhook\endcsname
+          {\copy\descfootb@x}%
+        \fi
+        \newpage
+        \ifx\desccaptionb@xnext\@empty
+          \typeout{TRACE: switch page}%
+          \ifdescpage@dd
+            \aftergroup\descpage@ddfalse
+            \expandafter\descpage@ddfalse
+          \else
+            \aftergroup\descpage@ddtrue
+            \expandafter\descpage@ddtrue
+          \fi
+          \csname @desclistentryhook\endcsname
+          {\copy\desccaptionb@xother}%
+         \fi
+      \fi
+    \endgroup
+    \ifx\desccaptionb@xnext\desccaptionb@xfirst
+      \ifthispageodd{\descpage@ddtrue}{\descpage@ddfalse}%
+    \fi
+    \csname @desclistentryhook\endcsname
+    {\copy\descentryb@x}%
+    \let\desccaptionb@xnext\@empty
+   \entryskip
+  }%
+}{%
+  \vskip -.5\baselineskip
+  \setbox\descfootb@x\vbox{%
+    \tabular{p{\labelwidth}}
+    \bottomrule\tabularnewline
+    \endtabular
+  }%
+  \csname @desclistentryhook\endcsname
+  {\copy\descfootb@x}%
+  \par
+  \vskip -\baselineskip \vskip \intextsep
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{environment}
 %
 %
 % \section{Listings}
@@ -1086,10 +1223,11 @@
     @rightmark,
     @secondoftwo,
     @tempswafalse,@tempswatrue,
-    AtBeginDocument,
-    AtEndDocument,
+    @undefined,
+    AtBeginDocument,AtEndDocument,
+    appendix,
     ClassWarningNoLine,CurrentOption,
-    DeclareOption,dimexpr,
+    DeclareOption,DeclareRobustCommand,dimexpr,
     end@float,
     ExecuteOptions,
     if@filesw,if@tempswa,if@twoside,
@@ -1097,9 +1235,9 @@
     MessageBreak,
     onehalfspacing,
     PackageError,PackageInfo,PackageWarning,PassOptionsToPackage,
-    ProcessOptions,ProvidesFile,ProvidesPackage,
-    RequirePackage,
-    setlength,
+    ProcessOptions,protected@write,ProvidesFile,ProvidesPackage,
+    RequirePackage,RequirePackageWithOptions,
+    setkey,setlength,
     textsuperscript}%
 }
 \lstdefinestyle{output}{%
@@ -1109,18 +1247,24 @@
   style=code,%
   moretexcs={%
     @addtoplength,@setplength,@newplength,
-    addchap,addrentry,Address,addcontentslinetoeachtocfile,addtoeachtocfile,
+    activateareas,
+    addchap,addrentry,Address,addcontentslinetoeachtocfile,addsec,
+    addtoeachtocfile,
     addtokomafont,addtolengthplength,addtoreffields,addtotoclist,
-    adrchar,adrentry,AfterBibliographyPreamble,AfterFile,AfterPackage,
+    adrchar,adrentry,AfterBibliographyPreamble,AfterCalculatingTypearea,
+    AfterFile,AfterPackage,AfterStartingTOC,
     appendixmore,appendixname,areaset,autodot,automark,AtAddToTocList,
     AtBeginLetter,
     BeforeClosingMainAux,BeforePackage,bib@beginhook,bib@endhook,
-    cc,captionabove,captionformat,cefoot,cfoot,chapapp,chapappifchapterprefix,
+    cc,captionabove,captionaboveof,captionbelow,captionbelowof,captionformat,
+    captionof,cefoot,cfoot,chapapp,
+    chapappifchapterprefix,
     chapter,chapterformat,chaptermarkformat,chapterpagestyle,chead,
     cleardoubleevenemptypage,clearscrheadfoot,closing,cofoot,Comment,
+    DeclareNewTOC,
     dedication,deffootnote,deffootnotemark,DefineFamily,DefineFamilyKey,
     DefineFamilyMember,defpagestyle,deftripstyle,
-    dictum,dictumauthorformat,dictumwidth,doforeachtocfile,
+    dictum,dictumauthorformat,dictumrule,dictumwidth,doforeachtocfile,
     encl,extratitle,
     FamilyBoolKey,FamilyExecuteOptions,FamilyNumericalKey,%
     FamilyOption,FamilyOptions,FamilyProcessOptions,FamilySetBool,
@@ -1135,18 +1279,27 @@
     multfootsep,multiplefootnoteseparator,
     Name,nameday,newbibstyle,newcaptionname,newkomavar,nexthead,
     ofoot,ohead,opening,othersectionlevelsformat,
-    p@section,pagemark,part,partformat,partname,partpagestyle,pnumfont,
-    publishers,ps,
-    raggedsection,raggedpart,raggedsignature,recalctypearea,rehead,
-    removereffields,ReplaceInput,ReplacePackage,
-    sectionmarkformat,setbibpreamble,setcapindent,setcapwidth,
+    p@section,pagemark,Paragraph,parformat,parname,parshortname,
+    part,partformat,partname,partpagestyle,pnumfont,
+    PreventPackageFromLoading,publishers,ps,
+    raggedsection,raggedpart,raggedsignature,recalctypearea,
+    refL,refS,refN,refParagraph,refParagraphN,refPar,refParL,refParS,refParN,
+    refSentence,refSentenceL,refSentenceS,refSentenceN,
+    rehead,
+    removereffields,ReplaceInput,ReplacePackage,ResetPreventPackageFromLoading,
+    sectionmarkformat,Sentence,sentencename,sentenceshortname,
+    setbibpreamble,setcapindent,setcapwidth,
     setchapterpreamble,setfootbotline,setfootsepline,setfootwidth,
     setheadsepline,setheadtopline,setheadwidth,setindexpreamble,setkomafont,
     setkomavar,setlengthtoplength,setparsizes,setpartpreamble,setuptoc,
-    subject,subsectionmarkformat,subtitle,
+    showfields,showenvelope,showISOenvelope,showUScommercial,showUScheck,
+    StorePreventPackageFromLoading,
+    subject,SubParagraph,subsectionmarkformat,subtitle,
     tableformat,tablename,tableofcontents,textsubscript,thechapter,thefigure,
-    thefootnotemark,thepart,thesection,thesubsection,thetable,thistime,
-    titlehead,tocbasic@extend@babel,todaysname,typearea,
+    thefootnotemark,thepar,thepart,thesection,thesentence,thesubsection,
+    thetable,thistime,
+    titlehead,tocbasic@extend@babel,TOCclone,todaysname,typearea,
+    unitfactor,
     unsettoc,usekomafont,useplength,usekomavar,uppertitleback
   }%
 }
@@ -1264,6 +1417,15 @@ KOMAScript \endcsname
 \renewcommand*{\@pnumwidth}{1.8em}% 1.67
 \renewcommand*\@tocrmarg {2.70em}% 2.55em
 \renewcommand*\@dotsep{2.5}
+\settocfeature[toc][-1]{entryhook}{%
+  \let\sg@numberline\numberline
+  \renewcommand*{\numberline}[1]{%
+    \sg@numberline{\partname~##1}%
+    ~\linebreak\nopagebreak\hspace*{-\@tempdima}%
+  }%
+  \def\autodot{: }%
+  \sectfont
+}
 %    \end{macrocode}
 %
 % \section{Part}
@@ -1389,7 +1551,7 @@ KOMAScript \endcsname
 %    \begin{macrocode}
   \renewenvironment{theindex}{%
     \setchapterpreamble{\index@preamble}
-    \begin{multicols}{2}[\idx@heading\vspace{-1\baselineskip}]%
+    \begin{multicols}{2}[\idx@heading\vspace{-1\baselineskip}][.2\textheight]%
     \parindent\z@
     \setlength{\parskip}{\z@ \@plus .3\p@}%
     \setlength{\parfillskip}{\z@ \@plus 1fil}%
@@ -1411,7 +1573,6 @@ KOMAScript \endcsname
     \let\index@preamble=\relax
     \renewcommand*\idx@heading{%
       \addsec{\indexname}%
-      \markright{\indexname}%
       \ifx\index@preamble\relax
       \else\index@preamble\let\index@preamble=\relax\fi
     }%
@@ -1485,7 +1646,7 @@ KOMAScript \endcsname
 % \end{macro}
 %
 % \begin{macro}{\AddSeeIndex}
-%   Add »\emph{see another index}« entry to an index. First argument is an
+%   Add Â»\emph{see another index}Â« entry to an index. First argument is an
 %   index entry to the index with shortcut of second argument. The third
 %   argument is the name of another index given also by the shortcut at the
 %   fourth argument.

@@ -74,10 +74,10 @@ Anwender kaum oder gar nicht von Interesse sind. Experten bieten diese
 Anweisungen zusätzliche Möglichkeiten. Da die Beschreibungen für Experten
 gedacht sind, sind sie kürzer gefasst.
 
-\BeginIndex{Cmd}{activateareas}%
 \begin{Declaration}
   \Macro{activateareas}
 \end{Declaration}%
+\BeginIndex{Cmd}{activateareas}%
 Diese Anweisung wird von \Package{typearea} genutzt, um die Einstellungen
 für Satzspiegel und Ränder in die internen \LaTeX-Längen zu übertragen, wenn
 der Satzspiegel innerhalb des Dokuments, also nach
@@ -86,19 +86,61 @@ der Satzspiegel innerhalb des Dokuments, also nach
 neu aufgerufen. Damit kann beispielsweise innerhalb von PDF-Dokumenten die
 Seitengröße tatsächlich variieren.
 
-Experten können diese Anweisung ebenfalls verwenden, wenn Sie aus
-irgendwelchen Gründen, Längen wie \Length{textwidth} oder
-\Length{textheight} innerhalb des Dokuments manuell geändert haben. Der
-Experte ist dabei für ggf. notwendige Seitenumbrüche vor oder nach der
-Verwendung jedoch selbst verantwortlich! Darüber hinaus sind alle von
-\Macro{activateareas} durchgeführten Änderungen lokal!%
+Experten können diese Anweisung auch verwenden, wenn Sie aus irgendwelchen
+Gründen, Längen wie \Length{textwidth} oder \Length{textheight} innerhalb des
+Dokuments manuell geändert haben. Der Experte ist dabei für eventuell
+notwendige Seitenumbrüche vor oder nach der Verwendung jedoch selbst
+verantwortlich! Darüber hinaus sind alle von \Macro{activateareas}
+durchgeführten Änderungen lokal!%
 % 
 \EndIndex{Cmd}{activateareas}
 
-\BeginIndex{Cmd}{AfterCalculatingTypearea}%
+\begin{Declaration}
+  \Macro{storeareas}\Parameter{Anweisung}
+\end{Declaration}
+\BeginIndex{Cmd}{storearea}%
+Mit Hilfe von \Macro{storeareas} wird eine \PName{Anweisung} definiert, über
+die alle aktuellen Seitenspiegeleinstellungen wieder hergestellt werden
+können. So ist es möglich, die aktuellen Einstellungen zu speichern,
+anschließend die Einstellungen zu ändern und dann die gespeicherten
+Einstellungen wieder zu reaktivieren.
+
+\begin{Example}
+  Sie wollen in einem Dokument im Hochformat eine Seite im Querformat
+  unterbringen. Mit \Macro{storeareas} kein Problem:
+\begin{lstcode}
+  \documentclass[pagesize]{scrartcl}
+
+  \begin{document}
+  \rule{\textwidth}{\textheight}
+
+  \storeareas\meinegespeichertenWerte
+  \KOMAoptions{paper=landscape,DIV=current}
+  \rule{\textwidth}{\textheight}
+
+  \clearpage
+  \meinegespeichertenWerte
+  \rule{\textwidth}{\textheight}
+  \end{document}
+\end{lstcode}
+  Wichtig\textnote{Achtung!} ist dabei die Anweisung \Macro{clearpage} vor dem 
+  Aufruf von \Macro{meinegespeichertenWerte}, damit die Wiederherstellung erst
+  auf der nächsten Seite erfolgt.
+\end{Example}
+Bei\textnote{Achtung!} der Verwendung von \Macro{storeareas} ist zu beachten,
+dass sowohl \Macro{storeareas} als auch die damit definierte \PName{Anweisung}
+nicht innerhalb einer Gruppe aufgerufen werden sollten. Die Definition der
+\PName{Anweisung} erfolgt intern mit
+\Macro{newcommand}\IndexCmd{newcommand*}\important{\Macro{newcommand*}}. Bei
+erneuter Verwendung einer bereits definierte \PName{Anweisung} wird eine
+entsprechende Fehlermeldung ausgegeben.
+%
+\EndIndex{Cmd}{storeareas}
+
 \begin{Declaration}
   \Macro{AfterCalculatingTypearea}\Parameter{Anweisungen}
 \end{Declaration}%
+\BeginIndex{Cmd}{AfterCalculatingTypearea}%
 Diese Anweisung dient der Verwaltung eines \emph{Hooks} und ermöglicht es dem
 Experten jedes Mal, nachdem \Package{typearea} eine neue Aufteilung in
 Satzspiegel und Ränder berechnet hat, also nach jeder impliziten oder
@@ -127,3 +169,5 @@ lassen. Diese \PName{Anweisungen} werden dabei unmittelbar vor
 %%% coding: iso-latin-1
 %%% TeX-master: "../guide"
 %%% End:
+
+% LocalWords:  Hochformat Seitenspiegels
