@@ -1,6 +1,6 @@
 # ======================================================================
 # Makefile
-# Copyright (c) Markus Kohm, 2002-2011
+# Copyright (c) Markus Kohm, 2002-2012
 #
 # This file is part of the LaTeX2e KOMA-Script bundle.
 #
@@ -18,7 +18,7 @@
 # This work consists of all files listed in manifest.txt.
 # ----------------------------------------------------------------------
 # Makefile
-# Copyright (c) Markus Kohm, 2002-2011
+# Copyright (c) Markus Kohm, 2002-2012
 #
 # Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 # Version 1.3c, verteilt und/oder veraendert werden.
@@ -54,6 +54,16 @@ tocbasic.tex: ../../tocbasic.tex
 
 ../../tocbasic.tex: ../../tocbasic.dtx
 	cd ../.. && tex \\nonstopmode\\input tocbasic.dtx
+# ----------------------------------------------------------------------
+
+# ----------------------------------------------------------------------
+# NOTE: Remove these rules after real translation of scrwfile.tex 
+#       is available.
+scrwfile.tex: ../../scrwfile.tex
+	if [ -L $@ ] || ! [ -f $@ ]; then $(SYMLINK) $< .; else touch $@; fi
+
+../../scrwfile.tex: ../../scrwfile.dtx
+	cd ../.. && tex \\nonstopmode\\input scrwfile.dtx
 # ----------------------------------------------------------------------
 
 #
