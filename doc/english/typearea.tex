@@ -48,31 +48,10 @@
 \ProvidesFile{typearea.tex}[2012/01/31 KOMA-Script guide (chapter: typearea)]
 \translator{Markus Kohm\and Gernot Hassenpflug}
 
-% Date of translated german file: 2006-11-29
-% Updated: 2008-01-02
+% Date of translated german file: 2011/10/12
 
 \chapter{Construction of the Page Layout with \Package{typearea}}
 \labelbase{typearea}
-
-%\textsc{Note:} Following commands are still missing in this chapter:
-%\Macro{KOMAoptions}, \Macro{KOMAoption}, \Macro{recalctypearea}.
-%
-%\textsc{Note:} Following options are still missing in this chapter:
-%\OptionValue{BCOR}{current}, \OptionValue{twoside}{semi},
-%\KOption{headheight}\PName{height}, \OptionValue{pagesize}{automedia}.
-%
-%% Done 2 Jan: sections 2.1, 2.2, 2.3
-%%                      section 2.4 skipped
-%% Done 3 Jan: parts of section 2.5
-%%                      \OptionValue{BCOR}{current}
-%%                      \OptionValue{twoside}{semi}
-%%                      \OptionValue{headheight}{height}
-%% Done 4 Jan: completed section 2.5
-%%                      \OptionValue{areaset}
-%%                      section 2.4 (common.tex)
-%%                      section 2.6
-%%                      \OptionValue{pagesize}{automedia}
-%%                      section 2.7
 
 Many {\LaTeX} classes, including the standard classes, present the user
 with the largely fixed configuration of margins and typearea. With the
@@ -112,16 +91,17 @@ user, but rather at class- and package authors.
 %%  \ifx\BUCH\undefined\cite{DANTE:TK0402:MJK}\else(siehe
 %%   \autoref{cha:typeareaconstruction})\fi
   The literature contains much discussion of different algorithms and
-  heuristic approaches for constructing a good page layout.  Often
-  mentioned is an approach which involves diagonals and their
-  intersections. The result is a page where the text block proportions
-  are related to the proportions of the \emph{page}.  In a
-  single-sided document, the left and the right margin should have
-  equal widths.  The relation of the upper margin to the lower margin
-  should be 1\(:\)2. In a double-sided document\Index{double-sided}
-  (e.\,g. a book) however, the complete inner margin (the margin at
-  the spine) should be the same as each of the two outer margins; in
-  other words, a single page contributes only half of the inner
+  heuristic approaches for constructing a good page layout%
+  \iffree{ \cite{DANTE:TK0402:MJK}}{. A short introduction to the basics may
+    be found at \autoref{cha:typeareaconstruction}}%
+  .  Often mentioned is an approach which involves diagonals and their
+  intersections. The result is a page where the text block proportions are
+  related to the proportions of the \emph{page}.  In a single-sided document,
+  the left and the right margin should have equal widths.  The relation of the
+  upper margin to the lower margin should be 1\(:\)2. In a double-sided
+  document\Index{double-sided} (e.\,g. a book) however, the complete inner
+  margin (the margin at the spine) should be the same as each of the two outer
+  margins; in other words, a single page contributes only half of the inner
   margin.
 
   In the previous paragraph, we mentioned and emphasized \emph{the
@@ -1414,24 +1394,51 @@ the \Macro{recalctypearea} command (see
   given in the form of a \Macro{special} command. With {pdf\TeX} or
   {V\TeX} one sets instead two lengths.
 \end{Explain}
-The option \OptionValue{pagesize}{dvips}\IndexOption{pagesize~=dvips}
-writes the paper size as a \Macro{special} into die DVI data
-file. This \Macro{special} is then evaluated by, for example,
-\File{dvips}. On the other hand, the option
-\OptionValue{pagesize}{pdftex} writes the paper size at the start of
-the document into the {pdf\TeX} page registers
-\Length{pdfpagewidth}\IndexLength{pdfpagewidth} and
-\Length{pdfpageheight}\IndexLength{pdfpageheight}, so that later when
-viewing the PDF file the correct format is chosen. The option
-\OptionValue{pagesize}{auto} is more flexible and, depending on
-whether a PDF or DVI data file is output, uses the mechanism of the
-option \OptionValue{pagesize}{dvips} or
-\OptionValue{pagesize}{pdftex}. With the option
-\OptionValue{pagesize}{automedia} it may be that \Length{mediawidth}
-and \Length{mediaheight} are also set appropriately. In this way even
-the demands of {V\TeX} are supported. If the option \Option{pagesize}
-is used with specifying an \PName{output driver} then \PValue{auto} is
-used.
+With option \Option{pagesize} you may select an output driver for writing the
+paper size into the destination document. Supported output drivers are listed
+at \autoref{tab:typearea.outputdriver}. The default is
+\OptionValue{pagesize}{false}. Usage of option
+\Option{pagesize}\IndexOption{pagesize} without value is same like
+\OptionValue{pagesize}{auto}.
+%
+\begin{table}
+  \caption{Output driver for option \KOption{pagesize}\PName{output driver}}
+  \begin{desctabular}
+    \pventry{auto}{Uses output driver \PValue{pdftex} if pdf\TeX-specific
+      registers \Macro{pdfpagewidth}\IndexLength{pdfpagewidth} and
+      \Macro{pdfpageheight}\IndexLength{pdfpageheight} are defined. In
+      addition output driver \PValue{dvips} will be
+      used.\IndexOption{pagesize~=\PValue{auto}}}%
+    \pventry{automedia}{Almost the same like \PValue{auto} but if the
+      \mbox{V\TeX}-specific registers
+      \Macro{mediawidth}\IndexLength{mediawidth} and
+      \Macro{mediaheight}\IndexLength{mediaheight} are defined, they will be
+      set additionally.\IndexOption{pagesize~=\PValue{automedia}}}%
+    \entry{\PValue{false}, \PValue{no}, \PValue{off}}{%
+      Doesn't set any output driver and doesn't send page size information to
+      the output driver.\IndexOption{pagesize~=\PValue{false}}}%
+    \pventry{dvipdfmx}{\ChangedAt{v3.05a}{\Package{typearea}}Writes paper size
+      into DVI files using
+      \Macro{special}\PParameter{pagesize=\PName{width},\PName{height}}. The
+      name of the output driver is \PValue{dvipdfmx} because application
+      \File{dvipdfmx} handles such specials not only at document preamble but
+      at the document body too.\IndexOption{pagesize~=\PValue{dvipdfmx}}}%
+    \pventry{dvips}{Using this option at the document preamble sets paper size
+      using
+      \Macro{special}\PParameter{pagesize=\PName{width},\PName{height}}. While
+      application \File{dvips} cannot handle changes of paper size at the
+      inner document pages a hack is needed to achieve such changes. Use
+      changes of paper size after \Macro{begin}\PParameter{document} on your
+      own risk, if you are using
+      \PValue{dvips}!\IndexOption{pagesize~=\PValue{dvips}}}%
+    \pventry{pdftex}{Sets paper size using the pdf\TeX-specific registers
+      \Macro{pdfpagewidth}\IndexLength{pdfpagewidth} and
+      \Macro{pdfpageheight}\IndexLength{pdfpageheight}. You may do this at any
+      time in your document.\IndexOption{pagesize~=\PValue{pdftex}}}%
+  \end{desctabular}
+  \label{tab:typearea.outputdriver}
+\end{table}
+
 \begin{Example}
   Assume that a document should be available both as a DVI data file
   and in PDF format for online viewing. Then the preamble might begin
