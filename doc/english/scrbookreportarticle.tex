@@ -675,20 +675,395 @@ units required extra or less and then, as in the above example, use
 %
 \EndIndex{}{table of contents}
 
+
 \LoadCommon{6}% \section{Paragraph Markup}
 
-\section{Detection of Odd and Even Pages\protect\footnote{This section is
-    still missing. Translators from German to English would be welcome!}}
-\label{sec:maincls.oddOrEven}
+\LoadCommon{7}% \section{Detection of Odd and Even Pages}
 
-\mbox{}
 
-\section{Head and Foot Using Predefined Page Styles\protect\footnote{This
-    section is still missing. Translators from German to English would be
-    welcome!}}
+\section{Head and Foot Using Predefined Page Styles}
 \label{sec:maincls.pagestyle}
+\BeginIndex{}{page>style}
 
-\mbox{}
+One of the general characteristics of a document is the page style. In
+{\LaTeX} this means mostly the contents of headers and footers.
+
+\begin{Declaration}
+  \KOption{headsepline}\PName{simple switch}\\
+  \KOption{footsepline}\PName{simple switch}
+\end{Declaration}%
+\BeginIndex{Option}{headsepline~=\PName{simple switch}}%
+\BeginIndex{Option}{footsepline~=\PName{simple switch}}%
+In\ChangedAt{v3.00}{\Class{scrbook}\and \Class{scrreprt}\and \Class{scrartcl}}
+order to have or not to have a rule separating the header from the text body
+use the option \Option{headsepline} with any value shown in
+\autoref{tab:truefalseswitch}, \autopageref{tab:truefalseswitch}). Activation
+of the option will result in such a separation line. Like this activation of
+option \Option{footsepline} switches on a rule above the foot
+line. Deactivation of any of the options will deactivate the corresponding
+rule.
+
+These options have no effect with the page styles \PValue{empty} and
+\PValue{plain}, because there is no header in this case. Such a line always
+has the effect of visually bringing header and text body closer together. That
+doesn't mean that the header must now be moved farther from the text
+body. Instead, the header should be considered as belonging to the text body
+for the purpose of page layout calculations. {\KOMAScript} takes this into
+account by automatically passing the option \Option{headinclude} to the
+\Package{typearea} package whenever the \Option{headsepline} option is
+used. \KOMAScript{} behaves similar with \Option{footinclude} using
+\Option{footsepline}. Package \Package{scrpage2} (see \autoref{cha:scrpage}
+adds additional features to this.%
+%
+\EndIndex{Option}{headsepline~=\PName{simple switch}}%
+\EndIndex{Option}{footsepline~=\PName{simple switch}}%
+
+\begin{Declaration}
+  \Macro{pagestyle}\PParameter{page style}\\
+  \Macro{thispagestyle}\Parameter{local page style}
+\end{Declaration}%
+\BeginIndex{Cmd}{pagestyle}%
+\BeginIndex{Cmd}{thispagestyle}%
+Usually one distinguishes four different page styles:
+\begin{description}
+\item[empty\BeginIndex{Pagestyle}{empty}] is the page
+  style with entirely empty headers and footers. In {\KOMAScript} this is
+  completely identical to the standard classes.
+\item[headings\BeginIndex{Pagestyle}{headings}] is the page style with running
+  headings in the header. These are headings for which titles are
+  automatically inserted into the header.
+  \OnlyAt{\Class{scrbook}\and\Class{scrreprt}}With the classes
+  \Class{scrbook}\IndexClass{scrbook} and
+  \Class{scrreprt}\IndexClass{scrreprt} the titles of chapters and sections
+  are repeated in the header for double-sided layout\,---\,with {\KOMAScript}
+  on the outer side, with the standard classes on the inner side.  The page
+  number is set on the outer side of the footer with {\KOMAScript}, with the
+  standard classes it is set on the inner side of the header.  In one-sided
+  layouts only the titles of the chapters are used and are, with
+  {\KOMAScript}, centered in the header. The page numbers are set centered in
+  the footer with {\KOMAScript}.
+  \OnlyAt{\Class{scrartcl}}\Class{scrartcl}\IndexClass{scrartcl} behaves
+  similarly, but starting a level deeper in the section hierarchy with
+  sections and subsections, because the chapter level does not exist in this
+  case.
+
+  While the standard classes automatically set running headings always
+  in capitals, {\KOMAScript} applies the style of the title. This has
+  several typographic reasons. Capitals as a decoration are actually
+  far too strong. If one applies them nevertheless, they should be set
+  in a one point smaller type size and with tighter spacing. The
+  standard classes do not take these points in consideration.
+
+  Beyond this {\KOMAScript} classes support rules below the head and above the
+  foot using options \Option{headsepline} and \Option{footsepline} which are
+  described above.
+\item[myheadings\BeginIndex{Pagestyle}{myheadings}] corresponds mostly to the
+  page style \PValue{headings}, but the running headings are not automatically
+  produced, but have to be defined by the user. The commands \Macro
+  {markboth}\IndexCmd{markboth} and \Macro{markright}\IndexCmd{markright} can
+  be used for that purpose (see below).
+\item[plain\BeginIndex{Pagestyle}{plain}] is the page style with empty header
+  and only a page number in the footer. With the standard classes this page
+  number is always centered in the footer. With {\KOMAScript} the page number
+  appears on double-sided\Index {double-sided} layout on the outer side of the
+  footer. The one-sided page style behaves like the standard setup.
+\end{description}
+
+The page style can be set at any time with the help of the \Macro{pagestyle}
+command and takes effect with the next page that is output. If\textnote{Hint!}
+you one uses \Macro{pagestyle} just before a command, that results in an
+implicit page break and if the new page style should be used at the resulting
+new page first, a \Macro{cleardoublepage} just before \Macro{pagestyle} will
+be useful. But usually one sets the page style only once at the beginning of
+the document or in the preamble.
+
+To\important{\Macro{thispagestyle}} change the page style of the current page
+only, one uses the \Macro{thispagestyle} command. This also happens
+automatically at some places in the document. For example, the instruction
+\Macro{thispagestyle}\PParameter{\Macro{chapterpagestyle}} is issued
+implicitly on the first page of a chapter.
+
+Please\textnote{Attention!} note that the change between automatic and manual
+running headings is no longer performed by page style changes when using the
+\Package{scrpage2} package, but instead via special instructions. The page
+styles \PValue{headings} and \PValue{myheadings} should not be used together
+with this package (see \autoref{cha:scrpage},
+\autopageref{desc:scrpage.pagestyle.useheadings}).%
+%
+\EndIndex{Pagestyle}{empty}% Darueber erfahren wir nun nichts mehr
+
+\BeginIndex[indexother]{}{font>style}%
+\BeginIndex{FontElement}{pageheadfoot}%
+\BeginIndex{FontElement}{pagefoot}%
+\BeginIndex{FontElement}{pagenumber}%
+In order to change the font style used in the header, footer or for the page
+number\ChangedAt{v2.8p}{%
+  \Class{scrbook}\and \Class{scrreprt}\and \Class{scrartcl}}%
+, please use the interface described in \autoref{sec:maincls.textmarkup},
+\autopageref{desc:maincls.cmd.setkomafont}. The same element is used for header
+and footer, which you can designate with
+\FontElement{pageheadfoot}\IndexFontElement{pageheadfoot}%
+\important{\FontElement{pageheadfoot}}. The element for
+the page number within the header or footer is called
+\FontElement{pagenumber}\IndexFontElement{pagenumber}%
+\important{\FontElement{pagenumber}}.
+The element \FontElement{pagefoot}\IndexFontElement{pagefoot}, that is
+additionally supported by the \KOMAScript{} classes, will be used only if
+a page style has been defined, that has text at the foot line, using package
+\Package{scrpage2}\IndexPackage{scrpage2} (see \autoref{cha:scrpage},
+\autopageref{desc:scrpage.fontelement.pagefoot}).
+
+The default settings can be found in
+\autoref{tab:maincls.defaultFontsHeadFoot}.%
+%
+\begin{table}
+%  \centering%
+  \KOMAoptions{captions=topbeside}%
+  \setcapindent{0pt}%
+%  \caption
+  \begin{captionbeside}
+    [{Default values for the elements of a page style}]
+    {\label{tab:maincls.defaultFontsHeadFoot}%
+      Default values for the elements of a page style}
+    [l]
+  \begin{tabular}[t]{ll}
+    \toprule
+    Element & Default value \\
+    \midrule
+    \FontElement{pagefoot}\IndexFontElement{pagefoot} &
+    \\
+    \FontElement{pageheadfoot}\IndexFontElement{pagefoothead} &
+    \Macro{normalfont}\Macro{normalcolor}\Macro{slshape} \\
+    \FontElement{pagenumber}\IndexFontElement{pagenumber} &
+    \Macro{normalfont}\Macro{normalcolor}\\
+    \bottomrule
+  \end{tabular}
+  \end{captionbeside}
+\end{table}
+%
+\begin{Example}
+  \leavevmode\phantomsection\label{sec:maincls.pageStyle.example}%
+  Assume that you want to set header and footer in a smaller type size
+  and in italics. However, the page number should not be set in
+  italics but bold. Apart from the fact that the result will look
+  horrible, you can obtain this as follows:
+\begin{lstcode}
+  \setkomafont{pageheadfoot}{%
+    \normalfont\normalcolor\itshape\small
+  }
+  \setkomafont{pagenumber}{\normalfont\bfseries}
+\end{lstcode}
+  If you want only that in addition to the default slanted variant a smaller
+  type size is used, it is sufficient to use the following:
+\begin{lstcode}
+  \addtokomafont{pagehead}{\small}
+\end{lstcode}
+  As you can see, the last example uses the element
+  \FontElement{pagehead}\important{\FontElement{pagehead}}. You can achieve
+  the same result using \PValue{pageheadfoot} instead (see
+  \autoref{tab:maincls.elementsWithoutText} on
+  \autopageref{tab:maincls.elementsWithoutText}).
+\end{Example}
+It is not possible to use these methods to force capitals to be used
+automatically for the running headings. For that, please use the
+\Package{scrpage2} package (see \autoref{cha:scrpage},
+\autopageref{desc:scrpage.option.markuppercase}).
+
+If you define your own page styles, the commands
+\Macro{usekomafont}\PParameter{pageheadfoot}, \Macro{usekomafont}\PParameter
+{pagenumber}, and \Macro{usekomafont}\PParameter{pagefoot} can be useful.  If
+you do not use the {\KOMAScript} package \Package{scrpage2} (see
+\autoref{cha:scrpage}) for that, but, for example, the package
+\Package{fancyhdr}\IndexPackage{fancyhdr} (see \cite{package:fancyhdr}), you
+can use these commands in your definitions.  Thereby you can remain compatible
+with {\KOMAScript} as much as possible. If you do not use these commands in
+your own definitions, changes like those shown in the previous examples have
+no effect. The package \Package{scrpage2}\IndexPackage {scrpage2} takes care
+to keep the maximum possible compatibility with other packages itself.
+%
+\EndIndex{FontElement}{pagenumber}%
+\EndIndex{FontElement}{pagefoot}%
+\EndIndex{FontElement}{pageheadfoot}%
+\EndIndex{Pagestyle}{plain}%
+\EndIndex{Cmd}{pagestyle}%
+\EndIndex{Cmd}{thispagestyle}%
+%
+\EndIndex[indexother]{}{font>style}%
+
+\begin{Declaration}
+  \Macro{markboth}\Parameter{left mark}\Parameter{right mark}\\
+  \Macro{markright}\Parameter{right mark}
+\end{Declaration}
+\BeginIndex{Cmd}{markboth}%
+\BeginIndex{Cmd}{markright}%
+At page style \Pagestyle{myheadings}\important{\Pagestyle{myheadings}}%
+\IndexPagestyle{myheadings} there's no automatic setting of the running head.
+Instead of this one would set it with help of commands \Macro{markboth} and
+\Macro{markright}. Thereby \PName{left mark} normally will be used at the head
+of even pages and \PName{right mark} at the heads of odd pages. At one-side
+printing only the \PName{right mark} exists. Using package
+\Package{scrpage2}\IndexPackage{scrpage2}\important{\Package{scrpage2}} the
+additional command
+\Macro{markleft}\IndexCmd{markleft}\important{\Macro{markleft}} exists.
+
+The commands may be used with other page style too. Combination with automatic
+running head, i.\,g., with page style \Pagestyle{headings}, limits the effect
+of the commands until the next automatic setting of the corresponding marks.%
+%
+\EndIndex{Cmd}{markright}%
+\EndIndex{Cmd}{markboth}%
+%
+\EndIndex{Pagestyle}{myheadings}%
+\EndIndex{Pagestyle}{headings}%
+
+\begin{Declaration}
+  \Macro{titlepagestyle}\\
+  \Macro{partpagestyle}\\
+  \Macro{chapterpagestyle}\\
+  \Macro{indexpagestyle}
+\end{Declaration}%
+\BeginIndex{Cmd}{titlepagestyle}\Index{title>page style}%
+\BeginIndex{Cmd}{partpagestyle}\Index{part>page style}%
+\BeginIndex{Cmd}{chapterpagestyle}\Index{chapter>page style}%
+\BeginIndex{Cmd}{indexpagestyle}\Index{index>page style}%
+For some pages a different page style is chosen with the help of the
+command \Macro{thispagestyle}. Which page style this actually is, is
+defined by these four macros, of which \Macro{partpagestyle} and
+\Macro{chapterpagestyle}\OnlyAt{\Class{scrbook}\and\Class{scrreprt}}
+are found only with classes \Class{scrbook} and \Class{scrreprt}, but
+not in \Class{scrartcl}. The default value for all four cases is
+\PValue{plain}. The meaning of these macros can be taken from
+\autoref{tab:specialpagestyles}.
+%
+\begin{table}
+  \centering
+  \caption{Macros to set up page style of special pages}
+  \label{tab:specialpagestyles}
+  \begin{desctabular}
+    \mentry{titlepagestyle}{Page style for a title page when using
+      \emph{in-page} titles.}%
+    \mentry{partpagestyle}{Page style for the pages with \Macro{part}
+      titles.}%
+    \mentry{chapterpagestyle}{Page style for the first page of a chapter.}%
+    \mentry{indexpagestyle}{Page style for the first page of the index.}%
+  \end{desctabular}
+\end{table}
+%
+The page styles can be redefined with the \Macro{renewcommand} macro.
+\begin{Example}
+  Assume that you want the pages with a \Macro{part} heading to have
+  no number. Then you can use the following command, for example in
+  the preamble of your document:
+\begin{lstcode}
+  \renewcommand*{\partpagestyle}{empty}
+\end{lstcode}
+  As mentioned previously on \autopageref{desc:maincls.pagestyle.empty},
+  the page style \PValue{empty} is exactly what is required in this
+  example. Naturally you can also use a user-defined page style.
+
+  Assume you have defined your own page style for initial chapter pages
+  with the package \Package{scrpage2} (see
+  \autoref{cha:scrpage}). You have given to this page style the
+  fitting name \PValue{chapter}. To actually use this style, you must
+  redefine the macro \Macro{chapterpagestyle} accordingly:
+\begin{lstcode}
+  \renewcommand*{\chapterpagestyle}{chapter}
+\end{lstcode}
+
+  Assume that you want that the table of contents\Index{table of
+    contents}\textnote{table of contents} of a book to have no page
+  numbers. However, everything after the table of contents should work again
+  with the page style \PValue{headings}, as well as with \PValue{plain} on
+  every first page of a chapter. You can use the following commands:
+\begin{lstcode}
+  \clearpage
+  \pagestyle{empty}
+  \renewcommand*{\chapterpagestyle}{empty}
+  \tableofcontents
+  \clearpage
+  \pagestyle{headings}
+  \renewcommand*{\chapterpagestyle}{plain}
+\end{lstcode}
+  Instead of the above you may do a local redefinition using a group. The
+  advantage will be that you don't need to know the current page style before
+  the change to switch back at the end.
+\begin{lstcode}
+  \clearpage
+  \begingroup
+    \pagestyle{empty}
+    \renewcommand*{\chapterpagestyle}{empty}
+    \tableofcontents
+    \clearpage
+  \endgroup
+\end{lstcode}
+
+  But\important{Attention!} notice that you never should put a numbered head
+  into a group. Otherwise you may get funny results with commands like
+  \Macro{label}.
+\end{Example}
+
+\begin{Explain}
+  Whoever thinks that it is possible to put running headings on the
+  first page of a chapter by using the command
+\begin{lstcode}
+  \renewcommand*{\chapterpagestyle}{headings}
+\end{lstcode}
+  should read more about the background of \Macro{rightmark} at
+  \autoref{sec:maincls-experts.addInfos},
+  \autopageref{desc:maincls-experts.cmd.rightmark}.
+\end{Explain}
+%
+\EndIndex{Cmd}{titlepagestyle}%
+\EndIndex{Cmd}{partpagestyle}%
+\EndIndex{Cmd}{chapterpagestyle}%
+\EndIndex{Cmd}{indexpagestyle}%
+
+\begin{Declaration}
+  \Macro{pagenumbering}\Parameter{numbering style}
+\end{Declaration}
+\BeginIndex{Cmd}{pagenumbering}%
+This command works the same way in {\KOMAScript} as in the standard
+classes. More precisely it is a feature neither of the standard classes nor of
+the \KOMAScript{} classes but of the {\LaTeX} kernel.  You can specify with
+this command the \PName{numbering style} of page numbers.
+
+The changes take effect immediately, hence starting with the
+page that contains the command. It is recommended to use
+\Macro{cleardoubleoddpage} to close the last page and start a new odd page
+before. The possible settings can be found in
+\autoref{tab:numberKind}.  
+
+Using\textnote{Attention!} the command \Macro{pagenumbering} also resets the
+page counter\Index{page>counter}\Index{page>number}.  Thus the page number of
+the next page which {\TeX} outputs will have the number 1 in the style
+\PName{numbering style}.
+%
+\begin{table}
+%  \centering
+  \KOMAoptions{captions=topbeside}%
+  \setcapindent{0pt}%
+%  \caption
+  \begin{captionbeside}
+    {\label{tab:numberKind}%
+      Available numbering styles of page numbers}
+  \begin{tabular}[t]{lll}
+    \toprule
+    numbering style & example & description \\
+    \midrule
+    \PValue{arabic} & 8 & Arabic numbers \\
+    \PValue{roman}  & viii & lower-case Roman numbers \\
+    \PValue{Roman}  & VIII & upper-case Roman numbers \\
+    \PValue{alph}   & h    & letters \\
+    \PValue{Alph}   & H    & capital letters \\
+    \bottomrule
+  \end{tabular}
+  \end{captionbeside}
+\end{table}
+%
+\EndIndex{Cmd}{pagenumbering}%
+%
+\EndIndex{}{page>style}
+
 
 \section{Interleaf Pages\protect\footnote{This
     section is still missing. Translators from German to English would be
@@ -981,38 +1356,6 @@ empty left page. The option \OptionValue{cleardoublepage}{empty} causes the
 styles are described in \autoref{sec:maincls.pageStyle}.%
 \EndIndex{Option}{cleardoublepage~=\PValue{current}}%
 \EndIndex{Option}{cleardoublepage~=\PName{page style}}%
-
-
-\begin{Declaration}
-  \KOption{headsepline}\PName{simple switch}\\
-  \KOption{footsepline}\PName{simple switch}
-\end{Declaration}%
-\BeginIndex{Option}{headsepline~=\PName{simple switch}}%
-\BeginIndex{Option}{footsepline~=\PName{simple switch}}%
-In order to have a line separating the header from the text body use the
-option \Option{headsepline} (see \autoref{tab:truefalseswitch},
-\autopageref{tab:truefalseswitch}). The option
-\OptionValue{headsepline}{false} has the reverse effect. These options have no
-effect with the page styles \PValue{empty} and \PValue{plain}, because there
-is no header in this case. Such a line always has the effect of visually
-bringing header and text body closer together. That doesn't mean that the
-header must now be moved farther from the text body. Instead, the header
-should be considered as belonging to the text body for the purpose of page
-layout calculations. {\KOMAScript} takes this into account by automatically
-passing the option \Option{headinclude} to the \Package{typearea} package
-whenever the \Option{headsepline} option is used.
-
-The presence of a line between text body and footer is controlled by the
-option \Option{footsepline}, that behaves like the corresponding header
-functions. Whenever a line is requested by the \Option{footsepline} option,
-the \Option{footinclude} option is automatically passed to the
-\Package{typearea} package. In contrast to \Option{headsepline},
-\Option{footsepline} takes effect when used together with the page style
-\PValue{plain}, because the \PValue{plain} style produces a page number in the
-footer.
-%
-\EndIndex{Option}{headsepline~=\PName{simple switch}}%
-\EndIndex{Option}{footsepline~=\PName{simple switch}}%
 
 
 \begin{Declaration}
@@ -1360,307 +1703,6 @@ style\Index[indexmain]{page>style}. In {\LaTeX} this means mostly the
 contents of headers and footers.
 
 \begin{Declaration}
-  \Macro{pagestyle}\PParameter{empty}\\
-  \XMacro{pagestyle}\PParameter{plain}\\
-  \XMacro{pagestyle}\PParameter{headings}\\
-  \XMacro{pagestyle}\PParameter{myheadings}\\
-  \Macro{thispagestyle}\Parameter{local page style}
-\end{Declaration}%
-\BeginIndex{Cmd}{pagestyle}%
-\BeginIndex{Cmd}{thispagestyle}%
-\BeginIndex{Pagestyle}{empty}%
-\BeginIndex{Pagestyle}{plain}%
-\BeginIndex{Pagestyle}{headings}%
-\BeginIndex{Pagestyle}{myheadings}%
-Usually one distinguishes four different page styles.
-\begin{description}
-\item[empty] is the page
-  style with entirely empty headers and footers. In {\KOMAScript} this is
-  completely identical to the standard classes.
-\item [plain] is the page style with empty header and only a page
-  number in the footer. With the standard classes this page number is
-  always centered in the footer. With {\KOMAScript} the page number
-  appears on double-sided\Index {double-sided} layout on the outer
-  side of the footer. The one-sided page style behaves like the
-  standard setup.
-\item[headings] is the page style with running headings in the
-  header. These are headings for which titles are automatically
-  inserted into the header.
-  \OnlyAt{\Class{scrbook}\and\Class{scrreprt}}With the classes
-  \Class{scrbook}\IndexClass{scrbook} and
-  \Class{scrreprt}\IndexClass{scrreprt} the titles of chapters and
-  sections are repeated in the header for double-sided
-  layout\,---\,with {\KOMAScript} on the outer side, with the standard
-  classes on the inner side.  The page number is set on the outer side
-  of the footer with {\KOMAScript}, with the standard classes it is
-  set on the inner side of the header.  In one-sided layouts only the
-  titles of the chapters are used and are, with {\KOMAScript},
-  centered in the header. The page numbers are set centered in the
-  footer with {\KOMAScript}.
-  \OnlyAt{\Class{scrartcl}}\Class{scrartcl}\IndexClass{scrartcl}
-  behaves similarly, but starting a level deeper in the section
-  hierarchy with sections and subsections, because the chapter level
-  does not exist in this case.
-
-  While the standard classes automatically set running headings always
-  in capitals, {\KOMAScript} applies the style of the title. This has
-  several typographic reasons. Capitals as a decoration are actually
-  far too strong. If one applies them nevertheless, they should be set
-  in a one point smaller type size and with tighter spacing. The
-  standard classes do not take these points in consideration.
-\item [myheadings] corresponds mostly to the page style
-  \PValue{headings}, but the running headings are not automatically
-  produced, but have to be defined by the user. The commands \Macro
-  {markboth}\IndexCmd{markboth} and
-  \Macro{markright}\IndexCmd{markright} can be used for that purpose.
-\end{description}
-Besides, the form of the page styles \PValue{headings} and
-\PValue{myheadings} is affected by each of the four class options
-\Option{headsepline}, \OptionValue{headsepline}{false}, \Option{footsepline} and
-\OptionValue{footsepline}{false} (see \autoref{sec:maincls.layoutOptions},
-\autopageref{desc:maincls.option.headsepline}).
-The page style starting with the current page is changed by the
-command \Macro{pagestyle}.  On the other hand \Macro{thispagestyle}
-changes only the style of the current page.
-
-The page style can be set at any time with the help of the
-\Macro{pagestyle} command and takes effect with the next page that is
-output. Usually one sets the page style only once at the beginning of
-the document or in the preamble. To change the page style of the
-current page only, one uses the \Macro{thispagestyle} command. This
-also happens automatically at some places in the document. For
-example, the instruction \Macro{thispagestyle}\PParameter{plain} is
-issued implicitly on the first page of a chapter.
-
-Please note that the change between automatic and manual running
-headings is no longer performed by page style changes when using the
-\Package{scrpage2} package, but instead via special instructions. The
-page styles \PValue{headings} and \PValue{myheadings} should not be
-used together with this package (see \autoref{cha:scrpage},
-\autopageref{desc:scrpage.pagestyle.useheadings}).
-%
-\EndIndex{Cmd}{pagestyle}%
-\EndIndex{Cmd}{thispagestyle}%
-\EndIndex{Pagestyle}{empty}%
-\EndIndex{Pagestyle}{plain}%
-\EndIndex{Pagestyle}{headings}%
-\EndIndex{Pagestyle}{myheadings}%
-
-\BeginIndex[indexother]{}{type style}%
-In order to change the type style used in the header, footer or for
-the page number\ChangedAt{v2.8p}{%
-  \Class{scrbook}\and\Class{scrreprt}\and\Class{scrartcl}}%
-, please use the interface described in
-\autoref{sec:maincls.font}. The same element is used for header and
-footer, which you can designate equivalently with
-\FontElement{pagehead}\IndexFontElement{pagehead} or
-\FontElement{pagefoot}\IndexFontElement{pagefoot}.  The element for
-the page number within the header or footer is called
-\FontElement{pagenumber}\IndexFontElement{pagenumber}. The default
-settings can be found in \autoref{tab:maincls.defaultFontsHeadFoot}.
-%
-%
-\begin{table}
-  \centering%
-  \caption{Default values for the elements of a page style}
-  \begin{tabular}{ll}
-    \toprule
-    Element & Default value \\
-    \midrule
-    \FontElement{pagefoot}\IndexFontElement{pagefoot} &
-    \Macro{normalfont}\Macro{normalcolor}\Macro{slshape} \\
-    \FontElement{pagehead}\IndexFontElement{pagehead} &
-    \Macro{normalfont}\Macro{normalcolor}\Macro{slshape} \\
-    \FontElement{pagenumber}\IndexFontElement{pagenumber} &
-    \Macro{normalfont}\Macro{normalcolor}\\
-    \bottomrule
-  \end{tabular}
-  \label{tab:maincls.defaultFontsHeadFoot}
-\end{table}
-%
-\begin{Example}
-  \phantomsection\label{sec:maincls.pageStyle.example}%
-  Assume that you want to set header and footer in a smaller type size
-  and in italics. However, the page number should not be set in
-  italics but bold. Apart from the fact that the result will look
-  horrible, you can obtain this as follows:
-\begin{lstcode}
-  \setkomafont{pagehead}{%
-    \normalfont\normalcolor\itshape\small
-  }
-  \setkomafont{pagenumber}{\normalfont\bfseries}
-\end{lstcode}
-  If you want  only that in addition to the default slanted variant a
-  smaller type size is used, it is sufficient to use the following:
-\begin{lstcode}
-  \addtokomafont{pagefoot}{\small}
-\end{lstcode}
-  As you can see, the last example uses the element
-  \FontElement{pagefoot}. You can achieve the same result using
-  \PValue{pagehead} instead (see
-  \autoref{tab:maincls.elementsWithoutText} on
-  \autopageref{tab:maincls.elementsWithoutText}).
-\end{Example}
-It is not possible to use these methods to force capitals to be used
-automatically for the running headings. For that, please use the
-\Package{scrpage2} package (see \autoref{cha:scrpage},
-\autopageref{desc:scrpage.option.markuppercase}).
-
-If you define your own page styles, the commands
-\Macro{usekomafont}\PParameter{pagehead} and
-\Macro{usekomafont}\PParameter {pagenumber} can be useful.  If you do
-not use the {\KOMAScript} package \Package{scrpage2} (see
-\autoref{cha:scrpage}) for that, but, for example, the package
-\Package{fancyhdr}\IndexPackage{fancyhdr} (see
-\cite{package:fancyhdr}), you can use these commands in your
-definitions.  Thereby you can remain compatible with {\KOMAScript} as
-much as possible. If you do not use these commands in your own
-definitions, changes like those shown in the previous examples have no
-effect. The packages \Package{scrpage}\IndexPackage{scrpage} and
-\Package{scrpage2}\IndexPackage {scrpage2} take care to keep the
-maximum possible compatibility with other packages.
-%
-\EndIndex[indexother]{}{type style}%
-
-
-\begin{Declaration}
-  \Macro{titlepagestyle}\\
-  \Macro{partpagestyle}\\
-  \Macro{chapterpagestyle}\\
-  \Macro{indexpagestyle}
-\end{Declaration}%
-\BeginIndex{Cmd}{titlepagestyle}%
-\BeginIndex{Cmd}{partpagestyle}%
-\BeginIndex{Cmd}{chapterpagestyle}%
-\BeginIndex{Cmd}{indexpagestyle}%
-For some pages a different page style is chosen with the help of the
-command \Macro{thispagestyle}. Which page style this actually is, is
-defined by these four macros, of which \Macro{partpagestyle} and
-\Macro{chapterpagestyle}\OnlyAt{\Class{scrbook}\and\Class{scrreprt}}
-are found only with classes \Class{scrbook} and \Class{scrreprt}, but
-not in \Class{scrartcl}. The default value for all four cases is
-\PValue{plain}. The meaning of these macros can be taken from
-\autoref{tab:specialpagestyles}.
-%
-\begin{table}
-  \centering
-  \caption{Macros to set up page style of special pages}
-  \label{tab:specialpagestyles}
-  \begin{desctabular}
-    \mentry{titlepagestyle}{Page style for a title page when using
-      \emph{in-page} titles.}%
-    \mentry{partpagestyle}{Page style for the pages with \Macro{part}
-      titles.}%
-    \mentry{chapterpagestyle}{Page style for the first page of a chapter.}%
-    \mentry{indexpagestyle}{Page style for the first page of the index.}%
-  \end{desctabular}
-\end{table}
-%
-The page styles can be redefined with the \Macro{renewcommand} macro.
-\begin{Example}
-  Assume that you want the pages with a \Macro{part} heading to have
-  no number. Then you can use the following command, for example in
-  the preamble of your document:
-\begin{lstcode}
-  \renewcommand*{\partpagestyle}{empty}
-\end{lstcode}
-As mentioned previously on \autopageref{desc:maincls.pagestyle.empty},
-the page style \PValue{empty} is exactly what is required in this
-example. Naturally you can also use a user-defined page style.
-
-  Assume you have defined your own page style for initial chapter pages
-  with the package \Package{scrpage2} (see
-  \autoref{cha:scrpage}). You have given to this page style the
-  fitting name \PValue{chapter}. To actually use this style, you must
-  redefine the macro \Macro{chapterpagestyle} accordingly:
-\begin{lstcode}
-  \renewcommand*{\chapterpagestyle}{chapter}
-\end{lstcode}
-
-  Assume that you want that the table of contents of a book to
-  have no page numbers. However,  everything after the table of
-  contents should work
-  again with the page style \PValue{headings}, as well as with
-  \PValue{plain} on every first page of a chapter. You can use the
-  following commands:
-\begin{lstcode}
-  \clearpage
-  \pagestyle{empty}
-  \renewcommand*{\chapterpagestyle}{empty}
-  \tableofcontents
-  \clearpage
-  \pagestyle{headings}
-  \renewcommand*{\chapterpagestyle}{plain}
-\end{lstcode}
-  Instead of the above you may do a local redefinition using a group. The
-  advantage will be that you don't need to know the current page style before
-  the change to switch back at the end.
-\begin{lstcode}
-  \clearpage
-  \begingroup
-    \pagestyle{empty}
-    \renewcommand*{\chapterpagestyle}{empty}
-    \tableofcontents
-    \clearpage
-  \endgroup
-\end{lstcode}
-  But notice that you never should put a numbered head into a group. Otherwise
-  you may get funny results with commands like \Macro{label}.
-\end{Example}
-
-
-
-\begin{Explain}
-  Whoever thinks that it is possible to put running headings on the
-  first page of a chapter by using the command
-\begin{lstcode}
-  \renewcommand*{\chapterpagestyle}{headings}
-\end{lstcode}
-  will be surprised at the results.
-  For sure, the page style \PValue{headings} is thereby applied to the
-  initial page of a chapter. But nevertheless no running headings appear
-  when using the \Option{openright} option.
-  The reason for this behaviour can be found in the {\LaTeX}
-  core. There, the command \Macro{rightmark}, that generates the marks
-  for right-hand pages, is defined with;
-\begin{lstcode}
-  \let\@rightmark\@secondoftwo
-  \def\rightmark{\expandafter\@rightmark
-    \firstmark\@empty\@empty}
-\end{lstcode}
-  The right-hand mark is set with \Macro{firstmark}. \Macro{firstmark}
-  contains the  left-hand  and right-hand  marks that were first set
-  for a page. Within \Macro{chapter}, \Macro{markboth} is used to set
-  the left mark to the chapter header and the right mark to empty.
-  Hence, the first right
-  mark on  a chapter beginning with a right-hand page is empty. Therefore,
-  the running heading is also empty on those pages.
-
-  You could redefine \Macro{rightmark} in the preamble so that the
-  last mark on the page is used instead of the first:
-\begin{lstcode}
-  \makeatletter
-  \renewcommand*{\rightmark}{%
-    \expandafter\@rightmark\botmark\@empty\@empty}
-  \makeatother
-\end{lstcode}
-  This would however cause the running heading of the first page of a
-  chapter to use the title of the last section in the page. This is
-  confusing and should be avoided.
-
-  It is also confusing (and hence should be avoided) to have as
-  running heading of the first page of a chapter the chapter title
-  instead of the the section title. Therefore, the current behavior
-  should be considered to be correct.
-\end{Explain}
-%
-\EndIndex{Cmd}{titlepagestyle}%
-\EndIndex{Cmd}{partpagestyle}%
-\EndIndex{Cmd}{chapterpagestyle}%
-\EndIndex{Cmd}{indexpagestyle}%
-
-
-\begin{Declaration}
   \Macro{clearpage}\\
   \Macro{cleardoublepage}\\
   \Macro{cleardoublestandardpage}\\
@@ -1702,120 +1744,6 @@ the active option.
 \EndIndex{Cmd}{cleardoubleemptypage}%
 
 
-\begin{Declaration}
-  \Macro{ifthispageodd}\Parameter{true}\Parameter{false}
-  \Macro{ifthispagewasodd} \PName{true}\Macro{else} \PName{false}\Macro{fi}
-\end{Declaration}%
-\BeginIndex{Cmd}{ifthispageodd}%
-\BeginIndex{Cmd}{ifthispagewasodd}%
-\begin{Explain}%
-  A peculiarity of {\LaTeX} consists of the fact that it is not
-  possible to determine on which page the current text will fall. It
-  is also difficult to say whether the current page has an odd or an
-  even page number. Now some will argue that there is, nevertheless,
-  the {\TeX} test macro \Macro{ifodd} which one needs only to apply to
-  the current page counter. However, this is an error. At the time of
-  the evaluation of such a test {\LaTeX} does not know at all whether
-  the text just processed will be typeset on the current page or only
-  on the next. The page breaks take place not while reading the
-  paragraph, but only in the \emph{output} routine of
-  {\LaTeX}. However, at that moment a command of the form
-  \verb|\ifodd\value{page}| would already have been completely
-  evaluated.
-
-  To find out reliably whether a text falls on an even or odd
-  page, one must usually work with a label and a page reference to
-  this label. One must also take special precautionary measures during
-  the first {\LaTeX} run, when the label is not yet known.
-\end{Explain}
-If one wants to find out with {\KOMAScript} whether a text falls on an
-even or odd page, one can use the \Macro {ifthispageodd} command. The
-\PName{true} argument is executed only if the command falls on an odd
-page.  Otherwise the \PName{false} argument is executed.
-
-\begin{Explain}
-  More precisely stated, the question is not where the text is, but
-  whether a page reference to a label placed in this location would
-  refer to an odd or an even page.
-\end{Explain}
-\begin{Example}
-  Assume that you want to indicate if an odd or even page is
-  output. This could be achieved with the command:
-\begin{lstcode}
-  This is a page with an \ifthispageodd{odd}{even}
-  page number.
-\end{lstcode}
-  The output would then be:
-  \begin{quote}
-    This is a page with an \ifthispageodd{odd}{even}
-    page number.
-  \end{quote}
-\end{Example}
-
-Because the \Macro{ifthispageodd} command uses a mechanism that is
-very similar to a label and a reference to it, at least two {\LaTeX}
-runs are required after every text modification. Only then the
-decision is correct. In the first run a heuristic is used to make the
-first choice.
-
-
-\begin{Explain}
-  There are situations where the \Macro{ifthispageodd} command never
-  leads to the correct result. Suppose that the command is used within
-  a box. A box is set by {\LaTeX} always as a whole. No page breaks
-  take place inside. Assume further that the \PName{true} part is very
-  big, but the \PName{false} part is empty. If we suppose further that
-  the box with the \PName {false} part still fits on the current, even
-  page, but that with the \PName{true} part it does not.  Further
-  assume that {\KOMAScript} heuristically decides for the first run
-  that the \PName{true} part applies. The decision is wrong and is
-  revised in the next run. The \PName{false} part is thereby
-  processed, instead of the \PName{true} part. The decision must again
-  be revised in the next run and so on.
-
-  These cases are rare. Nevertheless it should not be said that I have
-  not pointed out that they are possible.
-
-  Sometimes you need to know the state of the last decision. This may be done
-  using the expert command \Macro{ifthispagewasodd}. This is either same like
-  \Macro{iftrue} or \Macro{iffalse} and may be used like those.
-\end{Explain}
-%
-\EndIndex{Cmd}{ifthispageodd}%
-\EndIndex{Cmd}{ifthispagewasodd}%
-
-\begin{Declaration}
-  \Macro{pagenumbering}\Parameter{numbering style}
-\end{Declaration}
-\BeginIndex{Cmd}{pagenumbering}%
-This command works the same way in {\KOMAScript} as in the standard
-classes. More precisely it is a command from the {\LaTeX} kernel.  You
-can specify with this command the \PName{numbering style} of page
-numbers.  The changes take effect immediately, hence starting with the
-page that contains the command.  The possible settings can be found in
-\autoref{tab:numberKind}.  Using the command \Macro{pagenumbering}
-also resets the page counter\Index{page>counter}\Index{page>number}.
-Thus the page number of the next page which {\TeX} outputs will have
-the number 1 in the style \PName{numbering style}.
-%
-\begin{table}
-  \centering
-  \caption{Available numbering styles of page numbers}
-  \begin{tabular}{lll}
-    \toprule
-    numbering style & example & description \\
-    \midrule
-    \PValue{arabic} & 8 & Arabic numbers \\
-    \PValue{roman}  & viii & lower-case Roman numbers \\
-    \PValue{Roman}  & VIII & upper-case Roman numbers \\
-    \PValue{alph}   & h    & letters \\
-    \PValue{Alph}   & H    & capital letters \\
-    \bottomrule
-  \end{tabular}
-  \label{tab:numberKind}
-\end{table}
-%
-\EndIndex{Cmd}{pagenumbering}
 
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

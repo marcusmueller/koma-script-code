@@ -279,3 +279,109 @@ option \Option{version}, \autoref{sec:maincls.compatibilityOptions},
 \autopageref{desc:maincls.option.version}). The mechanism also does
 not work if the commands to generate the table of contents are
 redefined, for example, by the use of the package \Package{tocloft}.
+
+\begin{Declaration}
+  \Macro{ifthispageodd}\Parameter{true}\Parameter{false}
+  \Macro{ifthispagewasodd} \PName{true}\Macro{else} \PName{false}\Macro{fi}
+\end{Declaration}%
+\BeginIndex{Cmd}{ifthispageodd}%
+\BeginIndex{Cmd}{ifthispagewasodd}%
+\begin{Explain}%
+  A peculiarity of {\LaTeX} consists of the fact that it is not
+  possible to determine on which page the current text will fall. It
+  is also difficult to say whether the current page has an odd or an
+  even page number. Now some will argue that there is, nevertheless,
+  the {\TeX} test macro \Macro{ifodd} which one needs only to apply to
+  the current page counter. However, this is an error. At the time of
+  the evaluation of such a test {\LaTeX} does not know at all whether
+  the text just processed will be typeset on the current page or only
+  on the next. The page breaks take place not while reading the
+  paragraph, but only in the \emph{output} routine of
+  {\LaTeX}. However, at that moment a command of the form
+  \verb|\ifodd\value{page}| would already have been completely
+  evaluated.
+
+  To find out reliably whether a text falls on an even or odd
+  page, one must usually work with a label and a page reference to
+  this label. One must also take special precautionary measures during
+  the first {\LaTeX} run, when the label is not yet known.
+
+  More precisely stated, the question is not where the text is, but
+  whether a page reference to a label placed in this location would
+  refer to an odd or an even page.
+
+  There are situations where the \Macro{ifthispageodd} command never
+  leads to the correct result. Suppose that the command is used within
+  a box. A box is set by {\LaTeX} always as a whole. No page breaks
+  take place inside. Assume further that the \PName{true} part is very
+  big, but the \PName{false} part is empty. If we suppose further that
+  the box with the \PName {false} part still fits on the current, even
+  page, but that with the \PName{true} part it does not.  Further
+  assume that {\KOMAScript} heuristically decides for the first run
+  that the \PName{true} part applies. The decision is wrong and is
+  revised in the next run. The \PName{false} part is thereby
+  processed, instead of the \PName{true} part. The decision must again
+  be revised in the next run and so on.
+
+  These cases are rare. Nevertheless it should not be said that I have
+  not pointed out that they are possible.
+
+  Sometimes you need to know the state of the last decision. This may be done
+  using the expert command \Macro{ifthispagewasodd}. This is either same like
+  \Macro{iftrue} or \Macro{iffalse} and may be used like those.
+\end{Explain}
+%
+\EndIndex{Cmd}{ifthispageodd}%
+\EndIndex{Cmd}{ifthispagewasodd}%
+
+\begin{Declaration}
+  \Macro{chapterpagestyle}\\
+  \Macro{markright}
+\end{Declaration}
+\BeginIndex{Cmd}{chapterpagestyle}%
+\BeginIndex{Cmd}{markright}%
+\begin{Explain}
+  Whoever thinks that it is possible to put running headings on the
+  first page of a chapter by using the command
+\begin{lstcode}
+  \renewcommand*{\chapterpagestyle}{headings}
+\end{lstcode}
+  will be surprised at the results.
+  For sure, the page style \PValue{headings} is thereby applied to the
+  initial page of a chapter. But nevertheless no running headings appear
+  when using the \Option{openright} option.
+  The reason for this behaviour can be found in the {\LaTeX}
+  core. There, the command \Macro{rightmark}, that generates the marks
+  for right-hand pages, is defined with;
+\begin{lstcode}
+  \let\@rightmark\@secondoftwo
+  \def\rightmark{\expandafter\@rightmark
+    \firstmark\@empty\@empty}
+\end{lstcode}
+  The right-hand mark is set with \Macro{firstmark}. \Macro{firstmark}
+  contains the  left-hand  and right-hand  marks that were first set
+  for a page. Within \Macro{chapter}, \Macro{markboth} is used to set
+  the left mark to the chapter header and the right mark to empty.
+  Hence, the first right
+  mark on  a chapter beginning with a right-hand page is empty. Therefore,
+  the running heading is also empty on those pages.
+
+  You could redefine \Macro{rightmark} in the preamble so that the
+  last mark on the page is used instead of the first:
+\begin{lstcode}
+  \makeatletter
+  \renewcommand*{\rightmark}{%
+    \expandafter\@rightmark\botmark\@empty\@empty}
+  \makeatother
+\end{lstcode}
+  This would however cause the running heading of the first page of a
+  chapter to use the title of the last section in the page. This is
+  confusing and should be avoided.
+
+  It is also confusing (and hence should be avoided) to have as
+  running heading of the first page of a chapter the chapter title
+  instead of the the section title. Therefore, the current behavior
+  should be considered to be correct.
+\end{Explain}
+\EndIndex{Cmd}{markright}%
+\EndIndex{Cmd}{chapterpagestyle}
