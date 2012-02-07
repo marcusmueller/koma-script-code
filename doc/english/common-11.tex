@@ -40,13 +40,15 @@
 %
 % ----------------------------------------------------------------------
 %
-% Abs‰tze, die mehreren Kapiteln der KOMA-Script-Anleitung gemeinsam sind
+% Absaetze, die mehreren Kapiteln der KOMA-Script-Anleitung gemeinsam sind
 % Verwaltet von Markus Kohm
 %
 % ======================================================================
 
-\ProvidesFile{common-11.tex}[2009/01/04 KOMA-Script guide (common paragraphs)]
-\translator{Gernot Hassenpflug}
+\ProvidesFile{common-11.tex}[2012/02/07 KOMA-Script guide (common paragraphs)]
+\translator{Gernot Hassenpflug and Markus Kohm}
+
+% Date of the translated German file: 2012/01/01
 
 \makeatletter
 \@ifundefined{ifCommonmaincls}{\newif\ifCommonmaincls}{}%
@@ -56,32 +58,60 @@
 \makeatother
 
 
-\ifIgnoreThis\else
+\ifIgnoreThis %+++++++++++++++++++++++++++++++++++++++++++++ nicht maincls +
+\else %------------------------------------------------------- nur maincls -
 \begin{Declaration}
-  \Macro{deffootnote}\OParameter{Markenbreite}\Parameter{Einzug}%
-                     \Parameter{Absatzeinzug}\Parameter{Markendefinition}\\
-  \Macro{deffootnotemark}\Parameter{Markendefinition}\\
+  \Macro{deffootnote}\OParameter{mark width}\Parameter{indent}%
+                     \Parameter{parindent}\Parameter{definition}\\
+  \Macro{deffootnotemark}\Parameter{definition}\\
   \Macro{thefootnotemark}
 \end{Declaration}%
 \BeginIndex{Cmd}{deffootnote}%
 \BeginIndex{Cmd}{deffootnotemark}%
 \BeginIndex{Cmd}{thefootnotemark}%
-Die \KOMAScript-Klassen setzen Fuﬂnoten etwas anders als die Standardklassen.
-Die Fuﬂnotenmarkierung im Text, also die Referenzierung der Fuﬂnote, erfolgt
-wie bei den Standardklassen durch kleine hochgestellte Zahlen.  Genauso werden
-die Markierungen auch in der Fuﬂnote selbst wiedergegeben. Sie werden dabei
-rechtsb¸ndig in einem Feld der Breite \PName{Markenbreite} gesetzt. Die erste
-Zeile der Fuﬂnote schlieﬂt direkt an das Feld der Markierung an.
+Footnotes are formatted slightly differently in {\KOMAScript} to in the
+standard classes. As in the standard classes the footnote mark in the text is
+depicted using a small superscripted number. The same formatting is used in
+the footnote itself. The mark in the footnote is type-set right-aligned in a
+box with width \PName{mark width}. The first line of the footnote follows
+directly.
 
-Alle weiteren Zeilen werden um den Betrag von \PName{Einzug} eingezogen
-ausgegeben. Wird der optionale Parameter \PName{Markenbreite} nicht angegeben,
-dann entspricht er dem Wert von \PName{Einzug}.  Sollte die Fuﬂnote aus
-mehreren Abs‰tzen bestehen, dann wird die erste Zeile eines Absatzes
-zus‰tzlich mit dem Einzug der Grˆﬂe \PName{Absatzeinzug} versehen.
+All following lines will be indented by the length of \PName{indent}. If the
+optional parameter \PName{mark width} is not specified, it defaults to
+\PName{indent}.  If the footnote consists of more than one paragraph, then the
+first line of a paragraph is indented, in addition to \PName{indent}, by the
+value of \PName{parindent}.
+
+\hyperref[fig:maincls.deffootnote]{Figure~\ref*{fig:maincls.deffootnote}} %
+\IfCommon{scrlttr2}{at \autopageref{fig:maincls.deffootnote} }%
+illustrates the layout parameters. The default configuration of the
+{\KOMAScript} classes is:
+\begin{lstcode}
+  \deffootnote[1em]{1.5em}{1em}
+    {\textsuperscript{\thefootnotemark}}
+\end{lstcode}
+\Macro{textsuperscript} controls both the superscript and the smaller
+font size. Command \Macro{thefootnotemark} is the current footnote mark
+without any formatting.%
+\IfCommon{scrextend}{ % <-- Leerzeichen ist wichtig!
+  Package \Package{scrextend} in contrast to this does not change the default
+  footnote settings of the used class. Loading the package does not change any
+  type style of footnote marks or footnote text in general. You have to copy
+  the above shown source to use the default
+  settings of the \KOMAScript{} classes with \Package{scrextend}. This may be
+  done immediately after loading package \Package{scrextend}.}%
 
 \IfCommon{maincls}{%
 \begin{figure}
-  \centering\setlength{\unitlength}{1mm}
+%  \centering
+  \KOMAoption{captions}{bottombeside}
+  \setcapindent{0pt}%
+  \begin{captionbeside}
+    [{Parameters that control the footnote layout}]%
+    {\label{fig:maincls.deffootnote}\hspace{0pt plus 1ex}%
+      Parameters that control the footnote layout}%
+    [l]
+  \setlength{\unitlength}{1mm}
   \begin{picture}(100,22)
     \thinlines
     % frame of following paragraph
@@ -99,8 +129,8 @@ zus‰tzlich mit dem Einzug der Grˆﬂe \PName{Absatzeinzug} versehen.
     % box of the footnote mark
     \put(0,16.5){\framebox(14.5,4.5){\mbox{}}}
     % description of paragraphs
-    \put(45,16){\makebox(0,0)[l]{\small\textsf{erster Absatz einer Fuﬂnote}}}
-    \put(45,5){\makebox(0,0)[l]{\small\textsf{folgender Absatz einer Fuﬂnote}}}
+    \put(45,16){\makebox(0,0)[l]{\textsf{first paragraph of a footnote}}}
+    \put(45,5){\makebox(0,0)[l]{\textsf{next paragraph of a footnote}}}
     % help lines
     \thicklines
     \multiput(0,0)(0,3){7}{\line(0,1){2}}
@@ -109,143 +139,156 @@ zus‰tzlich mit dem Einzug der Grˆﬂe \PName{Absatzeinzug} versehen.
     \put(2,7){\vector(1,0){3}}
     \put(5,7){\line(1,0){5}}
     \put(15,7){\vector(-1,0){5}}
-    \put(15,7){\makebox(0,0)[l]{\small\PName{Absatzeinzug}}}
-    %
+    \put(15,7){\makebox(0,0)[l]{\small\PName{parindent}}}
+    % 
     \put(-3,13){\vector(1,0){3}}
     \put(0,13){\line(1,0){5}}
     \put(10,13){\vector(-1,0){5}}
-    \put(10,13){\makebox(0,0)[l]{\small\PName{Einzug}}}
-    %
+    \put(10,13){\makebox(0,0)[l]{\small\PName{indent}}}
+    % 
     \put(-3,19){\vector(1,0){3}}
     \put(0,19){\line(1,0){14.5}}
     \put(19.5,19){\vector(-1,0){5}}
-    \put(19.5,19){\makebox(0,0)[l]{\small\PName{Markenbreite}}}
+    \put(19.5,19){\makebox(0,0)[l]{\small\PName{mark width}}}
   \end{picture}
-  \caption{Parameter f¸r die Darstellung der Fuﬂnoten}
-  \label{fig:maincls.deffootnote}
+  \end{captionbeside}
 \end{figure}}
-
-\autoref{fig:maincls.deffootnote} %
-\IfCommon{scrlttr2}{auf \autopageref{fig:maincls.deffootnote} }%
-veranschaulicht die verschiedenen Parameter%
-\IfCommon{maincls}{nochmals}%
-. Die Voreinstellung in den \KOMAScript-Klassen entspricht folgender
-Definition:
-% Umbruchkorrektur: listings korrigieren!
-\begin{lstcode}[belowskip=\dp\strutbox]
-  \deffootnote[1em]{1.5em}{1em}{\textsuperscript{\thefootnotemark}}
-\end{lstcode}
-Dabei wird mit Hilfe von \Macro{textsuperscript} sowohl die Hochstellung als
-auch die Wahl einer kleineren Schrift erreicht. \Macro{thefootnotemark} ist
-die aktuelle Fuﬂnotenmarke ohne jegliche Formatierung.%
-\IfCommon{scrextend}{ Das Paket \Package{scrextend} ¸berl‰sst hingegen in der
-  Voreinstellung das Setzen der Fuﬂnoten der verwendeten Klasse. Das Laden des
-  Pakets allein sollte daher noch zu keinerlei ƒnderungen bei der Formatierung
-  der Fuﬂnoten oder der Fuﬂnotenmarken f¸hren. Zur ‹bernahme der
-  Voreinstellungen der \KOMAScript-Klassen muss man vielmehr obige Einstellung
-  selbst vornehmen. Dazu kann obige Code-Zeile beispielsweise unmittelbar nach
-  dem Laden von \Package{scrextend} eingef¸gt werden.}%
 
 \BeginIndex{FontElement}{footnote}%
 \BeginIndex{FontElement}{footnotelabel}%
-Auf\ChangedAt{v2.8q}{\Class{scrbook}\and \Class{scrreprt}\and
-  \Class{scrartcl}\and \Class{scrlttr2}} die Fuﬂnote einschlieﬂlich der
-Markierung findet auﬂerdem die f¸r das Element \FontElement{footnote}
-eingestellte Schriftart Anwendung. Die % Umbruchkorrekturvarianten
-\IfCommon{maincls}{davon abweichende }%
-Schriftart der Markierung kann %
-\IfNotCommon{maincls}{jedoch }%
-mit Hilfe der Anweisungen \Macro{setkomafont} und \Macro{addtokomafont} (siehe
-\autoref{sec:\csname label@base\endcsname.textmarkup},
-\autopageref{desc:\csname label@base\endcsname.cmd.setkomafont}) f¸r das
-Element \FontElement{footnotelabel} %
-\IfCommon{scrlttr2}{davon abweichend }%
-eingestellt werden. Siehe hierzu auch %
+The\ChangedAt{v2.8q}{%
+  \Class{scrbook}\and\Class{scrreprt}\and\Class{scrartcl}} font element
+\FontElement{footnote}\important{\FontElement{footnote}} determines the font
+of the footnote including the footnote mark. Using the element
+\FontElement{footnotelabel}\important{\FontElement{footnotelabel}} the font of
+the footnote mark can be changed separately with the commands
+\Macro{setkomafont} and \Macro{addtokomafont} (see \autoref{sec:\csname
+  label@base\endcsname.textmarkup}, \autopageref{desc:\csname
+  label@base\endcsname.cmd.setkomafont}). Please refer also to
 \IfNotCommon{scrextend}{\autoref{tab:\csname
     label@base\endcsname.elementsWithoutText}, \autopageref{tab:\csname
     label@base\endcsname.elementsWithoutText}}%
 \IfCommon{scrextend}{\autoref{tab:maincls.elementsWithoutText},
   \autopageref{tab:maincls.elementsWithoutText}}%
-. Voreingestellt ist jeweils keine Umschaltung der Schrift.%
-\IfCommon{scrextend}{ Die Elemente finden bei scrextend jedoch nur dann
-  Anwendung, wenn die Fuﬂnoten mit diesem Paket gesetzt werden, also
-  \Macro{deffootnote} verwendet wurde.}%
-\EndIndex{FontElement}{footnotelabel}%
-\EndIndex{FontElement}{footnote}%
+. Default setting is no change in the font.%
+\IfCommon{scrextend}{ % <-- Dieses Leerzeichen ist wichtig!
+  With \Package{scrextend} the elements may change the fonts only if the
+  footnotes are handled by the package, i.\,g., after using
+  \Macro{deffootnote}.}
 
-Die Fuﬂnotenmarkierung im Text wird getrennt von der Markierung vor der
-Fuﬂnote definiert. Dies geschieht mit der Anweisung
-\Macro{deffootnotemark}. Voreingestellt ist hier:
+\BeginIndex{FontElement}{footnotereference}%
+The footnote mark in the text is defined separately from the mark in
+front of the actual footnote. This is done with
+\Macro{deffootnotemark}. Default setting is:
 % Umbruchkorrektur: listings korrigieren!
 \begin{lstcode}[belowskip=\dp\strutbox]
-  \deffootnotemark{\textsuperscript{\thefootnotemark}}
+  \deffootnotemark{%
+    \textsuperscript{\thefootnotemark}}
 \end{lstcode}
-Dabei findet\ChangedAt{v2.8q}{\Class{scrbook}\and \Class{scrreprt}\and
-  \Class{scrartcl}} die Schriftart f¸r das Element
-\FontElement{footnotereference}\IndexFontElement{footnotereference} Anwendung
-(siehe %
+In the above\ChangedAt{v2.8q}{%
+  \Class{scrbook}\and\Class{scrreprt}\and\Class{scrartcl}} the font
+for the element
+\FontElement{footnotereference}\important{\FontElement{footnotereference}} is
+applied (see %
 \IfNotCommon{scrextend}{\autoref{tab:\csname
     label@base\endcsname.elementsWithoutText}, \autopageref{tab:\csname
     label@base\endcsname.elementsWithoutText}}%
 \IfCommon{scrextend}{\autoref{tab:maincls.elementsWithoutText},
   \autopageref{tab:maincls.elementsWithoutText}}%
-). Die Markierungen im Text und in der Fuﬂnote selbst sind also identisch. Die
-Schriftart kann mit Hilfe der Anweisungen \Macro{setkomafont} und
-\Macro{addtokomafont} (siehe \autoref{sec:\csname
+). %
+Thus the footnote
+marks in the text and in the footnote itself are identical. The font
+can be changed with the commands \Macro{setkomafont} and
+\Macro{addtokomafont} (see \autoref{sec:\csname
   label@base\endcsname.textmarkup}, \autopageref{desc:\csname
-  label@base\endcsname.cmd.setkomafont}) jedoch ge‰ndert werden%
-\IfCommon{scrextend}{, sobald die Anweisung \Macro{deffootnotemark} verwendet
-  wird}%
-.
+  label@base\endcsname.cmd.setkomafont})%
+\IfCommon{scrextend}{ after usage of \Macro{deffootnotemark}}.
 
 \ifCommonscrlttr\else
 \begin{Example}
   \phantomsection\label{desc:maincls.cmd.deffootnote.example}%
-  Relativ h‰ufig wird gew¸nscht, dass die Markierung in der Fuﬂnote selbst
-  weder hochgestellt noch kleiner gesetzt wird. Dabei soll sie aber nicht
-  direkt am Text kleben, sondern geringf¸gig davor stehen. Dies kann zum einen
-  wie folgt erreicht werden:
-  \begin{lstcode}
+  A\textnote{Hint!} feature often asked for is footnote marks which are
+  neither in superscript nor in a smaller font size. They should not touch the
+  footnote text but be separated by a small space. This can be accomplished as
+  follows:
+\begin{lstcode}
   \deffootnote{1em}{1em}{\thefootnotemark\ }
-  \end{lstcode}
-  Die Fuﬂnotenmarkierung einschlieﬂlich dem folgenden Leerzeichen wird also
-  rechtsb¸ndig in eine Box der Breite 1\Unit{em} gesetzt.  Die folgenden
-  Zeilen der Fuﬂnote werden gegen¸ber dem linken Rand ebenfalls um 1\Unit{em}
-  eingezogen.
+\end{lstcode}
+  The footnote mark and the following space are therefore set
+  right-aligned into a box of width 1\Unit{em}. The following lines of
+  the footnote text are also indented by 1\Unit{em} from the left
+  margin.
   
-  Eine weitere, oft gefragte Formatierung sind linksb¸ndige
-  Fuﬂnotenmarkierungen in der Fuﬂnote. Diese kˆnnen mit folgender Definition
-  erhalten werden:
-  \begin{lstcode}
+  Another\textnote{Hint!} often requested footnote layout is left-aligned
+  footnote marks. These can be obtained with:
+\begin{lstcode}
   \deffootnote{1.5em}{1em}{%
       \makebox[1.5em][l]{\thefootnotemark}}
-  \end{lstcode}
+\end{lstcode}
   
-  Sollen jedoch die Fuﬂnoten insgesamt lediglich in einer anderen Schriftart,
-  beispielsweise serifenlos gesetzt werden, so ist dies ganz einfach mit Hilfe
-  der Anweisungen \Macro{setkomafont} und \Macro{addtokomafont} (siehe
+  If you want however only to change the font for all footnotes, for example
+  to sans serif, you can solve this problem simply by using the commands
+  \Macro{setkomafont} and \Macro{addtokomafont} (see
   \autoref{sec:maincls.textmarkup},
-  \autopageref{desc:maincls.cmd.setkomafont}) zu lˆsen:
-  \begin{lstcode}
+  \autopageref{desc:maincls.cmd.setkomafont}:
+\begin{lstcode}
   \setkomafont{footnote}{\sffamily}
-  \end{lstcode}
-\end{Example}
-Wie die Beispiele zeigen, ermˆglicht {\KOMAScript} mit dieser einfachen
-Benutzerschnittstelle eine groﬂe Vielfalt unterschiedlicher
-Fuﬂnotenformatierungen.%
+\end{lstcode}
+\end{Example}%
+\IfNotCommon{scrextend}{As demonstrated with the examples above, the simple
+  user interface of {\KOMAScript} provides a great variety of different
+  footnote formattings.}%
 \fi%
-\IfCommon{scrlttr2}{Beispiele finden Sie in \autoref{sec:maincls.footnotes},
-  \autopageref{desc:maincls.cmd.deffootnote}.}%
+\IfCommon{scrlttr2}{%
+  Examples may be found at \autoref{sec:maincls.footnotes}, from
+  \autopageref{desc:maincls.cmd.deffootnote} onwards.}%
+%
+\EndIndex{FontElement}{footnotereference}%
+\EndIndex{FontElement}{footnotelabel}%
+\EndIndex{FontElement}{footnote}%
 %
 \EndIndex{Cmd}{deffootnote}%
 \EndIndex{Cmd}{deffootnotemark}%
 \EndIndex{Cmd}{thefootnotemark}%
-\IfNotCommon{scrlttr2}{\EndIndex{}{Fussnoten=Fuﬂnoten}}
-\fi% IgnoreThis
+
+
+\begin{Declaration}
+  \Macro{setfootnoterule}\OParameter{thickness}\Parameter{length}%
+\end{Declaration}%
+\BeginIndex{Cmd}{setfootnoterule}%
+Generally\ChangedAt{v3.06}{\Class{scrlttr2}\and \Class{scrbook}\and
+  \Class{scrreprt}\and \Class{scrartcl}\and \Package{scrextend}} a horizontal
+rule will be placed between the text area and the footnote area. But normally
+this rule is not as long as the width of the typing area. With Command
+\Macro{setfootnoterule} you may change the thickness and the width of that
+rule. Thereby the parameters \PName{thickness} and \PName{length} will be
+evaluated not at definition time but when setting the rule itself. If
+optional argument \PName{thickness} ha been omitted the thickness of the rule
+will not be changed. Empty arguments \PName{thickness} or \PName{length} are
+also allowed and do not change the corresponding parameter. Using implausible
+values may result in warning messages not only setting the arguments but also
+when \KOMAScript{} uses the parameters.
+
+\BeginIndex{FontElement}{footnoterule}%
+With element \FontElement{footnoterule}\important{\FontElement{footnoterule}}
+the color \ChangedAt{v3.07}{\Class{scrlttr2}\and \Class{scrbook}\and
+  \Class{scrreprt}\and \Class{scrartcl}\and \Package{scrextend}} of the rule
+may be changed using the commands \Macro{setkomafont} and
+\Macro{addtokomafont} (see \autoref{sec:\csname
+  label@base\endcsname.textmarkup}, \autopageref{desc:\csname
+  label@base\endcsname.cmd.setkomafont}). Default is no change of font or
+color. For color changes a color package like
+\Package{xcolor}\IndexPackage{xcolor}\important{\Package{xcolor}} would be
+needed.%
+%
+\EndIndex{FontElement}{footnoterule}%
+\EndIndex{Cmd}{setfootnoterule}%
+\IfNotCommon{scrlttr2}{\EndIndex{}{footnotes}}
+\fi %**************************************************** Ende nur maincls *
 
 
 %%% Local Variables:
 %%% mode: latex
-%%% coding: iso-latin-1
+%%% coding: us-ascii
 %%% TeX-master: "../guide"
 %%% End:
