@@ -1156,9 +1156,7 @@ the command \Macro{pagenumbering} from \autoref{sec:maincls.pagestyle},
 \EndIndex{}{matter>back}%
 
 
-\section{Structuring of Documents\protect\footnote{This
-    section is still missing. Translators from German to English would be
-    welcome!}}
+\section{Structuring of Documents}
 \label{sec:maincls.structure}
 
 Structuring of documents means to divide them into parts, chapters, sections
@@ -2061,6 +2059,380 @@ of element \FontElement{minisec} is empty, so the default of the element
 %
 \EndIndex{Cmd}{minisec}%
 
+\begin{Declaration}
+  \Macro{raggedsection}\\
+  \Macro{raggedpart}
+\end{Declaration}%
+\BeginIndex{Cmd}{raggedsection}%
+\BeginIndex{Cmd}{raggedpart}%
+In the standard classes\textnote{\KOMAScript{} vs. standard classes} headings
+are set as justified text. That means that hyphenated words can occur and
+headings with more than one line are stretched up to the text border. This is
+a rather uncommon approach in typography. {\KOMAScript} therefore formats the
+headings left aligned with hanging indentation using \Macro{raggedsection}
+with the definition:
+\begin{lstcode}[belowskip=\dp\strutbox]
+  \newcommand*{\raggedsection}{\raggedright}
+\end{lstcode}
+This command can be redefined with \Macro{renewcommand}.
+\begin{Example}
+  You prefer justified headings, so you write in the preamble of your document:
+\begin{lstcode}
+  \renewcommand*{\raggedsection}{}
+\end{lstcode}
+  or more compactly:
+\begin{lstcode}
+  \let\raggedsection\relax
+\end{lstcode}
+  You will get a formatting of the headings which is very close to that
+  of the standard classes. It will become even closer when you combine
+  this change with the change of the element
+  \FontElement{disposition}\IndexFontElement{disposition} mentioned
+  above.
+\end{Example}
+In difference to all others the headings of parts (\Macro{part}) will be
+horizontally centered instead of set ragged right. This is because command
+\Macro{raggedpart} is defined as:
+\begin{lstcode}[belowskip=\dp\strutbox]
+  \let\raggedpart\centering
+\end{lstcode}
+You may also redefine this using \Macro{renewcommand} too.
+\begin{Example}
+  You don't want different alignment at headings of \Macro{part}. So you
+  put
+\begin{lstcode}
+  \renewcommand*{\raggedpart}{\raggedsection}
+\end{lstcode}
+  into the preamble of your document. In\textnote{Hint!} this case and in
+  opposite to the example above \Macro{let} has not been used, because
+  \Macro{let} would give \Macro{raggedpart} the current meaning of
+  \Macro{raggedsection}. Further changes of \Macro{raggedsection} would then
+  stay disregarded at the usage of \Macro{raggedpart}. Doing the redefinition
+  using \Macro{renewcommand} give \Macro{raggedpart} the meaning of
+  \Macro{raggedsection} not at definition time, but each time
+  \Macro{raggedpart} will be used.
+\end{Example}%
+%
+\EndIndex{Cmd}{raggedpart}%
+\EndIndex{Cmd}{raggedsection}%
+
+
+\begin{Declaration}
+  \Macro{partformat}\\
+  \Macro{chapterformat}\\
+  \Macro{othersectionlevelsformat}\Parameter{sectioning
+    name}\Parameter{}\Parameter{counter output}\\
+  \Macro{autodot}
+\end{Declaration}%
+\BeginIndex{Cmd}{partformat}\Index{part>number}%
+\BeginIndex{Cmd}{chapterformat}\Index{chapter>number}%
+\BeginIndex{Cmd}{othersectionlevelsformat}\Index{section>number}%
+\BeginIndex{Cmd}{autodot}%
+{\KOMAScript} has added a further logical level on the top of
+\Macro{the\PName{sectioning name}} to the output of the sectioning
+numbers. The counters for the respective heading are not merely output. They
+are formatted using the commands \Macro{partformat}, \Macro{chapterformat},
+and the command \Macro{othersectionlevelsformat}, that expects three
+arguments.  \OnlyAt{\Class{scrbook}\and\Class{scrreprt}}Of course the command
+\Macro{chapterformat} like \Macro{thechapter} does not exist in the class
+\Class{scrartcl} but only in the classes \Class{scrbook} and \Class{scrreprt}.
+
+As described for option \Option{numbers}\important{\Option{numbers}} at the
+beginning of this section (see \autopageref{desc:maincls.option.numbers}),
+periods in section numbers should be handled for the German-speaking region
+according to the rules given in \cite{DUDEN}. The command \Macro{autodot} in
+{\KOMAScript} ensures that these rules are being followed. In all levels
+except for \Macro{part} a dot is followed by a further \Macro{enskip}. This
+corresponds to a horizontal skip of 0.5\Unit{em}.
+
+The command \Macro{othersectionlevelsformat} takes as first parameter the
+name of the section level, such as \PValue{section},
+\PValue{subsection}, \PValue{subsection},
+\PValue{subsubsection}, \PValue{paragraph} and \PValue{subparagraph}. The
+third parameter should be the output of the corresponding counter, usually
+\Macro{thesection}, \Macro{thesubsection}, \Macro{thesubsubsection},
+\Macro{theparagraph}, or \Macro{thesubparagraph}.
+
+Per default therefore, only the levels
+\Macro{part} and \Macro{chapter} have formatting commands of their
+own, while all other section levels are covered by one general
+formatting command. This has historical reasons. At the time that
+Werner Lemberg suggested a suitable extension of {\KOMAScript} for his
+\Package{CJK} package, only this differentiation was needed. Users should
+ignore the third argument of \Macro{othersectionlevelsformat} completely.
+
+The formatting commands can be redefined using \Macro{renewcommand} to
+fit them to your personal needs. The following original definitions
+are used by the {\KOMAScript} classes:
+\begin{lstcode}
+  \newcommand*{\partformat}{\partname~\thepart\autodot}
+  \newcommand*{\chapterformat}{%
+    \chapappifchapterprefix{\ }\thechapter\autodot\enskip}
+  \newcommand*{\othersectionlevelsformat}[3]{%
+    #3\autodot\enskip}
+\end{lstcode}
+
+\begin{Example}
+  Assume that when using \Macro{part} you do not want the word
+  ``Part'' written in front of the part number.  You could use the
+  following command in the preamble of your document:
+\begin{lstcode}
+  \renewcommand*{\partformat}{\thepart\autodot}
+\end{lstcode}
+  Strictly speaking, you could do without \Macro{autodot} at this point and
+  insert a fixed dot instead. As \Macro{part} is numbered with roman numerals,
+  according to \cite{DUDEN} a period has to be applied. However, you thereby
+  give up the possibility to use one of the options
+  \OptionValue{numbers}{endperiod} and \OptionValue{numbers}{noendperiod} and
+  optionally depart from the rules. More details concerning class options can
+  be found at \autopageref{desc:maincls.option.numbers}.
+  
+  An additional possibility could be to place the section numbers in the
+  left margin in such a way that the heading text is left aligned with
+  the surrounding text.  This can be accomplished with:
+\begin{lstcode}
+  \renewcommand*{\othersectionlevelsformat}[3]{%
+      \llap{\#3\autodot\enskip}}
+\end{lstcode}
+  The little known {\TeX} command \Macro{llap} in the definition above
+  puts its argument left of the current position without changing the
+  position thereby. A much better {\LaTeX} solution would be:
+\begin{lstcode}
+  \renewcommand*{\othersectionlevelsformat}[3]{%
+    \makebox[0pt][r]{%
+      #3\autodot\enskip}}
+\end{lstcode}
+  See \cite{latex:usrguide} for more information about the optional arguments
+  of \Macro{makebox}.
+\end{Example}
+%
+\EndIndex{Cmd}{partformat}%
+\EndIndex{Cmd}{chapterformat}%
+\EndIndex{Cmd}{othersectionlevelsformat}%
+\EndIndex{Cmd}{autodot}%
+
+
+\begin{Declaration}
+  \Macro{chapappifchapterprefix}\Parameter{additional text}\\
+  \Macro{chapapp}
+\end{Declaration}%
+\BeginIndex{Cmd}{chapappifchapterprefix}%
+\BeginIndex{Cmd}{chapapp}%
+These\OnlyAt{\Class{scrbook}\and\Class{scrreprt}}%
+\ChangedAt{v2.8o}{\Class{scrbook}\and\Class{scrreprt}} two commands
+are not only used internally by {\KOMAScript} but are also provided to
+the user. Later it will be shown how they can be used for example to
+redefine other commands. 
+
+Using the layout option
+\OptionValue{chapterprefix}{true}\important{\Option{chapterprefix}} (see
+\autopageref{desc:maincls.option.chapterprefix})
+\Macro{chapappifchapterprefix} outputs the word
+``Chapter''\Index{chapter>heading} in the main part of the document in the
+current language, followed by \PName{additional text}. In the
+appendix\Index{appendix}, the word ``Appendix'' in the current
+language is output instead, followed by \PName{additional text}. If the
+option \OptionValue{chapterprefix}{false} is set, then nothing is output.
+
+The command \Macro{chapapp} always outputs the word ``Chapter'' or
+``Appendix''.  In this case the selection of option \Option{chapterprefix} has
+no effect.
+
+Since chapters only exist in the classes \Class{scrbook} and
+\Class{scrreprt} these commands only exist in these classes.%
+%
+\EndIndex{Cmd}{chapappifchapterprefix}%
+\EndIndex{Cmd}{chapapp}%
+
+
+\begin{Declaration}
+  \Macro{chaptermark}\Parameter{running head}\\
+  \Macro{sectionmark}\Parameter{running head}\\
+  \Macro{subsectionmark}\Parameter{running head}\\
+  \Macro{chaptermarkformat}\\
+  \Macro{sectionmarkformat}\\
+  \Macro{subsectionmarkformat}
+\end{Declaration}%
+\BeginIndex{Cmd}{chaptermark}%
+\BeginIndex{Cmd}{sectionmark}%
+\BeginIndex{Cmd}{subsectionmark}%
+\BeginIndex{Cmd}{chaptermarkformat}%
+\BeginIndex{Cmd}{sectionmarkformat}%
+\BeginIndex{Cmd}{subsectionmarkformat}%
+\begin{Explain}%
+  As mentioned in \autoref{sec:maincls.pagestyle} the page style
+  \PValue{headings} works with automatic running
+  heads\Index{running head}. For this, the commands
+  \Macro{chaptermark} and \Macro{sectionmark}, or \Macro{sectionmark}
+  and \Macro{subsectionmark}, respectively, are defined. Every
+  structuring command (\Macro{chapter}, \Macro{section} \dots)
+  automatically carries out the respective \Macro{\dots mark} command.
+  The parameter passed contains the text of the section
+  heading\Index{heading}. The respective section number is added
+  automatically in the \Macro{\dots mark} command. The formatting is
+  done according to the section level with one of the three commands
+  \Macro{chaptermarkformat}, \Macro{sectionmarkformat} or
+  \Macro{subsectionmarkformat}.
+
+  \OnlyAt{\Class{scrbook}\and\Class{scrreprt}}Of course there is no
+  command \Macro{chaptermark} or \Macro{chaptermarkformat} in
+  \Class{scrartcl}. \OnlyAt{\Class{scrartcl}}Accordingly,
+  \Macro{subsectionmark} and \Macro{subsectionmarkformat} exist only
+  in \Class{scrartcl}. This changes when you use the
+  \Package{scrpage2} package (see \autoref{cha:scrpage}).\par
+\end{Explain}
+Similar to \Macro{chapterformat} and \Macro{othersectionlevelsformat},
+the commands \Macro{chaptermarkformat} (not in \Class{scrartcl}),
+\Macro{sectionmarkformat} and \Macro{subsectionmarkformat} (only in
+\Class{scrartcl}) define the formatting of the sectioning numbers in
+the automatic running heads. They can be adapted to your personal
+needs with \Macro{renewcommand}. The original definitions for the
+{\KOMAScript} classes are:
+\begin{lstcode}
+  \newcommand*{\chaptermarkformat}{%
+    \chapappifchapterprefix{\ }\thechapter\autodot\enskip}
+  \newcommand*{\sectionmarkformat}{\thesection\autodot\enskip}
+  \newcommand*{\subsectionmarkformat}{%
+    \thesubsection\autodot\enskip}
+\end{lstcode}
+\begin{Example}
+  Suppose you want to prepend the word ``Chapter'' to the chapter
+  number in the running heading. For example you could insert the
+  following definition in the preamble of your document :
+\begin{lstcode}
+  \renewcommand*{\chaptermarkformat}{%
+    \chapapp~\thechapter\autodot\enskip}
+\end{lstcode}
+\end{Example}
+As you can see, both the commands \Macro{chapappifchapterprefix} and
+\Macro{chapapp} explained above are used here.%
+%
+\EndIndex{Cmd}{chaptermark}%
+\EndIndex{Cmd}{sectionmark}%
+\EndIndex{Cmd}{subsectionmark}%
+\EndIndex{Cmd}{chaptermarkformat}%
+\EndIndex{Cmd}{sectionmarkformat}%
+\EndIndex{Cmd}{subsectionmarkformat}%
+
+
+\begin{Declaration}
+  \Counter{secnumdepth}
+\end{Declaration}%
+\BeginIndex{Counter}{secnumdepth}\BeginIndex{}{numbering}%
+Per default, in the classes \Class{scrbook}\IndexClass{scrbook} and
+\Class{scrreprt}\IndexClass{scrreprt} the section levels from
+\Macro{part}\IndexCmd{part}\IndexCmd{chapter}\IndexCmd{section} down
+to \Macro{subsection}\IndexCmd{subsection} and in the class
+\Class{scrartcl}\IndexClass{scrartcl} the levels from \Macro{part}
+down to \Macro{subsubsection}\IndexCmd{subsubsection} are numbered.
+This is controlled by the {\LaTeX} counter \Counter{secnumdepth}. The
+value \(-\)1 represents \Macro{part}, 0 the level \Macro{chapter},
+and so on. By defining, incrementing or decrementing this counter you
+can determine down to which level the headings are numbered. The same
+applies in the standard classes. Please refer also to the explanation
+concerning the counter \Counter{tocdepth} in
+\autoref{sec:maincls.toc},
+\autopageref{desc:maincls.counter.tocdepth}.
+%
+\EndIndex{Counter}{secnumdepth}\EndIndex{}{numbering}
+
+
+\begin{Declaration}
+  \Macro{setpartpreamble}%
+  \OParameter{position}\OParameter{width}\Parameter{preamble}\\
+  \Macro{setchapterpreamble}%
+  \OParameter{position}\OParameter{width}\Parameter{preamble}
+\end{Declaration}%
+\BeginIndex{Cmd}{setpartpreamble}%
+\BeginIndex{Cmd}{setchapterpreamble}%
+Parts\OnlyAt{\Class{scrbook}\and
+  \Class{scrreprt}}\Index{part>preamble}\Index{chapter>preamble} and chapters
+in {\KOMAScript} can be started with a \PName{preamble}. This is particularly
+useful when you are using a two column layout with the class option
+\Option{twocolumn}\IndexOption{twocolumn}, since the heading together with the
+\PName{preamble} is always set in a one column layout.  The \PName{preamble}
+can comprise more than one paragraph. The command to output the
+\PName{preamble} has to be placed before the respective \Macro{part},
+\Macro{addpart}, \Macro{chapter} or \Macro{addchap} command.
+\begin{Example}
+  You are writing a report about the condition of a company. You
+  organize the report in such a way that every department gets its own
+  partial report.  Every one of these parts should be introduced by an
+  abstract on the corresponding title page. You could write the
+  following:
+\begin{lstcode}
+  \setpartpreamble{%
+    \begin{abstract}
+      This is a filler text. It serves merely to demonstrate the
+      capabilities of {\KOMAScript}. If you read this text, you will
+      get no information.
+    \end{abstract}
+  }
+  \part{Department for Word Processing}
+\end{lstcode}
+  Depending on the settings for the heading font size\Index{heading}
+  (see \autopageref{desc:maincls.option.headings}) and the options for
+  the \Environment{abstract} environment\IndexEnv{abstract} (see
+  \autoref{sec:maincls.abstract},
+  \autopageref{desc:maincls.option.abstract}), the result would look
+  similar to:
+  \begin{ShowOutput}\centering
+    {\LARGE\usekomafont{disposition} Part III.\par\vspace{20pt}}
+    {\LARGE\usekomafont{disposition} Department for Word Processing\strut\par}
+    \begin{quote}\small
+      \vspace{4ex}
+      \begin{center}
+        \usekomafont{disposition}\abstractname
+      \end{center}
+      \vspace{2ex}       
+      This is a filler text. It serves merely to demonstrate the
+      capabilities of {\KOMAScript}. If you read this text, you will
+      get no information.
+    \end{quote}
+  \end{ShowOutput}
+\end{Example}
+Please\textnote{Attention!} note that it is \emph{you} who is responsible for
+the spaces between the heading, preamble and the following text. Please note
+also that there is no \Environment{abstract} environment in the class
+\Class{scrbook} (see \autoref{sec:maincls.abstract},
+\autopageref{desc:maincls.env.abstract}).
+
+The\ChangedAt{v2.8p}{\Class{scrbook}\and\Class{scrreprt}} first
+optional argument \PName{position} determines the position at which
+the preamble is placed with the help of one or two letters. For the
+vertical placement there are two possibilities at present:
+\begin{labeling}[~--]{\quad\PValue{o}}\itemsep=0pt
+\item [\quad\texttt{o}] above the heading
+\item [\quad\texttt{u}] below the heading
+\end{labeling}
+You can insert one preamble above and another below a heading. For the
+horizontal placement you have the choice between three alignments:
+\begin{labeling}[~--]{\quad\PValue{o}}\itemsep=0pt
+\item [\quad\texttt{l}] left-aligned
+\item [\quad\texttt{r}] right-aligned
+\item [\quad\texttt{c}] centered
+\end{labeling}
+However, this does not output the text of the \PName{preamble} in such
+a manner, but inserts a box whose width is determined by the second
+optional argument \PName{width}. If you leave out this second argument
+the whole text width is used. In that case the option for horizontal
+positioning will have no effect. You can combine exactly one letter
+from the vertical with one letter from the horizontal positioning.
+
+A more often usage of \Macro{setchapterpreamble} would be something like a
+smart slogan or dictum to a heading. The command
+\Macro{dictum}\IndexCmd{dictum}, that may be used for this, will be described
+at the next section. You will also find an example there.
+
+Please note\textnote{Attention!} that a above the chapter headings placed
+\PName{preamble} will be set into the already existing vertical space above
+the heading. The heading will not be moved down. It is you, who is responsible
+that the preamble is small enough and the space is sufficient. See also
+\Macro{chapterheadstartvskip} in \autoref{sec:maincls-experts.experts},
+\autopageref{desc:maincls-experts.cmd.chapterheadstartvskip} for this.%
+%
+\EndIndex{Cmd}{setpartpreamble}%
+\EndIndex{Cmd}{setchapterpreamble}%
 
 
 \section{Dicta\protect\footnote{This section is still missing. Translators
@@ -2545,349 +2917,6 @@ information as well.
 
 There are several commands to structure a document into parts, chapters,
 sections and so on.
-
-
-
-\begin{Declaration}
-  \Macro{raggedsection}
-\end{Declaration}%
-\BeginIndex{Cmd}{raggedsection}%
-In the standard classes headings are set as justified text. That means
-that hyphenated words can occur and headings with more than one line
-are stretched up to the text border. This is a rather uncommon
-approach in typography. {\KOMAScript} therefore formats the headings
-left aligned with hanging indentation using \Macro{raggedsection} with
-the definition:
-\begin{lstcode}
-  \newcommand*{\raggedsection}{\raggedright}
-\end{lstcode}
-This command can be redefined with \Macro{renewcommand}.
-\begin{Example}
-  You prefer justified headings, so you write in the preamble of your document:
-\begin{lstcode}
-  \renewcommand*{\raggedsection}{}
-\end{lstcode}
-  or more compactly:
-\begin{lstcode}
-  \let\raggedsection\relax
-\end{lstcode}
-You will get a formatting of the headings which is very close to that
-of the standard classes. It will become even closer when you combine
-this change with the change of the element
-\FontElement{disposition}\IndexFontElement{disposition} mentioned
-above.
-\end{Example}
-%
-\EndIndex{Cmd}{raggedsection}%
-
-
-\begin{Explain}%
-\begin{Declaration}
-  \Macro{partformat}\\
-  \Macro{chapterformat}\\
-  \Macro{othersectionlevelsformat}\Parameter{section name}\\
-  \Macro{autodot}
-\end{Declaration}%
-\BeginIndex{Cmd}{partformat}%
-\BeginIndex{Cmd}{chapterformat}%
-\BeginIndex{Cmd}{othersectionlevelsformat}%
-\BeginIndex{Cmd}{autodot}%
-As you might know, for every counter in {\LaTeX} there is a command
-\Macro{the}\PName{countername}, which outputs the value of the
-counter. Depending on the class the counter for a particular level
-starting from \Macro{section} (\Class{book}, \Class{scrbook},
-\Class{report}, \Class{scrreprt}) or \Macro{subsection}
-(\Class{article}, \Class{scrartcl}) is composed of the counter for the
-next higher level followed by a dot and the Arabic number of the
-\PName{countername} of the respective level.\par
-\end{Explain}
-
-{\KOMAScript} has added a further logical level to the output of the
-section number. The counters for the respective heading are not merely
-output. They are formatted using the commands \Macro{partformat},
-\Macro{chapterformat} and \Macro{othersectionlevelsformat}.
-\OnlyAt{\Class{scrbook}\and\Class{scrreprt}}Of course the command
-\Macro{chapterformat} like \Macro{thechapter} does not exist in the
-class \Class{scrartcl} but only in the classes \Class{scrbook} and
-\Class{scrreprt}.
-
-As described in \autoref{sec:maincls.formattingOptions},
-\autopageref{desc:maincls.option.numbers}, dots in section
-numbers should be handled for the German-speaking region according to
-the rules given in \cite{DUDEN}. The command \Macro{autodot} in
-{\KOMAScript} ensures that these rules are being followed. In all
-levels except for \Macro{part} a dot is followed by a further
-\Macro{enskip}. This corresponds to a horizontal skip of
-0.5\Unit{em}.
-
-The command \Macro{othersectionlevelsformat} takes as a parameter the
-name of the section level, such as ``\PName{section}'',
-``\PName{subsection}'' \dots{} Per default therefore, only the levels
-\Macro{part} and \Macro{chapter} have formatting commands of their
-own, while all other section levels are covered by one general
-formatting command. This has historical reasons. At the time that
-Werner Lemberg suggested a suitable extension of {\KOMAScript} for his
-\Package{CJK} package, only this differentiation was needed.
-
-The formatting commands can be redefined using \Macro{renewcommand} to
-fit them to your personal needs. The following original definitions
-are used by the {\KOMAScript} classes:
-\begin{lstcode}
-  \newcommand*{\partformat}{\partname~\thepart\autodot}
-  \newcommand*{\chapterformat}{%
-    \chapappifchapterprefix{\ }\thechapter\autodot\enskip}
-  \newcommand*{\othersectionlevelsformat}[1]{%
-    \csname the#1\endcsname\autodot\enskip}
-\end{lstcode}
-
-\begin{Example}
-  Assume that when using \Macro{part} you do not want the word
-  ``Part'' written in front of the part number.  You could use the
-  following command in the preamble of your document:
-\begin{lstcode}
-  \renewcommand*{\partformat}{\thepart\autodot}
-\end{lstcode}
-Strictly speaking, you could do without \Macro{autodot} at this point
-and insert a fixed dot instead. As \Macro{part} is numbered with roman
-numerals, according to \cite{DUDEN} a dot has to be applied. However,
-you thereby give up the possibility to use one of the options
-\OptionValue{numbers}{enddot} and \OptionValue{numbers}{noenddot} and optionally
-depart from the rules. More details concerning class options can be
-found in \autoref{sec:maincls.formattingOptions},
-\autopageref{desc:maincls.option.numbers}.
-  
-An additional possibility could be to place the section numbers in the
-left margin in such a way that the heading text is left aligned with
-the surrounding text.  This can be accomplished with:
-\begin{lstcode}
-  \renewcommand*{\othersectionlevelsformat}[1]{%
-      \llap{\csname the#1\endcsname\autodot\enskip}}
-\end{lstcode}
-The little known {\TeX} command \Macro{llap} in the definition above
-puts its argument left of the current position without changing the
-position thereby. A much better {\LaTeX} solution would be:
-\begin{lstcode}
-  \renewcommand*{\othersectionlevelsformat}[1]{%
-    \makebox[0pt][r]{%
-      \csname the#1\endcsname\autodot\enskip}}
-\end{lstcode}
-  See \cite{latex:usrguide} for more information about the optional arguments
-  of \Macro{makebox}.
-\end{Example}
-%
-\EndIndex{Cmd}{partformat}%
-\EndIndex{Cmd}{chapterformat}%
-\EndIndex{Cmd}{othersectionlevelsformat}%
-\EndIndex{Cmd}{autodot}%
-
-
-\begin{Declaration}
-  \Macro{chapappifchapterprefix}\Parameter{additional text}\\
-  \Macro{chapapp}
-\end{Declaration}%
-\BeginIndex{Cmd}{chapappifchapterprefix}%
-\BeginIndex{Cmd}{chapapp}%
-These\OnlyAt{\Class{scrbook}\and\Class{scrreprt}}%
-\ChangedAt{v2.8o}{\Class{scrbook}\and\Class{scrreprt}} two commands
-are not only used internally by {\KOMAScript} but are also provided to
-the user. Later it will be shown how they can be used for example to
-redefine other commands. Using the layout option
-\Option{chapterprefix} (see \autoref{sec:maincls.layoutOptions},
-\autopageref{desc:maincls.option.chapterprefix})
-\Macro{chapappifchapterprefix} outputs the word
-``Chapter''\Index{chapter} in the main part of the document in the
-current language, followed by \PName{additional text}. In the
-appendix\Index{appendix}, the word ``Appendix'' in the current
-language is output instead, followed by \PName{additional text}. If the
-option \OptionValue{chapterprefix}{false} is set, then nothing is output.
-
-The command \Macro{chapapp} always outputs the word ``Chapter'' or
-``Appendix''.  In this case the options \Option{chapterprefix} and
-\OptionValue{chapterprefix}{false} have no effect.
-
-Since chapters only exist in the classes \Class{scrbook} and
-\Class{scrreprt} these commands only exist in these classes.
-%
-\EndIndex{Cmd}{chapappifchapterprefix}%
-\EndIndex{Cmd}{chapapp}%
-
-
-\begin{Declaration}
-  \Macro{chaptermark}\Parameter{Running heading}\\
-  \Macro{sectionmark}\Parameter{Running heading}\\
-  \Macro{subsectionmark}\Parameter{Running heading}\\
-  \Macro{chaptermarkformat}\\
-  \Macro{sectionmarkformat}\\
-  \Macro{subsectionmarkformat}
-\end{Declaration}%
-\BeginIndex{Cmd}{chaptermark}%
-\BeginIndex{Cmd}{sectionmark}%
-\BeginIndex{Cmd}{subsectionmark}%
-\BeginIndex{Cmd}{chaptermarkformat}%
-\BeginIndex{Cmd}{sectionmarkformat}%
-\BeginIndex{Cmd}{subsectionmarkformat}%
-\begin{Explain}%
-  As mentioned in \autoref{sec:maincls.pageStyle} the page style
-  \PValue{headings} works with automatic running
-  headings\Index{running heading}. For this, the commands
-  \Macro{chaptermark} and \Macro{sectionmark}, or \Macro{sectionmark}
-  and \Macro{subsectionmark}, respectively, are defined. Every
-  structuring command (\Macro{chapter}, \Macro{section} \dots)
-  automatically carries out the respective \Macro{\dots mark} command.
-  The parameter passed contains the text of the section
-  heading\Index{heading}. The respective section number is added
-  automatically in the \Macro{\dots mark} command. The formatting is
-  done according to the section level with one of the three commands
-  \Macro{chaptermarkformat}, \Macro{sectionmarkformat} or
-  \Macro{subsectionmarkformat}.
-  \OnlyAt{\Class{scrbook}\and\Class{scrreprt}}Of course there is no
-  command \Macro{chaptermark} or \Macro{chaptermarkformat} in
-  \Class{scrartcl}. \OnlyAt{\Class{scrartcl}}Accordingly,
-  \Macro{subsectionmark} and \Macro{subsectionmarkformat} exist only
-  in \Class{scrartcl}. This changes when you use the
-  \Package{scrpage2} package (see \autoref{cha:scrpage}).\par
-\end{Explain}
-Similar to \Macro{chapterformat} and \Macro{othersectionlevelsformat},
-the commands \Macro{chaptermarkformat} (not in \Class{scrartcl}),
-\Macro{sectionmarkformat} and \Macro{subsectionmarkformat} (only in
-\Class{scrartcl}) define the formatting of the sectioning numbers in
-the automatic running headings. They can be adapted to your personal
-needs with \Macro{renewcommand}. The original definitions for the
-{\KOMAScript} classes are:
-\begin{lstcode}
-  \newcommand*{\chaptermarkformat}{%
-    \chapappifchapterprefix{\ }\thechapter\autodot\enskip}
-  \newcommand*{\sectionmarkformat}{\thesection\autodot\enskip}
-  \newcommand*{\subsectionmarkformat}{%
-    \thesubsection\autodot\enskip}
-\end{lstcode}
-\begin{Example}
-  Suppose you want to prepend the word ``Chapter'' to the chapter
-  number in the running heading. For example you could insert the
-  following definition in the preamble of your document :
-\begin{lstcode}
-  \renewcommand*{\chaptermarkformat}{%
-    \chapapp~\thechapter\autodot\enskip}
-\end{lstcode}
-\end{Example}
-As you can see, both the commands \Macro{chapappifchapterprefix} and
-\Macro{chapapp} explained above are used here.
-%
-\EndIndex{Cmd}{chaptermark}%
-\EndIndex{Cmd}{sectionmark}%
-\EndIndex{Cmd}{subsectionmark}%
-\EndIndex{Cmd}{chaptermarkformat}%
-\EndIndex{Cmd}{sectionmarkformat}%
-\EndIndex{Cmd}{subsectionmarkformat}%
-
-
-\begin{Declaration}
-  \Counter{secnumdepth}
-\end{Declaration}%
-\BeginIndex{Counter}{secnumdepth}\BeginIndex{}{numbering}%
-Per default, in the classes \Class{scrbook}\IndexClass{scrbook} and
-\Class{scrreprt}\IndexClass{scrreprt} the section levels from
-\Macro{part}\IndexCmd{part}\IndexCmd{chapter}\IndexCmd{section} down
-to \Macro{subsection}\IndexCmd{subsection} and in the class
-\Class{scrartcl}\IndexClass{scrartcl} the levels from \Macro{part}
-down to \Macro{subsubsection}\IndexCmd{subsubsection} are numbered.
-This is controlled by the {\LaTeX} counter \Counter{secnumdepth}. The
-value \(-\)1 represents \Macro{part}, 0 the level \Macro{chapter},
-and so on. By defining, incrementing or decrementing this counter you
-can determine down to which level the headings are numbered. The same
-applies in the standard classes. Please refer also to the explanation
-concerning the counter \Counter{tocdepth} in
-\autoref{sec:maincls.toc},
-\autopageref{desc:maincls.counter.tocdepth}.
-%
-\EndIndex{Counter}{secnumdepth}\EndIndex{}{numbering}
-
-
-\begin{Declaration}
-  \Macro{setpartpreamble}%
-  \OParameter{position}\OParameter{width}\Parameter{preamble}\\
-  \Macro{setchapterpreamble}%
-  \OParameter{position}\OParameter{width}\Parameter{preamble}
-\end{Declaration}%
-\BeginIndex{Cmd}{setpartpreamble}%
-\BeginIndex{Cmd}{setchapterpreamble}%
-Parts\OnlyAt{\Class{scrbook}\and\Class{scrreprt}} and chapters in
-{\KOMAScript} can be started with a \PName{preamble}. This is
-particularly useful when you are using a two column layout with the
-class option \Option{twocolumn}\IndexOption{twocolumn}, since the
-heading together with the \PName{preamble} is always set in a one
-column layout.  The \PName{preamble} can comprise more than one
-paragraph. The command to output the \PName{preamble} has to be placed
-before the respective \Macro{part}, \Macro{addpart}, \Macro{chapter}
-or \Macro{addchap} command.
-\begin{Example}
-  You are writing a report about the condition of a company. You
-  organize the report in such a way that every department gets its own
-  partial report.  Every one of these parts should be introduced by an
-  abstract on the corresponding title page. You could write the
-  following:
-\begin{lstcode}
-  \setpartpreamble{%
-    \begin{abstract}
-      This is a filler text. It serves merely to demonstrate the
-      capabilities of {\KOMAScript}. If you read this text, you will
-      get no information.
-    \end{abstract}
-  }
-  \part{Department for Word Processing}
-\end{lstcode}
-Depending on the settings for the heading font size\Index{heading}
-(see \autoref{sec:maincls.fontOptions},
-\autopageref{desc:maincls.option.headings}) and the options for
-the \Environment{abstract} environment\IndexEnv{abstract} (see
-\autoref{sec:maincls.formattingOptions},
-\autopageref{desc:maincls.option.abstract}), the result would look
-similar to:
-  \begin{ShowOutput}\centering
-    {\LARGE\usekomafont{disposition} Part III.\par\vspace{20pt}}
-    {\LARGE\usekomafont{disposition} Department for Word Processing\strut\par}
-    \begin{quote}\small
-      \vspace{3ex}
-      \begin{center}
-        \usekomafont{disposition}\abstractname
-      \end{center}
-      \vspace{2ex}       
-      This is a filler text. It serves merely to demonstrate the
-      capabilities of {\KOMAScript}. If you read this text, you will
-      get no information.
-    \end{quote}
-  \end{ShowOutput}
-\end{Example}
-Please note that it is \emph{you} who is responsible for the spaces
-between the heading, preamble and the following text. Please note also
-that there is no \Environment{abstract} environment in the class
-\Class{scrbook} (see \autoref{sec:maincls.titles},
-\autopageref{desc:maincls.env.abstract}).
-
-The\ChangedAt{v2.8p}{\Class{scrbook}\and\Class{scrreprt}} first
-optional argument \PName{position} determines the position at which
-the preamble is placed with the help of one or two letters. For the
-vertical placement there are two possibilities at present:
-\begin{description}
-\item [\quad\texttt{o}:] above the heading
-\item [\quad\texttt{u}:] below the heading
-\end{description}
-You can insert one preamble above and another below a heading. For the
-horizontal placement you have the choice between three alignments:
-\begin{description}
-\item [\quad\texttt{l}:] left-aligned
-\item [\quad\texttt{r}:] right-aligned
-\item [\quad\texttt{c}:] centered
-\end{description}
-However, this does not output the text of the \PName{preamble} in such
-a manner, but inserts a box whose width is determined by the second
-optional argument \PName{width}. If you leave out this second argument
-the whole text width is used. In that case the option for horizontal
-positioning will have no effect. You can combine exactly one letter
-from the vertical with one letter from the horizontal positioning.
-%
-\EndIndex{Cmd}{setpartpreamble}%
-\EndIndex{Cmd}{setchapterpreamble}%
 
 
 \begin{Declaration}
