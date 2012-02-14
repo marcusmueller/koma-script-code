@@ -226,7 +226,7 @@ the one currently used with the specified \PName{element}.
   \feentry{chapterprefix}{%
     chapter number line at setting \OptionValue{chapterprefix}{true} or
     \OptionValue{appendixprefix}{true} (see \autoref{sec:maincls.structure},
-    \autopageref{desc:maincls.options.chapterprefix})}%
+    \autopageref{desc:maincls.option.chapterprefix})}%
   \feentry{descriptionlabel}{labels, i.\,e., the optional argument of
     \Macro{item} in the \Environment{description} environment (see
     \autoref{sec:maincls.lists}, \autopageref{desc:maincls.env.description})}%
@@ -426,6 +426,9 @@ table of contents (see \autoref{sec:maincls.floats}).
   \KOption{toc}\PName{selection}
 \end{Declaration}
 \BeginIndex{Option}{toc~=\PName{selection}}%
+\label{desc:maincls.option.toc.listof}%
+\label{desc:maincls.option.toc.nolistof}%
+\label{desc:maincls.option.toc.listofnumbered}\nobreak
 It is becoming increasingly common to find entries in the table of contents
 for the lists of tables and figures, for the bibliography, and, sometimes,
 even for the index. This is surely also related to the recent trend of putting
@@ -2494,12 +2497,1233 @@ and would not react on run-time changes of the option.
 \EndIndex{}{equations}
 
 
-\section{Floating Environments of Tables and Figures\protect\footnote{This
-    section is still missing. Translators from German to English would be
-    welcome!}}
+\section{Floating Environments of Tables and Figures}
 \label{sec:maincls.floats}
+\BeginIndex{}{floats}%
+\BeginIndex{}{tables}%
+\BeginIndex{}{figures}%
 
-\mbox{}
+With the floating environments {\LaTeX} offers a very capable and comfortable
+mechanism for automatic placement of figures\Index{figure} and
+tables\Index{table}.
+% Im Deutschen ist hier ein Absatz, den wir nicht uebernehmen!
+But\textnote{Attention!} often these floating environments\Index[indexmain]
+{floating environments} are slightly misunderstood by beginners. They often
+ask for a fixed position of a table or figure within the text. However, since
+these floating environments are being referenced in the text this is not
+necessary in most cases. It is also not sensible because such an object can
+only be set on the page if there is enough space left for it. If this is not
+the case the object would have to be shifted onto the next page, thereby
+possibly leaving a huge blank space on the page before.
+  
+Often\textnote{Attention!} one finds in a document for every floating object
+the same optional argument for positioning the object. This also makes no
+sense. In such cases one should rather change the standard parameter
+globally. For more details refer to \cite{DANTE:FAQ}.
+
+One\textnote{Attention!} last important note before starting this section:
+most mechanisms described here which extend the capabilities of the standard
+classes no longer work correctly when used together with packages which modify
+the typesetting of captions of figures and tables. This should be self
+evident, but it is often not understood.
+
+\begin{Declaration}
+  \KOption{captions}\PName{selection}
+\end{Declaration}
+\BeginIndex{Option}{captions~=\PName{selection}}%
+The standard classes format titles of floating environments, that are placed
+with \Macro{caption}\IndexCmd{caption} (see below), like signatures. They
+differentiate between one-line and multi-line table or figure
+captions. One-line captions are centered while multi-line captions are
+left-justified.
+
+\leavevmode\phantomsection\nobreak
+\label{desc:maincls.option.captions.tableheading}\nobreak
+But at tables often headings are used. That's because there may be tables that
+span several pages. Surely the reader wants to know the purpose of the table
+at the first page already. Furthermore tables will be read row by row from top
+down to bottom. So there are at least two good reasons to generally use table
+headings. \KOMAScript{}\important{\OptionValue{captions}{tableheading}}
+therefor supports option
+\OptionValue{captions}{tableheading}%
+\IndexOption{captions~=\PValue{tableheading}}, that changes the caption format
+into headings at tables only.
+
+Please note\textnote{Attention!} that multi-page tabulars may not use any
+floating environment. To have an automatic page break at any kind tabular you
+also need additional packages like \Package{longtable}\IndexPackage{longtable}
+(see \cite{package:longtable}) or \Package{tabu}\IndexPackage{tabu} (see
+\cite{package:tabu}).
+
+You may switch back
+\important[i]{\begin{tabular}[t]{@{}l@{}}
+    \Option{captions=}\\
+    \quad\PValue{tablesignature}
+  \end{tabular}} to the default table signatures using
+\OptionValue{captions}{tablesignature}%
+\IndexOption{captions~=\PValue{tablesignature}}. Note\textnote{Attention!} that using any of these options does not change the position of
+the caption from above the top of the table to below the bottom of the
+table or vica versa. It only affects whether the text is formatted as
+a caption for use above or below a table. Whether the text is in fact
+placed above or below a table is set through the position of the
+\Macro{caption} command inside the \Environment{table} environment. This may
+change using package \Package{float}\IndexPackage{float} and command
+\Macro{restylefloats} (see \cite{package:float}).
+
+Of course similar feature exists\ChangedAt{v3.09}{\Class{scrbook}\and
+  \Class{scrreprt}\and \Class{scrartcl}} for figures using options
+\OptionValue{captions}{figureheading}%
+\IndexOption{captions~=\PValue{figureheading}} and
+\OptionValue{captions}{figuresignature}%
+\IndexOption{captions~=\PValue{figuresignature}}. Nevertheless figures like
+photos will be viewed at a whole and in case of a diagram or graph mostly
+examined from
+left bottom to the right. Therefor in general signatures should be used and it
+wouldn't be useful to change the caption format from signatures to headings.
+
+Nevertheless sometimes all floating environments shall use headings. For this
+\KOMAScript{} supports\ChangedAt{v3.09}{\Class{scrbook}\and
+  \Class{scrreprt}\and \Class{scrartcl}}
+options\important[i]{\OptionValue{captions}{heading}\\
+  \OptionValue{captions}{signature}}
+\OptionValue{captions}{heading}\IndexOption{captions~=\PValue{heading}} and
+\OptionValue{captions}{signature}\IndexOption{captions~=\PValue{signature}} to
+switch the format of every floating environment. These options may be used
+also inside a floating environment but before using \Macro{caption}.
+
+Note\textnote{Attention!}\OnlyAt{\Package{float}}\IndexPackage{float} that
+when using the \Package{float} package, the options
+\OptionValue{captions}{tablesignature} and
+\OptionValue{captions}{tableheading} cease to act correctly when
+\Macro{restylefloat} is applied to tables. More details of the \Package{float}
+package and \Macro{restylefloat} can be found in
+\cite{package:float}. Additional support in {\KOMAScript} for the
+\Package{float} package may be found at the explanation of \PValue{komaabove}
+(see \autopageref{desc:maincls.floatstyle.komaabove}).
+
+\leavevmode\phantomsection\nobreak
+\label{desc:maincls.option.captions.nooneline}\nobreak
+\label{desc:maincls.option.captions.oneline}\nobreak
+Furthermore, \KOMAScript{} supports to switch off the distinguish of captions
+with only one line or more than one line using option
+\OptionValue{captions}{nooneline}\IndexOption{captions~=\PValue{nooneline}}%
+\important{\OptionValue{captions}{nooneline}}. This may be useful, if one-line
+captions shouldn't be centered. The default of centering one-line captions
+corresponds to \OptionValue{captions}{oneline}.
+
+Another special feature of \KOMAScript{} is to alternatively put the caption
+neither above nor below the floating object but beside
+it. For this you need Environment\important{\Environment{captionbeside}}
+\Environment{captionsbeside}\IndexEnv{captionbeside}, that will be described
+from \autopageref{desc:maincls.env.captionbeside}. Several settings
+for this environment may be done also using \Option{caption}. You may find all
+the available \PName{settings} at \autoref{tab:maincls.captions}.
+%
+\begin{desclist}
+  \desccaption[{Available values for option \Option{captions}}]{%
+    Available values for option \Option{captions} to select formation of
+    captions as headings or signatures at floating environments%
+    \label{tab:maincls.captions}%
+  }{%
+    Available values for option \Option{captions} (\emph{continuation})%
+  }%
+  \entry{\PValue{bottombeside}, \PValue{besidebottom}}{%
+    Captions and contents of environment \Environment{captionsbeside} (see
+    \autoref{sec:maincls.floats},
+    \autopageref{desc:maincls.env.captionbeside}) will be vertically align
+    depending on the bottommost base lines.%
+    \IndexOption{captions~=\PValue{bottombeside}}}%
+  \entry{\PValue{centeredbeside}, \PValue{besidecentered},
+    \PValue{middlebeside}, \PValue{besidemiddle}}{%
+    Captions and contents of environment \Environment{captionsbeside} (see
+    \autoref{sec:maincls.floats},
+    \autopageref{desc:maincls.env.captionbeside}) will be vertically centered%
+    \IndexOption{captions~=\PValue{centeredbeside}}}%
+  \entry{\PValue{figureheading}, \PValue{figureabove}, \PValue{abovefigure},
+    \PValue{topatfigure}%
+    \IndexOption{captions~=\PValue{figureheading}}}{%
+    \ChangedAt{v3.09}{\Class{scrbook}\and \Class{scrreprt}\and
+      \Class{scrartcl}}%
+    Captions of figures will use heading formation\,---\,maybe in discrepancy
+    to \OptionValue{captions}{signature}.%
+  }%
+  \entry{\PValue{figuresignature}, \PValue{belowfigure},
+    \PValue{bottomatfiggure}%
+    \IndexOption{captions~=\PValue{figuresignature}}}{%
+    \ChangedAt{v3.09}{\Class{scrbook}\and \Class{scrreprt}\and
+      \Class{scrartcl}}%
+    Captions of figures will use signature formation\,---\,maybe in
+    discrepancy to \OptionValue{captions}{headings}.%
+  }%
+  \entry{\PValue{heading}, \PValue{above}, \PValue{top}%
+    \IndexOption{captions~=\PValue{heading}}}{%
+    \ChangedAt{v3.09}{\Class{scrbook}\and \Class{scrreprt}\and
+      \Class{scrartcl}} Captions of floating environments will use heading
+    formation. Nevertheless this does not influence whether they are really
+    placed at the top or at the bottom of the object. This options also
+    implies \OptionValue{captions}{tableheading} and
+    \OptionValue{captions}{figureheading}.%
+  }%
+  \entry{\PValue{innerbeside},
+    \PValue{besideinner}\IndexOption{captions~=\PValue{innerbeside}}}{%
+    Captions of environment \Environment{captionsbeside} (siehe
+    \autoref{sec:maincls.floats},
+    \autopageref{desc:maincls.env.captionbeside})
+    will be placed innermost beside the contents of the environment at
+    double-side printing. At single-side printing
+    \OptionValue{captions}{leftbeside} will be used.%
+  }%
+  \entry{\PValue{leftbeside},
+    \PValue{besideleft}\IndexOption{captions~=\PValue{leftbeside}}}{%
+    Captions of environment \Environment{captionsbeside} (siehe
+    \autoref{sec:maincls.floats},
+    \autopageref{desc:maincls.env.captionbeside}) will be placed left beside
+    the contents of the environment.%
+  }%
+  \pventry{nooneline}{%
+    Captions with only one line will not be handled different from captions
+    with more than one line.%
+    \IndexOption{captions~=\PValue{nooneline}}}%
+  \pventry{oneline}{%
+    Captions with only one line will be centered horizontally.%
+    \IndexOption{captions~=\PValue{oneline}}}%
+  \entry{\PValue{outerbeside}, \PValue{besideouter}%
+    \IndexOption{captions~=\PValue{outerbeside}}}{%
+    Captions of environment \Environment{captionsbeside} (siehe
+    \autoref{sec:maincls.floats},
+    \autopageref{desc:maincls.env.captionbeside})
+    will be placed outermost beside the contents of the environment at
+    double-side printing. At single-side printing
+    \OptionValue{captions}{rightbeside} will be used.%
+  }%
+  \entry{\PValue{rightbeside}, \PValue{besideright}%
+    \IndexOption{captions~=\PValue{rightbeside}}}{%
+    Captions of environment \Environment{captionsbeside} (siehe
+    \autoref{sec:maincls.floats},
+    \autopageref{desc:maincls.env.captionbeside}) will be placed right beside
+    the contents of the environment.%
+  }%
+  \entry{\PValue{signature}, \PValue{below}, \PValue{bot}, \PValue{bottom}%
+    \IndexOption{captions~=\PValue{signature}}}{%
+    \ChangedAt{v3.09}{\Class{scrbook}\and \Class{scrreprt}\and
+      \Class{scrartcl}}%
+    Captions of floating environments will use signature
+    formation. Nevertheless this does not influence whether they are really
+    placed at the top or at the bottom of the object. This options also
+    implies \OptionValue{captions}{tablesignature} and
+    \OptionValue{captions}{figuresignature}.%
+  }%
+  \entry{\PValue{tableheading}, \PValue{tableabove}, \PValue{abovetable},
+    \PValue{abovetabular}, \PValue{topattable}%
+    \IndexOption{captions~=\PValue{tableheading}}}{%
+    Captions of tables will use heading formation\,---\,maybe in discrepancy
+    to \OptionValue{captions}{signature}.%
+  }%
+  \entry{\PValue{tablesignature}, \PValue{belowtable}, \PValue{belowtabular},
+    \PValue{bottomattable}%
+    \IndexOption{captions~=\PValue{tablesignature}}}{%
+     Captions of tables will use signature formation\,---\,maybe in discrepancy
+    to \OptionValue{captions}{heading}.%
+  }%
+  \entry{\PValue{topbeside}, \PValue{besidetop}}{%
+    Captions and contents of environment \Environment{captionsbeside} (see
+    \autoref{sec:maincls.floats},
+    \autopageref{desc:maincls.env.captionbeside}) will be vertically align
+    depending on the topmost base lines.%
+    \IndexOption{captions~=\PValue{topbeside}}}%
+\end{desclist}%
+%
+\EndIndex{Option}{captions~=\PName{selection}}%
+
+
+\begin{Declaration}
+  \Macro{caption}\OParameter{entry}\Parameter{title}\\
+  \Macro{captionbelow}\OParameter{entry}\Parameter{title}\\
+  \Macro{captionabove}\OParameter{entry}\Parameter{title}
+\end{Declaration}%
+\BeginIndex{Cmd}{caption}%
+\BeginIndex{Cmd}{captionabove}%
+\BeginIndex{Cmd}{captionbelow}%
+In the standard classes caption text \PName{title} of tables and
+figures is inserted with the \Macro{caption} command below the table
+or figure. In general this is correct for figures. Opinions differ as
+to whether captions of tables are to be placed above or, consistent
+with captions of figures\Index{caption>of figure}, below the
+table\Index{caption>of table}. That is the reason why
+{\KOMAScript}\textnote{\KOMAScript{} vs. standard classes},
+unlike the standard classes, offers \Macro{captionbelow} for captions
+below and \Macro{captionabove} for captions above tables or
+figures.
+
+Not only for tables but also for figures or all kind of floating environments
+the behaviour of \Macro{caption} may be modified using option
+\Option{captions}\IndexOption{captions} described at the beginning of this
+section. For
+compatibility reasons the default behaviour of \Macro{caption} used
+with all kinds of floating environments is similar to
+\Macro{captionbelow}. Nevertheless it
+is recommended\textnote{Hint!} to use table headings and therefor switch
+behaviour of \Macro{caption} inside table environments into
+\Macro{captionabove} using option
+\OptionValue{captions}{tableheading}. Alternatively you may use
+\Macro{captionabove} instead of \Macro{caption} inside of every
+\Environment{table} environment.
+%
+\begin{Example}
+  Instead of using captions below a table you want to place your
+  captions above it\Index{table>caption}, because you have tables
+  which span more then one page. In the standard classes you could
+  only write:
+\begin{lstcode}
+  \begin{table}
+    \caption{This is an example table}
+    \begin{tabular}{llll}
+      This & is & an & example.\\\hline
+      This & is & an & example.\\
+      This & is & an & example.
+    \end{tabular}
+  \end{table}
+\end{lstcode}
+  Then you would get the unsatisfying result:
+  \begin{ShowOutput}\centering
+    {\usekomafont{caption}{\usekomafont{captionlabel}\tablename~30.2:}
+      This is an example table.}\\
+        \begin{tabular}{llll}
+      This & is & an & example.\\\hline
+      This & is & an & example.\\
+      This & is & an & example.
+        \end{tabular}
+\end{ShowOutput}
+  Using {\KOMAScript} you write instead:
+\begin{lstcode}
+  \begin{table}
+    \captionabove{This is just an example table}
+    \begin{tabular}{llll}
+      This & is & an & example.\\\hline
+      This & is & an & example.\\
+      This & is & an & example.
+    \end{tabular}
+  \end{table}
+\end{lstcode}
+  Then you get:
+  \begin{ShowOutput}\centering
+    {\usekomafont{caption}{\usekomafont{captionlabel}\tablename~30.2:}
+      This is just an example table}\\\vskip\abovecaptionskip
+    \begin{tabular}{llll}
+      This & is & an & example.\\\hline
+      This & is & an & example.\\
+      This & is & an & example.
+    \end{tabular}
+  \end{ShowOutput}
+  Since you want all your tables typeset with captions above, you could
+  of course use the option \OptionValue{captions}{tableheading} instead (see
+  \autoref{sec:maincls.formattingOptions},
+  \autopageref{desc:maincls.option.captions.tableheading}). Then you can use
+  \Macro{caption} as you would in the standard classes. You will get
+  the same result as with \Macro{captionabove}.
+\end{Example}
+
+\BeginIndex[indexother]{}{font>style}%
+\BeginIndex{FontElement}{caption}%
+\BeginIndex{FontElement}{captionlabel}%
+The font style\ChangedAt{v2.8p}{%
+  \Class{scrbook}\and\Class{scrreprt}\and\Class{scrartcl}} for the
+description and the label\,---\,``Figure'' or ``Table'', followed by
+the number and the delimiter\,---\,can be changed with the commands
+\Macro{setkomafont}
+and \Macro{addtokomafont} (see \autoref{sec:maincls.textmarkup},
+\autopageref{desc:maincls.cmd.setkomafont}). The respective elements for
+this are \FontElement{caption}\important{\FontElement{caption}} and
+\FontElement{captionlabel}\important{\FontElement{captionlabel}} (see
+\autoref{tab:maincls.elementsWithoutText},
+\autopageref{tab:maincls.elementsWithoutText}).  First the font style
+for the element \FontElement{caption} is applied to the element
+\FontElement{captionlabel} too.  After this the font style of
+\FontElement{captionlabel} is applied on the respective element. The
+default settings are listed in \autoref{tab:maincls.captionFont}.
+%
+\begin{table}
+%  \centering%
+  \KOMAoptions{captions=topbeside}%
+  \setcapindent{0pt}
+%  \caption
+  \begin{captionbeside}
+  {Font defaults for the elements of figure or table captions}
+  [l]
+  \begin{tabular}[t]{ll}
+    \toprule
+    element & default \\
+    \midrule
+    \FontElement{caption} & \Macro{normalfont} \\
+    \FontElement{captionlabel} & \Macro{normalfont}\\
+    \bottomrule
+  \end{tabular}
+  \end{captionbeside}
+  \label{tab:maincls.captionFont}
+\end{table}
+%
+\begin{Example}
+  You want the table and figure descriptions typeset in a smaller font
+  size. Thus you could write the following in the preamble of your
+  document:
+\begin{lstcode}
+  \addtokomafont{caption}{\small}
+\end{lstcode}
+  Furthermore, you would like the labels to be printed in sans serif and
+  bold. You add:
+\begin{lstcode}
+  \setkomafont{captionlabel}{\sffamily\bfseries}
+\end{lstcode}
+  As you can see, simple extensions of the default definitions are
+  possible.
+\end{Example}
+%
+\EndIndex{FontElement}{captionlabel}%
+\EndIndex{FontElement}{caption}%
+\EndIndex[indexother]{}{font>style}%
+%
+\EndIndex{Cmd}{caption}%
+\EndIndex{Cmd}{captionabove}%
+\EndIndex{Cmd}{captionbelow}%
+
+\begin{Declaration}
+  \Macro{captionof}\Parameter{float type}\OParameter{entry}%
+  \Parameter{title}\\
+  \Macro{captionbelowof}\Parameter{float type}\OParameter{entry}%
+  \Parameter{title}\\
+  \Macro{captionaboveof}\Parameter{float type}\OParameter{entry}%
+  \Parameter{title}
+\end{Declaration}%
+\BeginIndex{Cmd}{captionof}%
+\BeginIndex{Cmd}{captionaboveof}%
+\BeginIndex{Cmd}{captionbelowof}%
+\KOMAScript{} supports a command
+\Macro{captionof}\ChangedAt{v3.05}{\Class{scrbook}\and \Class{scrreprt}\and
+  \Class{scrartcl}} similar to packages
+\Package{caption}\IndexPackage{caption} and
+\Package{capt-of}\IndexPackage{capt-of}. You may use this command to place a
+floating environment caption with corresponding entry into the list of that
+kind of floating environment but even inside a another floating environment or
+outside any floating environment. In difference to \Macro{caption} the kind of
+floating environment has to be set as first parameter.
+
+Furthermore, \KOMAScript{} provides the additional commands
+\Macro{captionaboveof}\ChangedAt{v3.09}{\Class{scrbook}\and
+  \Class{scrreprt}\and \Class{scrartcl}} and \Macro{captionbelowof}. These are
+like \Macro{captionabove} and \Macro{captionbelow} but with the additional
+features and parameter of \Macro{captionof}.
+
+Of course \KOMAScript\ChangedAt{v3.09a}{\Class{scrbook}\and
+  \Class{scrreprt}\and \Class{scrartcl}} takes care of the \PValue{heading}
+and \PValue{signature} setting of option
+\Option{captions}. But this feature may be lost, loading package
+\Package{capt-of} or \Package{caption}. Please note the manual of package
+\Package{caption} for this!
+%
+\begin{Example}
+  Assumed you want to create a floating object with a table and a figure side
+  by side. As you know, there are now mixed floating environment. Therefor you
+  use a \Environment{figure} environment primarily:
+\begin{lstcode}
+  \begin{figure}
+    \begin{minipage}{.5\linewidth}
+      \centering
+      \rule{4cm}{3cm}
+      \caption{A rectangle}\label{fig:rechteck}
+    \end{minipage}%
+    \begin{minipage}{.5\linewidth}
+      \centering
+      \captionaboveof{table}
+      [Measure of the rectangle in
+        figure~\ref{fig:rechteck}]%
+      {Measure of the rectangle}
+      \label{tab:rechteck}
+      \begin{tabular}{ll}
+        Width:  & 4\,cm\\
+        Height: & 3\,cm
+      \end{tabular}
+    \end{minipage}
+  \end{figure}
+\end{lstcode}
+  Two \Environment{minipage} environments have been used to have figure and
+  table side by side. The\textnote{Attention!} percent char after the end of
+  the first \Environment{minipage} is important. Without an additional
+  inter-word distance would be made between the \Environment{minipage}
+  environments.
+
+  The figure signature has been done using \Macro{caption}. The table heading
+  has been done using \Macro{captionaboveof} with first argument
+  \PValue{table}. Because of this \KOMAScript{} knows, that despite the
+  \Environment{figure} environment a table caption should be made.
+
+  The optional argument of \Macro{captionaboveof} does make the entry into the
+  list of tables. Without the optional argument, the last mandatory argument
+  would have been used for the list of tables too. Although this caption text
+  is sufficient for the environment itself, it would be very useful at the
+  list of tables. Therefor a somehow more detailed description has been used
+  for the list of tables using the optional argument. The
+  \autoref{fig:maincls.captionaboveof} shows the result of the example code.%
+\begin{figure}
+%  \centering
+%  \caption
+  \KOMAoptions{captions=bottombeside}%
+  \setcapindent{0pt}%
+  \begin{captionbeside}
+    [{Example: Usage of \Macro{captionaboveof} inside another floating
+      environment}]
+    {Example: Usage of \Macro{captionaboveof} inside another floating
+      environment\label{fig:maincls.captionaboveof}}
+    [l]
+  \begin{minipage}[b]{.66\linewidth}%
+  \raisebox{\depth}{\fbox{\KOMAoptions{captions=oneline}%
+    \begin{minipage}{.5\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}
+      \centering
+      \rule{4cm}{3cm}
+      \caption[Example: A rectangle]{A rectangle}\label{fig:maincls.rechteck}
+    \end{minipage}%
+    \begin{minipage}{.5\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}
+      \centering
+      \captionaboveof{table}[Example: Measure of the rectangle in
+        figure~\ref{fig:maincls.rechteck}]{Rectangle size}
+      \label{tab:maincls.rechteck}
+      \begin{tabular}{ll}
+        Width: & 4\,cm\\
+        Height:   & 3\,cm
+      \end{tabular}
+    \end{minipage}}}%
+  \end{minipage}%
+  \end{captionbeside}%
+\end{figure}%
+\end{Example}%
+A non-floating table with a caption may be produced in the same kind like the
+table inside a figure environment in the example above. In such a case also a
+\Environment{minipage} environment should be used, to avoid page breaks
+between table caption an tabular. An additional \Environment{flushleft}
+environment around the \Environment{minipage} environment may be used, to have
+a pleasing distance above and below is and to avoid the paragraph indentation
+of the \Environment{minipage} environment.%
+%
+\EndIndex{Cmd}{captionof}%
+\EndIndex{Cmd}{captionaboveof}%
+\EndIndex{Cmd}{captionbelowof}%
+
+\begin{Declaration}
+  \XMacro{begin}\PParameter{\Environment{captionbeside}}%
+    \OParameter{entry}\Parameter{title}\texttt{\%}\\
+    \hphantom{\XMacro{begin}\PParameter{captionbeside}}%
+    \OParameter{placement}\OParameter{width}%
+    \OParameter{offset}\\%
+  \quad\dots\\
+  \XMacro{end}\PParameter{captionbeside}\\
+  \XMacro{begin}\PParameter{captionbeside}\OParameter{entry}%
+    \Parameter{title}\texttt{\%}\\
+    \hphantom{\XMacro{begin}\PParameter{captionbeside}}%
+    \OParameter{placement}\OParameter{width}%
+    \OParameter{offset}\PValue{*}\\
+  \quad\dots\\
+  \XMacro{end}\PParameter{captionbeside}
+\end{Declaration}
+\BeginIndex{Env}{captionbeside}%
+Apart\ChangedAt{v2.8q}{%
+  \Class{scrbook}\and \Class{scrreprt}\and \Class{scrartcl}} from
+captions above and below the figure, one often finds captions, in
+particular with small figures, which are placed beside the figure. In
+general in this case both the baseline of the figure and of the
+caption are aligned at the bottom. With some fiddling and the use of
+two \Macro{parbox} commands this could also be achieved in the
+standard classes.  However, {\KOMAScript} offers a special environment
+for this which can be used within the floating environment.  The first
+optional parameter \PName{entry} and the obligatory parameter
+\PName{title} mean the same as the corresponding parameters of
+\Macro{caption}, \Macro{captionabove} or \Macro{captionbelow}. The
+caption text \PName{title} is placed beside the content of the
+environment in this case.
+
+Whether the caption text \PName{title} is placed on the left or the
+right can be determined by the parameter \PName{placement}. Exactly
+one of the following letters is allowed:
+\begin{labeling}[~--]{\quad\PValue{o}}\setlength{\itemsep}{0pt}%
+\item[\PValue{l}] left
+\item[\PValue{r}] right
+\item[\PValue{i}] inner margin in two-sided layout
+\item[\PValue{o}] outer margin in two-sided layout
+\end{labeling}
+Default setting is to the right of the content of the environment. This
+default\ChangedAt{v3.00}{\Class{scrbook}\and \Class{scrreprt}\and
+  \Class{scrartcl}} my be changed using option
+\Option{captions}\IndexOption{captions}\important{\Option{captions}} (see
+\autopageref{desc:maincls.option.captions}) with values like
+\PValue{innerbeside}\IndexOption[indexmain]{captions~=\PValue{innerbeside}},
+\PValue{leftbeside}\IndexOption[indexmain]{captions~=\PValue{leftbeside}},
+\PValue{outerbeside}\IndexOption[indexmain]{captions~=\PValue{outerbeside}},
+and
+\PValue{rightbeside}\IndexOption[indexmain]{captions~=\PValue{rightbeside}}.
+If either \PValue{o} or \PValue{i} are used you may need to run {\LaTeX} twice
+to obtain the correct placement.
+
+Per default the content of the environment and the caption text
+\PName{title} fill the entire available text width. However, using the
+optional parameter \PName{width}, it is possible to adjust the width
+used. This width could even be larger than the current text width.
+
+When supplying a \PName{width} the used width is usually centered with
+respect to the text width. Using the optional parameter
+\PName{offset}, you can shift the environment relative to the left
+margin. A positive value corresponds to a shift to the right, whereas
+a negative value corresponds to a shift to the left. An \PName{offset}
+of 0\Unit{pt} gives you a left-aligned output.
+
+Adding a star to the optional parameter \PName{offset} makes the the
+value mean a shift relative to the right margin on left hand pages in
+two-sided layout. A positive value corresponds to a shift towards the
+outer margin, whereas a negative value corresponds to a shift towards
+the inner margin. An \PName{offset} of 0\Unit{pt} means alignment with
+the inner margin. As mentioned before, in some cases it takes two
+{\LaTeX} runs for this to work correctly.
+
+The default vertical alignment is bottom. This means that the bottommost base
+lines of the contents of the environment and of the caption are aligned. This
+setting\ChangedAt{v3.00}{\Class{scrbook}\and \Class{scrreprt}\and
+  \Class{scrartcl}} may be changed using option
+\Option{captions}\IndexOption{captions} (see
+\autopageref{desc:maincls.option.captions}) with value
+\PValue{topbeside}\IndexOption[indexmain]{captions~=\PValue{topbeside}},
+\PValue{centeredbeside}%
+\IndexOption[indexmain]{captions~=\PValue{centeredbeside}}, or
+\PValue{bottombeside}\IndexOption[indexmain]{captions~=\PValue{bottombeside}}. With
+setting \PValue{topbeside} the topmost base lines of the environment contents
+and caption will be aligned. With \PValue{centeredbeside} they will be
+centered vertically. In this context it should be known, that the base line of
+a pictures is mostly at the bottom of the picture. This may be changed,
+e.\,g., using \Macro{raisebox}\IndexCmd{raisebox}.
+
+\begin{Example}
+  An example for the usage of the \Environment{captionbeside} environment
+  can be found in \autoref{fig:maincls.captionbeside}.
+  This figure was typeset with:
+\begin{lstcode}
+  \begin{figure}
+    \begin{captionbeside}[Example: Figure beside description]%
+      {A figure description which is neither above nor
+       below, but beside the figure}[i][\linewidth][%
+      [i][\linewidth][%
+        \dimexpr\marginparwidth+\marginparsep\relax]*
+      \fbox{%
+        \parbox[b][5\baselineskip][c]{.25\textwidth}
+        {%
+          \hspace*{\fill}\KOMAScript
+          \hspace*{\fill}\par
+        }%
+      }
+    \end{captionbeside}
+    \label{fig:maincls.captionbeside}
+  \end{figure}
+\end{lstcode}
+  \begin{figure}
+    \begin{captionbeside}[Example: Figure beside description]%
+      {A figure description which is neither above nor 
+       below, but beside the figure}[i][\linewidth][2em]*
+      \fbox{%
+        \parbox[b][5\baselineskip][c]{.25\textwidth}{%
+          \hspace*{\fill}\KOMAScript\hspace*{\fill}\par}}
+    \end{captionbeside}
+    \label{fig:maincls.captionbeside}
+  \end{figure}
+  The total width is thus the currently available width
+  \PValue{\Macro{linewidth}}. However, this width is shifted
+  \PValue{2em} to the outside. The caption text or description is
+  placed on the inner side beside the figure. The figure itself is
+  shifted 2\Unit{em} into the outer margin.
+
+  With \Macro{dimexp} a \eTeX{} command has been used. This shouldn't be a
+  problem at all, because \KOMAScript{} itself needs \eTeX{} and every almost
+  up-to-date \LaTeX{} distribution uses \eTeX already.
+
+  \hyperref[fig:maincls.captionbesidecentered]%
+           {Figure~\ref*{fig:maincls.captionbesidecentered}}
+  shows a centered caption with:
+\begin{lstcode}
+  \KOMAoption{captions}{centeredbeside}
+\end{lstcode}
+  Even if you are not a typographer you may see, that this is not a
+  recommended suggestion.
+
+  \begin{figure}
+    \begin{captionbeside}[Example: Description centered beside figure]%
+      {A figure description which is neither above nor 
+       below, but centered beside the figure}[i][\linewidth][2em]*
+      \fbox{%
+        \parbox[b][5\baselineskip][c]{.25\textwidth}{%
+          \hspace*{\fill}\KOMAScript\hspace*{\fill}\par}}
+    \end{captionbeside}
+    \label{fig:maincls.captionbesidecentered}
+  \end{figure}
+
+  In opposite to the centered example, the top aligned from
+  \autoref{fig:maincls.captionbesidetop} may be used. To show how to change
+  the baseline using \Macro{raisebox}, the complete example code follows:
+\begin{lstcode}
+  \documentclass[captions=topbeside]{scrbook}
+  \usepackage[english]{babel}
+  \usepackage{graphics}
+  \begin{document}
+  \chapter{An Example}
+  \begin{figure}
+    \begin{captionbeside}%
+      [Example: Figure title top beside]%
+      {A figure description which is neither above nor 
+       below, but top beside the figure}%
+      [i][\linewidth][%
+        \dimexpr\marginparwidth+\marginparsep\relax
+      ]*
+      \raisebox{%
+        \dimexpr\baselineskip-\totalheight\relax
+      }{%
+        \includegraphics{examplepicture}%
+      }%
+    \end{captionbeside}
+    \label{fig:maincls.captionbesidetop}
+  \end{figure}
+  \end{document}
+\end{lstcode}
+  \begin{figure}
+    \KOMAoption{captions}{topbeside}
+    \begin{captionbeside}[Example: Figure title top beside]%
+      {A figure description which is neither above nor 
+        below, but top beside the figure}%
+      [i][\linewidth]
+      \raisebox{\dimexpr\baselineskip-\totalheight}{%
+        \fbox{%
+          \parbox[b][5\baselineskip][c]{.25\textwidth}{%
+            \hspace*{\fill}\KOMAScript\hspace*{\fill}\par}}%
+      }%
+    \end{captionbeside}
+    \label{fig:maincls.captionbesidetop}
+  \end{figure}
+  You may use such a movement not only at graphics replacements like show, but
+  also using \Macro{includegraphics} (see \cite{package:graphics}).
+\end{Example}
+%
+\EndIndex{Env}{captionbeside}
+
+\begin{Declaration}
+  \XMacro{begin}\PParameter{\Environment{captionofbeside}}%
+    \Parameter{float type}%
+    \OParameter{entry}\Parameter{title}\texttt{\%}\\
+    \hphantom{\XMacro{begin}\PParameter{captionofbeside}}%
+    \OParameter{placement}\OParameter{width}%
+    \OParameter{offset}\\%
+  \quad\dots\\
+  \XMacro{end}\PParameter{captionofbeside}\\
+  \XMacro{begin}\PParameter{captionofbeside}\Parameter{float type}%
+    \OParameter{entry}%
+    \Parameter{title}\texttt{\%}\\
+    \hphantom{\XMacro{begin}\PParameter{captionofbeside}}%
+    \OParameter{placement}\OParameter{width}%
+    \OParameter{offset}\PValue{*}\\
+  \quad\dots\\
+  \XMacro{end}\PParameter{captionofbeside}
+\end{Declaration}
+\BeginIndex{Env}{captionofbeside}%
+This\ChangedAt{v3.10}{\Class{scrbook}\and \Class{scrreprt}\and
+  \Class{scrartcl}} environment corresponds to \Environment{captionbeside}
+in the same manner like \Macro{captionof} corresponds to
+\Macro{caption}. The float type is not defined by a floating environment but
+by the first mandatory argument.%
+%
+\EndIndex{Env}{captionofbeside}%
+
+
+\begin{Declaration}
+  \FloatStyle{komaabove}\\
+  \FloatStyle{komabelow}
+\end{Declaration}%
+\BeginIndex{Floatstyle}{komaabove}%
+\BeginIndex{Floatstyle}{komabelow}%
+If you use\OnlyAt{\Package{float}} the \Package{float}\IndexPackage{float}
+package the appearance of the float environments is solely defined by the
+\emph{float} style. This includes whether captions above or below are used. In
+the \Package{float} package there is no predefined style which gives you the
+same output and offers the same setting options (see below) as {\KOMAScript}.
+Therefore {\KOMAScript} defines the two additional styles \PValue{komaabove}
+and \PValue{komabelow}.  When using the \Package{float} package these styles
+can be activated just like the styles \PValue{plain}\IndexFloatstyle{plain},
+\PValue{boxed}\IndexFloatstyle{boxed} or \PValue{ruled}\IndexFloatstyle{ruled}
+defined in \Package{float}.  For details refer to \cite{package:float}.  The
+style \PValue{komaabove} inserts \Macro{caption}, \Macro{captionabove} and
+\Macro{captionbelow} above, whereas \PValue{komabelow} inserts them below the
+float content.
+%
+\EndIndex{Floatstyle}{komaabove}%
+\EndIndex{Floatstyle}{komabelow}%
+
+
+\begin{Declaration}
+  \Macro{captionformat}
+\end{Declaration}%
+\BeginIndex{Cmd}{captionformat}%
+In {\KOMAScript} there are different ways to change the formatting of
+the caption text. The definition of different font styles was already
+explained above. This or the caption delimiter between the label and
+the label text itself is specified in the macro \Macro{captionformat}.
+In contrast to all other \Macro{\dots}format commands, in this case it
+does not contain the counter but only the items which follow it. The
+original definition is:
+\begin{lstcode}
+  \newcommand*{\captionformat}{:\ }
+\end{lstcode}
+This too can be changed with \Macro{renewcommand}.
+\begin{Example}
+  For some inexplicable reasons you want a dash with spaces before and
+  after instead of a colon followed by a space as label delimiter. You
+  define:
+\begin{lstcode}
+  \renewcommand*{\captionformat}{~--~}
+\end{lstcode}
+This definition should be put in the preamble of your document.
+\end{Example}
+%
+\EndIndex{Cmd}{captionformat}%
+
+
+\begin{Declaration}
+  \Macro{figureformat}\\
+  \Macro{tableformat}
+\end{Declaration}%
+\BeginIndex{Cmd}{figureformat}%
+\BeginIndex{Cmd}{tableformat}%
+It was already mentioned that \Macro{captionformat} does not contain
+formatting for the label itself. This situation should under no
+circumstances be changed using redefinitions of the commands for the
+output of counters, \Macro{thefigure} or \Macro{thetable}. Such a
+redefinition would have unwanted side effects on the output of
+\Macro{ref} or the table of contents, list of figures and list of
+tables. To deal with the situation, {\KOMAScript} offers two
+\Macro{\dots format} commands instead. These are predefined as
+follows:
+% Umbruchkorrektur: listings
+\begin{lstcode}[belowskip=\dp\strutbox]
+  \newcommand*{\figureformat}{\figurename~\thefigure\autodot}
+  \newcommand*{\tableformat}{\tablename~\thetable\autodot}
+\end{lstcode}
+They also can be adapted to your personal preferences with
+\Macro{renewcommand}.
+\begin{Example}
+  From time to time captions without any label and of course without
+  delimiter are desired. In {\KOMAScript} it takes only the following
+  definitions to achieve this:
+\begin{lstcode}
+  \renewcommand*{\figureformat}{}
+  \renewcommand*{\tableformat}{}
+  \renewcommand*{\captionformat}{}
+\end{lstcode}
+  It should be noted, however, that although no numbering is output, the
+  internal counters are nevertheless incremented. This becomes important
+  especially if this redefinition is applied only to selected
+  \Environment{figure} or \Environment{table} environments.
+\end{Example}
+%
+\EndIndex{Cmd}{figureformat}%
+\EndIndex{Cmd}{tableformat}%
+
+
+\begin{Declaration}
+  \Macro{setcapindent}\Parameter{indent}\\
+  \Macro{setcapindent*}\Parameter{xindent}\\
+  \Macro{setcaphanging}
+\end{Declaration}%
+\BeginIndex{Cmd}{setcapindent}%
+\BeginIndex{Cmd}{setcapindent*}%
+\BeginIndex{Cmd}{setcaphanging}%
+As mentioned previously, in the standard classes the captions are set
+in a non-hanging style, that is, in multi-line captions the second and
+subsequent lines start directly beneath the label. The standard
+classes provide no direct mechanism to change this behaviour. In
+{\KOMAScript}, on the contrary, beginning at the second line all lines
+are indented by the width of the label so that the caption text is
+aligned.
+
+This behaviour, which corresponds to the usage of \Macro{setcaphanging}, can
+easily be changed by using the command \Macro{setcapindent} or
+\Macro{setcapindent*}. Here the parameter \PName{indent} determines the
+indentation of the second and subsequent lines. If you want a line break after
+the label and before the caption text, then you can define the indentation
+\PName{xindent} of the caption text with the starred version of the command
+instead: \Macro{setcapindent*}.
+Using a negative value of \PName{indent} instead, a line break is also
+inserted before the caption text and only the first line of the
+caption text but not subsequent lines are indented by
+the absolute value of \PName{indent}.
+
+Whether one-line captions are set as captions with more than one line or are
+treated separately is specified with the option \Option{captions}. For details
+please refer to the explanations of these option at
+\autopageref{desc:maincls.option.captions.oneline}.
+
+\begin{Example}
+  For the examples please refer to
+  figures~\ref{fig:maincls.caption.first} to
+  \ref{fig:maincls.caption.last}. As you can see the usage of a fully
+  hanging indentation is not advantageous when combined with narrow
+  column width. To illustrate, the source code for the second figure
+  is given here with a modified caption text:
+\begin{lstcode}
+  \begin{figure}
+    \setcapindent{1em}
+    \fbox{\parbox{.95\linewidth}{\centering{\KOMAScript}}}
+    \caption{Example with slightly indented caption
+             starting at the second line}
+  \end{figure}
+\end{lstcode}
+As can be seen the formatting can also be changed locally within the
+\Environment{figure} environment\IndexEnv{figure}. The change then
+affects only the current figure. Following figures once again use the
+default settings or global settings set, for example, in the preamble
+of the document. This also of course applies to tables.
+  \begin{figure}
+    \typeout{^^J--- Ignore underfull and overfull \string\hbox:}
+    \addtokomafont{caption}{\small}
+    \addtokomafont{captionlabel}{\bfseries}
+    \centering%
+    \begin{minipage}{.9\linewidth}
+      \begin{minipage}[t]{.48\linewidth}\sloppy
+        \fbox{\parbox{.95\linewidth}{\centering{\KOMAScript}}}
+        \caption[Example: Default figure caption]%
+        {\sloppy Equivalent to the standard setting, similar to the
+          usage of \Macro{setcaphanging}}
+        \label{fig:maincls.caption.first}
+      \end{minipage}
+      \hspace{.02\linewidth}
+      \begin{minipage}[t]{.48\linewidth}\sloppy
+        \setcapindent{1em}
+        \fbox{\parbox{.95\linewidth}{\centering{\KOMAScript}}}
+        \caption[Example: Figure caption with slightly hanging indention]%
+        {With slightly hanging indentation starting at the second line
+         using \Macro{setcapindent}\PParameter{1em}}
+      \end{minipage}
+    \end{minipage}
+
+    \vspace*{2ex}\noindent%
+    \begin{minipage}{.9\linewidth}
+      \begin{minipage}[t]{.48\linewidth}\sloppy
+        \setcapindent*{1em}
+        \fbox{\parbox{.95\linewidth}{\centering{\KOMAScript}}}
+        \caption[Example: Figure caption with hanging indention and line
+          break]% 
+        {With hanging indentation starting at the second line and line
+          break before the description using
+          \Macro{setcapindent*}\PParameter{1em}}
+      \end{minipage}
+      \hspace{.02\linewidth}
+      \begin{minipage}[t]{.48\linewidth}\sloppy
+        \setcapindent{-1em}
+        \fbox{\parbox{.95\linewidth}{\centering{\KOMAScript}}}
+        \caption[Example: Figure caption with hanging indention at the second
+          line]%
+        {With indentation in the second line only and line break
+          before the description using
+          \Macro{setcapindent}\PParameter{-1em}}
+                \label{fig:maincls.caption.last}
+      \end{minipage}
+    \end{minipage}
+    \typeout{^^J--- Don't ignore underfull and overfull
+      \string\hbox:^^J}
+  \end{figure}
+\end{Example}
+%
+\EndIndex{Cmd}{setcapindent}%
+\EndIndex{Cmd}{setcapindent*}%
+\EndIndex{Cmd}{setcaphanging}%
+
+
+\begin{Declaration}
+  \Macro{setcapwidth}\OParameter{justification}\Parameter{width}\\
+  \Macro{setcapmargin}\OParameter{margin left}\Parameter{margin}\\
+  \Macro{setcapmargin*}\OParameter{margin inside}\Parameter{margin}
+\end{Declaration}
+\BeginIndex{Cmd}{setcapwidth}%
+\BeginIndex{Cmd}{setcapmargin}%
+\BeginIndex{Cmd}{setcapmargin*}%
+Using\ChangedAt{v2.8q}{%
+  \Class{scrbook}\and\Class{scrreprt}\and\Class{scrartcl}} these three
+commands you can specify the width and justification of the caption
+text.  In general the whole text width or column width is available
+for the caption.
+
+With\important{\Macro{setcapwidth}} the command \Macro{setcapwidth} you can
+decrease this \PName{width}.  The obligatory argument determines the maximum
+\PName{width} of the caption.  As an optional argument you can supply exactly
+one letter which specifies the horizontal justification. The possible
+justifications are given in the following list.
+\begin{labeling}[~--]{\quad\PValue{o}}\rightskip=1em
+\item[\PValue{l}] left-aligned
+\item[\PValue{c}] centered
+\item[\PValue{r}] right-aligned
+\item[\PValue{i}] alignment at the inner margin in double-sided output
+\item[\PValue{o}] alignment at the outer margin in double-sided output
+\end{labeling}
+The justification inside and outside corresponds to left-aligned and
+right-aligned, respectively, in single-sided
+output. Within\textnote{Attention!}
+\Package{longtable}\IndexPackage{longtable}%
+\important{\Package{longtable}} tables the justification inside or outside
+does not work correctly. In particular, the captions on subsequent pages of
+such tables are aligned according to the format of the caption on the first
+page of the table. This is a conceptual problem in the implementation of
+\Package{longtable}.
+
+With\important{\Macro{setcapmargin}} the command \Macro{setcapmargin} you can
+specify a \PName{margin} which is to be left free next to the description in
+addition to the normal text margin. If you want margins with different widths
+at the left and right side you can specify these using the optional argument
+\PName{margin left}. The starred version \Macro{setcapmargin*} defines instead
+of a \PName{margin left} a \PName{margin inside} in a double-sided layout. In
+case of \Package{longtable}\IndexPackage{longtable}%
+\important{\Package{longtable}} tables you have to deal with the same problem
+with justification inside or outside as mentioned with the macro
+\Macro{setcapwidth}.  Furthermore, the usage of \Macro{setcapmargin} or
+\Macro{setcapmargin*} switches on the option \OptionValue{captions}{nooneline}
+(see \autopageref{desc:maincls.option.captions.nooneline}) for the captions
+which are typeset with this margin setting.
+
+You\textnote{Hint!} can also submit negative values for \PName{margin} and
+\PName{margin left} or \PName{margin inside}. This has the effect of the
+caption expanding into the margin.
+
+Experts\textnote{Hint!} and advanced users may find a tricky usage of
+\Macro{setcapwidth} in
+\iffree{\cite{book:komascript}}{\autoref{cha:floattricks},
+  \autopageref{cha:floattricks}}.%
+%
+\EndIndex{Cmd}{setcapwidth}%
+\EndIndex{Cmd}{setcapmargin}%
+\EndIndex{Cmd}{setcapmargin*}%
+
+\begin{Declaration}
+  \Option{origlongtable}
+\end{Declaration}%
+\BeginIndex{Option}{origlongtable}%
+\BeginIndex{Package}{longtable}%
+If the table captions produced by the \Package{longtable} package (see
+\cite{package:longtable}) should not be redefined by the {\KOMAScript}
+classes, activate the \Option{origlongtable} option. This\textnote{Attention!}
+option has to be used at the optional argument of \Macro{documentclass}. It
+may not be used as a setting of \Macro{KOMAoptions} or \Macro{KOMAoptions}.
+%
+\EndIndex{Package}{longtable}%
+\EndIndex{Option}{origlongtable}%
+
+
+\begin{Declaration}
+  \KOption{listof}\PName{setting}
+\end{Declaration}
+\BeginIndex{}{tables>list of}\BeginIndex{}{list of>tables}%
+\BeginIndex{}{figures>list of}\BeginIndex{}{list of>figures}%
+\BeginIndex{Option}{listof~=\PName{setting}}%
+Normally\ChangedAt{v3.00}{\Class{scrbook}\and \Class{scrreprt}\and
+  \Class{scrartcl}} lists of floating environments\,---\,like list of
+tables or list of
+figures will neither get an
+entry at the table of contents nor have a number at the heading. More
+information about that may be found in \autoref{sec:maincls.toc}. Alternative
+to the view from the table of contents to the lists of floating environments,
+you may reconsider a view from the lists of floating environments into the
+table of contents. Because of this, there are not only the options
+\OptionValue{toc}{nolistof}\IndexOption{toc~=\PValue{nolistof}},
+\OptionValue{toc}{listof}\IndexOption{toc~=\PValue{listof}}, and
+\OptionValue{toc}{listofnumbered}\IndexOption{toc~=\PValue{listofnumbered}}
+described in \autoref{sec:maincls.toc},
+\autopageref{desc:maincls.option.toc.listof}, but also
+\OptionValue{listof}{notoc}, \OptionValue{listof}{totoc}, and
+\OptionValue{listof}{numbered} with the same meaning.
+
+By default the headings of the lists of floating environments use the topmost
+level below \Macro{part}. This is the chapter level at \Class{scrbook} and
+\Class{scrreprt} and the section level at
+\Class{scrartcl}. With\ChangedAt{v3.06}{\Class{scrbook}\and
+  \Class{scrreprt}\and \Class{scrartcl}}
+\OptionValue{listof}{leveldown}\important{\OptionValue{listof}{leveldown}} a
+one step lower level will be used instead.
+\begin{Example}
+  At a book you want to move the list of figures and the list of tables as
+  sub-lists into a common list named ``Figures and Tables''. With
+\begin{lstcode}
+  \KOMAoption{listof}{leveldown}
+\end{lstcode}
+  you first declare to use the section instead of the chapter level for both
+  lists and then you use:
+\begin{lstcode}
+  \addchap*{Figures and Tables}
+  \listoffigures
+  \listoftables
+\end{lstcode}
+  for the new list, that contains the list of figures and the list of
+  tables. More information about the command \Macro{addchap*} may be found in
+  \autoref{sec:maincls.structure} at \autopageref{desc:maincls.cmd.addchap*}.
+\end{Example}
+
+Normally\ChangedAt{v2.8q}{%
+  \Class{scrbook}\and \Class{scrreprt}\and \Class{scrartcl}} the lists of
+floating environments use a constant with to place the caption number of the
+entries. Additionally all entries will be indented a little bit. This
+corresponds to setting
+\OptionValue{listof}{graduated}\IndexOption{listof~=\PValue{graduated}}.
+
+If the numbers of the figures or tables, become very wide\,---\,i.\,e., if you
+have a lot of tables or figures\,---\, their may be not enough width
+predefined. There's\important{\OptionValue{listof}{flat}} a setting
+\OptionValue{listof}{flat}\IndexOption{listof~=\PValue{flat}} for the lists of
+floating environment similar to
+\OptionValue{toc}{flat}\IndexOption{toc~=\PValue{flat}} for the table of
+contents. Thereby the needed with for printing the number will be determined
+at each \LaTeX{} run. See option \OptionValue{toc}{flat},
+\autoref{sec:maincls.toc}, \autopageref{desc:maincls.option.toc.flat} for
+information about how it works. Please\textnote{Attention!} note again, that
+you need more than one \LaTeX{} runs until the lists of floating environments
+will become their final result.
+
+Setting \OptionValue{listof}{entryprefix}\ChangedAt{v3.06}{\Class{scrbook}\and
+  \Class{scrreprt}\and \Class{scrartcl}} will automatically activate
+\OptionValue{listof}{flat}
+too. Normally\important{\OptionValue{listof}{entryprefix}} it wouldn't make
+sense to add the prefix ``figure'' to each entry of the list of figures and
+the prefix ``table'' to each entry of the list of tables, because nothing else
+than figures would be and should be expected at the list of figures and
+nothing else than tables would be and should be expected at the list of
+tables. So this prefixes wouldn't give any additional information and for this
+wouldn't be useful. Nevertheless, such prefixes may be added using option
+\OptionValue{listof}{entryprefix}. With this all entries of the same list will
+get the same prefix. The prefix will depend on the file extension of the
+helper file, that will be used for the corresponding list. For the list of
+figures the file extension would be ``\File{lof}'' and therefor
+\Macro{listoflofentryname} would be used. For the list of tables, the file
+extension would be ``\File{lot}'' and \Macro{listoflotentryname} would be
+used.
+
+Within classes \Class{scrbook} and \Class{scrreprt}\OnlyAt{\Class{scrbook}\and
+  \Class{scrreprt}} \KOMAScript{} adds a vertical gap to the lists of floating
+environments whenever a new chapter starts. This behaviour, that is same at
+the standard classes, structures the lists by chapters. At \KOMAScript{} it
+corresponds to setting \ChangedAt{v3.00}{\Class{scrbook}\and
+  \Class{scrreprt}\and \Class{scrartcl}}
+\OptionValue{listof}{chaptergapsmall}%
+\IndexOption{listof~=\PValue{chaptergapsmall}}. In this case a gap of width
+10\Unit{pt} will be used. With\important{\OptionValue{listof}{chaptergapline}}
+option \OptionValue{listof}{chaptergapline}%
+\IndexOption{listof~=\PValue{chaptergapline}} a gap of the height of one
+standard text line will be
+used. The\important{\OptionValue{listof}{nochaptergap}} gap may be switched of
+with \OptionValue{listof}{nochaptergap}%
+\IndexOption{listof~=\PValue{nochaptergap}}. Option\important{\OptionValue{listof}{chapterentry}}
+\OptionValue{listof}{chapterentry}%
+\IndexOption{listof~=\PValue{chapterentry}} is somehow special. Instead of a
+gap it adds the table of contents entry for the chapter additionally to the
+lists of floating environments. Please\textnote{Attention!} note, that this
+would also happen, if the chapter doesn't have any floating
+environment. Additional influence of chapters to the lists of floating
+environments is available with option \Option{chapteratlists}. See
+\autoref{sec:maincls.structure},
+\autopageref{desc:maincls.option.chapteratlists} for more information about
+that.
+
+An overview about all settings to option \Option{listof} may be found at
+\autoref{tab:maincls.listof}.
+
+\begin{desclist}
+  \desccaption[{Available values for option \Option{listof}}]{%
+    Available values for option \Option{listof} to modify contents and
+    formation of the lists of floating environments\label{tab:maincls.listof}%
+  }{%
+    Available values for option \Option{listof} (\emph{continuation})%
+  }%
+  \entry{\PValue{chapterentry}, \PValue{withchapterentry}}{%
+    Marks chapter starts at the lists of floating environments by a copy of
+    their entries to the table of contents.%
+    \IndexOption{listof~=\PValue{chapterentry}}}%
+  \entry{\PValue{chaptergapline}, \PValue{onelinechaptergap}}{%
+    Marks chapter starts at the lists of floating environments by a vertical
+    gap of the height of one standard text line.%
+    \IndexOption{listof~=\PValue{chaptergapline}}}%
+  \entry{\PValue{chaptergapsmall}, \PValue{smallchaptergap}}{%
+    Marks chapter starts at the lists of floating environments by a small
+    vertical gap.%
+    \IndexOption{listof~=\PValue{chaptergapsmall}}}%
+  \entry{\PValue{entryprefix}}{%
+    \ChangedAt{v3.06}{\Class{scrbook}\and \Class{scrreprt}\and
+      \Class{scrartcl}}%
+    Adds a prefix depending on the file extension of the list to each entry of
+    the lists of floating environments. The prefix additionally depends on the
+    language, e.\,g., in English ``Figure'' would be used for the entries to
+    the list of figures and ``Table'' for the entries to the list of
+    tables. Both prefixes will be followed by a white space.%
+    \IndexOption{listof~=\PValue{entryprefix}}}%
+  \entry{\PValue{flat}, \PValue{left}}{%
+    The lists of floating environments will be printed like a kind of
+    table. The caption numbers will be the first column, the caption texts the
+    second column, and the page numbers the last column. The with of the first
+    column depends on the previous \LaTeX{} run.%
+    \IndexOption{listof~=\PValue{flat}}}%
+  \entry{\PValue{graduated}, \PValue{indent}, \PValue{indented}}{%
+    The lists of floating environments will be printed in hierarchical
+    form. The width for the caption numbers will be limited.%
+    \IndexOption{listof~=\PValue{graduated}}}%
+  \entry{\PValue{leveldown}}{%
+    The lists of floating environments will use a heading of one step lower
+    sectioning level than default.%
+    \IndexOption{listof~=\PValue{leveldown}}}%
+  \entry{\PValue{nochaptergap}, \PValue{ignorechapter}}{%
+    Chapter starts won't be marked at the lists of floating environments.%
+    \IndexOption{listof~=\PValue{nochaptergap}}}%
+  \entry{\PValue{notoc}, \PValue{plainheading}}{%
+    The lists of floating environments, e.\,g., list of figures and list of
+    tables, won't generate an entry at the table of contents.%
+    \IndexOption{listof~=\PValue{notoc}}}%
+  \entry{\PValue{numbered}, \PValue{totocnumbered}, \PValue{tocnumbered},
+    \PValue{numberedtotoc}}{%
+    The lists of floating environments, e.\,g., list of figures and list of
+    tables, would get a numbered heading and therefor generate an entry at the
+    table of contents.%
+    \IndexOption{listof~=\PValue{numbered}}}%
+  \entry{\PValue{totoc}, \PValue{toc}, \PValue{notnumbered}}{%
+    The lists of floating environments, e.\,g., list of figures and list of
+    tables, would generate an entry at the table of contents, but their
+    headings won't be numbered.%
+    \IndexOption{listof~=\PValue{totoc}}}%
+\end{desclist}
+%
+\EndIndex{Option}{listof~=\PName{setting}}%
+
+
+\begin{Declaration}
+  \Macro{listoftables}\\
+  \Macro{listoffigures}
+\end{Declaration}
+\BeginIndex{Cmd}{listoftables}%
+\BeginIndex{Cmd}{listoffigures}%
+These commands generate a list of tables or figures.  Changes in the document
+that modify these lists will require two {\LaTeX} runs in order to take
+effect.  The layout of the lists can be influenced by the option
+\Option{listof}\important{\Option{listof}} with values \PValue{graduated} or
+\PValue{flat} (see \autopageref{desc:maincls.option.listof}).  Moreover, the
+values \PValue{listof} and \PValue{listofnumbered} of option
+\Option{toc}\important{\Option{toc}} (see \autoref{sec:maincls.toc}) as well
+as the values \PValue{totoc} and \PValue{numbered} of the previous described
+option \Option{listof} have influence to the lists of floating environments.
+
+Mostly\textnote{Hint!} the lists of floating environment may be found after
+the table of contents. But some publishers like to have these lists at the
+appendix. Nevertheless the author of this guide prefers to find them
+immediately after the table of contents.%
+\EndIndex{Cmd}{listoftables}%
+\EndIndex{Cmd}{listoffigures}%
+%
+\EndIndex{}{figures>list of}\EndIndex{}{list of>figures}%
+\EndIndex{}{tables>list of}\EndIndex{}{list of>tables}%
+%
+\EndIndex{}{figures}%
+\EndIndex{}{tables}%
+\EndIndex{}{floats}
+
 
 \section{Marginal Notes\protect\footnote{This section is still
     missing. Translators from German to English would be welcome!}}
@@ -2695,65 +3919,6 @@ course, all page layout options (see
 options. The reverse is also partially true.
 
 
-\begin{Declaration}
-  \OptionValue{captions}{oneline}\\
-  \OptionValue{captions}{nooneline}
-\end{Declaration}
-\BeginIndex{Option}{captions~=\PValue{oneline}}%
-\BeginIndex{Option}{captions~=\PValue{nooneline}}%
-The standard classes differentiate between one-line and multi-line
-table or figure captions. One-line captions are centered while
-multi-line captions are left-justified. This behavior, which is also
-the default with \KOMAScript, corresponds to the option
-\OptionValue{captions}{oneline}. There is no special handling of one-line
-captions when the \OptionValue{captions}{nooneline} option is given.
-
-\begin{Explain}
-  The avoidance of a special treatment for the caption has an
-  additional effect that is sometimes highly desirable. Footnotes that
-  appear inside a \Macro{caption} command often have a wrong number
-  assigned to them. This happens because the footnote counter is
-  incremented once as soon as the text is measured to determine if it
-  will be one line or more. When the \OptionValue{captions}{nooneline} option
-  is used no such measurement is made. The footnote numbers are
-  therefore correct.
-
-  But since {\KOMAScript} version~2.9 you don't need the option
-  \OptionValue{captions}{nooneline} to avoid the above described
-  effect. {\KOMAScript} classes contain a workaround, so you can have
-  footnotes inside captions. It should be mentioned though that when
-  using footnotes inside floating environments, the contents of the
-  floating environment should be encapsulated inside a minipage. That
-  way it is guaranteed that floating environment and footnote are
-  inseparable.
-\end{Explain}
-%
-\EndIndex{Option}{captions~=\PValue{oneline}}%
-\EndIndex{Option}{captions~=\PValue{nooneline}}%
-
-
-\subsection{Options for Lists of Floats}
-\label{sec:maincls.listsOptions}
-
-The best known lists of floats are the list of figures and the list of
-tables.  Additionally, with help from the
-\Package{float}\IndexPackage{float} package, for instance, it is
-possible to produce new float environments with corresponding lists.
-
-\begin{Explain}
-  Whether {\KOMAScript} options have any effect on lists of floats
-  produced by other packages depends mainly on those packages. This is
-  generally the case with the lists of floats produced by the
-  \Package{float}\IndexPackage{float} package.
-
-  Besides the options described here, there are others that affect the
-  lists of floats though not their formatting or contents. Instead
-  they affect what is included in the table of contents. The
-  corresponding descriptions can therefore be found in
-  \autoref{sec:maincls.tocOptions}.
-\end{Explain}
-
-
 \subsection{Options Affecting the Formatting}
 \label{sec:maincls.formattingOptions}
 
@@ -2761,68 +3926,7 @@ Formatting options are all those options that affect the form or
 formatting of the document and cannot be assigned to other sections.
 They are therefore the \emph{remaining options}.
 
-\begin{Declaration}
-  \OptionValue{captions}{tablesignature}\\
-  \OptionValue{captions}{tableheading}
-\end{Declaration}%
-\BeginIndex{Option}{captions~=\PValue{tablesignature}}%
-\BeginIndex{Option}{captions~=\PValue{tableheading}}%
-As described in \autoref{sec:maincls.floats},
-\autopageref{desc:maincls.cmd.caption}, the
-\Macro{caption}\IndexCmd{caption} command acts with figures like the
-\Macro{captionbelow}\IndexCmd{captionbelow} command. The behaviour
-with tables, however, depends on these two options.  In the default
-setting, \OptionValue{captions}{tablesignature}, the \Macro{caption} macro acts
-also with tables like the \Macro{captionbelow} command. With the
-\OptionValue{captions}{tableheading} option, \Macro{caption} acts like the
-\Macro{captionabove}\IndexCmd{captionabove} command.
 
-Note that using any of these options does not change the position of
-the caption from above the top of the table to below the bottom of the
-table or vica versa. It only affects whether the text is formatted as
-a caption for use above or below a table. Whether the text is in fact
-placed above or below a table is set through the position of the
-\Macro{caption} command inside the \Environment{table} environment.
-
-Note\OnlyAt{\Package{float}}\IndexPackage{float} that when using the
-\Package{float} package, the options \OptionValue{captions}{tablesignature} and
-\OptionValue{captions}{tableheading} cease to act correctly when
-\Macro{restylefloat} is applied to tables. More details of the
-\Package{float} package and \Macro{restylefloat} can be found in
-\cite{package:float}. Additional support in {\KOMAScript} for the
-\Package{float} package may be found at the explanation of
-\PValue{komaabove} in \autoref{sec:maincls.floats},
-\autopageref{desc:maincls.floatstyle.komaabove}.
-%
-\EndIndex{Option}{captions~=\PValue{tablesignature}}%
-\EndIndex{Option}{captions~=\PValue{tableheafins}}%
-
-
-\begin{Explain}%
-\begin{Declaration}
-  \Option{origlongtable}
-\end{Declaration}%
-\BeginIndex{Option}{origlongtable}%
-The package\OnlyAt{\Package{longtable}}
-\Package{longtable}\IndexPackage{longtable} (see
-\cite{package:longtable}) sets table captions internally by calling
-the command \Macro{LT@makecaption}.  In order to ensure that these
-table captions match the ones used with normal tables, the
-{\KOMAScript} classes normally redefine that command. See
-\autoref{sec:maincls.floats},
-\autopageref{desc:maincls.cmd.caption.longtable} for more
-details. The redefinition is performed with help of the command
-\Macro{AfterPackage} immediately after the loading of package
-\Package{longtable}.  If the package
-\Package{caption2}\IndexPackage{caption2} (see \cite{package:caption})
-has been previously loaded, the redefinition is not made in order not
-to interfere with the \Package{caption2} package.
-\end{Explain}
-If the table captions produced by the \Package{longtable} package
-should not be redefined by the {\KOMAScript} classes, activate the
-\Option{origlongtable} option.
-%
-\EndIndex{Option}{origlongtable}%
 
 
 \begin{Declaration}
@@ -2867,52 +3971,6 @@ only a stretchable horizontal space.
 
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-\section{Lists of Floats\protect\footnote{This section is deprecated
-    and should be replaced by new sections using the structure of the German
-    guide. Translators from English to German would be welcome! You may find
-    additional information about obsolete or deprecated options at
-    \autoref{cha:maincls-experts}.}}
-
-As a rule, the lists of floats\Index{floating environments}, e.\,g., list of
-tables\Index[indexmain]{list>of tables} and list of
-figures\Index[indexmain]{list>of figures}, can be found directly after the
-table of contents.  In some documents, they can even be found in the appendix.
-However, the author of this manual prefers their location after the table of
-contents, therefore the explanation is given here.
-
-\begin{Declaration}
-  \Macro{listoftables}\\
-  \Macro{listoffigures}\\
-  \Macro{listtablename}\\
-  \Macro{listfigurename}
-\end{Declaration}
-\BeginIndex{Cmd}{listoftables}%
-\BeginIndex{Cmd}{listoffigures}%
-\BeginIndex{Cmd}{listtablename}%
-\BeginIndex{Cmd}{listfigurename}%
-These commands generate a list of tables or figures.  Changes in the document
-that modify these lists will require two {\LaTeX} runs in order to take
-effect.  The layout of the lists can be influenced by the options
-\OptionValue{listof}{graduated} and \OptionValue{listof}{flat} (see
-\autoref{sec:maincls.listsOptions},
-\autopageref{desc:maincls.option.listof}).  Moreover, the options
-\OptionValue{listof}{totoc} and \OptionValue{listof}{numbered} have indirect
-influence (see \autoref{sec:maincls.tocOptions},
-\autopageref{desc:maincls.option.listof.totoc}).
-
-\begin{Explain}
-  The text of the titles of this tables are stored in the macros
-  \Macro{listtablename} and \Macro{listfigurename}. If you use a
-  language package like \Package{babel} and want to redefine these
-  macros, you should read the documentation of the language package.
-\end{Explain}
-%
-\EndIndex{Cmd}{listoftables}%
-\EndIndex{Cmd}{listoffigures}%
-\EndIndex{Cmd}{listtablename}%
-\EndIndex{Cmd}{listfigurename}%
 
 
 \section{Main Text\protect\footnote{This section is deprecated
@@ -2988,700 +4046,6 @@ code above.
 %
 \EndIndex{Cmd}{marginpar}%
 \EndIndex{Cmd}{marginline}%
-
-
-\subsection{Tables and Figures}
-\label{sec:maincls.floats.obsolete}
-
-\begin{Explain}
-  With the floating environments {\LaTeX} offers a very capable and
-  comfortable mechanism for automatic placement of
-  figures\Index{figure} and tables\Index{table}. But often these
-  floating environments\Index[indexmain] {floating environments} are
-  slightly misunderstood by beginners. They often ask for a fixed
-  position of a table or figure within the text. However, since these
-  floating environments are being referenced in the text this is not
-  necessary in most cases. It is also not sensible because such an
-  object can only be set on the page if there is enough space left for
-  it. If this is not the case the object would have to be shifted onto
-  the next page, thereby possibly leaving a huge blank space on the
-  page before.
-  
-  Often one finds in a document for every floating object the same
-  optional argument for positioning the object. This also makes no
-  sense. In such cases one should rather change the standard parameter
-  globally. For more details refer to \cite{DANTE:FAQ}.\par
-\end{Explain}
-
-One last important note before starting this section: most mechanisms
-described here which extend the capabilities of the standard classes
-no longer work correctly when used together with packages which modify
-the typesetting of captions of figures and tables. This should be self
-evident, but it is often not understood.
-
-\begin{Declaration}
-  \Macro{caption}\OParameter{entry}\Parameter{title}\\
-  \Macro{captionbelow}\OParameter{entry}\Parameter{title}\\
-  \Macro{captionabove}\OParameter{entry}\Parameter{title}
-\end{Declaration}%
-\BeginIndex{Cmd}{caption}%
-\BeginIndex{Cmd}{captionabove}%
-\BeginIndex{Cmd}{captionbelow}%
-In the standard classes caption text \PName{title} of tables and
-figures is inserted with the \Macro{caption} command below the table
-or figure. In general this is correct for figures. Opinions differ as
-to whether captions of tables are to be placed above or, consistent
-with captions of figures\Index{caption>of figure}, below the
-table\Index{caption>of table}. That is the reason why {\KOMAScript},
-unlike the standard classes, offers \Macro{captionbelow} for captions
-below and \Macro{captionabove} for captions above tables or
-figures. Using \Macro{caption} for figures always produces captions
-below the figure, whereas with tables the behaviour of \Macro{caption}
-can be modified using the options
-\OptionValue{captions}{tableheading} and
-\OptionValue{captions}{tablesignature} (see
-\autoref{sec:maincls.formattingOptions},
-\autopageref{desc:maincls.option.captions.tableheading}). For
-compatibility reasons the default behaviour of \Macro{caption} used
-with tables is similar to \Macro{captionbelow}.
-%
-\begin{Example}
-  Instead of using captions below a table you want to place your
-  captions above it\Index{table>caption}, because you have tables
-  which span more then one page. In the standard classes you could
-  only write:
-\begin{lstcode}
-  \begin{table}
-    \caption{This is an example table}
-    \begin{tabular}{llll}
-      This & is & an & example.\\\hline
-      This & is & an & example.\\
-      This & is & an & example.
-    \end{tabular}
-  \end{table}
-\end{lstcode}
-  Then you would get the unsatisfying result:
-  \begin{ShowOutput}\centering
-    {\usekomafont{caption}{\usekomafont{captionlabel}\tablename~30.2:}
-      This is an example table.}\\
-        \begin{tabular}{llll}
-      This & is & an & example.\\\hline
-      This & is & an & example.\\
-      This & is & an & example.
-        \end{tabular}
-\end{ShowOutput}
-  Using {\KOMAScript} you write instead:
-\begin{lstcode}
-  \begin{table}
-    \captionabove{This is just an example table}
-    \begin{tabular}{llll}
-      This & is & an & example.\\\hline
-      This & is & an & example.\\
-      This & is & an & example.
-    \end{tabular}
-  \end{table}
-\end{lstcode}
-  Then you get:
-  \begin{ShowOutput}\centering
-    {\usekomafont{caption}{\usekomafont{captionlabel}\tablename~30.2:}
-      This is just an example table}\\\vskip\abovecaptionskip
-    \begin{tabular}{llll}
-      This & is & an & example.\\\hline
-      This & is & an & example.\\
-      This & is & an & example.
-    \end{tabular}
-  \end{ShowOutput}
-  Since you want all your tables typeset with captions above, you could
-  of course use the option \OptionValue{captions}{tableheading} instead (see
-  \autoref{sec:maincls.formattingOptions},
-  \autopageref{desc:maincls.option.captions.tableheading}). Then you can use
-  \Macro{caption} as you would in the standard classes. You will get
-  the same result as with \Macro{captionabove}.
-\end{Example}
-
-\begin{Explain}
-  Some would argue that you could achieve the same result using the
-  \Macro{topcaption} command from the \Package{topcapt}
-  package\IndexPackage{topcapt} (see \cite{package:topcapt}). However,
-  that is not the case. The command \Macro{topcaption} is ignored by
-  packages which directly redefine the \Macro{caption} macro. The
-  \Package{hyperref} package (see \cite{package:hyperref}) is one such
-  example. In {\KOMAScript}, \Macro{captionabove} and
-  \Macro{captionbelow} are so implemented that changes have an effect
-  on both of these commands as well.
-  
-  \phantomsection\label{desc:maincls.cmd.caption.longtable}%
-  If the \Package{longtable} package\IndexPackage{longtable} is used,
-  {\KOMAScript} ensures that captions above tables which are placed
-  within a \Environment{longtable} environment have the same
-  appearance as those in a normal \Environment{table}
-  environment. This also means that you can apply the same settings as
-  in a \Environment{table} environment. Please note that in the
-  \Package{longtable} package the maximum width of a table caption can
-  be limited and the default is set to 4\Unit{in} (see
-  \cite{package:longtable}). Used together with {\KOMAScript} this
-  mechanism in \Package{longtable} works only if the class option
-  \Option{origlongtable} is set (see
-  \autoref{sec:maincls.formattingOptions},
-  \autopageref{desc:maincls.option.origlongtable}). If the
-  \Package{caption2}\IndexPackage{caption2} or
-  \Package{caption}\IndexPackage{caption} package (see
-  \cite{package:caption}) is loaded, table captions are handled by
-  this package.
-  
-  Please note that \Macro{captionabove} and \Macro{captionbelow}, if
-  placed within a \Environment{float} environment which was defined
-  using the \Package{float}\IndexPackage{float} package, have the
-  exact same behaviour described in \cite{package:float} for the
-  \Macro{caption} command.  In this case, the float style determines
-  whether the caption will be set below or above the figure or table.
-\end{Explain}
-
-
-\begin{Declaration}
-  \Environment{captionbeside}\OParameter{entry}%
-    \Parameter{title}\OParameter{placement}\OParameter{width}%
-    \OParameter{offset}\\%
-  \XEnvironment{captionbeside}\OParameter{entry}%
-    \Parameter{title}\OParameter{placement}\OParameter{width}%
-    \OParameter{offset}\PValue{*}
-\end{Declaration}
-\BeginIndex{Env}{captionbeside}%
-Apart\ChangedAt{v2.8q}{%
-  \Class{scrbook}\and\Class{scrreprt}\and\Class{scrartcl}} from
-captions above and below the figure, one often finds captions, in
-particular with small figures, which are placed beside the figure. In
-general in this case both the baseline of the figure and of the
-caption are aligned at the bottom. With some fiddling and the use of
-two \Macro{parbox} commands this could also be achieved in the
-standard classes.  However, {\KOMAScript} offers a special environment
-for this which can be used within the floating environment.  The first
-optional parameter \PName{entry} and the obligatory parameter
-\PName{title} mean the same as the corresponding parameters of
-\Macro{caption}, \Macro{captionabove} or \Macro{captionbelow}. The
-caption text \PName{title} is placed beside the content of the
-environment in this case.
-
-Whether the caption text \PName{title} is placed on the left or the
-right can be determined by the parameter \PName{placement}. Exactly
-one of the following letters is allowed:
-\begin{labeling}[--~]{\PValue[o]}
-\item[\PValue{l}] left
-\item[\PValue{r}] right
-\item[\PValue{i}] inner margin in two-sided layout
-\item[\PValue{o}] outer margin in two-sided layout
-\end{labeling}
-Default setting is to the right of the content of the environment.  If
-either \PValue{o} or \PValue{i} are used you may need to run {\LaTeX}
-twice to obtain the correct placement.
-
-Per default the content of the environment and the caption text
-\PName{title} fill the entire available text width. However, using the
-optional parameter \PName{width}, it is possible to adjust the width
-used. This width could even be larger than the current text width.
-
-When supplying a \PName{width} the used width is usually centered with
-respect to the text width. Using the optional parameter
-\PName{offset}, you can shift the environment relative to the left
-margin. A positive value corresponds to a shift to the right, whereas
-a negative value corresponds to a shift to the left. An \PName{offset}
-of 0\Unit{pt} gives you a left-aligned output.
-
-Adding a star to the optional parameter \PName{offset} makes the the
-value mean a shift relative to the right margin on left hand pages in
-two-sided layout. A positive value corresponds to a shift towards the
-outer margin, whereas a negative value corresponds to a shift towards
-the inner margin. An \PName{offset} of 0\Unit{pt} means alignment with
-the inner margin. As mentioned before, in some cases it takes two
-{\LaTeX} runs for this to work correctly.
-
-\begin{Example}
-  An example for the usage of the \Environment{captionbeside} environment
-  can be found in \autoref{fig:maincls.captionbeside}.
-  This figure was typeset with:
-\begin{lstcode}
-  \begin{figure}
-    \begin{captionbeside}[Example for a figure description]%
-      {A figure description which is neither above nor
-       below, but beside the figure}[i][\linewidth][2em]*
-      \fbox{%
-        \parbox[b][5\baselineskip][c]{.25\textwidth}{%
-          \hspace*{\fill}\KOMAScript\hspace*{\fill}\par}}
-    \end{captionbeside}
-    \label{fig:maincls.captionbeside}
-  \end{figure}
-\end{lstcode}
-  \begin{figure}
-    \begin{captionbeside}[Example for a figure description]%
-      {A figure description which is neither above nor 
-       below, but beside the figure}[i][\linewidth][2em]*
-      \fbox{%
-        \parbox[b][5\baselineskip][c]{.25\textwidth}{%
-          \hspace*{\fill}\KOMAScript\hspace*{\fill}\par}}
-    \end{captionbeside}
-    \label{fig:maincls.captionbeside}
-  \end{figure}
-  The total width is thus the currently available width
-  \PValue{\Macro{linewidth}}. However, this width is shifted
-  \PValue{2em} to the outside. The caption text or description is
-  placed on the inner side beside the figure. The figure itself is
-  shifted 2\Unit{em} into the outer margin.
-\end{Example}
-%
-\EndIndex{Env}{captionbeside}
-
-
-\BeginIndex[indexother]{}{font>style}
-The font style\ChangedAt{v2.8p}{%
-  \Class{scrbook}\and\Class{scrreprt}\and\Class{scrartcl}} for the
-description and the label\,---\,``Figure'' or ``Table'', followed by
-the number and the delimiter\,---\,can be changed with the commands
-described in \autoref{sec:maincls.font}. The respective elements for
-this are \FontElement{caption}\IndexFontElement{caption} and
-\FontElement{captionlabel}\IndexFontElement{captionlabel} (see
-\autoref{tab:maincls.elementsWithoutText},
-\autopageref{tab:maincls.elementsWithoutText}).  First the font style
-for the element \FontElement{caption} is applied to the element
-\FontElement{captionlabel} too.  After this the font style of
-\FontElement{captionlabel} is applied on the respective element. The
-default settings are listed in \autoref{tab:maincls.captionFont}.
-%
-\begin{table}
-  \centering%
-  \caption{Font defaults for the elements of figure or table captions}
-  \begin{tabular}{ll}
-    \toprule
-    element & default \\
-    \midrule
-    \FontElement{caption} & \Macro{normalfont} \\
-    \FontElement{captionlabel} & \Macro{normalfont}\\
-    \bottomrule
-  \end{tabular}
-  \label{tab:maincls.captionFont}
-\end{table}
-%
-\begin{Example}
-  You want the table and figure descriptions typeset in a smaller font
-  size. Thus you could write the following in the preamble of your
-  document:
-\begin{lstcode}
-  \addtokomafont{caption}{\small}
-\end{lstcode}
-  Furthermore, you would like the labels to be printed in sans serif and
-  bold. You add:
-\begin{lstcode}
-  \setkomafont{captionlabel}{\sffamily\bfseries}
-\end{lstcode}
-  As you can see, simple extensions of the default definitions are
-  possible.
-\end{Example}
-\EndIndex[indexother]{}{font>style}
-%
-\EndIndex{Cmd}{caption}%
-\EndIndex{Cmd}{captionabove}%
-\EndIndex{Cmd}{captionbelow}%
-
-
-\begin{Explain}
-\begin{Declaration}
-  \FloatStyle{komaabove}\\
-  \FloatStyle{komabelow}
-\end{Declaration}%
-\BeginIndex{Floatstyle}{komaabove}%
-\BeginIndex{Floatstyle}{komabelow}%
-If you use\OnlyAt{\Package{float}} the
-\Package{float}\IndexPackage{float} package the appearance of the
-float environments is solely defined by the \emph{float} style. This
-includes whether captions above or below are used. In the
-\Package{float} package there is no predefined style which gives you
-the same output and offers the same setting options (see below) as
-{\KOMAScript}.  Therefore {\KOMAScript} defines the two additional
-styles \PValue{komaabove} and \PValue{komabelow}.  When using the
-\Package{float} package these styles can be activated just like the
-styles \PValue{plain}\IndexFloatstyle{plain},
-\PValue{boxed}\IndexFloatstyle{boxed} or
-\PValue{ruled}\IndexFloatstyle{ruled} defined in \Package{float}.  For
-details refer to \cite{package:float}.  The style \PValue{komaabove}
-inserts \Macro{caption}, \Macro{captionabove} and \Macro{captionbelow}
-above, whereas \PValue{komabelow} inserts them below the float
-content.
-%
-\EndIndex{Floatstyle}{komaabove}%
-\EndIndex{Floatstyle}{komabelow}%
-\end{Explain}
-
-
-\begin{Declaration}
-  \Macro{captionformat}
-\end{Declaration}%
-\BeginIndex{Cmd}{captionformat}%
-In {\KOMAScript} there are different ways to change the formatting of
-the caption text. The definition of different font styles was already
-explained above. This or the caption delimiter between the label and
-the label text itself is specified in the macro \Macro{captionformat}.
-In contrast to all other \Macro{\dots}format commands, in this case it
-does not contain the counter but only the items which follow it. The
-original definition is:
-\begin{lstcode}
-  \newcommand*{\captionformat}{:\ }
-\end{lstcode}
-This too can be changed with \Macro{renewcommand}.
-\begin{Example}
-  For some inexplicable reasons you want a dash with spaces before and
-  after instead of a colon followed by a space as label delimiter. You
-  define:
-\begin{lstcode}
-  \renewcommand*{\captionformat}{~--~}
-\end{lstcode}
-This definition should be put in the preamble of your document.
-\end{Example}
-%
-\EndIndex{Cmd}{captionformat}%
-
-
-\begin{Declaration}
-  \Macro{figureformat}\\
-  \Macro{tableformat}
-\end{Declaration}%
-\BeginIndex{Cmd}{figureformat}%
-\BeginIndex{Cmd}{tableformat}%
-It was already mentioned that \Macro{captionformat} does not contain
-formatting for the label itself. This situation should under no
-circumstances be changed using redefinitions of the commands for the
-output of counters, \Macro{thefigure} or \Macro{thetable}. Such a
-redefinition would have unwanted side effects on the output of
-\Macro{ref} or the table of contents, list of figures and list of
-tables. To deal with the situation, {\KOMAScript} offers two
-\Macro{\dots format} commands instead. These are predefined as
-follows:
-\begin{lstcode}
-  \newcommand*{\figureformat}{\figurename~\thefigure\autodot}
-  \newcommand*{\tableformat}{\tablename~\thetable\autodot}
-\end{lstcode}
-They also can be adapted to your personal preferences with
-\Macro{renewcommand}.
-\begin{Example}
-  From time to time captions without any label and of course without
-  delimiter are desired. In {\KOMAScript} it takes only the following
-  definitions to achieve this:
-\begin{lstcode}
-  \renewcommand*{\figureformat}{}
-  \renewcommand*{\tableformat}{}
-  \renewcommand*{\captionformat}{}
-\end{lstcode}
-It should be noted, however, that although no numbering is output, the
-internal counters are nevertheless incremented. This becomes important
-especially if this redefinition is applied only to selected
-\Environment{figure} or \Environment{table} environments.
-\end{Example}
-%
-\EndIndex{Cmd}{figureformat}%
-\EndIndex{Cmd}{tableformat}%
-
-\begin{Declaration}
-  \Macro{setcapindent}\Parameter{indent}\\
-  \Macro{setcapindent*}\Parameter{xindent}\\
-  \Macro{setcaphanging}
-\end{Declaration}%
-\BeginIndex{Cmd}{setcapindent}%
-\BeginIndex{Cmd}{setcapindent*}%
-\BeginIndex{Cmd}{setcaphanging}%
-As mentioned previously, in the standard classes the captions are set
-in a non-hanging style, that is, in multi-line captions the second and
-subsequent lines start directly beneath the label. The standard
-classes provide no direct mechanism to change this behaviour. In
-{\KOMAScript}, on the contrary, beginning at the second line all lines
-are indented by the width of the label so that the caption text is
-aligned.
-
-This behaviour, which corresponds to the usage of
-\Macro{setcaphanging}, can easily be changed by using the command
-\Macro{setcapindent} or \Macro{setcapindent*}. Here the parameter
-\PName{indent} determines the indentation of the second and subsequent
-lines.
-
-If you want a line break after the label and before the caption text,
-then you can define the indentation \PName{xindent} of the caption
-text with the starred version of the command instead:
-\Macro{setcapindent*}.
-
-Using a negative value of \PName{indent} instead, a line break is also
-inserted before the caption text and only the first line of the
-caption text but not subsequent lines are indented by
-the absolute value of \PName{indent}.
-
-Whether one-line captions are set as captions with more than one line
-or are treated separately is specified with the class options
-\OptionValue{captions}{oneline} and \OptionValue{captions}{nooneline}. For details
-please refer to the explanations of these options in
-\autoref{sec:maincls.layoutOptions},
-\autopageref{desc:maincls.option.captions.nooneline}.
-
-\begin{Example}
-  For the examples please refer to
-  figures~\ref{fig:maincls.caption.first} to
-  \ref{fig:maincls.caption.last}. As you can see the usage of a fully
-  hanging indentation is not advantageous when combined with narrow
-  column width. To illustrate, the source code for the second figure
-  is given here with a modified caption text:
-\begin{lstcode}
-  \begin{figure}
-    \setcapindent{1em}
-    \fbox{\parbox{.95\linewidth}{\centering{\KOMAScript}}}
-    \caption{Example with slightly indented caption
-             starting at the second line}
-  \end{figure}
-\end{lstcode}
-As can be seen the formatting can also be changed locally within the
-\Environment{figure} environment\IndexEnv{figure}. The change then
-affects only the current figure. Following figures once again use the
-default settings or global settings set, for example, in the preamble
-of the document. This also of course applies to tables.
-  \begin{figure}
-    \typeout{^^J--- Ignore underfull and overfull \string\hbox:}
-    \addtokomafont{caption}{\small}
-    \addtokomafont{captionlabel}{\bfseries}
-    \centering%
-    \begin{minipage}{.9\linewidth}
-      \begin{minipage}[t]{.48\linewidth}\sloppy
-        \fbox{\parbox{.95\linewidth}{\centering{\KOMAScript}}}
-        \caption[Example for figure caption]%
-        {\sloppy Equivalent to the standard setting, similar to the
-          usage of \Macro{setcaphanging}}
-        \label{fig:maincls.caption.first}
-      \end{minipage}
-      \hspace{.02\linewidth}
-      \begin{minipage}[t]{.48\linewidth}\sloppy
-        \setcapindent{1em}
-        \fbox{\parbox{.95\linewidth}{\centering{\KOMAScript}}}
-        \caption[Example for figure caption]%
-        {With slightly hanging indentation starting at the second line
-         using \Macro{setcapindent}\PParameter{1em}}
-      \end{minipage}
-    \end{minipage}
-
-    \vspace*{2ex}\noindent%
-    \begin{minipage}{.9\linewidth}
-      \begin{minipage}[t]{.48\linewidth}\sloppy
-        \setcapindent*{1em}
-        \fbox{\parbox{.95\linewidth}{\centering{\KOMAScript}}}
-        \caption[Example for a figure caption]%
-        {With hanging indentation starting at the second line and line
-          break before the description using
-          \Macro{setcapindent*}\PParameter{1em}}
-      \end{minipage}
-      \hspace{.02\linewidth}
-      \begin{minipage}[t]{.48\linewidth}\sloppy
-        \setcapindent{-1em}
-        \fbox{\parbox{.95\linewidth}{\centering{\KOMAScript}}}
-        \caption[Example for a figure caption]%
-        {With indentation in the second line only and line break
-          before the description using
-          \Macro{setcapindent}\PParameter{-1em}}
-                \label{fig:maincls.caption.last}
-      \end{minipage}
-    \end{minipage}
-    \typeout{^^J--- Don't ignore underfull and overfull
-      \string\hbox:^^J}
-  \end{figure}
-\end{Example}
-%
-\EndIndex{Cmd}{setcapindent}%
-\EndIndex{Cmd}{setcapindent*}%
-\EndIndex{Cmd}{setcaphanging}%
-
-
-\begin{Declaration}
-  \Macro{setcapwidth}\OParameter{justification}\Parameter{width}\\
-  \Macro{setcapmargin}\OParameter{margin left}\Parameter{margin}\\
-  \Macro{setcapmargin*}\OParameter{margin inside}\Parameter{margin}
-\end{Declaration}
-\BeginIndex{Cmd}{setcapwidth}%
-\BeginIndex{Cmd}{setcapmargin}%
-\BeginIndex{Cmd}{setcapmargin*}%
-Using\ChangedAt{v2.8q}{%
-  \Class{scrbook}\and\Class{scrreprt}\and\Class{scrartcl}} these three
-commands you can specify the width and justification of the caption
-text.  In general the whole text width or column width is available
-for the caption.
-
-With the command \Macro{setcapwidth} you can decrease this
-\PName{width}.  The obligatory argument determines the maximum
-\PName{width} of the caption.  As an optional argument you can supply
-exactly one letter which specifies the horizontal justification. The
-possible justifications are given in the following list.
-\begin{labeling}[--~]{\PValue[o]}
-\item[\PValue{l}] left-aligned
-\item[\PValue{c}] centered
-\item[\PValue{r}] right-aligned
-\item[\PValue{i}] alignment at the inner margin in double-sided output
-\item[\PValue{o}] alignment at the outer margin in double-sided output
-\end{labeling}
-The justification inside and outside corresponds to left-aligned and
-right-aligned, respectively, in single-sided output. Within
-\Package{longtable}\IndexPackage{longtable} tables the justification
-inside or outside does not work correctly. In particular, the captions
-on subsequent pages of such tables are aligned according to the format
-of the caption on the first page of the table. This is a conceptual
-problem in the implementation of \Package{longtable}.
-
-With the command \Macro{setcapmargin} you can specify a \PName{margin}
-which is to be left free next to the description in addition to the
-normal text margin. If you want margins with different widths at the
-left and right side you can specify these using the optional argument
-\PName{margin left}. The starred version \Macro{setcapmargin*} defines
-instead of a \PName{margin left} a \PName{margin inside} in a
-double-sided layout. In case of
-\Package{longtable}\IndexPackage{longtable} tables you have to deal
-with the same problem with justification inside or outside as
-mentioned with the macro \Macro{setcapwidth}.  Furthermore, the usage
-of \Macro{setcapmargin} or \Macro{setcapmargin*} switches on the
-option \OptionValue{captions}{nooneline} (see
-\autoref{sec:maincls.layoutOptions},
-\autopageref{desc:maincls.option.captions.nooneline}) for the captions
-which are typeset with this margin setting.
-
-\begin{Explain}
-  \Package{longtable} places the caption in a box, which is issued
-  again on subsequent pages as needed. When outputting a box, the
-  macros needed for its creation are not reevaluated. That is the
-  reason why it is not possible for {\KOMAScript} to swap margin
-  settings for even pages in double-sided layout . This is what would
-  be necessary in order to produce a justification which is shifted
-  towards the outside or inside.
-  
-  You can also submit negative values for \PName{margin} and
-  \PName{margin left} or \PName{margin inside}. This has the effect
-  of the caption expanding into the margin.
-\end{Explain}
-
-\begin{Example}
-  A rather odd problem is that of a figure caption which is required
-  to be both centered and of the same width as the figure itself. If
-  the width of the figure is known in advance, the solution with
-  {\KOMAScript} is quite easy. Supposing the figure has a width of
-  8\Unit{cm}, it only takes:
-\begin{lstcode}
-  \setcapwidth[c]{8cm}
-\end{lstcode}
-directly in front of \Macro{caption} or \Macro{captionbelow}. If the
-width is unknown then you first have to define a length in the
-preamble of your document:
-\begin{lstcode}
-  \newlength{\FigureWidth}
-\end{lstcode}
-  Having done this you can calculate the width directly with the
-  {\LaTeX} command \Macro{settowidth} (see \cite{latex:usrguide})
- in many cases. A possible solution would look as follows:
-\begin{lstcode}
-  \begin{figure}
-    \centering%
-    \settowidth{\FigureWidth}{%
-      \fbox{\quad\KOMAScript\quad}%
-      }%
-    \fbox{\quad\KOMAScript\quad}%
-    \setcapwidth[c]{\FigureWidth}
-    \caption{Example of a centered caption below the figure}
-  \end{figure}
-\end{lstcode}
-However, it is awkward to write the content twice and to call
-\Macro{setcapwidth} for every figure. Yet nothing is easier than
-defining a new command in the preamble of your document which hides
-the three steps of:
-  \begin{enumerate}
-  \item defining the width of the argument
-  \item specifying the width of the caption
-  \item outputting the argument
-  \end{enumerate}
-  in:
-\begin{lstcode}
-  \newcommand{\Figure}[1]{%
-    \settowidth{\FigureWidth}{#1}%
-    \setcapwidth[c]{\FigureWidth}%
-    #1}
-\end{lstcode}
-  Using this command the example abbreviates to:
-\begin{lstcode}
-  \begin{figure}
-    \centering%
-    \Figure{\fbox{\quad\KOMAScript\quad}}%
-    \caption{Example of a centered caption below the figure}
-  \end{figure}
-\end{lstcode}
-  
-However, commands have the disadvantage that errors in the macros of
-the argument in case of arguments with more than one line are not
-reported with the very accurate line numbers by {\LaTeX}. Thus in some
-cases the use of an environment has advantages. Then, however, the
-question arises of how the width of the content of the environment can
-be determined. The solution involves the \Environment{lrbox}
-environment, described in \cite{latex:usrguide}:
-\begin{lstcode}
-  \newsavebox{\FigureBox}
-  \newenvironment{FigureDefinesCaptionWidth}{%
-    \begin{lrbox}{\FigureBox}%
-  }{%
-    \end{lrbox}%
-    \global\setbox\FigureBox=\box\FigureBox%
-    \aftergroup\SetFigureBox%
-  }
-  \newcommand{\SetFigureBox}{%
-    \Figure{\usebox{\FigureBox}}}
-\end{lstcode}
-  This definition uses the macro \Macro{Figure} defined above.  In
-  the main text you write:
-\begin{lstcode}
-  \begin{figure}
-    \centering%
-    \begin{FigureDefinesCaptionWidth}
-      \fbox{\hspace{1em}\KOMAScript\hspace{1em}}
-    \end{FigureDefinesCaptionWidth}
-    \caption{Example of a centered caption below the figure}
-  \end{figure}
-\end{lstcode}
-Admittedly, the environment in this example is not necessary. However,
-its definition using \Macro{global} is quite tricky. Most users would
-probably not be able to define such an environment without help. Thus,
-as this definition can be very useful, it was introduced in the above
-example.
-  
-Even if the \Environment{captionbeside} environment did not exist you
-could nevertheless place the figure caption beside the figure in a
-quite simple way. For this \Macro{SetFigureBox} from the example above
-would have to be redefined first:
-\begin{lstcode}
-  \renewcommand{\SetFigureBox}{%
-    \settowidth{\captionwidth}{\usebox{\FigureBox}}%
-    \parbox[b]{\captionwidth}{\usebox{\FigureBox}}%
-    \hfill%
-    \addtolength{\captionwidth}{1em}%
-    \addtolength{\captionwidth}{-\hsize}%
-    \setlength{\captionwidth}{-\captionwidth}%
-    \setcapwidth[c]{\captionwidth}%
-    }
-\end{lstcode}
-Finally you only have to put the \Macro{caption} command in a
-\Macro{parbox} too:
-\begin{lstcode}
-  \begin{figure}
-    \centering%
-    \begin{FigureSetsCaptionWidth}
-      \fbox{\rule{0pt}{5\baselineskip}%
-        \hspace{1em}\KOMAScript\hspace{1em}}
-    \end{FigureSetsCaptionWidth}
-    \parbox[b]{\FigureWidth}{%
-      \caption{Example of a centered caption
-               below the figure}
-    }
-  \end{figure}
-\end{lstcode}
-The \Macro{rule} command in this example only serves as an invisible
-support to produce an example figure with a greater vertical height.
-\end{Example}
-%
-\EndIndex{Cmd}{setcapwidth}%
-\EndIndex{Cmd}{setcapmargin}%
-\EndIndex{Cmd}{setcapmargin*}%
 
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

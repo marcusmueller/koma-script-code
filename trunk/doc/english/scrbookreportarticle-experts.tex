@@ -438,3 +438,270 @@ this is not without another disadvantage: in some cases pages can no
 longer be filled correctly, which has the effect of generating several
 warnings.
 \EndIndex{Env}{addmargin*}%
+
+\begin{Declaration}
+  \OptionValue{captions}{oneline}\\
+  \OptionValue{captions}{nooneline}
+\end{Declaration}
+\BeginIndex{Option}{captions~=\PValue{oneline}}%
+\BeginIndex{Option}{captions~=\PValue{nooneline}}%
+The standard classes differentiate between one-line and multi-line
+table or figure captions. One-line captions are centered while
+multi-line captions are left-justified. This behavior, which is also
+the default with \KOMAScript, corresponds to the option
+\OptionValue{captions}{oneline}. There is no special handling of one-line
+captions when the \OptionValue{captions}{nooneline} option is given.
+
+\begin{Explain}
+  The avoidance of a special treatment for the caption has an
+  additional effect that is sometimes highly desirable. Footnotes that
+  appear inside a \Macro{caption} command often have a wrong number
+  assigned to them. This happens because the footnote counter is
+  incremented once as soon as the text is measured to determine if it
+  will be one line or more. When the \OptionValue{captions}{nooneline} option
+  is used no such measurement is made. The footnote numbers are
+  therefore correct.
+
+  But since {\KOMAScript} version~2.9 you don't need the option
+  \OptionValue{captions}{nooneline} to avoid the above described
+  effect. {\KOMAScript} classes contain a workaround, so you can have
+  footnotes inside captions. It should be mentioned though that when
+  using footnotes inside floating environments, the contents of the
+  floating environment should be encapsulated inside a minipage. That
+  way it is guaranteed that floating environment and footnote are
+  inseparable.
+\end{Explain}
+%
+\EndIndex{Option}{captions~=\PValue{oneline}}%
+\EndIndex{Option}{captions~=\PValue{nooneline}}%
+
+\begin{Declaration}
+  \Macro{caption}\OParameter{entry}\Parameter{title}\\
+  \Macro{captionbelow}\OParameter{entry}\Parameter{title}\\
+  \Macro{captionabove}\OParameter{entry}\Parameter{title}
+\end{Declaration}%
+\BeginIndex{Cmd}{caption}%
+\BeginIndex{Cmd}{captionabove}%
+\BeginIndex{Cmd}{captionbelow}%
+\begin{Explain}
+  Some would argue that you could achieve the same result using the
+  \Macro{topcaption} command from the \Package{topcapt}
+  package\IndexPackage{topcapt} (see \cite{package:topcapt}). However,
+  that is not the case. The command \Macro{topcaption} is ignored by
+  packages which directly redefine the \Macro{caption} macro. The
+  \Package{hyperref} package (see \cite{package:hyperref}) is one such
+  example. In {\KOMAScript}, \Macro{captionabove} and
+  \Macro{captionbelow} are so implemented that changes have an effect
+  on both of these commands as well.
+  
+  \phantomsection\label{desc:maincls.cmd.caption.longtable}%
+  If the \Package{longtable} package\IndexPackage{longtable} is used,
+  {\KOMAScript} ensures that captions above tables which are placed
+  within a \Environment{longtable} environment have the same
+  appearance as those in a normal \Environment{table}
+  environment. This also means that you can apply the same settings as
+  in a \Environment{table} environment. Please note that in the
+  \Package{longtable} package the maximum width of a table caption can
+  be limited and the default is set to 4\Unit{in} (see
+  \cite{package:longtable}). Used together with {\KOMAScript} this
+  mechanism in \Package{longtable} works only if the class option
+  \Option{origlongtable} is set (see
+  \autoref{sec:maincls.formattingOptions},
+  \autopageref{desc:maincls.option.origlongtable}). If the
+  \Package{caption2}\IndexPackage{caption2} or
+  \Package{caption}\IndexPackage{caption} package (see
+  \cite{package:caption}) is loaded, table captions are handled by
+  this package.
+  
+  Please note that \Macro{captionabove} and \Macro{captionbelow}, if
+  placed within a \Environment{float} environment which was defined
+  using the \Package{float}\IndexPackage{float} package, have the
+  exact same behaviour described in \cite{package:float} for the
+  \Macro{caption} command.  In this case, the float style determines
+  whether the caption will be set below or above the figure or table.
+\end{Explain}
+%
+\EndIndex{Cmd}{caption}%
+\EndIndex{Cmd}{captionabove}%
+\EndIndex{Cmd}{captionbelow}%
+
+
+\begin{Declaration}
+  \Macro{setcapwidth}\OParameter{justification}\Parameter{width}\\
+  \Macro{setcapmargin}\OParameter{margin left}\Parameter{margin}\\
+  \Macro{setcapmargin*}\OParameter{margin inside}\Parameter{margin}
+\end{Declaration}
+\BeginIndex{Cmd}{setcapwidth}%
+\BeginIndex{Cmd}{setcapmargin}%
+\BeginIndex{Cmd}{setcapmargin*}%
+\begin{Explain}
+  \Package{longtable} places the caption in a box, which is issued
+  again on subsequent pages as needed. When outputting a box, the
+  macros needed for its creation are not reevaluated. That is the
+  reason why it is not possible for {\KOMAScript} to swap margin
+  settings for even pages in double-sided layout . This is what would
+  be necessary in order to produce a justification which is shifted
+  towards the outside or inside.
+\end{Explain}
+
+\begin{Example}
+  A rather odd problem is that of a figure caption which is required
+  to be both centered and of the same width as the figure itself. If
+  the width of the figure is known in advance, the solution with
+  {\KOMAScript} is quite easy. Supposing the figure has a width of
+  8\Unit{cm}, it only takes:
+\begin{lstcode}
+  \setcapwidth[c]{8cm}
+\end{lstcode}
+directly in front of \Macro{caption} or \Macro{captionbelow}. If the
+width is unknown then you first have to define a length in the
+preamble of your document:
+\begin{lstcode}
+  \newlength{\FigureWidth}
+\end{lstcode}
+  Having done this you can calculate the width directly with the
+  {\LaTeX} command \Macro{settowidth} (see \cite{latex:usrguide})
+ in many cases. A possible solution would look as follows:
+\begin{lstcode}
+  \begin{figure}
+    \centering%
+    \settowidth{\FigureWidth}{%
+      \fbox{\quad\KOMAScript\quad}%
+      }%
+    \fbox{\quad\KOMAScript\quad}%
+    \setcapwidth[c]{\FigureWidth}
+    \caption{Example of a centered caption below the figure}
+  \end{figure}
+\end{lstcode}
+However, it is awkward to write the content twice and to call
+\Macro{setcapwidth} for every figure. Yet nothing is easier than
+defining a new command in the preamble of your document which hides
+the three steps of:
+  \begin{enumerate}
+  \item defining the width of the argument
+  \item specifying the width of the caption
+  \item outputting the argument
+  \end{enumerate}
+  in:
+\begin{lstcode}
+  \newcommand{\Figure}[1]{%
+    \settowidth{\FigureWidth}{#1}%
+    \setcapwidth[c]{\FigureWidth}%
+    #1}
+\end{lstcode}
+  Using this command the example abbreviates to:
+\begin{lstcode}
+  \begin{figure}
+    \centering%
+    \Figure{\fbox{\quad\KOMAScript\quad}}%
+    \caption{Example of a centered caption below the figure}
+  \end{figure}
+\end{lstcode}
+  
+However, commands have the disadvantage that errors in the macros of
+the argument in case of arguments with more than one line are not
+reported with the very accurate line numbers by {\LaTeX}. Thus in some
+cases the use of an environment has advantages. Then, however, the
+question arises of how the width of the content of the environment can
+be determined. The solution involves the \Environment{lrbox}
+environment, described in \cite{latex:usrguide}:
+\begin{lstcode}
+  \newsavebox{\FigureBox}
+  \newenvironment{FigureDefinesCaptionWidth}{%
+    \begin{lrbox}{\FigureBox}%
+  }{%
+    \end{lrbox}%
+    \global\setbox\FigureBox=\box\FigureBox%
+    \aftergroup\SetFigureBox%
+  }
+  \newcommand{\SetFigureBox}{%
+    \Figure{\usebox{\FigureBox}}}
+\end{lstcode}
+  This definition uses the macro \Macro{Figure} defined above.  In
+  the main text you write:
+\begin{lstcode}
+  \begin{figure}
+    \centering%
+    \begin{FigureDefinesCaptionWidth}
+      \fbox{\hspace{1em}\KOMAScript\hspace{1em}}
+    \end{FigureDefinesCaptionWidth}
+    \caption{Example of a centered caption below the figure}
+  \end{figure}
+\end{lstcode}
+Admittedly, the environment in this example is not necessary. However,
+its definition using \Macro{global} is quite tricky. Most users would
+probably not be able to define such an environment without help. Thus,
+as this definition can be very useful, it was introduced in the above
+example.
+  
+Even if the \Environment{captionbeside} environment did not exist you
+could nevertheless place the figure caption beside the figure in a
+quite simple way. For this \Macro{SetFigureBox} from the example above
+would have to be redefined first:
+\begin{lstcode}
+  \renewcommand{\SetFigureBox}{%
+    \settowidth{\captionwidth}{\usebox{\FigureBox}}%
+    \parbox[b]{\captionwidth}{\usebox{\FigureBox}}%
+    \hfill%
+    \addtolength{\captionwidth}{1em}%
+    \addtolength{\captionwidth}{-\hsize}%
+    \setlength{\captionwidth}{-\captionwidth}%
+    \setcapwidth[c]{\captionwidth}%
+    }
+\end{lstcode}
+Finally you only have to put the \Macro{caption} command in a
+\Macro{parbox} too:
+\begin{lstcode}
+  \begin{figure}
+    \centering%
+    \begin{FigureSetsCaptionWidth}
+      \fbox{\rule{0pt}{5\baselineskip}%
+        \hspace{1em}\KOMAScript\hspace{1em}}
+    \end{FigureSetsCaptionWidth}
+    \parbox[b]{\FigureWidth}{%
+      \caption{Example of a centered caption
+               below the figure}
+    }
+  \end{figure}
+\end{lstcode}
+The \Macro{rule} command in this example only serves as an invisible
+support to produce an example figure with a greater vertical height.
+\end{Example}
+%
+\EndIndex{Cmd}{setcapwidth}%
+\EndIndex{Cmd}{setcapmargin}%
+\EndIndex{Cmd}{setcapmargin*}%
+
+\begin{Declaration}
+  \Option{origlongtable}
+\end{Declaration}%
+\BeginIndex{Option}{origlongtable}%
+\BeginIndex{Package}{longtable}%
+The package\OnlyAt{\Package{longtable}}
+\Package{longtable}\IndexPackage{longtable} (see \cite{package:longtable})
+sets table captions internally by calling the command \Macro{LT@makecaption}.
+In order to ensure that these table captions match the ones used with normal
+tables, the {\KOMAScript} classes normally redefine that command. See
+\autoref{sec:maincls.floats}, \autopageref{desc:maincls.cmd.caption.longtable}
+for more details. The redefinition is performed with help of the command
+\Macro{AfterPackage} immediately after the loading of package
+\Package{longtable}.  If the package \Package{caption2}\IndexPackage{caption2}
+(see \cite{package:caption}) has been previously loaded, the redefinition is
+not made in order not to interfere with the \Package{caption2} package.
+%
+\EndIndex{Package}{longtable}%
+\EndIndex{Option}{origlongtable}%
+
+\begin{Declaration}
+  \Macro{listtablename}\\
+  \Macro{listfigurename}
+\end{Declaration}
+\BeginIndex{Cmd}{listtablename}%
+\BeginIndex{Cmd}{listfigurename}%
+The text of the titles of this tables are stored in the macros
+\Macro{listtablename} and \Macro{listfigurename}. If you use a
+language package like \Package{babel} and want to redefine these
+macros, you should read the documentation of the language package.
+%
+\EndIndex{Cmd}{listtablename}%
+\EndIndex{Cmd}{listfigurename}%
