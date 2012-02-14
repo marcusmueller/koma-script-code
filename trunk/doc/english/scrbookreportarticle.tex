@@ -45,7 +45,7 @@
 %
 % ============================================================================
 
-\ProvidesFile{scrbookreportarticle.tex}[2012/02/09 KOMA-Script guide (chapter:
+\ProvidesFile{scrbookreportarticle.tex}[2012/02/14 KOMA-Script guide (chapter:
 scrbook, scrreprt, scrartcl)]
 \translator{Jens-Uwe Morawski\and Gernot Hassenpflug\and Markus Kohm}
 
@@ -3728,11 +3728,45 @@ immediately after the table of contents.%
 \LoadCommon{13}% \section{Margin Notes}
 
 
-\section{Appendix\protect\footnote{This section is still missing. Translators
-    from German to English would be welcome!}}
+\section{Appendix}
 \label{sec:maincls.appendix}
+\BeginIndex{}{appendix}
 
-\mbox{}
+The appendix of a document contains mainly the enclosures to the
+document. These are typically bibliography, index, glossary. But only for this
+parts nobody would and should start an appendix, because the formation of
+these already distinguishes them from the main document. But if there are
+additional elements at the appendix, i.\,e., cited third party documents,
+endnotes, figures or tabulars, the standard elements like the bibliography
+should also be part of the appendix.
+
+\begin{Declaration}
+  \Macro{appendix}
+\end{Declaration}%
+\BeginIndex{Cmd}{appendix}%
+The appendix in the standard as well as the {\KOMAScript} classes is
+introduced with \Macro{appendix}. This command switches, among other things,
+the chapter numbering to upper case letters, also ensuring that the rules
+according to \cite{DUDEN} are followed (for German-speaking regions). These
+rules are explained in more detail in the description of the option
+\Option{numbers} in \autoref{sec:maincls.structure},
+\autopageref{desc:maincls.option.numbers}.
+
+Die output of the chapter headings\OnlyAt{\Class{scrbook}\and
+  \Class{scrreprt}} in the appendix are influenced by the options
+\Option{chapterprefix} and \Option{appendixprefix}. See
+\autoref{sec:maincls.structure},
+\autopageref{desc:maincls.option.appendixprefix} for more information.
+
+Please\textnote{Attention!} note that \Macro{appendix} is a command,
+\emph{not} an environment!  This command does not expect any
+argument. Chapters and sections in the appendix uses \Macro{chapter} and
+\Macro{section} just as does the main text.%
+%
+\EndIndex{Cmd}{appendix}%
+%
+\EndIndex{}{appendix}
+
 
 \section{Bibliography\protect\footnote{This section is still
     missing. Translators from German to English would be welcome!}}
@@ -3950,102 +3984,6 @@ only a stretchable horizontal space.
     additional information about obsolete or deprecated options at
     \autoref{cha:maincls-experts}.}}
 \label{sec:maincls.appendix.obsolete}
-
-The last part of a document usually contains the
-appendix\Index{appendix}, the bibliography\Index{bibliography} and, if
-necessary, the index\Index{index}.
-
-\begin{Declaration}
-  \Macro{appendix}
-\end{Declaration}%
-\BeginIndex{Cmd}{appendix}%
-The appendix in the standard as well as the {\KOMAScript} classes is
-introduced with \Macro{appendix}. This command switches, among other
-things, the chapter numbering to upper case letters, also ensuring
-that the rules according to \cite{DUDEN} are followed (for
-German-speaking regions). These rules are explained in more detail in
-the description of the class options \OptionValue{numbers}{enddot} and
-\OptionValue{numbers}{noenddot} in \autoref{sec:maincls.formattingOptions},
-\autopageref{desc:maincls.option.numbers}.
-
-Please note that \Macro{appendix} is a command, \emph{not} an
-environment!  This command does not expect any argument. Sectioning in
-the appendix uses \Macro{chapter} and \Macro{section} just as does the
-main text.
-
-%
-\EndIndex{Cmd}{appendix}
-
-
-\begin{Declaration}
-  \Macro{appendixmore}
-\end{Declaration}%
-\BeginIndex{Cmd}{appendixmore}%
-There is a peculiarity within the \Macro{appendix} command in the
-{\KOMAScript} classes. If the command \Macro{appendixmore} is defined,
-this command is executed also by the \Macro{appendix}
-command. Internally the {\KOMAScript} classes \Class{scrbook} and
-\Class{scrreprt} take advantage of this behaviour to implement the
-options \Option{appendixprefix} and \OptionValue{appendixprefix}{false} (see
-\autoref{sec:maincls.layoutOptions},
-\autopageref{desc:maincls.option.appendixprefix}). You should take
-note of this in case you decide to define or redefine the
-\Macro{appendixmore}. In case one of these options is set, you will
-receive an error message when using
-\verb|\newcommand{\appendixmore}{|\dots\verb|}|. This behaviour is
-intended to prevent you from disabling options without noticing it.
-
-\begin{Example}
-  You do not want the chapters in the main part of the classes
-  \Class{scrbook} or \Class{scrreprt} to be introduced by a prefix
-  line (see layout options \Option{chapterprefix} and
-  \OptionValue{chapterprefix}{false} in \autoref{sec:maincls.layoutOptions},
-  \autopageref{desc:maincls.option.chapterprefix}). For consistency
-  you also do not want such a line in the appendix either. Instead,
-  you would like to see the word ``Chapter'' in the language of your
-  choice written in front of the chapter letter and, simultaneously,
-  in the page headings.  Instead of using the either layout option
-  \Option{appendixprefix} or \OptionValue{appendixprefix}{false}, you would
-  define in the document preamble:
-%
-\begin{lstcode}
-  \newcommand*{\appendixmore}{%
-    \renewcommand*{\chapterformat}{%
-      \appendixname~\thechapter\autodot\enskip}
-    \renewcommand*{\chaptermarkformat}{%
-      \appendixname~\thechapter\autodot\enskip}
-  }
-\end{lstcode}
-%  
-  In case you subsequently change your mind and decide to use the option
-  \Option{appendixprefix} at a later stage, you will get an error message
-  because of the already defined \Macro{appendixmore} command.  This behaviour
-  prevents the definition made above from invisibly changing the settings
-  intended with the option.
-  
-  It is also possible to get a similar behaviour of the appendix for
-  the class \Class{scrartcl}. You would write in the preamble of your
-  document:
-\begin{lstcode}
-  \newcommand*{\appendixmore}{%
-    \renewcommand*{\othersectionlevelsformat}[1]{%
-      \ifthenelse{\equal{##1}{section}}{\appendixname~}{}%
-      \csname the##1\endcsname\autodot\enskip}
-    \renewcommand*{\sectionmarkformat}{%
-      \appendixname~\thesection\autodot\enskip}
-  }
-\end{lstcode}
-  In addition, the package \Package{ifthen}\IndexPackage{ifthen} (see
-  \cite{package:ifthen}) is required.
-  
-  Redefined commands are explained in more detail in
-  \autoref{sec:maincls.structure},
-  \autopageref{desc:maincls.cmd.chapterformat} and
-  \autopageref{desc:maincls.cmd.chaptermarkformat}.
-\end{Example}
-%
-\EndIndex{Cmd}{appendixmore}%
-
 
 \begin{Declaration}
   \Macro{setbibpreamble}\Parameter{preamble}

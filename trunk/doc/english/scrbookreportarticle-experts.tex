@@ -729,3 +729,73 @@ in displayed math formulas.%
 %
 \EndIndex{Cmd}{marginpar}%
 \EndIndex{Cmd}{marginline}%
+
+
+\begin{Declaration}
+  \Macro{appendixmore}
+\end{Declaration}%
+\BeginIndex{Cmd}{appendixmore}%
+There is a peculiarity within the \Macro{appendix} command in the
+{\KOMAScript} classes. If the command \Macro{appendixmore} is defined,
+this command is executed also by the \Macro{appendix}
+command. Internally the {\KOMAScript} classes \Class{scrbook} and
+\Class{scrreprt} take advantage of this behaviour to implement the
+options \Option{appendixprefix} and \OptionValue{appendixprefix}{false} (see
+\autoref{sec:maincls.layoutOptions},
+\autopageref{desc:maincls.option.appendixprefix}). You should take
+note of this in case you decide to define or redefine the
+\Macro{appendixmore}. In case one of these options is set, you will
+receive an error message when using
+\verb|\newcommand{\appendixmore}{|\dots\verb|}|. This behaviour is
+intended to prevent you from disabling options without noticing it.
+
+\begin{Example}
+  You do not want the chapters in the main part of the classes
+  \Class{scrbook} or \Class{scrreprt} to be introduced by a prefix
+  line (see layout options \Option{chapterprefix} and
+  \OptionValue{chapterprefix}{false} in \autoref{sec:maincls.layoutOptions},
+  \autopageref{desc:maincls.option.chapterprefix}). For consistency
+  you also do not want such a line in the appendix either. Instead,
+  you would like to see the word ``Chapter'' in the language of your
+  choice written in front of the chapter letter and, simultaneously,
+  in the page headings.  Instead of using the either layout option
+  \Option{appendixprefix} or \OptionValue{appendixprefix}{false}, you would
+  define in the document preamble:
+%
+\begin{lstcode}
+  \newcommand*{\appendixmore}{%
+    \renewcommand*{\chapterformat}{%
+      \appendixname~\thechapter\autodot\enskip}
+    \renewcommand*{\chaptermarkformat}{%
+      \appendixname~\thechapter\autodot\enskip}
+  }
+\end{lstcode}
+%  
+  In case you subsequently change your mind and decide to use the option
+  \Option{appendixprefix} at a later stage, you will get an error message
+  because of the already defined \Macro{appendixmore} command.  This behaviour
+  prevents the definition made above from invisibly changing the settings
+  intended with the option.
+  
+  It is also possible to get a similar behaviour of the appendix for
+  the class \Class{scrartcl}. You would write in the preamble of your
+  document:
+\begin{lstcode}
+  \newcommand*{\appendixmore}{%
+    \renewcommand*{\othersectionlevelsformat}[1]{%
+      \ifthenelse{\equal{##1}{section}}{\appendixname~}{}%
+      \csname the##1\endcsname\autodot\enskip}
+    \renewcommand*{\sectionmarkformat}{%
+      \appendixname~\thesection\autodot\enskip}
+  }
+\end{lstcode}
+  In addition, the package \Package{ifthen}\IndexPackage{ifthen} (see
+  \cite{package:ifthen}) is required.
+  
+  Redefined commands are explained in more detail in
+  \autoref{sec:maincls.structure},
+  \autopageref{desc:maincls.cmd.chapterformat} and
+  \autopageref{desc:maincls.cmd.chaptermarkformat}.
+\end{Example}
+%
+\EndIndex{Cmd}{appendixmore}%
