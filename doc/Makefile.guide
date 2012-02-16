@@ -1,6 +1,6 @@
 # ======================================================================
 # Makefile.guide
-# Copyright (c) Markus Kohm, 2002-2012
+# Copyright (c) Markus Kohm, 2002-2011
 #
 # This file is part of the LaTeX2e KOMA-Script bundle.
 #
@@ -18,7 +18,7 @@
 # This work consists of all files listed in manifest.txt.
 # ----------------------------------------------------------------------
 # Makefile.guide
-# Copyright (c) Markus Kohm, 2002-2012
+# Copyright (c) Markus Kohm, 2002-2011
 #
 # Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 # Version 1.3c, verteilt und/oder veraendert werden.
@@ -57,14 +57,10 @@ endif
 
 # ----------------------------------------------------------------------
 # List of all Makefiles
-MAKE_FILES	= Makefile
+MAKE_FILES	= Makefile Makefile.guide
 
 # ----------------------------------------------------------------------
 GUIDENAME       = scrgui$(LANGUAGESHORTCUT)
-
-GENERATED_SRC   = plenDIN.mps
-
-plenDIN_SRC	= plenDIN.mp plinc.mp pllcoDIN.mp pltex.mp
 
 ifeq ($(LANGUAGE),english)
 TEX_APPENDICES  = japanlco.tex
@@ -72,22 +68,58 @@ else
 TEX_APPENDICES  =
 endif
 
-TEX_CHAPTERS    = introduction.tex typearea.tex \
-		  scrbookreportarticle.tex scrpage2.tex \
-		  scrdatetime.tex scrlttr2.tex scraddr.tex \
-		  adrconvnote.tex scrlfile.tex scrwfile.tex tocbasic.tex \
-                  $(TEX_APPENDICES)
+TEX_CHAPTERS     = preface.tex introduction.tex \
+                   authorpart.tex typearea.tex scrbookreportarticle.tex \
+                   scrlttr2.tex scrpage2.tex scrdatetime.tex scraddr.tex \
+                   adrconvnote.tex scrextend.tex \
+                   expertpart.tex scrbase.tex scrlfile.tex scrwfile.tex \
+		   tocbasic.tex scrhack.tex \
+                   typearea-experts.tex scrbookreportarticle-experts.tex \
+                   scrlttr2-experts.tex \
+                   $(TEX_APPENDICES)
 
-TEX_MISC        = common-0.tex common-1.tex common-2.tex common-3.tex \
-		  common-4.tex common-5.tex common-6.tex common-7.tex \
-		  common-8.tex common-9.tex common-10.tex common-11.tex \
-		  common-12.tex common-13.tex common-14.tex common-15.tex
+TEX_MISC         = $(DOCDIR)guide.tex linkalias.tex \
+		   common-0.tex common-1.tex common-2.tex common-3.tex \
+		   common-4.tex common-5.tex common-6.tex common-7.tex \
+		   common-8.tex common-9.tex common-10.tex common-11.tex \
+		   common-12.tex common-13.tex common-14.tex common-15.tex
+
+EXAMPLE_LETTER_DTX = scrlttr2examples.dtx
+
+EXAMPLE_LETTER_LETTERS = $(foreach num,\
+                           0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 \
+                           20 21 22 23 label nipponA nipponB,\
+                           letter-$(num).tex)
+
+EXAMPLE_LETTER_DTX_RESULT = $(EXAMPLE_LETTER_LETTERS) musterlogo.eps ich.lco
+
+PLENGTH_DTX      = $(DOCDIR)plength.dtx
+
+PLENGTH_DTX_RESULT = plength.drv plenDIN.mp varDIN.mp plinc.mp \
+                   pltex-vars.mp pltex-terms.mp pllcoDIN.mp
+
+PLENGTH_PDF      = plenDIN.pdf varDIN.pdf
+
+PDF_EPS_SRC      = musterlogo.eps
+
+PDF_EPS          = $(addsuffix .pdf,$(basename $(PDF_EPS_SRC)))
+
+EXAMPLE_LETTER_SRC = $(EXAMPLE_LETTER_LETTERS) $(PDF_EPS) ich.lco \
+		   $(DOCDIR)labelbasic.lco $(DOCDIR)settleford600label.lco
+
+EXAMPLE_LETTER_PDF = $(addsuffix .pdf,$(basename $(EXAMPLE_LETTER_LETTERS)))
+
+GENERATED_SRC    = $(EXAMPLE_LETTER_PDF) $(PLENGTH_PDF)
+
+GENERATED_CLEAN  = $(GENERATED_SRC) \
+		   $(EXAMPLE_LETTER_DTX_RESULT) $(PDF_EPS) \
+                   $(PLENGTH_DTX_RESULT) 
 
 TEX_SRC		= guide-$(LANGUAGELONG).tex $(TEX_CHAPTERS) $(TEX_MISC)
 
 MISC_SRC	= $(MAKE_FILES) htmlsetup
 
-DIST_SRC	= $(MISC_SRC) $(TEX_SRC)
+DIST_SRC	= $(MISC_SRC) $(TEX_SRC) $(EXAMPLE_LETTER_DTX)
 
 GUIDE_FILES     = $(GUIDENAME).pdf $(GUIDENAME).html
 
@@ -102,19 +134,18 @@ MAINTAIN_FILES	= $(MAINTAIN_SRC)
 default_local: $(GUIDE_FILES)
 
 prepare_local: # nothing to do
-	       echo $(GUIDE_FILES)
-	       echo $(GENERATED_SRC)
+	$(ECHO) $(GENERATED_SRC)
 
 clean_local:
-	$(RM) *.aux *.bbl *.blg *.glo *.idx *.ilg *.ind *.log *.lot \
-	      *.dvi *.tmp  mpxerr.tex \
-	      *.md5 *.toc *.mpx *.drv *.chn *.xref $(plenDIN_SRC)
+	$(RM) *.aux *.bbl *.blg *.glo *.idx *.ilg *.ind *.lof *.log *.lot \
+	      *.dvi *.tmp  mpxerr.tex *.1 *.mp.keep *.mpo \
+	      *.md5 *.toc *.mpx *.drv *.chn *.xref
 
 distclean_local: clean_local
-	$(RM) $(GENERATED_SRC)
+	$(RM) $(GENERATED_CLEAN)
 
 maintainclean_local: distclean_local
-	$(RM) guide.pdf $(GUIDENAME).pdf
+	$(RM) guide.pdf $(GUIDENAME).pdf $(GUIDENAME).html
 
 ifdef DISTDIR
 
@@ -194,11 +225,10 @@ edit:
 # ----------------------------------------------------------------------
 # file rules
 
-CKSUMFILES = $(DOCDIR)plength.dtx $(DOCDIR)guide.tex $(DOCDIR)scrguide.cls \
-	     $(BIBTEX_SRC) $(MAKEINDEXSTYLE) $(MAKECHANGESTYLE) \
+CKSUMFILES = $(BIBTEX_SRC) $(MAKEINDEXSTYLE) $(MAKECHANGESTYLE) \
 	     guide.aux guide.ind guide.idx guide.bbl guide.toc guide.lot \
 	     guide.chn guide.glo \
-	     $(foreach file,$(TEX_CHAPTERS),$(basename $(file)).aux)
+	     $(foreach file,$(TEX_CHAPTERS) $(TEX_NONFREECHAPTERS),$(basename $(file)).aux)
 
 define latex
 	$(SMV) $@ guide.pdf || exit 0
@@ -215,22 +245,36 @@ define latex
 	$(SMV) guide.pdf $@
 endef
 
-$(GUIDENAME).html: guide.aux
-	$(GENHTMLINDEX) $(addsuffix .aux,$(basename $(TEX_CHAPTERS))) >$@
+$(GUIDENAME).html: htmlsetup guide.aux \
+                   $(foreach file,$(TEX_CHAPTERS) $(TEX_NONFREECHAPTERS),\
+		             $(basename $(file)).aux)
+	$(GENHTMLINDEX) $(addsuffix .aux,\
+	                  $(basename $(TEX_CHAPTERS) $(TEX_NONFREECHAPTERS)))\
+			  >$@
 
 $(GUIDENAME).pdf: $(DOCDIR)scrguide.cls $(DOCDIR)guide.tex $(GENERATED_SRC)\
 		  guide.aux guide.bbl $(BIBTEX_SRC) \
 	          $(MAKEINDEXSTYLE) guide.ind guide.idx \
 		  $(MAKECHANGESTYLE) guide.chn guide.glo \
-	          $(TEX_SRC)
+	          $(TEX_SRC) $(TEX_NONFREECHAPTERS) $(TEX_NONFREEMISC)
 	$(SRM) guide.md5
 	$(latex)
 
-plenDIN.mps: $(plenDIN_SRC)
-	$(MPOST) $<
-	$(MV) $(basename $@).1 $@
+$(PLENGTH_DTX_RESULT): $(PLENGTH_DTX)
+	$(PDFLATEX) $<
 
-$(plenDIN_SRC): $(DOCDIR)plength.dtx
+$(PLENGTH_PDF): $(PLENGTH_DTX_RESULT)
+	$(MPOST) $(addsuffix .mp,$(basename $@))
+	$(MPTOPDF) $(addsuffix .mp,$(basename $@))
+	$(MV) $(addsuffix .pdf,$(basename $@)-1) $@
+
+$(PDF_EPS): $(PDF_EPS_SRC)
+	$(EPSTOPDF) $(addsuffix .eps,$(basename $@))
+
+$(EXAMPLE_LETTER_PDF): $(EXAMPLE_LETTER_SRC)
+	$(PDFLATEX) $(addsuffix .tex,$(basename $@))
+
+$(EXAMPLE_LETTER_DTX_RESULT): $(EXAMPLE_LETTER_DTX)
 	$(PDFLATEX) $<
 
 guide.ind: guide.idx
@@ -244,7 +288,8 @@ guide.bbl: $(BIBTEX_SRC) guide.aux
 	$(BIBTEX) guide || test $$? -le $(BIBTEXNOERROR)
 	$(BIBTEXFIX) guide.bbl
 
-guide.glo guide.idx guide.aux: ../guide.tex $(TEX_SRC)
+guide.glo guide.idx guide.aux: $(DOCDIR)guide.tex $(TEX_SRC) \
+	                       $(TEX_NONFREECHAPTERS) $(TEX_NONFREEMISC)
 	$(PDFLATEX) guide.tex
 
 # ----------------------------------------------------------------------

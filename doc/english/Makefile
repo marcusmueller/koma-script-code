@@ -66,5 +66,15 @@ scrwfile.tex: ../../scrwfile.tex
 	cd ../.. && tex \\nonstopmode\\input scrwfile.dtx
 # ----------------------------------------------------------------------
 
+# ----------------------------------------------------------------------
+# NOTE: Remove these rules after real translation of scrwfile.tex 
+#       is available.
+scrhack.tex: ../../scrhack.tex
+	if [ -L $@ ] || ! [ -f $@ ]; then $(SYMLINK) $< .; else touch $@; fi
+
+../../scrhack.tex: ../../scrhack.dtx ../../scrmain.ins
+	cd ../.. && tex \\nonstopmode\\input scrmain.ins
+# ----------------------------------------------------------------------
+
 #
 # end of file `Makefile'
