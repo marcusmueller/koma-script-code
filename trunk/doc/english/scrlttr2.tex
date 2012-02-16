@@ -480,11 +480,411 @@ description of \Macro{raggedbottom} and \Macro{flushbottom} in
 \EndIndex{}{page>layout}
 
 
-\section{General Structure of Letter Documents\protect\footnote{This section is still missing. Translators
-    from German to English would be welcome! See the deprecated sections for
-    some of the information, that should be in this section.}}
-\label{sec:scrlttr2.stillmissing}
-\mbox{}
+\section{General Structure of Letter Documents}
+\label{sec:scrlttr2.document}
+\BeginIndex{}{letter>structure}
+
+The general structure of a letter document differs somewhat from the
+structure of a normal document. Whereas a book document in general
+contains only one book, a letter document can contain several
+letters. As illustrated in \autoref{fig:scrlttr2.document}, a letter
+document consists of a preamble, the individual letters, and the
+closing.
+
+\begin{figure}
+  \KOMAoptions{captions=bottombeside}%
+  \setcapindent{0pt}%
+  \begin{captionbeside}[{%
+      General structure of a letter document with several individual letters%
+    }]{%
+      General structure of a letter document with several individual letters
+      (the structure of a single letter is shown in
+      \autoref{fig:scrlttr2.letter})%
+      \label{fig:scrlttr2.document}%
+    }[l]
+    \begin{minipage}[b]{.667\linewidth}
+      \centering\small\setlength{\fboxsep}{1.5ex}%
+      \addtolength{\linewidth}{-\dimexpr2\fboxrule+2\fboxsep\relax}%
+      \fbox{\parbox{\linewidth}{\raggedright%
+          \Macro{documentclass}\OParameter{\dots}\PParameter{scrlttr2}\\
+          \dots\\
+          {\centering\emph{settings for all letters}\\}
+          \dots\\
+          \Macro{begin}\PParameter{document}\\
+          \dots\\
+          {\centering\emph{settings for all letters}\\}
+          \dots\\
+        }}\\
+      \fbox{\parbox{\linewidth}{\raggedright%
+          \Macro{begin}\PParameter{letter}\Parameter{addressee}\\
+          \dots\\
+          {\centering\emph{content of the individual letter}\\}
+          \dots\\
+          \Macro{end}\PParameter{letter}\\
+        }}\\[2pt]
+      \parbox{\linewidth}{\raggedright\vspace{-.5ex}\vdots\vspace{1ex}}\\
+      \fbox{\parbox{\linewidth}{\raggedright%
+          \Macro{end}\PParameter{document}\\
+        }}\\[\dimexpr\fboxsep+\fboxrule\relax]
+    \end{minipage}
+  \end{captionbeside}
+\end{figure}
+
+The preamble comprises all settings that in general concern all letters. Most
+of them can also be overwritten in the settings of the individual letters. The
+only setting which can not be changed within a single letter is compatibility
+to prior versions of \Class{scrlttr2} (see option \Option{version} in
+\autoref{sec:scrlttr2.compatibilityOptions},
+\autopageref{desc:scrlttr2.option.version}).
+
+It is recommended that only general settings such as the loading of packages
+and the setting of options be placed before
+\Macro{begin}\PParameter{document}. All settings that comprise the setting of
+variables or other text features should be done after
+\Macro{begin}\PParameter{document}. This is particularly recommended when the
+\Package{babel} package\IndexPackage{babel} (see \cite{package:babel}) is
+used, or language-dependent variables of \Class{scrlttr2} are to be changed.
+
+The closing usually consists only of
+\Macro{end}\PParameter{document}. Of course you can also insert
+additional comments at this point.
+
+\begin{figure}
+  \KOMAoptions{captions=bottombeside}%
+  \setcapindent{0pt}%
+  \begin{captionbeside}[{%
+      General structure of a single letter within a letter document%
+    }]{%
+      General structure of a single letter within a letter document (see also
+      \autoref{fig:scrlttr2.document})%
+      \label{fig:scrlttr2.letter}}[l]
+    \begin{minipage}[b]{.667\linewidth}%
+      \centering\small\setlength{\fboxsep}{1.5ex}%
+      \addtolength{\linewidth}{-\dimexpr2\fboxrule+2\fboxsep\relax}%
+      \fbox{\parbox{\linewidth}{\raggedright%
+          \Macro{begin}\PParameter{letter}%
+          \OParameter{Optionen}\Parameter{addressee}\\
+          \dots\\[\dp\strutbox]
+          {\centering\emph{settings for this letter}\\}
+          \dots\\
+          \Macro{opening}\Parameter{opening}\\
+        }}\\[1pt]
+      \fbox{\parbox{\linewidth}{\raggedright%
+          \dots\\[\dp\strutbox]
+          {\centering\emph{letter text}\\}
+          \dots\\
+        }}\\[1pt]
+      \fbox{\parbox{\linewidth}{\raggedright%
+          \Macro{closing}\Parameter{closing}\\
+          \Macro{ps}\\
+          \dots\\[\dp\strutbox]
+          {\centering\emph{postscript}\\}
+          \dots\\
+          \Macro{encl}\Parameter{enclosures}\\
+          \Macro{cc}\Parameter{additional addressees}\\
+          \Macro{end}\PParameter{letter}\\
+        }}\\[\dimexpr\fboxsep+\fboxrule\relax]
+    \end{minipage}
+  \end{captionbeside}
+\end{figure}
+
+As shown in \autoref{fig:scrlttr2.letter}, every single letter itself consists
+of an introduction, the letter body, and the closing. In the introduction, all
+settings pertaining only to the current letter are defined. It is important
+that this introduction always ends with
+\Macro{opening}\IndexCmd{opening}. Similarly, the closing always starts with
+\Macro{closing}\IndexCmd{closing}. The two arguments \PName{opening} and
+\PName{closing} can be left empty, but both commands must be used and must
+have an argument.
+
+It should be noted that several settings can be changed between the individual
+letters. Such changes then have an effect on all subsequent letters. For
+reasons of maintainability of your letter documents, it is however not
+recommended to use further general settings with limited scope between the
+letters.
+
+\begin{Declaration}
+  \XMacro{begin}\PParameter{\Environment{letter}}%
+  \OParameter{options}\Parameter{addressee}\\
+  \quad\dots\\
+  \XMacro{end}\PParameter{letter}
+\end{Declaration}
+\BeginIndex{Env}{letter}%
+\BeginIndex{}{addressee}%
+The \Environment{letter} environment is one of the key environments of the
+letter class. A special\textnote{\KOMAScript{} vs. standard classes}
+\Class{scrlttr2} feature are optional arguments to the \Environment{letter}
+environment. These \PName{options} are executed internally via the
+\Macro{KOMAoptions} command.
+
+The \PName{addressee} is a mandatory argument passed to the
+\Environment{letter} environment. Parts\textnote{Attention!} of the addressee
+contents are separated by double backslashes. These parts are output on
+individual lines in the address field. Nevertheless, the double backslash
+should not be interpreted as a certain line break. Vertical material such as
+paragraphs or vertical space is not permitted within \PName{addressee}, and
+could lead to unexpected results and error messages, as is the case also for
+the standard letter class.
+
+\begin{Example}
+  \phantomsection\label{desc:scrlttr2.env.letter.example}%
+  Assumed, someone wants to send a letter to Joana Public. A minimalistic
+  letter document for this may be:
+\begin{lstcode}
+  \documentclass[version=last]{scrlttr2}
+  \usepackage[english]{babel}
+  \begin{document}
+  \begin{letter}{Joana Public\\
+      Hillside 1\\
+      12345 Public-City}
+  \end{letter}
+  \end{document}
+\end{lstcode}
+  However, this would not result in any printable output. At least there
+  wouldn't be an addressee at the note paper sheet. The reason for this will
+  be explained at the description of command \Macro{opening} at
+  \autopageref{desc:scrlttr2.cmd.opening}.
+\end{Example}
+%
+\EndIndex{}{addressee}%
+\EndIndex{Env}{letter}%
+
+\begin{Declaration}
+  \Macro{AtBeginLetter}\Parameter{instruction code}\\
+  \Macro{AtEndLetter}\Parameter{instruction code}
+\end{Declaration}
+\BeginIndex{Cmd}{AtBeginLetter}%
+\BeginIndex{Cmd}{AtEndLetter}%
+{\LaTeX} enables the user to declare \PName{instruction code} whose execution
+is delayed until a determined point. Such points are called
+\emph{hooks}\Index{hook}. Known macros for using hooks are
+\Macro{AtBeginDocument}\IndexCmd{AtBeginDocument} and
+\Macro{AtEndOfClass}\IndexCmd{AtEndOfClass} at the \LaTeX{} kernel. The class
+\Class{scrlttr2} provides two more hooks. The \PName{instruction code} for
+these may be declared using \Macro{AtBeginLetter} and
+\Macro{AtEndLetter}\ChangedAt{v2.95}{\Class{scrlttr2}}. Originally, hooks were
+provided for package and class authors, so they are documented in
+\cite{latex:clsguide} only, and not in \cite{latex:usrguide}. However, with
+letters there are useful applications of \Macro{AtBeginLetter} as the
+following example may illustrate.
+%
+\begin{Example}
+  It is given that one has to set multiple letters with questionnaires
+  within one document. Questions are numbered automatically within
+  single letters using a counter. Since, in contrast to page
+  numbering, that counter is not known by \Class{scrlttr2}, it would
+  not be reset at the start of each new letter. Given that each
+  questionnaire contains ten questions, question~1 would get number~11
+  in the second letter. A solution is to reset this counter at the
+  beginning of each new letter:
+\begin{lstlisting}
+  \newcounter{Question}
+  \newcommand{\Question}[1]{%
+    \refstepcounter{Question}\par
+    \noindent\begin{tabularx}{\textwidth}{l@{}X}
+      \theQuestion:~ & #1\\
+    \end{tabularx}%
+  }%
+  \AtBeginLetter{\setcounter{Question}{0}}
+\end{lstlisting}
+  This way first question remains question~1, even in the 1001st letter. Of
+  course the definition at this example needs package
+  \Package{tabularx}\IndexPackage{tabularx} (see \cite{package:tabularx}).
+\end{Example}
+%
+\EndIndex{Cmd}{AtEndLetter}%
+\EndIndex{Cmd}{AtBeginLetter}%
+
+
+\begin{Declaration}
+  \Macro{opening}\Parameter{opening}
+\end{Declaration}
+\BeginIndex{Cmd}{opening}%
+This is one of the most important commands in \Class{scrlttr2}.  For the user
+it may seem that only the \PName{opening}\Index{letter>opening}, e.\,g.,
+``Dear Mrs~\dots'', is typeset, but\textnote{Attention!} the command also
+typesets the folding marks\Index{folding marks},
+letterhead\Index{letter>head}, address field\Index{address field}, reference
+fields line\Index{reference line}, subject\Index{subject}, the page
+footer\Index{page>footer} and others. In short, without \Macro{opening} there
+is no letter. And if you want to print a letter without opening you have to
+use an \Macro{opening} command with an empty argument.
+
+\begin{Example}
+  Let's extend the example from
+  \autopageref{desc:scrlttr2.env.letter.example} by an opening:
+  \lstinputcode[xleftmargin=1em]{letter-0.tex}
+  This will result in a note paper sheet shown in
+  \autoref{fig:scrlttr2.letter-0}.
+  \begin{figure}
+    \setcapindent{0pt}%
+    \begin{captionbeside}[{Example: letter with addressee and opening}]{%
+        result of a minimalistic letter with addressee and opening only 
+        (date and folding marks are defaults of DIN-letters)}[l]
+    \frame{\includegraphics[width=.4\textwidth]{letter-0}}
+    \end{captionbeside}
+    \label{fig:scrlttr2.letter-0}
+  \end{figure}
+\end{Example}
+\iffalse% Umbruchkorrekturtext
+
+In the early days of computer-generated letters, programs did not have many
+capabilities, therefore the letters seldom had an opening.  Today the
+capabilities have been enhanced. Thus personal openings are very common, even
+in mass-production advertising letters.%
+\fi
+%
+\EndIndex{Cmd}{opening}%
+
+\begin{Declaration}
+  \Macro{closing}\Parameter{closing phrase}
+\end{Declaration}
+\BeginIndex{Cmd}{closing}%
+The main purpose of the command \Macro{closing} is to typeset the
+\PName{closing phrase}\Index{closing}. This may even consists of multiple
+lines. The lines should be separated by double backslash. Paragraph breaks
+inside the \PName{closing phrase} are not allowed.
+
+Beyond that the command also typesets the content of the variable
+\Variable{signature}. More information about the signature and the
+configuration of the signature may be found at \autoref{sec:scrlttr2.closing}
+ab \autopageref{desc:scrlttr2.variable.signature}.
+
+\begin{Example}
+  Let's extend the our example by some lines of text and a closing phrase:
+  \lstinputcode[xleftmargin=1em]{letter-1.tex}
+  This will result in a the letter shown in \autoref{fig:scrlttr2.letter-1}.
+  \begin{figure}
+    \setcapindent{0pt}%
+    \begin{captionbeside}[{Example: letter with addressee, opening, text, and
+        closing}]{%
+        result of a small letter with addressee, opening, text, and closing
+        (date and folding marks are defaults of DIN-letters)}[l]
+      \frame{\includegraphics[width=.4\textwidth]{letter-1}}
+    \end{captionbeside}
+    \label{fig:scrlttr2.letter-1}
+  \end{figure}
+\end{Example}
+%
+\EndIndex{Cmd}{closing}%
+
+\begin{Declaration}
+  \Macro{ps}
+\end{Declaration}%
+\BeginIndex{Cmd}{ps}%
+This instruction merely switches to the postscript.  Hence, a new
+paragraph begins, and a vertical distance\,---\,usually below the
+signature\,---\,is inserted.  The command \Macro{ps} is followed by
+normal text. If you want the postscript to be introduced with the
+acronym ``PS:'' , which by the way is written without a full stop, you
+have to type this yourself. The acronym is typeset neither
+automatically nor optionally by the class \Class{scrlttr2}.
+
+\begin{Example}
+  The example letter extended by a postscript
+  \lstinputcode[xleftmargin=1em]{letter-2.tex}
+  results in \autoref{fig:scrlttr2.letter-2}.
+  \begin{figure}
+    \setcapindent{0pt}%
+    \begin{captionbeside}[{Example: letter with addressee, opening, text,
+        closing, and postscript}]{%
+        result of a small letter with addressee, opening, text, closing, and
+        postscript
+        (date and folding marks are defaults of DIN-letters)}[l]
+      \frame{\includegraphics[width=.4\textwidth]{letter-2}}
+    \end{captionbeside}
+    \label{fig:scrlttr2.letter-2}
+  \end{figure}
+\end{Example}
+
+\begin{Explain}
+  In the time when letters were written by hand it was quite common to use a
+  postscript because this was the only way to add information which one had
+  forgotten to mention in the main part of the letter. Of course, in letters
+  written with {\LaTeX} you can insert additional lines easily. Nevertheless,
+  it is still popular to use the postscript. It gives one a good possibility
+  to underline again the most important or sometimes the less important things
+  of the particular letter.
+\end{Explain}
+%
+\EndIndex{Cmd}{ps}
+
+\begin{Declaration}
+  \Macro{cc}\Parameter{distribution list}\\
+  \Macro{setkomavar}\PParameter{\Variable{ccseparator}}%
+    \OParameter{description}\Parameter{content}
+\end{Declaration}
+\BeginIndex{Cmd}{cc}%
+\BeginIndex{Variable}{ccseparator}%
+With the command \Macro{cc}%
+\Index{addressee>additional}\Index{distribution list}\Index{carbon copy} it is
+possible to typeset a \PName{distribution list}.  The command takes the
+\PName{distribution list} as its argument. If the content of the variable
+\Variable{ccseparator}\Index{separator}\Index{delimiter} is not empty, then
+the name and the content of this variable is inserted before
+\PName{distribution list}.  In this case the \PName{distribution list} will be
+indented appropriately.  It is a good idea\textnote{Hint!} to set the
+\PName{distribution list} \Macro{raggedright}\IndexCmd{raggedright} and to
+separate the individual entries with a double backslash.
+\begin{Example}
+  This time, the example letter should be send not only to the chairman, but
+  also to all club members:
+  \lstinputcode[xleftmargin=1em]{letter-3.tex}%
+  The result is shown in \autoref{fig:scrlttr2.letter-3}.
+  \begin{figure}
+    \setcapindent{0pt}%
+    \begin{captionbeside}[{Example: letter with addressee, opening, text,
+        closing, postscript, and distribution list}]{%
+        result of a small letter with addressee, opening, text, closing,
+        postscript, and distribution list
+        (date and folding marks are defaults of DIN-letters)}[l]
+      \frame{\includegraphics[width=.4\textwidth]{letter-3}}
+    \end{captionbeside}
+    \label{fig:scrlttr2.letter-3}
+  \end{figure}
+\end{Example}
+In front of the distribution list a vertical gap is inserted automatically.%
+%
+\EndIndex{Variable}{ccseparator}%
+\EndIndex{Cmd}{cc}%
+
+
+\begin{Declaration}
+  \Macro{encl}\Parameter{enclosures}\\
+  \Macro{setkomavar}\PParameter{\Variable{enclseparator}}%
+      \OParameter{description}\Parameter{content}
+\end{Declaration}
+\BeginIndex{Cmd}{encl}%
+\BeginIndex{Variable}{enclseparator}%
+The \PName{enclosures} have the same structure as the distribution list.
+The only difference is that here the enclosures starts with the name
+and content of the variable
+\Variable{enclseparator}\Index{separator}\Index{delimiter}.
+\begin{Example}
+  Now, the example letter will be extended by some paragraphs from the
+  constitution. These will be added as an enclosure. The description title
+  will be changed also, because there is only one enclosure and the default
+  may be prepared for several enclosures:
+  \lstinputcode[xleftmargin=1em]{letter-4.tex}
+  This will result in \autoref{fig:scrlttr2.letter-4}.
+  \begin{figure}
+    \setcapindent{0pt}%
+    \begin{captionbeside}[{Example: letter with addressee, opening, text,
+        closing, postscript, distribution list, and enclosure}]{%
+        result of a small letter with addressee, opening, text, closing,
+        postscript, distribution list, and enclosure
+        (date and folding marks are defaults of DIN-letters)}[l]
+      \frame{\includegraphics[width=.4\textwidth]{letter-4}}
+    \end{captionbeside}
+    \label{fig:scrlttr2.letter-4}
+  \end{figure}
+\end{Example}
+%
+\EndIndex{Cmd}{encl}%
+\EndIndex{Variable}{enclseparator}%
+%
+\EndIndex{}{letter>structure}
+
 
 \section{Selection of Document or Letter Font Size\protect\footnote{This section is still missing. Translators
     from German to English would be welcome! See the deprecated sections for
@@ -1950,105 +2350,6 @@ variables are removed from the reference fields line.
 \subsection{The General Structure of a Letter Document}
 \label{sec:scrlttr2.document}
 
-The general structure of a letter document differs somewhat from the
-structure of a normal document. Whereas a book document in general
-contains only one book, a letter document can contain several
-letters. As illustrated in \autoref{fig:scrlttr2.document}, a letter
-document consists of a preamble, the individual letters, and the
-closing.
-
-The preamble comprises all settings that in general concern all letters. Most
-of them can also be overwritten in the settings of the individual letters. The
-only setting which can not be changed within a single letter is compatibility
-to prior versions of \Class{scrlttr2} (see option \Option{version} in
-\autoref{sec:scrlttr2.compatibilityOptions},
-\autopageref{desc:scrlttr2.option.version}).
-
-It is recommended that only general settings such as the loading of packages
-and the setting of options be placed before
-\Macro{begin}\PParameter{document}. All settings that comprise the setting of
-variables or other text features should be done after
-\Macro{begin}\PParameter{document}. This is particularly recommended when the
-\Package{babel} package\IndexPackage{babel} (see \cite{package:babel}) is
-used, or language-dependent variables of \Class{scrlttr2} are to be changed.
-
-The closing usually consists only of
-\Macro{end}\PParameter{document}. Of course you can also insert
-additional comments at this point.
-
-\begin{figure}
-\centering\small\setlength{\fboxsep}{1.5ex}
-\fbox{\parbox{.667\linewidth}{\raggedright%
-    \Macro{documentclass}\OParameter{\dots}\PParameter{scrlttr2}\\
-    \dots\\
-    {\centering\emph{settings for all letters}\\}
-    \dots\\
-    \Macro{begin}\PParameter{document}\\
-    \dots\\
-    {\centering\emph{settings for all letters}\\}
-    \dots\\
-  }}\\
-\fbox{\parbox{.667\linewidth}{\raggedright%
-    \Macro{begin}\PParameter{letter}\Parameter{addressee}\\
-    \dots\\
-    {\centering\emph{content of the individual letter}\\}
-    \dots\\
-    \Macro{end}\PParameter{letter}\\
-  }}\\
-\parbox{.667\linewidth}{\raggedright\vspace{-.5ex}\vdots\vspace{1ex}}\\
-\fbox{\parbox{.667\linewidth}{\raggedright%
-    \Macro{end}\PParameter{document}\\
-  }}\\
-\caption{General structure of a letter document with several
-individual letters (the structure of a single letter is shown in
- \autoref{fig:scrlttr2.letter})}
-\label{fig:scrlttr2.document}
-\vspace{2\abovecaptionskip}
-\fbox{\parbox{.667\linewidth}{\raggedright%
-    \Macro{begin}\PParameter{letter}%
-      \OParameter{options}\Parameter{addressee}\\
-    \dots\\
-    {\centering\emph{settings for this letter}\\}
-    \dots\\
-    \Macro{opening}\Parameter{opening}\\
-  }}\\
-\fbox{\parbox{.667\linewidth}{\raggedright%
-    \dots\\
-    {\centering\emph{letter text}\\}
-    \dots\\
-  }}\\
-\fbox{\parbox{.667\linewidth}{\raggedright%
-    \Macro{closing}\Parameter{closing}\\
-    \Macro{ps}\\
-    \dots\\
-    {\centering\emph{postscript}\\}
-    \dots\\
-    \Macro{encl}\Parameter{enclosures}\\
-    \Macro{cc}\Parameter{additional addressees}\\
-    \Macro{end}\PParameter{letter}\\
-  }}\\
-\caption{General structure of a single letter within a letter
-document (see also \autoref{fig:scrlttr2.document})}
-\label{fig:scrlttr2.letter}
-\end{figure}
-
-As shown in \autoref{fig:scrlttr2.letter}, every single letter itself
-consists of an introduction, the letter body, and the closing. In the
-introduction, all settings pertaining only to the current letter are
-defined. It is important that this introduction always ends with
-\Macro{opening}. Similarly, the closing always starts with
-\Macro{closing}. The two arguments \PName{opening} and \PName{closing}
-can be left empty, but both commands must be used and must have an
-argument.
-
-\begin{Explain}
-  It should be noted that several settings can be changed between the
-  individual letters. Such changes then have an effect on all
-  subsequent letters. For reasons of maintainability of your letter
-  documents, it is however not recommended to use further general
-  settings with limited scope between the letters.
-\end{Explain}
-
 As already mentioned, all general settings used in the preamble of a
 letter document, with the exception of font size, can also be in the
 preamble of the individual letters. Therefore, you will not find more
@@ -2731,72 +3032,11 @@ important hint on address formatting given in
   \Environment{letter}\OParameter{options}\Parameter{addressee}
 \end{Declaration}
 \BeginIndex{Env}{letter}%
-The \Environment{letter} environment is only one of the key
-environments of the letter class. A special \Class{scrlttr2} feature
-are optional arguments to the \Environment{letter} environment. These
-\PName{options} are executed internally via the \Macro{KOMAoptions}
-command.
-
-The \PName{addressee} is a mandatory argument passed to the
-\Environment{letter} environment. Parts of the addressee contents are
-separated by double backslashes. The first part of \PName{addressee}
-is stored in variable \Variable{toname}, while the rest is stored in
-variable \Variable{toaddress} for further use. These parts are output
-on individual lines in the address field. Nevertheless, the double
-backslash should not be interpreted as a certain line break. Vertical
-material such as paragraphs or vertical space is not permitted within
-\PName{addressee}, and could lead to unexpected results and error
-messages, as is the case also for the standard letter class. 
-
 The \Environment{letter} environment does not actually start the
 letter output. This is done by the \Macro{opening} command.
 %
 \EndIndex{Env}{letter}%
 
-
-\begin{Declaration}
-  \Macro{AtBeginLetter}\Parameter{commands}
-\end{Declaration}
-\BeginIndex{Cmd}{AtBeginLetter}%
-{\LaTeX} enables the user to declare \PName{commands} whose execution
-is delayed until a determined point. Such points are called
-\emph{hooks}. Known macros for using hooks are \Macro{AtBeginDocument}
-and \Macro{AtEndOfClass}. The letter class \Class{scrlttr2} provides
-an additional hook that can be used via the macro
-\Macro{AtBeginLetter}.  Originally, hooks were provided for package
-and class authors, so they are documented in \cite{latex:clsguide}
-only, and not in \cite{latex:usrguide}. However, with letters there
-are useful applications of \Macro{AtBeginLetter} as the following
-example may illustrate:
-%
-\begin{Example}
-  It is given that one has to set multiple letters with questionnaires
-  within one document. Questions are numbered automatically within
-  single letters using a counter. Since, in contrast to page
-  numbering, that counter is not known by \Class{scrlttr2}, it would
-  not be reset at the start of each new letter. Given that each
-  questionnaire contains ten questions, question~1 would get number~11
-  in the second letter. A solution is to reset this counter at the
-  beginning of each new letter:
-\begin{lstlisting}
-  \newcounter{Question}
-  \newcommand{\Question}[1]{%
-    \refstepcounter{Question}\par
-    \@hangfrom{\makebox[2em][r]{\theQuestion:~}}{#1}}
-  \AtBeginLetter{\setcounter{Question}{0}}
-\end{lstlisting}
-This way question~1 remains question~1, even in the 1001st letter. Of
-course definitions like those mentioned above need to be stated either
-between macros \Macro{makeatletter} and \Macro{makeatother} (see
-\cite{DANTE:FAQ}) in letter declarations (see
-\autoref{sec:scrlttr2.document} and \autoref{fig:scrlttr2.document},
-\autopageref{fig:scrlttr2.document}), in a unique package, or in an
-\File{lco} file (see \autoref{sec:scrlttr2.lcoFile}).
-\end{Example}
-%
-\EndIndex{Cmd}{AtBeginLetter}%
-%
-\EndIndex{}{address}%
 
 \subsection{The Sender's Extensions}
 \label{sec:scrlttr2.locationField}
@@ -3207,28 +3447,6 @@ text. Thereupon follow the signature, a postscript and various
 listings.
 
 
-\subsection{The Opening}
-\label{sec:scrlttr2.opening}
-
-\begin{Explain}
-  In the early days of computer-generated letters, programs did not
-  have many capabilities, therefore the letters seldom had an opening.
-  Today the capabilities have been enhanced. Thus personal openings
-  are very common, even in mass-production advertising letters.
-\end{Explain}
-
-\begin{Declaration}
-  \Macro{opening}\Parameter{opening}
-\end{Declaration}
-\BeginIndex{Cmd}{opening}%
-This is one of the most important commands in \Class{scrlttr2}.  For
-the user it may seem that only the opening is typeset, but the command
-also typesets the folding marks, letterhead, address field, reference
-fields line, subject, the page footer and others. In short, without
-\Macro{opening} there is no letter.
-%
-\EndIndex{Cmd}{opening}%
-
 \subsection{Footnotes}
 \label{sec:scrlttr2.footnotes}
 
@@ -3299,17 +3517,6 @@ backslash. Paragraphs in the explanation are however not permitted.
 \EndIndex{Variable}{signature}%
 
 \begin{Declaration}
-  \Macro{closing}\Parameter{closing phrase}
-\end{Declaration}
-\BeginIndex{Cmd}{closing}%
-The command \Macro{closing} not only typesets the closing phrase, but
-also the content of the variable \Variable{signature}.  The closing
-phrase may consists of multiple lines, but paragraphs are not
-permitted.
-%
-\EndIndex{Cmd}{closing}%
-
-\begin{Declaration}
   \PLength{sigindent}\\
   \PLength{sigbeforevskip}\\
   \Macro{raggedsignature}
@@ -3357,85 +3564,6 @@ the letter preamble (see \autoref{sec:scrlttr2.startLetter}).
 \EndIndex{PLength}{sigindent}%
 \EndIndex{PLength}{sigbeforevskip}%
 \EndIndex{Cmd}{raggedsignature}%
-
-\subsection{Postscript, Carbon Copy and Enclosures}
-\label{sec:scrlttr2.afterClosing}
-
-After the closing can follow some other statements.  Besides the
-postscript, there are the distribution list of carbon copies, and the
-reference to enclosures.
- 
-\begin{Explain}%
-\begin{Declaration}
-  \Macro{ps}
-\end{Declaration}%
-\BeginIndex{Cmd}{ps}%
-In the time when letters were written by hand it was quite common to
-use a postscript because this was the only way to add information
-which one had forgotten to mention in the main part of the letter. Of
-course, in letters written with {\LaTeX} you can insert additional
-lines easily. Nevertheless, it is still popular to use the
-postscript. It gives one a good possibility to underline again the
-most important or sometimes the less important things of the
-particular letter.
-%
-\end{Explain}
-This instruction merely switches to the postscript.  Hence, a new
-paragraph begins, and a vertical distance\,---\,usually below the
-signature\,---\,is inserted.  The command \Macro{ps} is followed by
-normal text. If you want the postscript to be introduced with the
-acronym ``PS:'' , which by the way is written without a full stop, you
-have to type this yourself. The acronym is typeset neither
-automatically nor optionally by the class \Class{scrlttr2}.
-%
-\EndIndex{Cmd}{ps}
-
-
-\begin{Declaration}
-  \Macro{cc}\Parameter{distribution list}\\
-  \Variable{ccseparator}
-\end{Declaration}
-\BeginIndex{Cmd}{cc}%
-\BeginIndex{Variable}{ccseparator}%
-With the command \Macro{cc} it is possible to typeset a
-\PName{distribution list}.  The command takes the \PName{distribution
-  list} as its argument. If the content of the variable
-\Variable{ccseparator} is not empty, then the name and the content of
-this variable is inserted before \PName{distribution list}.  In this
-case the \PName{distribution list} will be indented appropriately.  It
-is a good idea to set the \PName{distribution list}
-\Macro{raggedright} and to separate the individual entries with a
-double backslash.
-\begin{Example}
-  You want to indicate that your letter is sent to all members of a
-  society and to the board of directors:
-\begin{lstlisting}
-   \cc{%
-     the board of directors\\
-     all society members}
-\end{lstlisting}
-This instruction should be written below the \Macro{closing}
-instruction from the previous example, or below a possible postscript.
-\end{Example}
-A vertical space is inserted automatically before the distribution
-list.
-%
-\EndIndex{Cmd}{cc}%
-\EndIndex{Variable}{ccseparator}%
-
-
-\begin{Declaration}
-  \Macro{encl}\Parameter{enclosures}\\
-  \Variable{enclseparator}
-\end{Declaration}
-\BeginIndex{Cmd}{encl}%
-\BeginIndex{Variable}{enclseparator}%
-\PName{Enclosures} have the same structure as the distribution list.
-The only difference is that here the enclosures starts with the name
-and content of the variable \Variable{enclseparator}.
-%
-\EndIndex{Cmd}{encl}%
-\EndIndex{Variable}{enclseparator}%
 
 
 \section{Language Support\protect\footnote{This section is
