@@ -103,6 +103,10 @@
 \usepackage{listings}
 \lstset{breaklines,prebreak=\mbox{$\hookleftarrow$},language=[LaTeX]TeX,
   basicstyle=\small}
+\lstnewenvironment{lstcode}[1][]{%
+  \lstset{breaklines,prebreak=\mbox{$\hookleftarrow$},language=[LaTeX]TeX,
+    basicstyle=\ttfamily\small,#1}%
+}{}
 \CodelineIndex
 \RecordChanges
 \GetFileInfo{tocbasic.dtx}
@@ -367,7 +371,7 @@ package \Package{keyval} from the graphics bundle.
 There are two kind of commands.  The first kind are basic command.  Those
 are used to inform other packages about the extensions used for files that
 represent a list of something.  Classes or packages may use this information
-e.g, for putting something to every of those files.  Packages may also ask,
+e.\,g, for putting something to every of those files.  Packages may also ask,
 if an extension is already in use.  This does even work, if \Macro{nofiles}
 was used. The second kind are commands to create the list of something.
 
@@ -382,7 +386,7 @@ commands to do something for all known extensions.  And there are commands to
 set or unset features of an extension or the file represented by the
 extension.  Typically an extension also has an owner.  This owner may be a
 class or package or a term decided by the author of the class or package
-using \Package{tocbasic}, e.g., \KOMAScript{} uses the owner \texttt{float}
+using \Package{tocbasic}, e.\,g., \KOMAScript{} uses the owner \texttt{float}
 for list of figures ans list of tables and the default owner for the table of
 contents.
 
@@ -407,7 +411,7 @@ used, otherwise the \PName{false part} will be used.
 \begin{Example}
   Maybe you want to know if the extension ``\File{foo}'' is already in use to
   report an error, if you can not use it:
-  \begin{lstlisting}
+\begin{lstcode}
   \ifattoclist{foo}{%
     \PackageError{bar}{%
       extension `foo' already in use%
@@ -421,7 +425,7 @@ used, otherwise the \PName{false part} will be used.
   }{%
     \PackageInfo{bar}{using extension `foo'}%
   }
-  \end{lstlisting}
+\end{lstcode}
 \end{Example}
 % \iffalse
 \EndIndex{Cmd}{ifattoclist}%
@@ -452,40 +456,40 @@ empty owner.
 \begin{Example}
   You want to add the extension ``\File{foo}'' to the list of known extension,
   while loading your package with file name ``\File{bar.sty}'':
-  \begin{lstlisting}
+\begin{lstcode}
   \addtotoclist{foo}
-  \end{lstlisting}%
+\end{lstcode}%
   This will add the extension ``\PValue{foo}'' with owner ``\PValue{bar.sty}''
   to the list of known extensions, if it was not already at the list of known
   extensions. If the class or another package already added the extension you
   will get the error:
-  \begin{lstlisting}
+\begin{lstcode}
   Package tocbasic Error: file extension `#2' cannot be used twice
 
   See the tocbasic package documentation for explanation.
   Type  H <return>  for immediate help.
-  \end{lstlisting}
+\end{lstcode}
   and after typing \texttt{H <return>} you will get the help:
-  \begin{lstlisting}
+\begin{lstcode}
   File extension `foo' is already used by a toc-file, while bar.sty
   tried to use it again for a toc-file.
   This may be either an incompatibility of packages, an error at a package,
   or a mistake by the user.
-  \end{lstlisting}
+\end{lstcode}
   
   Maybe you package has a command, that creates list of files dynamically.  In
   this case you should use the optional argument of \Macro{addtotoclist} to
   set the owner.
-  \begin{lstlisting}
+\begin{lstcode}
   \newcommand*{\createnewlistofsomething}[1]{%
     \addtotoclist[bar.sty]{#1}%
     % Do something more to make this list of something available
   }
-  \end{lstlisting}
-  If the user calls know, e.g.
-  \begin{lstlisting}
+\end{lstcode}
+  If the user calls know, e.\,g.,
+\begin{lstcode}
   \createnewlistofsomething{foo}
-  \end{lstlisting}
+\end{lstcode}
   this would add the extension ``\PValue{foo}'' with the owner
   ``\PValue{bar.sty}'' to the list of known extension or report an error, if the
   extension is already in use.  You may use any owner you want.  But it should
@@ -525,12 +529,12 @@ indivdual owner.  While processing the \PValue{commands}, \Macro{@currext} wil
 be set to the extension of the currently added extension.
 \begin{Example}
 \Package{tocbasic} itself uses
-\begin{lstlisting}
+\begin{lstcode}
   \AtAddToTocList[]{%
     \expandafter\tocbasic@extend@babel
     \expandafter{\@currext}%
   }
-\end{lstlisting}
+\end{lstcode}
 to add every extension to the \Package{tocbasic}-internal babel handling of
 toc-files.  The \Macro{expandafter} are needed, because the argument of
 \Macro{tocbasic@extend@babel} has to expanded!  See the description of
@@ -588,13 +592,13 @@ the optional argument is empty, only toc-files with an empty owner will be
 used.
 \begin{Example}
   If you want to type out all known extensions, you may simply write:
-  \begin{lstlisting}
+\begin{lstcode}
   \doforeachtocfile{\typeout{\@currext}}
-  \end{lstlisting}
+\end{lstcode}
   and if only the extensions of owner ``\PValue{foo}'' should be typed out:
-  \begin{lstlisting}
+\begin{lstcode}
   \doforeachtocfile[foo]{\typeout{\@currext}}
-  \end{lstlisting}
+\end{lstcode}
 \end{Example}
 % \iffalse
 \EndIndex{Cmd}{doforeachtocfile}%
@@ -649,18 +653,18 @@ toc-file. While writing the contents, \Macro{@currext} is the extension of
 the currently handled toc-file.
 \begin{Example}
   You may add a vertical space of one text line to all toc-files.
-  \begin{lstlisting}
+\begin{lstcode}
     \addtoeachtocfile{%
       \protect\addvspace{\protect\baselineskip}%
     }
-  \end{lstlisting}
+\end{lstcode}
   And if you want to do this, only for the toc-files of owner
   ``\PValue{foo}'':
-  \begin{lstlisting}
+\begin{lstcode}
     \addtoeachtocfile[foo]{%
       \protect\addvspace{\protect\baselineskip}%
     }
-  \end{lstlisting}
+\end{lstcode}
 \end{Example}
 % \iffalse
 \EndIndex{Cmd}{addtoeachtocfile}%
@@ -685,10 +689,10 @@ toc-files or all known toc-files of a given owner.
   You are a class author and want to write the chapter entry not only to the
   table of contents toc-file but to all toc-files, while \texttt{\#1} is the
   title, that should be written to the files.
-  \begin{lstlisting}
+\begin{lstcode}
     \addcontentslinetoeachtocfile{chapter}{%
       \protect\numberline{\thechapter}#1}
-  \end{lstlisting}
+\end{lstcode}
 \end{Example}
 % \iffalse
 \EndIndex{Cmd}{addcontentslinetoeachtocfile}%
@@ -734,19 +738,19 @@ empty, this term will be empty, too! If you omit the optional argument, but
 \begin{Example}
   You have a new ``list of algorithms'' with extension \PValue{loa} and want to
   show it.
-  \begin{lstlisting}
+\begin{lstcode}
   \listof[list of algorithm]{loa}
-  \end{lstlisting}
+\end{lstcode}
   Maybe you want, that the ``list of algorithms'' will create an entry at the
   table of contents. You may set
-  \begin{lstlisting}
+\begin{lstcode}
   \setuptoc{loa}{totoc}
-  \end{lstlisting}
+\end{lstcode}
   But maybe the ``list of algorithms'' should not be set with a title. So you
   may use
-  \begin{lstlisting}
+\begin{lstcode}
   \listof*{loa}
-  \end{lstlisting}
+\end{lstcode}
   Note that in this case no entry at the table of contents will be created,
   even if you'd used the setup command above.
 \end{Example}
@@ -755,8 +759,9 @@ The default heading new following features using \Macro{setuptoc}:
 \begin{description}
 \item[\texttt{totoc}] writes the title of the list of to the table of contents
 \item[\texttt{numbered}] uses a numbered headings for the list of
-\item[\texttt{leveldown}] uses not the top level heading (e.g., \Macro{chapter}
-  with book) but the first sub level (e.g., \Macro{section} with book).
+\item[\texttt{leveldown}] uses not the top level heading (e.\,g.,
+  \Macro{chapter} with book) but the first sub level (e.\,g., \Macro{section}
+  with book).
 \end{description}
 % \iffalse
 \EndIndex{Cmd}{listoftoc*}%
@@ -930,8 +935,9 @@ features. \Package{tocbasic} does know following features:
 \begin{description}
 \item[\texttt{totoc}] writes the title of the list of to the table of contents
 \item[\texttt{numbered}] uses a numbered headings for the list of
-\item[\texttt{leveldown}] uses not the top level heading (e.g., \Macro{chapter}
-  with book) but the first sub level (e.g., \Macro{section} with book).
+\item[\texttt{leveldown}] uses not the top level heading (e.\,g.,
+  \Macro{chapter} with book) but the first sub level (e.\,g., \Macro{section}
+  with book).
 \item[\texttt{onecolumn}] switchs to internal one column mode, if the toc
   is set in internal two column mode and no \texttt{leveldown} was used.
 \item[\texttt{nobabel}] prevents the extension to be added to the babel
@@ -945,7 +951,7 @@ features. \Package{tocbasic} does know following features:
   entries at the list may be set wrong. This is a known issue of character
   protrusion.
 \end{description}
-Classes and packages may know features, too, e.g, the \KOMAScript{} classes
+Classes and packages may know features, too, e.\,g, the \KOMAScript{} classes
 know following additional features:
 \begin{description}
 \item[\texttt{chapteratlist}] activates special code to be put into the list
@@ -1064,7 +1070,7 @@ pairs.
   The owner as described in the sections before. If no owner was given owner
   \PValue{float} will be used.
 \item[\normalfont\PValue{type}=\PName{string}]\hfill\\*
-  sets the type of the new declared list. The type will be used e.g. to
+  sets the type of the new declared list. The type will be used e.\,g. to
   defined a \Macro{listof}\PName{string}. If no type is set up the extension
   from the mandatory argument will be used.
 \item[\normalfont\PValue{types}=\PName{string}]\hfill\\*
@@ -1605,7 +1611,7 @@ be defined and used in \Macro{tocbasic@listhead}.
 % \begin{macro}{\tocbasic@@after@hook}
 %   These are the general hooks. They may be used by classes and packages for
 %   commands, that should be used for all lists of not only the own lists of,
-%   e.g., \KOMAScript{} may use it to handle option \texttt{tocleft}.
+%   e.\,g., \KOMAScript{} may use it to handle option \texttt{tocleft}.
 %    \begin{macrocode}
 \newcommand*{\tocbasic@@before@hook}{}
 \newcommand*{\tocbasic@@after@hook}{}
@@ -1867,8 +1873,8 @@ be defined and used in \Macro{tocbasic@listhead}.
 %   \item[\texttt{totoc}] writes the title of the list of to the table of
 %     contents
 %   \item[\texttt{numbered}] uses a numbered headings for the list of
-%   \item[\texttt{leveldown}] uses not the top level heading (e.g.,
-%     \cs{chapter} with book) but the first sub level (e.g., \cs{section} with
+%   \item[\texttt{leveldown}] uses not the top level heading (e.\,g.,
+%     \cs{chapter} with book) but the first sub level (e.\,g., \cs{section} with
 %     book).
 %   \item[\texttt{nobabel}] prevents the extension to be added to the babel
 %     handling of toc-files.  To make this work, you have to set the feature
@@ -2012,7 +2018,7 @@ be defined and used in \Macro{tocbasic@listhead}.
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\tb@nt@name}
-%   We need a name/term for the entries of the new list. This may e.g. be used
+%   We need a name/term for the entries of the new list. This may e.\,g. be used
 %   for |caption| output. A |\<type>name| will also be defined.
 %    \begin{macrocode}
 \define@key{tocbasic}{name}{%
