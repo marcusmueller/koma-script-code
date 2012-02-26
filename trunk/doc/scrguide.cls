@@ -146,12 +146,7 @@
     \newcommand*{\important}[2][]{}%
     \newcommand*{\textnote}[2][]{}%
     \shortversiontrue
-    \newcommand*{\LoadNonFree}[2]{%
-      \par
-      Im \KOMAScript-Buch \cite{book:komascript} finden sich an dieser Stelle
-      weitere Informationen.
-      \par
-    }%
+    \newcommand*{\LoadNonFree}[2]{\par\GuideLoadNonFree\par}%
     \AtBeginDocument{\InputIfFileExists{linkalias.tex}{}{}}%
     \usepackage{lmodern}%
     \@twosidefalse\@openrightfalse\@mparswitchfalse
@@ -843,7 +838,8 @@
 \newenvironment{XmpTopPage}
  {%
    \begin{center}
-     \setlength{\unitlength}{.833mm}\begin{picture}(100,39)
+     \iffree{\setlength{\unitlength}{1mm}}{\setlength{\unitlength}{.833mm}}%
+     \begin{picture}(100,39)
        \thinlines
        \qbezier(0,5)(25,7)(50,5)\qbezier(50,5)(75,3)(100,5)
        \put(0,5){\line(0,1){34}}
@@ -861,7 +857,9 @@
 %   Output of the bottom of a page.
 %    \begin{macrocode}
 \newenvironment{XmpBotPage}
- {\begin{center}\setlength{\unitlength}{.833mm}\begin{picture}(100,40)%
+ {\begin{center}
+     \iffree{\setlength{\unitlength}{1mm}}{\setlength{\unitlength}{.833mm}}%
+     \begin{picture}(100,40)%
        \thinlines
        \qbezier(0,38)(25,40)(50,38)\qbezier(50,38)(75,36)(100,38)
        \put(0,5){\line(0,1){33}}
