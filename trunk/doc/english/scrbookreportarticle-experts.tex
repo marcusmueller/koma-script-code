@@ -127,7 +127,58 @@ may also define the \KOMAScript{} word mark with this name.%
   \Parameter{heading}
 \end{Declaration}
 \BeginIndex{Cmd}{addtocentrydefault}%
-% TODO: description
+The\ChangedAt{v3.08}{\Class{scrbook}\and \Class{scrreprt}\and
+  \Class{scrartcl}} \KOMAScript{} classes don't use
+\Macro{addcontentsline}\IndexCmd{addcontentsline}%
+\important{\Macro{addcontentsline}} directly. Instead they
+call \Macro{addtocentrydefault} with similar arguments. The command may be used
+for both, entries with and without number. Thereby \PName{level} is the
+textual sectioning level, i.\,e.,  \PValue{part},
+\PValue{chapter}, \PValue{section}, \PValue{subsection},
+\PValue{subsubsection}, \PValue{paragraph}, or \PValue{subparagraph}. The
+already formatted sectioning number is given by the second argument,
+\PName{number}. This argument may be empty. The text of the entry is given by
+argument \PName{heading}. It is recommended to protect fragile commands inside
+this argument with prefix
+\Macro{protect}\IndexCmd{protect}\important{\Macro{protect}}.
+
+There's one speciality for argument \PName{number}. An empty argument
+signalizes, that an entry without number should be generated. \KOMAScript{}
+uses
+\begin{quote}
+  \Macro{addcontentsline}\PParameter{toc}\Parameter{level}%
+  \Parameter{heading}
+\end{quote}
+for this. Nevertheless, if the argument is not empty an entry with number
+will be made and \PName{number} is the already formatted heading
+number. \KOMAScript{} uses
+\begin{quote}\raggedright
+  \Macro{addcontentsline}\PParameter{toc}\Parameter{level}%
+  \PParameter{\%\\
+    \quad\Macro{protect}\Macro{numberline}\Parameter{number}%
+    \PName{heading}\%\\
+  }
+\end{quote}
+to make this.
+
+Package authors an authors of wrapper classes may redefined this command to
+manipulate the entries. For example\textnote{Example} one could suggest
+\begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
+  \renewcommand{\addtocentrydefault}[3]{%
+    \ifstr{#3}{}{%
+      \ifstr{#2}{}{%
+        \addcontentsline{toc}{#1}{#3}%
+      }{%
+        \addcontentsline{toc}{#1}{\protect\numberline{#2}#3}%
+      }%
+    }%
+  }%
+\end{lstcode}
+to omit entries with empty \PName{heading}. In real live this wouldn't be
+needed, because the \KOMAScript{} classes already use another method to
+suppress empty entries. See the description of the structuring commands in
+\autoref{sec:maincls.structure} from \autopageref{desc:maincls.cmd.part}
+onward for this.%
 %
 \EndIndex{Cmd}{addtocentrydefault}
 
@@ -147,7 +198,15 @@ may also define the \KOMAScript{} word mark with this name.%
 \BeginIndex{Cmd}{addsubsubsectiontocentry}%
 \BeginIndex{Cmd}{addparagraphtocentry}%
 \BeginIndex{Cmd}{addsubparagraphtocentry}%
-% TODO: description
+The\ChangedAt{v3.08}{\Class{scrbook}\and \Class{scrreprt}\and
+  \Class{scrartcl}} \KOMAScript{} classes call the previously described
+command \Macro{addtocentrydefault}\IndexCmd{addtocentrydefault}%
+\important{\Macro{addtocentrydefault}} directly only if no individual command
+for the \PName{level} has been defined or if that command is
+\Macro{relax}\IndexCmd{relax}\important{\Macro{relax}}. Nevertheless, the
+default definition of all these individual commands simply call
+\Macro{addtocentrydefault} with their own \PName{level} passing their
+arguments through.%
 %
 \EndIndex{Cmd}{addsubparagraphtocentry}%
 \EndIndex{Cmd}{addsubsubsectiontocentry}%
@@ -222,7 +281,79 @@ may also define the \KOMAScript{} word mark with this name.%
   \Macro{appendixmore}
 \end{Declaration}%
 \BeginIndex{Cmd}{appendixmore}%
-% TODO: description
+There is a peculiarity within the \Macro{appendix} command in the
+{\KOMAScript} classes. If the command \Macro{appendixmore} is defined, this
+command is executed also by the \Macro{appendix} command. Internally the
+{\KOMAScript} classes \Class{scrbook}\OnlyAt{\Class{scrbook}\and
+  \Class{scrreprt}} and \Class{scrreprt} take advantage of this behaviour to
+implement the options \Option{appendixprefix} (see
+\autoref{sec:maincls.structure},
+\autopageref{desc:maincls.option.appendixprefix}). You\textnote{Attention!}
+should take note of this in case you decide to define or redefine the macro
+\Macro{appendixmore}. In case one of this option has been used, you will
+receive an error message when using
+\verb|\newcommand{\appendixmore}{|\dots\verb|}|. This behaviour is intended to
+prevent you from disabling options without noticing it.
+
+\begin{Example}
+  You do not want the chapters in the main part of the classes \Class{scrbook}
+  or \Class{scrreprt} to be introduced by a prefix line (see layout options
+  \Option{chapterprefix} in \autoref{sec:maincls.structure},
+  \autopageref{desc:maincls.option.chapterprefix}). For consistency you also
+  do not want such a line in the appendix either. Instead, you would like to
+  see the word ``Chapter'' in the language of your choice written in front of
+  the chapter letter and, simultaneously, in the page headings.  Instead of
+  using layout option \Option{appendixprefix}, you would define in the
+  document preamble:
+%
+\begin{lstcode}
+  \newcommand*{\appendixmore}{%
+    \renewcommand*{\chapterformat}{%
+      \appendixname~\thechapter\autodot\enskip}
+    \renewcommand*{\chaptermarkformat}{%
+      \appendixname~\thechapter\autodot\enskip}
+  }
+\end{lstcode}
+%  
+  In case you subsequently change your mind and decide to use the option
+  \Option{appendixprefix} at a later stage, you will get an error message
+  because of the already defined \Macro{appendixmore} command.  This behaviour
+  prevents the definition made above from invisibly changing the settings
+  intended with the option.
+  
+  It is also possible to get a similar behaviour of the appendix for
+  the class \Class{scrartcl}. You would write in the preamble of your
+  document:
+\begin{lstcode}[moretexcs={ifthenelse,equal}]
+  \newcommand*{\appendixmore}{%
+    \renewcommand*{\othersectionlevelsformat}[3]{%
+      \ifthenelse{\equal{##1}{section}}{%
+        \appendixname~}{}%
+      ##3\autodot\enskip}
+    \renewcommand*{\sectionmarkformat}{%
+      \appendixname~\thesection\autodot\enskip}}
+\end{lstcode}
+  In addition, the package \Package{ifthen}\IndexPackage{ifthen} (see
+  \cite{package:ifthen}) is required.
+
+  An alternative implementation would be:
+\begin{lstcode}
+  \newcommand*{\appendixmore}{%
+    \renewcommand*{\othersectionlevelsformat}[3]{%
+      \ifstr{##1}{section}{\appendixname~}{}%
+      ##3\autodot\enskip}
+    \renewcommand*{\sectionmarkformat}{%
+      \appendixname~\thesection\autodot\enskip}}
+\end{lstcode}
+  Thereby used command \Macro{ifstr}\IndexCmd[indexmain]{ifstr} is provided by
+  \KOMAScript{}. See \autoref{sec:scrbase.if},
+  \autopageref{desc:scrbase.cmd.ifstr}.
+  
+  Redefined commands are explained in more detail in
+  \autoref{sec:maincls.structure},
+  \autopageref{desc:maincls.cmd.chapterformat} and
+  \autopageref{desc:maincls.cmd.chaptermarkformat}.
+\end{Example}
 %
 \EndIndex{Cmd}{appendixmore}%
 
@@ -909,76 +1040,6 @@ in displayed math formulas.%
 %
 \EndIndex{Cmd}{marginpar}%
 \EndIndex{Cmd}{marginline}%
-
-
-\begin{Declaration}
-  \Macro{appendixmore}
-\end{Declaration}%
-\BeginIndex{Cmd}{appendixmore}%
-There is a peculiarity within the \Macro{appendix} command in the
-{\KOMAScript} classes. If the command \Macro{appendixmore} is defined,
-this command is executed also by the \Macro{appendix}
-command. Internally the {\KOMAScript} classes \Class{scrbook} and
-\Class{scrreprt} take advantage of this behaviour to implement the
-options \Option{appendixprefix} and \OptionValue{appendixprefix}{false} (see
-\autoref{sec:maincls.layoutOptions},
-\autopageref{desc:maincls.option.appendixprefix}). You should take
-note of this in case you decide to define or redefine the
-\Macro{appendixmore}. In case one of these options is set, you will
-receive an error message when using
-\verb|\newcommand{\appendixmore}{|\dots\verb|}|. This behaviour is
-intended to prevent you from disabling options without noticing it.
-
-\begin{Example}
-  You do not want the chapters in the main part of the classes
-  \Class{scrbook} or \Class{scrreprt} to be introduced by a prefix
-  line (see layout options \Option{chapterprefix} and
-  \OptionValue{chapterprefix}{false} in \autoref{sec:maincls.layoutOptions},
-  \autopageref{desc:maincls.option.chapterprefix}). For consistency
-  you also do not want such a line in the appendix either. Instead,
-  you would like to see the word ``Chapter'' in the language of your
-  choice written in front of the chapter letter and, simultaneously,
-  in the page headings.  Instead of using the either layout option
-  \Option{appendixprefix} or \OptionValue{appendixprefix}{false}, you would
-  define in the document preamble:
-%
-\begin{lstcode}
-  \newcommand*{\appendixmore}{%
-    \renewcommand*{\chapterformat}{%
-      \appendixname~\thechapter\autodot\enskip}
-    \renewcommand*{\chaptermarkformat}{%
-      \appendixname~\thechapter\autodot\enskip}
-  }
-\end{lstcode}
-%  
-  In case you subsequently change your mind and decide to use the option
-  \Option{appendixprefix} at a later stage, you will get an error message
-  because of the already defined \Macro{appendixmore} command.  This behaviour
-  prevents the definition made above from invisibly changing the settings
-  intended with the option.
-  
-  It is also possible to get a similar behaviour of the appendix for
-  the class \Class{scrartcl}. You would write in the preamble of your
-  document:
-\begin{lstcode}
-  \newcommand*{\appendixmore}{%
-    \renewcommand*{\othersectionlevelsformat}[1]{%
-      \ifthenelse{\equal{##1}{section}}{\appendixname~}{}%
-      \csname the##1\endcsname\autodot\enskip}
-    \renewcommand*{\sectionmarkformat}{%
-      \appendixname~\thesection\autodot\enskip}
-  }
-\end{lstcode}
-  In addition, the package \Package{ifthen}\IndexPackage{ifthen} (see
-  \cite{package:ifthen}) is required.
-  
-  Redefined commands are explained in more detail in
-  \autoref{sec:maincls.structure},
-  \autopageref{desc:maincls.cmd.chapterformat} and
-  \autopageref{desc:maincls.cmd.chaptermarkformat}.
-\end{Example}
-%
-\EndIndex{Cmd}{appendixmore}%
 
 \endinput
 
