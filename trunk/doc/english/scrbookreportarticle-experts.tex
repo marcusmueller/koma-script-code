@@ -47,21 +47,17 @@
 %
 % ============================================================================
 
-\ProvidesFile{scrbookreportarticle-experts.tex}[2012/02/01 KOMA-Script guide
+\ProvidesFile{scrbookreportarticle-experts.tex}[2012/02/28 KOMA-Script guide
 (chapter: scrbook, scrreprt, scrartcl for experts)]
 
 \translator{Gernot Hassenpflug\and Markus Kohm}
 
-% Date of the translated German file: 0000/00/00
+% Date of the translated German file: 2012/02/28
 
 
 \chapter{Additional Information about the Main Classes \Class{scrbook},
   \Class{scrreprt}, and \Class{scrartcl} as well as the Package
-  \Package{scrextend}\protect\footnote{Translation of this chapter is still
-    missing or incomplete. Instead of the translations of the original chapter
-    from the German manual you may find here outdated information from the old
-    English manual without any structure. Translators from German to English
-    would be welcome!}}
+  \Package{scrextend}}
 \labelbase{maincls-experts}
 
 This chapter gives additional information about the \KOMAScript{} classes
@@ -91,9 +87,7 @@ with a sans serif font. You shouldn't use them any longer.
 \LoadNonFree{scrbookreportarticle-experts}{2}
 
 
-\section{Expert Commands\protect\footnote{Translation of this section is
-    still missing or incomplete. Translators from German to English would be
-    welcome!}}
+\section{Expert Commands}
 \label{sec:maincls-experts.experts}
 
 This sections described commands, that are more or less out of average user's
@@ -552,8 +546,8 @@ prevent you from disabling options without noticing it.
 
 
 \begin{Declaration}
-  \Macro{newbibstyle}\OParameter{Elternstil}\Parameter{Name}%^^A
-  \Parameter{Anweisungen}\\
+  \Macro{newbibstyle}\OParameter{parent style}\Parameter{name}%^^A
+  \Parameter{instructions}\\
   \Macro{newblock}\\
   \Macro{@openbib@code}\\
   \Macro{bib@beginhook}\\
@@ -564,7 +558,82 @@ prevent you from disabling options without noticing it.
 \BeginIndex{Cmd}{@openbib@code}%
 \BeginIndex{Cmd}{bib@beginhook}%
 \BeginIndex{Cmd}{bib@endhook}%
-% TODO: description
+The standard classes\textnote{standard classes} already provide command
+\Macro{newblock} for structuring of bibliography entries. The exact purpose of
+this command depends on the class options. Using option
+\Option{openbib}\important{\Option{openbib}} redefine commands
+\Macro{@openbib@code} and \Macro{newblock} at the end of the used standard
+class. These classes execute command \Macro{@openbib@code} at the
+begin\,---\,or more precise: at the specification of the parameters of
+the\,---\,list environment, that will be used for the bibliography. It should
+be assumed, that many packages will execute this command in the same kind, if
+they redefine the bibliography.
+
+The \KOMAScript{} classes do something similar. Nevertheless, they don't
+redefine \Macro{@openbib@code} at the end of the class. Instead of, the
+bibliography style \PValue{openstyle} is defined using
+\Macro{newbibstyle}. The \PName{instructions}, that has been defined as part
+of the implementation, contain the appropriate redefinition of
+\Macro{@openbib@code} and \Macro{newblock}. Now, if this bibliography style
+will be selected using option \OptionValue{bibliography}{openstyle}%
+\IndexOption{bibliography~=\PValue{openstyle}}%
+\important{\OptionValue{bibliography}{openstyle}}, then the
+\PName{instructions} will be executed immediately. This will redefine
+\Macro{@openbib@code} and \Macro{newblock}.
+
+Beside \Macro{@openbib@code} and \Macro{newblock} also \Macro{bib@beginhook}
+and \Macro{bib@endhook} may be redefined by the \PName{instructions} of the
+style. Command \Macro{bib@beginhook} will be executed immediately after
+heading and preamble of the bibliography, but before the begin of the list
+with the bibliography entries. Command \Macro{bib@endhook} will be executed
+immediately after this list at the end of the bibliography. If
+\Macro{BreakBibliography} (see \autoref{sec:maincls.bibliography},
+\autopageref{desc:maincls.cmd.BreakBibliography}) intercepts the bibliography,
+these commands will also executed at the begin and end of each part of the
+bibliography, this would be immediately before and after
+\Macro{BreakBibliography}.
+
+The commands \Macro{newblock}, \Macro{@openbib@code}, \Macro{bib@beginhook},
+and \Macro{bib@endhook} will be reset to an empty definition at the start of
+each new bibliography style. After this the \PName{instructions} of the
+\PName{parent style} of the bibliography style will be executed. After this
+the \PName{instructions} of the bibliography style itself will be
+executed. Because of this these commands has to be defined using
+\Macro{renewcommand}\IndexCmd{renewcommand}\important{\Macro{renewcommand}}
+not \Macro{newcommand} inside of argument \PName{instructions}.
+
+If the user declares additional \PName{instructions} using
+\Macro{AtEndBibliography}%\important[i]{\Macro{AtEndBibliography}\\
+%  \Macro{AfterBibliographyPreamble}}% Passt bloeder Weise nicht!
+\IndexCmd{AtEndBibliography} and
+\Macro{AfterBibliographyPreamble}\IndexCmd{AfterBibliographyPreamble} to be
+executed after the preamble or at the end of the bibliography, the
+\PName{instructions} of \Macro{AfterBibliographyPreamble} will be executed
+only once at the begin of the bibliography but after the \Macro{bib@beginhook}
+\PName{instructions}, and the \PName{instructions} of
+\Macro{AtEndBibliography} will be executed only once at the end of the
+bibliography but before \Macro{bib@endhook}.
+
+Package\textnote{Example!}
+\Package{multicol}\IndexPackage{multicol}\important{\Package{multicol}} (see
+\cite{package:multicol}) could be used to define a bibliography style for
+printing the bibliography with two columns:
+% Umbruchkorrektur: listings korrigiert
+\begin{lstcode}[belowskip=\dp\strutbox plus 1ex]
+  \newbibstyle{twocolumstyle}{%
+    \renewcommand*{\bib@beginhook}{\begin{multicols}{2}}%
+    \renewcommand*{\bib@endhook}{\end{multicols}}}%
+\end{lstcode}
+If also an \emph{open}-variation of this style should be defined, one may use
+the provided heredity feature and specify a \PName{parent style}:
+% Umbruchkorrektur: listings korrigiert
+\begin{lstcode}[belowskip=\dp\strutbox plus 1ex]
+  \newbibstyle{twocolumopenstyle}[openstyle]{%
+    \renewcommand*{\bib@beginhook}{\begin{multicols}{2}}%
+    \renewcommand*{\bib@endhook}{\end{multicols}}}%
+\end{lstcode}
+These new defined styles may be selected using option \Option{bibliography}
+as usual.%
 %
 \EndIndex{Cmd}{bib@endhook}%
 \EndIndex{Cmd}{bib@beginhook}%
@@ -577,662 +646,6 @@ prevent you from disabling options without noticing it.
 \label{sec:maincls-experts.obsolete}
 
 \LoadNonFree{scrbookreportarticle-experts}{4}
-
-
-\section{Out-dated, Deprecated and Obsolete Information from the Former
-  \KOMAScript{} Manual\protect\footnote{This section shouldn't be here. Instead of this, all information of this
-  section should be restructured and moved to the previous sections or removed
-  completely. Translators from German to English would be welcome!}}
-\label{sec:maincls-experts.deprecated}
-
-\emph{Note, that the information at this section is without any structure!
-  Most of the information is deprecated and maybe wrong!!!}
-
-Since version~3.00 the main classes understand command \Macro{KOMAoptions}
-(see \autoref{sec:scrlttr2.options},
-\autopageref{desc:scrlttr2.cmd.KOMAoptions}).  In the course of the
-development many new options were implemented and old became obsolete.  Only
-the new options may be used with \Macro{KOMAoptions}.  You may find the
-obsolete and corresponding new options at
-\autoref{tab:maincls-experts.deprecated}.
-
-\begin{Explain}
-  In this section you will find commands which should not be used any
-  longer. They are part of older {\KOMAScript} versions and their use
-  was documented. For compatibility reasons they can still be used in
-  the current {\KOMAScript} release. There are however new mechanisms
-  and user interfaces which you should use instead. The reason for
-  listing the obsolete macros in this documentation is only to aid
-  users in understanding old documents.  Furthermore, package authors
-  are free to use these macros in the future.
-
-  \begin{Declaration}
-    \Macro{sectfont}
-  \end{Declaration}
-  \BeginIndex{Cmd}{sectfont}%
-  This macro sets the font which is used for all section headings and
-  the abstract, the main title and the highest level below
-  \Macro{part} in the table of contents. Instead, use the commands for
-  the element \FontElement{disposition}, described in
-  \autoref{sec:maincls.font}.%
-  \EndIndex{Cmd}{sectfont}%
-
-  \begin{Declaration}
-    \Macro{capfont} \\
-    \Macro{caplabelfont}
-  \end{Declaration}
-  \BeginIndex{Cmd}{capfont}%
-  \BeginIndex{Cmd}{caplabelfont}%
-  The macro \Macro{capfont} sets the font which is used for captions
-  in tables and figures. The macro \Macro{caplabelfont} sets the font
-  which is used for the label and numbering of tables and pictures.
-  Instead, use the commands for the elements \FontElement{caption} and
-  \FontElement{captionlabel}, described in
-  \autoref{sec:maincls.font}.%
-  \EndIndex{Cmd}{capfont}%
-  \EndIndex{Cmd}{caplabelfont}%
-
-  \begin{Declaration}
-    \Macro{descfont}
-  \end{Declaration}
-  \BeginIndex{Cmd}{descfont}%
-  This macro sets the font for the optional item arguments of a
-  \Environment{description} environment. Instead, use the commands for
-  the element \FontElement{descriptionlabel}, described in 
-  \autoref{sec:maincls.font}.%
-  \EndIndex{Cmd}{descfont}%
-
-\end{Explain}
-
-\begingroup
-  \onelinecaptionsfalse
-  \newcommand*{\NewOld}[2]{%
-    \BeginIndex{Option}{#1}\PValue{#1} & \PValue{#2}\EndIndex{Option}{#1}\\
-  }%
-  \begin{longtable}{p{\dimexpr.5\textwidth-2\tabcolsep}p{\dimexpr.5\textwidth-2\tabcolsep}}
-    \caption{Obsolete vs. Recommended Options\label{tab:maincls-experts.deprecated}}\\
-    \toprule
-    obsolete option & recommended option \\
-    \midrule
-    \endfirsthead
-    \caption[]{Obsolete vs. Recommended Options
-      (\emph{continuation})}\\
-    \toprule
-    obsolete Option & recommended option \\
-    \midrule
-    \endhead
-    \midrule
-    \multicolumn{2}{r@{}}{\dots}\\
-    \endfoot
-    \bottomrule
-    \endlastfoot
-    \NewOld{abstracton}{abstract}%
-    \NewOld{abstractoff}{abstract=false}%
-    \NewOld{parskip-}{parskip=full-}%
-    \NewOld{parskip+}{parskip=full+}%
-    \NewOld{parskip*}{parskip=full*}%
-    \NewOld{halfparskip}{parskip=half}%
-    \NewOld{halfparskip-}{parskip=half-}%
-    \NewOld{halfparskip+}{parskip=half+}%
-    \NewOld{halfparskip*}{parskip=half*}%
-    \NewOld{tocleft}{toc=flat}%
-    \NewOld{tocindent}{toc=graduated}%
-    \NewOld{listsleft}{listof=flat}%
-    \NewOld{listsindent}{listof=graduated}%
-    \NewOld{cleardoubleempty}{cleardoublepage=empty}%
-    \NewOld{cleardoubleplain}{cleardoublepage=plain}%
-    \NewOld{cleardoublestandard}{cleardoublepage=current}%
-    \NewOld{pointednumber}{numbers=enddot}%
-    \NewOld{pointlessnumber}{numbers=noenddot}%
-    \NewOld{nochapterprefix}{chapterprefix=false}%
-    \NewOld{noappendixprefix}{appendixprefix=false}%
-    \NewOld{bigheadings}{headings=big}%
-    \NewOld{normalheadings}{headings=normal}%
-    \NewOld{smallheadings}{headings=small}%
-    \NewOld{headnosepline}{headsepline=false}%
-    \NewOld{footnosepline}{footsepline=false}%
-    \NewOld{liststotoc}{listof=totoc}%
-    \NewOld{liststotocnumbered}{listof=numbered}%
-    \NewOld{bibtotoc}{bibliography=totoc}%
-    \NewOld{bibtotocnumbered}{bibliography=totocnumbered}%
-    \NewOld{idxtotoc}{index=totoc}%
-    \NewOld{tablecaptionabove}{captions=tableheading}%
-    \NewOld{tablecaptionbelow}{captions=tablesignature}%
-    \NewOld{onelinecaption}{captions=oneline}%
-    \NewOld{noonelinecaption}{captions=nooneline}%
-  \end{longtable}
-\endgroup
-
-\endinput
-
-% ============================================================================
-% Removed from scrbookreportarticle.tex:
-% ============================================================================
-
-\begin{Declaration}
-  \OptionValue{toc}{graduated}\\
-  \OptionValue{toc}{flat}
-\end{Declaration}%
-\BeginIndex{Option}{toc~=\PName{value}}%
-\begin{Explain}
-  In order to calculate automatically the space taken by the unit
-  numbers when using the option \OptionValue{toc}{flat} it is necessary to
-  redefine some macros. It is improbable but not impossible that this
-  leads to problems when using other packages. If you think this may
-  be causing problems, you should try the alternative option
-  \OptionValue{toc}{graduated}, since it does not make any redefinitions. When
-  using packages that affect the format of the table of contents, it
-  is possible that the use of options \OptionValue{toc}{flat} and
-  \OptionValue{toc}{graduated} too may lead to problems. When using such
-  packages then, for safety's sake, one should refrain from using
-  either of these options as global (class) options.
-
-  If the \OptionValue{toc}{flat} option is active, the width of the field for
-  unit numbering is determined when outputting the table of contents.
-  After a change that affects the table of contents, at most three
-  {\LaTeX} runs are necessary to obtain a correctly set table of
-  contents.
-\end{Explain}
-\EndIndex{Option}{toc~=\PName{value}}%
-
-\begin{Declaration}
-  \Macro{tableofcontents}\\
-  \Macro{contentsname}
-\end{Declaration}%
-\BeginIndex{Cmd}{tableofcontents}%
-\BeginIndex{Cmd}{contentsname}%
-\begin{Explain}
-  The table of contents is set as an unnumbered chapter and is therefore
-  subject to the side effects of the standard \Macro{chapter*} command,
-  which are described in \autoref{sec:maincls.structure},
-  \autopageref{desc:maincls.cmd.chapter*}.  However, the running
-  headings\Index{running heading} for left and right pages are correctly filled
-  with the heading of the table of contents. 
-
-  The text of the heading is given by the macro
-  \Macro{contentsname}. If you make use of a language package such as
-  \Package{babel}, please read the documentation of that package
-  before redefining this macro.
-\end{Explain}%
-\EndIndex{Cmd}{tableofcontents}%
-\EndIndex{Cmd}{contentsname}%
-
-There are two variants for the construction of the table of
-contents. With the standard variant, the titles of the sectional units
-are indented so that the unit number is flush left to the edge of the
-text of the next upper sectional unit.  However, the space for the
-numbers is thereby limited and is only sufficient for a little more
-than 1.5 places per unit level.  Should this become a problem, the
-option \OptionValue{toc}{flat} can be used to set the behaviour such that all
-entries in the table of contents are set flush left under one
-another. As explained in \autoref{sec:maincls.tocOptions},
-\autopageref{desc:maincls.option.toc}, several {\LaTeX} runs are
-needed.
-
-{\KOMAScript} has always attempted to avoid page breaking directly
-between a sectional unit and the adjacent next lower unit, for
-example, between a chapter title and its first section title. However,
-the mechanism worked poorly or not at all until version~2.96. In
-version~2.96a\ChangedAt{v2.96a}{%
-  \Class{scrbook} \and\Class{scrreprt} \and\Class{scrartcl}} the
-mechanism was much improved and should now always work
-correctly. There can be changes in the page breaking in the table of
-contents as a result though. Thus, the new mechanism is only active,
-if the compatibility option is not set to version~2.96 or less (see
-option \Option{version}, \autoref{sec:maincls.compatibilityOptions},
-\autopageref{desc:maincls.option.version}). The mechanism also does
-not work if the commands to generate the table of contents are
-redefined, for example, by the use of the package \Package{tocloft}.
-
-\begin{Declaration}
-  \Macro{ifthispageodd}\Parameter{true}\Parameter{false}
-  \Macro{ifthispagewasodd} \PName{true}\Macro{else} \PName{false}\Macro{fi}
-\end{Declaration}%
-\BeginIndex{Cmd}{ifthispageodd}%
-\BeginIndex{Cmd}{ifthispagewasodd}%
-\begin{Explain}%
-  A peculiarity of {\LaTeX} consists of the fact that it is not
-  possible to determine on which page the current text will fall. It
-  is also difficult to say whether the current page has an odd or an
-  even page number. Now some will argue that there is, nevertheless,
-  the {\TeX} test macro \Macro{ifodd} which one needs only to apply to
-  the current page counter. However, this is an error. At the time of
-  the evaluation of such a test {\LaTeX} does not know at all whether
-  the text just processed will be typeset on the current page or only
-  on the next. The page breaks take place not while reading the
-  paragraph, but only in the \emph{output} routine of
-  {\LaTeX}. However, at that moment a command of the form
-  \verb|\ifodd\value{page}| would already have been completely
-  evaluated.
-
-  To find out reliably whether a text falls on an even or odd
-  page, one must usually work with a label and a page reference to
-  this label. One must also take special precautionary measures during
-  the first {\LaTeX} run, when the label is not yet known.
-
-  More precisely stated, the question is not where the text is, but
-  whether a page reference to a label placed in this location would
-  refer to an odd or an even page.
-
-  There are situations where the \Macro{ifthispageodd} command never
-  leads to the correct result. Suppose that the command is used within
-  a box. A box is set by {\LaTeX} always as a whole. No page breaks
-  take place inside. Assume further that the \PName{true} part is very
-  big, but the \PName{false} part is empty. If we suppose further that
-  the box with the \PName {false} part still fits on the current, even
-  page, but that with the \PName{true} part it does not.  Further
-  assume that {\KOMAScript} heuristically decides for the first run
-  that the \PName{true} part applies. The decision is wrong and is
-  revised in the next run. The \PName{false} part is thereby
-  processed, instead of the \PName{true} part. The decision must again
-  be revised in the next run and so on.
-
-  These cases are rare. Nevertheless it should not be said that I have
-  not pointed out that they are possible.
-
-  Sometimes you need to know the state of the last decision. This may be done
-  using the expert command \Macro{ifthispagewasodd}. This is either same like
-  \Macro{iftrue} or \Macro{iffalse} and may be used like those.
-\end{Explain}
-%
-\EndIndex{Cmd}{ifthispageodd}%
-\EndIndex{Cmd}{ifthispagewasodd}%
-
-\begin{Declaration}
-  \Macro{chapterpagestyle}\\
-  \Macro{markright}
-\end{Declaration}
-\BeginIndex{Cmd}{chapterpagestyle}%
-\BeginIndex{Cmd}{markright}%
-\begin{Explain}
-  Whoever thinks that it is possible to put running headings on the
-  first page of a chapter by using the command
-\begin{lstcode}
-  \renewcommand*{\chapterpagestyle}{headings}
-\end{lstcode}
-  will be surprised at the results.
-  For sure, the page style \PValue{headings} is thereby applied to the
-  initial page of a chapter. But nevertheless no running headings appear
-  when using the \Option{openright} option.
-  The reason for this behaviour can be found in the {\LaTeX}
-  core. There, the command \Macro{rightmark}, that generates the marks
-  for right-hand pages, is defined with;
-\begin{lstcode}
-  \let\@rightmark\@secondoftwo
-  \def\rightmark{\expandafter\@rightmark
-    \firstmark\@empty\@empty}
-\end{lstcode}
-  The right-hand mark is set with \Macro{firstmark}. \Macro{firstmark}
-  contains the  left-hand  and right-hand  marks that were first set
-  for a page. Within \Macro{chapter}, \Macro{markboth} is used to set
-  the left mark to the chapter header and the right mark to empty.
-  Hence, the first right
-  mark on  a chapter beginning with a right-hand page is empty. Therefore,
-  the running heading is also empty on those pages.
-
-  You could redefine \Macro{rightmark} in the preamble so that the
-  last mark on the page is used instead of the first:
-\begin{lstcode}
-  \makeatletter
-  \renewcommand*{\rightmark}{%
-    \expandafter\@rightmark\botmark\@empty\@empty}
-  \makeatother
-\end{lstcode}
-  This would however cause the running heading of the first page of a
-  chapter to use the title of the last section in the page. This is
-  confusing and should be avoided.
-
-  It is also confusing (and hence should be avoided) to have as
-  running heading of the first page of a chapter the chapter title
-  instead of the the section title. Therefore, the current behavior
-  should be considered to be correct.
-\end{Explain}
-\EndIndex{Cmd}{markright}%
-\EndIndex{Cmd}{chapterpagestyle}
-
-
-\begin{Declaration}
-  \Macro{the\PName{counter name}}
-\end{Declaration}%
-\BeginIndex{Cmd}{thecountername=the\PName{counter name}}%
-As you might know, for every counter in {\LaTeX} there is a command
-\Macro{the}\PName{countername}, which outputs the value of the
-counter. Depending on the class the counter for a particular level
-starting from \Macro{section} (\Class{book}, \Class{scrbook},
-\Class{report}, \Class{scrreprt}) or \Macro{subsection}
-(\Class{article}, \Class{scrartcl}) is composed of the counter for the
-next higher level followed by a dot and the Arabic number of the
-\PName{countername} of the respective level.\par
-%
-\EndIndex{Cmd}{thecountername=the\PName{counter name}}%
-
-\subsection{Lists}
-\label{sec:maincls-experts.lists} 
-
-One concluding remark on list environments: on the internet and during support
-it is often asked why such an environment is followed by a
-indented\Index{indentation} paragraph. In fact, this is not the case but is
-the result of the user demanding a new paragraph. In {\LaTeX} empty lines are
-interpreted as a new paragraph. This is also the case before and after list
-environments. Thus, if you want a list environment to be set within a
-paragraph you have to omit empty lines before and after. To nevertheless
-separate the environment from the rest of your text in the {\LaTeX} source
-file, you can insert a comment line before and after, that is, lines which
-begin with a percent character and contain nothing more.
-
-\begin{Declaration}
-  \XMacro{begin}\PParameter{\Environment{addmargin*}}%
-  \OParameter{inner indentation}\Parameter{indentation}\\
-  \quad\dots\\
-  \XMacro{end}\PParameter{addmargin*}
-\end{Declaration}
-\BeginIndex{Env}{addmargin*}%
-There is one problem with the \Environment{addmargin*} which you
-should be aware of. If a page break occurs within an
-\Environment{addmargin*} environment, the indentation on the following
-page will be on the wrong side.  This means that suddenly the
-\PName{inner indentation} is applied on the outside of the
-page. Therefore it is recommended to prevent page breaks within this
-environment. This can be achieved by using an additional
-\Macro{parbox} or, as in the example above, a
-\Environment{minipage}. This makes use of the fact that neither the
-argument of a \Macro{parbox} nor the content of a
-\Environment{minipage} breaks at the end of a page.  Unfortunately
-this is not without another disadvantage: in some cases pages can no
-longer be filled correctly, which has the effect of generating several
-warnings.
-\EndIndex{Env}{addmargin*}%
-
-\begin{Declaration}
-  \OptionValue{captions}{oneline}\\
-  \OptionValue{captions}{nooneline}
-\end{Declaration}
-\BeginIndex{Option}{captions~=\PValue{oneline}}%
-\BeginIndex{Option}{captions~=\PValue{nooneline}}%
-The standard classes differentiate between one-line and multi-line
-table or figure captions. One-line captions are centered while
-multi-line captions are left-justified. This behavior, which is also
-the default with \KOMAScript, corresponds to the option
-\OptionValue{captions}{oneline}. There is no special handling of one-line
-captions when the \OptionValue{captions}{nooneline} option is given.
-
-\begin{Explain}
-  The avoidance of a special treatment for the caption has an
-  additional effect that is sometimes highly desirable. Footnotes that
-  appear inside a \Macro{caption} command often have a wrong number
-  assigned to them. This happens because the footnote counter is
-  incremented once as soon as the text is measured to determine if it
-  will be one line or more. When the \OptionValue{captions}{nooneline} option
-  is used no such measurement is made. The footnote numbers are
-  therefore correct.
-
-  But since {\KOMAScript} version~2.9 you don't need the option
-  \OptionValue{captions}{nooneline} to avoid the above described
-  effect. {\KOMAScript} classes contain a workaround, so you can have
-  footnotes inside captions. It should be mentioned though that when
-  using footnotes inside floating environments, the contents of the
-  floating environment should be encapsulated inside a minipage. That
-  way it is guaranteed that floating environment and footnote are
-  inseparable.
-\end{Explain}
-%
-\EndIndex{Option}{captions~=\PValue{oneline}}%
-\EndIndex{Option}{captions~=\PValue{nooneline}}%
-
-\begin{Declaration}
-  \Macro{caption}\OParameter{entry}\Parameter{title}\\
-  \Macro{captionbelow}\OParameter{entry}\Parameter{title}\\
-  \Macro{captionabove}\OParameter{entry}\Parameter{title}
-\end{Declaration}%
-\BeginIndex{Cmd}{caption}%
-\BeginIndex{Cmd}{captionabove}%
-\BeginIndex{Cmd}{captionbelow}%
-\begin{Explain}
-  Some would argue that you could achieve the same result using the
-  \Macro{topcaption} command from the \Package{topcapt}
-  package\IndexPackage{topcapt} (see \cite{package:topcapt}). However,
-  that is not the case. The command \Macro{topcaption} is ignored by
-  packages which directly redefine the \Macro{caption} macro. The
-  \Package{hyperref} package (see \cite{package:hyperref}) is one such
-  example. In {\KOMAScript}, \Macro{captionabove} and
-  \Macro{captionbelow} are so implemented that changes have an effect
-  on both of these commands as well.
-  
-  \phantomsection\label{desc:maincls.cmd.caption.longtable}%
-  If the \Package{longtable} package\IndexPackage{longtable} is used,
-  {\KOMAScript} ensures that captions above tables which are placed
-  within a \Environment{longtable} environment have the same
-  appearance as those in a normal \Environment{table}
-  environment. This also means that you can apply the same settings as
-  in a \Environment{table} environment. Please note that in the
-  \Package{longtable} package the maximum width of a table caption can
-  be limited and the default is set to 4\Unit{in} (see
-  \cite{package:longtable}). Used together with {\KOMAScript} this
-  mechanism in \Package{longtable} works only if the class option
-  \Option{origlongtable} is set (see
-  \autoref{sec:maincls.formattingOptions},
-  \autopageref{desc:maincls.option.origlongtable}). If the
-  \Package{caption2}\IndexPackage{caption2} or
-  \Package{caption}\IndexPackage{caption} package (see
-  \cite{package:caption}) is loaded, table captions are handled by
-  this package.
-  
-  Please note that \Macro{captionabove} and \Macro{captionbelow}, if
-  placed within a \Environment{float} environment which was defined
-  using the \Package{float}\IndexPackage{float} package, have the
-  exact same behaviour described in \cite{package:float} for the
-  \Macro{caption} command.  In this case, the float style determines
-  whether the caption will be set below or above the figure or table.
-\end{Explain}
-%
-\EndIndex{Cmd}{caption}%
-\EndIndex{Cmd}{captionabove}%
-\EndIndex{Cmd}{captionbelow}%
-
-
-\begin{Declaration}
-  \Macro{setcapwidth}\OParameter{justification}\Parameter{width}\\
-  \Macro{setcapmargin}\OParameter{margin left}\Parameter{margin}\\
-  \Macro{setcapmargin*}\OParameter{margin inside}\Parameter{margin}
-\end{Declaration}
-\BeginIndex{Cmd}{setcapwidth}%
-\BeginIndex{Cmd}{setcapmargin}%
-\BeginIndex{Cmd}{setcapmargin*}%
-\begin{Explain}
-  \Package{longtable} places the caption in a box, which is issued
-  again on subsequent pages as needed. When outputting a box, the
-  macros needed for its creation are not reevaluated. That is the
-  reason why it is not possible for {\KOMAScript} to swap margin
-  settings for even pages in double-sided layout . This is what would
-  be necessary in order to produce a justification which is shifted
-  towards the outside or inside.
-\end{Explain}
-
-\begin{Example}
-  A rather odd problem is that of a figure caption which is required
-  to be both centered and of the same width as the figure itself. If
-  the width of the figure is known in advance, the solution with
-  {\KOMAScript} is quite easy. Supposing the figure has a width of
-  8\Unit{cm}, it only takes:
-\begin{lstcode}
-  \setcapwidth[c]{8cm}
-\end{lstcode}
-directly in front of \Macro{caption} or \Macro{captionbelow}. If the
-width is unknown then you first have to define a length in the
-preamble of your document:
-\begin{lstcode}
-  \newlength{\FigureWidth}
-\end{lstcode}
-  Having done this you can calculate the width directly with the
-  {\LaTeX} command \Macro{settowidth} (see \cite{latex:usrguide})
- in many cases. A possible solution would look as follows:
-\begin{lstcode}
-  \begin{figure}
-    \centering%
-    \settowidth{\FigureWidth}{%
-      \fbox{\quad\KOMAScript\quad}%
-      }%
-    \fbox{\quad\KOMAScript\quad}%
-    \setcapwidth[c]{\FigureWidth}
-    \caption{Example of a centered caption below the figure}
-  \end{figure}
-\end{lstcode}
-However, it is awkward to write the content twice and to call
-\Macro{setcapwidth} for every figure. Yet nothing is easier than
-defining a new command in the preamble of your document which hides
-the three steps of:
-  \begin{enumerate}
-  \item defining the width of the argument
-  \item specifying the width of the caption
-  \item outputting the argument
-  \end{enumerate}
-  in:
-\begin{lstcode}
-  \newcommand{\Figure}[1]{%
-    \settowidth{\FigureWidth}{#1}%
-    \setcapwidth[c]{\FigureWidth}%
-    #1}
-\end{lstcode}
-  Using this command the example abbreviates to:
-\begin{lstcode}
-  \begin{figure}
-    \centering%
-    \Figure{\fbox{\quad\KOMAScript\quad}}%
-    \caption{Example of a centered caption below the figure}
-  \end{figure}
-\end{lstcode}
-  
-However, commands have the disadvantage that errors in the macros of
-the argument in case of arguments with more than one line are not
-reported with the very accurate line numbers by {\LaTeX}. Thus in some
-cases the use of an environment has advantages. Then, however, the
-question arises of how the width of the content of the environment can
-be determined. The solution involves the \Environment{lrbox}
-environment, described in \cite{latex:usrguide}:
-\begin{lstcode}
-  \newsavebox{\FigureBox}
-  \newenvironment{FigureDefinesCaptionWidth}{%
-    \begin{lrbox}{\FigureBox}%
-  }{%
-    \end{lrbox}%
-    \global\setbox\FigureBox=\box\FigureBox%
-    \aftergroup\SetFigureBox%
-  }
-  \newcommand{\SetFigureBox}{%
-    \Figure{\usebox{\FigureBox}}}
-\end{lstcode}
-  This definition uses the macro \Macro{Figure} defined above.  In
-  the main text you write:
-\begin{lstcode}
-  \begin{figure}
-    \centering%
-    \begin{FigureDefinesCaptionWidth}
-      \fbox{\hspace{1em}\KOMAScript\hspace{1em}}
-    \end{FigureDefinesCaptionWidth}
-    \caption{Example of a centered caption below the figure}
-  \end{figure}
-\end{lstcode}
-Admittedly, the environment in this example is not necessary. However,
-its definition using \Macro{global} is quite tricky. Most users would
-probably not be able to define such an environment without help. Thus,
-as this definition can be very useful, it was introduced in the above
-example.
-  
-Even if the \Environment{captionbeside} environment did not exist you
-could nevertheless place the figure caption beside the figure in a
-quite simple way. For this \Macro{SetFigureBox} from the example above
-would have to be redefined first:
-\begin{lstcode}
-  \renewcommand{\SetFigureBox}{%
-    \settowidth{\captionwidth}{\usebox{\FigureBox}}%
-    \parbox[b]{\captionwidth}{\usebox{\FigureBox}}%
-    \hfill%
-    \addtolength{\captionwidth}{1em}%
-    \addtolength{\captionwidth}{-\hsize}%
-    \setlength{\captionwidth}{-\captionwidth}%
-    \setcapwidth[c]{\captionwidth}%
-    }
-\end{lstcode}
-Finally you only have to put the \Macro{caption} command in a
-\Macro{parbox} too:
-\begin{lstcode}
-  \begin{figure}
-    \centering%
-    \begin{FigureSetsCaptionWidth}
-      \fbox{\rule{0pt}{5\baselineskip}%
-        \hspace{1em}\KOMAScript\hspace{1em}}
-    \end{FigureSetsCaptionWidth}
-    \parbox[b]{\FigureWidth}{%
-      \caption{Example of a centered caption
-               below the figure}
-    }
-  \end{figure}
-\end{lstcode}
-The \Macro{rule} command in this example only serves as an invisible
-support to produce an example figure with a greater vertical height.
-\end{Example}
-%
-\EndIndex{Cmd}{setcapwidth}%
-\EndIndex{Cmd}{setcapmargin}%
-\EndIndex{Cmd}{setcapmargin*}%
-
-\begin{Declaration}
-  \Option{origlongtable}
-\end{Declaration}%
-\BeginIndex{Option}{origlongtable}%
-\BeginIndex{Package}{longtable}%
-The package\OnlyAt{\Package{longtable}}
-\Package{longtable}\IndexPackage{longtable} (see \cite{package:longtable})
-sets table captions internally by calling the command \Macro{LT@makecaption}.
-In order to ensure that these table captions match the ones used with normal
-tables, the {\KOMAScript} classes normally redefine that command. See
-\autoref{sec:maincls.floats}, \autopageref{desc:maincls.cmd.caption.longtable}
-for more details. The redefinition is performed with help of the command
-\Macro{AfterPackage} immediately after the loading of package
-\Package{longtable}.  If the package \Package{caption2}\IndexPackage{caption2}
-(see \cite{package:caption}) has been previously loaded, the redefinition is
-not made in order not to interfere with the \Package{caption2} package.
-%
-\EndIndex{Package}{longtable}%
-\EndIndex{Option}{origlongtable}%
-
-\begin{Declaration}
-  \Macro{listtablename}\\
-  \Macro{listfigurename}
-\end{Declaration}
-\BeginIndex{Cmd}{listtablename}%
-\BeginIndex{Cmd}{listfigurename}%
-The text of the titles of this tables are stored in the macros
-\Macro{listtablename} and \Macro{listfigurename}. If you use a
-language package like \Package{babel} and want to redefine these
-macros, you should read the documentation of the language package.
-%
-\EndIndex{Cmd}{listtablename}%
-\EndIndex{Cmd}{listfigurename}%
-
-\begin{Declaration}
-  \Macro{marginpar}\OParameter{margin note left}\Parameter{margin note}\\
-  \Macro{marginline}\Parameter{margin note}
-\end{Declaration}%
-\BeginIndex{Cmd}{marginpar}%
-\BeginIndex{Cmd}{marginline}%
-Unfortunately \Macro{marginpar} does not always work correctly in
-two-sided\Index{twoside} layout. Whether a margin note will end up in the left
-or right margin is already decided while evaluating the command
-\Macro{marginpar}. If the output routine now shifts the margin note onto the
-next page the formatting is no longer correct. This behaviour is deeply rooted
-within {\LaTeX} and was therefore declared a feature by the {\LaTeX}3
-team. \Macro{marginline} suffers from this ``feature'' too. The package
-\Package{mparhack}\IndexPackage{mparhack} (see \cite{package:mparhack}) offers
-a standard solution for this problem which naturally benefits also
-\Macro{marginpar} and \Macro{marginline}.
-
-Note that you may not use \Macro{marginpar} or \Macro{marginline} within float
-environments such as tables or figures. Also, these commands will not function
-in displayed math formulas.%
-%
-\EndIndex{Cmd}{marginpar}%
-\EndIndex{Cmd}{marginline}%
 
 \endinput
 
