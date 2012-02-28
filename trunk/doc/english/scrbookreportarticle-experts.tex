@@ -243,7 +243,31 @@ font size.%
 \end{Declaration}
 \BeginIndex{Cmd}{newkomafont}%
 \BeginIndex{Cmd}{aliaskomafont}%
-% TODO: description
+Experts may use \Macro{newkomafont} to define a \PName{default} for the font
+style of an \PName{element}. After this that default may be changed using
+commands \Macro{setkomafont} and \Macro{addtokomafont} (see
+\autoref{sec:maincls.textmarkup},
+\autopageref{desc:maincls.cmd.setkomafont}). Of course this is not enough to
+use the defined font style. The expert himself has to prepare his code to use
+command
+\Macro{usekomafont}\important{\Macro{usekomafont}}\IndexCmd{usekomafont} (see
+\autopageref{desc:maincls.cmd.usekomafont}) with that \PName{element} at his
+code definitions.
+
+The optional argument \PName{warning message} defines a warning message,
+that \KOMAScript{} will show whenever the default font style of that
+\PName{element} will be changed. The sender of the warning in such cases will
+be the used \KOMAScript{} class or package \Package{scrextend}.
+
+Command \Macro{aliaskomafont} defines an \PName{alias name} to an already
+defined \PName{element}. \KOMAScript{} will inform the user automatically
+about the real name of the element, whenever an \PName{alias name} will be
+used. An\textnote{Hint!} \PName{alias name} may be used, e.\,g., if a
+developer finds a better name for an element, that has been defined formerly
+with another name, if the old name should still be usable because of
+compatibility. Also an \PName{alias name}s may increase usability, because
+different users may find different names more or less intuitive. \KOMAScript{}
+itself defines a lot of \PName{alias name}s for several \PName{element}s.
 %
 \EndIndex{Cmd}{aliaskomafont}%
 \EndIndex{Cmd}{newkomafont}%
@@ -253,6 +277,25 @@ font size.%
   \Parameter{last line end space}
 \end{Declaration}
 \BeginIndex{Cmd}{setparsizes}%
+With this command \KOMAScript{} provides to set the indent of the first line
+of a new paragraph, the distance between paragraphs and the white space that
+has to be at the end of the last line of each paragraph. This command should
+be used whenever changes should also be recognized by option
+\OptionValue{parskip}{relative}. \KOMAScript{}\textnote{Beispiel} itself uses
+this command, e.\,g., with
+\begin{lstcode}[belowskip=\dp\strutbox plus 1ex]
+  \setparsizes{0pt}{0pt}{0pt plus 1fil}
+\end{lstcode}
+to switch of paragraph indent and distance between paragraphs and to allow any
+white space at the end of the last line of paragraphs. This make sense, if a
+paragraph consists of a box only, that should be printed without vertical
+distance but with the whole column width. If, in opposite to that, the box
+should only span the whole width but should be printed with the current
+settings of paragraph indent and distance between paragraphs, usage of
+\begin{lstcode}[belowskip=\dp\strutbox plus 1ex]
+  \setlength{\parfillskip}{0pt plus 1fil}
+\end{lstcode}
+would be recommended.%
 %
 \EndIndex{Cmd}{setparsizes}%
 
@@ -260,7 +303,15 @@ font size.%
   \Macro{raggedchapterentry}
 \end{Declaration}
 \BeginIndex{Cmd}{raggedchapterentry}%
-% TODO: description
+This command is not really comparable with commands like
+\Macro{raggedsection}. In opposite to those commands, that provide to print
+corresponding elements either justified or right- or left-aligned or centered,
+\Macro{raggedchapterentry} currently only provides to print chapter entries at
+the table of contents justified or left-aligned. Default is justified. For
+left-aligned the command has to be redefined to be
+\Macro{raggedright}\important{\Macro{raggedright}}\IndexCmd{raggedright}. See
+also the limitation note in \autoref{sec:maincls-experts.coexistence},
+\autopageref{desc:maincls-experts.cmd.raggedsection} for this.%
 %
 \EndIndex{Cmd}{raggedchapterentry}
 
@@ -279,7 +330,137 @@ font size.%
 \BeginIndex{Cmd}{partheadmidvskip}%
 \BeginIndex{Cmd}{partheadendvskip}%
 \BeginIndex{Cmd}{partheademptypage}%
-% TODO: description
+These\important[i]{\Macro{chapter}\\
+  \Macro{part}\\
+  \Macro{addchap}\\
+  \Macro{addpart}} are used inside of the definition of the headings
+\Macro{chapter}\IndexCmd{chapter}, \Macro{part}, \Macro{addchap},
+\Macro{addpart} and their star-variations. Thereby
+\Macro{chapterheadstartvskip} is designed to be a command, that inserts
+vertical distance before the chapter heading. Analogues
+\Macro{chapterheadendvskip} is designed to be a command, that inserts vertical
+distance after the chapter heading.
+
+Vertical distance above and below part headings will be inserted using the
+commands \Macro{partheadstartvskip} and \Macro{partheadendvskip}. A page break
+would be interpreted to be part of the vertical distance and therefor is
+already part of the default of \Macro{partheadendvskip} in
+\Class{scrbook}\OnlyAt{\Class{scrbook}\and \Class{scrreprt}} and
+\Class{scrreprt}. Command
+\Macro{partheademptypage}\ChangedAt{v3.02}{\Class{scrbook}\and
+  \Class{scrreprt}} is used to produce the empty page after the part heading
+page of \Class{scrbook} and \Class{scrreprt}.
+
+The \Class{scrbook}\OnlyAt{\Class{scrbook}\and \Class{scrreprt}} and
+\Class{scrreprt} default of the six commands are listed in
+\autoref{tab:maincls-experts.headvskip} and
+\autoref{tab:maincls-experts.headvskip2}. The
+\Class{scrartcl}\OnlyAt{\Class{scrartcl}} defaults of the three at this class
+defined commands are listed in
+\autoref{tab:maincls-experts.headvskip3}. An\textnote{Example!} example, that
+redefines \Macro{chapterheadstartvskip} and \Macro{chapterheadendvskip} to
+print extra rules above and below the chapter heading, may be found at
+\cite{homepage} (in German).%
+%
+\begin{table}
+  \centering
+%  \KOMAoptions{captions=topbeside}%
+%  \setcapindent{0pt}%
+  \caption
+%  \begin{captionbeside}
+    {%
+      defaults of the commands for the vertical distances of chapter headings
+      with \Class{scrbook} and \Class{scrreprt}%
+    }%
+%    [l]
+    \begin{tabular}{ll}
+      \multicolumn{2}{@{}l}{\bfseries Mit \OptionValue{headings}{big}:}\\
+      \toprule
+      command & default definition \\
+      \midrule
+      \Macro{chapterheadstartvskip} &
+      \Macro{vspace*}\PParameter{2.3\Macro{baselineskip}} \\
+      \Macro{chapterheadendvskip} &
+      \Macro{vspace*}\texttt{\{1.725\Macro{baselineskip}} \\ & \quad
+      \texttt{plus .115\Macro{baselineskip}} % \\ & \quad
+      \texttt{minus .192\Macro{baselineskip}\}} \\
+      \bottomrule\\
+      \multicolumn{2}{@{}l}{\bfseries Mit \OptionValue{headings}{normal}:}\\
+      \toprule
+      command & default definition \\
+      \midrule
+      \Macro{chapterheadstartvskip} &
+      \Macro{vspace*}\PParameter{2\Macro{baselineskip}} \\
+      \Macro{chapterheadendvskip} &
+      \Macro{vspace*}\texttt{\{1.5\Macro{baselineskip}}\\ & \quad
+      \texttt{plus .1\Macro{baselineskip}} % \\ & \quad
+      \texttt{minus .167\Macro{baselineskip}\}} \\
+      \bottomrule\\
+      \multicolumn{2}{@{}l}{\bfseries Mit \OptionValue{headings}{small}:}\\
+      \toprule
+      command & default definition \\
+      \midrule
+      \Macro{chapterheadstartvskip} &
+      \Macro{vspace*}\PParameter{1.8\Macro{baselineskip}} \\
+      \Macro{chapterheadendvskip} &
+      \Macro{vspace*}\texttt{\{1.35\Macro{baselineskip}}\\ & \quad
+      \texttt{plus .09\Macro{baselineskip}} % \\ & \quad
+      \texttt{minus .15\Macro{baselineskip}\}} \\
+      \bottomrule\\
+    \end{tabular}
+%  \end{captionbeside}
+    \label{tab:maincls-experts.headvskip}%
+\end{table}
+%
+\begin{table}
+%  \centering
+  \KOMAoptions{captions=topbeside}%
+  \setcapindent{0pt}%
+%  \caption
+  \begin{captionbeside}
+    {%
+      defaults of the commands for the vertical distances of part headings
+      with \Class{scrbook} and \Class{scrreprt}%
+    }[l]
+  \begin{tabular}[t]{ll}
+    \toprule
+    command & default definition \\
+    \midrule
+    \Macro{partheadstartvskip} & \Macro{null}\Macro{vfil} \\
+    \Macro{partheadmidvskip} & \Macro{par}\Macro{nobreak}\Macro{vskip} \texttt{20pt}\\
+    \Macro{partheadendvskip} & \Macro{vfil}\Macro{newpage} \\
+    \Macro{partheademptypage} & \Macro{if@twoside}\Macro{if@openright} \\ &
+      \quad\Macro{null}\Macro{thispagestyle}\PParameter{empty}\texttt{\%}\\ &
+      \quad\Macro{newpage}\\&
+      \Macro{fi}\Macro{fi}\\
+    \bottomrule
+  \end{tabular}
+  \end{captionbeside}
+  \label{tab:maincls-experts.headvskip2}%
+\end{table}%
+%
+\begin{table}
+%  \centering
+  \KOMAoptions{captions=topbeside}%
+  \setcapindent{0pt}%
+%  \caption
+  \begin{captionbeside}
+    {%
+      defaults of the commands for the vertical distances of part headings
+      with \Class{scrartcl}%
+    }[l]
+    \begin{tabular}[t]{ll}
+      \toprule
+      command & default definition \\
+      \midrule
+      \Macro{partheadstartvskip} & \Macro{addvspace}\PParameter{4ex} \\
+      \Macro{partheadmidvskip} &  \Macro{par}\Macro{nobreak}\\
+      \Macro{partheadendvskip} & \Macro{vskip} \texttt{3ex}\\
+      \bottomrule
+    \end{tabular}
+  \end{captionbeside}
+  \label{tab:maincls-experts.headvskip3}%
+\end{table}%
 %
 \EndIndex{Cmd}{partheademptypage}%
 \EndIndex{Cmd}{partheadendvskip}%
