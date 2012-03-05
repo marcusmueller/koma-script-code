@@ -90,7 +90,7 @@
 %<driver>\ProvidesFile{scrwfile.drv}
 %<doc>\ProvidesFile{scrwfile.tex}
 %<*dtx|(package&identify)|driver|doc>
-  [2011/09/11 v0.1c-alpha LaTeX2e KOMA-Script package (write and clone files)]
+  [2012/03/05 v0.1d-alpha LaTeX2e KOMA-Script package (write and clone files)]
 %</dtx|(package&identify)|driver|doc>
 %<*driver>
   \documentclass{scrdoc}
@@ -118,11 +118,11 @@
   \let\endShowOutput\endquote
   \let\Parameter\marg
   \let\OParameter\oarg
-  \newcommand\PParameter[1]{\mbox{\texttt{\{#1\}}}}
+  \providecommand\PParameter[1]{\mbox{\texttt{\{#1\}}}}
   \let\PName\meta
   \let\PValue\texttt
   \providecommand*{\autoref}[1]{\expandafter\AUTOREF#1:}
-  \newcommand*{\AUTOREF}{}
+  \providecommand*{\AUTOREF}{}
   \makeatletter
   \def\AUTOREF#1:#2:{%
     \edef\@tempa{#1}%
@@ -130,6 +130,8 @@
     \edef\@tempb{sec}\ifx\@tempa\@tempb section~\fi
     \ref{#1:#2}%
   }
+  \providecommand*{\IndexCmd}[2][]{}
+  \providecommand*{\textnote}[2][]{}
   \makeatother
 
   \begin{document}
@@ -259,96 +261,106 @@ THERE IS NO SUPPORT, IF YOU USE THIS PACKAGE!
 %\iffalse^^A meta comment
 \chapter[{Spare and Replace Files Using \Package{scrwfile}}]
 {Spare and Replace Files Using \Package{scrwfile}%
-  \footnote{This chapter has been generated from \File{scrwfile.dtx}.}%
+%  \footnote{This chapter has been generated from \File{scrwfile.dtx}.}%
 }
 \labelbase{scrwfile}
 
+\BeginIndex{Package}{scrwfile}
+
 %\fi^^A meta comment
 % \begin{abstract}
-\TeX{} supports 18 write handles only. Handle 0 is used
-by \TeX{} itself (log file). \LaTeX{} needs at least handle 1 for
-\Macro{@mainaux}, handle 2 for \Macro{@partaux}, one handle for
-\Macro{tableofcontents}, one handle for \Macro{listoffigures}, one
-handle for \Macro{listoftables}, one handle for \Macro{makeindex}. So
-there are 11 left. Seams a lot and enough. But every new float, every new
-index and several other packages, e.g., \Package{hyperref} need write
-handles, too. Loading \Package{scrwfile} minimizes the need of write
-handles for list of floats or tables of contents. Additionally it allows
-to clone entries from one file to another file.
+\TeX{} supports 18 write handles only. Handle 0 is used by \TeX{} itself (log
+file). \LaTeX{} needs at least handle 1 for \Macro{@mainaux}, handle 2 for
+\Macro{@partaux}, one handle for \Macro{tableofcontents}, one handle for
+\Macro{listoffigures}, one handle for \Macro{listoftables}, one handle for
+\Macro{makeindex}. So there are 11 left. Seams a lot and enough. But every new
+type of float, every new index and several other packages, e.g.,
+\Package{hyperref} need write handles, too. 
+
+The bottom line is, that this eventually will result in the error message:
+\begin{lstcode}
+  ! No room for a new \write .
+  \ch@ck ...\else \errmessage {No room for a new #3}
+                                                    \fi 
+\end{lstcode}
+
+Last but not least, immediately opening one more write handle for every table
+of contents, list of figures, list of tables, and so on has one more
+disadvantage. These are not only set by the corresponding commands, they also
+couldn't not be set once more, because their helper files are empty after the
+corresponding commands until the end of the document.
+
+Package \Package{scrwfile} provides a general change of the \LaTeX{} kernel,
+that may solve both problems.
 % \end{abstract}
 %
 % \tableofcontents
 
-\section{The Idea}
-\label{sec:scrwfile.idea}
+\section{General Modifications of the \LaTeX{} Kernel}
+\label{sec:scrwfile.kernelpatches}
 
-Table of contents, list of figures, list of tables and other content
-directories make use of a small amount of \LaTeX{} kernel macros to open
-helper files, write to those helper files and read them. The first macro is
-\Macro{@starttoc}. It is used inside of \Macro{tableofcontents},
-\Macro{listoffigure}, \Macro{listoftable} and many \Macro{listof} macros of
-several packages.
+\LaTeX{} classes use the \LaTeX{} kernel command
+\Macro{@starttoc}\IndexCmd{@starttoc} for output and opening of a new table of
+contents, list of float, e.\,g., \Macro{listoffigures} or
+\Macro{listoftables}, or similar. Thereby \LaTeX{} not only reads the helper
+file with the contents of the directory, but opens the helper file for writing
+also. Nevertheless, if afterwards new entries to these lists of floats will be
+made using \Macro{addcontentsline}, then this will not write immediately to
+the helper file. Instead of \LaTeX{} writes
+\Macro{@writefile}\IndexCmd{@writefile} commands into the
+\File{aux}-file. Only while reading the \File{aux}-file while the end of the
+document, those \Macro{@writefile} commands generates real write operations
+into the helper files. \LaTeX{} even doesn't close the helper files
+explicitly. Instead of \LaTeX{} counts on \TeX{} to close all open files at
+the end.
 
-The primary macro \Macro{@starttoc} reads the helper file with the contents
-of the directory. But this kernel macro also calls for a new write handle
-and even opens the helper file for writing. So every call of this macro
-consumes one of the rare write handles.
+This procedure means, that all the helper files are open for writing from the
+output of the contents, i.\,e. at the front matter of the document until the
+end of the document, though their content is written after the end of the
+document. \Package{scrwfile}'s basic approach is exactly this: redefinition of
+\Macro{@starttoc} and \Macro{@writefile}.
 
-But while the document is processed nobody writes to that handle until
-\Macro{end}\PParameter{document}. Every write operation should be done using
-\Macro{addtocontents} or \Macro{addcontentsline}, that internally uses
-\Macro{addtocontents}, too. The macro \Macro{addtocontents} does not really
-write to the helper file, but writes a \Macro{@writefile} macro to the main
-or part \File{aux} file.
+Surely\textnote{Attention!}, changes of the \LaTeX{} kernel always may
+potentially result in incompatibilities with other packages. In case of
+\Package{scrwfile} this may be happen with all packages, that redefine
+\Macro{@starttoc} or \Macro{@writefile} too. Sometimes changing the order of
+loading the packages may help.
 
-At \Macro{end}\PParameter{document} the main \File{aux} file is closed and
-after closing \LaTeX{} inputs the main \File{aux} file. While this reading
-the \Macro{@writefile} macros are processed and only then the helper
-files are written.
+In fact, such problems with \Package{scrwfile} haven't been reported currently,
+though several users have tested the package for more than a year until first
+release. Nevertheless, if you find such a problem, please contact the
+\KOMAScript{} author.
 
-You see, there is no need to hold the helper files open while the document
-is processed. The helper files need to be opened only before reading the
-\File{aux} file at \Macro{end}\PParameter{document}. Even you do not need
-one write handle per helper file, if you only could write one after the
-other. In this case only one write handle would be needed. And that's the
-idea.
 
-\section{Using the Package}
-\label{sec:scrwfile.usage}
+\section{The Single File Feature}
+\label{sec:scrwfile.singlefilefeature}
 
-First of all you have to load the package. This may be simply done using
-\begin{lstcode}
+Just while loading the package using, e.\,g.,
+\begin{lstcode}[belowskip=\dp\strutbox]
   \usepackage{scrwfile}
 \end{lstcode}
-or if you are a package author by using
-\begin{lstcode}
-  \RequirePackage{scrwfile}
-\end{lstcode}
-This also activates the \emph{single file feature}.
+\Package{scrwfile} will redefine \Macro{@starttoc}\IndexCmd{@starttoc} to not
+longer allocate a file handle or open any file for writing. Immediately before
+closing the \File{aux}-file in \Macro{end}\PParameter{document} it will
+redefine \Macro{@writefile} to not longer write into the usual helper files
+but into one single new file with file extension \File{wrt}. After
+reading the \File{aux}-file this \File{wrt}-file will be processed once per
+helper file. This means, that not all of the helper file have to be open at
+the same time, but only one at a time. And this single file will be closed
+afterwards and the write handle is not longer needed after it is closed. An
+internal write handle of \LaTeX{} is used for this. So \Package{scrwfile}
+doesn't need any own write handle.
 
-\subparagraph*{Note:} The package \Package{scrwfile} may be used with other
-files, that redefine \Macro{@starttoc}. But if these files do a complete
-new definition of \Macro{@starttoc} you should load them before
-\Package{scrwfile} to avoid errors.
+Because of this, even if only one table of contents should be generated, after
+loading \Package{scrwfile} one more write file handle will be available,
+e.\,g., for bibliographies, indexes, glossaries and similar, that are not
+using \Macro{@starttoc}. Additionally the number of tables of contents and
+lists of whatever, that use \Macro{@starttoc}\IndexCmd{@starttoc} won't be
+limited any longer.
 
-\subsection{The Single File Feature}
 
-To activate the single file feature, that means, that \Macro{\@starttoc}
-does not longer consumes write handles and every open and write to helper
-file action will be done at \Macro{end}\PParameter{document}, you only need
-to load package \Package{scrwfile}.
-
-See \autoref{sec:scrwfile.idea} for more information about the idea of this
-feature.
-
-\subparagraph*{Note:} Package \Package{scrwfile} uses package
-\Package{scrlfile} to redefine \Macro{@writefile} while
-\Macro{end}\PParameter{document}. Instead of directly writing to the helper
-files \Macro{@writefile} itself will write to a new helper file
-\Macro{jobname}\File{.wrt}. To write all the helper files this will file be
-input several times. One time for each helper file.
-
-\subsection{The Clone File Write Feature}
+\section{The Clone File Write Feature}
+\label{sec:scrwfile.clonefilefeature}
 
 Sometimes it is useful to input a file not only once but several times. As
 \Macro{@starttoc} does not open files for writing any longer, this may be
@@ -390,7 +402,7 @@ would be cloned, too.
 %\iffalse^^A meta-comment
 \begin{Example}
 %\fi^^A meta-comment
-E.g., you want a short table of contents
+Assumed, you want a short table of contents
 with only the chapter level but an additional entry with the table of
 contents:
 \begin{lstcode}
@@ -416,6 +428,19 @@ one but this entry will not be part of the detailed table of contents.
 %\iffalse^^A meta-comment
 \end{Example}
 \EndIndex{Cmd}{TOCclone}
+
+\section{State of Development Note}
+\label{sec:scrwfile.draft}
+
+Though this package has been tested by several users and even is in
+productivity usage several times, development is not finished yet. Because of
+this especially internal functionality may be changed in future. Most likely
+the package will be extended. Some code for extensions is already in the
+package. Nevertheless, currently user haven't make requests for such
+extension. So there's currently no user documentation for this.
+
+\EndIndex{Package}{scrwfile}
+
 %\fi^^A meta-comment
  
 %\iffalse
@@ -725,7 +750,10 @@ one but this entry will not be part of the detailed table of contents.
 \endinput
 %
 % end of file `scrwfile.dtx'
+
 %%% Local Variables:
 %%% mode: doctex
+%%% mode: flyspell
+%%% ispell-local-dictionary: "english"
 %%% TeX-master: t
 %%% End:
