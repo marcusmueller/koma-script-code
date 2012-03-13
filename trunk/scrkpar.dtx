@@ -1,4 +1,4 @@
-% \CheckSum{608}
+% \CheckSum{632}
 % \iffalse meta-comment
 % ======================================================================
 % scrkpar.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkpar.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkpar.dtx}[2011/09/28 v3.10 KOMA-Script (paragraphs)]
+\ProvidesFile{scrkpar.dtx}[2012/03/13 v3.10b KOMA-Script (paragraphs)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -412,6 +412,8 @@
 %   \changes{v2.95}{2006/04/14}{neue Erweiterung}
 %   \changes{v3.10}{2010/09/28}{\textsf{everysel}-Behandlung korrigiert}
 %   \changes{v3.10}{2010/09/28}{\textsf{tracefnt}-Behandlung hinzugefügt}
+%   \changes{v3.10b}{2011/03/13}{\textsf{everysel} kann jetzt auch während
+%     \cs{begin}\marg{document} geladen werden}
 % Damit das auch bei Verwendung des \textsf{everysel}-Pakets funktioniert,
 % wird hier zusätzliche Vorsorge getroffen.
 %    \begin{macrocode}
@@ -426,9 +428,30 @@
   }%
 }
 \AfterPackage{everysel}{%
-  \g@addto@macro\@EverySelectfont@Init{%
-    \expandafter\g@addto@macro\csname selectfont \endcsname{\par@update}%
-    \expandafter\let\expandafter\scr@new@selectfont\csname selectfont \endcsname
+  \scr@ifundefinedorrelax{@EverySelectfont@Init}{%
+%    \end{macrocode}
+% Jetzt gibt es zwei Möglichkeiten: Entweder wurde ein \textsf{everysel}
+% verwendet, bei dem alles anders funktioniert, oder es wurde während
+% \cs{begin}\marg{document} geladen. In beiden Fällen versuchen wir einen
+% direkten Patch:
+%    \begin{macrocode}
+    \expandafter\ifx\csname selectfont \endcsname\scr@new@selectfont
+      \ClassWarningNoLine{\KOMAClassName}{%
+        \string\selectfont\space already changed}%
+    \else
+      \expandafter\g@addto@macro\csname selectfont \endcsname{\par@update}%
+      \expandafter\let\expandafter\scr@new@selectfont
+        \csname selectfont \endcsname
+    \fi
+  }{%
+%    \end{macrocode}
+% In diesem Fall muss hingegen indirekt gepatcht werden.
+%    \begin{macrocode}
+    \g@addto@macro\@EverySelectfont@Init{%
+      \expandafter\g@addto@macro\csname selectfont \endcsname{\par@update}%
+      \expandafter\let\expandafter\scr@new@selectfont
+        \csname selectfont \endcsname
+    }%
   }%
 }
 \AfterPackage{tracefnt}{%
