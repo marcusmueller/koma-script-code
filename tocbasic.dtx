@@ -284,9 +284,10 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % \makeatother
 % \providecommand*{\BeginIndex}[2]{}
 % \providecommand*{\IndexPackage}[2][]{\index{#2 (package)}}
-% \providecommand*{\IndexCmd}[2]{}{}
+% \providecommand*{\IndexCmd}[2][]{\index{\cs{#2}}}
 % \providecommand*{\Index}[1][]{\index}
-% \providecommand*{\IndexOption}[2][]{\index{#1 (option)}}
+% \providecommand*{\IndexOption}[2][]{\index{#2 (option)}}
+% \providecommand*{\IndexLength}[2][]{\index{\cs{#2} (length)}}
 % \providecommand*{\textnote}[2][]{}
 % \providecommand*{\important}[2][]{}
 % \providecommand*{\OptionValue}[2]{\texttt{#1=#2}}
@@ -1211,7 +1212,9 @@ Command
 \begin{Declaration}
 % \fi
   \Macro{iftocfeature}\Parameter{file extension}\Parameter{feature}%^^A
-  \Parameter{true-instructions}\Parameter{false-instructions}
+  \Parameter{true-instructions}%^^A
+%\linebreak[1]^^A
+  \Parameter{false-instructions}
 % \iffalse
 \end{Declaration}
 \BeginIndex{Cmd}{iftocfeature}%
@@ -1238,28 +1241,47 @@ should not change them!
 %<*dtx>
 % \fi
 \DescribeMacro{\tocbasic@extend@babel}
-Command
 % \iffalse
 %</dtx>
 \begin{Declaration}
-% \fi
-  \Macro{tocbasic@extend@babel}\Parameter{extension}
-% \iffalse
+  \Macro{tocbasic@extend@babel}\Parameter{file extension}
 \end{Declaration}
 \BeginIndex{Cmd}{tocbasic@extend@babel}%
-This command
 % \fi
-extends the babel handling of toc-files. By default babel writes language
-selections only to \PValue{toc}, \PValue{lot} and
-\PValue{lof}. \Package{tocbasic} adds every \PName{extension} added to the
-list of known extensions (see \Macro{addtotoclist}, \autoref{sec:tocbasic.basics}%
+The Package \Package{babel}\IndexPackage{babel} 
 % \iffalse
-, \autopageref{desc:tocbasic.cmd.addtotoclist}%
+(see \cite{package:babel})
 % \fi
-) using \Macro{tocbasic@extend@babel}. Note: This should be called only once
-per \PName{extension}. \Macro{tocbasic@extend@babel} does nothing, if the
-feature \PValue{nobabel} was set for \PName{extension} before using
-\Macro{addtotoclist}.
+respectively a \LaTeX{} kernel that has been extended by the language
+management of \Package{babel} writes instructions to change the language
+inside of the files with the file extensions \File{toc}, \File{lof}, and
+\File{lot} into those files at every change of the current language
+either at the begin of the document or inside the document. Package
+\Package{tocbasic} extends this mechanism with
+\Macro{tocbasic@extend@babel}
+%\unskip\Parameter{file extension}
+to be used for other file extensions too. Argument \PName{file extension} has
+to be expandable! Otherwise the meaning of the argument may change until it
+will be used really.
+
+Normally this command will be used by default for every \PName{file extension}
+that will be added to the list of known extensions using
+\Macro{addtotoclist}. The may be suppressed using feature
+\PValue{nobabel}\important{\PValue{nobabel}} (see \Macro{setuptoc},
+\autoref{sec:tocbasic.toc}%^^A
+% \iffalse
+, \autopageref{desc:tocbasic.cmd.setuptoc}%^^A
+% \fi
+). For the file extensions \File{toc}, \File{lof}, and \File{lot} this will be
+done automatically by \Package{tocbasic} to avoid double language switching in
+the corresponding files.
+
+Normally there isn't any reason to call this command yourself. But there may
+by lists of something, that should not be under control of \Package{tocbasic},
+and to are not in \Package{tocbasic}'s list of known file extensions, but
+nevertheless should be handled by the language change mechanism of
+\Package{babel}. The command may be used explicitly for those files. But pleas
+note, that this should be done only once per file extension!%
 % \iffalse
 \EndIndex{Cmd}{tocbasic@extend@babel}%
 % \fi
@@ -1277,15 +1299,53 @@ Command
 % \iffalse
 \end{Declaration}
 \BeginIndex{Cmd}{tocbasic@starttoc}
-This command is something like the \LaTeX{} kernel macro \Macro{@starttoc},
-but does some additional settings before using \Macro{@starttoc}. It does set
-\Macro{parskip} zu zero, \Macro{parindent} to zero, \Macro{parfillskip} to
-zero plus one fil, \Macro{@currext} to the \PName{extension}, and processes
-hooks before and after reading the toc-file.
+This command
+% \fi
+is something like the \LaTeX{} kernel macro
+\Macro{@starttoc}\IndexCmd{@starttoc}\important{\Macro{@starttoc}}.  It's the
+command behind \Macro{listoftoc*} (siehe \autoref{sec:tocbasic.toc}%^^A
+% \iffalse
+, \autopageref{desc:tocbasic.cmd.listoftoc*}%^^A
+% \fi
+). Authors of classes or packages who want to participate from the advantages
+of \Package{tocbasic} should at least use this command. Nevertheless it's
+recommended to use \Macro{listoftoc}. Command \Macro{tocbasic@starttoc}
+internally uses \Macro{\@starttoc}, but sets
+% \expandafter\Macro\iffalse
+\Length
+% \fi
+{parskip}\IndexLength{parskip}\important{\Length{parskip}\\
+  \Length{parindent}\\
+  \Length{parfillskip}} and 
+% \expandafter\Macro\iffalse
+\Length
+% \fi
+{parindent}\IndexLength{parindent} to 0 and
+% \expandafter\Macro\iffalse
+\Length
+% \fi
+{parfillskip} to 0 until infinite before. Moreover,
+\Macro{@currext}\important{\Macro{@currext}}\IndexCmd{@currext} will be set to
+the file extension of the current helper file, so this will be available while
+the execution of the hooks, that will be done before and after reading the
+helper files.
+
+Because\textnote{Attention!} of \LaTeX{} will immediately open a new helper
+file for writing after reading that file, the usage of
+\Macro{tocbasic@starttoc} may result in an error message like
+\begin{lstoutput}
+  ! No room for a new \write .
+  \ch@ck ...\else \errmessage {No room for a new #3}
+                                                    \fi   
+\end{lstoutput}
+if there are no more unused write handles. This may be solved, e.\,g., using
+package
+\Package{scrwfile}\important{\Package{scrwfile}}\IndexPackage{scrwfile}.
+% \iffalse
+See \autoref{cha:scrwfile} for more information about that package.%
 \EndIndex{Cmd}{tocbasic@starttoc}
 % \fi
 %
-
 
 % \iffalse
 %<*dtx>
