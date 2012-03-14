@@ -254,10 +254,12 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % \let\Class\textsf
 % \let\Package\textsf
 % \let\File\texttt
+% \let\Environment\texttt
 % \let\Parameter\marg
 % \let\OParameter\oarg
 % \let\PName\meta
 % \let\PValue\texttt
+% \let\Option\texttt
 % \newenvironment{Example}{\quote
 %   \hspace*{-\leftmargin}\textbf{Example:}\enskip\ignorespaces
 % }{\endquote}
@@ -290,6 +292,7 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % \providecommand*{\IndexLength}[2][]{\index{\cs{#2} (length)}}
 % \providecommand*{\textnote}[2][]{}
 % \providecommand*{\important}[2][]{}
+% \providecommand*{\KOption}[1]{\texttt{#1=}}
 % \providecommand*{\OptionValue}[2]{\texttt{#1=#2}}
 % \providecommand*{\ChangedAt}[2]{}
 %
@@ -303,6 +306,10 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % \iffalse
 %</dtx>
 %<*doc>
+
+\translator{Markus Kohm}
+
+% Date of the translated German file: 2012/03/14
 
 \chapter[{Management of Tables and Lists of Contents Using
   \Package{tocbasic}}]
@@ -1462,18 +1469,159 @@ be defined and used in \Macro{tocbasic@listhead} automatically.
 \EndIndex{Cmd}{tocbasic@listhead@\PName{extension}}%
 % \fi
 
-% \iffalse
-\section{A Complete Example\protect\footnote{Translations of this section is
-    still missing. Translators from German to English would be welcome!}}
-\label{sec:tocbasic.example}
-\mbox{}% TODO
-% \fi
 
-\section{Generating new Lists of Something and new Floats}
+\section{A Complete Example}
+\label{sec:tocbasic.example}
+
+This section will show you a complete example of a user defined floating
+environment with list of that kind of floats and \KOMAScript{} integration
+using \Package{tocbasic}. This example uses internal commands, that have a
+``\texttt{@}'' in their name. This means\textnote{Attention}, that the code
+has to be put into a own package or class, or has to be placed between
+\Macro{makeatletter}\important[i]{\Macro{makeatletter}\\\Macro{makeatother}}%
+\IndexCmd{makeatletter} and \Macro{makeatother}\IndexCmd{makeatother}.
+
+First\textnote{environment} of all, a new floating environment will be
+needed. This could simply be done using:
+\begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
+  \newenvironment{remarkbox}{%
+    \@float{remarkbox}%
+  }{%
+    \end@float
+  }
+\end{lstcode}
+To the new environment is named \Environment{remarkbox}.
+
+Each\textnote{placement} floating environment has a default
+placement. This is build by some of the well known placement options:
+\begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
+  \newcommand*{\fps@remarkbox}{tbp}
+\end{lstcode}
+So, the new floating environment should be placed by default only either at
+the top of a page, at the bottom of a page, or on a page on its own.
+
+Floating\textnote{type} environments have a numerical floating
+type. Environments with the same active bit at the floating type cannot change
+their order. Figures and table normally use type~1 and 2. So a figure that
+comes later at the source code than a table, may be output earlier than the
+table and vica versa.
+\begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
+  \newcommand*{\ftype@remarkbox}{4}
+\end{lstcode}
+The new environment has floating type~4, so it may pass figures and floats and
+may be passed by those.
+
+The\textnote{number} captions of floating environment also have numbers.
+\begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
+  \newcounter{remarkbox}
+  \newcommand*{\remarkboxformat}{%
+    Remark~\theremarkbox\csname autodot\endcsname}
+  \newcommand*{\fnum@remarkbox}{\remarkboxformat}
+\end{lstcode}
+Here first a new counter has been defined, that is independent from chapters
+or the counters of other structural levels. \LaTeX{} itself also defines
+\Macro{theremarkbox} with the default Arabic representation of the counter's
+value. Afterwards this has been used defining the formatted output of the
+counter. Last this formatted output has been used for the output of the
+environment number of the \Macro{caption} command.
+
+Floating\textnote{file extension} environments have lists of themselves and
+those need a helper file with name \Macro{jobname} and a file extension.
+\begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
+  \newcommand*{\ext@remarkbox}{lor}
+\end{lstcode}
+The file extension of the helper file for the list of
+\Environment{remarkbox}es is ``\File{lor}''.
+
+This was the definition of the floating environment. But the list of this new
+environment's captions is still missing. To reduce the implementation effort
+package \Package{tocbasic} will be used for this. This will be loaded using
+\begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
+  \usepackage{tocbasic}
+\end{lstcode}
+inside of document preambles. Authors of classes or packages would use
+\begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
+  \RequirePackage{tocbasic}
+\end{lstcode}
+instead.
+
+Now\textnote{extension} we register the file name extension for package
+\Package{tocbasic}:
+\begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
+  \addtotoclist[float]{lor}
+\end{lstcode}
+Thereby the owner \PValue{float} has been used, to allude all further
+\KOMAScript{} options for lists of something also to the new one.
+
+Next\textnote{title} we define a title or heading for the list of
+\Environment{remarkbox}es:
+\begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
+  \newcommand*{\listoflorname}{List of Remarks}
+\end{lstcode}
+You may use package \Package{scrbase} to additionally support titles in other
+languages than English.
+
+Also\textnote{entry} a command is needed to define the layout of the entries
+to the list of remarks:
+\begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
+  \newcommand*{\l@remarkbox}{\l@figure}
+\end{lstcode}
+Here simply the entries to the list of remarks get the same layout like the
+entries to the list of figure. This would be the easiest solution. A more
+explicit would be, e.\,g.,
+\begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
+  \newcommand*{\l@remarkbox}{\@dottedtocline{1}{1em}{1.5em}}
+\end{lstcode}
+
+Additionally\textnote{chapter entry} you may want structure the list of
+remarks depending on chapters.
+\begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
+  \setuptoc{lor}{chapteratlist}
+\end{lstcode}
+The \KOMAScript{} classes provide that feature and may other classes do so
+too. Unfortunately the standard classes do not.
+
+This\textnote{list of remarks} would already be enough. Now, users may already
+select different kinds of headings either using the corresponding options of
+the \KOMAScript{} classes, or \Macro{setuptoc}, e.\,g., with or without entry
+in the table of contents, with or without number. But a simply
+\begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
+  \newcommand*{\listofremarkboxes}{\listoftoc{lor}}
+\end{lstcode}
+may make the usage a little bit easier again.
+
+As you've seen only five commands refers to the list of remarks. Only three of
+them are necessary. Nevertheless the new list of remarks already provides
+optional numbering of the heading and optional not numbered entry into the
+table of contents. Optional even a lower document structure level may be used
+for the heading. Running headers are provides with the \KOMAScript{} classes,
+the standard classes, and all classes that explicitly support
+\Package{tocbasic}. Supporting classes even pay attention to this new list of
+remarks at every new \Macro{chapter}. Even changes of the current language are
+handled inside the list of remarks like they will inside the list of figures
+or inside the list of tables.
+
+Moreover.\textnote{additional features} an author of a package may add more
+features. For example, options to hide \Macro{setuptoc} from the users may be
+added. On the other hand, the \Package{tocbasic} manual may be referenced to
+describe the corresponding features. The advantage of this would be that user
+would get information about new features provides by \Package{tocbasic}. But
+if the user should be able to set the features of the remarks even without
+knowledge about the file extension \File{lor} a simple
+\begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
+  \newcommand*{\setupremarkboxes}{\setuptoc{lor}}
+\end{lstcode}
+would be enough to use a list of features argument to
+\Macro{setupremarkboxes} as list of features of file extension \File{lor}.
+
+
+\section{Everything with One Command Only}
 \label{sec:tocbasic.highlevel}
 
-There is one simple command to generate either a new list of foo or a new list
-of a new float.
+The example from the previous section shows, that using \Package{tocbasic} to
+define floating environments and lists with the captions of those floating
+environments is easy. The following example will show, that is may be even
+easier.
 
 % \iffalse
 %<*dtx>
@@ -1490,77 +1638,177 @@ Command
 \BeginIndex{Cmd}{DeclareNewTOC}%
 This command
 % \fi
-declares at least a new list of \PName{extension}. Depending on the
-\PName{options} it may also define a new float. The mandatory argument
-\PName{extension} is the extension of the help file for that list. See the
-prior sections for more informations about this. The optional parameter
-\PName{options} is a comma separated list of \emph{key}=\emph{value}
-pairs.
-\begin{description}
-\item[\normalfont\PValue{atbegin}=\PName{code}]\hfill\\*
-  The \PName{code} will be executed at the begin of the float or nonfloat
-  environment.
-\item[\normalfont\PValue{atend}=\PName{code}]\hfill\\*
-  The \PName{code} will be executed at the end of the float or nonfloat
-  environment.
-%^^A not yet implemented
-%^^A \item[\normalfont\PValue{captionpos}=\PName{position}]\hfill\\*
+declares\ChangedAt{v3.06}{\Package{tocbasic}} in one step only a new list of
+something, the heading of that list, the term used for the entries to the
+list, and to manage the file name \PName{extension}. Additionally optional
+floating and non-floating environments may be defined, and inside of both such
+environments \Macro{caption}\important{\Macro{caption}}\IndexCmd{caption} may
+be used. The additional features \Macro{captionabove}\important[i]{%
+  \Macro{captionabove}\\
+  \Macro{captionbelow}}, \Macro{captionbelow}, and \Environment{captionbeside}
+of the \KOMAScript{} classes
+% \iffalse
+(see \autoref{sec:maincls.floats})
+% \fi
+may also be used inside of those environments.
+
+Argument \PName{extension} is the file name extension of the helper file, that
+represents the list of something. See \autoref{sec:tocbasic.basics} for more
+information about this. This argument is mandatory and must not be empty!
+
+Argument \PName{options} is a comma separated list, like you know it from,
+e.\,g., \Macro{KOMAoptions}%
+% \iffalse
+\ (see \autoref{sec:typearea.options})%^^A
+% \fi
+. Nevertheless\textnote{Attention!}, those options cannot be set using
+\Macro{KOMAoptions}\IndexCmd{KOMAoptions}! An overview of all available
+options
+% is shown next.
+% \iffalse
+may be found in \autoref{tab:tocbasic.DeclareNewTOC-options}.
+% \fi
+
+% \iffalse
+\begin{desclist}
+  \renewcommand*{\abovecaptionskipcorrection}{-\normalbaselineskip}%
+  \desccaption[{Options for command \Macro{DeclareNewTOC}}]{%
+    Options for command
+    \Macro{DeclareNewTOC}\ChangedAt{v3.06}{\Package{tocbasic}}%
+    \label{tab:tocbasic.DeclareNewTOC-options}%
+  }{%
+    Options for command \Macro{DeclareNewTOC} (continuation)%
+  }%
+% \fi
+%\begin{description}
+%  \newcommand{\entry}[2]{\item[\normalfont#1]\hfill\\* #2}
+  \entry{\KOption{atbegin}\PName{instructions}}{%
+    The \PName{instructions} will be executed at the begin of the floating or
+    non-floating environment.%
+  }%
+  \entry{\KOption{atend}\PName{instructions}}{%
+    The \PName{instructions} will be executed at the end of the floating or
+    non-floating environment.%
+  }%
+  \entry{\KOption{counterwithin}\PName{\LaTeX{} counter}}{%
+    If you define a float or non-float, the captions will be numbered and a
+    counter \PName{type} (see option \Option{type}) will be defined. You may
+    declare another counter to be the parent \LaTeX{} counter. In this case,
+    the parent counter will be set before the float counter and the float
+    counter will be reset whenever the parent counter is increased using
+    \Macro{stepcounter} or \Macro{refstepcounter}.%
+  }%
+%^^A not yet implemented:
+%^^A \entry{\KOption{captionpos}\PName{position}}{%
 %^^A   If \PName{position} is \PValue{top} or \PValue{above} the spacing above
 %^^A   and below the caption will be done for captions above objects. If
 %^^A   \PName{position} is \PValue{bot}, \PValue{bottom}, or \PValue{below} the
 %^^A   spacing above and below the caption will be done for captions below
 %^^A   objects.
-\item[\normalfont\PValue{counterwithin}=\PName{parent counter}]\hfill\\*
-  If you define a float or nonfloat, the captions will be numbered. You may
-  declare another counter to be the parent counter. In this case, the parent
-  counter will be set before the float counter and the float counter will be
-  reset whenever the parent counter is increased using \Macro{stepcounter}
-  oder \Macro{refstepcounter}.
-\item[\normalfont\PValue{float}]\hfill\\*
-  If set, float environments for that type will be defined. The names of the
-  environments are the value of \PName{type} and for double column floats the
-  value of \PName{type} with postfix ``\PValue{*}''.
-\item[\normalfont\PValue{floatpos}=\PName{float positions}]\hfill\\*
-  The default floating-position of the float. If no float position was given,
-  ``tbp'' will be used like the standard classes do for figures and tables.
-\item[\normalfont\PValue{floattype}=\PName{number}]\hfill\\*
-  The numericle float type of the defined floats. Float types with common bits
-  cannot be reordered. At the standard classes figures has float type 1 and
-  tables has float type 2. If no float type was given, 16 will be used.
-\item[\normalfont\PValue{forcenames}]\hfill\\*
-  If set, the names will be even defined, if they where already defined
-  before.
-\item[\normalfont\PValue{hang}=\PName{length}]\hfill\\*
-  The amount of the hanging indent of the entries for that list. If not given,
-  1.5\,em will be used like standard classes use for entries to list of
-  figures or list of tables.
-\item[\normalfont\PValue{indent}=\PName{length}]\hfill\\*
-  The indent value for the entries of that list. If not given, 1\,em will be
-  used like standard classes use for entries to list of figures or list of
-  tables.
-\item[\normalfont\PValue{level}=\PName{number}]\hfill\\*
-  The level of the entries of that list. If not given level 1 will be used
-  like standard classes use for entries to list of figures or list of tables.
-\item[\normalfont\PValue{listname}=\PName{string}]\hfill\\*
-  The name of the list of foo. If not given the value of \PValue{types} with
-  upper case first char prefixed by ``List of '' will be used.
-\item[\normalfont\PValue{name}=\PName{string}]\hfill\\*
-  The name of an element. If no name is given, the value of \PValue{type} with
-  upper case first char will be used.
-\item[\normalfont\PValue{nonfloat}]\hfill\\*
-  If set, a non floating environment will be defined. The name of the
-  environment is the value of \PName{type} with postfix ``\PValue{-}''.
-\item[\normalfont\PValue{owner}=\PName{string}]\hfill\\*
-  The owner as described in the sections before. If no owner was given owner
-  \PValue{float} will be used.
-\item[\normalfont\PValue{type}=\PName{string}]\hfill\\*
-  sets the type of the new declared list. The type will be used e.\,g. to
-  defined a \Macro{listof}\PName{string}. If no type is set up the extension
-  from the mandatory argument will be used.
-\item[\normalfont\PValue{types}=\PName{string}]\hfill\\*
-  the plural of the type. If no plural was given the value of \PValue{type}
-  with postfix ``s'' will be used.
-\end{description}
+%^^A }
+  \entry{\Option{float}}{%
+    If set, float environments for that type will be defined. The names of the
+    environments are the value of \PName{type} and for double column floats
+    the value of \PName{type} with addendum ``\PValue{*}''.%
+  }%
+  \entry{\KOption{floatpos}\PName{float positions}}{%
+    The default floating position of the float. If no float position was
+    given, ``tbp'' will be used like the standard classes do for figures and
+    tables.%
+  }%
+  \entry{\KOption{floattype}\PName{number}}{%
+    The numerical float type of the defined floats. Float types with common
+    bits cannot be reordered. At the standard classes figures has float type 1
+    and tables has float type 2. If no float type was given, 16 will be used.%
+  }%
+  \entry{\Option{forcenames}}{%
+    If set, the names will be even defined, if they where already defined
+    before.%
+  }%
+  \entry{\KOption{hang}\PName{length}}{%
+    The amount of the hanging indent of the entries for that list. If not
+    given, 1.5\,em will be used like standard classes use for entries to list
+    of figures or list of tables.%
+  }%
+  \entry{\KOption{indent}\PName{length}}{%
+    The indent value for the entries of that list. If not given, 1\,em will be
+    used like standard classes use for entries to list of figures or list of
+    tables.%
+  }%
+  \entry{\KOption{level}\PName{number}}{%
+    The level of the entries of that list. If not given level 1 will be used
+    like standard classes use for entries to list of figures or list of
+    tables.%
+  }%
+  \entry{\KOption{listname}\PName{string}}{%
+    The name of the list of foo. If not given the value of \PValue{types} with
+    upper case first char prefixed by ``List of '' will be used.%
+  }%
+  \entry{\KOption{name}\PName{string}}{%
+    The name of an element. If no name is given, the value of \PValue{type}
+    with upper case first char will be used.%
+  }%
+  \entry{\Option{nonfloat}}{%
+    If set, a non floating environment will be defined. The name of the
+    environment is the value of \PName{type} with postfix ``\PValue{-}''.%
+  }%
+  \entry{\KOption{owner}\PName{string}}{%
+    The owner as described in the sections before. If no owner was given owner
+    \PValue{float} will be used.%
+  }%
+  \entry{\KOption{type}\PName{string}}{%
+    sets the type of the new declared list. The type will be used e.\,g. to
+    defined a \Macro{listof}\PName{string}. If no type is set up the extension
+    from the mandatory argument will be used.%
+  }%
+  \entry{\KOption{types}\PName{string}}{%
+    the plural of the type. If no plural was given the value of \PValue{type}
+    with addendum ``s'' will be used.%
+  }%
+% \end{description}
+% \iffalse
+\end{desclist}
+% \fi
+
+\begin{Example}
+  Using \Macro{DeclareNewTOC} reduces the example from
+  \autoref{sec:tocbasic.example} to:
+\begin{lstcode}
+  \DeclareNewTOC[%
+    type=remarkbox,%
+    types=remarkboxes,%
+    float,% define a floating environment
+    floattype=4,%
+    name=Remark,%
+    listname={List of Remarks}%
+  ]{lor}
+  \setuptoc{lor}{chapteratlist}
+\end{lstcode}
+  Beside environments \Environment{remarkbox} and \Environment{remarkbox*} the
+  counter 
+% \expandafter\texttt\iffalse
+\Counter
+% \fi
+  {remarkbox}, the commands \Macro{theremarkbox},
+  \Macro{remarkboxname}, and \Macro{remarkboxformat} that are used for
+  captions; the commands \Macro{listremarkboxnames} and
+  \Macro{listofremarkboxes} that are used at the list of remarks; and some
+  internal commands that depends on the file name extension \File{lor} are
+  defined. If the package should use a default for the floating type, option
+  Option{floattype} may be omitted. If option \Option{nonfloat} will be used
+  additionally, then a non-floating environment \Environment{remarkbox-} will
+  be also defined. You may use \Macro{caption}\IndexCmd{caption} inside of
+  that non-floating environment as usual for floating environments.
+\end{Example}
+% \iffalse
+\EndIndex{Cmd}{DeclareNewTOC}%
+%
+\EndIndex{Package}{tocbasic}%
+\EndIndex{}{table of contents}%
+\EndIndex{}{list>of contents}%
+\EndIndex{}{file>extension}%
+% \fi
+%
 % \iffalse
 %</doc|dtx>
 % \fi
