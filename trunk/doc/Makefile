@@ -200,6 +200,7 @@ distclean_local:
 	$(make_recursive)
 
 maintainclean_local:
+	$(SRM) ChangeLog.svn
 	$(make_recursive)
 
 edit:
