@@ -217,7 +217,12 @@ CLS_SRC		= $(CLS_MAIN_SRC)
 
 NODIST_GENERATED = $(CLS_DVIS) $(CLS_FILES) $(ALPHA_DOC)
 
-GENERATED	= $(NODIST_GENERATED) ChangeLog
+GENERATED	= $(NODIST_GENERATED) ChangeLog \
+		  scrjura.ins \
+		  scrlettr.drv \
+		  scrwfile.ins scrwfile.tex scrwfile.drv \
+		  tocbasic.ins tocbasic.tex \
+	 	  tocstyle.ins tocstyle.tex tocstyle.dvi tocstyle.drv
 
 MISC_SRC	= $(INS_TEMPLATES) $(MAKE_FILES) \
                   scrdoc.dtx ChangeLog ChangeLog.2
@@ -345,11 +350,12 @@ maintainclean_local: clean_local
 dist_prior:
 ifdef PREPARERELEASE
 	developer/scripts/preparerelease.sh 1
+	$(MAKE) prepare
 endif
 	-$(RMDIR) $(DISTDIR)
 	$(MKDIR) $(DISTDIR)
 
-dist_local: $(DIST_FILES)
+dist_local: $(DIST_FILES) $(NODIST_GENERATED)
 	$(CP) $(DIST_FILES) $(DISTDIR)
 
 dist_post:
