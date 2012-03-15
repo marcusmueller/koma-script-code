@@ -78,13 +78,13 @@ doit() {
 	    echo "You may use"
 	    echo "  svn add"
 	    echo "for each of them to add all files to the svn."
+	    [ ${#dirnotatsvn[@]} -gt 0 ] \
+		&& echo "But for the directories you should test whether or not their complete content   should be added."
+	    echo "Or you may use"
+	    echo "  svnclean.sh --clean"
+	    echo "to remove all of them, that are not part of directory developer."
 	fi
-	[ ${#dirnotatsvn[@]} -gt 0 ] \
-	    && echo "But for the directories you should test whether or not their complete content   should be added."
-	echo "Or you may use"
-	echo "  svnclean.sh --clean"
-	echo "to remove all of them, that are not part of directory developer."
-    else
+    elif [ ${#filenotatsvn[@]} -gt 0 -o ${#dirnotatsvn[@]} -gt 0 ]; then
 	echo "Now, I'll remove all of them (without developer files)."
 	for f in "${filenotatsvn[@]}"; do
 	    [ "${f%%/*}" = "developer" ] || rm -f "$f"
