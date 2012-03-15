@@ -102,8 +102,7 @@ STATIC_DOC_LINKS= komascript.html komascr.html \
 		  scrtime.html scrdate.html tocbasic.html scrbase.html
 
 DOC_SRC		= scrguide.cls scrguide.ist scrguide.gst \
-	          guide.tex guide.bib plength.dtx \
-		  labelbasic.lco settleford600label.lco
+	          guide.tex guide.bib plength.dtx
 
 STATIC_DOC      = $(STATIC_DOC_SRC) $(STATIC_DOC_LINKS)
 
@@ -180,7 +179,7 @@ uninstall_local:
 clean_local:
 	$(make_recursive)
 
-dist_local:
+dist_local: $(DIST_FILES)
 	-$(RMDIR) $(DISTDIR)
 	$(MKDIR) $(DISTDIR)
 	$(MKDIR) $(DISTDIR)/$(BIN_DIR)
@@ -200,7 +199,7 @@ distclean_local:
 	$(make_recursive)
 
 maintainclean_local:
-	$(SRM) ChangeLog.svn
+	$(SRM) ChangeLog.svn ChangeLog.bak $(STATIC_DOC_LINKS)
 	$(make_recursive)
 
 edit:
