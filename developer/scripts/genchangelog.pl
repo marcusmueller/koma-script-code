@@ -4,7 +4,7 @@ eval 'exec perl -S $0 ${1+"$@"}'
 
 # ======================================================================
 # genchangelog.pl
-# Copyright (c) Markus Kohm, 2002-2009
+# Copyright (c) Markus Kohm, 2002-2012
 #
 # This file is part of the LaTeX2e KOMA-Script bundle.
 #
@@ -22,7 +22,7 @@ eval 'exec perl -S $0 ${1+"$@"}'
 # This work consists of all files listed in manifest.txt.
 # ----------------------------------------------------------------------
 # genchangelog.pl
-# Copyright (c) Markus Kohm, 2002-2009
+# Copyright (c) Markus Kohm, 2002-2012
 #
 # Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 # Version 1.3c, verteilt und/oder veraendert werden.
@@ -116,8 +116,10 @@ printtext(*NCH);
 
 flush NCH;
 
-copy($ChangeLogFile,\*NCH) or
-    die "Cannot append $ChangeLogFile to $NewChangeLogFile";
+if (-e $ChangeLogFile) {
+    copy($ChangeLogFile,\*NCH) or
+        die "Cannot append $ChangeLogFile to $NewChangeLogFile";
+}
 
 close NCH;
 

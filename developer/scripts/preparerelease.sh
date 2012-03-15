@@ -22,9 +22,12 @@ error() {
 
 stepone() {
     [ $# -ne 0 ] && error "unexpected parameter \`$1'!"
-    developer/scripts/genchangelog.pl . && \
-	mv doc/ChangeLog.svn doc/ChangeLog.bak && \
-	mv doc/ChangeLog.tmp doc/ChangeLog.svn && \
+    developer/scripts/genchangelog.pl . \
+	|| error "ChangeLog generation failed!"
+    ! [ -f doc/ChangeLog.svn ] \
+	|| mv doc/ChangeLog.svn doc/ChangeLog.bak \
+	|| error "ChangeLog generation failed!"
+    mv doc/ChangeLog.tmp doc/ChangeLog.svn && \
 	cat doc/ChangeLog.svn ChangeLog.cvs > ChangeLog || \
 	error "ChangeLog generation failed!"
     exit 0
