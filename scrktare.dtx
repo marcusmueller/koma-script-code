@@ -1,4 +1,4 @@
-% \CheckSum{2041}
+% \CheckSum{2087}
 % \iffalse meta-comment
 % ======================================================================
 % scrktare.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrktare.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrktare.dtx}[2011/09/13 v3.10 KOMA-Script (type area)]
+\ProvidesFile{scrktare.dtx}[2012/04/17 v3.11 KOMA-Script (type area)]
 % \iffalse
 %</driver>
 %<package&identify>\ProvidesPackage{typearea}[%
@@ -672,6 +672,19 @@
 \KOMA@DeclareDeprecatedOption[typearea]{DIVclassic}{DIV=classic}
 %    \end{macrocode}
 % \end{option}
+% \end{option}
+%
+%
+% \begin{option}{areasetadvanced}
+%   \changes{v3.11}{2012/04/17}{new internal option}
+% Switch to advanced version of \cs{areaset}. This does calculate margins
+% more like \cs{typearea}. Nevertheless, there's still a difference at the top
+% margin, because \cs{typerea} doesn't balance differences in calculated
+% height of margins and resulting height of margins but reduces only the
+% bottom margin.
+%    \begin{macrocode}
+\KOMA@ifkey{areasetadvanced}{@areasetadvanced}
+%    \end{macrocode}
 % \end{option}
 %
 %
@@ -1657,6 +1670,26 @@
 %  \end{macro}
 %  \end{macro}
 %
+%  \begin{macro}{\AfterSettingArea}
+%    \changes{v3.11}{2012/04/17}{new}
+% The user may influence the result of \cs{areaset}. The star version works
+% local while the non-star version is global.
+%    \begin{macrocode}
+\newcommand*{\AfterSettingArea}{%
+  \@ifstar \l@addto@macro \g@addto@macro \@areaset@end
+}
+%    \end{macrocode}
+%  \begin{macro}{\@areaset@end}
+%    \changes{v3.11}{2012/04/17}{new}
+% Macro \cs{@areaset@end} is a hook to make it possible to add some
+% instructions to the end of the \cs{areaset} command. This will be executed
+% before the activation of the settings inside a document.
+%    \begin{macrocode}
+\newcommand*{\@areaset@end}{}
+%    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
+%
 %  \begin{macro}{\activateareas}
 %    \changes{v2.96a}{Neuer Name für alte Anweisung}
 % Dieses Makro wird verwendet, um mit einem gewaltigen Hack die Änderung des
@@ -2253,15 +2286,15 @@
 %    \end{macrocode}
 %  \end{macro}
 %
-%  \begin{macro}{\areaset}
-%    \changes{v2.1b}{1994/12/31}{\cs{headheight} von \cs{@ptsize}
-%      abhängig gemacht}
-%    \changes{v2.6}{2000/01/04}{\cs{headheight} von \cs{f@size} statt
-%      von \cs{@ptsize} abhängig gemacht}
-%    \changes{v2.7g}{2001/04/17}{auch hier existiert der symbolische
-%      Wert \texttt{current} für BCOR}
-%    \changes{v2.95}{2002/12/05}{am Ende von \cs{areaset} wird noch
-%      \cs{@typeare@end} ausgeführt}
+% \begin{macro}{\areaset}
+%   \changes{v2.1b}{1994/12/31}{\cs{headheight} von \cs{@ptsize}
+%     abhängig gemacht}
+%   \changes{v2.6}{2000/01/04}{\cs{headheight} von \cs{f@size} statt
+%     von \cs{@ptsize} abhängig gemacht}
+%   \changes{v2.7g}{2001/04/17}{auch hier existiert der symbolische
+%     Wert \texttt{current} für BCOR}
+%   \changes{v2.95}{2002/12/05}{am Ende von \cs{areaset} wird noch
+%     \cs{@typeare@end} ausgeführt}
 % Zur Berechnung eines Satzspiegels mit fester Breite und Höhe dient
 % der Befehl \cs{areaset}. Der Algorithmus ist ähnlich dem vorherigen
 % Verfahren, aber einfacher. Auch hier soll ein Wechsel innerhalb des
@@ -2288,7 +2321,20 @@
   \ta@hblk=\paperwidth
   \advance\ta@hblk by-\ta@bcor
   \advance\ta@hblk by-\textwidth
-  \divide\ta@hblk by3
+%    \end{macrocode}
+%   \changes{v3.11}{2012/04/17}{advanced version with different margin widths}%
+% With version 3.11 we will have an advanced version of \cs{areaset}. This
+% version takes care to option \texttt{mpinclude}.
+%    \begin{macrocode}
+  \if@areasetadvanced
+    \if@mincl
+      \divide\ta@hblk by4
+    \else
+      \divide\ta@hblk by3
+    \fi
+  \else
+    \divide\ta@hblk by3
+  \fi
   \oddsidemargin=-1in
   \evensidemargin=-1in
   \if@twoside
@@ -2312,9 +2358,23 @@
     \topskip=\@ptsize\p@
     \advance\topskip by 10\p@
   }%
-  \headheight=15\p@
-  \advance\headheight by\f@size\p@
-  \advance\headheight by-10\p@
+%    \end{macrocode}
+%   \changes{v3.11}{2012/04/17}{advanced version with different margin widths}%
+% With version 3.11 we will have an advanced version of \cs{areaset}. This
+% version uses the head height algorithm of \cs{typearea}.
+%    \begin{macrocode}
+  \if@areasetadvanced
+    \normalsize
+    \@ifundefined{ta@hh}{%
+      \headheight=1.25\baselineskip
+    }{%
+      \headheight=\ta@hh
+    }%
+  \else
+    \headheight=15\p@
+    \advance\headheight by\f@size\p@
+    \advance\headheight by-10\p@
+  \fi
   \headsep=1.5\baselineskip
   \footskip=3.5\baselineskip
   \ta@vblk=\paperheight
@@ -2327,8 +2387,8 @@
   \if@fincl
     \advance\textheight by-\footskip
   \fi
-  \topmargin \ta@vblk
-  \advance\topmargin by-1in
+  \topmargin=-1in
+  \advance\topmargin by\ta@vblk
   \if@hincl \else
     \advance\topmargin by-\headheight
     \advance\topmargin by-\headsep
@@ -2343,8 +2403,29 @@
     \marginparwidth=\ta@hblk
   \fi
   \marginparsep=1cc
+%    \end{macrocode}
+%   \changes{v3.11}{2012/04/17}{advanced version with different
+%     \cs{marginparwidth} and unchanged \cs{marginparsep}}%
+% With version 3.11 we will have an advanced version of \cs{areaset}. This
+% version supports \texttt{mpinclude} option like \cs{typearea}.
+%    \begin{macrocode}
+  \if@areasetadvanced
+    \if@mincl
+      \marginparwidth=\ta@hblk
+      \if@twoside\if@semitwoside\else
+          \advance\evensidemargin by\marginparwidth
+      \fi\fi
+      \advance\marginparwidth by-\marginparsep
+    \fi
+  \fi
   \marginparpush=0.45\baselineskip
   \ta@layoutinfo{areaset}{}%
+%    \end{macrocode}
+%   \changes{v3.11}{2012/04/17}{usage of \cs{@areaset@end}}%
+% Since version~3.11 we also support \cs{AfterSettingArea} analogous to
+% \cs{AfterCalculatingTypearea}:
+%    \begin{macrocode}
+  \@areaset@end
   \activateareas
 }
 %    \end{macrocode}
