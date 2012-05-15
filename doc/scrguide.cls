@@ -98,14 +98,14 @@
 \LoadClassWithOptions{scrbook}
 \RequirePackage[latin1]{inputenc}
 \RequirePackage[TS1,T1]{fontenc}
-\def\languages{}
-\ifstr{\languagename}{english}{}{\g@addto@macro\languages{,english}}
-\ifstr{\languagename}{ngerman}{\frenchspacing}{%
-  \g@addto@macro\languages{,ngerman}}
+\def\languages{ngerman,english,}
 \g@addto@macro\languages{,\languagename}
 \edef\uselanguage{\languagename}
 \edef\languages{\languages}
 \expandafter\RequirePackage\expandafter[\languages]{babel}%
+\AtBeginDocument{%
+  \expandafter\selectlanguage\expandafter{\uselanguage}%
+  \typeout{Current language is `\languagename`.}}%
 \RequirePackage[fixlanguage]{babelbib}
 \expandafter\selectbiblanguage\expandafter{\uselanguage}
 \RequirePackage{afterpage}
