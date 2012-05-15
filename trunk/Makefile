@@ -238,7 +238,8 @@ MAINTAIN_FILES  = $(MAINTAIN_SRC)
 
 # ----------------------------------------------------------------------
 # additional ruls
-bindist:dist
+tdsdist:dist
+	# extract dist and make all
 	$(UNTARGZ) $(DISTDIR).tar.gz
 	chmod -R a+w $(DISTDIR)
 ifdef PREPARERELEASE
@@ -248,25 +249,81 @@ ifdef PREPARERELEASE
 endif
 	$(CD) $(notdir $(DISTDIR)) && \
 	  $(MAKE)
+	# install to temporary directory
 	$(MKDIR) $(notdir $(DISTDIR))-bin/komascript-texmf
 	$(CD) $(notdir $(DISTDIR)) && \
 	  $(MAKE) INSTALLTEXMF=$(PWD)/$(notdir $(DISTDIR))-bin/komascript-texmf install
 	$(RMDIR) $(notdir $(DISTDIR))
 	$(SRM) $(notdir $(DISTDIR))-bin/komascript-texmf/ls-R
+	# build the tds.zip
+	$(SRM) komascript.tds.zip
+	$(CD) $(notdir $(DISTDIR))-bin/komascript-texmf && \
+	  $(ZIP) ../../komascript.tds.zip source doc tex
+	# clean up
+	$(RMDIR) $(notdir $(DISTDIR))-bin
+	$(SRM) $(notdir $(DISTDIR)).tar.gz
+
+bindist:tdsdist
+	# extract tds.zip
+	$(MKDIR) $(notdir $(DISTDIR))-bin
+	$(MKDIR) $(notdir $(DISTDIR))-bin/komascript-texmf
+	$(CD) $(notdir $(DISTDIR))-bin/komascript-texmf && \
+	  $(UNZIP) ../../komascript.tds.zip
+	# copy some of the files to primary folder
+	$(MV) komascript.tds.zip $(notdir $(DISTDIR))-bin/
 	$(INSTALL) $(notdir $(DISTDIR))-bin/komascript-texmf/source/latex/koma-script/ChangeLog $(notdir $(DISTDIR))-bin
 	$(INSTALL) $(notdir $(DISTDIR))-bin/komascript-texmf/doc/latex/koma-script/scrgui* $(notdir $(DISTDIR))-bin
 	$(INSTALL) $(notdir $(DISTDIR))-bin/komascript-texmf/doc/latex/koma-script/*.txt $(notdir $(DISTDIR))-bin
 	$(INSTALL) $(notdir $(DISTDIR))-bin/komascript-texmf/doc/latex/koma-script/README $(notdir $(DISTDIR))-bin
 	$(INSTALL) $(notdir $(DISTDIR))-bin/komascript-texmf/doc/latex/koma-script/koma*.html $(notdir $(DISTDIR))-bin
 	$(GREP) 'CheckKOMAScriptVersion{' $(notdir $(DISTDIR))-bin/komascript-texmf/source/latex/koma-script/scrkvers.dtx | grep -o '2.*t' > $(notdir $(DISTDIR))-bin/VERSION
-	$(CD) $(notdir $(DISTDIR))-bin/komascript-texmf && \
-	  $(ZIP) ../komascript.tds.zip source doc tex
+	# build the bin.zip
 	$(RMDIR) $(notdir $(DISTDIR))-bin/komascript-texmf
 	$(SRM) $(notdir $(DISTDIR))-bin.zip
 	$(CD) $(notdir $(DISTDIR))-bin && \
 	  $(ZIP) ../$(notdir $(DISTDIR))-bin.zip *
-	$(SRM) $(notdir $(DISTDIR)).tar.gz
+	# clean up
 	$(RMDIR) $(notdir $(DISTDIR))-bin
+
+ctandist:tdsdist
+	# extract tds.zip
+	$(SRMDIR) $(notdir $(DISTDIR))-ctan
+	$(MKDIR) $(notdir $(DISTDIR))-ctan/texmf
+	$(INSTALL) komascript.tds.zip $(notdir $(DISTDIR))-ctan
+	$(CD) $(notdir $(DISTDIR))-ctan/texmf && \
+	  $(UNZIP) ../komascript.tds.zip
+	# copy some doc files to doc source
+	$(INSTALL) $(notdir $(DISTDIR))-ctan/texmf/doc/latex/koma-script/*.html \
+	  $(notdir $(DISTDIR))-ctan/texmf/doc/latex/koma-script/*.pdf \
+	  $(notdir $(DISTDIR))-ctan/texmf/source/latex/koma-script/doc/
+	# copy some doc files to main source
+	$(INSTALL) $(notdir $(DISTDIR))-ctan/texmf/doc/latex/koma-script/*.txt \
+	  $(notdir $(DISTDIR))-ctan/texmf/doc/latex/koma-script/*.tex \
+	  $(notdir $(DISTDIR))-ctan/texmf/doc/latex/koma-script/README \
+	  $(notdir $(DISTDIR))-ctan/texmf/source/latex/koma-script/
+	# generate VERSION at main source
+	$(GREP) 'CheckKOMAScriptVersion{' $(notdir $(DISTDIR))-ctan/texmf/source/latex/koma-script/scrkvers.dtx | grep -o '2.*t' \
+	  > $(notdir $(DISTDIR))-ctan/texmf/source/latex/koma-script/VERSION
+	# generate README.distributors at upmost
+	$(HEAD) 18 $(notdir $(DISTDIR))-ctan/texmf/source/latex/koma-script/README > $(notdir $(DISTDIR))-ctan/README.distributors
+	$(SECHO) 'File komascript.tds.zip is a complete TEXMF tree of KOMA-Script.  It may be' >> $(notdir $(DISTDIR))-ctan/README.distributors
+	$(SECHO) 'used for manual installation or by distributors for distributions like' >> $(notdir $(DISTDIR))-ctan/README.distributors
+	$(SECHO) '<http://www.ctan.org/tex-archive/install/macros/latex/contrib/komascript.tds.zip>.' >> $(notdir $(DISTDIR))-ctan/README.distributors
+	$(SECHO) "File $(notdir $(DISTDIR)).ctan-src.zip is a file with sources and manuals of KOMA-Script"  >> $(notdir $(DISTDIR))-ctan/README.distributors
+	$(SECHO) 'that CTAN seems to prefer for the distribution at'  >> $(notdir $(DISTDIR))-ctan/README.distributors
+	$(SECHO) '<http://www.ctan.org/tex-archive/macros/latex/contrib/komascript>.' >> $(notdir $(DISTDIR))-ctan/README.distributors
+	$(SECHO) 'Note, that it is not easy to generate a ready to use and complete installation' >> $(notdir $(DISTDIR))-ctan/README.distributors
+	$(SECHO) "from $(notdir $(DISTDIR)).ctan-src.zip.  So it is hardly recommended to use" >> $(notdir $(DISTDIR))-ctan/README.distributors
+	$(SECHO) 'komascript.tds.zip not only by users, but redistributors also.' >> $(notdir $(DISTDIR))-ctan/README.distributors
+	# build ctan-src.zip
+	$(CD) $(notdir $(DISTDIR))-ctan/texmf/source/latex && \
+	  $(ZIP) ../../../$(notdir $(DISTDIR)).ctan-src.zip koma-script
+	$(RMDIR) $(notdir $(DISTDIR))-ctan/texmf
+	# build ctan.zip (with both ctan-src.zip and tds.zip)
+	$(CD) $(notdir $(DISTDIR))-ctan && \
+	  $(ZIP) ../$(notdir $(DISTDIR))-ctan.zip *
+	# clean up
+	$(RMDIR) $(notdir $(DISTDIR))-ctan
 
 # ----------------------------------------------------------------------
 # local rules
