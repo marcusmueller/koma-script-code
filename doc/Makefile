@@ -141,7 +141,7 @@ install_local: $(DIST_FILES)
 	fi
 	$(INSTALL) $(DIST_SRC) $(INSTALLSRCDIR)
 	$(foreach file,$(STATIC_DOC),$(SYMLINK) ../../../../doc/latex/koma-script/$(file) $(INSTALLSRCDIR)/$(file);)
-	$(INSTALL) $(BIN_FILES) $(INSTALLSRCDIR)/$(BIN_DIR)
+	$(INSTALLEXECUTABLE) $(BIN_FILES) $(INSTALLSRCDIR)/$(BIN_DIR)
 	$(INSTALL) $(STATIC_DOC) $(INSTALLDOCDIR)
 	$(make_recursive)
 	$(SECHO) ------------------------------------------------------------
