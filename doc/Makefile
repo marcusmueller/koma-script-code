@@ -102,7 +102,8 @@ STATIC_DOC_LINKS= komascript.html komascr.html \
 		  scrtime.html scrdate.html tocbasic.html scrbase.html
 
 DOC_SRC		= scrguide.cls scrguide.ist scrguide.gst \
-	          guide.tex guide.bib plength.dtx
+	          guide.tex guide.bib plength.dtx \
+		  linkalias.tex
 
 STATIC_DOC      = $(STATIC_DOC_SRC) $(STATIC_DOC_LINKS)
 
