@@ -1,4 +1,4 @@
-% \CheckSum{1384}
+% \CheckSum{1419}
 % \iffalse meta-comment
 % ======================================================================
 % scrkbase.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkbase.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkbase.dtx}[2012/05/28 v3.11a KOMA-Script (basics)]
+\ProvidesFile{scrkbase.dtx}[2012/06/11 v3.11a KOMA-Script (basics)]
 % \iffalse
 %</driver>
 %<package&option>\ProvidesPackage{%
@@ -340,6 +340,8 @@
 %
 % \begin{macro}{\FamilyProcessOptions}
 %   \changes{v3.00}{2008/04/30}{Neue Anweisung}%
+%   \changes{v3.11a}{2012/06/11}{Klassen melden falsche Werte nicht
+%     selbst als Fehler, sondern informieren nur darüber}
 % \begin{macro}{\scr@removeunused}
 %   \changes{v3.10}{2011/09/12}{neu (intern)}%
 %   Diese Anweisung führt alle Optionen, sowohl normal deklarierte als auch
@@ -390,17 +392,25 @@
         \scr@optiontest{#2#1}\CurrentOption{%
           \default@ds
         }{%
+          \let\scr@removeunused\relax
           \edef\reserved@a{%
             \noexpand\setkeys{#2#1}{\CurrentOption}%
             \noexpand\def\noexpand\CurrentOption{\CurrentOption}%
           }\reserved@a
+          \ifx\scr@removeunused\relax\else\default@ds\fi
         }%
       }{%
-        \@expandtwoargs\setkeys{#2}%
-        \CurrentOption
+        \let\scr@removeunused\relax
+        \edef\reserved@a{%
+          \noexpand\setkeys{#2}{\CurrentOption}%
+          \noexpand\def\noexpand\CurrentOption{\CurrentOption}%
+        }\reserved@a
+        \if\scr@removeunused\relax\else\default@ds\fi
         \scr@optiontest{#2#1}\CurrentOption{}{%
+          \let\scr@removeunused\relax
           \@expandtwoargs\setkeys{#2#1}%
           \CurrentOption
+          \ifx\scr@removeunused\relax\else\default@ds\fi
         }%
       }%
     }{%
