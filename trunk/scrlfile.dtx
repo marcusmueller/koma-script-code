@@ -1,4 +1,4 @@
-% \CheckSum{594}
+% \CheckSum{600}
 % \iffalse meta-comment
 % ======================================================================
 % scrlfile.dtx
@@ -64,7 +64,7 @@
 %%% From File: scrlfile.dtx
 %<*driver|scrlfile|load>
 % \fi
-\def\scrlfileversion{2012/06/13 v3.11a}
+\def\scrlfileversion{2012/06/15 v3.12}
 % \iffalse
 %</driver|scrlfile|load>
 %<*driver>
@@ -369,6 +369,7 @@
 % \cs{RequirePackage} before loading the class.
 %
 % \DescribeMacro{\PreventPackageFromLoading}
+% \DescribeMacro{\PreventPackageFromLoading*}
 % \DescribeMacro{\ResetPreventPackageFromLoading}
 % \DescribeMacro{\StorePreventPackageFromLoading}
 % The command \cs{PreventPackageFromLoading}\marg{package list}
@@ -381,6 +382,11 @@
 % list}. If you need to know the packages at the \meta{package list}, you may
 % use \cs{StorePackageFromLoading}\marg{command} to store the current list at
 % macro \meta{command}.
+%
+% The normal version of \cs{PreventPackageFromLoading} with empty argument
+% results in a warning message. The star version
+% \cs{PreventPackageFromLoading*} writes only an info into the log-file, if
+% the argument is empty. Both commands are not robust!
 %
 % \DescribeMacro{\BeforeClosingMainAux}
 % The command \cs{BeforeClosingMainAux}\marg{instructions}
@@ -780,23 +786,31 @@
 %  \end{macro}
 %
 % \begin{macro}{\PreventPackageFromLoading}
-%  \changes{v3.08}{2010/11/04}{New}
-%  \changes{v3.11a}{2012/06/13}{write fault error in \cs{MessageBreak} fixed}
+%   \changes{v3.08}{2010/11/04}{New}
+%   \changes{v3.11a}{2012/06/13}{write fault error in \cs{MessageBreak} fixed}
+%   \changes{v3.12}{2012/06/15}{new star version allowes empty argument with
+%     info instead of warning}
+% \begin{macro}{\@PreventPackageFromLoading}
+%   \changes{v3.12}{2012/06/15}{New (internal)}
 % \begin{macro}{\scrlfile@excludedpackages}
-%  \changes{v3.08}{2010/11/04}{New (internal)}
+%   \changes{v3.08}{2010/11/04}{New (internal)}
 % \begin{macro}{\scrlfile@saved@RequirePackage}
-%  \changes{v3.08}{2010/11/04}{New (internal)}
+%   \changes{v3.08}{2010/11/04}{New (internal)}
 %    \begin{macrocode}
 \newcommand*{\scrlfile@excludedpackages}{}
 \let\scrlfile@excludedpackages\@empty
 \newcommand*{\scrlfile@saved@RequirePackage}{}
-\newcommand*{\PreventPackageFromLoading}[1]{%
+\newcommand*{\PreventPackageFromLoading}{%
+  \@ifstar{\@PreventPackageFromLoading\PackageInfo}%
+          {\@PreventPackageFromLoading\PackageWarning}%
+}
+\newcommand*{\@PreventPackageFromLoading}[2]{%
 %    \end{macrocode}
 % We do nothing, if the argument was empty:
 %    \begin{macrocode}
-  \edef\reserved@b{#1}%
+  \edef\reserved@b{#2}%
   \ifx \reserved@b\@empty
-    \PackageWarning{scrlfile}{%
+    #1{scrlfile}{%
       \string\PreventPackageFromLoading\space with empty argument\MessageBreak
       ignored%
     }%
@@ -808,7 +822,7 @@
     \ifx\scrlfile@excludedpackages\@empty
       \let\scrlfile@saved@RequirePackage\RequirePackage
       \let\RequirePackage\scrlfile@RequirePackage
-      \def\reserved@a#1{%  
+      \def\reserved@a#2{%  
         \@latex@error
         {\noexpand \usepackage before \string\documentclass}%
         {\noexpand \usepackage may only appear in the document
@@ -910,6 +924,7 @@
   \reserved@a
 }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
