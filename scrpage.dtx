@@ -1,4 +1,4 @@
-% \CheckSum{2695}
+% \CheckSum{2715}
 % \iffalse
 % ======================================================================
 % scrpage.dtx
@@ -65,7 +65,7 @@
 %<v1>\ProvidesPackage{scrpage}[2008/02/29 v1.3e KOMA-Script
 %<v2>\ProvidesPackage{scrpage2}
 %<*!v1>
-                [2010/04/22 v2.5 LaTeX2e KOMA-Script
+                [2012/11/02 v2.5a LaTeX2e KOMA-Script
 %</!v1>
 %<scrpage>                 package]
 %<*driver>
@@ -2568,11 +2568,27 @@
   \begingroup\expandafter\expandafter\expandafter\endgroup\expandafter
   \ifx\csname sectionmark\endcsname\relax
     \ifx\@mkboth\markboth\@automarktrue\fi
-  \else 
-    \ifx\sectionmark\@gobble\else\@automarktrue\fi
+  \else
+%    \end{macrocode}
+% \changes{v2.5a}{2012/11/02}{\cs{@gobble} is long, but \cs{sectionmark} and
+%   \cs{chaptermark} may be short}
+%    \begin{macrocode}
+    \ifx\sectionmark\@gobble\else
+      \begingroup
+        \def\@gobble#1{}\ifx\sectionmark\@gobble\else
+          \aftergroup\@automarktrue
+        \fi
+      \endgroup
+    \fi
   \fi
 \else
-  \ifx\chaptermark\@gobble\else\@automarktrue\fi
+  \ifx\chaptermark\@gobble\else
+    \begingroup
+      \def\@gobble#1{}\ifx\chaptermark\@gobble\else
+        \aftergroup\@automarktrue
+      \fi
+    \endgroup
+  \fi
 \fi
 %    \end{macrocode}
 %
