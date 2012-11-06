@@ -1,4 +1,4 @@
-% \CheckSum{2715}
+% \CheckSum{2384}
 % \iffalse
 % ======================================================================
 % scrpage.dtx
@@ -61,12 +61,8 @@
 %</dtx>
 %<scrpage>\NeedsTeXFormat{LaTeX2e}[1995/06/01]
 %<driver>   \ProvidesFile{scrpage.drv}
-%<*scrpage>
-%<v1>\ProvidesPackage{scrpage}[2008/02/29 v1.3e KOMA-Script
-%<v2>\ProvidesPackage{scrpage2}
-%<*!v1>
+%<scrpage>\ProvidesPackage{scrpage2}
                 [2012/11/02 v2.5a LaTeX2e KOMA-Script
-%</!v1>
 %<scrpage>                 package]
 %<*driver>
                  driver]
@@ -350,7 +346,6 @@
 % the \textsf{KOMA}-script-classes their definitions are not quite simple.
 %
 %    \begin{macrocode}
-%<*v2>
 \newcommand*{\@Pass@Obsolete@Option@To@Typearea}[1]{%
   \@expandtwoargs\in@{,\CurrentOption,}{,\@curroptions,}%
   \ifin@
@@ -369,22 +364,17 @@
     \fi
   \fi
 }
-%</v2>
 \DeclareOption{headinclude}{%
-%<v1>  \PassOptionsToPackage{headinclude}{typearea}%
-%<v2>  \@Pass@Obsolete@Option@To@Typearea{headinclude}%
+  \@Pass@Obsolete@Option@To@Typearea{headinclude}%
 }
 \DeclareOption{headexclude}{%
-%<v1>  \PassOptionsToPackage{headexclude}{typearea}%
-%<v2>  \@Pass@Obsolete@Option@To@Typearea{headinclude=false}%
+  \@Pass@Obsolete@Option@To@Typearea{headinclude=false}%
 }
 \DeclareOption{footinclude}{%
-%<v1>  \PassOptionsToPackage{footinclude}{typearea}%
-%<v2>  \@Pass@Obsolete@Option@To@Typearea{footinclude}%
+  \@Pass@Obsolete@Option@To@Typearea{footinclude}%
 }
 \DeclareOption{footexclude}{%
-%<v1>  \PassOptionsToPackage{footexclude}{typearea}%
-%<v2>  \@Pass@Obsolete@Option@To@Typearea{footinclude=false}%
+  \@Pass@Obsolete@Option@To@Typearea{footinclude=false}%
 }
 %    \end{macrocode}
 % We do so, because we want so set |headinclude|, |footinclude| by
@@ -394,11 +384,7 @@
 % \end{option}
 % \end{option}
 %
-% At version 2 we have additonal options designed for the additional
-% interface.
-%    \begin{macrocode}
-%<*v2>
-%    \end{macrocode}
+% We have additional options designed for the additional interface.
 %  \begin{option}{mpinclude}
 %    \changes{v2.8q}{2002/03/28}{New option}
 %  \begin{option}{mpexclude}
@@ -648,15 +634,9 @@
 % \end{option}
 %
 %
+% We don't need default options.
 %    \begin{macrocode}
-%</v2>
-%    \end{macrocode}
-%
-% Set the default options.
-%    \begin{macrocode}
-\ExecuteOptions{%
-%<!v2>headinclude,footinclude%
-}
+\ExecuteOptions{}
 %    \end{macrocode}
 % But you may set other Options:
 %    \begin{macrocode}
@@ -695,7 +675,6 @@
 \begingroup\expandafter\expandafter\expandafter\endgroup
 \expandafter\ifx\csname mainmatter\endcsname\relax
 \else
-%<*v2>
   \@ifundefined{@mainmattertrue}{%
     \PackageWarningNoLine{scrpage2}{%
       \string\mainmatter\space defined without
@@ -705,9 +684,8 @@
       back matter and will be defined now%
     }%
   }{%
-%</v2>
     \let\@tempa\relax
-%<v2>  }%
+  }%
 \fi
 \@tempa
 %    \end{macrocode}
@@ -745,7 +723,7 @@
 % We need this switch to decide to switch on or off \cs{@mkboth} at the
 % pagestyles.
 %    \begin{macrocode}
-%<!v1>\newif\if@automark\@automarkfalse
+\newif\if@automark\@automarkfalse
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
@@ -781,88 +759,12 @@
 % Before version 2.5 we have distinguished one- and two-side definitions while
 % loading the package and have had all the definitions of \cs{@mkboth},
 % \cs{chaptermark}, \cs{sectionmark}, and \cs{subsectionmark} at the
-% definition of the page style. This was a lot of code:
-%    \begin{macrocode}
-%<*v1>
-\if@twoside
-  \def\@defpagestyle[#1]#2#3#4{%
-    \expandafter\def\csname ps@#2\endcsname{%
-      \def\@tempa{+}%
-      \def\@tempb{#1}%
-      \ifx\@tempa\@tempb
-        \let\@mkboth\markboth
-        \if@chapter
-          \def\chaptermark####1{%
-            \markboth {\ifnum \c@secnumdepth >\m@ne%
-              \if@mainmatter\chaptermarkformat\fi\fi ####1}{%
-              \ifnum \c@secnumdepth >\m@ne%
-              \if@mainmatter\chaptermarkformat\fi\fi ####1}}%
-          \def\sectionmark####1{%
-            \markright {\ifnum \c@secnumdepth >\z@%
-              \sectionmarkformat\fi ####1}}%
-        \else
-          \def\sectionmark####1{%
-            \markboth {\ifnum \c@secnumdepth >\z@%
-              \if@mainmatter\sectionmarkformat\fi\fi ####1}{%
-              \ifnum \c@secnumdepth >\z@%
-              \if@mainmatter\sectionmarkformat\fi\fi ####1}}%
-          \def\subsectionmark####1{%
-            \markright {\ifnum \c@secnumdepth >\@ne%
-              \subsectionmarkformat\fi ####1}}%
-        \fi
-      \else
-        \let\@mkboth\@gobbletwo
-        \if@chapter
-          \def\chaptermark####1{}%
-        \else
-          \def\subsectionmark####1{}%
-        \fi
-        \def\sectionmark####1{}%
-      \fi
-      \def@twosidehead#3
-      \def@twosidefoot#4
-    }
-  }
-\else
-  \def\@defpagestyle[#1]#2#3#4{%
-    \expandafter\def\csname ps@#2\endcsname{%
-      \def\@tempa{+}%
-      \def\@tempb{#1}%
-      \ifx\@tempa\@tempb
-        \let\@mkboth\markboth
-        \if@chapter
-          \def\chaptermark####1{%
-            \markright {\ifnum \c@secnumdepth >\m@ne%
-              \if@mainmatter\chaptermarkformat\fi\fi ####1}}%
-          \def\sectionmark####1{}%
-        \else
-          \def\sectionmark####1{%
-            \markright{\ifnum \c@secnumdepth >\z@%
-              \if@mainmatter\sectionmarkformat\fi\fi ####1}}%
-          \def\subsectionmark####1{}%
-        \fi
-      \else
-        \let\@mkboth\@gobbletwo
-        \if@chapter
-          \def\chaptermark####1{}%
-        \else
-          \def\subsectionmark####1{}%
-        \fi
-        \def\sectionmark####1{}%
-      \fi
-      \def@onesidehead#3
-      \def@onesidefoot#4
-    }
-  }
-\fi
-%</v1>
-%    \end{macrocode}
+% definition of the page style.
 % Since version~2.5 the difference of one- and two-side is made at the
 % definition of the heads and foots themself and \cs{chaptermark},
 % \cs{sectionmark}, and \cs{subsectionmark} are defined by \cs{automark} and
 % \cs{manualmark}. So the code is much easier.
 %    \begin{macrocode}
-%<*v2>
 \def\@defpagestyle[#1]#2#3#4{%
   \expandafter\def\csname ps@#2\endcsname{%
     \if@automark\let\@mkboth\markboth\else\let\@mkboth\@gobbletwo\fi
@@ -870,119 +772,8 @@
     \def@foot#4
   }%
 }
-%</v2>
 %    \end{macrocode}
-% \begin{macro}{\def@twosidehead}
-%   \changes{v2.5}{2010/04/22}{replaced by \cs{\def@head}}
-% \begin{macro}{\def@@twosidehead}
-%   \changes{v1.3}{2001/03/30}{Use of \cs{@headwidth} instead of
-%     \cs{textwidth}}
-%   \changes{v2.5}{2010/04/22}{replaced by \cs{\def@@head}}
-%    \begin{macrocode}
-%<*v1>
-\def\def@twosidehead(#1,#2)#3#4#5(#6,#7){%
-  \def\@evenhead{\let\headmark\leftmark%
-    \hss\hskip\@evenheadshift\vbox{\hsize=\@headwidth\relax%
-      \hf@rule{#1}{#2}{\@headwidth}%
-      \vskip#2
-      \vskip\baselineskip
-      \hb@xt@\@headwidth{{%
-          \headfont\strut #3}}%
-      \hf@rule{#6}{#7}{\@headwidth}%
-  }\hskip\@oddheadshift\hss}%
-  \def\@oddhead{\let\headmark\rightmark
-    \hss\hskip\@oddheadshift\vbox{\hsize=\@headwidth\relax
-      \hf@rule{#1}{#2}{\@headwidth}%
-      \vskip#2%
-      \vskip\baselineskip
-      \hb@xt@\@headwidth{{%
-          \headfont\strut #4}}%
-      \hf@rule{#6}{#7}{\@headwidth}%
-  }\hskip\@evenheadshift\hss}%
-}
-%</v1>
-% \end{macro}
-% \end{macro}
-% \begin{macro}{\def@onesidehead}
-%   \changes{v1.3}{2001/03/30}{Use of \cmd\@headwidth instead of
-%     \cs{textwidth}}
-%   \changes{v2.5}{2010/04/22}{replaced by \cs{\def@head}}
-% \begin{macro}{\def@@onesidehead}
-%   \changes{v2.5}{2010/04/22}{replaced by \cs{\def@@head}}
-% \begin{macro}{\def@@@onesidehead}
-%   \changes{v2.5}{2010/04/22}{replaced by \cs{\def@@@head}}
-% Next the onesided head:
-%    \begin{macrocode}
-%<*v1>
-\def\def@onesidehead(#1,#2)#3#4#5(#6,#7){%
-  \def\@evenhead{}%
-  \def\@oddhead{\let\headmark\rightmark
-    \hss\hskip\@oddheadshift\vbox{\hsize=\@headwidth\relax
-      \hf@rule{#1}{#2}{\@headwidth}%
-      \vskip#2%
-      \vskip\baselineskip
-      \hb@xt@\@headwidth{{%
-          \headfont\strut #5}}%
-      \hf@rule{#6}{#7}{\@headwidth}%
-  }\hskip\@evenheadshift\hss}%
-}
-%</v1>
-%    \end{macrocode}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-% \begin{macro}{\def@twosidefoot}
-%   \changes{v1.3}{2001/03/30}{Use of \cmd\@footwidth instead of
-%     \cs{textwidth}}
-%   \changes{v2.5}{2010/04/22}{replaced by \cs{\def@foot}}
-% \begin{macro}{\def@@twosidefoot}
-%   \changes{v2.5}{2010/04/22}{replaced by \cs{\def@@foot}}
-% \begin{macro}{\def@@@twosidefoot}
-%   \changes{v2.5}{2010/04/22}{replaced by \cs{\def@@@foot}}
-% Next the twosided foot:
-%    \begin{macrocode}
-%<*v1>
-\def\def@twosidefoot(#1,#2)#3#4#5(#6,#7){%
-  \def\@evenfoot{\let\headmark\leftmark
-    \hss\hskip\@evenfootshift\vbox{\hsize=\@footwidth\relax
-      \topfoot@rule{#1}{#2}\hb@xt@\@footwidth{{%
-          \headfont\footfont\strut #3}}%
-      \botfoot@rule{#6}{#7}}\hskip\@oddfootshift\hss}%
-  \def\@oddfoot{\let\headmark\rightmark
-    \hss\hskip\@oddfootshift\vbox{\hsize=\@footwidth\relax
-      \topfoot@rule{#1}{#2}\hb@xt@\@footwidth{{%
-          \headfont\footfont\strut #4}}%
-      \botfoot@rule{#6}{#7}}\hskip\@evenfootshift\hss}%
-}
-%</v1>
-%    \end{macrocode}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-% \begin{macro}{\def@onesidefoot}
-%   \changes{v1.3}{2001/03/30}{Use of \cmd\@footwidth instead of
-%     \cs{textwidth}}
-%   \changes{v2.5}{2010/04/22}{replaced by \cs{\def@foot}}
-% \begin{macro}{\def@@onesidefoot}
-%   \changes{v2.5}{2010/04/22}{replaced by \cs{\def@@foot}}
-% \begin{macro}{\def@@@onesidefoot}
-%   \changes{v2.5}{2010/04/22}{replaced by \cs{\def@@@foot}}
-%    \begin{macrocode}
-%<*v1>
-\def\def@onesidefoot(#1,#2)#3#4#5(#6,#7){%
-  \def\@evenfoot{}%
-  \def\@oddfoot{\let\headmark\rightmark
-    \hss\hskip\@oddfootshift\vbox{\hsize=\@footwidth\relax
-      \topfoot@rule{#1}{#2}\hb@xt@\@footwidth{{%
-          \headfont\footfont\strut #5}}
-      \botfoot@rule{#6}{#7}}\hskip\@evenfootshift\hss}%
-}
-%</v1>
-%    \end{macrocode}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
-
+%
 % \begin{macro}{\def@head}
 %   \changes{v2.5}{2010/04/22}{new (internal)}
 % \begin{macro}{\def@@head}
@@ -993,7 +784,6 @@
 % This was real simple, but we already have to do the real definition
 % of the heads and foots. First the head:
 %    \begin{macrocode}
-%<*v2>
 \def\def@head{%
   \@ifnextchar(%)
   {\def@@head}%
@@ -1031,7 +821,6 @@
       \hf@rule{#6}{#7}{\@headwidth}{headbelow}%
   }\hskip\@evenheadshift\hss}%
 }
-%</v2>
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -1049,7 +838,6 @@
 %   \changes{v2.5}{2010/04/22}{new (internal)}
 % And last twosided and onesided foot:
 %    \begin{macrocode}
-%<*v2>
 \def\def@foot{%
   \@ifnextchar(%)
   {\def@@foot}
@@ -1079,7 +867,6 @@
           \headfont\footfont\strut \if@twoside #4\else #5\fi}}%
       \botfoot@rule{#6}{#7}}\hskip\@evenfootshift\hss}%
 }
-%</v2>
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -1092,8 +879,7 @@
 \newcommand\topfoot@rule[2]{%
   \@tempdima\baselineskip\advance\@tempdima by-.7\normalbaselineskip
   \advance\@tempdima by -#2
-  \vskip\@tempdima\hf@rule{#1}{#2}{\@footwidth}%
-%<v2>      {footabove}%
+  \vskip\@tempdima\hf@rule{#1}{#2}{\@footwidth}{footabove}%
   \vskip-\@tempdima}
 %    \end{macrocode}
 %  \end{macro}
@@ -1102,8 +888,7 @@
 \newcommand\botfoot@rule[2]{%
   \@tempdima-\baselineskip\advance\@tempdima by .3\normalbaselineskip
   \advance\@tempdima by #2
-  \vskip\@tempdima\hf@rule{#1}{#2}{\@footwidth}%
-%<v2>      {footbelow}%
+  \vskip\@tempdima\hf@rule{#1}{#2}{\@footwidth}{footbelow}%
 }
 %    \end{macrocode}
 %  \end{macro}
@@ -1117,10 +902,8 @@
 %    \changes{v2.2}{2005/07/05}{Macro is not longer long}
 %    \changes{v2.2b}{2005/08/31}{No even alignment at oneside}
 %    \begin{macrocode}
-%<!v2>\newcommand\hf@rule[3]{%
-%<v2>\newcommand*{\hf@rule}[4]{%
+\newcommand*{\hf@rule}[4]{%
   \setlength{\@tempdimb}{#1}
-%<*v2>
   \begingroup
     \csname scr@pre@#4@line\endcsname
     \if@twoside
@@ -1134,20 +917,19 @@
       \edef\@tempa{\hfline@adjust}%
     \fi
     \ifnum\@tempa=1
-%</v2>
       \setlength{\@tempdimb}{.5\@tempdimb}%
-%<v2>    \fi
+    \fi
     \hb@xt@#3{%
-%<v2>      \ifnum\@tempa>0
+      \ifnum\@tempa>0
         \hfill%
         \llap{\vrule\@depth#2\@height\z@\@width\@tempdimb}%
-%<v2>      \fi
-%<v2>      \ifnum\@tempa<2
+      \fi
+      \ifnum\@tempa<2
         \rlap{\vrule\@depth#2\@height\z@\@width\@tempdimb}%
         \hfill%
-%<v2>      \fi
+      \fi
     }%
-%<v2>  \endgroup
+  \endgroup
 }
 %    \end{macrocode}
 %  \begin{macro}{\scr@pre@headabove@line}
@@ -1169,7 +951,6 @@
 %  \begin{macro}{\scr@fnt@instead@footbotline}
 %    \changes{v2.2}{2004/07/05}{New KOMA-Script font command}
 %    \begin{macrocode}
-%<*v2>
 \newcommand*{\scr@pre@headabove@line}{}
 \newcommand*{\scr@fnt@headtopline}{\scr@pre@headabove@line}
 \newcommand*{\scr@pre@headbelow@line}{}
@@ -1179,7 +960,6 @@
 \newcommand*{\scr@pre@footbelow@line}{}
 \newcommand*{\scr@fnt@footbottomline}{\scr@pre@footbelow@line}
 \newcommand*{\scr@fnt@instead@footbotline}{footbottomline}
-%</v2>
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
@@ -1191,6 +971,7 @@
 %  \end{macro}
 %  \end{macro}
 %  \end{macro}
+% \end{macro}
 %
 % Using these definitions, we can define the testing macros.
 %
@@ -1217,8 +998,7 @@
     \@defpagestyle[#1]{#2}{#3}{#4}%
   \else
     \PackageError
-%<v1>      {scrpage}%
-%<v2>      {scrpage2}%
+      {scrpage2}%
       {Your command was ignored}%
       {There is already a pagestyle named ``#1''.\MessageBreak%
        Use \protect\defpagestyle\space, \protect\renewpagestyle or
@@ -1250,8 +1030,7 @@
   \begingroup\expandafter\expandafter\expandafter\endgroup
   \expandafter\ifx\csname ps@#2\endcsname\relax
     \PackageError
-%<v1>      {scrpage}%
-%<v2>      {scrpage2}%
+      {scrpage2}%
       {Your command was ignored}%
       {There is no pagestyle named ``#1''.\MessageBreak%
        Use \protect\defpagestyle, \protect\newpagestyle or
@@ -1290,8 +1069,7 @@
     \@defpagestyle[#1]{#2}{#3}{#4}%
   \else
     \PackageInfo
-%<v1>      {scrpage}%
-%<v2>      {scrpage2}%
+      {scrpage2}%
       {\protect\providepagestyle\protect{#1\protect} ignored.}%
   \fi
 }
@@ -1374,10 +1152,7 @@
 %
 %
 % \subsection{Automark or not}
-% This is only valid at version 2.
-%    \begin{macrocode}
-%<*v2>
-%    \end{macrocode}
+% This is new since version 2.
 %  \begin{macro}{\automark}
 %    \changes{v2.0}{2001/04/20}{New}
 %    \changes{v2.0c}{2001/06/07}{Use of \cs{MakeMarkcase}}
@@ -1606,10 +1381,6 @@
 %    \end{macrocode}
 %  \end{macro}
 %
-%    \begin{macrocode}
-%</v2>
-%    \end{macrocode}
-%
 %
 % \subsection{Width of head and foot}
 %  \begin{macro}{\setheadwidth}
@@ -1706,8 +1477,7 @@
   \settowidthof{\@tempdima}{#3}%
   \ifdim\@tempdima>\paperwidth
     \PackageWarning
-%<v1>      {scrpage}%
-%<v2>      {scrpage2}%
+      {scrpage2}%
       {You've set width of #1 to a value\MessageBreak
         greater than width of page!\MessageBreak%
         I`ll reduce width of #1 to width of page}%
@@ -1715,8 +1485,7 @@
   \else
     \ifdim\@tempdima<\z@
        \PackageWarning
-%<v1>         {scrpage}%
-%<v2>         {scrpage2}%
+         {scrpage2}%
          {You've set width of #1 to negative value!\MessageBreak%
            I'll set it to 0pt}%
        \setlength{\@tempdima}{\z@}%
@@ -1783,7 +1552,6 @@
 % If option \texttt{mpinclude} was used, we use a special trick to set
 % width of head and foot but only if the user doesn't:
 %    \begin{macrocode}
-%<*v2>
 \if@mincl
   \renewcommand*{\@headwidth}{}%
   \renewcommand*{\@footwidth}{}%
@@ -1796,7 +1564,6 @@
     \fi
     }
 \fi
-%</v2>
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
@@ -1820,15 +1587,11 @@
 % There is also a macro used by |\@evenhead|, |\@oddhead| and |\@evenfoot|,
 % |\@oddfoot|:
 %    \begin{macrocode}
-\providecommand*{\headfont}{\normalfont%
-%<v2>  \slshape%
-}
-%<*v2>
+\providecommand*{\headfont}{\normalfont\slshape}
 \def\scr@fnt@wrn@pagehead#1{%
   `pagehead' is only an alias of `pageheadfoot'.\MessageBreak
   Font of page foot may also be changed%
 }
-%</v2>
 %    \end{macrocode}
 %  \end{macro}
 %
@@ -1840,11 +1603,9 @@
 %    \changes{v2.2f}{2008/02/14}{deactivated}
 % There is also a macro used by |\@evenfoot|, |\@oddfoot| after |\headfont|:
 %    \begin{macrocode}
-%<*v2>
 \providecommand*{\footfont}{\normalfont}
 \providecommand*{\scr@fnt@pagefoot}{\footfont}
 \let\scr@fnt@wrn@pagefoot\relax
-%</v2>
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
@@ -1872,10 +1633,7 @@
 % \changes{v2.0d}{2001/06/19}{\texttt{footbot} changed into 
 %                             \texttt{footbelow}}
 %  \changes{v2.0f}{2001/06/23}{new symbolic value ``auto''}
-%    \begin{macrocode}
-%<*v2>
-%    \end{macrocode}
-% Only at version 2 there are new macros to set the length and
+% Since version 2 there are new macros to set the length and
 % thickness of the lines at head and foot. Wie use macros not
 % dimensions, because the amount of dimensions is very small at \TeX.
 %    \begin{macrocode}
@@ -1924,9 +1682,6 @@
 %  \end{macro}
 %  \end{macro}
 %  \end{macro}
-%    \begin{macrocode}
-%</v2>
-%    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
 %  \end{macro}
@@ -1960,17 +1715,15 @@
 \if@chapter
   \providecommand{\chaptermarkformat}    {\@chapapp\ \thechapter. \ }
   \providecommand{\sectionmarkformat}    {\thesection. \ }
-%<v2>  \providecommand{\subsectionmarkformat} {\@seccntmarkformat{subsection}}
+  \providecommand{\subsectionmarkformat} {\@seccntmarkformat{subsection}}
 \else
   \providecommand{\sectionmarkformat}    {\thesection\quad}
   \providecommand{\subsectionmarkformat} {\thesubsection\quad}
 \fi
-%<*v2>
 \providecommand{\subsubsectionmarkformat}{\@seccntmarkformat{subsubsection}}
 \providecommand{\paragraphmarkformat}    {\@seccntmarkformat{paragraph}}
 \providecommand{\subparagraphmarkformat} {\@seccntmarkformat{subparagraph}}
 \providecommand{\@seccntmarkformat}[1]   {\@seccntformat{#1}}
-%</v2>
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
@@ -1985,9 +1738,6 @@
 %
 % \subsection{Definition of default pagestyles}
 %
-%    \begin{macrocode}
-%<*v2>
-%    \end{macrocode}
 % \begin{macro}{\ps@save@plain}
 % \changes{v2.0}{2001/04/20}{New}
 % \changes{v2.0b}{2001/05/31}{use this instread of
@@ -2592,10 +2342,6 @@
 \fi
 %    \end{macrocode}
 %
-%    \begin{macrocode}
-%</v2>
-%    \end{macrocode}
-%
 %
 % \subsection{Configurationfile}
 % Not last and not least we include the local configuration-file
@@ -2615,7 +2361,6 @@
 % the moment. And the one is a check, if the \cs{headheight} should be
 % increased.
 %    \begin{macrocode}
-%<*v2>
 \AtBeginDocument{%
   \ifdim\headheight=12pt
     \PackageWarningNoLine{scrpage2}%
@@ -2638,7 +2383,6 @@
        into the preamble of your document.\MessageBreak
        A better solution would be to use typearea package}%
   \fi\fi}
-%</v2>
 %    \end{macrocode}
 %
 % \subsection{End}

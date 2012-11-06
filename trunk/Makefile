@@ -99,7 +99,6 @@ CLS_MAIN	= scrbook.cls \
 		  scrbase.sty \
 		  scrkbase.sty \
 		  scraddr.sty \
-		  scrpage.sty \
 		  scrpage2.sty \
 		  scrtime.sty \
 		  scrdate.sty \
