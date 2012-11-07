@@ -89,7 +89,6 @@ CLS_MAIN	= scrbook.cls \
 		  scrreprt.cls \
 		  scrartcl.cls \
 		  scrlttr2.cls \
-	          scrlettr.cls \
 		  typearea.sty \
 		  scrsize10pt.clo \
 		  scrsize11pt.clo \
@@ -157,7 +156,6 @@ CLS_MAIN_DTX    = scrbeta.dtx \
 		  scraddr.dtx \
 		  scrpage.dtx \
 		  scrtime.dtx \
-		  scrlettr.dtx \
 		  scrlogo.dtx \
 	          scrextend.dtx \
                   scrhack.dtx \
@@ -177,7 +175,7 @@ CLS_MAIN_DVI	= scrsource.dvi
 
 CLS_MAIN_INS	= scrmain.ins
 
-CLS_MAIN_SUBINS	= scrlfile.ins scraddr.ins scrlettr.ins scrpage.ins
+CLS_MAIN_SUBINS	= scrlfile.ins scraddr.ins scrpage.ins
 
 ALPHA_INS       = tocstyle.dtx tocbasic.dtx scrjura.dtx scrwfile.dtx
 
@@ -218,7 +216,6 @@ NODIST_GENERATED = $(CLS_DVIS) $(CLS_FILES) $(ALPHA_DOC)
 
 GENERATED	= $(NODIST_GENERATED) ChangeLog \
 		  scrjura.ins \
-		  scrlettr.drv \
 		  scrwfile.ins scrwfile.tex scrwfile.drv \
 		  tocbasic.ins tocbasic.tex \
 	 	  tocstyle.ins tocstyle.tex tocstyle.dvi tocstyle.drv
