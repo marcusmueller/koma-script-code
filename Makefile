@@ -147,7 +147,7 @@ CLS_MAIN_DTX    = scrbeta.dtx \
 		  scrkpar.dtx \
 		  scrkplen.dtx \
 		  scrksect.dtx \
-		  scrktare.dtx \
+		  scrkernel-typearea.dtx \
 		  scrktitl.dtx \
 		  scrkvars.dtx \
 		  scrkvers.dtx \
