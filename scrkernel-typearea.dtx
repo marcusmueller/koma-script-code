@@ -1,4 +1,4 @@
-% \CheckSum{2087}
+% \CheckSum{2100}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-typearea.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkernel-typearea.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkernel-typearea.dtx}[2012/04/17 v3.11 KOMA-Script (type area)]
+\ProvidesFile{scrkernel-typearea.dtx}[2012/11/23 v3.12 KOMA-Script (type area)]
 % \iffalse
 %</driver>
 %<package&identify>\ProvidesPackage{typearea}[%
@@ -936,12 +936,27 @@
   }%
   \ifnum \scr@compatibility>\@nameuse{scr@v@3.02b}\relax
     \renewcommand*{\set@dvipspagesize}{%
-      \scr@ifundefinedorrelax{AtNextShipout}{%
-        \scr@ifundefinedorrelax{AtBeginShipoutNext}{%
-          \begingroup
-            \protected@edef\reserved@a{\endgroup
-            \scr@updatedvipspagesize}\reserved@a
-        }{%
+%    \end{macrocode}
+% \changes{v3.12}{2012/11/23}{nur im DVI- und PS-Fall das Papierformatupdate
+%   durchführen}
+% Es wird getestet, ob unspezfizierte DVI-Ausgabe oder spezifizierte
+% PS-Ausgabe verwendet wird.  Nur in diesen Fällen wird der PS-Code für das
+% Papierformatupdate eingefügt.
+%    \begin{macrocode}
+      \begingroup
+        \@tempswafalse
+        \scr@ifdvioutput{\@tempswatrue}{%
+          \ifnotundefined{if@dvips}{\let\if@tempswa\if@dvips}{}%
+        }%
+        \if@tempswa
+          \endgroup
+          \scr@ifundefinedorrelax{AtNextShipout}{%
+            \scr@ifundefinedorrelax{AtBeginShipoutNext}{%
+              \begingroup
+                \protected@edef\reserved@a{\endgroup
+                  \scr@updatedvipspagesize}%
+              \reserved@a
+            }{%
 %    \end{macrocode}
 % Wenn \textsf{atbegshi} geladen wurde, bzw. \cs{AtBeginShipoutNext} zur
 % Verfügung steht, dann soll dieser Code noch vor Code ausgeführt werden, der
@@ -951,18 +966,20 @@
 % noch etwas per \cs{AtBeginShipout} oder \cs{AtBeginShipoutNext} eingefügt
 % werden, dann gehen diese Teile verloren!
 %    \begin{macrocode}
-          \begingroup
-            \protected@edef\reserved@a{\endgroup
-            \protect\AtBeginShipoutNext{%
-              \protect\bgroup
-                \protect\global\protect\setbox\AtBeginShipoutBox\protect\vbox{%
-                  \scr@updatedvipspagesize
-                  \protect\box\AtBeginShipoutBox
-                }%
-              \protect\egroup
-            }}\reserved@a
-        }%
-      }{%
+              \begingroup
+                \protected@edef\reserved@a{\endgroup
+                  \protect\AtBeginShipoutNext{%
+                    \protect\bgroup
+                    \protect\global\protect\setbox\AtBeginShipoutBox
+                    \protect\vbox{%
+                      \scr@updatedvipspagesize
+                      \protect\box\AtBeginShipoutBox
+                    }%
+                    \protect\egroup
+                  }}%
+              \reserved@a
+            }%
+          }{%
 %    \end{macrocode}
 % Wenn \textsf{everyshi} geladen wurde, bzw. \cs{AtNextShipout} zur
 % Verfügung steht, dann soll dieser Code noch vor Code ausgeführt werden, der
@@ -972,17 +989,26 @@
 % noch etwas per \cs{AtNextShipout} oder \cs{EveryShipout} eingefügt
 % werden, dann gehen diese Teile verloren!
 %    \begin{macrocode}
-        \begingroup
-          \protected@edef\reserved@a{\endgroup
-          \protect\AtNextShipout{%
-            \protect\bgroup
-              \protect\global\protect\setbox\protect\@cclv\protect\vbox{%
-                \scr@updatedvipspagesize
-                \protect\box\protect\@cclv
-              }%
-            \protect\egroup
-          }}\reserved@a
-      }%
+            \begingroup
+              \protected@edef\reserved@a{\endgroup
+                \protect\AtNextShipout{%
+                  \protect\bgroup
+                  \protect\global\protect\setbox\protect\@cclv\protect\vbox{%
+                    \scr@updatedvipspagesize
+                    \protect\box\protect\@cclv
+                  }%
+                  \protect\egroup
+                }}%
+            \reserved@a
+          }%
+        \else
+%    \end{macrocode}
+% In diesem Fall (nämlich weder DVI- noch PS-Ausgabe) muss nur die Gruppe, die
+% eingefügt wurde, um die Änderung von \cs{if@tempswa} lokal zu halten,
+% geschlossen werden.
+%    \begin{macrocode}
+          \endgroup
+        \fi
     }%
   \else
     \let\set@dvipspagesize=\setnot@dvipspagesize
