@@ -1,7 +1,7 @@
-% \CheckSum{319}
+% \CheckSum{407}
 % \iffalse meta-comment
 % ======================================================================
-% scrkbib.dtx
+% scrkernel-bibliography.dtx
 % Copyright (c) Markus Kohm, 2002-2012
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
@@ -19,7 +19,7 @@
 %
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
-% scrkbib.dtx
+% scrkernel-bibliography.dtx
 % Copyright (c) Markus Kohm, 2002-2012
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
@@ -55,17 +55,18 @@
 %   Right brace   \}     Tilde         \~}
 %
 % \iffalse
-%%% From File: scrkbib.dtx
+%%% From File: scrkernel-bibliography.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkbib.dtx}[2011/08/31 v3.10 KOMA-Script (bibliography)]
+\ProvidesFile{scrkernel-bibliography.dtx}[2013/02/06 v3.12 KOMA-Script 
+                                                        (bibliography)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
 \usepackage[latin1]{inputenc}
 \CodelineIndex
 \RecordChanges
-\GetFileInfo{scrkbib.dtx}
+\GetFileInfo{scrkernel-bibliography.dtx}
 \title{\KOMAScript{} \partname\ \texttt{\filename}%
   \footnote{Dies ist Version \fileversion\ von Datei
     \texttt{\filename}.}}
@@ -79,7 +80,6 @@
 \end{document}
 %</driver>
 % \fi
-%
 % \selectlanguage{ngerman}
 %
 % \changes{v2.95}{2002/06/30}{%
@@ -231,18 +231,29 @@
 %     \texttt{thebibliography}-Umgebung verschoben}%
 %   \changes{v2.98c}{2008/02/15}{wird nun früher definiert}%
 %   \changes{v3.10}{2011/08/31}{\cs{MakeMarkcase} wird beachtet}%
+%   \changes{v3.12}{2012/02/06}{\cs{ifbib@leveldown} wird beachtet}%
 %   Befehl zum Setzen der Überschrift des Literaturverzeichnisses.
 %    \begin{macrocode}
 \newcommand*\bib@heading{%
-%<*article> 
-  \section*{\refname}%
-  \@mkboth{\MakeMarkcase{\refname}}{\MakeMarkcase{\refname}}%
+%<*article>
+  \ifbib@leveldown
+    \subsection*{\refname}%
+    \ifx\@mkboth\@gobble\else\markright{\MakeMarkcase{\refname}}\fi
+  \else
+    \section*{\refname}%
+    \@mkboth{\MakeMarkcase{\refname}}{\MakeMarkcase{\refname}}%
+  \fi
 %</article>
 %<*book|report>
-  \chapter*{\bibname}%
-  \@mkboth{\MakeMarkcase{\bibname}}{\MakeMarkcase{\bibname}}%
+  \ifbib@leveldown
+    \section*{\bibname}%
+    \ifx\@mkboth\@gobble\else\markright{\MakeMarkcase{\bibname}}\fi
+  \else
+    \chapter*{\bibname}%
+    \@mkboth{\MakeMarkcase{\bibname}}{\MakeMarkcase{\bibname}}%
+  \fi
 %</book|report>
-}
+}%
 %    \end{macrocode}
 % \end{macro}
 %
@@ -253,11 +264,18 @@
 % \begin{option}{bibliography}
 %   \changes{v2.98c}{2008/02/15}{Neu}%
 %   \changes{v3.10}{2011/08/31}{\cs{MakeMarkcase} wird beachtet}%
+%   \changes{v3.12}{2013/02/06}{neuer Wert \texttt{leveldown}}
+%   \changes{v3.12}{2013/02/06}{neuer Wert \texttt{standardlevel}}
 %   Dies ist der Generalschlüssel für alle Optionen, die das
 %   Literaturverzeichnis betreffen. Neu ist, dass verschiedene Stile definiert
 %   werden können. Desweiteren kann man \texttt{totoc} und
 %   \texttt{totocnumbered} wieder mit \texttt{nottotoc} aufgeben.
+% \begin{macro}{\ifbib@leveldown}
+%   \changes{v3.12}{2013/02/06}{neuer Schalter (intern)}
+%   Für den ab Version~3.12 neuen Wert \texttt{leveldown} und dessen
+%   Gegenstück \texttt{standardlevel} wird außerdem ein Schalter benötigt.
 %    \begin{macrocode}
+\newif\ifbib@leveldown
 \KOMA@key{bibliography}{%
   \scr@ifundefinedorrelax{scr@bibstyle@#1}{%
     \let\FamilyElseValues\scr@bibstylelist
@@ -265,49 +283,86 @@
       {notoc}{0},{nottotoc}{0},{plainheading}{0},%
       {totoc}{1},{toc}{1},{notnumbered}{1},%
       {numbered}{2},{totocnumbered}{2},{tocnumbered}{2},{numberedtotoc}{2},%
-      {numberedtoc}{2}%
+      {numberedtoc}{2},%
+      {leveldown}{3},%
+      {standardlevel}{4}%
     }{#1}%
     \ifcase \@tempa\relax
       \renewcommand*\bib@heading{%
-%<*article> 
-        \section*{\refname}%
-        \@mkboth{\MakeMarkcase{\refname}}{\MakeMarkcase{\refname}}%
+%<*article>
+        \ifbib@leveldown
+          \subsection*{\refname}%
+          \ifx\@mkboth\@gobble\else\markright{\MakeMarkcase{\refname}}\fi
+        \else
+          \section*{\refname}%
+          \@mkboth{\MakeMarkcase{\refname}}{\MakeMarkcase{\refname}}%
+        \fi
 %</article>
 %<*book|report>
-        \chapter*{\bibname}%
-        \@mkboth{\MakeMarkcase{\bibname}}{\MakeMarkcase{\bibname}}%
+        \ifbib@leveldown
+          \section*{\bibname}%
+          \ifx\@mkboth\@gobble\else\markright{\MakeMarkcase{\bibname}}\fi
+        \else
+          \chapter*{\bibname}%
+          \@mkboth{\MakeMarkcase{\bibname}}{\MakeMarkcase{\bibname}}%
+        \fi
 %</book|report>
       }%
     \or% totoc
       \renewcommand*\bib@heading{%
 %<*article>
-        \addsec{\refname}%
-        \@mkboth{\MakeMarkcase{\refname}}{\MakeMarkcase{\refname}}%
+        \ifbib@leveldown
+          \subsection*{%
+                \addcontentsline{toc}{subsection}{\refname}%
+                \refname
+              }%
+          \ifx\@mkboth\@gobble\else\markright{\MakeMarkcase{\refname}}\fi 
+        \else
+          \addsec{\refname}%
+          \@mkboth{\MakeMarkcase{\refname}}{\MakeMarkcase{\refname}}%
+        \fi
 %</article>
 %<*book|report>
-        \addchap{\bibname}%
-        \@mkboth{\MakeMarkcase{\bibname}}{\MakeMarkcase{\bibname}}%
+        \ifbib@leveldown
+          \addsec{\bibname}%
+        \else
+          \addchap{\bibname}%
+          \@mkboth{\MakeMarkcase{\bibname}}{\MakeMarkcase{\bibname}}%
+        \fi
 %</book|report>
       }%
     \or% numbered
       \renewcommand*\bib@heading{%
 %<*article>
-        \section{\refname}%
-        \@mkboth{\MakeMarkcase{\sectionmarkformat \refname}}%
-                {\MakeMarkcase{\sectionmarkformat \refname}}%
+        \ifbib@leveldown
+          \subsection{\refname}%
+        \else
+          \section{\refname}%
+          \@mkboth{\MakeMarkcase{\sectionmarkformat \refname}}%
+                  {\MakeMarkcase{\sectionmarkformat \refname}}%
+        \fi
 %</article>
 %<*book|report>
-        \chapter{\bibname}%
-        \@mkboth{\MakeMarkcase{\chaptermarkformat \bibname}}%
-                {\MakeMarkcase{\chaptermarkformat \bibname}}%
+        \ifbib@leveldown
+          \section{\bibname}%
+        \else
+          \chapter{\bibname}%
+          \@mkboth{\MakeMarkcase{\chaptermarkformat \bibname}}%
+                  {\MakeMarkcase{\chaptermarkformat \bibname}}%
+        \fi
 %</book|report>
       }
+    \or% leveldown
+      \bib@leveldowntrue
+    \or% standardlevel
+      \bib@leveldownfalse
     \fi
   }{%
     \csname scr@bibstyle@#1\endcsname
   }%
 }
 %    \end{macrocode}
+% \end{macro}
 % \end{option}
 %
 % \begin{option}{openbib}
@@ -585,7 +640,7 @@
 %
 \endinput
 %
-% end of file `scrkbib.dtx'
+% end of file `scrkernel-bibliography.dtx'
 %%% Local Variables:
 %%% mode: doctex
 %%% TeX-master: t

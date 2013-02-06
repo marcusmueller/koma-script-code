@@ -129,7 +129,7 @@ CLS_MAIN	= scrbook.cls \
 
 CLS_MAIN_DTX    = scrbeta.dtx \
 		  scrkbase.dtx \
-		  scrkbib.dtx \
+		  scrkernel-bibliography.dtx \
 		  scrkcile.dtx \
 		  scrkcomp.dtx \
 		  scrkfloa.dtx \
