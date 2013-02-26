@@ -1,4 +1,4 @@
-% \CheckSum{2258}
+% \CheckSum{2235}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkernel-sections.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkernel-sections.dtx}[2013/02/13 v3.12 KOMA-Script 
+\ProvidesFile{scrkernel-sections.dtx}[2013/02/26 v3.12 KOMA-Script 
                                                      (disposition)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
@@ -751,7 +751,7 @@
 %
 % \subsection{Definitionen für Seitenstile}
 %
-%  \begin{macro}{\chaptermark}
+% \begin{macro}{\chaptermark}
 % Da \cs{chapter} nicht mit Hilfe von \cs{@startsection} definiert
 % wird, wird auch \cs{chaptermark} nicht automatisch definiert. Es
 % wird aber in den Seitenstilen benötigt bzw. umdefiniert. Also hier
@@ -761,6 +761,36 @@
 %    \end{macrocode}
 %  \end{macro}
 %
+% \begin{macro}{\addchapmark}
+%   \changes{v3.12}{2013/03/26}{neue Anweisung}
+% \begin{macro}{\addsecmark}
+%   \changes{v3.12}{2013/03/26}{neue Anweisung} Für \cs{addchapmark} und
+% \cs{addsecmark} gilt dies hingegen nicht. Das wird nicht von den Stilen
+% definiert, sondern direkt mit der gewünschten Definition
+% initialisiert. Bitte nicht davon verwirren lassen, dass \cs{if@mainmatter}
+% hier auch von \textsf{scrreprt} definiert wird. Das ist Absicht und
+% vereinfacht dem einen oder anderen Paket oder Benutzer vielleicht die
+% Arbeit.
+%    \begin{macrocode}
+%<*book|report>
+\newcommand*\addchapmark[1]{%
+  \begingroup
+    \expandafter\let\csname if@mainmatter\expandafter\endcsname
+    \csname iffalse\endcsname
+    \c@secnumdepth=\m@ne
+    \chaptermark{#1}%
+  \endgroup
+}
+%</book|report>
+\newcommand*\addsecmark[1]{%
+  \begingroup
+    \c@secnumdepth=\m@ne
+    \sectionmark{#1}%
+  \endgroup
+}
+%    \end{macrocode}
+% \end{macro}^^A \addsecmark
+% \end{macro}^^A \addchapmark
 %
 % \subsection{Der Automatismus für den Punkt in der Nummerierung}
 %
@@ -2000,7 +2030,9 @@
 % \texttt{hpdftex.def} das interne Makro \cs{@schapter} so umdefiniert
 % wird, dass ein korrekter Link erzeugt wird.
 % \begin{macro}{\@addchap}
+%   \changes{v3.12}{2013/02/26}{Verwendung von \cs{addchapmark}}
 % \begin{macro}{\@saddchap}
+%   \changes{v3.12}{2013/02/26}{Verwendung von \cs{addchapmark}}
 %    \begin{macrocode}
 \newcommand\addchap{%
   \if@openright\cleardoublepage\else\clearpage\fi
@@ -2066,15 +2098,9 @@
       }%
     \fi
   \fi
-  \if@twoside
-    \expandafter\@mkboth\expandafter{%
-      \expandafter\MakeMarkcase\expandafter{\scr@ds@head}}{}%
-  \else
-    \expandafter\@mkboth\expandafter{\expandafter}\expandafter{%
-      \expandafter\MakeMarkcase\expandafter{\scr@ds@head}}%
-  \fi
+  \addchapmark{\scr@ds@head}%
 }%
-\newcommand*{\@saddchap}[1]{\@schapter{#1}\@mkboth{}{}}%
+\newcommand*{\@saddchap}[1]{\@schapter{#1}\addchapmark{}}%
 %    \end{macrocode}
 % \iffalse
 %<*book>
@@ -2130,7 +2156,9 @@
 %   \changes{v3.10}{2011/08/30}{Verwendung von \cs{addsectiontocentry}}
 %   \changes{v3.10}{2011/08/30}{Integration der Erweiterung für das optionale
 %     Argument der Gliederungsbefehle}
+%   \changes{v3.12}{2013/02/26}{Verwendung von \cs{addsecmark}}
 % \begin{macro}{\@saddsec}
+%   \changes{v3.12}{2013/02/26}{Verwendung von \cs{addsecmark}}
 % \KOMAScript{} bietet in allen drei Hauptklassen den zusätzlichen
 % Gliederungsbefehl \cs{addsec}. Es handelt sich dabei um einen mit
 % \cs{section*} vergleichbaren Befehl, bei dem jedoch der
@@ -2161,23 +2189,9 @@
   \ifx\scr@ds@tocentry\@empty\else
     \addsectiontocentry{}{\scr@ds@tocentry}%
   \fi
-  \if@twoside 
-%<*article>
-    \expandafter\@mkboth\expandafter{%
-      \expandafter\MakeMarkcase\expandafter{\scr@ds@head}}{}%
-  \else 
-    \expandafter\@mkboth\expandafter{\expandafter}\expandafter{%
-      \expandafter\MakeMarkcase\expandafter{\scr@ds@head}}%
-%</article>
-%<*report|book>
-    \ifx\@mkboth\markboth
-      \expandafter\markright\expandafter{%
-        \expandafter\MakeMarkcase{\scr@ds@head}}%
-    \fi
-%</report|book>
-  \fi
+  \addsecmark{\scr@ds@head}%
 }
-\newcommand*{\@saddsec}[1]{\section*{#1}\@mkboth{}{}}
+\newcommand*{\@saddsec}[1]{\section*{#1}\addsecmark{}}
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
