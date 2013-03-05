@@ -1,7 +1,7 @@
-% \CheckSum{1419}
+% \CheckSum{1615}
 % \iffalse meta-comment
 % ======================================================================
-% scrkbase.dtx
+% scrkernel-basics.dtx
 % Copyright (c) Markus Kohm, 2002-2012
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
@@ -19,7 +19,7 @@
 %
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
-% scrkbase.dtx
+% scrkernel-basics.dtx
 % Copyright (c) Markus Kohm, 2002-2012
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
@@ -55,10 +55,10 @@
 %   Right brace   \}     Tilde         \~}
 %
 % \iffalse
-%%% From File: scrkbase.dtx
+%%% From File: scrkernel-basics.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkbase.dtx}[2012/06/11 v3.11a KOMA-Script (basics)]
+\ProvidesFile{scrkernel-basics.dtx}[2013/03/04 v3.12 KOMA-Script (basics)]
 % \iffalse
 %</driver>
 %<package&option>\ProvidesPackage{%
@@ -74,7 +74,7 @@
 \usepackage[latin1]{inputenc}
 \CodelineIndex
 \RecordChanges
-\GetFileInfo{scrkbase.dtx}
+\GetFileInfo{scrkernel-basics.dtx}
 \title{\KOMAScript{} \partname\ \texttt{\filename}%
   \footnote{Dies ist Version \fileversion\ von Datei
     \texttt{\filename}.}}
@@ -92,6 +92,8 @@
 % \selectlanguage{ngerman}
 %
 % \changes{v1.0}{2002/07/06}{Beginn der ersten Version}
+% \changes{v3.12}{203/03/05}{Verwendung von \cs{@tempa}, \cs{@tempb},
+%   \cs{@tempc} eliminiert}
 %
 % \section{Grundlegenden \KOMAScript-Erweiterungen}
 %
@@ -137,16 +139,16 @@
 %    \begin{macrocode}
 %<*base>
 \begingroup
-  \def\@tempb{}%
-  \def\@tempa{%
-    \PackageError{scrbase}{seems you are not running e-TeX\@tempb}{%
+  \def\reserved@b{}%
+  \def\reserved@a#1{%
+    \PackageError{scrbase}{seems you are not running e-TeX#1}{%
       Since 2004 the LaTeX team recommends to use e-TeX.\MessageBreak
       KOMA-Script since version 2.95 uses several e-TeX features.\MessageBreak
       At actual systems `latex' should already use e-TeX.\MessageBreak
       At deprecated systems it may be called `elatex'.\MessageBreak
       Use either unsupported KOMA-Script up to version 2.9u or\MessageBreak
-      ask you administrator for LaTeX using e-TeX\@tempb.\MessageBreak
-      Not using e-TeX\@tempb\space is a fatal error!\MessageBreak
+      ask you administrator for LaTeX using e-TeX#1.\MessageBreak
+      Not using e-TeX#1 is a fatal error!\MessageBreak
       Processing cannot be continued!}%
     \endgroup
     \batchmode \errmessage{}\csname @@end\endcsname\end\relax
@@ -154,12 +156,12 @@
   }%
   \expandafter\ifx\csname eTeXversion\endcsname\relax\else
     \ifnum\eTeXversion <2
-      \def\@tempb{ V 2}%
+      \def\reserved@b{ V 2}%
     \else
-      \let\@tempa\endgroup
+      \let\reserved@a\endgroup
     \fi
   \fi
-\@tempa
+\expandafter\reserved@a\expandafter{\reserved@b}
 %</base>
 %    \end{macrocode}
 %
@@ -204,7 +206,7 @@
 }
 %</base>
 %    \end{macrocode}
-%  \end{macro}
+%  \end{macro}^^A \scr@ifundefinedorrelax
 %
 %
 % \subsection{Definition von KOMA-\textsf{keyval}-Schlüsseln (Basis)}
@@ -222,6 +224,7 @@
 %   \changes{v3.00}{2008/04/30}{Neue Anweisung}
 % \begin{macro}{\DefineFamilyKey}
 %   \changes{v3.00}{2008/04/30}{Neue Anweisung}
+%   \changes{v3.12}{2013/03/04}{Setzen von \cs{FamilyKeyState}}
 % \begin{macro}{\scr@if@family}
 %   \changes{v3.00}{2008/04/30}{Neu (intern)}
 % \begin{macro}{\scr@if@familymember}
@@ -277,18 +280,109 @@
     \fi
   }%
 }
-\newcommand*{\DefineFamilyKey}[2][.\@currname.\@currext]{%
+\newcommand*{\DefineFamilyKey}[3][.\@currname.\@currext]{%
+  \@ifnextchar[%]
+  {%
+    \edef\reserved@a{#1}%
+    \expandafter\scr@define@family@key
+    \expandafter{\reserved@a}{#2}{#3}%
+  }{%
+    \edef\reserved@a{#1}%
+    \expandafter\scr@define@family@key@nodefault
+    \expandafter{\reserved@a}{#2}{#3}%
+  }%
+}
+\newcommand*{\scr@define@family@key}{}
+\def\scr@define@family@key#1#2#3[#4]#5{%
   \scr@if@familymember{#1}{#2}{define a key}{%
-    \define@key{#2#1}%
+    \define@key{#2#1}{#3}[{#4}]{%
+      \def\FamilyOfKey{#2}\def\FamilyMemberOfKey{#1}%
+      \FamilyKeyStateUnknown
+      #5%
+      \def\FamilyOfKey{#2}\def\FamilyMemberOfKey{#1}%
+    }%
+  }%
+}
+\newcommand*{\scr@define@family@key@nodefault}[4]{%
+  \scr@if@familymember{#1}{#2}{define a key}{%
+    \define@key{#2#1}{#3}{%
+      \def\FamilyOfKey{#2}\def\FamilyMemberOfKey{#1}%
+      \FamilyKeyStateUnknown
+      #4
+      \def\FamilyOfKey{#2}\def\FamilyMemberOfKey{#1}%
+    }%
+    \@namedef{KV@#2#1@#3@default}{%
+      \def\FamilyOfKey{#2}\def\FamilyMemberOfKey{#1}%
+      \FamilyKeyStateNeedValue
+    }%
   }%
 }
 %</base>
 %    \end{macrocode}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-% \end{macro}
+% \end{macro}^^A \scr@if@familymember
+% \end{macro}^^A \scr@if@family
+% \end{macro}^^A \DefineFamilyKey
+% \end{macro}^^A \DefineFamilyMember
+% \end{macro}^^A \DefineFamily
+%
+% \begin{macro}{\FamilyKeyState}
+%   \changes{v3.12}{2013/03/04}{Neue Anweisung}
+% \begin{macro}{\FamilyKeyStateProcessed}
+%   \changes{v3.12}{2013/03/04}{Neue Anweisung}
+% \begin{macro}{\FamilyKeyStateUnknown}
+%   \changes{v3.12}{2013/03/04}{Neue Anweisung}%
+% \begin{macro}{\FamilyKeyStateUnknownValue}
+%   \changes{v3.12}{2013/03/04}{Neue Anweisung}%
+% \begin{macro}{\FamilyKeyStateNeedValue}
+%   \changes{v3.12}{2013/03/04}{Neue Anweisung}%
+% \cs{FamilyKeyState} gibt den Status der Verarbeitung eines Schlüssels
+% an. In der Voreinstellung wird der Status beim Aufruf des Schlüssels auf
+% \cs{FamilyKeyStateUnknown} gesetzt, was anzeigt, dass der Zustand
+% unbekannnt ist, der Schlüssel aber möglicherweise verarbeitet
+% wurde. Daneben gibt es den Zustand \cs{FamilyKeyStateProcessed}, der
+% anzeigt, dass der Schlüssel komplett verarbeitet wurde. Alternativ kann
+% das Makro einen Text enthalten, der ggf. Teil einer Fehlermeldung, einer
+% Warnung oder einer Information über Probleme bei der Verarbeitung wird. Es
+% ist zu beachten, dass \cs{FamilyKeyState} nur unmittelbar nach der
+% Verarbeitung gültig ist.
+%    \begin{macrocode}
+%<*base>
+\newcommand*{\FamilyKeyState}{}
+\newcommand*{\FamilyKeyStateUnknown}{%
+  \let\FamilyKeyState\FamilyKeyStateUnknown
+}
+\newcommand*{\FamilyKeyStateUnknownValue}{%
+  \let\FamilyKeyState\FamilyKeyStateUnknownValue
+}
+\newcommand*{\FamilyKeyStateNeedValue}{%
+  \let\FamilyKeyState\FamilyKeyStateNeedValue
+}
+\newcommand*{\FamilyKeyStateProcessed}{%
+  \let\FamilyKeyState\FamilyKeyStateProcessed
+}
+\let\FamilyKeyState\FamilyKeyStateUnknown
+%</base>
+%    \end{macrocode}
+% \end{macro}^^A \FamilyKeyStateNeedValue
+% \end{macro}^^A \FamilyKeyStateUnknownValue
+% \end{macro}^^A \FamilyKeyStateUnknown
+% \end{macro}^^A \FamilyKeyStateProcessed
+% \end{macro}^^A \FamilyKeyState
+%
+% \begin{macro}{\FamilyOfKey}
+%   \changes{v3.12}{2013/03/04}{Neue Anweisung}
+% \begin{macro}{\FamilyMemberOfKey}
+%   \changes{v3.12}{2013/03/04}{Neue Anweisung}
+% Geben innerhalb der Verarbeitung eines Schlüssels dessen Familie bzw. das
+% zugehörige Familienmitglied an.
+%    \begin{macrocode}
+%<*base>
+\newcommand*{\FamilyOfKey}{}
+\newcommand*{\FamilyMemberOfKey}{}
+%</base>
+%    \end{macrocode}
+% \end{macro}^^A \FamilyMemberOfKey
+% \end{macro}^^A \FamilyOfKey
 %
 % \begin{macro}{\KOMA@key}
 %   \changes{v2.97c}{2007/04/19}{neues optionales Argument}
@@ -342,80 +436,105 @@
 %   \changes{v3.00}{2008/04/30}{Neue Anweisung}%
 %   \changes{v3.11a}{2012/06/11}{Klassen melden falsche Werte nicht
 %     selbst als Fehler, sondern informieren nur darüber}
+%   \changes{v3.12}{2013/03/04}{Fehlerbehandlung}
+% Es ist zu beachten, dass falsche Werte für Optionen grundsätzlich nicht in
+% der Verarbeitung der Optionen per Info, Warnung oder Fehler gemeldet werden
+% sollten, sondern über setzen von \cs{FamilyKeyState}. Erst, wenn auch andere
+% Familienmitglieder den Wert nicht verarbeiten können, ergibt sich daraus
+% ggf. eine Meldung, die dann von der Verarbeitung hier erzeugt wird.
+% Es wird darauf hingewiesen, dass diese Anweisung nicht reentrant ist. Das
+% bedeutet, dass man es innerhalb der eigenen Ausführung nicht erneut aufrufen
+% darf.
 % \begin{macro}{\scr@removeunused}
 %   \changes{v3.10}{2011/09/12}{neu (intern)}%
-%   Diese Anweisung führt alle Optionen, sowohl normal deklarierte als auch
-%   \textsf{keyval}-Optionen für eine angegebene Familie (2. Argument) und das
-%   aktuelle Mitglied (1. optionales Argument) in der Reihenfolge, in der sie
-%   verwendet wurden aus -- zuerst globale Optionen, dann lokale Optionen. Das
-%   entspricht der Verwendung von \cs{ProcessOptions*} mit dem Unterschied,
-%   dass eben auch die \textsf{keyval}-Optionen abgearbeitet
-%   werden. \textsf{keyval}-Optionen, die keinem Mitglied zugeordnet, sondern
-%   universell sind, werden dabei vor gleichnamigen \textsf{keyval}-Optionen
-%   des aktuellen Mitglieds ausgeführt.
+%   \changes{v3.12}{2013/03/04}{entfernt}
+% \end{macro}^^A \scr@removeunused
+% \begin{macro}{\scr@optiontest}
+%   \changes{v2.97c}{2007/04/18}{neu (intern)}%
+%   \changes{v3.12}{2013/03/04}{entfernt}%
+% \begin{macro}{\scr@pti@ntest}
+%   \changes{v2.97c}{2007/04/18}{neu (intern)}%
+%   \changes{v3.12}{2013/03/04}{entfernt}%
+% \end{macro}^^A \scr@pti@ntest
+% \end{macro}^^A \scr@optiontest
 %    \begin{macrocode}
 %<*base>
-\newcommand*{\scr@removeunused}{}
 \newcommand*{\FamilyProcessOptions}[2][.\@currname.\@currext]{%
+  \ifx\AtEndOfFamilyOptions\scr@AtEndOfFamilyOptions
+    \PackageError{scrbase}{nested \string\FamilyProcessOptions\space
+      detected\MessageBreak}{%
+      \string\FamilyProcessOptions\space has been used while processing or
+      setting options.\MessageBreak
+      This is currently not allowed. You should contact the author of the
+      causing\MessageBreak
+      code.\MessageBreak
+      This error is fatal. You should not continue.%
+    }%
+  \fi
+  \let\AtEndOfFamilyOption\scr@AtEndOfFamilyOptions
+  \@namedef{scr@after@options@#1@hook}{\@namedef{scr@after@options@#1@hook}{}}%
   \let\ds@\@empty
   \edef\@curroptions{\@ptionlist{\@currname.\@currext}}%
   \ifx\@currext\@clsextension\else
+%    \end{macrocode}
+% Bei Klassen ist die aktuelle Optionenliste gleichzeitig die globale
+% Optionenliste. Daher dürften Klassen nicht auch noch die globale Optionliste
+% verarbeiten. Paket verarbeiten jedoch auch die globale Optionenliste, geben
+% dazu jedoch keine Fehler oder Warnungen aus.
+%    \begin{macrocode}
     \@for\CurrentOption:=\@globaloptionslist\do{%
+%    \end{macrocode}
+% Die Optionen werden in der Reihenfolge verarbeitet, in der sie als globale
+% Optionen angegeben wurden. Dabei werden nur Optionen verarbeitet, die nicht
+% leer sind und die im aktuellen Paket bekannt sind. Das sind also keine
+% \textsf{keyval}-Optionen, sondern normale \LaTeX-Optionen.
+%    \begin{macrocode}
       \ifx\CurrentOption\@empty\else
         \@expandtwoargs\in@{,\CurrentOption,}{,\@declaredoptions,}%
         \ifin@
           \@use@ption
           \expandafter\let\csname ds@\CurrentOption\endcsname\@empty
         \else
-          \expandafter\def\expandafter\scr@removeunused\expandafter{%
-            \expandafter\def\expandafter\CurrentOption\expandafter{%
-              \CurrentOption}\@use@ption}%
-          \scr@optiontest{#2}\CurrentOption{}{%
-            \@expandtwoargs\setkeys{#2}%
-            \CurrentOption
-            \scr@removeunused
-          }%
-          \scr@optiontest{#2#1}\CurrentOption{}{%
-            \@expandtwoargs\setkeys{#2#1}%
-            \CurrentOption
-            \scr@removeunused
-          }%
-          \let\scr@removeunused\@empty
+%    \end{macrocode}
+% Wenn die Option keine \LaTeX-Option ist, kann sie noch immer eine
+% \textsf{keyval}-Option sein. In diesem Fall wird geprüft, ob das
+% Mitglied (\#1) eine Option in der Familie (\#2) hat. Wenn das der Fall ist,
+% wird die Option unmittelbar ausgeführt und zwar einmal ohne Mitglied (also
+% Optionen, die global der Familie gehören) und dann mit Mitglied. Im Fall
+% einer unbekannnten Option oder eines unbekannten Wertes, geschieht hier gar
+% nichts.
+%    \begin{macrocode}
+          \scr@ifprocess@curroption{#1}{#2}{%
+            \@expandtwoargs\@removeelement\CurrentOption
+            \@unusedoptionlist\@unusedoptionlist
+          }{}%
         \fi
       \fi
     }%
   \fi
+%    \end{macrocode}
+% Sowohl für Klassen als auch für Pakete werden nun die aktuellen Optionen
+% abgearbeitet. In diesem Fall ist zu beachten, dass nicht definierte Optionen
+% oder unbekannte Werte für Optionen unmittelbar zu einem Fehler führen, wenn
+% es sich um ein Paket handelt. Bei Klassen landet die Option hingegen in der
+% Liste der nicht benutzten globalen Optionen.
+%    \begin{macrocode}
   \@for\CurrentOption:=\@curroptions\do{%
-    \@use@ption
     \scr@ifundefinedorrelax{ds@\CurrentOption}{%
-      \scr@optiontest{#2}\CurrentOption{%
-        \scr@optiontest{#2#1}\CurrentOption{%
-          \default@ds
-        }{%
-          \let\scr@removeunused\relax
-          \edef\reserved@a{%
-            \noexpand\setkeys{#2#1}{\CurrentOption}%
-            \noexpand\def\noexpand\CurrentOption{\CurrentOption}%
-          }\reserved@a
-          \ifx\scr@removeunused\relax\else\default@ds\fi
-        }%
-      }{%
-        \let\scr@removeunused\relax
-        \edef\reserved@a{%
-          \noexpand\setkeys{#2}{\CurrentOption}%
-          \noexpand\def\noexpand\CurrentOption{\CurrentOption}%
-        }\reserved@a
-        \if\scr@removeunused\relax\else\default@ds\fi
-        \scr@optiontest{#2#1}\CurrentOption{}{%
-          \let\scr@removeunused\relax
-          \@expandtwoargs\setkeys{#2#1}%
-          \CurrentOption
-          \ifx\scr@removeunused\relax\else\default@ds\fi
-        }%
-      }%
-    }{%
-    }%
+      \@use@ption
+      \scr@ifprocess@curroption{#1}{#2}{}\default@ds
+    }\@use@ption
   }%
+%    \end{macrocode}
+% Jetzt muss noch der Hook ausgeführt und wieder gelöscht werden.
+%    \begin{macrocode}
+  \let\AtEndOfFamilyOptions\@firstofone
+  \@nameuse{scr@after@options@#1@hook}%
+%    \end{macrocode}
+% Zum Schluss wird wir im \LaTeX-Kern der Optionencode für alle deklarierten
+% \LaTeX-Optionen gelöscht und dafür gesorgt, dass nach dem Paket keine
+% unverarbeiteten Optionen mehr vorhanden sind.
+%    \begin{macrocode}
   \@for\CurrentOption:=\@declaredoptions\do{%
     \expandafter\let\csname ds@\CurrentOption\endcsname\relax}%
   \let\CurrentOption\@empty
@@ -424,27 +543,103 @@
 }
 \@onlypreamble\FamilyProcessOptions
 %    \end{macrocode}
-% \end{macro}
-% \begin{macro}{\scr@optiontest}
-%   \changes{v2.97c}{2007/04/18}{neu (intern)}%
-% \begin{macro}{\scr@pti@ntest}
-%   \changes{v2.97c}{2007/04/18}{neu (intern)}%
-%   Es werden zwei interne Makros benötigt, um zu testen, ob eine
-%   entsprechende keyval-Option definiert ist. Grund der Übung ist, dass
-%   sowohl das Familienargument als auch die Option selbst expandiert werden
-%   muss.
+% \begin{macro}{\AtEndOfFamilyOptions}
+%   \changes{v3.12}{2013/03/04}{Neue Anweisung}
+% Mit dieser Option kann innerhalb der Ausführung einer Option Material auf
+% das Ende der aktuellen \cs{FamilyProcessOptions}, \cs{FamilyExecuteOptions},
+% \cs{FamilyOptions} oder \cs{FamilyOption} verzögert werden. Als einziges
+% Argument wird der zu verzögernde Code erwartet, der an \cs{l@addto@macro}
+% delegiert wird.
+% \begin{macro}{scr@AtEndOfFamilyOptions}
+%   \changes{v3.12}{2013/03/04}{Neue Anweisung (intern)}
 %    \begin{macrocode}
-\newcommand*{\scr@optiontest}[2]{%
-  \edef\reserved@a{\noexpand\scr@pti@ntest{#1}#2=\noexpand\@nil}%
-  \reserved@a
+\newcommand*{\scr@AtEndOfFamilyOptions}{%
+  \expandafter
+  \l@addto@macro\csname scr@after@options@\FamilyOfKey@hook\endcsname
 }
-\newcommand*{\scr@pti@ntest}{}
-\def\scr@pti@ntest#1#2=#3\@nil{\scr@ifundefinedorrelax{KV@#1@#2}}
+\newcommand*{\AtEndOfFamilyOptions}{}
+\let\AtEndOfFamilyOptions\@firstofone
+%    \end{macrocode}
+% \end{macro}^^A \scr@AtEndOfFamilyOptions
+% \end{macro}^^A \AtEndOfFamilyOptions
+% \begin{macro}{\scr@ifprocess@curroption}
+% Dieses Makro führt eine aktuelle \textsf{keyval}-Option für das angegebene
+% Mitglied (\#1) der angegebenen Familie (\#2) aus. Falls die Option keinen
+% entsprechenden Wert hat, wird das vierte Argument ausgeführt, anderenfalls
+% nicht. Es ist zu beachten, dass vor der Option des Mitglieds die
+% Familien-Option auszuführen ist. Ggf. benötigt das Mitglied dann keine
+% entsprechende Option.
+%    \begin{macrocode}
+\newcommand*\scr@ifprocess@curroption[2]{%
+  \def\reserved@a##1=##2\@nil{\def\reserved@a{##1}}%
+  \expandafter\reserved@a\CurrentOption=\@nil
+  \scr@ifundefinedorrelax{KV@#2@\reserved@a}{%
+    \scr@ifundefinedorrelax{KV@#2#1@\reserved@a}{%
+      \let\FamilyKeyState\OptionNotUsed
+    }{%
+      \protected@edef\reserved@b{\noexpand\setkeys{#2#1}{\CurrentOption}%
+        \noexpand\def\noexpand\CurrentOption{\CurrentOption}}%
+      \reserved@b
+      \ifx\FamilyKeyState\FamilyKeyStateUnknown
+        \PackageInfo{scrbase}{Unknown processing state.\MessageBreak
+          Processing option `\CurrentOption'\MessageBreak
+          of member `#1' of family\MessageBreak
+          `#2' doesn't set\MessageBreak
+          a valid state. This will be interpreted\MessageBreak
+          as \string\FamilyKeyStateProcessed
+        }%
+        \FamilyKeyStateProcessed
+      \fi
+    }{%
+      \let\FamilyKeyState\OptionNotUsed
+    }%
+  }{%
+    \proteced@edef\reserved@b{\noexpand\setkeys{#2}{\CurrentOption}%
+      \noexpand\def\noexpand\CurrentOption{\CurrentOption}}%
+    \reserved@b
+    \ifx\FamilyKeyState\FamilyKeyStateUnknown
+      \PackageInfo{scrbase}{Unknown processing state.\MessageBreak
+        Processing option `\CurrentOption'\MessageBreak
+        of family `#2'\MessageBreak
+        doesn't set a valid state.\MessageBreak
+        This will be interpreted\MessageBreak
+        as \string\FamilyKeyStateProcessed
+      }%
+      \FamilyKeyStateProcessed
+    \fi
+    \def\reserved@a##1=##2\@nil{\def\reserved@a{##1}}%
+    \expandafter\reserved@a\CurrentOption=\@nil
+    \scr@ifundefinedorrelax{KV@#2#1@\reserved@a}{}{%
+      \protected@edef\reserved@b{\noexpand\setkeys{#2#1}{\CurrentOption}%
+        \noexpand\def\noexpand\CurrentOption{\CurrentOption}}%
+      \ifx\FamilyKeyState\FamiliyKeyStateProcessed
+        \reserved@b
+        \FamilyKeyStateProcessed
+      \else
+        \reserved@b
+        \ifx\FamilyKeyState\FamilyKeyStateUnknown
+          \PackageInfo{scrbase}{Unknown processing state.\MessageBreak
+            Processing option `\CurrentOption'\MessageBreak
+            of member `#1' of family\MessageBreak
+            `#2' doesn't set\MessageBreak
+            a valid state. This will be interpreted\MessageBreak
+            as \string\FamilyKeyStateProcessed
+          }%
+          \FamilyKeyStateProcessed
+        \fi
+      \fi
+    }%
+  }%
+  \ifx\FamilyKeyState\FamilyKeyStateProcessed
+    \expandafter\@firstoftwo
+  \else
+    \expandafter\@secondoftwo
+  \fi
+}
 %</base>
 %    \end{macrocode}
-% \end{macro}
-% \end{macro}
-% \end{macro}
+% \end{macro}^^A \scr@process@curroption
+% \end{macro}^^A \FamilyProcessOptions
 %
 % \begin{macro}{\KOMAProcessOptions}
 %   \changes{v2.97c}{2007/04/18}{neu}%
@@ -591,12 +786,12 @@
   \else
     \@ifundefined{#1}{%
       \begingroup
-        \expandafter\def\expandafter\@tempa
+        \expandafter\def\expandafter\reserved@a
           \expandafter{\csname scr@#1\endcsname}
-        \expandafter\def\expandafter\@tempb
+        \expandafter\def\expandafter\reserved@b
           \expandafter{\csname #1\endcsname}
       \expandafter\expandafter\expandafter\endgroup
-      \expandafter\expandafter\expandafter\let\expandafter\@tempb\@tempa
+      \expandafter\expandafter\expandafter\let\expandafter\reserved@b\reserved@a
       \if@atdocument\else
         \g@addto@macro\document{%
           \expandafter\ifx\csname #1\expandafter\endcsname
@@ -675,8 +870,8 @@
 %    \begin{macrocode}
 %<*base>
 \newcommand\ifstr[2]{%
-  \begingroup\protected@edef\@tempa{#1}\protected@edef\@tempb{#2}%
-  \ifx\@tempa\@tempb
+  \begingroup\protected@edef\reserved@a{#1}\protected@edef\reserved@b{#2}%
+  \ifx\reserved@a\reserved@b
     \endgroup\expandafter\@firstoftwo
   \else
     \endgroup\expandafter\@secondoftwo
@@ -790,7 +985,7 @@
   \scr@next
 }
 %    \end{macrocode}
-%  \begin{macro}{\testdimunt}
+%  \begin{macro}{\test@dimunt}
 %  \begin{macro}{\test@trueunt}
 % Außer einer Gleitkomma- bzw. Gleitpunktzahl muss auch noch die Einheit
 % behandelt werden. Dabei sind sowohl die neun Standardeinheiten als auch
@@ -803,8 +998,8 @@
 }
 \newcommand*{\test@trueunt}{}
 \def\test@trueunt#1true#2true#3\test@trueunt{%
-  \edef\@tempa{#1}
-  \ifx\@tempa\@empty\test@@ifdimunt{#2}\else\test@@ifdimunt{#1}\fi
+  \edef\reserved@a{#1}%
+  \ifx\reserved@a\@empty\test@@ifdimunt{#2}\else\test@@ifdimunt{#1}\fi
 }
 %    \end{macrocode}
 %  \begin{macro}{\test@@ifdimunt}
@@ -1036,141 +1231,317 @@
 %   \changes{v3.04b}{2010/01/29}{\cs{edef} durch \cs{protected@edef} ersetzt}
 %   \changes{v3.04b}{2010/02/02}{\cs{scr@key@atlist} und \cs{scr@key@name}
 %     vor Überschreiben in \cs{serkeys} geschützt}
-% Entspriche \cs{ExecuteOptions} jedoch \textsf{keyval}-Optionen.
+%   \changes{v3.12}{2013/03/04}{neue Implementierung}
+%   \changes{v3.12}{2013/03/04}{darf auch noch nach der Präambel verwendet
+%     werden}
+% Entspriche \cs{ExecuteOptions} jedoch \textsf{keyval}-Optionen. Insbesondere
+% ist die Anweisung reentrant! Es ist jedoch zu beachten, dass der hook lokal
+% zum jeweiligen Aufruf ist.
 %    \begin{macrocode}
 %<*base>
 \newcommand*{\FamilyExecuteOptions}[3][.\@currname.\@currext]{%
-  \def\reserved@a##1\@nil{%
-    \@for\scr@key@atlist:=#3\do{%
-      \expandafter\scr@key@split@name@value\scr@key@atlist==\@nil
-      \scr@ifundefinedorrelax{KV@#2@\scr@key@name}{}{%
-        \protected@edef\reserved@a{\noexpand\setkeys{#2}{\scr@key@atlist}%
-          \noexpand\def\noexpand\scr@key@atlist{\scr@key@atlist}%
-          \noexpand\def\noexpand\scr@key@name{\scr@key@name}%
+  \@namedef{scr@after@options@#1@hook}{\@namedef{scr@after@options@#1@hook}{}}%
+  \@for\scr@key@atlist:=#3\do{%
+    \expandafter\scr@key@split@name@value\scr@key@atlist==\@nil
+    \ifx\scr@key@name\@empty\else
+      \ifx\scr@key@name\space\else
+        \scr@ifundefinedorrelax{KV@#2@\scr@key@name}{%
+          \scr@ifundefinedorrelax{KV@#2#1@\scr@key@name}{%
+            \PackageError{scrbase}{%
+              unknown option
+              `\expandafter\detokenize\expandafter{\scr@key@atlist}'%
+            }{%
+              Member `#1' of family `#2'\MessageBreak
+              cannot handle option `\scr@key@name'.\MessageBreak
+              So it cannot be set%
+              \ifx\scr@key@value\@empty\else
+                \space to value
+                `\expandafter\detokenize\expandafter{\scr@key@value}'%
+              \fi.%
+            }%
+          }{%
+            \scr@execute@option{#2#1}%
+          }%
+        }{%
+          \scr@execute@option{#2}%
+          \ifstr{#1}{}{}{%
+            \scr@ifundefinedorrelax{KV@#2#1\scr@key@name}{}{%
+              \ifx\FamilyKeyState\FamilyKeyStateProcessed
+                \scr@execute@option{#2#1}%
+                \FamilyKeyStateProcessed
+              \else
+                \scr@execute@option{#2#1}%
+              \fi
+            }%
+          }%
         }%
-        \reserved@a
-      }%
-      \scr@ifundefinedorrelax{KV@#2#1@\scr@key@name}{}{%
-        \protected@edef\reserved@a{%
-          \noexpand\setkeys{#2#1}{\scr@key@atlist}%
-          \noexpand\def\noexpand\scr@key@atlist{\scr@key@atlist}%
-          \noexpand\def\noexpand\scr@key@name{\scr@key@name}%
-        }%
-        \reserved@a
-      }%
-      \let\CurrentOption\scr@key@atlist
-      \csname ds@\CurrentOption\endcsname
-    }%
-    \edef\CurrentOption{##1}%
+        \scr@show@key@state@error
+      \fi
+    \fi
   }%
-  \expandafter\reserved@a\CurrentOption\@nil
+  \@nameuse{scr@after@options@#1@hook}%
 }
-\@onlypreamble\FamilyExecuteOptions
 %</base>
 %    \end{macrocode}
-% \end{macro}
+% \begin{macro}{\scr@show@key@state@error}
+%   \changes{v3.12}{2013/03/04}{Neue Anweisung (intern)}%
+% Zeige abhängig von \cs{FamilyKeyState} eine Fehlermeldung. Alle
+% Informationen zu dem Fehler müssen in \cs{FamilyMemberOfKey}
+% (Familienmitglied oder \cs{@empty}), \cs{FamilyOfKey} (Familie oder
+% \cs{@empty}), \cs{scr@key@atlist} (Option, wie sie in der Liste stand),
+% \cs{scr@key@name} (Name der Option) und \cs{scr@key@value} (Wert der
+% Option) stehen. Es ist zu beachten, dass \cs{scr@key@atlist} und
+% \cs{scr@key@value} ebenfalls Macros enthalten können. Deshalb werden diese
+% Werte ggf. über \cs{detokenize} ausgegeben.
+%    \begin{macrocode}
+%<*base>
+\newcommand*{\scr@show@key@state@error}{%
+  \ifx\FamilyKeyState\FamilyKeyStateProcessed\else
+    \PackageError{scrbase}{%
+      unknown option
+      `\expandafter\detokenize\expandafter{\scr@key@atlist}'%
+    }{%
+      Option
+      `\expandafter\detokenize\expandafter{\scr@key@name}'\MessageBreak
+      \ifx\FamilyMemberOfKey\@empty\else
+        of member `\FamilyMemberOfKey'\MessageBreak
+      \fi
+      \ifx\FamilyOfKey\@empty\else
+        of family `\FamilyOfKey'\MessageBreak
+      \fi
+      \ifx\FamilyKeyState\FamilyKeyStateNeedValue
+        expects a value, but has been used without any value.%
+      \else
+        cannot handle value\MessageBreak
+        `\expandafter\detokenize\expandafter{\scr@key@value}',%
+        \MessageBreak
+        \ifx\FamilyKeyState\FamilyKeyStateUnknownValue
+          because this is an unsupported value.%
+        \else
+          because \FamilyKeyState.
+        \fi
+      \fi
+    }%
+  \fi
+}
+%</base>
+%    \end{macrocode}
+% \end{macro}^^A \scr@show@key@state@error
+% \end{macro}^^A \FamilyExecuteOptions
 %
 % \begin{macro}{\KOMAExecuteOptions}
 %   \changes{v2.97c}{2007/04/19}{Neue Anweisung}
 %   \changes{v3.00}{2008/04/30}{Kein optionales Argument mehr}
-% Liste von Optionen ausführen
+%   \changes{v3.12}{2013/03/04}{darf auch noch nach der Präambel verwendet
+%     werden}
+% Liste von Optionen für ein Mitglied der Familie \texttt{KOMA} ausführen.
 %    \begin{macrocode}
 %<*koma>
-\newcommand*{\KOMAExecuteOptions}{\FamilyExecuteOptions{KOMA}}
-\@onlypreamble\KOMAExecuteOptions
+\newcommand*{\KOMAExecuteOptions}[1][.\@currname.\@currext]{%
+  \FamilyExecuteOptions[#1]{KOMA}%
+}
 %</koma>
 %    \end{macrocode}
 % \end{macro}
 %
 % \begin{macro}{\FamilyOptions}
 %   \changes{v3.00}{2008/04/30}{Neue Anweisung}
+%   \changes{v3.12}{2013/03/02}{Neue Implementierung}
+%   \changes{v3.12}{2013/03/02}{\cs{scr@after@options@\#1@hook}}
+% \begin{macro}{\Family@Options}
+%   \changes{v3.00}{2008/04/30}{Neues Makro (intern)}%
+%   \changes{v3.12}{2013/03/04}{entfernt}
+% \end{macro}^^A \FamilyOptions
 % Es werden Schlüssel einer Familie verwendet. Existiert ein Schlüssel nicht,
-% so wird eine Fehlermeldung ausgegeben.
+% oder ist der Wert für alle Schlüssel unbekannt, so wird ein Fehler
+% ausgegeben. Diese Anweisung selbst ist reentrant, das heißt sie kann auch
+% innerhalb der Ausführung von Optionen aufgerufen werden. Es sei jedoch
+% erwähnt, dass der hook dabei nur die jeweilige Anweisung umfasst.
 %    \begin{macrocode}
 %<*base>
 \newcommand*{\FamilyOptions}[2]{%
-  \Family@Options{#1}{#2}{%
-    \PackageError{scrbase}{%
-      option `\scr@key@name' unknown at family `#1'%
-    }{%
-      You have used \string\FamilyOptions{#1} to set
-      `\scr@key@atlist',\MessageBreak
-      but family `#1' does not know any option named
-      `\scr@key@name'.\MessageBreak
-      See the manual for the package or class using family `#1' for
-      more\MessageBreak
-      informations about options and their values.%
-    }%
-  }%
-}
-% \begin{macro}{\Family@Options}
-%   \changes{v3.00}{2008/04/30}{Neues Makro (intern)}%
-%   Das interne Macro \cs{Family@Options} macht die eigentliche Arbeit. Das
-%   erste Argument ist dabei die Familie. Das zweite Argument ist die Liste
-%   der Optionen, das zweite Code, der im Fehlerfall ausgeführt werden
-%   soll. Dabei sind die Makros \cs{scr@key@atlist}, \cs{scr@key@name} und
-%   \cs{scr@key@value} gültig und können verwendet werden.
-%
-%   Anmerkung: Es wird nicht auf \textsf{xkeyval} und den dortigen Befehl
+  \@namedef{scr@after@options@#1@hook}{\@namedef{scr@after@options@#1@hook}{}}%
+%    \end{macrocode}
+% \begin{description}
+% \item[Anmerkung:] Es wird nicht auf \textsf{xkeyval} und den dortigen Befehl
 %   \cs{setkeys+} gesetzt, weil dieser die Optionen nicht in der Reihenfolge
 %   der Optionen, sondern in der Reihenfolge der Familien ausführt. Das passt
 %   mir aber hier gar nicht.
-%
-%   In einer Schleife über alle Optionen werden die Optionen zunächst in
-%   Option und Wert aufgespaltet.
+% \end{description}
+% In einer Schleife über alle Optionen werden die Optionen zunächst in Option
+% und Wert aufgespaltet.
 %    \begin{macrocode}
-\newcommand*{\Family@Options}[3]{%
   \@for\scr@key@atlist:=#2\do{%
 %    \end{macrocode}
 %   \changes{v3.08}{2010/11/05}{leere Argumente in der Optionenliste}%
-%   Auf vielfachen Wunsch und entgegen meiner Überzeugung, sind auch leere
-%   Argumente in der Optionenliste erlaubt. Die erste Form wäre, wenn zwei
-%   Kommas diret aufeinander folgen:
+% Auf vielfachen Wunsch und entgegen meiner Überzeugung, sind auch leere
+% Argumente in der Optionenliste erlaubt. Die erste Form wäre, wenn zwei
+% Kommas diret aufeinander folgen:
 %    \begin{macrocode}
     \ifx\scr@key@atlist\@empty\else
 %    \end{macrocode}
-%   Die zweite Möglichkeit wäre, dass noch Leerzeichen zwischen den Komma
-%   übrig bleiben:
+% Die zweite Möglichkeit wäre, dass noch Leerzeichen zwischen den Komma
+% übrig bleiben:
 %    \begin{macrocode}
       \ifx\scr@key@atlist\space\else
         \expandafter\scr@key@split@name@value\scr@key@atlist==\@nil
 %    \end{macrocode}
-%   Die dritte Möglichkeit, dass auch noch ein Gleichheitszeichen übrig
-%   gelassen wurde, werde ich aber nicht abfangen. Irgendwann müssen die
-%   Anwender auch mal ihre Fehler einsehen und korrigieren!
+% Die dritte Möglichkeit, dass auch noch ein Gleichheitszeichen übrig
+% gelassen wurde, werde ich aber nicht abfangen. Irgendwann müssen die
+% Anwender auch mal ihre Fehler einsehen und korrigieren!
 %
-%   Dann wird in einer Schleife über alle Familien festgestellt, ob die Option
-%   in einer Familie bekannt ist und ggf. ausgeführt.
+% Wir haben jetzt also eine Option und diese aufgespaltet in Schlüssel und
+% Wert.
+%   \changes{v3.12}{2013/03/04}{der Gesamtstatus wird gespeichert}
+% Jetzt speichern wir den Gesamtstatus einfach, indem der Fehlerspeicher
+% gelöscht wird. Bei \cs{relax} wird er nicht weiter benötigt und es liegt
+% ebenso wie bei \cs{@empty} kein auszugebender Fehler vor. Bei anderen
+% Werten, enthält er Fehler, die zu melden sind.
+%    \begin{macrocode}
+        \let\scr@key@run@errors\@empty
+%    \end{macrocode}
+%
 %   \changes{v3.04b}{2010/01/29}{\cs{edef} durch \cs{protected@edef} ersetzt}
 %   \changes{v3.09a}{2011/06/07}{weniger Expansion durch sinnvollen Gebrauch
 %     von \cs{unexpanded}}
+% Dann wird in einer Schleife über alle Familien festgestellt, ob die Option
+% in einer Familie bekannt ist und ggf. ausgeführt. Hier ist wichtig, dass
+% keines der internen Macros vom Aufruf verändert wird. Außerdem muss der
+% Status und die daraus resultierenden Meldungen aufgesammelt werden.
 %    \begin{macrocode}
         \scr@key@found@false
-        \edef\@tempa{\csname #1@key@familylist\endcsname}%
-        \@for\@tempa:=\@tempa\do{%
-          \scr@ifundefinedorrelax{KV@\@tempa @\scr@key@name}{}{%
+        \edef\reserved@a{\csname #1@key@familylist\endcsname}%
+        \@for\reserved@a:=\reserved@a\do{%
+          \scr@ifundefinedorrelax{KV@\reserved@a @\scr@key@name}{}{%
+            \expandafter\scr@execute@option\expandafter{\reserved@a}%
             \scr@key@found@true
-            \protected@edef\reserved@a{%
-              \noexpand\setkeys{\@tempa}{%
-                \unexpanded\expandafter{\scr@key@atlist}}%
-              \noexpand\def\noexpand\@tempa{%
-                \unexpanded\expandafter{\@tempa}}%
-              \noexpand\def\noexpand\scr@key@atlist{%
-                \unexpanded\expandafter{\scr@key@atlist}}%
-              \noexpand\def\noexpand\scr@key@name{%
-                \unexpanded\expandafter{\scr@key@name}}%
-              \noexpand\def\noexpand\scr@key@value{%
-                \unexpanded\expandafter{\scr@key@value}}%
-            }%
-            \reserved@a
+            \ifx\scr@key@run@errors\relax\else
+              \ifx\FamilyKeyState\FamilyKeyStateProcessed
+                \let\scr@key@run@errors\relax
+              \else
+                \ifx\FamilyKeyState\FamilyKeyStateUnknownValue
+                  \edef\scr@key@run@errors{%
+                    \unexpanded\expandafter{\scr@key@run@errors}%
+                    \noexpand\MessageBreak
+                    \FamilyMemberOfKey: unkown value
+                    `\expandafter\detokenize\expandafter{\scr@key@value}'.%
+                  }%
+                \else
+                  \ifx\FamilyKeyState\FamilyKeyStateNeedValue
+                    \edef\scr@key@run@errors{%
+                      \unexpanded\expandafter{\scr@key@run@errors}%
+                      \noexpand\MessageBreak
+                      \FamilyMemberOfKey: value expected.
+                    }%
+                  \else
+                    \edef\scr@key@run@errors{%
+                      \unexpanded\expandafter{\scr@key@run@errors}%
+                      \noexpand\MessageBreak
+                      \FamilyMemberOfKey: \FamilyKeyState.
+                    }%
+                  \fi
+                \fi
+              \fi
+            \fi
           }%
         }%
-        \ifscr@key@found@\else#3\fi
+        \ifscr@key@found@
+          \ifx\scr@key@run@errors\relax\else
+            \ifx\scr@key@run@errors\@empty\else
+              \PackageError{scrbase}{%
+                unknown option
+                `\expandafter\detokenize\expandafter{\scr@key@atlist}'%
+              }{%
+                The members of family `#1' cannot set option
+                `\scr@key@name'
+                \ifx\scr@key@value\@empty\else
+                  \MessageBreak
+                  to value
+                  `\expandafter\detokenize\expandafter{\scr@key@value}'%
+                \fi.\MessageBreak
+                Here's what each member says:
+                \scr@key@run@errors
+              }%
+            \fi
+          \fi
+        \else
+          \PackageError{scrbase}{%
+            unknown option
+            `\expandafter\detokenize\expandafter{\scr@key@atlist}'%
+          }{%
+            No one of the members of family `#1'\MessageBreak
+            can handle option `\scr@key@name'.\MessageBreak
+            So it cannot be set%
+            \ifx\scr@key@value\@empty\else
+              \space to value
+              `\expandafter\detokenize\expandafter{\scr@key@value}'%
+            \fi.%
+          }%
+        \fi
       \fi
     \fi
   }%
+  \@nameuse{scr@after@options@#1@hook}%
 }
 %    \end{macrocode}
+% \begin{macro}{\scr@execute@option}
+%   \changes{v3.12}{2013/03/04}{Neue Anweisung (intern)}%
+% Es wird die bereits gesplittete Option ausgeführt, ohne dass die dabei
+% wesentlichen Macros (aber nicht \cs{reserved@a}!)  verändert werden. Das
+% erste Argument ist bereits der Besitzer in \textsf{keyval}-Syntax.
+%    \begin{macrocode}
+\newcommand*{\scr@execute@option}[1]{%
+  \protected@edef\reserved@a{%
+    \noexpand\let\noexpand\KV@err\noexpand\scr@KV@err
+    \noexpand\setkeys{#1}{%
+      \unexpanded\expandafter{\scr@key@atlist}}%
+     \noexpand\def\noexpand\scr@key@atlist{%
+      \unexpanded\expandafter{\scr@key@atlist}}%
+    \noexpand\def\noexpand\scr@key@name{%
+      \unexpanded\expandafter{\scr@key@name}}%
+    \noexpand\def\noexpand\scr@key@value{%
+      \unexpanded\expandafter{\scr@key@value}}
+    \ifx\scr@key@run@errors\relax
+      \noexpand\let\noexpand\scr@key@run@errors\relax
+    \else
+      \noexpand\def\noexpand\scr@key@run@errors{%
+        \unexpanded\expandafter{\scr@key@run@errors}}%
+    \fi
+    \noexpand\def\expandafter\noexpand
+    \csname scr@after@options@#1@hook\endcsname{%
+      \expandafter\unexpanded\expandafter\expandafter\expandafter{%
+        \csname scr@after@options@#1@hook\endcsname
+      }}%
+  }%
+  \let\AtEndOfFamilyOptions\scr@AtEndOfFamilyOptions
+  \reserved@a
+  \let\AtEndOfFamilyOptions\@firstofone
+  \ifx\FamilyKeyState\FamilyKeyStateUnknown
+    \PackageInfo{scrbase}{Unknown processing state.\MessageBreak
+      Processing option `\scr@key@atlist'\MessageBreak
+      \ifx\FamilyMemberOfKey\@empty\else
+        of member `\FamilyMemberOfKey'\MessageBreak
+      \fi
+      of family `\FamilyOfKey'\MessageBreak
+      doesn't set a valid state.\MessageBreak
+      This will be interpreted\MessageBreak
+      as \string\FamilyKeyStateProcessed
+    }%
+    \FamilyKeyStateProcessed
+  \fi
+}
+%    \end{macrocode}
+% \begin{macro}{\scr@key@run@errors}
+%   \changes{v3.12}{2013/03/04}{Neue Anweisung (intern)}
+% Wird innerhalb von \cs{FamilyOptions} benötigt, um die Fehlermeldungen
+% aufzusammeln, aber erst auszugeben, wenn tatsächlich kein Mitglied die
+% Option verarbeiten konnte. Wir definieren das hier, damit oben die
+% Wiederherstellung korrekt funktioniert.
+%    \begin{macrocode}
+\newcommand*{\scr@key@run@errors}{}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}^^A \scr@execute@option
 % \begin{macro}{\ifscr@key@found@}
 %   \changes{v2.97c}{2007/04/19}{Neuer Schalter (intern)}
 %   \changes{v3.00}{2008/04/30}{umbenannt von \cs{ifKOMA@key@found}}
@@ -1200,17 +1571,18 @@
 }
 %</base>
 %    \end{macrocode}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-% \end{macro}
+% \end{macro}^^A \scr@key@split@name@value
+% \end{macro}^^A \scr@key@value
+% \end{macro}^^A \scr@key@name
+% \end{macro}^^A \scr@key@atlist
+% \end{macro}^^A \FamilyOptions
 %
 % \begin{macro}{\FamilyOption}
 %   \changes{v3.00}{2008/04/30}{Neue Anweisung}
 % \begin{macro}{\Family@Option}
 %   \changes{v3.00}{2008/04/30}{Neu (intern)}
+%   \changes{v3.12}{2013/03/04}{entfernt}
+% \end{macro}
 %   \changes{v3.04b}{2010/01/29}{\cs{edef} durch \cs{protected@edef} ersetzt}
 % Im Gegensatz zu \cs{FamilyOptions} kann man mit dieser Anweisung nur eine
 % einzige Option setzen. Dafür kann man gleich mehrere durch Komma getrennte
@@ -1220,53 +1592,31 @@
 %    \begin{macrocode}
 %<*base>
 \newcommand*{\FamilyOption}[3]{%
-  \Family@Option{#1}{#2}{#3}{%
-    \PackageError{scrbase}{%
-      unknown option `\scr@key@name' for familie `#1'%
-    }{%
-      You have used \string\FamilyOption{#1} to set
-      `\scr@key@name',\MessageBreak
-      but family '#1' does not know any option named
-      `\scr@key@name'.\MessageBreak
-      See the the manual of the class or package, that provides
-      family\MessageBreak
-      `#1' for more informations about options and their values.%
-    }%
-  }%
-}
-\newcommand*{\Family@Option}[4]{%
   \expandafter\KV@@sp@def\expandafter\scr@key@name\expandafter{#2}%
-  \scr@key@found@false
-  \edef\@tempa{\csname #1@key@familylist\endcsname}%
-  \@for\@tempa:=\@tempa\do{%
-    \scr@ifundefinedorrelax{KV@\@tempa @\scr@key@name}{}{%
-      \scr@key@found@true
-      \let\@tempb\@tempa
-    }%
-  }%
-  \ifscr@key@found@
-    \let\reserved@a\@empty
-    \@for\@tempa:=#3\do{%
-      \expandafter\KV@@sp@def\expandafter\@tempa\expandafter{\@tempa}%
+%    \end{macrocode}
+% Der einfachste Weg ist nun schlicht, die Liste der Werte durchzugehen und so
+% nach und nach eine Liste von Werten für \cs{FamilyOptions} zu erzeugen.
+%    \begin{macrocode}
+  \let\reserved@a\@empty
+  \@for\reserved@b:=#3\do{%
 %    \end{macrocode}
 %   \changes{v3.08}{2010/11/05}{leere Argumente in der Werteliste}
-%   Auf vielfachen Wunsch und entgegen meiner Überzeugung, sind auch leere
-%   Argumente in der Werteliste erlaubt:
+% Auf vielfachen Wunsch und entgegen meiner Überzeugung, sind auch leere
+% Argumente in der Werteliste erlaubt, werden jedoch ignoriert:
 %    \begin{macrocode}
-      \ifx\@tempa\@empty\else
-        \protected@edef\reserved@a{\reserved@a,\scr@key@name=\@tempa}%
+    \ifx\reserved@b\@empty\else
+%    \end{macrocode}
+%   \changes{v3.12}{2012/03/04}{auch Leerzeichenargumente werden ignoriert}
+% Auch Argumente, die nur aus einem Leerzeichen bestehen, werden ignoriert:
+%    \begin{macrocode}
+      \ifx\reserved@b\space\else
+        \edef\reserved@a{\unexpanded\expandafter{\reserved@a},%
+          \scr@key@name=\unexpanded\expandafter{\reserved@b}}%
       \fi
-    }%
-    \ifx\reserved@a\@empty
-      \protected@edef\reserved@a{\noexpand\setkeys{\@tempb}{\scr@key@name}}%
-    \else
-      \protected@edef\reserved@a{%
-        \noexpand\setkeys{\@tempb}{\expandafter\@gobble\reserved@a}}%
     \fi
-    \reserved@a
-  \else
-    #4
-  \fi
+  }%
+  \def\reserved@b{\FamilyOptions{#1}}%
+  \expandafter\reserved@b\expandafter{\reserved@a}%
 }
 %</base>
 %    \end{macrocode}
@@ -1276,77 +1626,33 @@
 % \begin{macro}{\KOMAoptions}
 %   \changes{v2.96}{2006/08/20}{Neuer Hook nach den Optionen}
 %   \changes{v2.97c}{2007/04/19}{Optionen aller KOMA-Familien abarbeiten}
-% Es werden Schlüssel verwendet und ggf. danach noch Dinge ausgeführt.
+%   \changes{v3.12}{2013/03/04}{Hook-Mechanismus von \cs{FamilyOptions}
+%     verwendent}
+% Simple kleine Abkürzung.
 %    \begin{macrocode}
 %<*koma>
-\newcommand*{\KOMAoptions}[1]{%
-  \let\post@kopt@hook\@empty
-  \KOMA@options{#1}{%
-%    \end{macrocode}
-% Wenn der Schlüssel für keines der bekannten Familienmitglieder definiert
-% ist, wird ein Fehler ausgegeben.
-%    \begin{macrocode}
-    \PackageError{scrkbase}{%
-      unknown KOMA option `\scr@key@name'%
-    }{%
-      You have used \string\KOMAoptions\space to set
-      `\scr@key@atlist',\MessageBreak
-      but KOMA-Script does not know any option named
-      `\scr@key@name'.\MessageBreak
-      See the KOMA-Script manual for more informations about options
-      and\MessageBreak
-      their values.%
-    }%
-  }%
-  \post@kopt@hook\let\post@kopt@hook\relax
-}
+\newcommand*{\KOMAoptions}{\FamilyOptions{KOMA}}
+%</koma>
 %    \end{macrocode}
 % \begin{macro}{\KOMA@options}
 %   \changes{v2.97c}{2007/04/19}{Neues Makro (intern)}
-% Das interne Macro \cs{KOMA@options} macht die eigentliche Arbeit. Das erste
-% Argument ist dabei die Liste der Optionen, das zweite Code, der im
-% Fehlerfall ausgeführt werden soll. Dabei sind die Makros
-% \cs{KOMA@key@atlist}, \cs{KOMA@key@name} und \cs{KOMA@key@value} gültig und
-% können verwendet werden.
-%
-% Anmerkung: Es wird nicht auf \textsf{ykeyval} und den dortigen Befehl
-% \cs{setkeys+} gesetzt, weil dieser die Optionen nicht in der Reihenfolge der
-% Optionen, sondern in der Reihenfolge der Familien ausführt. Das passt mir
-% aber hier gar nicht.
-%
-% In einer Schleife über alle Optionen werden die Optionen zunächst in Option
-% und Wert aufgespaltet.
-%    \begin{macrocode}
-\newcommand*{\KOMA@options}{\Family@Options{KOMA}}
-%</koma>
-%    \end{macrocode}
-% \end{macro}
-% \end{macro}
+%   \changes{v3.12}{2013/03/04}{entfernt}
+% \end{macro}^^A \KOMA@options
+% \end{macro}^^A \KOMAoptions
 %
 % \begin{macro}{\post@kopt@hook}
+%   \changes{v3.12}{2013/03/04}{entfernt}
+% \end{macro}^^A \post@kopt@hook
 % \begin{macro}{\AfterKOMAoptions}
+%   \changes{v3.12}{2013/03/04}{Verwendung von \cs{AtEndOfFamilyOptions}}
 % Eine Option kann dafür sorgen, dass nach den Optionen noch etwas passiert.
 %    \begin{macrocode}
 %<*koma>
-\newcommand*{\post@kopt@hook}{}
-\let\post@kopt@hook\relax
-\newcommand*{\AfterKOMAoptions}{%
-  \ifx\post@kopt@hook\relax
-    \PackageWarning{scrkbase}{%
-      \string\AfterKOMAoptions\space can only be used inside a\MessageBreak
-      KOMA-Script option that is called using \string\KOMAoptions.\MessageBreak
-      Because of this, command will be ignored%
-    }%
-    \expandafter\@gobbletwo
-  \else
-    \expandafter\l@addto@macro
-  \fi
-  \post@kopt@hook
-}
+\newcommand*{\AfterKOMAoptions}{}
+\let\AfterKOMAoptions\AtEndOfFamilyOptions
 %</koma>
 %    \end{macrocode}
-% \end{macro}
-% \end{macro}
+% \end{macro}^^A \AfterKOMAoptions
 %
 % \begin{macro}{\l@addto@macro}
 %   \changes{v2.8p}{2001/09/22}{neu (intern)} 
@@ -1377,30 +1683,10 @@
 %
 % \begin{macro}{\KOMAoption}
 %   \changes{v2.98c}{2008/03/12}{Neue Anweisung}
-% Im Gegensatz zu \cs{KOMAoptions} kann man mit dieser Anweisung nur eine
-% einzige Option setzen. Dafür kann man gleich mehrere durch Komma getrennte
-% Argumente für diese Option setzen. Das erste obligatorische Argument ist die
-% Option, das zweite, obligatorische Argument ist die Liste der Werte für
-% diese Option.
+%   \changes{v3.12}{2013/03/04}{Einfacher Aufruf von \cs{FamilyOption}}
 %    \begin{macrocode}
 %<*koma>
-\newcommand*{\KOMAoption}[2]{%
-  \let\post@kopt@hook\@empty
-  \Family@Option{KOMA}{#1}{#2}{%
-    \PackageError{scrkbase}{%
-      unknown KOMA option `\scr@key@name'%
-    }{%
-      You have used \string\KOMAoption\space to set
-      `\scr@key@name',\MessageBreak
-      but KOMA-Script does not know any option named
-      `\scr@key@name'.\MessageBreak
-      See the KOMA-Script manual for more informations about options
-      and\MessageBreak
-      their values.%
-    }%
-  }%
-  \post@kopt@hook\let\post@kopt@hook\relax
-}
+\newcommand*{\KOMAoption}{\FamilyOption{KOMA}}
 %</koma>
 %    \end{macrocode}
 % \end{macro}
@@ -1409,36 +1695,20 @@
 %   \changes{v3.10}{2011/09/12}{no error while processing global options}%
 %   \changes{v3.11a}{2012/05/28}{prevent remove from list of unused global
 %     options globally}%
-%   Dieses Makro berichtet über Fehler wegen unbekannter Wertübergabe an einen
-%   Schlüssel. Das erste Argument ist die Familie, das zweite der Schlüssel,
-%   das dritte der Wert und das vierte die Liste der möglichen Werte.
+% Dieses Makro berichtet über Fehler wegen unbekannter Wertübergabe an einen
+% Schlüssel. Das erste Argument ist die Familie, das zweite der Schlüssel,
+% das dritte der Wert und das vierte die Liste der möglichen Werte.
 %    \begin{macrocode}
 %<*base>
 \newcommand*{\FamilyUnknownKeyValue}[4]{%
-  \ifx\scr@removeunused\@empty
-    \PackageError{%
-      scrbase%
-    }{%
-      option `#2' of family `#1' has no value `#3'%
-    }{%
-      You've tried to set option `#2' of family '#1' to value `#3'.\MessageBreak
-      But allowed values are only:\MessageBreak
-      #4\FamilyElseValues.\MessageBreak
-      See the manual of the class or package, that provides family
-      `#1'\MessageBreak
-      for more information about options and their values.%
-    }%
-  \else
-    \global\let\scr@removeunused\@empty
-    \PackageInfo{%
-      scrbase%
-    }{%
-      option `#2' of family `#1' has no value `#3'.\MessageBreak
-      Allowed values for option `#2' of family `#1'\MessageBreak
-      would be:\MessageBreak
-      #4\FamilyElseValues.\MessageBreak
-      Maybe another class or package provides this option.\MessageBreak
-      Global option ignored
+  \FamilyKeyStateUnknownValue
+  \ifx\FamilyElseValues\@empty\else
+    \PackageWarning{scrbase}{non empty \string\FamilyElseValue
+      ignored.\MessageBreak
+      Setting this command to a non empty\MessageBreak
+      value for option `#2' of\MessageBreak
+      family `#1' is deprecated,\MessageBreak
+      but has been found
     }%
   \fi
 }
@@ -1446,18 +1716,19 @@
 %    \end{macrocode}
 % \begin{macro}{\FamilyElseValues}
 %   \changes{v3.00}{2008/05/02}{Neue Anweisung}
-% Diese Anweisung kann vor dem Setzen eines Wertes definiert werden, um bei
-% einer etwaigen Fehlermeldung weitere Werte als erlaubt auszugeben. Am Ende
-% von \cs{FamilySetBool} und \cs{FamilySetNumerical} wird die Anweisung
-% automatisch zu \cs{@empty}. Es ist zu beachten, dass bei der Definition der
-% Anweisung als erstes ein Komma und ein Leerzeichen zu setzen ist!
+%   \changes{v3.12}{2013/03/04}{wird intern nicht mehr verwendet} Diese
+% Anweisung konnte ursprünglich vor dem Setzen eines Wertes definiert
+% werden, um bei einer etwaigen Fehlermeldung weitere Werte als erlaubt
+% auszugeben. Am Ende von \cs{FamilySetBool} und \cs{FamilySetNumerical}
+% wird die Anweisung automatisch zu \cs{@empty}. Seit Version~3.12 wird diese
+% Anweisung jedoch nicht mehr ausgewertet.
 %    \begin{macrocode}
 %<*base>
 \newcommand*{\FamilyElseValues}{}
 %</base>
 %    \end{macrocode}
-% \end{macro}
-% \end{macro}
+% \end{macro}^^A \FamilyUnknownKeyValue
+% \end{macro}^^A \FamilyElseValue
 %
 % \begin{macro}{\FamilyBoolKey}
 %   \changes{v3.00}{2008/04/30}{Neue Anweisung}
@@ -1483,12 +1754,12 @@
 % Schalter und das vierte schließlich der gewünschte Wert.
 %    \begin{macrocode}
 \newcommand*{\FamilySetBool}[4]{%
-  \ifstr{#4}{true}{\@nameuse{#3true}}{%
-    \ifstr{#4}{on}{\@nameuse{#3true}}{%
-      \ifstr{#4}{yes}{\@nameuse{#3true}}{%
-        \ifstr{#4}{false}{\@nameuse{#3false}}{%
-          \ifstr{#4}{off}{\@nameuse{#3false}}{%
-            \ifstr{#4}{no}{\@nameuse{#3false}}{%
+  \ifstr{#4}{true}{\@nameuse{#3true}\FamilyKeyStateProcessed}{%
+    \ifstr{#4}{on}{\@nameuse{#3true}\FamilyKeyStateProcessed}{%
+      \ifstr{#4}{yes}{\@nameuse{#3true}\FamilyKeyStateProcessed}{%
+        \ifstr{#4}{false}{\@nameuse{#3false}\FamilyKeyStateProcessed}{%
+          \ifstr{#4}{off}{\@nameuse{#3false}\FamilyKeyStateProcessed}{%
+            \ifstr{#4}{no}{\@nameuse{#3false}\FamilyKeyStateProcessed}{%
               \FamilyUnknownKeyValue{#1}{#2}{#4}{%
                 `true', `on', `yes', `false', `off', `no'%
               }%
@@ -1593,30 +1864,31 @@
 \newcommand*{\FamilySetNumerical}[5]{%
   \begingroup
     \edef\@searched{#5}%
-    \let\@tempa=\@empty
-    \let\@tempb=\@empty
+    \let\reserved@a=\@empty
+    \let\reserved@b=\@empty
     \@tempswafalse
     \@for\@valuelist:=#4\do{%
       \if@tempswa\else
-        \edef\@tempc{\expandafter\@firstoftwo\@valuelist}%
-        \edef\@tempa{\@tempa\@tempb`\@tempc'}%
-        \edef\@tempb{, }%
-        \ifx\@tempc\@searched
+        \edef\reserved@c{\expandafter\@firstoftwo\@valuelist}%
+        \edef\reserved@a{\reserved@a\reserved@b`\reserved@c'}%
+        \edef\reserved@b{, }%
+        \ifx\reserved@c\@searched
           \@tempswatrue
-          \edef\@tempa{\expandafter\@secondoftwo\@valuelist}%
+          \edef\reserved@a{\expandafter\@secondoftwo\@valuelist}%
         \fi
       \fi
     }%
     \if@tempswa
-      \edef\@tempa{\endgroup
-        \noexpand\@namedef{#3}{\@tempa}%
+      \edef\reserved@a{\endgroup
+        \noexpand\@namedef{#3}{\reserved@a}%
+        \noexpand\FamilyKeyStateProcessed
       }%
     \else
-      \edef\@tempa{\endgroup
-        \noexpand\FamilyUnknownKeyValue{#1}{#2}{#5}{\@tempa}%
+      \edef\reserved@a{\endgroup
+        \noexpand\FamilyUnknownKeyValue{#1}{#2}{#5}{\reserved@a}%
       }%
     \fi
-  \@tempa
+  \reserved@a
   \let\FamilyElseValues\@empty
 }
 %</base>
@@ -1687,7 +1959,7 @@
   \DefineFamilyKey[{#1}]{#2}{#3}[{#4}]{\def#5{##1}}%
 }
 \newcommand{\Family@String@Key}[4]{%
-  \DefineFamilyKey[{#1}]{#2}{#3}{\def#4{##1}}%
+  \DefineFamilyKey[{#1}]{#2}{#3}{\def#4{##1}\FamilyKeyStateProcessed}%
 }
 %</base>
 %    \end{macrocode}
@@ -1723,29 +1995,38 @@
 }
 %    \end{macrocode}
 % \begin{macro}{\KOMA@UseDeprecatedOption}
-%   \changes{v3.01a}{2008/11/20}{neu (intern)}
+%   \changes{v3.01a}{2008/11/20}{neu (intern)}%
+%   \changes{v3.12}{2013/03/04}{Test für \texttt{version!=first}}%
 % Die eigentliche Arbeit wird von diesem Makro erledigt. Die Argumente sind
 % 1. Meldungsbefehl, 2. obsolete Option, 3. Setzen des Schlüssels.
 %    \begin{macrocode}
 \newcommand*{\KOMA@UseDeprecatedOption}[3]{%
   \let\scr@sr@co\CurrentOption
-  #1{%
-    You've used obsolete option `#2'.\MessageBreak
-    Usage of this option indicates an old document and\MessageBreak
-    changes compatibility level using\MessageBreak
-    `#3,version=first'.\MessageBreak
-    If you don't want this, you should simply replace\MessageBreak
-    usage of option `#2' by `#3'%
-  }%
+  \begingroup
+    #1{%
+      You've used obsolete option `#2'.\MessageBreak
+      Usage of this option indicates an old document and\MessageBreak
+      \scr@ifundefinedorrelax{KV@KOMA.\@currname.\@currext @version}{%
+        changes compatibility level using\MessageBreak
+        `#3,version=first'.\MessageBreak
+        If you don't want this, y%
+      }{%
+        is deprecated.\MessageBreak
+        Y%
+      }%
+      ou should simply replace\MessageBreak
+      usage of option `#2' by `#3'%
+    }%
+  \endgroup
   \KOMAExecuteOptions{#3,version=first}%
   \let\CurrentOption\scr@sr@co
 }
 %</koma>
 %    \end{macrocode}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-% \end{macro}
+% \end{macro}^^A \KOMA@UseDeprecatedOption
+% \end{macro}^^A \KOMA@@@DeclareDeprecatedOption
+% \end{macro}^^A \KOMA@@DeclareDeprecatedOption
+% \end{macro}^^A \KOMA@DeclareDeprecatedOption
 %
 %
 % \begin{macro}{\KOMA@DeclareStandardOption}
@@ -1792,81 +2073,9 @@
   \KOMAExecuteOptions{#3}%
   \let\CurrentOption\scr@sr@co
 }
-%</koma>
 %    \end{macrocode}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-%
-%
-% \begin{macro}{\KOMA@DeclareObsoleteOption}
-%   \changes{v2.96}{2006/08/20}{\cs{CurrentOption wir geschützt}}
-% \begin{macro}{\KOMA@@DeclareObsoleteOption}
-%   \changes{v2.98c}{2008/02/18}{neu (intern)}
-% \begin{macro}{\KOMA@@@DeclareObsoleteOption}
-%   \changes{v2.98c}{2008/02/18}{neu (intern)}
-% \begin{macro}{\KOMA@iv@DeclareObsoleteOption}
-%   \changes{v2.98c}{2008/02/18}{neu (intern)}
-% Mit Hilfe dieses Makros kann eine Option definiert werden, die
-% eigentlich obsolete ist. Statt dieser Option wird dann ein Schlüssel
-% verwendet. Das erste Argument ist optional und muss dann entweder
-% \cs{PackageInfo}, \cs{PackageInfoNoLine}, \cs{PackageWarning},
-% \cs{PackageWarningNoLine} oder das gleiche für Klassen sein. Das zweite
-% Argument ist ebenfalls optional und der Name des Pakets oder der Klasse. Das
-% dritte Argument ist der Name der Option. Das vierte Argument ist das Setzen
-% des gewünschten Schlüssels.
-%    \begin{macrocode}
-%<*koma>
-\newcommand*{\KOMA@DeclareObsoleteOption}{%
-  \@ifnextchar [%]
-  {\KOMA@@DeclareObsoleteOption}%
-  {\KOMA@@DeclareObsoleteOption[\@gobbletwo]}%
-}
-\newcommand*{\KOMA@@DeclareObsoleteOption}{}
-\def\KOMA@@DeclareObsoleteOption[#1]{%
-  \@ifnextchar [%]
-  {\KOMA@@@DeclareObsoleteOption{#1}}%
-  {\KOMA@@@DeclareObsoleteOption{#1}[]}%
-}
-\newcommand*{\KOMA@@@DeclareObsoleteOption}{}
-\def\KOMA@@@DeclareObsoleteOption#1[#2]#3#4{%
-  \ifstr{#2}{}{%
-    \KOMA@iv@DeclareObsoleteOption{#1}{\@currname}{#3}{#4}%
-  }{%
-    \KOMA@UseObsoleteOption{#1}{#2}{#3}{#4}%
-  }%
-}
-\newcommand*{\KOMA@iv@DeclareObsoleteOption}[4]{%
-  \DeclareOption{#3}{\KOMA@UseObsoleteOption{#1{#2}}{#3}{#4}}%
-}
-%    \end{macrocode}
-% \begin{macro}{\KOMA@UseObsoleteOption}
-%   \changes{v2.97c}{2007/04/19}{neu (intern)}
-% Die eigentliche Arbeit wird von diesem Makro erledigt. Die Argumente sind
-% 1. Meldungsbefehl, 2. obsolete Option, 3. Setzen des Schlüssels.
-%    \begin{macrocode}
-\newcommand*{\KOMA@UseObsoleteOption}[3]{%
-  \let\scr@sr@co\CurrentOption
-  #1{%
-    You've used obsolete option `#2'.\MessageBreak
-    \protect\KOMAExecuteOptions{#3} will be\MessageBreak
-    used instead.\MessageBreak
-    You may simply replace `#2'\MessageBreak
-    by `#3'%
-  }%
-  \KOMAExecuteOptions{#3}%
-  \let\CurrentOption\scr@sr@co
-}
-%    \end{macrocode}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-%
-%  \begin{macro}{\scr@sr@co}
-%    \changes{v2.96}{2006/08/20}{neu (intern)}
+% \begin{macro}{\scr@sr@co}
+%   \changes{v2.96}{2006/08/20}{neu (intern)}
 % Da das \texttt{xkeyval}-Paket leider \cs{CurrentOption} vernichtet, das aber
 % innerhalb von \cs{ProcessOptions} und \cs{KOMAProcessOptions} nach dem
 % Ausführen der Option noch benötigt wird, muss die Anweisung gesichert
@@ -1875,9 +2084,38 @@
 \newcommand*{\scr@sr@co}{}
 %</koma>
 %    \end{macrocode}
-% \end{macro}
+% \end{macro}^^A \scr@sr@co
+% \end{macro}^^A \KOMA@UseStandardOption
+% \end{macro}^^A \KOMA@@@DeclareStandardOption
+% \end{macro}^^A \KOMA@@DeclareStandardOption
+% \end{macro}^^A \KOMA@DeclareStandardOption
 %
-% \begin{macro}{\KOMA@newobsoletecommand}
+%
+% \begin{macro}{\KOMA@DeclareObsoleteOption}
+%   \changes{v2.96}{2006/08/20}{\cs{CurrentOption wir geschützt}}
+%   \changes{v3.12}{2013/03/04}{entfernt weil unbenutzt}
+% \begin{macro}{\KOMA@@DeclareObsoleteOption}
+%   \changes{v2.98c}{2008/02/18}{neu (intern)}
+%   \changes{v3.12}{2013/03/04}{entfernt weil unbenutzt}
+% \begin{macro}{\KOMA@@@DeclareObsoleteOption}
+%   \changes{v2.98c}{2008/02/18}{neu (intern)}
+%   \changes{v3.12}{2013/03/04}{entfernt weil unbenutzt}
+% \begin{macro}{\KOMA@iv@DeclareObsoleteOption}
+%   \changes{v2.98c}{2008/02/18}{neu (intern)}
+%   \changes{v3.12}{2013/03/04}{entfernt weil unbenutzt}
+% \begin{macro}{\KOMA@UseObsoleteOption}
+%   \changes{v2.97c}{2007/04/19}{neu (intern)}
+%   \changes{v3.12}{2013/03/04}{entfernt weil unbenutzt}
+% \end{macro}^^A \KOMA@UseObsoleteOption
+% \end{macro}^^A \KOMA@iv@DeclareObsoleteOption
+% \end{macro}^^A \KOMA@iii@DeclareObsoleteOption
+% \end{macro}^^A \KOMA@ii@DeclareObsoleteOption
+% \end{macro}^^A \KOMA@i@DeclareObsoleteOption
+%
+%
+% \begin{macro}{\KOMA@newdeprecatedcommand}
+%   \changes{v3.12}{2013/03/04}{renamed \cs{KOMA@newobsoletecommand} into
+%     \cs{KOMA@newdeprecatedcommand}}
 % Mit Hilfe dieses Makros kann ein Makro definiert werden, das
 % eigentlich obsolete ist. Das Makro verwendet dann schlicht einen
 % Schlüssel. Das erste Argument ist optional und muss dann entweder
@@ -1888,20 +2126,22 @@
 % \cs{long} und versteht auch keine Argumente.
 %    \begin{macrocode}
 %<*koma>
-\newcommand*{\KOMA@newobsoletecommand}[3][\@gobbletwo]{%
-  \newcommand*{#2}{\KOMA@UseObsoleteCommand{#1}{\string#2}{#3}}%
+\newcommand*{\KOMA@newdeprecatedcommand}[3][\@gobbletwo]{%
+  \newcommand*{#2}{\KOMA@UseDeprecatedCommand{#1}{\string#2}{#3}}%
 }
 %    \end{macrocode}
-% \begin{macro}{\KOMA@UseObsoleteCommand}
+% \begin{macro}{\KOMA@UseDeprecatedCommand}
 %   \changes{v2.97c}{2007/04/19}{neu (intern)}
+%   \changes{v3.12}{2013/03/04}{renamed \cs{KOMA@UseObsoleteCommand} into
+%     \cs{KOMA@UseDeprecatedCommand}}
 % Die eigentliche Arbeit wird von diesem Makro erledigt. Die Argumente sind
 % dieselben.
 %    \begin{macrocode}
-\newcommand*{\KOMA@UseObsoleteCommand}[3]{%
+\newcommand*{\KOMA@UseDeprecatedCommand}[3]{%
   #1{%
     scrkbase%
   }{%
-    You've used the obsolete command `#2'.\MessageBreak
+    You've used deprecated command `#2'.\MessageBreak
     \protect\KOMAoptions{#3} will be used instead.\MessageBreak
     You should also replace `#2' by `\protect\KOMAoptions{#3}'%
   }%
@@ -1909,8 +2149,8 @@
 }
 %</koma>
 %    \end{macrocode}
-% \end{macro}
-% \end{macro}
+% \end{macro}^^A \KOMA@UseDeprecatedCommand
+% \end{macro}^^A \KOMA@newdeprecatedcommand
 %
 %
 % \iffalse
@@ -1921,7 +2161,7 @@
 %
 \endinput
 %
-% end of file `scrkbase.dtx'
+% end of file `scrkernel-basics.dtx'
 %%% Local Variables:
 %%% mode: doctex
 %%% TeX-master: t
