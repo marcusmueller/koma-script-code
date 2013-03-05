@@ -139,7 +139,7 @@ CLS_MAIN_DTX    = scrbeta.dtx \
 		  scrklang.dtx \
 		  scrklco.dtx \
 		  japanlco.dtx \
-		  scrkliof.dtx \
+		  scrkernel-listsof.dtx \
 		  scrklist.dtx \
 		  scrkmisc.dtx \
 		  scrknpap.dtx \
