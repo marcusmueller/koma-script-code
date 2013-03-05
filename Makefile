@@ -128,11 +128,11 @@ CLS_MAIN	= scrbook.cls \
 		  KakuLL.lco
 
 CLS_MAIN_DTX    = scrbeta.dtx \
-		  scrkbase.dtx \
+		  scrkernel-basics.dtx \
 		  scrkernel-bibliography.dtx \
 		  scrkcile.dtx \
 		  scrkcomp.dtx \
-		  scrkfloa.dtx \
+		  scrkernel-floats.dtx \
 		  scrkfont.dtx \
 		  scrkftn.dtx \
 		  scrkidx.dtx \
