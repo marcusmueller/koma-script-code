@@ -1,4 +1,4 @@
-% \CheckSum{590}
+% \CheckSum{600}
 % \iffalse meta-comment
 % ======================================================================
 % scrkpage.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkpage.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkpage.dtx}[2011/08/31 v3.10 KOMA-Script (page style)]
+\ProvidesFile{scrkpage.dtx}[2012/03/05 v3.12 KOMA-Script (page style)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -103,11 +103,13 @@
 %
 % \begin{option}{headsepline}
 %   \changes{v2.95c}{2006/08/11}{BugFix: Argument bei
-%     \cs{PassOptionsToPackage} vertauscht}
+%     \cs{PassOptionsToPackage} vertauscht}%
 %   \changes{v2.97c}{2007/04/19}{Option \texttt{headinclude} wird nicht
-%     mehr an \textsf{typearea} geschickt}
+%     mehr an \textsf{typearea} geschickt}%
 %   \changes{v2.98c}{2008/03/26}{Option \texttt{headinclude} wird gesetzt,
-%     wobei kein Fehler ausgegeben wird, wenn sie nicht existiert.}
+%     wobei kein Fehler ausgegeben wird, wenn sie nicht existiert.}%
+%   \changes{v3.12}{2013/03/05}{Nutzung der Status-Signalisierung mit
+%     \cs{FamilyKeyStateProcessed}}%
 % \begin{option}{headnosepline}
 %   \changes{v2.97d}{2007/10/03}{\cs{PackageInfo} durch \cs{PackageInfoNoLine}
 %     ersetzt}
@@ -130,7 +132,9 @@
 %    \begin{macrocode}
 \KOMA@key{headsepline}[true]{%
   \KOMA@set@ifkey{headsepline}{@hsl}{#1}%
-  \KOMA@options{headinclude=#1}{}%
+  \ifx\FamilyKeyState\FamilyKeyStateProcessed
+    \KOMAoptions{headinclude=#1}{}%
+  \fi
 }
 \KOMA@DeclareDeprecatedOption{headnosepline}{headsepline=false}
 %    \end{macrocode}
@@ -147,6 +151,8 @@
 %     mehr an \textsf{typearea} geschickt}
 %   \changes{v2.98c}{2008/03/26}{Option \texttt{footinclude} wird gesetzt,
 %     wobei kein Fehler ausgegeben wird, wenn sie nicht existiert.}
+%   \changes{v3.12}{2013/03/05}{Nutzung der Status-Signalisierung mit
+%     \cs{FamilyKeyStateProcessed}}%
 % \begin{option}{footnosepline}
 %   \changes{v2.97d}{2007/10/03}{\cs{PackageInfo} durch \cs{PackageInfoNoLine}
 %     ersetzt}
@@ -168,7 +174,9 @@
 %    \begin{macrocode}
 \KOMA@key{footsepline}[true]{%
   \KOMA@set@ifkey{footsepline}{@fsl}{#1}%
-  \KOMA@options{footinclude=#1}{}%
+  \ifx\FamilyKeyState\FamilyKeyStateProcessed
+    \KOMA@options{footinclude=#1}{}%
+  \fi
 }
 \KOMA@DeclareDeprecatedOption{footnosepline}{footsepline=false}
 %    \end{macrocode}
@@ -204,6 +212,8 @@
 %     funktionieren}
 %   \changes{v2.98c}{2008/03/06}{verwendet \cs{def} statt \cs{let}, damit die
 %     Option \texttt{open} funktioniert}
+%   \changes{v3.12}{2013/03/05}{Nutzung der Status-Signalisierung mit
+%     \cs{FamilyKeyStateProcessed}}%
 % \begin{option}{cleardoubleempty}
 %   \changes{v2.8a}{2001/06/18}{neue Option}
 %   \changes{v2.97d}{2007/10/03}{\cs{PackageInfo} durch \cs{PackageInfoNoLine}
@@ -281,6 +291,7 @@
         \def\cleardoublepage{\cleardoublestandardpage}%
         \def\cleardoubleoddpage{\cleardoubleoddstandardpage}%
         \def\cleardoubleevenpage{\cleardoubleevenstandardpage}%
+        \FamilyKeyStateProcessed
       }%
     }{%
       \ifnotundefined{ps@#1}{%
@@ -288,6 +299,7 @@
           \def\cleardoublepage{\cleardoublepageusingstyle{#1}}%
           \def\cleardoubleoddpage{\cleardoubleoddpageusingstyle{#1}}%
           \def\cleardoubleevenpage{\cleardoubleevenpageusingstyle{#1}}%
+          \FamilyKeyStateProcessed
         }%
       }{}%
     }%
