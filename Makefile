@@ -135,7 +135,7 @@ CLS_MAIN_DTX    = scrbeta.dtx \
 		  scrkernel-floats.dtx \
 		  scrkernel-fonts.dtx \
 		  scrkernel-footnotes.dtx \
-		  scrkidx.dtx \
+		  scrkernel-index.dtx \
 		  scrklang.dtx \
 		  scrklco.dtx \
 		  japanlco.dtx \
