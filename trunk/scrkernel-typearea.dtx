@@ -1,4 +1,4 @@
-% \CheckSum{2108}
+% \CheckSum{2133}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-typearea.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkernel-typearea.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkernel-typearea.dtx}[2012/02/06 v3.12 KOMA-Script 
+\ProvidesFile{scrkernel-typearea.dtx}[2013/03/05 v3.12 KOMA-Script 
                                                        (type area)]
 % \iffalse
 %</driver>
@@ -492,6 +492,8 @@
 %
 % \begin{option}{headlines}
 %   \changes{v2.95}{2002/12/06}{mit \textsf{keyval} neu implementiert}
+%   \changes{v3.12}{2013/03/05}{Verwendung der Status-Signalisierung mit
+%     \cs{FamilyKeyState}}
 % Neben der Auswertung der \meta{Wert}\texttt{headlines} Form über
 % Pattern Matching wird hier auch noch eine \textsf{keyval}-Option
 % definiert, die bevorzugt zu verwenden ist.
@@ -501,12 +503,15 @@
     \setlength{\@tempdima}{#1\baselineskip}%
   \endgroup
   \def\ta@hh{#1\baselineskip}%
+  \FamilyKeyStateProcessed
 }
 %    \end{macrocode}
 % \end{option}
 %
 % \begin{option}{headheight}
 %   \changes{v2.98c}{2008/04/06}{neue Option}
+%   \changes{v3.12}{2013/03/05}{Verwendung der Status-Signalisierung mit
+%     \cs{FamilyKeyState}}
 % Manchmal ist es nützlicher, wenn man die Höhe direkt setzen kann, statt sie
 % über die Anzahl der Grundlinien zu setzen. In dem Fall nimmt man einfach
 % diese Option.
@@ -516,6 +521,7 @@
     \setlength{\@tempdima}{#1}%
   \endgroup
   \def\ta@hh{#1}%
+  \FamilyKeyStateProcessed
 }
 %    \end{macrocode}
 % \end{option}
@@ -604,10 +610,12 @@
 % \end{option}
 % \end{option}
 %
-%  \begin{option}{BCOR}
-%    \changes{v2.2a}{1995/01/25}{neue Option}
-%    \changes{v2.95}{2002/12/04}{als \textsf{keyval}-Option
-%      implementiert}
+% \begin{option}{BCOR}
+%   \changes{v2.2a}{1995/01/25}{neue Option}
+%   \changes{v2.95}{2002/12/04}{als \textsf{keyval}-Option
+%     implementiert}
+%   \changes{v3.12}{2013/03/05}{Verwendung der Status-Signalisierung mit
+%     \cs{FamilyKeyState}}
 % Der Wert wird einfach an die Länge \cs{ta@bcor} verfüttert, wobei
 % symbolische Werte speziell behandelt werden, auch wenn sie beim
 % Laden des Pakets absolut keinen Sinn ergeben!
@@ -616,6 +624,7 @@
   \edef\@tempa{#1}\edef\@tempb{current}\ifx\@tempa\@tempb\else
     \setlength{\ta@bcor}{#1}%
   \fi
+  \FamilyKeyStateProcessed
 }
 %    \end{macrocode}
 % Wenn allerdings der Satzspiegel bereits berechnet ist, dann muss er
@@ -623,12 +632,14 @@
 %    \begin{macrocode}
 \AtEndOfPackage{\KOMA@key{BCOR}{\typearea[{#1}]{last}}}
 %    \end{macrocode}
-%  \end{option}
+% \end{option}
 %
-%  \begin{option}{DIV}
-%    \changes{v2.2a}{1995/01/25}{neue Option}
-%    \changes{v2.95}{2002/12/04}{als \textsf{keyval}-Option
-%      implementiert}
+% \begin{option}{DIV}
+%   \changes{v2.2a}{1995/01/25}{neue Option}
+%   \changes{v2.95}{2002/12/04}{als \textsf{keyval}-Option
+%     implementiert}
+%   \changes{v3.12}{2013/03/05}{Verwendung der Status-Signalisierung mit
+%     \cs{FamilyKeyState}}
 % Der Wert wird einfach an den Zähler \cs{ta@div} verfüttert, wobei
 % symbolische Werte speziell behandelt werden. Dabei werden auch die
 % Werte "`\texttt{last}"' und "`\texttt{current}"' ausgewertet, auch
@@ -646,6 +657,7 @@
       \fi
     \fi
   \fi
+  \FamilyKeyStateProcessed
 }
 %    \end{macrocode}
 % Wenn allerdings der Satzspiegel bereits berechnet ist, dann muss er
@@ -702,6 +714,8 @@
 %     Option an das Paket weiter}
 %   \changes{v3.00}{2008/07/09}{die Option kennt zusätzlich den Wert
 %     \texttt{semi}}
+%   \changes{v3.12}{2013/03/05}{Verwendung der Status-Signalisierung mit
+%     \cs{FamilyKeyState}}
 % \begin{macro}{if@semitwoside}
 %   \changes{v3.00}{2008/07/09}{neuer Schalter (intern)}
 % \begin{macro}{if@twoside}
@@ -723,6 +737,7 @@
   \ifstr{#1}{semi}{%
     \@twosidetrue
     \@semitwosidetrue
+    \FamilyKeyStateProcessed
   }{%
     \def\FamilyElseValue{, `semi'}%
     \KOMA@set@ifkey{twoside}{@twoside}{#1}%
@@ -762,6 +777,8 @@
 %     Option an das Paket weiter}
 %   \changes{v2.98a}{2007/01/08}{es wird die richtige Option an das Paket
 %     weitergereicht}
+%   \changes{v3.12}{2013/03/05}{Verwendung der Status-Signalisierung mit
+%     \cs{FamilyKeyState}}
 % Einspaltiger oder zweispaltiger Satz?
 %    \begin{macrocode}
 %</package>
@@ -770,7 +787,9 @@
 %<*package>
   \if@atdocument\clearpage\fi
   \KOMA@set@ifkey{twocolumn}{@twocolumn}{#1}%
-  \csname recalctypearea\endcsname
+  \ifx\FamilyKeyState\FammilyKeyStateProcessed
+    \csname recalctypearea\endcsname
+  \fi
 %</package>
 }
 \KOMA@DeclareStandardOption%
@@ -791,6 +810,8 @@
 %   \changes{v2.95}{2002/08/27}{neu implementiert}
 %   \changes{v3.02c}{2009/02/14}{neuer Wert \texttt{false}}
 %   \changes{v3.05a}{2010/03/18}{neuer Wert \texttt{dvipdfmx}}
+%   \changes{v3.12}{2013/03/05}{Verwendung der Status-Signalisierung mit
+%     \cs{FamilyKeyState}}
 % Diese Option ist nun das zentrale Element für die Übermittlung der
 % Seitengröße an pdf\TeX, \texttt{dvips} oder V\TeX. Sie wird auch von
 % den obsoleten Optionen verwendet. Die Werte und ihre Bedeutung:
@@ -818,26 +839,32 @@
       {off}{-1},{no}{-1},{false}{-1},%
       {auto}{0},{automedia}{1},{dvips}{2},{pdftex}{3},{dvipdfmx}{4}%
     }{#1}%
-    \ifcase\number\@tempa\relax
-      \endgroup
-      \set@pdftexpagesize
-      \set@dvipspagesize
-    \or
-      \endgroup
-      \set@pdftexpagesize
-      \set@vtexpagesize
-      \set@dvipspagesize
-    \or
-      \endgroup
-      \set@dvipspagesize
-    \or
-      \endgroup
-      \set@pdftexpagesize
-    \or
-      \endgroup
-      \set@dvipdfmxpagesize
+    \ifx\FamilyKeyState\FamilyKeyStateProcessed
+      \aftergroup\FamilyKeyStateProcessed
+      \ifcase\number\@tempa\relax
+        \endgroup
+        \set@pdftexpagesize
+        \set@dvipspagesize
+      \or
+        \endgroup
+        \set@pdftexpagesize
+        \set@vtexpagesize
+        \set@dvipspagesize
+      \or
+        \endgroup
+        \set@dvipspagesize
+      \or
+        \endgroup
+        \set@pdftexpagesize
+      \or
+        \endgroup
+        \set@dvipdfmxpagesize
+    \fi
+    \edef\@pagesizelast{#1}%
+  \else
+    \endgroup
+    \FamilyKeyStateUnknownValue
   \fi
-  \edef\@pagesizelast{#1}%
 }
 %    \end{macrocode}
 %
@@ -1149,6 +1176,8 @@
 %   \changes{v2.95}{2002/12/03}{neu implementiert}
 %   \changes{v3.01b}{2008/12/09}{Höhe und Breite vertauscht}
 %   \changes{v3.02c}{2009/02/12}{neuer Wert \texttt{seascape}}
+%   \changes{v3.12}{2013/03/05}{Verwendung der Status-Signalisierung mit
+%     \cs{FamilyKeyState}}
 % Im Normalfall wird die Papiergröße jedoch über diese Option
 % gesetzt. Dabei sind neben den Standard- und den ISO-Reihen A, B, C
 % und D auch Wertepaare der Form
@@ -1164,6 +1193,7 @@
       \setlength{\paperheight}{\@tempdima}%
       \@landscapetrue
     \fi
+    \FamilyKeyStateProcessed
   }{%      
     \ifstr{#1}{landscape}{%
       \@seascapefalse
@@ -1173,6 +1203,7 @@
         \setlength{\paperheight}{\@tempdima}%
         \@landscapetrue
       \fi
+      \FamilyKeyStateProcessed
     }{%
       \ifstr{#1}{portrait}{%
         \if@landscape
@@ -1181,6 +1212,7 @@
           \setlength{\paperheight}{\@tempdima}%
           \@landscapefalse
         \fi
+        \FamilyKeyStateProcessed
       }{%
         \ifstr{#1}{letter}{%
           \if@landscape
@@ -1190,6 +1222,7 @@
             \setlength\paperheight{11in}%
             \setlength\paperwidth {8.5in}%
           \fi
+          \FamilyKeyStateProcessed
         }{%
           \ifstr{#1}{legal}{%
             \if@landscape
@@ -1199,6 +1232,7 @@
               \setlength\paperheight{14in}%
               \setlength\paperwidth {8.5in}%
             \fi
+            \FamilyKeyStateProcessed
           }{%
             \ifstr{#1}{executive}{%
               \if@landscape
@@ -1208,6 +1242,7 @@
                 \setlength\paperheight{10.5in}%
                 \setlength\paperwidth {7.25in}%
              \fi
+             \FamilyKeyStateProcessed
             }{%
               \iso@paper{#1}%
               \if@tempswa\else
@@ -1227,6 +1262,7 @@
                     \setlength\paperwidth{\@tempa}%
                     \setlength\paperheight{\@tempb}%
                   \fi
+                  \FamilyKeyStateProcessed
                 \else
                   \KOMA@unknown@keyval{paper}{#1}{%
                     `letter', `legal', `executive', `a'<nr>, `b'<nr>,
