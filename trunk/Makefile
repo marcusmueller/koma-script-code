@@ -133,7 +133,7 @@ CLS_MAIN_DTX    = scrbeta.dtx \
 		  scrkcile.dtx \
 		  scrkcomp.dtx \
 		  scrkernel-floats.dtx \
-		  scrkfont.dtx \
+		  scrkernel-fonts.dtx \
 		  scrkftn.dtx \
 		  scrkidx.dtx \
 		  scrklang.dtx \
