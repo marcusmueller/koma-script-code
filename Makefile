@@ -141,9 +141,9 @@ CLS_MAIN_DTX    = scrbeta.dtx \
 		  japanlco.dtx \
 		  scrkernel-listsof.dtx \
 		  scrklist.dtx \
-		  scrkmisc.dtx \
+		  scrkernel-miscellaneous.dtx \
 		  scrknpap.dtx \
-		  scrkpage.dtx \
+		  scrkernel-pagestyles.dtx \
 		  scrkpar.dtx \
 		  scrkplen.dtx \
 		  scrkernel-sections.dtx \
