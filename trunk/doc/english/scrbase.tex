@@ -1,6 +1,6 @@
 % ======================================================================
 % scrbase.tex
-% Copyright (c) Markus Kohm, 2002-2012
+% Copyright (c) Markus Kohm, 2002-2013
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -18,7 +18,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrbase.tex
-% Copyright (c) Markus Kohm, 2002-2012
+% Copyright (c) Markus Kohm, 2002-2013
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -45,10 +45,10 @@
 %
 % ======================================================================
 
-\ProvidesFile{scrbase.tex}[2012/03/04 KOMA-Script package scrbase]
+\ProvidesFile{scrbase.tex}[2013/03/05 KOMA-Script package scrbase]
 \translator{Markus Kohm}
 
-% Date of the translated German file: 2012/03/04
+% Date of the translated German file: 2013/03/05
 
 \chapter{Basic Functions at Package \Package{scrbase}}
 \labelbase{scrbase}
@@ -134,7 +134,7 @@ of a family or of all family members.
 
 \begin{Declaration}
   \Macro{DefineFamily}\Parameter{family}\\
-  \Macro{DefineFamilyMember}\OParameter{family member}\Parameter{family}
+  \Macro{DefineFamilyMember}\OParameter{family member}\Parameter{family}%
 \end{Declaration}
 \BeginIndex{Cmd}{DefineFamily}%
 \BeginIndex{Cmd}{DefineFamilyMember}%
@@ -186,9 +186,19 @@ name of the bundle as \PName{family} and the name of the package as
 \begin{Declaration}
   \Macro{DefineFamilyKey}\OParameter{family member}\Parameter{family}%
   \Parameter{key}\OParameter{default}\\
-  \hphantom{\Macro{DefineFamilyKey}}\Parameter{action}
+  \hphantom{\Macro{DefineFamilyKey}}\Parameter{action}\\
+  \Macro{FamilyKeyState}\\
+  \Macro{FamilyKeyStateUnknown}\\
+  \Macro{FamilyKeyStateProcessed}\\
+  \Macro{FamilyKeyStateUnknownValue}\\
+  \Macro{FamilyKeyStateNeedValue}
 \end{Declaration}
 \BeginIndex{Cmd}{DefineFamilyKey}%
+\BeginIndex{Cmd}{FamilyKeyState}%
+\BeginIndex{Cmd}{FamilyKeyStateUnknown}%
+\BeginIndex{Cmd}{FamilyKeyStateProcessed}%
+\BeginIndex{Cmd}{FamilyKeyStateUnknownValue}%
+\BeginIndex{Cmd}{FamilyKeyStateNeedValue}%
 This command defines a \PName{key}. If a \PName{family member} is given, the
 \PName{key} will become an attribute of that member of the also given
 \PName{family}. If no \PName{family member} is given, the member
@@ -198,6 +208,7 @@ executed and the value will be an argument of this. So inside of
 \PName{action} ``\lstinline{#1}'' would be that value. If the value will be
 omitted, the \PName{default} will be used instead. If there's no
 \PName{default}, the \PName{key} can be used only with value.
+
 \begin{Explain}
   \phantomsection\label{explain:scrbase.macro.DefineFamilyKey}%
   At least
@@ -208,11 +219,45 @@ omitted, the \PName{default} will be used instead. If there's no
   will result in a call of
 \begin{lstcode}[moretexcs={define@key},escapeinside=`']
   \define@key{`\PName{family\,member}'}{`\PName{key}'}
-             [`\PName{default}']{`\PName{action}'}
+             [`\PName{default}']{`\PName{extended action}'}
 \end{lstcode}
   with \Macro{define@key} is provided by package
-  \Package{keyval}\IndexPackage{keyval} (see \cite{package:keyval}).
+  \Package{keyval}\IndexPackage{keyval} (see \cite{package:keyval}). However,
+  the call of \Macro{define@key} and the \PName{action} will in fact be
+  extended by additional arrangements.
 \end{Explain}
+
+Success\ChangedAt{v3.12}{\Package{scrbase}} or failure of the execution of the
+\PName{action} should be reported back to \Package{scrbase} by
+\Macro{FamilyKeyState}. The package itself will take care for additional
+procedures if needed. You should not report errors by yourself! The default
+state before execution of \PName{action} is
+\Macro{FamilyKeyStateUnknown}. This signals, that it is not known whether or
+not the execution is successful. If this state doesn't change until end of
+execution of the \PName{action}, \Package{scrbase} will write a message into
+the \File{log} file and supposes state \Macro{FamilyKeyStateProcessed} during
+the further procedure.
+
+State \Macro{FamilyKeyStateProcessed} signals, that the option and the value
+assignment to the option are completely and successfully finished. You may
+switch to this state by using \Macro{FamilyKeyStateProcessed} itself simply.
+
+State \Macro{FamilyKeyStateUnknownValue} indicates, that the option was
+handled, but the value, that should be assigned to the key, was unknown or not
+allowed. You may use \Macro{FamilyKeyStateUnknownValue} itself to switch to
+this state.
+
+State \Macro{FamilyKeyStateNeedValue} signals, that the option couldn't be
+set, because it needs a value, but not value have been assigned to the
+key. This state will be used automatically, whenever an option, that has been
+defined without \PName{default} value, will be used without value
+assignment. You could also set the state using \Macro{FamilyKeyStateNeedValue}
+yourself, but you shouldn't.
+
+Last but not least you may switch to additional failure states, simply
+re-defining \Macro{FamilyKeyState} with a very short message
+text. Generally the four predefined states should be sufficient.
+
 \begin{Example}
   Assumed, each of the three packages from the previous example should get a
   key \PValue{coldcuts}. If this is used, a switch should be set at each of
@@ -223,18 +268,24 @@ omitted, the \PName{default} will be used instead. If there's no
                   {coldcut}[true]{%
     \expandafter\let\expandafter\if@salami@coldcut
     \csname if#1\endcsname
+    \FamilyKeyStateProcessed
   }
 \end{lstcode}
   Available values for the key are \PValue{true} or \PValue{false} in this
-  case. There's no test on inappropriate values in this example. If the key
-  will be used later, this has to be done with one of the allowed values or
-  without assignment. In the second case the default \PName{true} will be
-  used.
+  case. Instead of testing on inappropriate values, success will be signaled
+  in any case in this example. If the key will be used later, this has to be
+  done with one of the allowed values or without assignment. In the second
+  case the default \PName{true} will be used.
 
   The definitions in the other packages are similar. Only ``\texttt{salami}''
   has to be replaced by the corresponding names.
 \end{Example}
 %
+\EndIndex{Cmd}{FamilyKeyStateNeedValue}%
+\EndIndex{Cmd}{FamilyKeyStateUnknownValue}%
+\EndIndex{Cmd}{FamilyKeyStateProcessed}%
+\EndIndex{Cmd}{FamilyKeyStateUnknown}%
+\EndIndex{Cmd}{FamilyKeyState}%
 \EndIndex{Cmd}{DefineFamilyKey}%
 
 
@@ -307,12 +358,9 @@ and before the keys of the family members.
 
 
 \begin{Declaration}
-  \Macro{FamilyOptions}\Parameter{family}\Parameter{options list}\\
-  \Macro{Family@Options}\Parameter{family}\Parameter{options list}%
-                        \Parameter{error action}
+  \Macro{FamilyOptions}\Parameter{family}\Parameter{options list}%
 \end{Declaration}
 \BeginIndex{Cmd}{FamilyOptions}%
-\BeginIndex{Cmd}{Family@Options}%
 Thereby \PName{options list} is like:
 \begin{flushleft}\vskip\dp\strutbox\begin{tabular}{l}
     \PName{key}\texttt{=}\PName{value}\texttt{,}%
@@ -329,9 +377,9 @@ also exists as an family attribute, then the family key will be set
 first. After this the member keys will follow in the order, the members has
 been defined. If a given \PName{key} does exist neither in the family nor in
 any member of the family, then \Macro{FamilyOptions} will result in an
-error. In opposite to this with \Macro{Family@Options} the user may declare
-his own \PName{error action}. But this internal command is reserved for
-authors of classes and packages.
+error. Package \Package{scrbase} reports an error also, if there are members
+with key \PName{key}, but all those members signal failure via
+\Macro{FamilyKeyState}.
 \begin{Example}
   You extend your butcher project by a package \Package{sausagesalad}. If this
   package has been loaded, all sausage package should generate cold cut:
@@ -365,19 +413,14 @@ authors of classes and packages.
   be loaded.
 \end{Example}
 %
-\EndIndex{Cmd}{Family@Options}%
 \EndIndex{Cmd}{FamilyOptions}%
 
 
 \begin{Declaration}
   \Macro{FamilyOption}\Parameter{family}%
-                      \Parameter{option}\Parameter{values list}\\
-  \Macro{Family@Option}\Parameter{family}%
-                       \Parameter{option}\Parameter{values list}%
-                       \Parameter{error action}
+                      \Parameter{option}\Parameter{values list}%
 \end{Declaration}
 \BeginIndex{Cmd}{FamilyOption}%
-\BeginIndex{Cmd}{Family@Option}%
 Beside options that have concurrently excluding values, there may be options,
 that have several values at the same time. Using \Macro{FamilyOptions} for
 that kind of options would result in using the same option several times with
@@ -388,9 +431,8 @@ to assign a whole \PName{values list} to the same \PName{option}. The
     \PName{value}\texttt{,}\PName{value}\dots
 \end{tabular}\end{flushleft}
 By the way please note, that usage of a comma inside a value may be done only,
-if the value is put into braces. The general functionality of these commands
-is the same like that of the previous commands \Macro{FamilyOptions} and
-\Macro{Family@Options}.
+if the value is put into braces. The general functionality of this command
+is the same like that of the previous command \Macro{FamilyOptions}.
 \begin{Example}
   Package \Package{sausagesalad} should have one mire option, to add
   additional ingredients. Each of the ingredients will set a switch like done
@@ -418,8 +460,23 @@ is the same like that of the previous commands \Macro{FamilyOptions} and
 \end{lstcode}
 \end{Example}
 %
-\EndIndex{Cmd}{Family@Option}%
 \EndIndex{Cmd}{FamilyOption}%
+
+
+\begin{Declaration}
+  \Macro{AtEndOfFamilyOptions}\Parameter{action}%
+\end{Declaration}
+\BeginIndex{Cmd}{AtEndOfFamilyOptions}%
+Sometimes\ChangedAt{v3.12}{\Package{scrbase}} it's useful to delay the
+execution of an \PName{action}, that is part of a value assignment to a key,
+until all assignments inside one \Macro{FamilyProcessOptions},
+\Macro{FamilyExecuteOptions}, \Macro{FamilyOptions}, or \Macro{FamilyOption}
+has been finished. This may be done, using \Macro{AtEndOfFamilyOptions} inside
+an option definition. Reporting failure states of \PName{action} isn't
+possible in this case. Furthermore, the command shouldn't be used outside an
+option definition.
+%
+\EndIndex{Cmd}{AtEndOfFamilyOptions}%
 
 
 \begin{Declaration}
@@ -448,9 +505,11 @@ initialize it to \PName{false}. Internally \Macro{FamilyBooKey} uses
 and \PValue{yes} beside \PName{true} for switching on and \PName{off} and
 \PName{no} beside \PName{false} for switching off. Unknown values will result
 in a call of \Macro{FamilyUnknownKeyValue} with the arguments \PName{family},
-\PName{key}, and \PName{value}. This will normally result in an error message
-about unknown value assignment (see also
-\autopageref{desc:scrbase.cmd.FamilyUnkownKeyValue}).
+\PName{key}, and \PName{value}, which results in setting of
+\Macro{FamilyKeyState}. Depending on the used command and other family
+members, may this result in an error message about unknown value assignment
+(see also \autopageref{desc:scrbase.cmd.FamilyUnkownKeyValue} and
+\autopageref{desc:scrbase.cmd.FamilyKeyState}).
 \begin{Example}
   The key \Option{coldcut} should be declared somehow more robust. Additionally
   all sausage packages should use the same key. So either all or none of them
@@ -473,7 +532,7 @@ about unknown value assignment (see also
   \@ifundefined{if@coldcut}{%
     \expandafter\newif\csname if@coldcut\endcsname
   }{}%
-  \define@key{butcher}{coldcut}[true]{%
+  \DefineFamilyKey[]{butcher}{coldcut}[true]{%
     \FamilySetBool{butcher}{coldcut}%
                            {@coldcut}%
                            {#1}%
@@ -601,7 +660,8 @@ the same like
 \Macro{DefineFamilyKey}\OParameter{family member}\Parameter{family}%
 \Parameter{key}\\
 \hphantom{\Macro{DefineFamilyKey}}%
-\PParameter{\Macro{def}\PName{command}\string{\#1\string}}.
+\PParameter{\Macro{def}\PName{command}\string{\#1\string}%
+\Macro{FamilyKeyStateProcessed}}.
 \end{quote}
 If an optional argument \PName{default} has been used, \Macro{FamilyStringKey}
 is the same like
@@ -641,8 +701,7 @@ at the value assignment to the key are not allowed.
 
 \begin{Declaration}
   \Macro{FamilyUnkownKeyValue}\Parameter{family}\Parameter{key}%
-                              \Parameter{value}\Parameter{values list}\\
-  \Macro{FamilyElseValues}
+                              \Parameter{value}\Parameter{values list}%
 \end{Declaration}
 \BeginIndex{Cmd}{FamilyUnkownKeyValue}%
 \BeginIndex{Cmd}{FamilyElseValues}%
@@ -652,15 +711,8 @@ separated list of allowed values in the form:
 \begin{flushleft}\vskip\dp\strutbox\begin{tabular}{l}
     `\PName{value}'\texttt{,} `\PName{value}' \dots
 \end{tabular}\vskip\dp\strutbox\end{flushleft}
-Additional allowed values may be set by \Macro{FamilyElseValues} in
-the form:
-\begin{flushleft}\vskip\dp\strutbox\begin{tabular}{l}
-    \texttt{,} `\PName{value}'\texttt{,} `\PName{value}' \dots
-\end{tabular}\vskip\dp\strutbox\end{flushleft}
-These will also be shown in the error message. \Macro{FamilySetBool} as well
-as \Macro{FamilySetNumerical} will reset \Macro{FamilyElseValue} to an empty
-definition automatically\,---\,independent of whether or not a error has been
-thrown.
+Certainly\ChangedAt{v3.12}{\Package{scrbase}} \PName{values list} is currently
+not used by \Package{scrbase}.
 \begin{Example}
   Now, for the cold cut the choices should be cut or no cut and in case of cut
   rough or thin. Rough should be the default for cutting.
@@ -673,24 +725,54 @@ thrown.
     \newif\csname if@coldcut\endcsname}{}
   \DefineFamilyKey{butcher}%
                   {coldcut}[true]{%
-    \ifstr{#1}{thin}{%
-      \@coldcuttrue
-      \@thincuttrue
-    }{%
+    \FamilySetBool{butcher}{coldcut}%
+                           {@coldcut}%
+                           {#1}%
+    \ifx\FamilyKeyState\FamilyKeyStateProcessed
       \@thincutfalse
-      \def\FamilyElseValue{, `thin'}%
-      \FamilySetBool{butcher}{coldcut}%
-                             {@coldcut}%
-                             {#1}%
-    }%
+    \else
+      \ifstr{#1}{thin}{%
+        \@coldcuttrue
+        \@thincuttrue
+        \FamilyKeyStateProcessed
+      }{}%
+    \fi
   }%
 \end{lstcode}
-  Command \Macro{ifstr} used at the example code above will be described at
-  \autopageref{desc:scrbase.cmd.ifstr} in \autoref{sec:scrbase.if}.
+  Let's have a look at the definition of \Option{butcher}:
+  First of all, we try to set the boolean switch of cold cut using
+  \Macro{FamilySetBool}. After this command we test, whether or not
+  \Macro{FamilyKeyState} signals the success of the command with state
+  \Macro{FamilyKeyStateProcessed}. If so, only the thin cut has to be
+  deactivated. In the other case, the value will be tested to be equal to
+  \PValue{thin}. In that case, cold cut and thin cut are activated and the
+  state will be switched to \Macro{FamilyKeyStateProcessed}. If the last test
+  failed also, the failure state of \Macro{FamilySetBool} is still valid at
+  the end of the execution.
+
+  Command \Macro{ifstr}, that has been used for the thin test, will be
+  described at \autopageref{desc:scrbase.cmd.ifstr} in
+  \autoref{sec:scrbase.if}.
 \end{Example}
 %
-\EndIndex{Cmd}{FamilyElseValues}%
 \EndIndex{Cmd}{FamilyUnkownKeyValue}%
+
+\begin{Declaration}
+  \Macro{FamilyElseValues}
+\end{Declaration}
+\BeginIndex{Cmd}{FamilyElseValues}%
+With former releases\ChangedAt{v3.12}{\Package{scrbase}} of \Package{scrbase}
+additional allowed values reported by \Macro{FamilyUnknownKeyValue} could be
+set re-defining \Macro{FamilyElseValues} in the form:
+\begin{flushleft}\vskip\dp\strutbox\begin{tabular}{l}
+    \texttt{,} `\PName{value}'\texttt{,} `\PName{value}' \dots
+\end{tabular}\vskip\dp\strutbox\end{flushleft}
+Since release~3.12 \Macro{FamilyUnknownValue} doesn't report errors itself but
+signals them using \Macro{FamilyKeyState}. Therefore \Macro{FamilyElseValues}
+became deprecated. Nevertheless, it's former usage will be recognized by
+\Package{scrbase} and results in a code change demand message.
+%
+\EndIndex{Cmd}{FamilyElseValues}%
 
 
 \section{Conditional Execution}
