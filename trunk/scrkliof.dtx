@@ -1,8 +1,8 @@
-% \CheckSum{410}
+% \CheckSum{418}
 % \iffalse meta-comment
 % ======================================================================
 % scrkliof.dtx
-% Copyright (c) Markus Kohm, 2002-2012
+% Copyright (c) Markus Kohm, 2002-2013
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrkliof.dtx
-% Copyright (c) Markus Kohm, 2002-2012
+% Copyright (c) Markus Kohm, 2002-2013
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -58,7 +58,7 @@
 %%% From File: scrkliof.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkliof.dtx}[2010/11/01 v3.08 KOMA-Script (lists of)]
+\ProvidesFile{scrkliof.dtx}[2013/03/05 v3.12 KOMA-Script (lists of)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -127,6 +127,8 @@
 %
 % \begin{option}{toc}
 %   \changes{v2.98c}{2008/03/04}{Neue Option}
+%   \changes{v3.12}{2013/03/05}{Nutzung der Status-Signalisierung mit
+%     \cs{FamilyKeyStateProcessed}}%
 % Dies ist die zentrale Option für Einstellungen des Inhaltsverzeichnisses.
 %    \begin{macrocode}
 \KOMA@key{toc}{%
@@ -156,26 +158,28 @@
     {flat}{8},{left}{8},%
     {graduated}{9},{indent}{9},{indented}{9}%
   }{#1}%
-  \ifcase \@tempa\relax
-    \KOMA@options{index=notoc}{}%
-  \or
-    \KOMA@options{index=totoc}{}%
-  \or
-    \KOMA@options{listof=notoc}{}%
-  \or
-    \KOMA@options{listof=totoc}{}%
-  \or
-    \KOMA@options{listof=numbered}{}%
-  \or
-    \KOMA@options{bibliography=nottotoc}{}%
-  \or
-    \KOMA@options{bibliography=totoc}{}%
-  \or
-    \KOMA@options{bibliography=totocnumbered}{}%
-  \or
-    \@toclefttrue
-  \or
-    \@tocleftfalse
+  \ifx\FamilyKeyState\FamilyKeyStateProcessed
+    \ifcase \@tempa\relax
+      \KOMA@options{index=notoc}{}%
+    \or
+      \KOMA@options{index=totoc}{}%
+    \or
+      \KOMA@options{listof=notoc}{}%
+    \or
+      \KOMA@options{listof=totoc}{}%
+    \or
+      \KOMA@options{listof=numbered}{}%
+    \or
+      \KOMA@options{bibliography=nottotoc}{}%
+    \or
+      \KOMA@options{bibliography=totoc}{}%
+    \or
+      \KOMA@options{bibliography=totocnumbered}{}%
+    \or
+      \@toclefttrue
+    \or
+      \@tocleftfalse
+    \fi
   \fi
 }
 %    \end{macrocode}
@@ -232,6 +236,8 @@
 %     Einstellungen wirken sich auch auf Verzeichnisse des Besitzers
 %     \texttt{float} aus, die erst später unter Kontrolle von
 %     \textsf{tocbasic} gestellt werden.}
+%   \changes{v3.12}{2013/03/05}{Nutzung der Status-Signalisierung mit
+%     \cs{FamilyKeyStateProcessed}}%
 % Dies ist die zentrale Option für die Gleitumgebungsverzeichnisse.
 %    \begin{macrocode}
 \KOMA@key{listof}{%
@@ -278,86 +284,88 @@
     {chaptergapline}{10},{onelinechaptergap}{10}%
 %</book|report>
   }{#1}%
-  \ifcase \@tempa\relax
-    \renewcommand*{\float@@listhead}{%
-%<article>    \section*
-%<report|book>    \chapter*
-    }%
-    \doforeachtocfile[float]{%
-      \unsettoc{\@currext}{numbered}%
-      \unsettoc{\@currext}{totoc}%
-    }%
-    \AtAddToTocList[float]{%
-      \unsettoc{\@currext}{numbered}%
-      \unsettoc{\@currext}{totoc}%
-    }%
-  \or% totoc
-    \renewcommand*{\float@@listhead}{%
-%<article>    \addsec
-%<report|book>    \addchap
-    }%
-    \doforeachtocfile[float]{%
-      \unsettoc{\@currext}{numbered}%
-      \setuptoc{\@currext}{totoc}%
-    }%
-    \AtAddToTocList[float]{%
-      \unsettoc{\@currext}{numbered}%
-      \setuptoc{\@currext}{totoc}%
-    }%
-  \or% numbered
-    \renewcommand*{\float@@listhead}{%
-%<article>    \section
-%<report|book>    \chapter
-    }%
-    \doforeachtocfile[float]{%
-      \setuptoc{\@currext}{numbered}%
-      \setuptoc{\@currext}{totoc}%
-    }%
-    \AtAddToTocList[float]{%
-      \setuptoc{\@currext}{numbered}%
-      \setuptoc{\@currext}{totoc}%
-    }%
-  \or% flat
-    \@dynlisttrue
-  \or% graduated
-    \@dynlistfalse
-  \or% leveldown
-    \doforeachtocfile[float]{%
-      \setuptoc{\@currext}{leveldown}%
-    }%
-    \AtAddToTocList[float]{%
-      \setuptoc{\@currext}{leveldown}%
-    }%
-  \or% entryprefix
-    \@dynlisttrue
-    \doforeachtocfile[float]{%
-      \BeforeStartingTOC[\@currext]{%
-        \scr@ifundefinedorrelax{listof\@currext entryname}{}{%
-          \expandafter\def\expandafter\numberline@prefix
-          \expandafter{\csname listof\@currext entryname\endcsname
-            \nobreakspace}%
+  \ifx\FamilyKeyState\FamilyKeyStateProcessed
+    \ifcase \@tempa\relax
+      \renewcommand*{\float@@listhead}{%
+%<article>      \section*
+%<report|book>      \chapter*
+      }%
+      \doforeachtocfile[float]{%
+        \unsettoc{\@currext}{numbered}%
+        \unsettoc{\@currext}{totoc}%
+      }%
+      \AtAddToTocList[float]{%
+        \unsettoc{\@currext}{numbered}%
+        \unsettoc{\@currext}{totoc}%
+      }%
+    \or% totoc
+      \renewcommand*{\float@@listhead}{%
+%<article>      \addsec
+%<report|book>      \addchap
+      }%
+      \doforeachtocfile[float]{%
+        \unsettoc{\@currext}{numbered}%
+        \setuptoc{\@currext}{totoc}%
+      }%
+      \AtAddToTocList[float]{%
+        \unsettoc{\@currext}{numbered}%
+        \setuptoc{\@currext}{totoc}%
+      }%
+    \or% numbered
+      \renewcommand*{\float@@listhead}{%
+%<article>      \section
+%<report|book>      \chapter
+      }%
+      \doforeachtocfile[float]{%
+        \setuptoc{\@currext}{numbered}%
+        \setuptoc{\@currext}{totoc}%
+      }%
+      \AtAddToTocList[float]{%
+        \setuptoc{\@currext}{numbered}%
+        \setuptoc{\@currext}{totoc}%
+      }%
+    \or% flat
+      \@dynlisttrue
+    \or% graduated
+      \@dynlistfalse
+    \or% leveldown
+      \doforeachtocfile[float]{%
+        \setuptoc{\@currext}{leveldown}%
+      }%
+      \AtAddToTocList[float]{%
+        \setuptoc{\@currext}{leveldown}%
+      }%
+    \or% entryprefix
+      \@dynlisttrue
+      \doforeachtocfile[float]{%
+        \BeforeStartingTOC[\@currext]{%
+          \scr@ifundefinedorrelax{listof\@currext entryname}{}{%
+            \expandafter\def\expandafter\numberline@prefix
+            \expandafter{\csname listof\@currext entryname\endcsname
+              \nobreakspace}%
+          }%
         }%
       }%
-    }%
-    \AtAddToTocList[float]{%
-      \BeforeStartingTOC[\@currext]{%
-        \scr@ifundefinedorrelax{listof\@currext entryname}{}{%
-          \expandafter\def\expandafter\numberline@prefix
-          \expandafter{\csname listof\@currext entryname\endcsname
-            \nobreakspace}%
+      \AtAddToTocList[float]{%
+        \BeforeStartingTOC[\@currext]{%
+          \scr@ifundefinedorrelax{listof\@currext entryname}{}{%
+            \expandafter\def\expandafter\numberline@prefix
+            \expandafter{\csname listof\@currext entryname\endcsname
+              \nobreakspace}%
+          }%
         }%
       }%
-    }%
 %<*book|report>
-  \or% chapterentry
-    \KOMA@options{chapteratlists=entry}{}%
-  \or% chaptergap
-    \KOMA@options{chapteratlists=\z@}{}%
-  \or% chaptergapsmall
-    \KOMA@options{chapteratlists=10\p@}{}%
-  \or% chaptergapline
-    \KOMA@options{chapteratlists=\baselineskip}{}%
+    \or% chapterentry
+      \KOMA@options{chapteratlists=entry}{}%
+    \or% chaptergap
+      \KOMA@options{chapteratlists=\z@}{}%
+    \or% chaptergapsmall
+      \KOMA@options{chapteratlists=10\p@}{}%
+    \or% chaptergapline
+      \KOMA@options{chapteratlists=\baselineskip}{}%
 %</book|report>
+    \fi
   \fi
 }
 %    \end{macrocode}
