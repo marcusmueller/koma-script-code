@@ -1,4 +1,4 @@
-% \CheckSum{2990}
+% \CheckSum{3035}
 % \iffalse meta-comment
 % ======================================================================
 % scrknpap.dtx
@@ -131,6 +131,8 @@
 %
 % \begin{option}{fromalign}
 %   \changes{v2.8q}{2002/01/25}{Neu}
+%   \changes{v3.12}{2013/03/05}{Verwendung der Status-Signalisierung mit
+%     \cs{FamilyKeyState}}
 % Diese Option legt fest, ob der Absender linksbündig, mittig oder
 % rechtsbündig gesetzt werden soll.
 % \begin{macro}{\@alignfrom}
@@ -162,7 +164,9 @@
     {locationright}{4},{rightlocation}{4},{location}{4},%
     {no}{10000},{false}{10000},{off}{10000}%
   }{#1}%
-  \ifcase\@alignfrom\or\or\or\@firstheadfalse\or\@firstheadfalse\fi
+  \ifx\FamilyKeyState\FamilyKeyStateProcessed
+    \ifcase\@alignfrom\or\or\or\@firstheadfalse\or\@firstheadfalse\fi
+  \fi
 }
 %    \end{macrocode}
 % \end{macro}
@@ -389,6 +393,8 @@
 %
 % \begin{option}{backaddress}
 %   \changes{v2.8q}{2002/01/22}{Neu}
+%   \changes{v3.12}{2013/03/05}{Verwendung der Status-Signalisierung mit
+%     \cs{FamilyKeyState}}
 % Im Adressfeld kann die Rücksendeadresse gesetzt werden. Dies geschieht nun
 % nicht mehr allein durch Definition einer Rücksendeadresse, sondern auch
 % durch eine Option.
@@ -416,23 +422,29 @@
       {underlined}{2},%
       {plain}{3}%
     }{#1}%
-    \ifcase\@tempa
+    \ifx\FamilyKeyState\FamilyKeyStateProcessed
+      \aftergroup\FamilyKeyStateProcessed
+      \ifcase\@tempa
+        \endgroup
+        \@baddrfalse
+      \or
+        \endgroup
+        \@baddrtrue
+      \or
+        \endgroup
+        \@baddrtrue
+        \let\backaddr@format\underline
+      \or
+        \endgroup
+        \@baddrtrue
+        \let\backaddr@format\@firstofone
+      \else
+        \endgroup
+      \fi
+  \else
       \endgroup
-      \@baddrfalse
-    \or
-      \endgroup
-      \@baddrtrue
-    \or
-      \endgroup
-      \@baddrtrue
-      \let\backaddr@format\underline
-    \or
-      \endgroup
-      \@baddrtrue
-      \let\backaddr@format\@firstofone
-    \else
-      \endgroup
-    \fi
+      \FamilyKeyStateUnknownValue
+  \fi
 }
 %    \end{macrocode}
 % \end{macro}
@@ -443,6 +455,8 @@
 % \begin{option}{locfield}
 %   \changes{v2.8q}{2001/10/09}{Neu}
 %   \changes{v2.97c}{2007/03/30}{vertauschte Bedeutung korrigiert}
+%   \changes{v3.12}{2013/03/05}{Verwendung der Status-Signalisierung mit
+%     \cs{FamilyKeyState}}
 % Mit Hilfe der Optione \texttt{locfield} kann der Platz neben dem Adressfeld
 % groß oder klein gewählt werden.
 % \begin{macro}{\if@bigloc}
@@ -459,13 +473,18 @@
 \KOMA@key{locfield}[wide]{%
   \begingroup
     \KOMA@set@ncmdkey{locfield}{@tempa}{{wide}{0},{narrow}{1}}{#1}%
-    \ifcase\@tempa
-      \endgroup
-      \@bigloctrue
+    \ifx\FamilyKeyState\FamilyKeyStateProcessed
+      \ifcase\@tempa
+        \endgroup
+        \@bigloctrue
+      \else
+        \endgroup
+        \@biglocfalse
+      \fi
     \else
       \endgroup
-      \@biglocfalse
-    \fi
+      \FamilyKeyStateUnknownValue
+  \fi
 }
 %    \end{macrocode}
 % \begin{option}{wlocfield}
@@ -487,6 +506,8 @@
 %   \changes{v2.8q}{2001/09/10}{Neu}
 %   \changes{v3.00}{2008/06/06}{es muss \cs{FamilyUnkownKeyVal} statt
 %     \cs{KOMA@unkown@keyval} lokal umdefiniert werden}
+%   \changes{v3.12}{2013/03/05}{Verwendung der Status-Signalisierung mit
+%     \cs{FamilyKeyState}}
 % Die Faltmarken können mit \texttt{foldmarks} aktiviert und deaktiviert
 % werden.
 % \begin{macro}{\if@fold}
@@ -504,48 +525,35 @@
 \newcommand*{\@usefolds}{TMBPL}
 \KOMA@key{foldmarks}[true]{%
   \begingroup
-    \def\FamilyUnknownKeyValue##1##2##3##4{%
-      \def\sc@nf@ldch@rs####1{%
-        \ifx ####1\@nil\else
-          \if ####1T\g@addto@macro\@usefolds{####1}\else
-            \if ####1M\g@addto@macro\@usefolds{####1}\else
-              \if ####1B\g@addto@macro\@usefolds{####1}\else
-                \if ####1P\g@addto@macro\@usefolds{####1}\else
-                  \if ####1L\g@addto@macro\@usefolds{####1}\else
-                    \if ####1V\g@addto@macro\@usefolds{L}\else
-                      \if ####1H\g@addto@macro\@usefolds{TMBP}\else
-                        \if ####1t\scr@removechar\@usefolds{T}\else
-                          \if ####1m\scr@removechar\@usefolds{M}\else
-                            \if ####1b\scr@removechar\@usefolds{B}\else
-                              \if ####1p\scr@removechar\@usefolds{P}\else
-                                \if ####1l\scr@removechar\@usefolds{L}\else
-                                  \if ####1v%
+    \KOMA@set@ifkey\@empty{@fold}{#1}%
+    \ifx\FamilyKeyState\FamilyKeyStateProcessed
+      \if@fold\aftergroup\@foldtrue\else\aftergroup\@foldfalse\fi
+      \aftergroup\FamilyKeyStateProcessed
+    \else
+      \aftergroup\FamilyKeyStateProcessed
+      \def\sc@nf@ldch@rs##1{%
+        \ifx ##1\@nil\else
+          \if ##1T\g@addto@macro\@usefolds{##1}\else
+            \if ##1M\g@addto@macro\@usefolds{##1}\else
+              \if ##1B\g@addto@macro\@usefolds{##1}\else
+                \if ##1P\g@addto@macro\@usefolds{##1}\else
+                  \if ##1L\g@addto@macro\@usefolds{##1}\else
+                    \if ##1V\g@addto@macro\@usefolds{L}\else
+                      \if ##1H\g@addto@macro\@usefolds{TMBP}\else
+                        \if ##1t\scr@removechar\@usefolds{T}\else
+                          \if ##1m\scr@removechar\@usefolds{M}\else
+                            \if ##1b\scr@removechar\@usefolds{B}\else
+                              \if ##1p\scr@removechar\@usefolds{P}\else
+                                \if ##1l\scr@removechar\@usefolds{L}\else
+                                  \if ##1v%
                                     \scr@removechar\@usefolds{L}%
                                   \else
-                                    \if ####1h%
+                                    \if ##1h%
                                       \scr@removechar\@usefolds{T}%
                                       \scr@removechar\@usefolds{M}%
                                       \scr@removechar\@usefolds{B}%
                                     \else
-                                      \ClassError{\KOMAClassName}{%
-                                        unknown fold mark switch `####1'}{%
-                                        You should use option `foldmarks' 
-                                        either with one of\MessageBreak
-                                        \@spaces `true', `on', or `yes' to
-                                        switch fold marks on,\MessageBreak
-                                        \@spaces `false', `off', or `no' to
-                                        switch fold marks off,\MessageBreak
-                                        or a combination of\MessageBreak
-                                        \@spaces `T', `M', `B', 'P', 'L', `V',
-                                        `H' to select dedicated fold
-                                        marks\MessageBreak
-                                        or\MessageBreak
-                                        \@spaces `t', `m', 'b', 'p', 'l', 'v',
-                                        'h' to deselect dedicated fold
-                                        marks.\MessageBreak
-                                        See the KOMA-Script manual for more 
-                                        information.
-                                      }%
+                                      \aftergroup\FamilyKeyStateUnknownValue
                                     \fi
                                   \fi
                                 \fi
@@ -564,9 +572,7 @@
         \fi
       }%
       \expandafter\sc@nf@ldch@rs#1\@nil
-    }%
-    \KOMA@set@ifkey\@empty{@fold}{#1}%
-    \if@fold\aftergroup\@foldtrue\else\aftergroup\@foldfalse\fi
+    \fi
   \endgroup
 }
 %    \end{macrocode}
@@ -595,6 +601,8 @@
 % \begin{option}{refline}
 %   \changes{v2.8n}{2001/09/08}{Neue Option}
 %   \changes{v2.96a}{2006/12/07}{vertauschte Bedeutung korrigiert}
+%   \changes{v3.12}{2013/03/05}{Verwendung der Status-Signalisierung mit
+%     \cs{FamilyKeyState}}
 % Kopf und Fuß der ersten Seite sind normalweise so breit, dass sie
 % zur Adresse des Empfängers passen. Für die Geschäftszeile gibt es
 % zwei Alternativen, eine breite und eine, deren Breite der Textbreite
@@ -617,26 +625,32 @@
 \KOMA@key{refline}[wide]{%
   \begingroup
     \KOMA@set@ncmdkey{refline}{@tempa}{{wide}{0},{narrow}{1},%
-    {dateleft}{2},{leftdate}{2},%
-    {dateright}{3},{rightdate}{3},%
-    {nodate}{4}%
-  }{#1}%
-    \ifcase\@tempa
+      {dateleft}{2},{leftdate}{2},%
+      {dateright}{3},{rightdate}{3},%
+      {nodate}{4}%
+    }{#1}%
+    \ifx\FamilyKeyState\FamilyKeyStateProcessed
+      \aftergroup\FamilyKeyStateProcessed
+      \ifcase\@tempa
+        \endgroup
+        \@refwidetrue
+      \or
+        \endgroup
+        \@refwidefalse
+      \or
+        \endgroup
+        \def\@datepos{2}%
+      \or
+        \endgroup
+        \def\@datepos{1}%
+      \or
+        \endgroup
+        \def\@datepos{0}%
+      \fi
+    \else
       \endgroup
-      \@refwidetrue
-    \or
-      \endgroup
-      \@refwidefalse
-    \or
-      \endgroup
-      \def\@datepos{2}%
-    \or
-      \endgroup
-      \def\@datepos{1}%
-    \or
-      \endgroup
-      \def\@datepos{0}%
-    \fi
+      \FamilyKeyStateUnknownValue
+  \fi
 }
 %    \end{macrocode}
 % \end{macro}
@@ -650,6 +664,8 @@
 %
 % \begin{option}{subject}
 %   \changes{v2.8q}{2001/10/09}{Neu}
+%   \changes{v3.12}{2013/03/05}{Verwendung der Status-Signalisierung mit
+%     \cs{FamilyKeyState}}
 % Ein Betreff-Titel kann mit \texttt{subject} ein- und abgeschaltet
 % werden. In England und Frankreich scheint es teilweise üblich zu
 % sein, den Betreff erst nach der Anrede und dafür zentriert zu
@@ -692,22 +708,27 @@
       {right}{6},%
       {centered}{7}%
     }{#1}%
-    \ifcase\@tempa
-      \aftergroup\@subjtrue
-    \or
-      \aftergroup\@subjfalse
-    \or
-      \aftergroup\@subjaftertrue
-    \or
-      \aftergroup\@subjafterfalse
-    \or
-      \aftergroup\let\aftergroup\subject@format\aftergroup\underline
-    \or
-      \aftergroup\let\aftergroup\raggedsubject\aftergroup\raggedright
-    \or
-      \aftergroup\let\aftergroup\raggedsubject\aftergroup\raggedleft
-    \or
-      \aftergroup\let\aftergroup\raggedsubject\aftergroup\centering
+    \ifx\FamilyKeyState\FamilyKeyStateProcessed
+      \aftergroup\FamilyKeyStateProcessed
+      \ifcase\@tempa
+        \aftergroup\@subjtrue
+      \or
+        \aftergroup\@subjfalse
+      \or
+        \aftergroup\@subjaftertrue
+      \or
+        \aftergroup\@subjafterfalse
+      \or
+        \aftergroup\let\aftergroup\subject@format\aftergroup\underline
+      \or
+        \aftergroup\let\aftergroup\raggedsubject\aftergroup\raggedright
+      \or
+        \aftergroup\let\aftergroup\raggedsubject\aftergroup\raggedleft
+      \or
+        \aftergroup\let\aftergroup\raggedsubject\aftergroup\centering
+      \fi
+    \else
+      \aftergroup\FamilyKeyStateUnknownValue
     \fi
   \endgroup
 }
@@ -768,6 +789,8 @@
 %
 % \begin{option}{pagenumber}
 %   \changes{v2.8q}{2002/01/31}{Neu}
+%   \changes{v3.12}{2013/03/05}{Verwendung der Status-Signalisierung mit
+%     \cs{FamilyKeyState}}
 % Bei Briefen kann gewählt werden, ob auf Folgeseiten die Seitenzahl
 % im Kopf oder im Fuß stehen soll. Dabei kann zwischen Seitenzahl
 % rechts, links oder zentriert gewählt werden. Voreingestellt ist der
@@ -803,29 +826,34 @@
       {top}{10},{head}{10},{bot}{11},{foot}{11},%
       {left}{20},{middle}{21},{center}{21},{centered}{21},{right}{22}%
     }{#1}%
-    \ifnum\@tempa<10
-      \edef\@tempa{\endgroup\edef\noexpand\@pageat{\@tempa}}%
-    \else
-      \ifnum\@tempa<20
-        \@tempcnta\@pageat\relax
-        \ifnum\@tempcnta>2
-          \advance\@tempcnta by -3
-        \fi
-        \ifnum\@tempa=11
-          \advance\@tempcnta by 3
-        \fi
-        \edef\@tempa{\endgroup\edef\noexpand\@pageat{\the\@tempcnta}}%
+    \ifx\FamilyKeyState\FamilyKeyStateProcessed
+      \aftergroup\FamilyKeyStateProcessed
+      \ifnum\@tempa<10
+        \edef\@tempa{\endgroup\edef\noexpand\@pageat{\@tempa}}%
       \else
-        \ifnum\@pageat>2
-          \edef\@pageat{3}%
+        \ifnum\@tempa<20
+          \@tempcnta\@pageat\relax
+          \ifnum\@tempcnta>2
+            \advance\@tempcnta by -3
+          \fi
+          \ifnum\@tempa=11
+            \advance\@tempcnta by 3
+          \fi
+          \edef\@tempa{\endgroup\edef\noexpand\@pageat{\the\@tempcnta}}%
         \else
-          \edef\@pageat{0}%
+          \ifnum\@pageat>2
+            \edef\@pageat{3}%
+          \else
+            \edef\@pageat{0}%
+          \fi
+          \@tempcnta\@tempa
+          \advance\@tempcnta by -20
+          \advance\@tempcnta by\@pageat
+          \edef\@tempa{\endgroup\edef\noexpand\@pageat{\the\@tempcnta}}%
         \fi
-        \@tempcnta\@tempa
-        \advance\@tempcnta by -20
-        \advance\@tempcnta by\@pageat
-        \edef\@tempa{\endgroup\edef\noexpand\@pageat{\the\@tempcnta}}%
       \fi
+    \else
+      \def\@tempa{\endgroup\FamilyKeyStateUnknownValue}%
     \fi
   \@tempa
 }
