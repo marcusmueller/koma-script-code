@@ -37,20 +37,20 @@ if svn status | grep '^M'; then
     fi
 fi
 
-if ! grep 'scr@v@'"${versionstr}" scrkcomp.dtx; then
-    cp -f scrkcomp.dtx scrkcomp.dtx~
-    sed 's!\(\\begin{macro}{\\scr@v@last}\)!\\begin{macro}{\\scr@v@'"${versionstr}"'}\n%   \\changes{v'"${versionstr}"'}{'"${datestr}"'}{Neues Macro}\n% \1!' scrkcomp.dtx > scrkcomp.dtx.tmp
-    sed '/^\\@namedef{scr@v@last}{[0-9]*} *$/{N;s!^\\@namedef{scr@v@last}{\([0-9]*\)} *\n%    \\end{macrocode}!\\@namedef{scr@v@'"${versionstr}"'}{\1}\n\0\n% \\end{macro}!}' scrkcomp.dtx.tmp > scrkcomp.dtx
-    curr_checksum=`head -1 scrkcomp.dtx | grep -o '[0-9]\+'`
+if ! grep 'scr@v@'"${versionstr}" scrkernel-compatibility.dtx; then
+    cp -f scrkernel-compatibility.dtx scrkernel-compatibility.dtx~
+    sed 's!\(\\begin{macro}{\\scr@v@last}\)!\\begin{macro}{\\scr@v@'"${versionstr}"'}\n%   \\changes{v'"${versionstr}"'}{'"${datestr}"'}{Neues Macro}\n% \1!' scrkernel-compatibility.dtx > scrkernel-compatibility.dtx.tmp
+    sed '/^\\@namedef{scr@v@last}{[0-9]*} *$/{N;s!^\\@namedef{scr@v@last}{\([0-9]*\)} *\n%    \\end{macrocode}!\\@namedef{scr@v@'"${versionstr}"'}{\1}\n\0\n% \\end{macro}!}' scrkernel-compatibility.dtx.tmp > scrkernel-compatibility.dtx
+    curr_checksum=`head -1 scrkernel-compatibility.dtx | grep -o '[0-9]\+'`
     new_checksum=$(( ${curr_checksum} + 1 ))
-    sed 's/^\(% *\\CheckSum{\).*\(}.*\)$/\1'${new_checksum}'\2/' scrkcomp.dtx > scrkcomp.dtx.tmp
-    mv scrkcomp.dtx.tmp scrkcomp.dtx
-    if latex -interaction=batchmode scrkcomp.dtx; then
-	rm scrkcomp.dtx~
+    sed 's/^\(% *\\CheckSum{\).*\(}.*\)$/\1'${new_checksum}'\2/' scrkernel-compatibility.dtx > scrkernel-compatibility.dtx.tmp
+    mv scrkernel-compatibility.dtx.tmp scrkernel-compatibility.dtx
+    if latex -interaction=batchmode scrkernel-compatibility.dtx; then
+	rm scrkernel-compatibility.dtx~
     else
-	mv -f scrkcomp.dtx scrkcomp.dtx.tmp
-	mv -f scrkcomp.dtx~ scrkcomp.dtx
-	echo "Error changing scrkcomp.dtx (see scrkcomp.dtx.tmp)." >&2
+	mv -f scrkernel-compatibility.dtx scrkernel-compatibility.dtx.tmp
+	mv -f scrkernel-compatibility.dtx~ scrkernel-compatibility.dtx
+	echo "Error changing scrkernel-compatibility.dtx (see scrkernel-compatibility.dtx.tmp)." >&2
 	exit 1
     fi
 fi
@@ -60,8 +60,8 @@ mv -f scrkvers.dtx.new scrkvers.dtx
 
 echo "Do next:"
 echo "  make"
-echo "  svn ci scrkvers.dtx scrkcomp.dtx -m 'prepared for ${versionstr}${additional}'"
+echo "  svn ci scrkvers.dtx scrkernel-compatibility.dtx -m 'prepared for ${versionstr}${additional}'"
 echo "  developer/scripts/addrelease.sh '${datestr}' '${versionstr}' \"$@\""
 echo "(NOTE: Don't execute addrelease.sh on BETA versions.)"
 echo "or:"
-echo "  rm scrkvers.dtx scrkcomp.dtx;svn up scrkvers.dtx scrkcomp.dtx"
+echo "  rm scrkvers.dtx scrkernel-compatibility.dtx;svn up scrkvers.dtx scrkernel-compatibility.dtx"
