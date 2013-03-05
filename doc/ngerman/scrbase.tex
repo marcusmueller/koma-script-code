@@ -1,6 +1,6 @@
 % ======================================================================
 % scrbase.tex
-% Copyright (c) Markus Kohm, 2002-2012
+% Copyright (c) Markus Kohm, 2002-2013
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -18,7 +18,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrbase.tex
-% Copyright (c) Markus Kohm, 2002-2012
+% Copyright (c) Markus Kohm, 2002-2013
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -45,7 +45,7 @@
 %
 % ======================================================================
 
-\ProvidesFile{scrbase.tex}[2012/03/04 KOMA-Script package scrbase]
+\ProvidesFile{scrbase.tex}[2013/03/05 KOMA-Script package scrbase]
 
 \chapter{Grundlegende Funktionen im Paket \Package{scrbase}}
 \labelbase{scrbase}
@@ -186,10 +186,20 @@ Pakete im Gesamtpaket als Mitglied zu verwenden.
 \EndIndex{Cmd}{DefineFamily}%
 
 \BeginIndex{Cmd}{DefineFamilyKey}%
+\BeginIndex{Cmd}{FamilyKeyState}%
+\BeginIndex{Cmd}{FamilyKeyStateUnknown}%
+\BeginIndex{Cmd}{FamilyKeyStateProcessed}%
+\BeginIndex{Cmd}{FamilyKeyStateUnknownValue}%
+\BeginIndex{Cmd}{FamilyKeyStateNeedValue}%
 \begin{Declaration}
   \Macro{DefineFamilyKey}\OParameter{Mitglied}\Parameter{Familie}%
   \Parameter{Schlüssel}\OParameter{Säumniswert}\\
-  \hphantom{\Macro{DefineFamilyKey}}\Parameter{Aktion}
+  \hphantom{\Macro{DefineFamilyKey}}\Parameter{Aktion}\\
+  \Macro{FamilyKeyState}\\
+  \Macro{FamilyKeyStateUnknown}\\
+  \Macro{FamilyKeyStateProcessed}\\
+  \Macro{FamilyKeyStateUnknownValue}\\
+  \Macro{FamilyKeyStateNeedValue}
 \end{Declaration}
 Mit dieser Anweisung wird ein \PName{Schlüssel} definiert. Ist ein
 \PName{Mitglied} angegeben, so ist der \PName{Schlüssel} eine Eigenschaft
@@ -202,6 +212,7 @@ ausgeführt, wobei der Wert als Parameter übergeben wird. Innerhalb von
 kein Wert übergeben, so wird stattdessen der \PName{Säumniswert}
 eingesetzt. Falls kein \PName{Säumniswert} angegeben wird, kann später der
 \PName{Schlüssel} nur mit Wertübergabe verwendet werden.
+
 \begin{Explain}
   \phantomsection\label{explain:scrbase.macro.DefineFamilyKey}%
   Letztlich führt
@@ -209,41 +220,50 @@ eingesetzt. Falls kein \PName{Säumniswert} angegeben wird, kann später der
   \DefineFamilyKey[»\PName{Mitglied}«]{»\PName{Familie}«}{»\PName{Schlüssel}«}
                   [»\PName{Säumniswert}«]{»\PName{Aktion}«}
 \end{lstcode}
-\iffalse% oder so
-  \begin{flushleft}\begin{tabular}{l@{}l}
-      \Macro{DefineFamilyKey}&\OParameter{Mitglied}\Parameter{Familie}%
-      \Parameter{Schlüssel}\\
-                             &\OParameter{Säumniswert}\Parameter{Aktion}
-  \end{tabular}\end{flushleft}
-\fi
   zu dem Aufruf
 \begin{lstcode}[moretexcs={define@key},escapeinside=»«]
   \define@key{»\PName{Familie\,Mitglied}«}{»\PName{Schlüssel}«}
-             [»\PName{Säumniswert}«]{»\PName{Aktion}«}
+             [»\PName{Säumniswert}«]{»\PName{erweiterte Aktion}«}
 \end{lstcode}
-\iffalse% oder so
-  \begin{flushleft}\begin{tabular}{l@{}l}
-      \Macro{define@key}&\Parameter{Familie\,Mitglied}%
-      \Parameter{Schlüssel}\\
-                        &\OParameter{Säumniswert}\Parameter{Aktion}
-  \end{tabular}\end{flushleft}
-\fi
   wobei \Macro{define@key} im \Package{keyval}-Paket\IndexPackage{keyval}
-  definiert ist (siehe \cite{package:keyval}).
-\iffalse% Umbruchkorrektur
-  Prinzipiell könnte daher dem
-  Schlüssel eines Familienmitglieds per
-\begin{lstcode}[moretexcs={setkeys},escapeinside=»«]
-  \setkeys{»\PName{Familie\,Mitglied}«}{»\PName{Schlüssel}«=»\PName{Wert}«}
-\end{lstcode}
-\iffalse% oder so
-  \begin{flushleft}\begin{tabular}{l@{}l}
-      \Macro{setkeys}&\Parameter{Familie\,Mitglied}\Parameter{Schlüssel=Wert}
-  \end{tabular}\end{flushleft}
-\fi
-  ein Wert zugewiesen werden.
-\fi
+  definiert ist (siehe \cite{package:keyval}). Allerdings kommen zu dem Aufruf
+  von \Macro{define@key} noch einige zusätzliche Vorkehrungen und auch die
+  \PName{Aktion} wird um zusätzliche Vorkehrungen erweitert.
 \end{Explain}
+
+Erfolg\ChangedAt{v3.12}{\Package{scrbase}} oder Misserfolg der Ausführung der
+\PName{Aktion} werden über \Macro{FamilyKeyState} an \Package{scrbase} zurück
+gemeldet, damit dieses je nach Bedarf und Verwendung der Option weitere
+Maßnahmen ergreifen kann. In der Voreinstellung ist \Macro{FamilyKeyState}
+identisch mit \Macro{FamilyKeyStateUnknown}. Das bedeutet, dass es nicht
+sicher ist, ob die Option korrekt verarbeitet werden konnte. Findet
+\Package{scrbase} nach Ausführung der \PName{Aktion} noch immer diesen Zustand
+vor, so wird ein Hinweis in die \File{log}-Datei geschrieben und im weiteren
+der Zustand \Macro{FamilyKeyStateProcessed} angenommen.
+
+Der Zustand \Macro{FamilyKeyStateProcessed} signalisiert, dass die Option und
+die Wertzuweisung an die Option vollständig abgeschlossen wurde und alles in
+Ordnung ist. Auf den Zustand kann einfach durch Aufruf von
+\Macro{FamilyKeyStateProcessed} selbst umgeschaltet werden.
+
+Der Zustand \Macro{FamilyKeyStateUnknownValue} signalisiert, dass die Option
+zwar verarbeitet wurde, ihr jedoch ein Wert zugewiesen werden sollte, der
+nicht erlaubt ist. Diesen Zustand meldet beispielsweise \Package{typearea},
+wenn versucht wird, an Option \Option{twoside} den Wert \PValue{unbekannt}
+zuzuweisen. Die Umschaltung auf den Zustand erfolgt einfach durch Aufruf von
+\Macro{FamilyKeyStateUnknownValue} selbst.
+
+Der Zustand \Macro{FamilyKeyStateNeedValue} signalisiert, dass die Option nicht
+verarbeitet werden konnte, weil sie zwingend einen Wert erwartet, sie aber
+ohne Wertzuweisung aufgerufen wurde. Dieser Zustand wird automatisch gesetzt,
+wenn eine Option, die keinen \PName{Säumniswert} besitzt, ohne Wertzuweisung
+verwendet wird. Theoretisch wäre aber auch eine explizite Umschaltung darauf
+durch Aufruf von \Macro{FamilyKeyStateNeedValue} selbst möglich.
+
+Desweiteren können zusätzliche Fehlerzustände definiert werden, indem man
+\Macro{FamilyKeyState} auf eine kurze Meldung umdefiniert. In der Regel
+sollten jedoch die vier vordefinierten Zustände verwendet werden.
+
 \begin{Example}
   Nehmen wir an, jedes der drei Pakete aus dem letzten Beispiel soll einen
   Schlüssel \PValue{Aufschnitt} erhalten. Wird dieser aufgerufen, so soll in
@@ -256,19 +276,27 @@ eingesetzt. Falls kein \PName{Säumniswert} angegeben wird, kann später der
                   {Aufschnitt}[true]{%
     \expandafter\let\expandafter\if@Salami@Aufschnitt
     \csname if#1\endcsname
+    \FamilyKeyStateProcessed
   }
 \end{lstcode}
   Als Wert sind daher beim Aufruf \PValue{true} oder \PValue{false}
   erlaubt. Ein Test auf unerlaubte Werte existiert in diesem Beispiel
-  nicht. Wird der Schlüssel später verwendet, so muss entweder einer der
-  erlaubten Werte zugewiesen oder ein Aufruf ohne Wertzuweisung verwendet
-  werden. In letzterem Fall wird der Säumniswert \PName{true} zugewiesen.
+  nicht. Stattdessen wird immer zurück gemeldet, dass die Option vollständig
+  und korrekt verarbeitet wwurde. Wird der Schlüssel später verwendet, so muss
+  entweder einer der erlaubten Werte zugewiesen oder ein Aufruf ohne
+  Wertzuweisung verwendet werden. In letzterem Fall wird der Säumniswert
+  \PName{true} zugewiesen.
 
   Für die anderen beiden Pakete kann das fast identisch definiert
   werden. Lediglich die Zeichenfolge »\texttt{Salami}« ist jeweils zu
   ersetzen.
 \end{Example}
 %
+\EndIndex{Cmd}{FamilyKeyStateNeedValue}%
+\EndIndex{Cmd}{FamilyKeyStateUnknownValue}%
+\EndIndex{Cmd}{FamilyKeyStateProcessed}%
+\EndIndex{Cmd}{FamilyKeyStateUnknown}%
+\EndIndex{Cmd}{FamilyKeyState}%
 \EndIndex{Cmd}{DefineFamilyKey}%
 
 
@@ -313,6 +341,11 @@ Man kann \Macro{FamilyProcessOptions} wahlweise als Erweiterung von
 \PName{Schlüssel=Wert}-Mechanismus von \Package{keyval} verstehen. Letztlich
 werden mit Hilfe von \Macro{FamilyProcessOptions} aus
 \PName{Schlüssel=Wert}-Paaren Optionen.
+
+Während der Ausführung von Optionen darf \Macro{FamilyProcessOptions} nicht
+verwendet werden. Es ist also insbesondere nicht erlaubt, innerhalb der
+Ausführung von Optionen Pakete zu laden, die selbst
+\Macro{FamilyProcessOptions} verwenden.%
 %
 \EndIndex{Cmd}{FamilyProcessOptions}%
 
@@ -343,16 +376,16 @@ Mitglieds gesetzt wird.
 \end{lstcode}
   ergänzt werden.
 \end{Example}
+
+Diese Anweisung darf auch innerhalb dere Ausführung von Optionen verwendet
+werden.%
 %
 \EndIndex{Cmd}{FamilyExecuteOptions}%
 
 
 \BeginIndex{Cmd}{FamilyOptions}%
-\BeginIndex{Cmd}{Family@Options}%
 \begin{Declaration}
-  \Macro{FamilyOptions}\Parameter{Familie}\Parameter{Optionenliste}\\
-  \Macro{Family@Options}\Parameter{Familie}\Parameter{Optionenliste}%
-                        \Parameter{Fehleraktion}
+  \Macro{FamilyOptions}\Parameter{Familie}\Parameter{Optionenliste}%
 \end{Declaration}
 Die \PName{Optionenliste} hat dabei die Form:
 \begin{flushleft}\vskip\dp\strutbox\begin{tabular}{l}
@@ -371,9 +404,9 @@ Eigenschaft der Familie selbst, so wird dieser Familien-Schlüssel zuerst
 gesetzt. Danach folgen die Mitglieder-Schlüssel in der Reihenfolge, in der die
 Mitglieder definiert wurden. Existiert ein angegebener \PName{Schlüssel} weder
 für die Familie noch für ein Mitglied der Familie, so wird von
-\Macro{FamilyOptions} ein Fehler ausgegeben. Bei \Macro{Family@Options} kann
-man hingegen die Fehleraktion selbst wählen. Diese interne Anweisung ist
-Klassen- und Paketautoren vorbehalten.
+\Macro{FamilyOptions} ein Fehler ausgegeben. Dies geschieht ebenfalls, wenn
+zwar für einige Mitglieder ein Schlüssel existiert, jedoch jedes dieser
+Mitglieder über \Macro{FamilyKeyState} einen Fehler zurückmeldet.
 \begin{Example}
   Sie ergänzen das Fleischermeister-Projekt um ein weiteres Paket
   \Package{Wurstsalat}. Wird dieses Paket verwendet, so sollen alle
@@ -408,16 +441,12 @@ Klassen- und Paketautoren vorbehalten.
   ist, wird nun auch gleich noch eine Warnung ausgegeben.
 \end{Example}
 %
-\EndIndex{Cmd}{Family@Options}%
 \EndIndex{Cmd}{FamilyOptions}%
 
 \BeginIndex{Cmd}{FamilyOption}%
-\BeginIndex{Cmd}{Family@Option}%
 \begin{Declaration}
   \Macro{FamilyOption}\Parameter{Familie}%
-  \Parameter{Option}\Parameter{Werteliste}\\
-  \Macro{Family@Option}\Parameter{Familie}%
-  \Parameter{Option}\Parameter{Werteliste}\Parameter{Fehleraktion}
+  \Parameter{Option}\Parameter{Werteliste}%
 \end{Declaration}
 Neben Optionen, die sich gegenseitig ausschließende Werte besitzen, kann es
 auch Optionen geben, die gleichzeitig mehrere Werte annehmen können. Für diese
@@ -432,7 +461,7 @@ einzigen \PName{Option} eine ganze \PName{Werteliste} zuweisen. Die
 In diesem Zusammenhang sei darauf hingewiesen, dass die Verwendung eines
 Kommas in einem Wert möglich ist, wenn man den Wert in geschweifte Klammern
 setzt. Die weiteren Funktionsweise ist der vorhergehenden Erklärung zu
-\Macro{FamilyOptions} und \Macro{Family@Options} zu entnehmen.
+\Macro{FamilyOptions} zu entnehmen.
 \begin{Example}
   Das Paket \Package{Wurstsalat} soll eine Option bekommen, über die man
   weitere Zutaten bestimmen kann. Für jede Zutat wird dabei wieder ein
@@ -462,8 +491,24 @@ setzt. Die weiteren Funktionsweise ist der vorhergehenden Erklärung zu
   verwenden.
 \end{Example}
 %
-\EndIndex{Cmd}{Family@Option}%
 \EndIndex{Cmd}{FamilyOption}%
+
+
+\begin{Declaration}
+  \Macro{AtEndOfFamilyOptions}\Parameter{Aktion}%
+\end{Declaration}
+\BeginIndex{Cmd}{AtEndOfFamilyOptions}%
+Manchmal\ChangedAt{v3.12}{\Package{scrbase}} ist es vorteilhafter, wenn nicht
+jede Wertzuweisung an eine Option eine \PName{Aktion} auslöst, sondern dies
+erst geschieht, wenn alle Wertzuweisungen innerhalb eines Aufrufs von
+\Macro{FamilyProcessOptions}, \Macro{FamilyExecuteOptions},
+\Macro{FamilyOptions} oder \Macro{FamilyOption} abgeschlossen sind. Genau dies
+ist mit Hilfe von \Macro{AtEndOfFamilyOptions} möglich. Die Rückmeldung von
+Fehlerzuständen ist über diese Anweisung jedoch ebenso wenig möglich, wie die
+Verwendung dieser Anweisung außerhalb der Ausführung von Optionen.
+%
+\EndIndex{Cmd}{AtEndOfFamilyOptions}%
+
 
 \BeginIndex{Cmd}{FamilyBoolKey}%
 \BeginIndex{Cmd}{FamilySetBool}%
@@ -489,14 +534,16 @@ definiert und mit \PName{false} voreingestellt. Intern verwendet
 \Macro{DefineFamilyKey}. Der Säumniswert für eine solche Option ist immer
 \PValue{true}.
 
-\Macro{FamilySetBool} wiederum versteht als \PName{Wert} neben
-\PValue{true} auch die Werte \PValue{on} und \PValue{yes} zum Einschalten und
-neben \PValue{false} auch die Werte \PValue{off} und \PValue{no} zum
+\Macro{FamilySetBool} wiederum versteht als \PName{Wert} neben \PValue{true}
+auch die Werte \PValue{on} und \PValue{yes} zum Einschalten und neben
+\PValue{false} auch die Werte \PValue{off} und \PValue{no} zum
 Ausschalten. Wird ein unbekannter Wert übergeben, so wird die Anweisung
 \Macro{FamilyUnkownKeyValue} mit den Argumenten \PName{Familie},
-\PName{Schlüssel} und \PName{Wert} aufgerufen. Dadurch wird dann eine
-Fehlermeldung über unbekannte Wertzuweisung ausgegeben (siehe auch
-\autopageref{desc:scrbase.cmd.FamilyUnkownKeyValue}).
+\PName{Schlüssel} und \PName{Wert} aufgerufen und so \Macro{FamilyKeyState}
+entsprechend gesetzt. Dadurch wird dann gegebenenfalls eine Meldung über
+unbekannte Wertzuweisung ausgegeben (siehe auch
+\autopageref{desc:scrbase.cmd.FamilyUnkownKeyValue} und
+\autopageref{desc:scrbase.cmd.FamilyKeyState}).
 \begin{Example}
   Der Schlüssel \Option{Aufschnitt} soll in den Wurstpaketen etwas robuster
   definiert werden. Außerdem sollen alle Wurstpakete denselben Schalter
@@ -521,7 +568,7 @@ Fehlermeldung über unbekannte Wertzuweisung ausgegeben (siehe auch
   \@ifundefined{if@Aufschnitt}{%
     \expandafter\newif\csname if@Aufschnitt\endcsname
   }{}%
-  \define@key{Fleischermeister}{Aufschnitt}[true]{%
+  \DefineFamilyKey[]{Fleischermeister}{Aufschnitt}[true]{%
     \FamilySetBool{Fleischermeister}{Aufschnitt}%
                                     {@Aufschnitt}%
                                     {#1}%
@@ -536,10 +583,28 @@ Fehlermeldung über unbekannte Wertzuweisung ausgegeben (siehe auch
   \autopageref{explain:scrbase.macro.DefineFamilyKey}, der nicht nur für
   \Macro{DefineFamilyKey}, sondern entsprechend auch für \Macro{FamilyBoolKey}
   gilt.
+
+  Da \Macro{FamilyKeyState} bereits von \Macro{FamilySetBool} gesetzt wird,
+  kann innerhalb der Definition der Option mit Hilfe von
+  \Macro{DefineFamilyKey} der Status gegebenenfalls auch abgefragt werden. So
+  könnte man im ersten Fall beispielsweise nach \Macro{FamilySetBool} einen
+  Test der Art:
+\begin{lstcode}
+  \ifx\FamilyKeyState\FamilyKeyStateProcessed
+      ...
+  \else
+      ...
+  \fi   
+\end{lstcode}
+  zusätzliche Aktionen in Abhängigkeit davon, ob \Macro{FamilySetBool}
+  erfolgreich war oder nicht, ausführen. Es ist zu beachten, dass an dieser
+  Stelle unbedingt ein Test mit Hilfe von \Macro{ifx} vorzunehmen
+  ist. Expandierende Tests wie \Macro{ifstr} sind hier zu vermeiden.
 \end{Example}
 %
 \EndIndex{Cmd}{FamilySetBool}%
 \EndIndex{Cmd}{FamilyBoolKey}
+
 
 \BeginIndex{Cmd}{FamilyNumericalKey}%
 \BeginIndex{Cmd}{FamilySetNumerical}%
@@ -632,6 +697,9 @@ Schlüssel ein unbekannter Wert übergeben, so wird von
 Argumenten \PName{Familie}, \PName{Schlüssel} und \PName{Wert}
 aufgerufen. Dadurch wird dann eine Fehlermeldung über unbekannte Wertzuweisung
 ausgegeben.
+
+Beim Aufruf von \Macro{FamilySetNumerical} wird wiederum auch der Erfolg oder
+Misserfolg automatisch via \Macro{FamilyKeyState} signalisiert.
 %
 \EndIndex{Cmd}{FamilySetNumerical}%
 \EndIndex{Cmd}{FamilyNumericalKey}%
@@ -660,7 +728,8 @@ das optionale Argument für den \PName{Säumniswert} so entspricht der Aufruf
 \Parameter{Schlüssel}\\
 \hphantom{\Macro{DefineFamilyKey}}%
 \OParameter{Säumniswert}%
-\PParameter{\Macro{def}\PName{Makro}\string{\#1\string}}.
+\PParameter{\Macro{def}\PName{Makro}\string{\#1\string}%
+\Macro{FamilyKeyStateProcessed}}.
 \end{quote}
 Ist
 \PName{Makro} noch nicht definiert, so wird es als leeres Makro definiert.
@@ -691,27 +760,19 @@ Wertzuweisung an den Schlüssel keine Absätze enthalten sein dürfen.
 \EndIndex{Cmd}{FamilyStringKey}%
 
 \BeginIndex{Cmd}{FamilyUnkownKeyValue}%
-\BeginIndex{Cmd}{FamilyElseValues}%
 \begin{Declaration}
   \Macro{FamilyUnkownKeyValue}\Parameter{Familie}\Parameter{Schlüssel}%
-  \Parameter{Wert}\Parameter{Werteliste}\\
-  \Macro{FamilyElseValues}
+  \Parameter{Wert}\Parameter{Werteliste}
 \end{Declaration}
-Die Anweisung \Macro{FamilyUnkownKeyValue} gibt eine Fehlermeldung über einen
-unbekannten Wert für einen bekannten Schlüssel aus. Als \PName{Werteliste}
+Die Anweisung \Macro{FamilyUnkownKeyValue} signalisiert über
+\Macro{FamilyKeyState} einen Fehler aufgrund eines unbekannten oder
+unerlaubten Werts. Als \PName{Werteliste}
 wird dabei eine durch Komma separierte Liste von erlaubten Werten der Form
 \begin{flushleft}\vskip\dp\strutbox\begin{tabular}{l}
     `\PName{Wert}'\texttt{,} `\PName{Wert}' \dots
 \end{tabular}\vskip\dp\strutbox\end{flushleft}
-erwartet. Darüber hinaus kann die Anweisung \Macro{FamilyElseValues} weitere
-erlaubte Werte in der Form
-\begin{flushleft}\vskip\dp\strutbox\begin{tabular}{l}
-    \texttt{,} `\PName{Wert}'\texttt{,} `\PName{Wert}' \dots
-\end{tabular}\vskip\dp\strutbox\end{flushleft}
-enthalten, die dann ebenfalls in der Fehlermeldung mit ausgegeben werden. Sowohl
-\Macro{FamilySetBool} als auch \Macro{FamilySetNumerical} leeren das
-Makro \Macro{FamilyElseValues} am Ende automatisch -- unabhängig davon, ob ein
-Fehler zu melden war oder nicht.
+erwartet. Allerdings\ChangedAt{v3.12}{\Package{scrbase}} wird die
+\PName{Werteliste} derzeit nicht ausgewertet.
 \begin{Example}
   Für den Aufschnitt soll nun zusätzlich wählbar sein, ob er grob oder
   fein geschnitten werden soll. Dabei ist grob die Voreinstellung, die auch
@@ -726,25 +787,55 @@ Fehler zu melden war oder nicht.
     \newif\csname if@Aufschnitt\endcsname}{}
   \DefineFamilyKey{Fleischermeister}%
                   {Aufschnitt}[true]{%
-    \ifstr{#1}{fein}{%
-      \@Aufschnitttrue
-      \@Feinschnittrue
-    }{%
+    \FamilySetBool{Fleischermeister}{Aufschnitt}%
+                                    {@Aufschnitt}%
+                                    {#1}%
+    \ifx\FamilyKeyState\FamilyKeyStateProcessed
       \@Feinschnittfalse
-      \def\FamilyElseValue{, `fein'}%
-      \FamilySetBool{Fleischermeister}{Aufschnitt}%
-                                      {@Aufschnitt}%
-                                      {#1}%
-    }%
+    \else      
+      \ifstr{#1}{fein}{%
+        \@Aufschnitttrue
+        \@Feinschnittrue
+        \FamilyKeyStateProcessed
+      }{}%
+    \fi
   }%
 \end{lstcode}
-  Die hierbei verwendete Anweisung \Macro{ifstr} ist auf
+  Hier wird zunächst versucht, den boolschen Schalter für Aufschnitt über
+  \Macro{FamilySetBool} zu setzen. Wenn dies über \Macro{FamilyKeyState} den
+  Erfolgs-Status \Macro{FamilyKeyStateProcessed} zurück liefert, wird nur noch
+  der Feinschnitt abgeschaltet. Anderenfalls wird überprüft, ob als Wert
+  keiner für den boolschen Schalter, sondern \PValue{fein} übergeben wurde. In
+  diesem Fall wird sowohl der Feinschnitt, als auch Aufschnitt aktiviert und
+  mit Hilfe von \Macro{FamilyKeyStateProcessed} der Erfolgs-Status
+  gesetzt. Ist auch das nicht der Fall, bleibt der von \Macro{FamilySetBool}
+  signalisierte Fehler-Zustand bestehen.
+
+  Die bei den Tests verwendete Anweisung \Macro{ifstr} ist auf
   \autopageref{desc:scrbase.cmd.ifstr} in \autoref{sec:scrbase.if}
   erklärt.
 \end{Example}
 %
-\EndIndex{Cmd}{FamilyElseValues}%
 \EndIndex{Cmd}{FamilyUnkownKeyValue}%
+
+\BeginIndex{Cmd}{FamilyElseValues}%
+\begin{Declaration}
+  \Macro{FamilyElseValues}
+\end{Declaration}
+In\ChangedAt{v3.12}{\Package{scrbase}} früheren Versionen von
+\Package{scrbase} konnte man über die Anweisung \Macro{FamilyElseValues} weitere
+erlaubte Werte für die Bearbeitung durch \Macro{FamilyUnknownValue} in der Form
+\begin{flushleft}\vskip\dp\strutbox\begin{tabular}{l}
+    \texttt{,} `\PName{Wert}'\texttt{,} `\PName{Wert}' \dots
+\end{tabular}\vskip\dp\strutbox\end{flushleft}
+ablegen, die dann ebenfalls in einer Fehlermeldung mit ausgegeben wurden. Seit
+Version~3.12 gibt \Macro{FamilyUnknownValue} selbst keine Fehlermeldungen mehr
+aus, sondern setzt nur noch \Macro{FamilyKeyState} entsprechend. Damit ist die
+Verwendung von \Macro{FamilyElseValue} ebenfalls überholt. Ihre Verwendung
+wird jedoch erkannt und führt dann zu einer Aufforderung, den Code
+entsprechend anzupassen.
+%
+\EndIndex{Cmd}{FamilyElseValues}%
 
 
 \section{Verzweigungen}
