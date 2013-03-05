@@ -142,7 +142,7 @@ CLS_MAIN_DTX    = scrbeta.dtx \
 		  scrkernel-listsof.dtx \
 		  scrklist.dtx \
 		  scrkernel-miscellaneous.dtx \
-		  scrknpap.dtx \
+		  scrkernel-notepaper.dtx \
 		  scrkernel-pagestyles.dtx \
 		  scrkernel-paragraphs.dtx \
 		  scrkplen.dtx \
