@@ -1,4 +1,4 @@
-% \CheckSum{2235}
+% \CheckSum{2251}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkernel-sections.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkernel-sections.dtx}[2013/02/26 v3.12 KOMA-Script 
+\ProvidesFile{scrkernel-sections.dtx}[2013/03/05 v3.12 KOMA-Script 
                                                      (disposition)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
@@ -115,6 +115,8 @@
 % \fi
 % \begin{option}{open}
 %   \changes{v2.98c}{2008/03/06}{Neue Option}
+%   \changes{v3.12}{2013/03/05}{Verwendung der Status-Signalisierung mit
+%     \cs{FamilyKeyState}}
 % Bei \textsf{scrreprt} und \textsf{scrbook} kann per Option eingestellt
 % werden, ob Kapitel nur auf linken oder rechten Seiten beginnen dürfen oder
 % auf jeder Seite.
@@ -138,15 +140,17 @@
     {right}{1},%
     {left}{2}%
   }{#1}%
-  \ifcase \@tempa\relax
-    \@openrightfalse
-    \renewcommand*{\cleardoublestandardpage}{\cleardoubleoddstandardpage}%
-  \or
-    \@openrighttrue
-    \renewcommand*{\cleardoublestandardpage}{\cleardoubleoddstandardpage}%
-  \or
-    \@openrighttrue
-    \renewcommand*{\cleardoublestandardpage}{\cleardoubleevenstandardpage}%
+  \ifx\FamilyKeyState\FamilyKeyStateProcessed
+    \ifcase \@tempa\relax
+      \@openrightfalse
+      \renewcommand*{\cleardoublestandardpage}{\cleardoubleoddstandardpage}%
+    \or
+      \@openrighttrue
+      \renewcommand*{\cleardoublestandardpage}{\cleardoubleoddstandardpage}%
+    \or
+      \@openrighttrue
+      \renewcommand*{\cleardoublestandardpage}{\cleardoubleevenstandardpage}%
+    \fi
   \fi
 }
 %    \end{macrocode}
@@ -170,6 +174,8 @@
 %
 % \begin{option}{numbers}
 %   \changes{v2.98c}{2008/03/07}{Neue Option}
+%   \changes{v3.12}{2013/03/05}{Verwendung der Status-Signalisierung mit
+%     \cs{FamilyKeyState}}
 % Dies ist die zentrale Option zur Konfiguration der Nummerierung. Dabei geht
 % es primär um die Gliederungsnummern, es sind jedoch auch davon abgeleitete
 % Nummern betroffen.
@@ -206,17 +212,19 @@
     {noendperiod}{2},{noperiodatend}{2},%
     {noenddot}{2},{nodotatend}{2}%
   }{#1}%
-  \ifcase \@tempa\relax
-    \if@atdocument\scr@dotchangeatdocument{#1}\else
-      \let\scr@altsecnumhook\@empty
-    \fi
-  \or
-    \if@atdocument\scr@dotchangeatdocument{#1}\else
-      \let\scr@altsecnumhook\scr@altsecnumhooktrue
-    \fi
-  \or
-    \if@atdocument\scr@dotchangeatdocument{#1}\else
-      \let\scr@altsecnumhook\scr@altsecnumhookfalse
+  \ifx\FamilyKeyState\FamilyKeyStateProcessed
+    \ifcase \@tempa\relax
+      \if@atdocument\scr@dotchangeatdocument{#1}\else
+        \let\scr@altsecnumhook\@empty
+      \fi
+    \or
+      \if@atdocument\scr@dotchangeatdocument{#1}\else
+        \let\scr@altsecnumhook\scr@altsecnumhooktrue
+      \fi
+    \or
+      \if@atdocument\scr@dotchangeatdocument{#1}\else
+        \let\scr@altsecnumhook\scr@altsecnumhookfalse
+      \fi
     \fi
   \fi
 }
@@ -311,13 +319,15 @@
 %  \end{option}
 %
 %
-%  \begin{option}{appendixprefix}
-%    \changes{v2.8}{2001/06/15}{neue Option}
-%    \changes{v2.95c}{2006/08/21}{als \textsf{keyval}-Option}
-%  \begin{option}{noappendixprefix}
-%    \changes{v2.8}{2001/06/15}{neue Option}
-%    \changes{v2.95c}{2006/08/21}{obsolete Option}
-%    \changes{v3.01a}{2008/11/20}{deprecated}
+% \begin{option}{appendixprefix}
+%   \changes{v2.8}{2001/06/15}{neue Option}
+%   \changes{v2.95c}{2006/08/21}{als \textsf{keyval}-Option}
+%   \changes{v3.12}{2013/03/05}{Verwendung der Status-Signalisierung mit
+%     \cs{FamilyKeyState}}
+% \begin{option}{noappendixprefix}
+%   \changes{v2.8}{2001/06/15}{neue Option}
+%   \changes{v2.95c}{2006/08/21}{obsolete Option}
+%   \changes{v3.01a}{2008/11/20}{deprecated}
 % \iffalse
 %<*book|report>
 % \fi
@@ -329,10 +339,12 @@
 %    \begin{macrocode}
 \KOMA@key{appendixprefix}[true]{%
   \KOMA@set@ifkey{appendixprefix}{@tempswa}{#1}%
-  \if@tempswa
-    \def\appendixmore{\@chapterprefixtrue}%
-  \else
-    \def\appendixmore{\@chapterprefixfalse}%
+  \ifx\FamilyKeyState\FamilyKeyStateProcessed
+    \if@tempswa
+      \def\appendixmore{\@chapterprefixtrue}%
+    \else
+      \def\appendixmore{\@chapterprefixfalse}%
+    \fi
   \fi
 }
 \KOMA@DeclareDeprecatedOption{noappendixprefix}{appendixprefix=false}
@@ -340,8 +352,8 @@
 % \iffalse
 %</book|report>
 % \fi
-%  \end{option}
-%  \end{option}
+% \end{option}^^A noappendixprefix
+% \end{option}^^A appendixprefix
 %
 %
 % \begin{macro}{\size@part}
@@ -425,12 +437,14 @@
 %   \changes{v2.98c}{2008/03/10}{Neue Option}%
 %   \changes{v3.10}{2011/08/30}{Integration der Erweiterung für das optionale
 %     Argument der Gliederungsbefehle}
-%   Dies ist eine neue zentrale Option für Überschriften. Dabei ergibt sich
-%   nun auch das Problem, dass die Gesamtmenge der Überschriften mal
-%   \emph{headings} (Überschriften), mal \emph{sectioning}
-%   (Abschnittseinteilung) und mal \emph{disposition} (Gliederung) genannt
-%   wird. Es wäre gut gewesen, sich bei Zeiten Gedanken darüber zu machen, wie
-%   man das am besten einheitlich nennt.
+%   \changes{v3.12}{2013/03/05}{Verwendung der Status-Signalisierung mit
+%     \cs{FamilyKeyState}}
+% Dies ist eine neue zentrale Option für Überschriften. Dabei ergibt sich
+% nun auch das Problem, dass die Gesamtmenge der Überschriften mal
+% \emph{headings} (Überschriften), mal \emph{sectioning}
+% (Abschnittseinteilung) und mal \emph{disposition} (Gliederung) genannt
+% wird. Es wäre gut gewesen, sich bei Zeiten Gedanken darüber zu machen, wie
+% man das am besten einheitlich nennt.
 %    \begin{macrocode}
 \KOMA@key{headings}{%
   \KOMA@set@ncmdkey{headings}{@tempa}{%
@@ -454,7 +468,8 @@
     {optiontotoc}{11},%
     {optiontohead}{12}%
   }{#1}%
-  \ifcase \@tempa\relax
+  \ifx\FamilyKeyState\FamilyKeyStateProcessed
+    \ifcase \@tempa\relax
 %    \end{macrocode}
 %   Als erstes kümmern wir uns um die drei Größenabstufungen für die
 %   Überschriften, die \KOMAScript{} bietet, und zwar in der Reihenfolge
@@ -464,117 +479,118 @@
 %   Font-Elementen für die einzelnen Überschriften aufhebt macht!
 %    \begin{macrocode}
 %<*book|report>
-    \renewcommand*{\chapterheadstartvskip}{%
-      \vspace*{2.3\baselineskip}%
-    }%
-    \renewcommand*{\chapterheadendvskip}{%
-      \vspace{1.725\baselineskip
-        \@plus .115\baselineskip \@minus .192\baselineskip}%
-    }%
+      \renewcommand*{\chapterheadstartvskip}{%
+        \vspace*{2.3\baselineskip}%
+      }%
+      \renewcommand*{\chapterheadendvskip}{%
+        \vspace{1.725\baselineskip
+          \@plus .115\baselineskip \@minus .192\baselineskip}%
+      }%
 %</book|report>
-    \renewcommand*{\size@part}{\Huge}%
-    \renewcommand*{\size@partnumber}{\huge}%
-%<book|report>    \renewcommand*{\size@chapter}{\huge}%
-    \renewcommand*{\size@section}{\Large}%
-    \renewcommand*{\size@subsection}{\large}%
-    \renewcommand*{\size@subsubsection}{\normalsize}%
-    \renewcommand*{\size@paragraph}{\normalsize}%
-    \renewcommand*{\size@subparagraph}{\normalsize}%
-  \or
+      \renewcommand*{\size@part}{\Huge}%
+      \renewcommand*{\size@partnumber}{\huge}%
+%<book|report>      \renewcommand*{\size@chapter}{\huge}%
+      \renewcommand*{\size@section}{\Large}%
+      \renewcommand*{\size@subsection}{\large}%
+      \renewcommand*{\size@subsubsection}{\normalsize}%
+      \renewcommand*{\size@paragraph}{\normalsize}%
+      \renewcommand*{\size@subparagraph}{\normalsize}%
+    \or
 %<*book|report>
-    \renewcommand*{\chapterheadstartvskip}{%
-      \vspace*{2\baselineskip}%
-    }%
-    \renewcommand*{\chapterheadendvskip}{%
-      \vspace{1.5\baselineskip
-        \@plus .1\baselineskip \@minus .167\baselineskip}%
-    }%
+      \renewcommand*{\chapterheadstartvskip}{%
+        \vspace*{2\baselineskip}%
+      }%
+      \renewcommand*{\chapterheadendvskip}{%
+        \vspace{1.5\baselineskip
+          \@plus .1\baselineskip \@minus .167\baselineskip}%
+      }%
 %</book|report>
-    \renewcommand*{\size@part}{\huge}%
-    \renewcommand*{\size@partnumber}{\huge}%
+      \renewcommand*{\size@part}{\huge}%
+      \renewcommand*{\size@partnumber}{\huge}%
 %<*book|report>
-    \renewcommand*{\size@chapter}{\LARGE}%
-    \renewcommand*{\size@section}{\Large}%
-    \renewcommand*{\size@subsection}{\large}%
+      \renewcommand*{\size@chapter}{\LARGE}%
+      \renewcommand*{\size@section}{\Large}%
+      \renewcommand*{\size@subsection}{\large}%
 %</book|report>
 %<*article>
-    \renewcommand*{\size@section}{\large}%
-    \renewcommand*{\size@subsection}{\normalsize}%
+      \renewcommand*{\size@section}{\large}%
+      \renewcommand*{\size@subsection}{\normalsize}%
 %</article>
-    \renewcommand*{\size@subsubsection}{\normalsize}%
-    \renewcommand*{\size@paragraph}{\normalsize}%
-    \renewcommand*{\size@subparagraph}{\normalsize}%
-  \or
+      \renewcommand*{\size@subsubsection}{\normalsize}%
+      \renewcommand*{\size@paragraph}{\normalsize}%
+      \renewcommand*{\size@subparagraph}{\normalsize}%
+    \or
 %<*book|report>
-    \renewcommand*{\chapterheadstartvskip}{%
-      \vspace*{1.8\baselineskip}%
-    }%
-    \renewcommand*{\chapterheadendvskip}{%
-      \vspace{1.35\baselineskip
-        \@plus 0.09\baselineskip \@minus .15\baselineskip}%
-    }%
+      \renewcommand*{\chapterheadstartvskip}{%
+        \vspace*{1.8\baselineskip}%
+      }%
+      \renewcommand*{\chapterheadendvskip}{%
+        \vspace{1.35\baselineskip
+          \@plus 0.09\baselineskip \@minus .15\baselineskip}%
+      }%
 %</book|report>
-    \renewcommand*{\size@part}{\LARGE}%
-    \renewcommand*{\size@partnumber}{\LARGE}%
+      \renewcommand*{\size@part}{\LARGE}%
+      \renewcommand*{\size@partnumber}{\LARGE}%
 %<*book|report>
-    \renewcommand*{\size@chapter}{\Large}%
-    \renewcommand*{\size@section}{\large}%
+      \renewcommand*{\size@chapter}{\Large}%
+      \renewcommand*{\size@section}{\large}%
 %</book|report>
 %<*article>
-    \renewcommand*{\size@section}{\normalsize}%
+      \renewcommand*{\size@section}{\normalsize}%
 %</article>
-    \renewcommand*{\size@subsection}{\normalsize}%
-    \renewcommand*{\size@subsubsection}{\normalsize}%
-    \renewcommand*{\size@paragraph}{\normalsize}%
-    \renewcommand*{\size@subparagraph}{\normalsize}%
+      \renewcommand*{\size@subsection}{\normalsize}%
+      \renewcommand*{\size@subsubsection}{\normalsize}%
+      \renewcommand*{\size@paragraph}{\normalsize}%
+      \renewcommand*{\size@subparagraph}{\normalsize}%
 %    \end{macrocode}
 %   Für \textsf{scrbook} und \textsf{scrreprt} gibt es dann noch die
 %   Möglichkeit, auch hierüber die Optionen \texttt{open=any},
 %   \texttt{open=right} und \texttt{open=left} zu setzen.
 %    \begin{macrocode}
-  \or
+    \or
 %<*book|report>
-    \KOMA@options{open=any}{}%
+      \KOMA@options{open=any}{}%
 %</book|report>
-  \or
+    \or
 %<*book|report>
-    \KOMA@options{open=right}{}%
+      \KOMA@options{open=right}{}%
 %</book|report>
-  \or
+    \or
 %<*book|report>
-    \KOMA@options{open=left}{}%
+      \KOMA@options{open=left}{}%
 %</book|report>
 %    \end{macrocode}
 %   Für \textsf{scrbook} und \textsf{scrreprt} gibt es dann noch die
 %   Möglichkeit, auch hierüber die Optionen \texttt{chapterprefix} und
 %   \texttt{appendixprefix} zu setzen.
 %    \begin{macrocode}
-  \or
+    \or
 %<*book|report>
-    \KOMA@options{chapterprefix=true}{}%
+      \KOMA@options{chapterprefix=true}{}%
 %</book|report>
-  \or
+    \or
 %<*book|report>
-    \KOMA@options{chapterprefix=false}{}%
+      \KOMA@options{chapterprefix=false}{}%
 %</book|report>
-  \or
+    \or
 %<*book|report>
-    \KOMA@options{appendixprefix=true}{}%
+      \KOMA@options{appendixprefix=true}{}%
 %</book|report>
-  \or
+    \or
 %<*book|report>
-    \KOMA@options{appendixprefix=false}{}%
+      \KOMA@options{appendixprefix=false}{}%
 %</book|report>
 %    \end{macrocode}
 %   Ab Version~3.10 wird über diese Option auch noch die Erweiterung für das
 %   optionale Argument der Gliederungsüberschriften aktiviert und gesteuert.
 %    \begin{macrocode}
-  \or
-    \scr@activate@xsection{3}%
-  \or
-    \scr@activate@xsection{2}%
-  \or
-    \scr@activate@xsection{1}%
+    \or
+      \scr@activate@xsection{3}%
+    \or
+      \scr@activate@xsection{2}%
+    \or
+      \scr@activate@xsection{1}%
+    \fi
   \fi
 }
 %    \end{macrocode}
