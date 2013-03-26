@@ -1,8 +1,8 @@
-% \CheckSum{2133}
+% \CheckSum{2213}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-typearea.dtx
-% Copyright (c) Markus Kohm, 2002-2012
+% Copyright (c) Markus Kohm, 2002-2013
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrkernel-typearea.dtx
-% Copyright (c) Markus Kohm, 2002-2012
+% Copyright (c) Markus Kohm, 2002-2013
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -58,7 +58,7 @@
 %%% From File: scrkernel-typearea.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkernel-typearea.dtx}[2013/03/05 v3.12 KOMA-Script 
+\ProvidesFile{scrkernel-typearea.dtx}[2013/03/26 v3.12 KOMA-Script 
                                                        (type area)]
 % \iffalse
 %</driver>
@@ -494,9 +494,12 @@
 %   \changes{v2.95}{2002/12/06}{mit \textsf{keyval} neu implementiert}
 %   \changes{v3.12}{2013/03/05}{Verwendung der Status-Signalisierung mit
 %     \cs{FamilyKeyState}}
+% \begin{option}{footlines}
+%   \changes{v3.12}{2013/03/26}{neue Option}
 % Neben der Auswertung der \meta{Wert}\texttt{headlines} Form über
 % Pattern Matching wird hier auch noch eine \textsf{keyval}-Option
-% definiert, die bevorzugt zu verwenden ist.
+% definiert, die bevorzugt zu verwenden ist. Für den Fuß wird überhaupt nur
+% diese Form bereit gestellt.
 %    \begin{macrocode}
 \KOMA@key{headlines}{%
   \begingroup
@@ -505,16 +508,26 @@
   \def\ta@hh{#1\baselineskip}%
   \FamilyKeyStateProcessed
 }
+\KOMA@key{footlines}{%
+  \begingroup
+    \setlength{\@tempdima}{#1\baselineskip}%
+  \endgroup
+  \def\ta@fh{#1\baselineskip}%
+  \FamilyKeyStateProcessed
+}
 %    \end{macrocode}
+% \end{option}
 % \end{option}
 %
 % \begin{option}{headheight}
 %   \changes{v2.98c}{2008/04/06}{neue Option}
 %   \changes{v3.12}{2013/03/05}{Verwendung der Status-Signalisierung mit
 %     \cs{FamilyKeyState}}
+% \begin{option}{footheight}
+%   \changes{v3.12}{2013/03/26}{neue Option}
 % Manchmal ist es nützlicher, wenn man die Höhe direkt setzen kann, statt sie
 % über die Anzahl der Grundlinien zu setzen. In dem Fall nimmt man einfach
-% diese Option.
+% diese Optionen.
 %    \begin{macrocode}
 \KOMA@key{headheight}{%
   \begingroup
@@ -523,7 +536,15 @@
   \def\ta@hh{#1}%
   \FamilyKeyStateProcessed
 }
+\KOMA@key{footheight}{%
+  \begingroup
+    \setlength{\@tempdima}{#1}%
+  \endgroup
+  \def\ta@fh{#1}%
+  \FamilyKeyStateProcessed
+}
 %    \end{macrocode}
+% \end{option}
 % \end{option}
 %
 % \begin{option}{headinclude}
@@ -1953,6 +1974,7 @@
 %   \changes{v2.96}{2006/08/21}{Warnung, wenn \cs{typearea} innerhalb einer
 %     Gruppe verwendet wird}
 %   \changes{v3.10}{2011/09/13}{Verwendung von \cs{scr@grouplevel@test}}
+%   \changes{v3.12}{2013/03/26}{konfigurierbare Höhe des Fußes}
 %      
 %   Die symbolischen Werte für das obligatorische Argument von
 %   \cs{typearea} haben folgende Bedeutung:
@@ -2026,10 +2048,22 @@
 %    \begin{macrocode}
     \headsep=1.5\baselineskip
 %    \end{macrocode}
+% Für den Fuß muss ähnlich verfahren werden. Dabei muss aber nicht nur
+% ggf. \cs{footheight}, sondern auch \cs{footskip} angepasst werden.
+%    \begin{macrocode}
+    \@ifundefined{footheight}{%
+      \newlength\footheight
+    }{}%
+    \@ifundefined{ta@fh}{%
+      \footheight=1.25\baselineskip
+    }{%
+      \footheight=\ta@fh
+    }%
+    \footskip=\dimexpr\footheight+2.25\baselineskip
+%    \end{macrocode}
 % Es folgen die restlichen von \textit{DIV} und \textit{BCOR}
 % unabhängigen Werte.
 %    \begin{macrocode}
-    \footskip=3.5\baselineskip
     \marginparsep=1cc
     \marginparpush=0.45\baselineskip
 %    \end{macrocode}
@@ -2303,6 +2337,18 @@
     \ta@layoutinfo{\number\ta@div}{\the\@tempcnta}%
     \@typearea@end
     \activateareas
+    \ifdim \dimexpr 1in+\topmargin
+                   +\headheight+\headsep
+                   +\textheight
+                   +\footskip+\dp\strutbox\relax
+           >\paperheight
+      \PackageWarningNoLine{typearea}{%
+        page content and margins higher than paper.\MessageBreak
+        This may result in page footer out of paper.\MessageBreak
+        You should decrease DIV, decrease foot height,\MessageBreak
+        or include footer into type area%
+      }%
+    \fi
   \fi
 }
 %    \end{macrocode}
@@ -2453,7 +2499,22 @@
     \advance\headheight by-10\p@
   \fi
   \headsep=1.5\baselineskip
-  \footskip=3.5\baselineskip
+%    \end{macrocode}
+%   \changes{v3.12}{2013/03/26}{changes for height of foot}
+%    \begin{macrocode}
+  \@ifundefined{footheight}{\newlength\footheight}{}
+  \if@areasetadvanced
+    \@ifundefined{ta@fh}{%
+      \footheight=1.25\baselineskip
+      \footskip=3.5\baselineskip
+    }{%
+      \footheight=\ta@fh
+      \footskip=\dimexpr \footheight+2.25\baselineskip\relax
+    }%
+  \else
+    \footheight=1.25\baselineskip
+    \footskip=3.5\baselineskip
+  \fi
   \ta@vblk=\paperheight
   \advance\ta@vblk by-\textheight
   \divide\ta@vblk by3
@@ -2504,6 +2565,18 @@
 %    \begin{macrocode}
   \@areaset@end
   \activateareas
+  \ifdim \dimexpr 1in+\topmargin
+                 +\headheight+\headsep
+                 +\textheight
+                 +\footskip+\dp\strutbox\relax
+         >\paperheight
+    \PackageWarningNoLine{typearea}{%
+      page content and margins higher than paper.\MessageBreak
+      This may result in page footer out of paper.\MessageBreak
+      You should decrease DIV, decrease foot height,\MessageBreak
+      or decreate height of text area%
+    }%
+  \fi
 }
 %    \end{macrocode}
 %  \end{macro}
