@@ -1,4 +1,4 @@
-% \CheckSum{2701}
+% \CheckSum{2846}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-fonts.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkernel-fonts.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkernel-fonts.dtx}[2013/03/05 v3.12 KOMA-Script 
+\ProvidesFile{scrkernel-fonts.dtx}[2013/03/30 v3.12 KOMA-Script 
                                                (font selection)]
 % \changes{v3.09}{2011/02/23}{Neues Paket \texttt{scrfontsizes}}
 % \iffalse
@@ -1512,7 +1512,99 @@
   }%
 }
 %    \end{macrocode}
-%  \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\usesizeofkomafont}
+%   \changes{v3.12}{2013/03/30}{neu}
+% \begin{macro}{\usefamilyofkomafont}
+%   \changes{v3.12}{2013/03/30}{neu}
+% \begin{macro}{\useseriesofkomafont}
+%   \changes{v3.12}{2013/03/30}{neu}
+% \begin{macro}{\useshapeofkomafont}
+%   \changes{v3.12}{2013/03/30}{neu}
+% \begin{macro}{\useencodingofkomafont}
+%   \changes{v3.12}{2013/03/30}{neu}
+% \begin{macro}{\usefontofkomafont}
+%   \changes{v3.12}{2013/03/30}{neu}
+% Manchmal wollen die Leute tatsächlich gar nicht den kompletten Font eines
+% Elements, sondern nur einen Teilaspekt davon. Aber Version~3.12 wird das mit
+% Hilfe neuer Anweisungen unterstützt.
+%    \begin{macrocode}
+\newcommand*{\usesizeofkomafont}[1]{%
+  \begingroup
+    \@tempcnta=\currentgrouplevel
+    \usekomafont{#1}{%
+      \ifnum \currentgrouplevel>\numexpr\@tempcnta\relax
+        \edef\reserved@a{\noexpand\egroup\noexpand\endgroup
+          \noexpand\fontsize{\f@size}{\f@baselineskip}%
+          \noexpand\bgroup}%
+      \else
+        \edef\reserved@a{\noexpand\endgroup
+          \noexpand\fontsize{\f@size}{\f@baselineskip}}%
+      \fi
+      \reserved@a
+    }%
+  \selectfont
+}
+\newcommand*{\usefamilyofkomafont}{\use@ofkomafont{family}}
+\newcommand*{\useseriesofkomafont}{\use@ofkomafont{series}}
+\newcommand*{\useshaperofkomafont}{\use@ofkomafont{shape}}
+\newcommand*{\useencodingofkomafont}{\use@ofkomafont{encoding}}
+\newcommand*{\usefontofkomafont}[1]{%
+  \begingroup
+    \@tempcnta=\currentgrouplevel
+    \usekomafont{#1}{%
+      \ifnum \currentgrouplevel>\numexpr\@tempcnta\relax
+        \edef\reserved@a{\noexpand\egroup\noexpand\endgroup
+          \noexpand\fontsize{\f@size}{\f@baselineskip}%
+          \noexpand\fontfamily{\f@family}%
+          \noexpand\fontseries{\f@series}%
+          \noexpand\fontshape{\f@shape}%
+          \noexpand\fontencoding{\f@encoding}%
+          \noexpand\bgroup}%
+      \else
+        \edef\reserved@a{\noexpand\endgroup
+          \noexpand\fontsize{\f@size}{\f@baselineskip}}%
+          \noexpand\fontfamily{\f@family}%
+          \noexpand\fontseries{\f@series}%
+          \noexpand\fontshape{\f@shape}%
+          \noexpand\fontencoding{\f@encoding}%
+      \fi
+      \reserved@a
+    }%
+  \selectfont
+}
+%    \end{macrocode}
+% \begin{macro}{\use@ofkomafont}
+%   \changes{v3.12}{2013/03/30}{neu (intern)}
+% Kleines Hilfsmakro für all diese Anweisungen bis auf die erste und die letzte.
+%    \begin{macrocode}
+\newcommand*{\use@ofkomafont}[2]{%
+  \begingroup
+    \@tempcnta=\currentgrouplevel
+    \usekomafont{#2}{%
+      \ifnum \currentgrouplevel>\numexpr\@tempcnta\relax
+        \edef\reserved@a{\noexpand\egroup\noexpand\endgroup
+          \expandafter\noexpand\csname font#1\endcsname
+          {\csname f@#1\endcsname}%
+          \noexpand\bgroup}%
+      \else
+        \edef\reserved@a{\noexpand\endgroup
+          \expandafter\noexpand\csname font#1\endcsname
+          {\csname f@#1\endcsname}%
+      \fi
+      \reserved@a
+    }%
+  \selectfont
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 %
 % Um dann ein Element zu definieren, definiert man zunächst ein
 % Makro, das die Schriftart enthält. Dann definiert man
