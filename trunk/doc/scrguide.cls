@@ -1,6 +1,6 @@
 % ======================================================================
 % scrguide.cls
-% Copyright (c) Markus Kohm, 2005-2012
+% Copyright (c) Markus Kohm, 2005-2013
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -18,7 +18,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrguide.cls
-% Copyright (c) Markus Kohm, 2005-2012
+% Copyright (c) Markus Kohm, 2005-2013
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2011/10/18 v1.6 internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2013/04/10 v1.7 internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -658,6 +658,9 @@
 %   This may already be defined.
 %    \begin{macrocode}
 \providecommand*{\eTeX}{\ensuremath{\varepsilon}-\TeX}
+\providecommand*{\NTS}{%
+  \leavevmode\hbox{$\cal N\kern-0.35em\lower0.5ex\hbox{$\cal T$}%
+  \kern-0.2emS$}}
 %    \end{macrocode}
 % \end{macro}
 %
