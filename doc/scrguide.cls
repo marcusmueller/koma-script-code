@@ -1335,12 +1335,12 @@ KOMAScript \endcsname
 %
 % \begin{macro}{\url@}
 %   Redefine to make \texttt{CTAN://} be an alias for
-%   \texttt{ftp://|\GuideCTANserver|/tex-archive/}.
+%   \texttt{http://|\GuideCTANserver|/tex-archive/}.
 %    \begin{macrocode}
 \def\url@#1{\expandafter\url@@#1\@nil}
 \def\url@@#1://#2\@nil{%
   \def\@tempa{#1}\def\@tempb{CTAN}\ifx\@tempa\@tempb
-    \hyper@linkurl{\Hurl{#1://#2}}{ftp://\GuideCTANserver/tex-archive/#2}%
+    \hyper@linkurl{\Hurl{#1://#2}}{http://\GuideCTANserver/tex-archive/#2}%
   \else
     \hyper@linkurl{\Hurl{#1://#2}}{#1://#2}%
   \fi
