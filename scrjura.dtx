@@ -1,4 +1,4 @@
-% \CheckSum{1404}
+% \CheckSum{1407}
 % \iffalse meta-comment
 % ======================================================================
 % scrjura.dtx
@@ -70,7 +70,7 @@
 %<driver>\ProvidesFile{scrjura.drv}
 %<package>\ProvidesPackage{scrjura}
 %<*dtx|package|driver>
-                [2013/04/16 v0.6b KOMA-Script for jurists
+                [2013/04/18 v0.7 KOMA-Script for jurists
 %</dtx|package|driver>
 %<driver>                 (driver)%
 %<package>                (package)%
@@ -1011,6 +1011,9 @@ standard classes created by The LaTeX3 Project 1994-1996.
 %   \changes{v0.6b}{2013/04/16}{\cs{paragraphformat} umdefiniert}
 % \begin{Counter}{contractSubParagraph}
 % \begin{macro}{\thecontractSubParagraph}
+% \begin{Counter}{contractAbsoluteParagraph}
+%   \changes{v0.7}{2013/04/18}{neuer (interner) Zähler über alle Paragraphen,
+%     um ggf. die Zählung neu beginnen zu können}
 % Die Umgebung \texttt{contract} wird als Anweisung \cs{contract}
 % definiert. Nichts desto trotz handelt es sich dabei um eine Umgebung und
 % sollte sie immer als Umgebung verwendet werden!
@@ -1051,7 +1054,9 @@ standard classes created by The LaTeX3 Project 1994-1996.
 \@addtoreset{SubParagraph}{Paragraph}
 \renewcommand*{\thecontractSubParagraph}{%
   {\theParagraph\alph{contractSubParagraph}}}
+\newcounter{contractAbsoluteParagraph}
 %    \end{macrocode}
+% \end{Counter}
 % \end{macro}
 % \end{Counter}
 % \end{macro}
@@ -1179,8 +1184,11 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % natürlich innerhalb der Überschrift keine Nummer gesetzt werden
 % soll. Trotzdem werden generell die Absatznummern eingeschaltet. Dann werden
 % die Optionen initialisiert und ausgeführt.
+%   \changes{v0.7}{2013/04/18}{Zähler \texttt{contractAbsoluteParagraph} wird
+%     erhöht}
 %    \begin{macrocode}
 \newcommand*{\contract@paragraph}[1]{%
+  \stepcounter{contractAbsoluteParagraph}%
   \ManualPar\parnumbertrue
   \let\contract@title\relax
   \let\contract@entry\relax
@@ -1266,11 +1274,14 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % \end{macro}
 %
 % \begin{macro}{contract@subparagraph}
-% \changes{v0.6a}{2012/10/08}{fehlendes \cs{par} ergänzt}
+%   \changes{v0.6a}{2012/10/08}{fehlendes \cs{par} ergänzt}%^^A
+%   \changes{v0.7}{2013/04/18}{Zähler \texttt{contractAbsoluteParagraph} wird
+%     erhöht}
 % Das entspricht bis auf wenige Kleinigkeiten, die Unterparagraphen betreffen,
 % |\contract@paragraph|
 %    \begin{macrocode}
 \newcommand*{\contract@subparagraph}[1]{%
+  \stepcounter{contractAbsoluteParagraph}%
   \ManualPar\parnumbertrue
   \let\contract@title\relax
   \let\contract@entry\relax
@@ -1482,6 +1493,8 @@ standard classes created by The LaTeX3 Project 1994-1996.
 %     \texttt{contractpars}}
 %   \changes{0.5c}{2010/04/26}{\cs{contract@Paragraphformat} expandiert beim
 %     Schreiben zu seinem Argument}
+%   \changes{v0.7}{2013/04/18}{Zähler \texttt{contractAbsoluteParagraph} wird
+%     verwendet}
 %    \begin{macrocode}
 \newcommand*{\contract@everypar}{%
   \ifparnumber
@@ -1489,8 +1502,10 @@ standard classes created by The LaTeX3 Project 1994-1996.
     \refstepcounter{sentence}%
     \begingroup
       \protected@write\@auxout{\let\contract@Paragraphformat\@firstofone}{%
-        \string\newmaxpar{contract}{\theSubParagraph}{\arabic{par}}}%
-      \getmaxpar\@tempa{contract}{\theSubParagraph}%
+        \string\newmaxpar{contract}%
+                         {\thecontractAbsoluteParagraph}%
+                         {\arabic{par}}}%
+      \getmaxpar\@tempa{contract}{\thecontractAbsoluteParagraph}%
       \typeout{Stored max is \@tempa}%
       \ifnum \@tempa>\@ne
         \parformat\nobreakspace
