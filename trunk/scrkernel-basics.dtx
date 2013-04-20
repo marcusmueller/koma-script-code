@@ -1,4 +1,4 @@
-% \CheckSum{1615}
+% \CheckSum{1640}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -1656,27 +1656,47 @@
 %
 % \begin{macro}{\l@addto@macro}
 %   \changes{v2.8p}{2001/09/22}{neu (intern)} 
-%   Damit \cs{AfterKOMAoptions} lokal möglich ist, wird eine lokal arbeitende
-%   Variante von \cs{g@addto@macro} benötigt, wie sie hier vorgestellt wird.
+% Damit \cs{AfterKOMAoptions} lokal möglich ist, wird eine lokal arbeitende
+% Variante von \cs{g@addto@macro} benötigt, wie sie hier vorgestellt wird.
 %   \changes{v2.95}{2006/06/02}{korrigiert, damit es sich bezüglich
 %     Erweiterung um Makrodefinitonen mit Argumenten wie \cs{g@addto@macro}
 %     verhält}
+%   \changes{v3.12}{2013/04/20}{veraltete \eTeX-freie Version entfernt}
+%   \changes{v3.12}{2013/04/20}{Warnung, falls eine inkompatible Definition
+%     von \cs{l@addto@macro} entdeckt wird}
 %    \begin{macrocode}
 %<*base>
-\scr@ifundefinedorrelax{unexpanded}{%
-  \newcommand*{\g@addto@macro@temp}{}%
-  \newcommand{\l@addto@macro}[2]{%
-    \begingroup%
-      \toks@\expandafter{#1#2}%
-      \xdef\g@addto@macro@temp{\the\toks@}%
-    \endgroup
-    \let#1\g@addto@macro@temp
-  }%
-}{%
-  \newcommand{\l@addto@macro}[2]{%
-    \edef#1{\unexpanded\expandafter{#1#2}}%
-  }%
+\newcommand{\l@addto@macro@temp}[2]{%
+  \edef#1{\unexpanded\expandafter{#1#2}}%
+}%
+\@ifundefined{l@addto@macro}{}{%
+  \begingroup
+    \let\reserved@a\relax
+    \newcommand{\reserved@a}[2]{%
+      \edef#1{\unexpanded\expandafter{#1#2}}%
+    }%
+    \ifx\reserved@a\l@addto@macro\else
+      \PackageWarning{scrbase}{%
+        Someone also uses macro name \string\l@addto@macro.\MessageBreak
+        When KOMA-Script author decided to use macro name\MessageBreak
+        \string\l@addto@macro\space, there was no other free LaTeX\MessageBreak
+        package on CTAN with this name.\MessageBreak
+        In the meantime other package others decided to use\MessageBreak
+        same macro name, but unfortunatly not all of those\MessageBreak
+        are compatible with KOMA-Script's definition, e.g.,\MessageBreak
+        while adding code to macros with arguments. Because\MessageBreak
+        of such a potentially incompatible definition,\MessageBreak
+        KOMA-Script will redefine the command now.\MessageBreak
+        Please ask the author of the other package to\MessageBreak
+        rename his macro, if a problem results in the\MessageBreak
+        redefinition%
+      }%
+    \fi
+  \endgroup
 }
+\long\def\l@addto@macro#1#2{%
+  \edef#1{\unexpanded\expandafter{#1#2}}%
+}%
 %</base>
 %    \end{macrocode}
 % \end{macro}
