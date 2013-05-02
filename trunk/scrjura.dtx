@@ -1,4 +1,4 @@
-% \CheckSum{1407}
+% \CheckSum{1430}
 % \iffalse meta-comment
 % ======================================================================
 % scrjura.dtx
@@ -70,7 +70,7 @@
 %<driver>\ProvidesFile{scrjura.drv}
 %<package>\ProvidesPackage{scrjura}
 %<*dtx|package|driver>
-                [2013/04/28 v0.7 KOMA-Script for jurists
+                [2013/05/02 v0.7 KOMA-Script for jurists
 %</dtx|package|driver>
 %<driver>                 (driver)%
 %<package>                (package)%
@@ -484,6 +484,18 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % ein |\parnumberfalse| und danach ein |\parnumbertrue|. Vergisst man dies,
 % wird der Abschnitt zum ersten als Paragraphenabsatz und dann als Abschnitt
 % nummeriert.
+%
+% \DescribeMacro{\ellipsispar}
+% \DescribeMacro{\parellipsis}
+% Manchmal wird insbesondere für Kommentare gewünscht, dass man Absätze in
+% Paragraphen auch auslassen kann, diese Absätze aber dennoch mitgezählt und
+% auch bei der automatischen Absatznummerierung mitberücksichtigt werden. Die
+% ausgelassenen Absätze sollen dabei in der Regel durch Pünktchen markiert
+% werden. Genau dies erledigt |\ellisispar|. Als optionales Argument kann
+% dabei die Anzahl der Absätze angegeben werden, die ausgelassen
+% wurde. Voreingestellt ist ein Absatz. Für das Auslassungszeichen wird
+% |\parellipsis| verwendet. Dies ist mit |\textellipsis| vordefiniert, falls
+% eine solche Anweisung existiert. Anderenfalls wird |\dots| verwendet.
 % 
 %
 % \subsection{Verweise}
@@ -997,6 +1009,32 @@ standard classes created by The LaTeX3 Project 1994-1996.
 %    \begin{macrocode}
 \newcommand*{\jura@env@type}{}
 %    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ellipsispar}
+%   \changes{v0.7}{2013/05/02}{neu}
+% \begin{macro}{\parellipsis}
+%   \changes{v0.7}{2013/05/02}{neu}
+% Paragraphen auslassen aber mit zählen.
+%    \begin{macrocode}
+\newcommand*{\ellipsispar}[1][1]{%
+  \begingroup
+    \KOMAoptions{parnumber=manual}\parellipsis\par
+    \addtocounter{par}{#1}%
+    \protected@write\@auxout{}{%
+      \string\newmaxpar{\jura@env@type}%
+                       {\thecontractAbsoluteParagraph}%
+                       {\arabic{par}}%
+    }%
+  \endgroup
+  \addtocounter{par}{-1}\refstepcounter{par}%
+  \ignorespaces
+}
+\newcommand*{\parellipsis}{%
+  \scr@ifundefinedorrelax{textellipsis}{\dots}{\textellipsis}%
+}
+%    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
 % \begin{environment}{contract}
