@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2013/04/10 v1.7 internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2013/05/03 v1.7a internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -112,6 +112,7 @@
 \RequirePackage{makeidx}
 \RequirePackage{scrdate}
 \RequirePackage{scrtime}
+\RequirePackage{picture}
 \RequirePackage{graphicx}
 \RequirePackage{booktabs}
 \RequirePackage{longtable}
