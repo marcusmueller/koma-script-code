@@ -1,4 +1,4 @@
-% \CheckSum{2213}
+% \CheckSum{2214}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-typearea.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkernel-typearea.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkernel-typearea.dtx}[2013/03/26 v3.12 KOMA-Script 
+\ProvidesFile{scrkernel-typearea.dtx}[2013/05/10 v3.12 KOMA-Script 
                                                        (type area)]
 % \iffalse
 %</driver>
@@ -906,6 +906,7 @@
 %   \changes{v2.95}{2002/08/27}{neu (intern)}
 % \begin{macro}{\scr@updatedvipspagesize}
 %   \changes{v3.02c}{2009/02/14}{neu (intern)}
+%   \changes{v3.12}{2013/05/10}{deaktiviert, wenn \cs{XeTeXversion} existiert}
 % Damit die Option \texttt{pagesize} überhaupt funktionieren kann,
 % werden einige interne Makros benötigt.
 % \begin{description}
@@ -974,15 +975,17 @@
   \let\set@vtexpagesize=\@empty
 }
 \newcommand*{\scr@updatedvipspagesize}{%
-  \special{ps::\@percentchar\@percentchar 
-    PageBoundingBox: 0 0 \the\numexpr\paperwidth/\dimexpr 1bp\relax\relax
-    \space \the\numexpr\paperheight/\dimexpr 1bp\relax\relax^^J%
-    \@percentchar\@percentchar BeginPageSetup^^J%
-    << /PageSize [\the\numexpr\paperwidth/\dimexpr 1bp\relax\relax\space
-    \the\numexpr\paperheight/\dimexpr 1bp\relax\relax] 
-    >> setpagedevice^^J%<<
-    0 0 bop^^J%
-    \@percentchar\@percentchar EndPageSetup}%
+  \scr@ifundefinedorrelax{XeTeXversion}{%
+    \special{ps::\@percentchar\@percentchar 
+      PageBoundingBox: 0 0 \the\numexpr\paperwidth/\dimexpr 1bp\relax\relax
+      \space \the\numexpr\paperheight/\dimexpr 1bp\relax\relax^^J%
+      \@percentchar\@percentchar BeginPageSetup^^J%
+      << /PageSize [\the\numexpr\paperwidth/\dimexpr 1bp\relax\relax\space
+      \the\numexpr\paperheight/\dimexpr 1bp\relax\relax] 
+      >> setpagedevice^^J%<<
+      0 0 bop^^J%
+      \@percentchar\@percentchar EndPageSetup}%
+  }{}%
 }
 \AtBeginDocument{%
   \renewcommand*{\set@pdftexpagesize}{%
