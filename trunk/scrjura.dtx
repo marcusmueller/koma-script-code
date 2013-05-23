@@ -1,4 +1,4 @@
-% \CheckSum{1430}
+% \CheckSum{1480}
 % \iffalse meta-comment
 % ======================================================================
 % scrjura.dtx
@@ -1024,7 +1024,7 @@ standard classes created by The LaTeX3 Project 1994-1996.
     \protected@write\@auxout{}{%
       \string\newmaxpar{\jura@env@type}%
                        {\thecontractAbsoluteParagraph}%
-                       {\arabic{par}}%
+                       {\thepar}%
     }%
   \endgroup
   \addtocounter{par}{-1}\refstepcounter{par}%
@@ -1542,16 +1542,30 @@ standard classes created by The LaTeX3 Project 1994-1996.
 %   \changes{v0.7}{2013/05/23}{Satznummer bei manuell nummerierten Absätzen
 %     auf 0 statt 1 initialisiert, weil \cs{Sentence} die Nummer als erstes
 %     hochzählt.}
+%   \changes{v0.7}{2013/05/23}{Absatznummer von \cs{thisparnumber} beachtet}
 %    \begin{macrocode}
 \newcommand*{\contract@everypar}{%
   \ifparnumber
-    \refstepcounter{par}%
-    \refstepcounter{sentence}%
+    \ifx\scrjura@special@par\relax
+      \ifx\scrjura@special@reset@par\relax\else
+        \global\let\thepar\scrjura@special@reset@par
+        \global\let\scrjura@special@reset@par\relax
+      \fi
+      \refstepcounter{par}%
+      \refstepcounter{sentence}%
+    \else
+      \ifx\scrjura@special@reset@par\relax
+        \global\let\scrjura@special@reset@par\thepar
+      \fi
+      \global\let\thepar\scrjura@special@par
+      \global\let\scrjura@special@par\relax
+      \setcounter{sentence}{0}\refstepcounter{sentence}%
+    \fi
     \begingroup
       \protected@write\@auxout{\let\contract@Paragraphformat\@firstofone}{%
         \string\newmaxpar{contract}%
                          {\thecontractAbsoluteParagraph}%
-                         {\arabic{par}}}%
+                         {\thepar}}%
       \getmaxpar\@tempa{contract}{\thecontractAbsoluteParagraph}%
       \typeout{Stored max is \@tempa}%
       \ifnum \@tempa>\@ne
@@ -1564,6 +1578,27 @@ standard classes created by The LaTeX3 Project 1994-1996.
 }
 %    \end{macrocode}
 % \end{macro}
+%
+% \begin{macro}{\thisparnumber}
+%   \changes{v0.7}{2013/05/23}{neue Anweisung}
+% \begin{macro}{\scrjura@special@par}
+%   \changes{v0.7}{2013/05/23}{neue Anweisung (intern)}
+% \begin{macro}{\scrjura@special@reset@par}
+%   \changes{v0.7}{2013/05/23}{neue Anweisung (intern)}
+% Mit dieser Anweisung kann man eine Absatznummer manuell vergeben. Allerdings
+% muss die Nummer voll expandierbar sein!
+%    \begin{macrocode}
+\newcommand*{\thisparnumber}[1]{%
+  \def\scrjura@special@par{#1}%
+}
+\newcommand*{\scrjura@special@par}{}
+\let\scrjura@special@par\relax
+\newcommand*{\scrjura@special@reset@par}{}
+\let\scrjura@special@reset@par\relax
+%    \end{macrocode}
+% \end{macro}^^A \scrjura@special@reset@par
+% \end{macro}^^A \scrjura@special@par
+% \end{macro}^^A\thisparnumber
 %
 %
 % \begin{macro}{\refL}
