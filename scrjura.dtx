@@ -1,4 +1,4 @@
-% \CheckSum{1480}
+% \CheckSum{1502}
 % \iffalse meta-comment
 % ======================================================================
 % scrjura.dtx
@@ -70,7 +70,7 @@
 %<driver>\ProvidesFile{scrjura.drv}
 %<package>\ProvidesPackage{scrjura}
 %<*dtx|package|driver>
-                [2013/05/23 v0.7 KOMA-Script for jurists
+                [2013/06/06 v0.7 KOMA-Script for jurists
 %</dtx|package|driver>
 %<driver>                 (driver)%
 %<package>                (package)%
@@ -1543,6 +1543,8 @@ standard classes created by The LaTeX3 Project 1994-1996.
 %     auf 0 statt 1 initialisiert, weil \cs{Sentence} die Nummer als erstes
 %     hochzählt.}
 %   \changes{v0.7}{2013/05/23}{Absatznummer von \cs{thisparnumber} beachtet}
+%   \changes{v0.7}{2013/06/06}{Im Fall von nicht rein nummerischen
+%     Absatznummern die Absätze auf jeden Fall nummerieren}
 %    \begin{macrocode}
 \newcommand*{\contract@everypar}{%
   \ifparnumber
@@ -1568,8 +1570,16 @@ standard classes created by The LaTeX3 Project 1994-1996.
                          {\thepar}}%
       \getmaxpar\@tempa{contract}{\thecontractAbsoluteParagraph}%
       \typeout{Stored max is \@tempa}%
-      \ifnum \@tempa>\@ne
+      \def\reserved@a##1\@nnil{\def\@tempa{##1}}%
+      \afterassignment\reserved@a\@tempcnta=0\@tempa\relax\@nnil
+      \ifnum \@tempcnta>\@ne
         \parformat\nobreakspace
+      \else
+        \def\reserved@a{\relax}%
+        \ifx\@tempa\reserved@a
+        \else
+          \parformat\nobreakspace
+        \fi
       \fi
     \endgroup
   \else
