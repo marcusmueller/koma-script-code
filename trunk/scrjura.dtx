@@ -1,4 +1,4 @@
-% \CheckSum{1502}
+% \CheckSum{1505}
 % \iffalse meta-comment
 % ======================================================================
 % scrjura.dtx
@@ -70,7 +70,7 @@
 %<driver>\ProvidesFile{scrjura.drv}
 %<package>\ProvidesPackage{scrjura}
 %<*dtx|package|driver>
-                [2013/06/06 v0.7 KOMA-Script for jurists
+                [2013/06/07 v0.7 KOMA-Script for jurists
 %</dtx|package|driver>
 %<driver>                 (driver)%
 %<package>                (package)%
@@ -700,8 +700,9 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % \DescribeMacro{\parformat}%
 % \DescribeMacro{\parciteformat}%
 % Zähler für die Absatznummern und dessen Ausgabe und Formatierung und
-% Formatierung der Referenz. ACHTUNG: |\thepar| muss bei unverändertem
-% |\parciteformat| eine arabische Zahl sein!
+% Formatierung der Referenz. ACHTUNG: Wenn |\thepar| nicht nur eine arabische
+% Zahl ist, werden Absätze bei automatischer Nummerierung unabhängig davon
+% nummeriert, ob es mehr als einen Absatz im Paragraphen gibt.
 %
 % \DescribeMacro{\refParagraph}%
 % So etwas wie |\ref| nur für den Paragraphen.
@@ -1508,6 +1509,8 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % \begin{Counter}{par}
 % \begin{macro}{\thepar}
 % \begin{macro}{\theHpar}
+% \begin{macro}{\parformat}
+%   \changes{v0.7}{2013/06/07}{neues Font-Element \texttt{parnumber}}
 % \begin{macro}{\p@par}
 %   \changes{v0.5d}{2010/04/28}{\cs{jura@usetype} mit Argument
 %     \cs{jura@env@type} eingefügt}
@@ -1523,10 +1526,12 @@ standard classes created by The LaTeX3 Project 1994-1996.
 \renewcommand*{\thepar}{\arabic{par}}
 \newcommand*{\theHpar}{\theH@AbsParagraph-\Roman{par}}
 \newcommand*{\parformat}{(\thepar)}
+\newkomafont{parnumber}{}
 \renewcommand*\p@par{{\jura@usetype{\jura@env@type}\theSubParagraph\jura@separator{\nobreakspace}}}
 \@addtoreset{par}{Paragraph}
 \@addtoreset{par}{SubParagraph}
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -1573,12 +1578,12 @@ standard classes created by The LaTeX3 Project 1994-1996.
       \def\reserved@a##1\@nnil{\def\@tempa{##1}}%
       \afterassignment\reserved@a\@tempcnta=0\@tempa\relax\@nnil
       \ifnum \@tempcnta>\@ne
-        \parformat\nobreakspace
+        {\usekomafont{parnumber}{\parformat\nobreakspace}}%
       \else
         \def\reserved@a{\relax}%
         \ifx\@tempa\reserved@a
         \else
-          \parformat\nobreakspace
+          {\usekomafont{parnumber}{\parformat\nobreakspace}}%
         \fi
       \fi
     \endgroup
