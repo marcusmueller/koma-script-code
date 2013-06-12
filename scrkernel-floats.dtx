@@ -58,7 +58,7 @@
 %%% From File: scrkernel-floats.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkernel-floats.dtx}[2013/03/01 v3.11c KOMA-Script 
+\ProvidesFile{scrkernel-floats.dtx}[2013/06/12 v3.12 KOMA-Script 
                                                          (floats)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
@@ -1051,15 +1051,21 @@
 % bestimmte werden, wenn Option \texttt{onelinecaption} verwendet
 % wird. Das bedeutet auch, dass bei \texttt{noonelinecaption} das
 % Problem mit dem Hochzählen der Fußnoten nicht auftritt.
-% \changes{v2.8q}{2002/05/17}{Problem mit doppelten Fußnoten behoben}
+% \changes{v2.8q}{2002/05/17}{Problem mit doppelten Fußnoten behoben}%
 % \changes{v2.95}{2004/01/30}{Korrekturen für vertikalen Abstand und
-%   \textsl{float}-Paket}
+%   \textsl{float}-Paket}%
 % \changes{v2.95a}{2006/07/13}{diverse Korrekturen für den vertikalen
-%   Abstand u.\,a. bei Verwendung des \textsl{color}-Pakets}
+%   Abstand u.\,a. bei Verwendung des \textsl{color}-Pakets}%
 % \changes{v2.97c}{2007/06/06}{\cs{unskip}\cs{strut} eingefügt, um die
 %   vertikale Ausrichtung im \emph{above}-Fall in eingen Fällen zu
-%   verbessern}
-% \changes{v3.02a}{2009/01/24}{diverse Gruppen- bzw. Argumentklammern ergänzt}
+%   verbessern}%
+% \changes{v3.02a}{2009/01/24}{diverse Gruppen- bzw. Argumentklammern ergänzt}%
+% \changes{v3.11c}{2013/06/12}{\cs{capfont} durch
+%   \cs{usekomafont{caption}}ersetzt}%
+% \changes{v3.11c}{2013/06/12}{\cs{caplabelfont} durch
+%   \cs{usekomafont{captionlabel}}ersetzt}%
+% \changes{v3.12}{2013/06/12}{ein \cs{usekomafont} durch
+%   \cs{usesizeofkomafont} ersetzt}
 %    \begin{macrocode}
 \newcommand{\@@makecaption}[3]{%
   \cap@margin
@@ -1068,8 +1074,8 @@
     \let\scr@tmp@footnotetext=\@footnotetext
     \let\@footnotetext=\@gobble
     \sbox\@tempboxa{%
-      {\capfont{\strut\ignorespaces
-        #1{{\caplabelfont{#2\captionformat}}}%
+      {\usekomafont{caption}{\strut\ignorespaces
+        #1{{\usekomafont{captionlabel}{#2\captionformat}}}%
         #3\unskip\strut}}%
     }%
     \let\@footnotetext=\scr@tmp@footnotetext
@@ -1094,8 +1100,8 @@
 % \changes{v2.97c}{2007/09/17}{\cs{scr@smashdp} eingefügt}
 %    \begin{macrocode} 
           \ifdofullc@p
-            {\capfont{\@hangfrom{\scr@smashdp{\strut\ignorespaces
-                  #1{{\caplabelfont{#2\captionformat}}}}}%
+            {\usekomafont{caption}{\@hangfrom{\scr@smashdp{\strut\ignorespaces
+                  #1{{\usekomafont{captionlabel}{#2\captionformat}}}}}%
               {#3\unskip\strut\par}}}%
 %    \end{macrocode}
 % Im zweiten Fall ist nun zu unterscheiden, ob nach dem Label ein
@@ -1105,18 +1111,20 @@
 %    \begin{macrocode} 
           \else%
             \ifdim\cap@indent<\z@
-              {\capfont{\strut\ignorespaces
-                #1{{\caplabelfont{#2\captionformat\par}}}%
+              {\usekomafont{caption}{\strut\ignorespaces
+                #1{{\usekomafont{captionlabel}{#2\captionformat\par}}}%
                 \noindent\hspace*{-\cap@indent}#3\unskip\strut\par}}%
             \else%
               \if@capbreak
-                {\capfont{\strut\ignorespaces
-                  #1{{\caplabelfont{#2\captionformat\par}}}%
+                {\usekomafont{caption}{\strut\ignorespaces
+                  #1{{\usekomafont{captionlabel}{#2\captionformat\par}}}%
                   \noindent\@hangfrom{\hspace*{\cap@indent}}{#3\par}}}%
               \else
-                {\capfont{\@hangfrom{\scr@smashdp\strut\hspace*{\cap@indent}}%
+                {\usekomafont{caption}{%
+                    \@hangfrom{\scr@smashdp\strut\hspace*{\cap@indent}}%
                   {\hspace{-\cap@indent}\scr@smashdp{\ignorespaces#1%
-                    {{\caplabelfont{#2\captionformat}}}}#3\unskip\strut\par}}}%
+                    {{\usekomafont{captionlabel}{%
+                          #2\captionformat}}}}#3\unskip\strut\par}}}%
               \fi
             \fi
           \fi
@@ -1139,11 +1147,12 @@
 %   werden, falls darin eine Größenumschaltung stattfindet}
 %    \begin{macrocode}
       \sbox\@tempboxa{%
-        {\capfont{\scr@smashdp{\strut\ignorespaces
-          #1{{\caplabelfont{#2\captionformat}}}}%
+        {\usekomafont{caption}{\scr@smashdp{\strut\ignorespaces
+          #1{{\usekomafont{captionlabel}{#2\captionformat}}}}%
           #3}}%
       }%
-      {\capfont{\hb@xt@\hsize{\strut\cap@left\box\@tempboxa\cap@right\strut}}}%
+      {\usesizeofkomafont{caption}{%
+          \hb@xt@\hsize{\strut\cap@left\box\@tempboxa\cap@right\strut}}}%
     \fi
   \endgroup
 }
