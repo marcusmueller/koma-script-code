@@ -1,8 +1,8 @@
-% \CheckSum{271}
+% \CheckSum{295}
 % \iffalse meta-comment
 % ======================================================================
 % scrwfile.dtx
-% Copyright (c) Markus Kohm, 2010-2012
+% Copyright (c) Markus Kohm, 2010-2013
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -29,7 +29,7 @@
 % at least three times.
 % ----------------------------------------------------------------------
 % scrwfile.dtx
-% Copyright (c) Markus Kohm, 2010-2012
+% Copyright (c) Markus Kohm, 2010-2013
 %
 % Diese Datei ist Teil des LaTeX2e KOMA-Script-Pakets.
 %
@@ -90,7 +90,7 @@
 %<driver>\ProvidesFile{scrwfile.drv}
 %<doc>\ProvidesFile{scrwfile.tex}
 %<*dtx|(package&identify)|driver|doc>
-  [2012/03/05 v0.1d-alpha LaTeX2e KOMA-Script package (write and clone files)]
+  [2013/07/24 v0.1e-alpha LaTeX2e KOMA-Script package (write and clone files)]
 %</dtx|(package&identify)|driver|doc>
 %<*driver>
   \documentclass{scrdoc}
@@ -364,7 +364,7 @@ limited any longer.
 
 Sometimes it is useful to input a file not only once but several times. As
 \Macro{@starttoc} does not open files for writing any longer, this may be
-done by simply using \Macro{\@starttoc} several times with the same
+done by simply using \Macro{@starttoc} several times with the same
 extension. But sometimes you may have additional entries in only some of the
 content directories. Because of this, \Package{scrwfile} allows to copy all
 entries of a file to another file, too. We call this cloning.
@@ -649,12 +649,47 @@ extension. So there's currently no user documentation for this.
 % \begin{macro}{\@starttoc}
 % We have to add the single handle feature to this.
 % \begin{macro}{\scrwfile@saved@starttoc}
+%   \changes{v0.1e}{2013/07/24}{take care for unfriendly \textsl{hyperref}}
 % This is the original definition, that will be used, if the file is not under
-% \texttt{scrwfile}'s control.
+% \texttt{scrwfile}'s control. Because of package \textsl{hyperref}, that does
+% a hard redefinition without any care for changed definitions, we have to
+% take care for that unfriendly package and cannot do a simple
+% \begin{verbatim}
+% \let\scrwfile@saved@starttoc\@starttoc
+% \let\@starttoc\scrwfile@starttoc
+% \end{verbatim}
 %    \begin{macrocode}
 \newcommand*{\scrwfile@saved@starttoc}{}
-\let\scrwfile@saved@starttoc\@starttoc
-\let\@starttoc\scrwfile@starttoc
+\AtBeginDocument{%
+  \begingroup
+    \@ifpackageloaded{hyperref}{%
+      \scr@ifundefinedorrelax{Hy@AtBeginDocument}{%
+        \PackageWarning{scrwfile}{%
+          Incompatible `hyperref` package detected!\MessageBreak
+          You are using a `hyperref` version, that\MessageBreak
+          doesn't provide `\string\Hy@AtBeginDocument`.\MessageBreak
+          This may or may not work.\MessageBreak
+          I'll directly redefine `\@starttoc`%
+        }%
+        \aftergroup\@firstofone
+      }{%
+        \PackageInfo{scrwfile}{%
+          Using `\string\Hy@AtBeginDocument`%
+        }%
+        \aftergroup\Hy@AtBeginDocument
+      }%
+    }{%
+      \aftergroup\@firstofone
+    }%
+  \endgroup
+  {%
+    \PackageInfo{scrwfile}{%
+      Extending `\@starttoc`
+    }%
+    \let\scrwfile@saved@starttoc\@starttoc
+    \let\@starttoc\scrwfile@starttoc
+  }%
+}
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
