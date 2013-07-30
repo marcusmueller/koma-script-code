@@ -1,4 +1,4 @@
-% \CheckSum{1744}
+% \CheckSum{1808}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-language.dtx
@@ -205,19 +205,23 @@
 % \dots\ fügen dabei \cs{extras\meta{Sprache}} die Definition \#3 für \#2
 % hinzu.
 %    \begin{macrocode}
-        \expandafter\ifx\csname extras\scr@reserved@a\endcsname\relax
-          \expandafter\expandafter\expandafter\gdef
+        \ifx\scr@reserved@a\@empty
+          \PackageWarning{scrbase}{empty language at \string\defcaptionname}%
         \else
-          \expandafter\expandafter\expandafter\g@addto@macro
-        \fi
-        \csname extras\scr@reserved@a\endcsname{%
-          \def#2{#3}%
-        }%
+          \expandafter\ifx\csname extras\scr@reserved@a\endcsname\relax
+            \expandafter\expandafter\expandafter\gdef
+          \else
+            \expandafter\expandafter\expandafter\g@addto@macro
+          \fi
+          \csname extras\scr@reserved@a\endcsname{%
+            \def#2{#3}%
+          }%
 %    \end{macrocode}
 % Wenn etwas hinzugefügt wurde, muss außerdem \cs{reserved@b} so umdefiniert
 % werden, dass dies ggf. auch unmittelbar Geltung bekommt.
 %    \begin{macrocode}
-        \scr@def@activateactivelanguageaftergroup{#2}{#3}%
+          \scr@def@activateactivelanguageaftergroup{#2}{#3}%
+        \fi
       }%
     \reserved@b
   }%
@@ -274,47 +278,51 @@
       \@onelevel@sanitize\scr@reserved@a
       \expandafter\@for \expandafter\scr@reserved@a \expandafter:\expandafter=%
       \scr@reserved@a \do{%
+        \ifx\scr@reserved@a\@empty
+          \PackageWarning{scrbase}{empty language at \string\defcaptionname}%
+        \else
 %    \end{macrocode}
 % \dots\ testen dabei, ob \#2 bereits in \cs{extras\meta{Sprache}} definiert
 % ist.
 %    \begin{macrocode}
-        \@tempswafalse
-        \begingroup
           \@tempswafalse
-          \ifcsname extras\scr@reserved@a\endcsname
-            \let#2\relax
-            \csname extras\scr@reserved@a\endcsname
-            \ifx #2\relax \else \aftergroup\@tempswatrue \fi
-          \fi
-        \endgroup
+          \begingroup
+            \@tempswafalse
+            \ifcsname extras\scr@reserved@a\endcsname
+              \let#2\relax
+              \csname extras\scr@reserved@a\endcsname
+              \ifx #2\relax \else \aftergroup\@tempswatrue \fi
+            \fi
+          \endgroup
 %    \end{macrocode}
 % Wenn \#2 bereits in \cs{extras\meta{Sprache}} definiert ist, \dots
 %    \begin{macrocode}
-        \if@tempswa
+          \if@tempswa
 %    \end{macrocode}
 % \dots\ dann definieren wir es genau hier neu,
 %    \begin{macrocode}
-          \expandafter\g@addto@macro\csname extras\scr@reserved@a\endcsname{%
-            \def#2{#3}%
-          }%
-        \else
+            \expandafter\g@addto@macro\csname extras\scr@reserved@a\endcsname{%
+              \def#2{#3}%
+            }%
+          \else
 %    \end{macrocode}
 % \dots\ anderenfalls definieren wir es in \cs{captions\meta{Sprache}} neu.
 %    \begin{macrocode}
-         \expandafter\ifx\csname captions\scr@reserved@a\endcsname\relax
-            \expandafter\expandafter\expandafter\gdef
-          \else
-            \expandafter\expandafter\expandafter\g@addto@macro
+           \expandafter\ifx\csname captions\scr@reserved@a\endcsname\relax
+              \expandafter\expandafter\expandafter\gdef
+            \else
+              \expandafter\expandafter\expandafter\g@addto@macro
+            \fi
+            \csname captions\scr@reserved@a\endcsname{%
+              \def#2{#3}%
+            }%
           \fi
-          \csname captions\scr@reserved@a\endcsname{%
-            \def#2{#3}%
-          }%
-        \fi
 %    \end{macrocode}
 % Wenn etwas hinzugefügt wurde, muss außerdem \cs{reserved@b} so umdefiniert
 % werden, dass dies ggf. auch unmittelbar Geltung bekommt.
 %    \begin{macrocode}
-        \scr@def@activateactivelanguageaftergroup{#2}{#3}%
+          \scr@def@activateactivelanguageaftergroup{#2}{#3}%
+        \fi
       }%
     \reserved@b
   }%
@@ -357,41 +365,46 @@
       \@onelevel@sanitize\scr@reserved@a
       \expandafter\@for \expandafter\scr@reserved@a \expandafter:\expandafter=%
       \scr@reserved@a \do{%
+        \ifx\scr@reserved@a\@empty
+          \PackageWarning{scrbase}{empty language at
+            \string\providecaptionname}%
+        \else
 %    \end{macrocode}
 % Im Unterschied zu \cs{defcaptionname} wird hier nur etwas zu
 % \cs{extras\meta{Sprache}} hinzugefügt, wenn das bereits definiert ist,
 % aber \#2 selbst noch nicht definiert ist.
 %    \begin{macrocode}
-        \begingroup
-          \let#2\relax
-          \csname extras\scr@reserved@a\endcsname
-          \csname captions\scr@reserved@a\endcsname
-          \ifx #2\relax \aftergroup\@firstofone
-          \else
+          \begingroup
+            \let#2\relax
+            \csname extras\scr@reserved@a\endcsname
+            \csname captions\scr@reserved@a\endcsname
+            \ifx #2\relax \aftergroup\@firstofone
+            \else
 %<*trace>
-            \PackageInfo{scrbase}{letting \scr@reserved@a\space
-              \expandafter\string#2\MessageBreak
-              unchanged}%
+              \PackageInfo{scrbase}{letting \scr@reserved@a\space
+                \expandafter\string#2\MessageBreak
+                unchanged}%
 %</trace>
-            \aftergroup\@gobble
-          \fi
-        \endgroup
-        {%
-          \expandafter\ifx\csname extras\scr@reserved@a\endcsname\relax
+              \aftergroup\@gobble
+            \fi
+          \endgroup
+          {%
+            \expandafter\ifx\csname extras\scr@reserved@a\endcsname\relax
 %<*trace>
-            \PackageInfo{scrbase}{letting 
-              \expandafter\string\csname extras\scr@reserved@a\endcsname\space
-              unused}%
+              \PackageInfo{scrbase}{letting 
+                \expandafter\string\csname extras\scr@reserved@a\endcsname\space
+                unused}%
 %</trace>
-            \expandafter\expandafter\expandafter\@gobbletwo
-          \else
-            \expandafter\expandafter\expandafter\g@addto@macro
-          \fi
-          \csname extras\scr@reserved@a\endcsname{%
-            \def#2{#3}%
+              \expandafter\expandafter\expandafter\@gobbletwo
+            \else
+              \expandafter\expandafter\expandafter\g@addto@macro
+            \fi
+            \csname extras\scr@reserved@a\endcsname{%
+              \def#2{#3}%
+            }%
+            \scr@def@activateactivelanguageaftergroup{#2}{#3}%
           }%
-          \scr@def@activateactivelanguageaftergroup{#2}{#3}%
-        }%
+        \fi
       }%
     \reserved@b
   }%
@@ -413,42 +426,47 @@
       \@onelevel@sanitize\scr@reserved@a
       \expandafter\@for \expandafter\scr@reserved@a \expandafter:\expandafter=%
       \scr@reserved@a \do{%
+        \ifx\scr@reserved@a\@empty
+          \PackageWarning{scrbase}{empty language at
+            \string\providecaptionname}%
+        \else
 %    \end{macrocode}
 % Im Unterschied zu \cs{defcaptionname} wird hier nur etwas zu
 % \cs{captions\meta{Sprache}} hinzugefügt, wenn das bereits definiert ist,
 % aber \#2 selbst weder in \cs{extras\meta{Sprache}} noch in
 % \cs{captions\meta{Sprache}} definiert ist.
 %    \begin{macrocode}
-        \begingroup
-          \let#2\relax
-          \csname captions\scr@reserved@a\endcsname
-          \csname extras\scr@reserved@a\endcsname
-          \ifx #2\relax \aftergroup\@firstofone
-          \else
+          \begingroup
+            \let#2\relax
+            \csname captions\scr@reserved@a\endcsname
+            \csname extras\scr@reserved@a\endcsname
+            \ifx #2\relax \aftergroup\@firstofone
+            \else
 %<*trace>
-            \PackageInfo{scrbase}{letting \scr@reserved@a 
-              \expandafter\string#2\MessageBreak
-              unchanged}%
+              \PackageInfo{scrbase}{letting \scr@reserved@a 
+                \expandafter\string#2\MessageBreak
+                unchanged}%
 %</trace>
-            \aftergroup\@gobble
-          \fi
-        \endgroup
-        {%
-          \expandafter\ifx\csname captions\scr@reserved@a\endcsname\relax
+              \aftergroup\@gobble
+            \fi
+          \endgroup
+          {%
+            \expandafter\ifx\csname captions\scr@reserved@a\endcsname\relax
 %<*trace>
-            \PackageInfo{scrbase}{letting 
-              \expandafter\string\csname extras\scr@reserved@a\endcsname\space 
-              unused}%
+              \PackageInfo{scrbase}{letting 
+                \expandafter\string\csname extras\scr@reserved@a\endcsname\space 
+                unused}%
 %</trace> 
-            \expandafter\expandafter\expandafter\@gobbletwo
-          \else
-            \expandafter\expandafter\expandafter\g@addto@macro
-          \fi
-          \csname captions\scr@reserved@a\endcsname{%
-            \def#2{#3}%
+              \expandafter\expandafter\expandafter\@gobbletwo
+            \else
+              \expandafter\expandafter\expandafter\g@addto@macro
+            \fi
+            \csname captions\scr@reserved@a\endcsname{%
+              \def#2{#3}%
+            }%
+            \scr@def@activateactivelanguageaftergroup{#2}{#3}%
           }%
-          \scr@def@activateactivelanguageaftergroup{#2}{#3}%
-        }%
+        \fi
       }%
     \reserved@b
   }%
@@ -494,36 +512,40 @@
       \@onelevel@sanitize\scr@reserved@a
       \expandafter\@for \expandafter\scr@reserved@a \expandafter:\expandafter=%
       \scr@reserved@a \do{%
+        \ifx\scr@reserved@a\@empty
+          \PackageWarning{scrbase}{empty language at \string\newcaptionname}%
+        \else
 %    \end{macrocode}
 % Im Unterschied zu \cs{defcaptionname} darf der Begriff noch nicht definiert
 % sein.
 %    \begin{macrocode}
-        \begingroup
-          \let#2\relax
-          \csname captions\scr@reserved@a\endcsname
-          \csname extras\scr@reserved@a\endcsname
-          \ifx #2\relax
+          \begingroup
+            \let#2\relax
+            \csname captions\scr@reserved@a\endcsname
+            \csname extras\scr@reserved@a\endcsname
+            \ifx #2\relax
+            \else
+              \PackageError{scrbase}{%
+                `\string#2' already defined\MessageBreak
+                for language `\scr@reserved@a'%
+              }{%
+                You've told me to define `\string#2' for language
+                `\scr@reserved@a',\MessageBreak
+                but is has already been defined.\MessageBreak
+                Nevertheless, if you'll continue it will be redefined.%
+              }%
+            \fi
+          \endgroup
+          \expandafter\ifx\csname extras\scr@reserved@a\endcsname\relax
+            \expandafter\expandafter\expandafter\gdef
           \else
-            \PackageError{scrbase}{%
-              `\string#2' already defined\MessageBreak
-              for language `\scr@reserved@a'%
-            }{%
-              You've told me to define `\string#2' for language
-              `\scr@reserved@a',\MessageBreak
-              but is has already been defined.\MessageBreak
-              Nevertheless, if you'll continue it will be redefined.%
-            }%
+            \expandafter\expandafter\expandafter\g@addto@macro
           \fi
-        \endgroup
-        \expandafter\ifx\csname extras\scr@reserved@a\endcsname\relax
-          \expandafter\expandafter\expandafter\gdef
-        \else
-          \expandafter\expandafter\expandafter\g@addto@macro
+          \csname extras\scr@reserved@a\endcsname{%
+            \def#2{#3}%
+          }%
+          \scr@def@activateactivelanguageaftergroup{#2}{#3}%
         \fi
-        \csname extras\scr@reserved@a\endcsname{%
-          \def#2{#3}%
-        }%
-        \scr@def@activateactivelanguageaftergroup{#2}{#3}%
       }%
     \reserved@b
   }%
@@ -545,36 +567,40 @@
       \@onelevel@sanitize\scr@reserved@a
       \expandafter\@for \expandafter\scr@reserved@a \expandafter:\expandafter=%
       \scr@reserved@a \do{%
+        \ifx\scr@reserved@a\@empty
+          \PackageWarning{scrbase}{empty language at \string\newcaptionname}%
+        \else
 %    \end{macrocode}
 % Im Unterschied zu \cs{defcaptionname} darf der Begriff noch nicht definiert
 % sein.
 %    \begin{macrocode}
-        \begingroup
-          \let#2\relax
-          \csname captions\scr@reserved@a\endcsname
-          \csname extras\scr@reserved@a\endcsname
-          \ifx #2\relax
+          \begingroup
+            \let#2\relax
+            \csname captions\scr@reserved@a\endcsname
+            \csname extras\scr@reserved@a\endcsname
+            \ifx #2\relax
+            \else
+              \PackageError{scrbase}{%
+                `\string#2' already defined\MessageBreak
+                for language `\scr@reserved@a'%
+              }{%
+                You've told me to define `\string#2' for language
+                `\scr@reserved@a',\MessageBreak
+                but is has already been defined.\MessageBreak
+                Nevertheless, if you'll continue it will be redefined.%
+              }%
+            \fi
+          \endgroup
+          \expandafter\ifx\csname captions\scr@reserved@a\endcsname\relax
+            \expandafter\expandafter\expandafter\gdef
           \else
-            \PackageError{scrbase}{%
-              `\string#2' already defined\MessageBreak
-              for language `\scr@reserved@a'%
-            }{%
-              You've told me to define `\string#2' for language
-              `\scr@reserved@a',\MessageBreak
-              but is has already been defined.\MessageBreak
-              Nevertheless, if you'll continue it will be redefined.%
-            }%
+            \expandafter\expandafter\expandafter\g@addto@macro
           \fi
-        \endgroup
-        \expandafter\ifx\csname captions\scr@reserved@a\endcsname\relax
-          \expandafter\expandafter\expandafter\gdef
-        \else
-          \expandafter\expandafter\expandafter\g@addto@macro
+          \csname captions\scr@reserved@a\endcsname{%
+            \def#2{#3}%
+          }%
+          \scr@def@activateactivelanguageaftergroup{#2}{#3}%
         \fi
-        \csname captions\scr@reserved@a\endcsname{%
-          \def#2{#3}%
-        }%
-        \scr@def@activateactivelanguageaftergroup{#2}{#3}%
       }%
     \reserved@b
   }%
@@ -621,35 +647,39 @@
       \@onelevel@sanitize\scr@reserved@a
       \expandafter\@for \expandafter\scr@reserved@a \expandafter:\expandafter=%
       \scr@reserved@a \do{%
+        \ifx\scr@reserved@a\@empty
+          \PackageWarning{scrbase}{empty language at \string\renewcaptionname}%
+        \else
 %    \end{macrocode}
 % Im Unterschied zu \cs{defcaptionname} muss der Begriff bereits definiert
 % sein.
 %    \begin{macrocode}
-        \begingroup
-          \let#2\relax
-          \csname captions\scr@reserved@a\endcsname
-          \csname extras\scr@reserved@a\endcsname
-          \ifx #2\relax
-            \PackageError{scrbase}{%
-              `\string#2' not defined at language `\scr@reserved@a'%
-            }{%
-              You've told me to redefine `\string#2' at language
-              `\scr@reserved@a',\MessageBreak
-              but is hasn't been defined before.\MessageBreak
-              Nevertheless, if you'll continue I'll define it at
-              `\expandafter\string\csname extras\scr@reserved@a\endcsname'%
-            }%
+          \begingroup
+            \let#2\relax
+            \csname captions\scr@reserved@a\endcsname
+            \csname extras\scr@reserved@a\endcsname
+            \ifx #2\relax
+              \PackageError{scrbase}{%
+                `\string#2' not defined at language `\scr@reserved@a'%
+              }{%
+                You've told me to redefine `\string#2' at language
+                `\scr@reserved@a',\MessageBreak
+                but is hasn't been defined before.\MessageBreak
+                Nevertheless, if you'll continue I'll define it at
+                `\expandafter\string\csname extras\scr@reserved@a\endcsname'%
+              }%
+            \fi
+          \endgroup
+          \expandafter\ifx\csname extras\scr@reserved@a\endcsname\relax
+            \expandafter\expandafter\expandafter\gdef
+          \else
+            \expandafter\expandafter\expandafter\g@addto@macro
           \fi
-        \endgroup
-        \expandafter\ifx\csname extras\scr@reserved@a\endcsname\relax
-          \expandafter\expandafter\expandafter\gdef
-        \else
-          \expandafter\expandafter\expandafter\g@addto@macro
+          \csname extras\scr@reserved@a\endcsname{%
+            \def#2{#3}%
+          }%
+          \scr@def@activateactivelanguageaftergroup{#2}{#3}%
         \fi
-        \csname extras\scr@reserved@a\endcsname{%
-          \def#2{#3}%
-        }%
-        \scr@def@activateactivelanguageaftergroup{#2}{#3}%
       }%
     \reserved@b
   }%
@@ -671,42 +701,47 @@
       \@onelevel@sanitize\scr@reserved@a
       \expandafter\@for \expandafter\scr@reserved@a \expandafter:\expandafter=%
       \scr@reserved@a \do{%
+        \ifx\scr@reserved@a\@empty
+          \PackageWarning{scrbase}{empty language at \string\renewcaptionname}%
+        \else
 %    \end{macrocode}
 % Im Unterschied zu \cs{defcaptionname} muss der Begriff bereits definiert
 % sein.
 %    \begin{macrocode}
-        \begingroup
-          \let#2\relax
-          \csname extras\scr@reserved@a\endcsname
-          \ifx #2\relax
-            \csname captions\scr@reserved@a\endcsname
+          \begingroup
+            \let#2\relax
+            \csname extras\scr@reserved@a\endcsname
             \ifx #2\relax
-              \PackageError{scrbase}{%
-                `\string#2' not defined at language `\scr@reserved@a'%
-              }{%
-                You've told me to redefine `\string#2' at language
-                `\scr@reserved@a',\MessageBreak
-                but it hasn't been defined before.\MessageBreak
-                Nevertheless, if you'll continue I'll define it at
-                `\expandafter\string\csname captions\scr@reserved@a\endcsname'%
-              }%
-            \fi
-            \expandafter\ifx\csname captions\scr@reserved@a\endcsname\relax
-              \expandafter\expandafter\expandafter\gdef
+              \csname captions\scr@reserved@a\endcsname
+              \ifx #2\relax
+                \PackageError{scrbase}{%
+                  `\string#2' not defined at language `\scr@reserved@a'%
+                }{%
+                  You've told me to redefine `\string#2' at language
+                  `\scr@reserved@a',\MessageBreak
+                  but it hasn't been defined before.\MessageBreak
+                  Nevertheless, if you'll continue I'll define it at
+                  `\expandafter\string
+                  \csname captions\scr@reserved@a\endcsname'%
+                }%
+              \fi
+              \expandafter\ifx\csname captions\scr@reserved@a\endcsname\relax
+                \expandafter\expandafter\expandafter\gdef
+              \else
+                \expandafter\expandafter\expandafter\g@addto@macro
+              \fi
+              \csname captions\scr@reserved@a\endcsname{\def#2{#3}}%
             \else
-              \expandafter\expandafter\expandafter\g@addto@macro
+              \expandafter\ifx\csname extras\scr@reserved@a\endcsname\relax
+                \expandafter\expandafter\expandafter\gdef
+              \else
+                \expandafter\expandafter\expandafter\g@addto@macro
+              \fi
+              \csname extras\scr@reserved@a\endcsname{\def#2{#3}}%
             \fi
-            \csname captions\scr@reserved@a\endcsname{\def#2{#3}}%
-          \else
-            \expandafter\ifx\csname extras\scr@reserved@a\endcsname\relax
-              \expandafter\expandafter\expandafter\gdef
-            \else
-              \expandafter\expandafter\expandafter\g@addto@macro
-            \fi
-            \csname extras\scr@reserved@a\endcsname{\def#2{#3}}%
-          \fi
-        \endgroup
-        \scr@def@activateactivelanguageaftergroup{#2}{#3}%
+          \endgroup
+          \scr@def@activateactivelanguageaftergroup{#2}{#3}%
+        \fi
       }%
     \reserved@b
   }%
