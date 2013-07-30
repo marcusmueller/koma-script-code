@@ -1,4 +1,4 @@
-% \CheckSum{1283}
+% \CheckSum{1744}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-language.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkernel-language.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkernel-language.dtx}[2013/05/29 v3.12 KOMA-Script 
+\ProvidesFile{scrkernel-language.dtx}[2013/07/30 v3.12 KOMA-Script 
                                                         (language)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
@@ -166,160 +166,554 @@
 %<*package&base>
 % \fi
 %
-% \begin{macro}{\providecaptionname}
-%   \changes{v2.8q}{2001/11/08}{neu}
-%   \changes{v2.9r}{2004/06/16}{Wenn die aktuelle Sprache, die geänderte
-%     ist, wird die Anderung sofort aktiviert.}
-%   \changes{v2.95}{2006/03/10}{Ermittlung der aktuellen Sprache funktioniert
-%     auch, wenn \cs{languagename} mit seltsamen catcodes erstellt wurde.}
-%   \changes{v3.00}{2008/05/02}{nach \textsf{scrbase} verschoben}
-%   \changes{v3.01b}{2008/12/07}{missing make undefined}
-%   \changes{v3.02c}{2009/02/17}{undefined test improved}
-% \begin{macro}{\newcaptionname}
-%   \changes{v2.8q}{2001/11/08}{neu}
-%   \changes{v2.9r}{2004/06/16}{Wenn die aktuelle Sprache, die geänderte
-%     ist, wird die Anderung sofort aktiviert.}
-%   \changes{v2.95}{2006/03/10}{Ermittlung der aktuellen Sprache funktioniert
-%     auch, wenn \cs{languagename} mit seltsamen catcodes erstellt wurde.}
-%   \changes{v3.00}{2008/05/02}{nach \textsf{scrbase} verschoben}
-%   \changes{v3.01b}{2008/12/07}{missing make undefined}
-%   \changes{v3.02c}{2009/02/17}{undefined test improved}
-% \begin{macro}{\renewcaptionname}
-%   \changes{v2.8q}{2001/11/08}{neu}
-%   \changes{v2.9r}{2004/06/16}{Wenn die aktuelle Sprache, die geänderte
-%     ist, wird die Anderung sofort aktiviert.}
-%   \changes{v2.95}{2006/03/10}{Ermittlung der aktuellen Sprache funktioniert
-%     auch, wenn \cs{languagename} mit seltsamen catcodes erstellt wurde.}
-%   \changes{v3.00}{2008/05/02}{nach \textsf{scrbase} verschoben}
-%   \changes{v3.01b}{2008/12/07}{missing make undefined}
-%   \changes{v3.02c}{2009/02/17}{undefined test improved}
-% Drei Benutzerkommandos zur Definition sprachabhängiger Begriffe.
-% Es empfiehlt sich wegen \textsf{babel} diese Anweisungen innerhalb
-% von \cs{AtBeginDocument} zu verwenden.
+% \begin{macro}{\defcaptionname}
+%   \changes{3.12}{2013/07/29}{neu}
+% Für eine Reihe von Sprachen (durch Komma separierte Liste in \#1)
+% wird ein Makro (\#2) auf einen bestimmten Inhalt (\#3) definiert. Die
+% Sternversion verwendet dabei zwingend \cs{extrass\meta{Sprache}}, während
+% die Normalversion \cs{captions\meta{Sprache}} verwendet, außer wenn der
+% Begriff  bereits in \cs{extras\meta{Sprache}} definiert ist. Falls der
+% Befehl in der Dokumentpräambel aufgerufen wird, wird er verzögert.
 %    \begin{macrocode}
-\newcommand*{\providecaptionname}[3]{%
-  \@ifundefined{captions#1}{%
-    \@ifundefined{cap@info@#1@done}{%
-      \PackageInfo{scrbase}{%
-        No captions found for `#1'\MessageBreak
-        --> skipped%
-      }%
-      \expandafter\let\csname cap@info@#1@done\endcsname\@empty
-    }{}%
-  }{%
-    \begingroup
-      \let\@tempa\endgroup
-      \def\@tempb{\relax\undefined\relax}%
-      \let #2\@tempb\relax
-      \csname captions#1\endcsname
-      \ifx #2\@tempb\relax
-        \edef\@tempb{#1}%
-        \@onelevel@sanitize\@tempb
-        \@onelevel@sanitize\languagename
-        \ifx\@tempb\languagename
-          \def\@tempa{\endgroup%
-            \expandafter\g@addto@macro\csname captions#1\endcsname{%
-              \def#2{#3}}%
-            \csname captions#1\endcsname
-          }%
-        \else
-          \def\@tempa{\endgroup%
-            \expandafter\g@addto@macro\csname captions#1\endcsname{%
-              \def#2{#3}}%
-          }%
-        \fi
-      \else
-        \PackageInfo{scrbase}{%
-          `\string#2' at language `#1' already
-          defined\MessageBreak
-          --> skipped%
-        }%
-      \fi
-    \@tempa
-  }%
-}
-\newcommand*{\newcaptionname}[3]{%
-  \@ifundefined{captions#1}{%
-    \PackageInfo{scrbase}{%
-      No captions found for `#1' --> defining%
-    }%
-    \@namedef{captions#1}{}%
-  }{}%
-  \begingroup
-    \def\@tempb{\relax\undefined\relax}%
-    \let #2\@tempb\relax
-    \csname captions#1\endcsname
-    \ifx #2\@tempb\relax\else
-      \PackageError{scrbase}{%
-        `\string#2' at language `#1' already defined%
-      }{%
-        You've told me to define `\string#2' at language
-        `#1',\MessageBreak
-        but it is already defined.\MessageBreak
-        It will be redefined, if you'll continue.%
-      }%
-    \fi
-  \endgroup
-  \expandafter\g@addto@macro\csname captions#1\endcsname{%
-    \def#2{#3}%
-  }%
-  \begingroup
-    \edef\@tempb{#1}%
-    \@onelevel@sanitize\@tempb
-    \@onelevel@sanitize\languagename
-    \ifx\@tempb\languagename
-      \def\@tempa{\endgroup\csname captions#1\endcsname}%
-    \else
-      \let\@tempa\endgroup
-    \fi
-  \@tempa
-}
-\newcommand*{\renewcaptionname}[3]{%
-  \@ifundefined{captions#1}{%
-    \PackageError{scrbase}{%
-      No captions found for `#1'%
-    }{%
-      You've told me to redefine the caption `\string#2' at language
-      `#1',\MessageBreak
-      but `\expandafter\string\csname captions#1\endcsname' is not
-      defined.\MessageBreak
-      If you'll continue it will be defined.%
-    }
-    \@namedef{captions#1}{}%
-  }{}%
-  \begingroup
-    \def\@tempb{\relax\undefined\relax}%
-    \let #2\@tempb\relax
-    \csname captions#1\endcsname
-    \ifx #2\@tempb\relax
-      \PackageError{scrbase}{%
-        `\string#2' not defined at language `#1'%
-      }{%
-        You've told me to redefine `\string#2' at language
-        `#1',\MessageBreak
-        but it is not defined.\MessageBreak
-        If you'll continue it will be defined.%
-      }%
-    \fi
-  \endgroup
-  \expandafter\g@addto@macro\csname captions#1\endcsname{%
-    \def#2{#3}%
-  }%
-  \begingroup
-    \edef\@tempb{#1}%
-    \@onelevel@sanitize\@tempb
-    \@onelevel@sanitize\languagename
-    \ifx\@tempb\languagename
-      \def\@tempa{\endgroup\csname captions#1\endcsname}%
-    \else
-      \let\@tempa\endgroup
-    \fi
-  \@tempa
+\newcommand*{\defcaptionname}{%
+  \@ifstar\scr@def@scaptionname\scr@def@captionname
 }
 %    \end{macrocode}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
+% \begin{macro}{\scr@def@scaptionname}
+%   \changes{v3.12}{2013/07/30}{neu (intern)}
+% Die Sternvariante von \cs{defcaptionname}. Die Argumente sind dieselben.
+%    \begin{macrocode}
+\newcommand*{\scr@def@scaptionname}[3]{%
+%    \end{macrocode}
+% Als erstes findet die Verzögerung bis \cs{begin{document}} statt.
+%    \begin{macrocode}
+  \if@atdocument \expandafter\@firstofone
+  \else \expandafter\AtBeginDocument
+  \fi
+  {%
+%    \end{macrocode}
+% Dann arbeiten wir in einer lokalen Schleife alle Sprachen aus Argument \#1
+% ab und \dots
+%    \begin{macrocode}
+    \begingroup
+      \let\reserved@b\endgroup
+      \edef\scr@reserved@a{#1}%
+      \@onelevel@sanitize\scr@reserved@a
+      \expandafter\@for \expandafter\scr@reserved@a \expandafter:\expandafter=%
+      \scr@reserved@a \do{%
+%    \end{macrocode}
+% \dots\ fügen dabei \cs{extras\meta{Sprache}} die Definition \#3 für \#2
+% hinzu.
+%    \begin{macrocode}
+        \expandafter\ifx\csname extras\scr@reserved@a\endcsname\relax
+          \expandafter\expandafter\expandafter\gdef
+        \else
+          \expandafter\expandafter\expandafter\g@addto@macro
+        \fi
+        \csname extras\scr@reserved@a\endcsname{%
+          \def#2{#3}%
+        }%
+%    \end{macrocode}
+% Wenn etwas hinzugefügt wurde, muss außerdem \cs{reserved@b} so umdefiniert
+% werden, dass dies ggf. auch unmittelbar Geltung bekommt.
+%    \begin{macrocode}
+        \scr@def@activateactivelanguageaftergroup{#2}{#3}%
+      }%
+    \reserved@b
+  }%
+}
+%    \end{macrocode}
+% \begin{macro}{\scr@def@activateactivelanguageaftergroup}
+%   \changes{v3.12}{2013/07/30}{neu (intern)}
+% Wenn die Sprache in \cs{reserved@a} die aktuelle Sprache \cs{languagename}
+% ist oder die Sprachnummer zur Sprache \cs{reserved@a} die aktuelle
+% Sprachnummer \cs{language} ist, dann wird \cs{reserved@b} so umdefiniert,
+% dass es die aktuelle Gruppe beendet und \#1 als \#2 definiert.
+%    \begin{macrocode}
+\newcommand*{\scr@def@activateactivelanguageaftergroup}[2]{%
+  \@onelevel@sanitize\languagename
+  \@tempswafalse
+  \ifx\languagename\scr@reserved@a
+    \@tempswatrue
+  \else
+    \ifcsname l@\scr@reserved@a\endcsname
+      \expandafter\ifnum\csname l@\scr@reserved@a\endcsname=\language
+        \@tempswatrue
+      \fi
+    \fi
+  \fi
+  \if@tempswa
+    \def\reserved@b{\endgroup
+      \PackageInfo{scrbase}{activating \languagename\space \string#1}%
+      \def#1{#2}%
+    }%
+  \fi
+} 
+%    \end{macrocode}
+% \end{macro}^^A \scr@def@activateactivelanguageaftergroup
+% \end{macro}^^A \scr@def@scaptionname
+% \begin{macro}{\scr@def@captionname}
+%   \changes{v3.12}{2013/07/30}{neu (intern)}
+% Die Normalvariante von \cs{defcaptionname}, mit denselben Argumenten.
+%    \begin{macrocode}
+\newcommand*{\scr@def@captionname}[3]{%
+%    \end{macrocode}
+% Als erstes findet die Verzögerung bis \cs{begin{document}} statt.
+%    \begin{macrocode}
+  \if@atdocument \expandafter\@firstofone
+  \else \expandafter\AtBeginDocument
+  \fi
+  {%
+%    \end{macrocode}
+% Dann arbeiten wir in einer lokalen Schleife alle Sprachen aus Argument \#1
+% ab und \dots
+%    \begin{macrocode}
+    \begingroup
+      \let\reserved@b\endgroup
+      \edef\scr@reserved@a{#1}%
+      \@onelevel@sanitize\scr@reserved@a
+      \expandafter\@for \expandafter\scr@reserved@a \expandafter:\expandafter=%
+      \scr@reserved@a \do{%
+%    \end{macrocode}
+% \dots\ testen dabei, ob \#2 bereits in \cs{extras\meta{Sprache}} definiert
+% ist.
+%    \begin{macrocode}
+        \@tempswafalse
+        \begingroup
+          \@tempswafalse
+          \ifcsname extras\scr@reserved@a\endcsname
+            \let#2\relax
+            \csname extras\scr@reserved@a\endcsname
+            \ifx #2\relax \else \aftergroup\@tempswatrue \fi
+          \fi
+        \endgroup
+%    \end{macrocode}
+% Wenn \#2 bereits in \cs{extras\meta{Sprache}} definiert ist, \dots
+%    \begin{macrocode}
+        \if@tempswa
+%    \end{macrocode}
+% \dots\ dann definieren wir es genau hier neu,
+%    \begin{macrocode}
+          \expandafter\g@addto@macro\csname extras\scr@reserved@a\endcsname{%
+            \def#2{#3}%
+          }%
+        \else
+%    \end{macrocode}
+% \dots\ anderenfalls definieren wir es in \cs{captions\meta{Sprache}} neu.
+%    \begin{macrocode}
+         \expandafter\ifx\csname captions\scr@reserved@a\endcsname\relax
+            \expandafter\expandafter\expandafter\gdef
+          \else
+            \expandafter\expandafter\expandafter\g@addto@macro
+          \fi
+          \csname captions\scr@reserved@a\endcsname{%
+            \def#2{#3}%
+          }%
+        \fi
+%    \end{macrocode}
+% Wenn etwas hinzugefügt wurde, muss außerdem \cs{reserved@b} so umdefiniert
+% werden, dass dies ggf. auch unmittelbar Geltung bekommt.
+%    \begin{macrocode}
+        \scr@def@activateactivelanguageaftergroup{#2}{#3}%
+      }%
+    \reserved@b
+  }%
+}
+%    \end{macrocode}
+% \end{macro}^^A \scr@def@captionname
+% \end{macro}^^A \defcaptionname
+%
+% \begin{macro}{\providecaptionname}
+%   \changes{v2.8q}{2001/11/08}{neu}^^A
+%   \changes{v2.9r}{2004/06/16}{Wenn die aktuelle Sprache, die geänderte
+%     ist, wird die Anderung sofort aktiviert.}^^A
+%   \changes{v2.95}{2006/03/10}{Ermittlung der aktuellen Sprache funktioniert
+%     auch, wenn \cs{languagename} mit seltsamen catcodes erstellt wurde.}^^A
+%   \changes{v3.00}{2008/05/02}{nach \textsf{scrbase} verschoben}^^A
+%   \changes{v3.01b}{2008/12/07}{missing make undefined}^^A
+%   \changes{v3.02c}{2009/02/17}{undefined test improved}^^A
+%   \changes{v3.12}{2013/07/30}{Neuimplementierung nach dem Muster von
+%    \cs{defcaptionname}}^^A
+% Wie \cs{defcaptionname}, allerdings wird nur definiert, wenn die Sprache \#1
+% bereits existiert, aber der Begriff \#2 nicht existiert. Unter dieser
+% Einschränkung verwendet die Sternvariante \cs{extras\meta{Sprache}}, während
+% die Normalvariante \cs{captions\meta{Sprache}} verwendet.
+%    \begin{macrocode}
+\newcommand*{\providecaptionname}{%
+  \@ifstar\scr@provide@scaptionname\scr@provide@captionname
+}
+%    \end{macrocode}
+% \begin{macro}{\scr@provide@scaptionname}
+%   \changes{v3.12}{2013/07/30}{neu (intern)}
+%    \begin{macrocode}
+\newcommand*{\scr@provide@scaptionname}[3]{%
+  \if@atdocument \expandafter\@firstofone
+  \else \expandafter\AtBeginDocument
+  \fi
+  {%
+    \begingroup
+      \let\reserved@b\endgroup
+      \edef\scr@reserved@a{#1}%
+      \@onelevel@sanitize\scr@reserved@a
+      \expandafter\@for \expandafter\scr@reserved@a \expandafter:\expandafter=%
+      \scr@reserved@a \do{%
+%    \end{macrocode}
+% Im Unterschied zu \cs{defcaptionname} wird hier nur etwas zu
+% \cs{extras\meta{Sprache}} hinzugefügt, wenn das bereits definiert ist,
+% aber \#2 selbst noch nicht definiert ist.
+%    \begin{macrocode}
+        \begingroup
+          \let#2\relax
+          \csname extras\scr@reserved@a\endcsname
+          \csname captions\scr@reserved@a\endcsname
+          \ifx #2\relax \aftergroup\@firstofone
+          \else
+%<*trace>
+            \PackageInfo{scrbase}{letting \scr@reserved@a\space
+              \expandafter\string#2\MessageBreak
+              unchanged}%
+%</trace>
+            \aftergroup\@gobble
+          \fi
+        \endgroup
+        {%
+          \expandafter\ifx\csname extras\scr@reserved@a\endcsname\relax
+%<*trace>
+            \PackageInfo{scrbase}{letting 
+              \expandafter\string\csname extras\scr@reserved@a\endcsname\space
+              unused}%
+%</trace>
+            \expandafter\expandafter\expandafter\@gobbletwo
+          \else
+            \expandafter\expandafter\expandafter\g@addto@macro
+          \fi
+          \csname extras\scr@reserved@a\endcsname{%
+            \def#2{#3}%
+          }%
+          \scr@def@activateactivelanguageaftergroup{#2}{#3}%
+        }%
+      }%
+    \reserved@b
+  }%
+}
+%    \end{macrocode}
+% \end{macro}^^A \scr@provide@scaptionname
+% \begin{macro}{\scr@provide@captionname}
+%   \changes{v3.12}{2013/07/30}{neu (intern)}
+% Die Normalvariante von \cs{providecaptionname}, mit denselben Argumenten.
+%    \begin{macrocode}
+\newcommand*{\scr@provide@captionname}[3]{%
+  \if@atdocument \expandafter\@firstofone
+  \else \expandafter\AtBeginDocument
+  \fi
+  {%
+    \begingroup
+      \let\reserved@b\endgroup
+      \edef\scr@reserved@a{#1}%
+      \@onelevel@sanitize\scr@reserved@a
+      \expandafter\@for \expandafter\scr@reserved@a \expandafter:\expandafter=%
+      \scr@reserved@a \do{%
+%    \end{macrocode}
+% Im Unterschied zu \cs{defcaptionname} wird hier nur etwas zu
+% \cs{captions\meta{Sprache}} hinzugefügt, wenn das bereits definiert ist,
+% aber \#2 selbst weder in \cs{extras\meta{Sprache}} noch in
+% \cs{captions\meta{Sprache}} definiert ist.
+%    \begin{macrocode}
+        \begingroup
+          \let#2\relax
+          \csname captions\scr@reserved@a\endcsname
+          \csname extras\scr@reserved@a\endcsname
+          \ifx #2\relax \aftergroup\@firstofone
+          \else
+%<*trace>
+            \PackageInfo{scrbase}{letting \scr@reserved@a 
+              \expandafter\string#2\MessageBreak
+              unchanged}%
+%</trace>
+            \aftergroup\@gobble
+          \fi
+        \endgroup
+        {%
+          \expandafter\ifx\csname captions\scr@reserved@a\endcsname\relax
+%<*trace>
+            \PackageInfo{scrbase}{letting 
+              \expandafter\string\csname extras\scr@reserved@a\endcsname\space 
+              unused}%
+%</trace> 
+            \expandafter\expandafter\expandafter\@gobbletwo
+          \else
+            \expandafter\expandafter\expandafter\g@addto@macro
+          \fi
+          \csname captions\scr@reserved@a\endcsname{%
+            \def#2{#3}%
+          }%
+          \scr@def@activateactivelanguageaftergroup{#2}{#3}%
+        }%
+      }%
+    \reserved@b
+  }%
+}
+%    \end{macrocode}
+% \end{macro}^^A \scr@provide@captionname
+% \end{macro}^^A \providecaptionname
+%
+% \begin{macro}{\newcaptionname}
+%   \changes{v2.8q}{2001/11/08}{neu}^^A
+%   \changes{v2.9r}{2004/06/16}{Wenn die aktuelle Sprache, die geänderte
+%     ist, wird die Anderung sofort aktiviert.}^^A
+%   \changes{v2.95}{2006/03/10}{Ermittlung der aktuellen Sprache funktioniert
+%     auch, wenn \cs{languagename} mit seltsamen catcodes erstellt wurde.}^^A
+%   \changes{v3.00}{2008/05/02}{nach \textsf{scrbase} verschoben}^^A
+%   \changes{v3.01b}{2008/12/07}{missing make undefined}^^A
+%   \changes{v3.02c}{2009/02/17}{undefined test improved}^^A
+%   \changes{v3.12}{2013/07/30}{Neuimplementierung nach dem Muster von
+%    \cs{defcaptionname}}^^A
+% Wie \cs{defcaptionname} mit folgender Änderung: Existiert die
+% Sprache und der Begriff, so wird ein Fehler ausgegeben. Existiert die
+% Sprache aber nicht der Begriff, so wird er definiert. Existiert die Sprache
+% nicht, so wird sie definiert. Unter dieser Prämisse verwendet die
+% Sternversion \cs{extras\meta{Sprache}}, während die Normalversion
+% \cs{captions\meta{Sprache}} verwendet.
+%    \begin{macrocode}
+\newcommand*{\newcaptionname}{%
+  \@ifstar\scr@new@scaptionname\scr@new@captionname
+}
+%    \end{macrocode}
+% \begin{macro}{\scr@new@scaptionname}
+%   \changes{v3.12}{2013/07/30}{neu (intern)}
+% Die Sternvariante von \cs{newcaptionname}. Die Argumente sind dieselben.
+%    \begin{macrocode}
+\newcommand*{\scr@new@scaptionname}[3]{%
+  \if@atdocument \expandafter\@firstofone
+  \else \expandafter\AtBeginDocument
+  \fi
+  {%
+    \begingroup
+      \let\reserved@b\endgroup
+      \edef\scr@reserved@a{#1}%
+      \@onelevel@sanitize\scr@reserved@a
+      \expandafter\@for \expandafter\scr@reserved@a \expandafter:\expandafter=%
+      \scr@reserved@a \do{%
+%    \end{macrocode}
+% Im Unterschied zu \cs{defcaptionname} darf der Begriff noch nicht definiert
+% sein.
+%    \begin{macrocode}
+        \begingroup
+          \let#2\relax
+          \csname captions\scr@reserved@a\endcsname
+          \csname extras\scr@reserved@a\endcsname
+          \ifx #2\relax
+          \else
+            \PackageError{scrbase}{%
+              `\string#2' already defined\MessageBreak
+              for language `\scr@reserved@a'%
+            }{%
+              You've told me to define `\string#2' for language
+              `\scr@reserved@a',\MessageBreak
+              but is has already been defined.\MessageBreak
+              Nevertheless, if you'll continue it will be redefined.%
+            }%
+          \fi
+        \endgroup
+        \expandafter\ifx\csname extras\scr@reserved@a\endcsname\relax
+          \expandafter\expandafter\expandafter\gdef
+        \else
+          \expandafter\expandafter\expandafter\g@addto@macro
+        \fi
+        \csname extras\scr@reserved@a\endcsname{%
+          \def#2{#3}%
+        }%
+        \scr@def@activateactivelanguageaftergroup{#2}{#3}%
+      }%
+    \reserved@b
+  }%
+}
+%    \end{macrocode}
+% \end{macro}^^A \scr@new@scaptionname
+% \begin{macro}{\scr@new@captionname}
+%   \changes{v3.12}{2013/07/30}{neu (intern)}
+% Die Normalvariante von \cs{newcaptionname}, mit denselben Argumenten.
+%    \begin{macrocode}
+\newcommand*{\scr@new@captionname}[3]{%
+  \if@atdocument \expandafter\@firstofone
+  \else \expandafter\AtBeginDocument
+  \fi
+  {%
+    \begingroup
+      \let\reserved@b\endgroup
+      \edef\scr@reserved@a{#1}%
+      \@onelevel@sanitize\scr@reserved@a
+      \expandafter\@for \expandafter\scr@reserved@a \expandafter:\expandafter=%
+      \scr@reserved@a \do{%
+%    \end{macrocode}
+% Im Unterschied zu \cs{defcaptionname} darf der Begriff noch nicht definiert
+% sein.
+%    \begin{macrocode}
+        \begingroup
+          \let#2\relax
+          \csname captions\scr@reserved@a\endcsname
+          \csname extras\scr@reserved@a\endcsname
+          \ifx #2\relax
+          \else
+            \PackageError{scrbase}{%
+              `\string#2' already defined\MessageBreak
+              for language `\scr@reserved@a'%
+            }{%
+              You've told me to define `\string#2' for language
+              `\scr@reserved@a',\MessageBreak
+              but is has already been defined.\MessageBreak
+              Nevertheless, if you'll continue it will be redefined.%
+            }%
+          \fi
+        \endgroup
+        \expandafter\ifx\csname captions\scr@reserved@a\endcsname\relax
+          \expandafter\expandafter\expandafter\gdef
+        \else
+          \expandafter\expandafter\expandafter\g@addto@macro
+        \fi
+        \csname captions\scr@reserved@a\endcsname{%
+          \def#2{#3}%
+        }%
+        \scr@def@activateactivelanguageaftergroup{#2}{#3}%
+      }%
+    \reserved@b
+  }%
+}
+%    \end{macrocode}
+% \end{macro}^^A \scr@new@captionname
+% \end{macro}^^A \newcaptionname
+%
+% \begin{macro}{\renewcaptionname}
+%   \changes{v2.8q}{2001/11/08}{neu}^^A
+%   \changes{v2.9r}{2004/06/16}{Wenn die aktuelle Sprache, die geänderte
+%     ist, wird die Anderung sofort aktiviert.}^^A
+%   \changes{v2.95}{2006/03/10}{Ermittlung der aktuellen Sprache funktioniert
+%     auch, wenn \cs{languagename} mit seltsamen catcodes erstellt wurde.}^^A
+%   \changes{v3.00}{2008/05/02}{nach \textsf{scrbase} verschoben}^^A
+%   \changes{v3.01b}{2008/12/07}{missing make undefined}^^A
+%   \changes{v3.02c}{2009/02/17}{undefined test improved}^^A
+%   \changes{v3.12}{2013/07/30}{Neuimplementierung nach dem Muster von
+%    \cs{defcaptionname}}^^A
+% Wie \cs{defcaptionname} mit folgender Änderung: Existiert die
+% Sprache nicht, so ist dies ein Fehler. Existiert die Sprache nicht aber der
+% Begriff, so ist dies ebenfalls ein Fehler. Existieren Sprache und Begriff,
+% so wird dieser umdefiniert. Unter dieser Voraussetzung ändert die
+% Sternvariante immer \cs{extras\meta{Sprache}}, während die Normalvariante
+% \cs{captions\meta{Sprache}} ändert, falls der Begriff nicht i
+% \cs{extras\meta{Sprache}} definiert war, und sonst \cs{extras\meta{Sprache}}.
+%    \begin{macrocode}
+\newcommand*{\renewcaptionname}{%
+  \@ifstar\scr@renew@scaptionname\scr@renew@captionname
+}
+%    \end{macrocode}
+% \begin{macro}{\scr@renew@scaptionname}
+%   \changes{v3.12}{2013/07/30}{neu (intern)}
+% Die Sternvariante von \cs{renewcaptionname}. Die Argumente sind dieselben.
+%    \begin{macrocode}
+\newcommand*{\scr@renew@scaptionname}[3]{%
+  \if@atdocument \expandafter\@firstofone
+  \else \expandafter\AtBeginDocument
+  \fi
+  {%
+    \begingroup
+      \let\reserved@b\endgroup
+      \edef\scr@reserved@a{#1}%
+      \@onelevel@sanitize\scr@reserved@a
+      \expandafter\@for \expandafter\scr@reserved@a \expandafter:\expandafter=%
+      \scr@reserved@a \do{%
+%    \end{macrocode}
+% Im Unterschied zu \cs{defcaptionname} muss der Begriff bereits definiert
+% sein.
+%    \begin{macrocode}
+        \begingroup
+          \let#2\relax
+          \csname captions\scr@reserved@a\endcsname
+          \csname extras\scr@reserved@a\endcsname
+          \ifx #2\relax
+            \PackageError{scrbase}{%
+              `\string#2' not defined at language `\scr@reserved@a'%
+            }{%
+              You've told me to redefine `\string#2' at language
+              `\scr@reserved@a',\MessageBreak
+              but is hasn't been defined before.\MessageBreak
+              Nevertheless, if you'll continue I'll define it at
+              `\expandafter\string\csname extras\scr@reserved@a\endcsname'%
+            }%
+          \fi
+        \endgroup
+        \expandafter\ifx\csname extras\scr@reserved@a\endcsname\relax
+          \expandafter\expandafter\expandafter\gdef
+        \else
+          \expandafter\expandafter\expandafter\g@addto@macro
+        \fi
+        \csname extras\scr@reserved@a\endcsname{%
+          \def#2{#3}%
+        }%
+        \scr@def@activateactivelanguageaftergroup{#2}{#3}%
+      }%
+    \reserved@b
+  }%
+}
+%    \end{macrocode}
+% \end{macro}^^A \scr@renew@scaptionname
+% \begin{macro}{\scr@renew@captionname}
+%   \changes{v3.12}{2013/07/30}{neu (intern)}
+% Die Normalvariante von \cs{renewcaptionname}, mit denselben Argumenten.
+%    \begin{macrocode}
+\newcommand*{\scr@renew@captionname}[3]{%
+  \if@atdocument \expandafter\@firstofone
+  \else \expandafter\AtBeginDocument
+  \fi
+  {%
+    \begingroup
+      \let\reserved@b\endgroup
+      \edef\scr@reserved@a{#1}%
+      \@onelevel@sanitize\scr@reserved@a
+      \expandafter\@for \expandafter\scr@reserved@a \expandafter:\expandafter=%
+      \scr@reserved@a \do{%
+%    \end{macrocode}
+% Im Unterschied zu \cs{defcaptionname} muss der Begriff bereits definiert
+% sein.
+%    \begin{macrocode}
+        \begingroup
+          \let#2\relax
+          \csname extras\scr@reserved@a\endcsname
+          \ifx #2\relax
+            \csname captions\scr@reserved@a\endcsname
+            \ifx #2\relax
+              \PackageError{scrbase}{%
+                `\string#2' not defined at language `\scr@reserved@a'%
+              }{%
+                You've told me to redefine `\string#2' at language
+                `\scr@reserved@a',\MessageBreak
+                but it hasn't been defined before.\MessageBreak
+                Nevertheless, if you'll continue I'll define it at
+                `\expandafter\string\csname captions\scr@reserved@a\endcsname'%
+              }%
+            \fi
+            \expandafter\ifx\csname captions\scr@reserved@a\endcsname\relax
+              \expandafter\expandafter\expandafter\gdef
+            \else
+              \expandafter\expandafter\expandafter\g@addto@macro
+            \fi
+            \csname captions\scr@reserved@a\endcsname{\def#2{#3}}%
+          \else
+            \expandafter\ifx\csname extras\scr@reserved@a\endcsname\relax
+              \expandafter\expandafter\expandafter\gdef
+            \else
+              \expandafter\expandafter\expandafter\g@addto@macro
+            \fi
+            \csname extras\scr@reserved@a\endcsname{\def#2{#3}}%
+          \fi
+        \endgroup
+        \scr@def@activateactivelanguageaftergroup{#2}{#3}%
+      }%
+    \reserved@b
+  }%
+}
+%    \end{macrocode}
+% \end{macro}^^A \scr@renew@captionname
+% \end{macro}^^A \renewcaptionname
 %
 % \iffalse
 %</package&base>
