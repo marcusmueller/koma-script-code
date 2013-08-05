@@ -90,7 +90,7 @@
 %<driver>\ProvidesFile{scrwfile.drv}
 %<doc>\ProvidesFile{scrwfile.tex}
 %<*dtx|(package&identify)|driver|doc>
-  [2013/07/24 v0.1e-alpha LaTeX2e KOMA-Script package (write and clone files)]
+  [2013/08/05 v0.1f-alpha LaTeX2e KOMA-Script package (write and clone files)]
 %</dtx|(package&identify)|driver|doc>
 %<*driver>
   \documentclass{scrdoc}
@@ -121,6 +121,7 @@
   \providecommand\PParameter[1]{\mbox{\texttt{\{#1\}}}}
   \let\PName\meta
   \let\PValue\texttt
+  \providecommand*{\important}[1]{}
   \providecommand*{\autoref}[1]{\expandafter\AUTOREF#1:}
   \providecommand*{\AUTOREF}{}
   \makeatletter
@@ -408,24 +409,54 @@ contents:
 \begin{lstcode}
   \usepackage{scrwfile}
   \TOCclone[Short \contentsname]{toc}{stoc}
-  \AtBeginDocument{%
-    % aux first opened at \begin{document}. So wait until this:
-    \addtocontents{toc}{% first toc entry:
-      \proctect\addcontentsline{stoc}{% write to Short Contents
-        \protect\tableofcontents% Contents
-      }%
-    }%
-  }
-  \begin{document}
-  \setcounter{tocdepth}{1}% show chapters only
-  \listofstoc% Write short table of contents
-  \setcounter{tocdepth}{6}% show all levels
-  \tableofcontents% Write table of contents
 \end{lstcode}
-You need at least three \LaTeX{} runs to get a short table of contents and a
-detailed table of contents. The detailed one produces an entry at the short
-one but this entry will not be part of the detailed table of contents.
+This would create a new table of contents with the heading »Short
+Contents«. The new table of contents uses a helper file with extension
+\File{stoc}. All entries to the helper file with extension \File{toc} will
+also be copied to this new helper file.
+
+The new short table of contents should only have the chapter entries. This may
+be done using:
+\begin{lstcode}
+  \addtocontents{stoc}{\protect\value{tocdepth}=0}
+\end{lstcode}
+Normally you cannot write into a helper file before
+\Macro{begin}\PParameter{document}. But using \Package{scrwfile} changes
+this. So the code above will be successful after loading \Package{scrwfile}.
+
+To show the new short contents of helper file extension \File{stoc} we will
+use
+\begin{lstcode}[moretexcs={listofsttoc}]
+  \listofstoc
+\end{lstcode}
+somewhere after \Macro{begin}\PParameter{document}.
+
+If we also want an entry for the table of contents at the short contents, we
+cannot use
+\begin{lstcode}
+  \addtocontents{toc}{% write to the Contents
+    \protect\addcontentsline{stoc}% write to Short Contents
+      {chapter}% a chapter entry with
+      {\contentsname}% the Contents' name
+  }
+\end{lstcode}
+because the \Macro{addcontentsline} command would be copied to \File{stoc}
+too. So we cannot add the command to the \File{toc}-file. Package
+\Package{tocbasic}\important{\Package{tocbasic}} may be used to solve this:
+\csname phantomsection\endcsname\label{example:scrwfile.AfterStartingTOC}
+\begin{lstcode}
+  \AfterStartingTOC[toc]{%
+    \addcontentsline{stoc}{chapter}
+                    {\protect\contentsname}%
+  }
+\end{lstcode}
+But this needs, that the file with extension \File{toc} is under control of
+package \Package{tocbasic}, which is indeed the case within all \KOMAScript{}
+classes.
 %\iffalse^^A meta-comment
+See \autoref{sec:tocbasic.toc} on
+\autopageref{desc:tocbasic.cmd.AfterStartingTOC} for more information about
+\Macro{AfterStartingTOC}.%
 \end{Example}
 \EndIndex{Cmd}{TOCclone}
 
