@@ -1,8 +1,8 @@
-% \CheckSum{1667}
+% \CheckSum{1699}
 % \iffalse meta-comment
 % ======================================================================
 % tocstyle.dtx
-% Copyright (c) Markus Kohm, 2007-2012
+% Copyright (c) Markus Kohm, 2007-2013
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -29,7 +29,7 @@
 % at least three times.
 % ----------------------------------------------------------------------
 % tocstyle.dtx
-% Copyright (c) Markus Kohm, 2007-2012
+% Copyright (c) Markus Kohm, 2007-2013
 %
 % Diese Datei ist Teil des LaTeX2e KOMA-Script-Pakets.
 %
@@ -104,7 +104,7 @@
 
 \preamble
 
-Copyright (c) 2007-2012 by Markus Kohm <komascript(at)gmx.info>
+Copyright (c) 2007-2013 by Markus Kohm <komascript(at)gmx.info>
 
 Copyright (c) 1994-2007
 Markus Kohm and any individual authors listed elsewhere in this file.
@@ -203,7 +203,7 @@ THERE IS NO SUPPORT, IF YOU USE THIS PACKAGE!
 %<driver>\ProvidesFile{tocstyle.drv}
 %<doc>\ProvidesFile{tocstyle.tex}
 %<*dtx|package|driver|doc>
-  [2009/11/09 v0.2d-alpha LaTeX2e KOMA-Script package (versatile toc styles)]
+  [2013/08/11 v0.2e-alpha LaTeX2e KOMA-Script package (versatile toc styles)]
 %</dtx|package|driver|doc>
 %<*driver>
 \documentclass{scrdoc}
@@ -2061,6 +2061,8 @@ usefull to define your own toc styles.
 % \end{macro}
 %
 % \subsubsection{Defining Some TOC Styles}
+% \changes{v0.2e}{2013/08/11}{usage of new font elements of \KOMAScript\space
+%   at \texttt{KOMAlike}}
 %
 %    \begin{macrocode}
 \newtocstyle{standard}{%
@@ -2070,12 +2072,7 @@ usefull to define your own toc styles.
   \settocfeature[-1]{leaders}{\hfill}%
   \settocfeature[0]{entryvskip}{1em\@plus\p@}%
   \settocfeature[0]{leaders}{\hfill}%
-  \settocfeature[0]{entryhook}{%
-    \begingroup
-      \edef\@tempa{toc}%
-      \ifx\tocstyleAliasTOC\@tempa\aftergroup\bfseries\fi
-    \endgroup
-  }%
+  \settocfeature[0]{entryhook}{\bfseries}
   \iftochaschapter\else
     \settocfeature[1]{entryvskip}{1em\@plus\p@}%
     \settocfeature[1]{leaders}{\hfill}%
@@ -2088,27 +2085,34 @@ usefull to define your own toc styles.
   \fi
 }
 \begingroup\expandafter\expandafter\expandafter\endgroup
-\expandafter\ifx\csname sectfont\endcsname\relax
+\expandafter\ifx\csname KOMAClassName\endcsname\relax
   \newtocstyle{KOMAlike}{%
     \settocfeature{dothook}{\normalfont}%
     \settocfeature[-1]{entryhook}{\sffamily\bfseries}%
     \settocfeature[-1]{entryvskip}{2.25em\@plus\p@}%
     \settocfeature[-1]{leaders}{\hfill}%
+    \settocfeature[-1]{pagenumberhook}{\sffamily\bfseries}%
     \settocfeature[0]{entryvskip}{1em\@plus\p@}%
     \settocfeature[0]{leaders}{\hfill}%
-    \settocfeature[0]{entryhook}{%
-      \begingroup
-        \edef\@tempa{toc}%
-        \ifx\tocstyleAliasTOC\@tempa\aftergroup\sffamily\bfseries\fi
-      \endgroup
-    }%
+    \settocfeature[0]{entryhook}{\sffamily\bfseries}
+    \settocfeature[0]{pagenumberhook}{\sffamily\bfseries}%
     \iftochaschapter\else
       \settocfeature[1]{entryvskip}{1em\@plus\p@}%
       \settocfeature[1]{leaders}{\hfill}%
       \settocfeature[1]{entryhook}{%
         \begingroup
           \edef\@tempa{toc}%
-          \ifx\tocstyleAliasTOC\@tempa\aftergroup\sffamily\bfseries\fi
+          \ifx\tocstyleAliasTOC\@tempa
+            \aftergroup\sffamily\aftergroup\bfseries
+          \fi
+        \endgroup
+      }%
+      \settocfeature[1]{pagenumberhook}{%
+        \begingroup
+          \edef\@tempa{toc}%
+          \ifx\tocstyleAliasTOC\@tempa
+            \aftergroup\sffamily\aftergroup\bfseries
+          \fi
         \endgroup
       }%
     \fi
@@ -2116,31 +2120,47 @@ usefull to define your own toc styles.
 \else
   \newtocstyle{KOMAlike}{%
     \settocfeature{dothook}{\normalfont}%
-    \settocfeature[-1]{entryhook}{\sectfont}%
+    \settocfeature[-1]{entryhook}{\usekomafont{partentry}}%
     \settocfeature[-1]{entryvskip}{2.25em\@plus\p@}%
     \settocfeature[-1]{leaders}{\hfill}%
+    \settocfeature[-1]{pagenumberhook}{\usekomafont{partentrypagenumber}}%
     \settocfeature[0]{entryvskip}{1em\@plus\p@}%
     \settocfeature[0]{leaders}{\hfill}%
-    \settocfeature[0]{entryhook}{%
-      \begingroup
-        \edef\@tempa{toc}%
-        \ifx\tocstyleAliasTOC\@tempa\aftergroup\sectfont\fi
-      \endgroup
-    }%
+    \settocfeature[0]{entryhook}{\usekomafont{chapterentry}}%
+    \settocfeature[0]{pagenumberhook}{\usekomafont{chapterentrypagenumber}}%
     \iftochaschapter\else
       \settocfeature[1]{entryvskip}{1em\@plus\p@}%
       \settocfeature[1]{leaders}{\hfill}%
       \settocfeature[1]{entryhook}{%
         \begingroup
           \edef\@tempa{toc}%
-          \ifx\tocstyleAliasTOC\@tempa\aftergroup\sectfont\fi
-        \endgroup
+          \ifx\tocstyleAliasTOC\@tempa
+            \def\@tempa{\endgroup\usekomafont{sectionentry}}%
+          \else
+            \let\@tempa\endgroup
+          \fi
+        \@tempa
+      }%
+      \settocfeature[1]{pagenumberhook}{%
+        \begingroup
+          \edef\@tempa{toc}%
+          \ifx\tocstyleAliasTOC\@tempa
+            \def\@tempa{\endgroup\usekomafont{sectionentrypagenumber}}%
+          \else
+            \let\@tempa\endgroup
+          \fi
+        \@tempa
       }%
     \fi
   }
 \fi
 \newcommand*{\tocstyle@deprecated@style@KOMAScript}{KOMAlike}%
 \newtocstyle[KOMAlike]{classic}{%
+  \settocfeature[-1]{pagenumberhook}{\normalfont\normalcolor}%
+  \settocfeature[0]{pagenumberhook}{\normalfont\normalcolor}%
+  \iftochaschapter\else
+    \settocfeature[1]{pagenumberhook}{\normalfont\normalcolor}%
+  \fi
   \settocfeature{pagenumberhook}{\normalfont\normalcolor}%
   \settocfeature{raggedhook}{\raggedright}%
 }
