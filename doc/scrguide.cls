@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2013/05/03 v1.7a internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2013/08/28 v1.7b internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -120,6 +120,7 @@
 \RequirePackage{listings}
 \RequirePackage{multicol}
 \RequirePackage{marginnote}
+\RequirePackage{tabularx}
 \RequirePackage{xcolor,tocstyle}% hyperref needs xcolor with tocstyle
 \RequirePackage[\uselanguage]{hyperref}
 \RequirePackage[open,openlevel=0]{bookmark}% improved pdf bookmarks
