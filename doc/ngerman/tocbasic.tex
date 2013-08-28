@@ -45,7 +45,7 @@
 %
 % ======================================================================
 
-\ProvidesFile{tocbasic.tex}[2012/03/14 KOMA-Script package tocbasic]
+\ProvidesFile{tocbasic.tex}[2013/08/28 KOMA-Script package tocbasic]
 
 \chapter{Verzeichnisse verwalten mit Hilfe von \Package{tocbasic}}
 \labelbase{tocbasic}
@@ -64,6 +64,13 @@ Verzeichnisse von \Package{babel}\IndexPackage{babel} (siehe
 werden. Durch Verwendung von \Package{tocbasic} soll dem Paketautor die Mühe
 genommen werden, selbst solche Anpassungen an andere Pakete oder an Klassen
 vornehmen zu müssen.
+
+Als kleiner Nebeneffekt kann das Paket auch verwendet werden, um neue
+Gleitumgebungen oder den Gleitumgebungen ähnliche nicht gleitende Umgebungen
+für Konsultationsobjekte zu definieren. Näheres dazu ist nach den
+grundlegenden Anweisungen in \autoref{sec:tocbasic.toc}, verdeutlicht durch
+ein Beispiel in \autoref{sec:tocbasic.example} und kompakt in
+\autoref{sec:tocbasic.declarenewtoc} zu finden.
 
 \KOMAScript{} verwendet \Package{tocbasic} sowohl für das Inhaltsverzeichnis
 als auch für die bereits erwähnten Verzeichnisse für Abbildungen und Tabellen.
@@ -1256,6 +1263,81 @@ die möglichen Optionen bietet \autoref{tab:tocbasic.DeclareNewTOC-options}.
   die Option \Option{nonfloat} angegeben, wird außerdem eine nicht gleitende
   Umgebung \Environment{remarkbox-} definiert, in der ebenfalls
   \Macro{caption}\IndexCmd{caption} verwendet werden kann.
+
+  Zum besseren Verständnis zeigt \autoref{tab:tocbasic.comparison} eine
+  Gegenüberstellung der Anweisungen und Umgebungen für die neu erstellte
+  Beispielumgebung \Environment{remarkbox} mit den entsprechenden Befehlen und
+  Umgebungen für Abbildungen.%
+  \begin{table}
+    \centering
+    \caption{Gegenüberstellung von Beispielumgebung \Environment{remarkbox}
+      und Umgebung \Environment{figure}}
+    \label{tab:tocbasic.comparison}
+    \begin{tabularx}{\textwidth}{ll>{\raggedright}p{7em}X}
+      \toprule
+      \Environment{remarkbox} & \Environment{figure}
+      & Optionen von \Macro{DeclareNewTOC} & Kurzbeschreibung \\[1ex]
+      \midrule
+      \Environment{remarkbox} & \Environment{figure} 
+      & \Option{type}, \Option{float} 
+      & Gleitumgebung des jeweiligen Typs.\\[1ex]
+      \Environment{remarkbox*} & \Environment{figure*} 
+      & \Option{type}, \Option{float} 
+      & spaltenübergreifende Gleitumgebung des jeweiligen Typs \\[1ex]
+      \Counter{remarkbox} & \Counter{figure} 
+      & \Option{type}, \Option{float} 
+      & Zähler, der von \Macro{caption} verwendet wird \\[1ex]
+      \Macro{theremarkbox} & \Macro{thefigure} 
+      & \Option{type}, \Option{float} 
+      & Anweisung zur Ausgabe des jeweiligen Zählers \\[1ex]
+      \Macro{remarkboxformat} & \Macro{figureformat}
+      & \Option{type}, \Option{float}
+      & Anweisung zur Formatierung des jeweiligen Zählers in der Ausgabe von
+        \Macro{caption}\\[1ex]
+      \Macro{remarkboxname} & \Macro{figurename}
+      & \Option{type}, \Option{float}, \Option{name}
+      & Name, der im Label von \Macro{caption} verwendet wird \\[1ex]
+      \Macro{listofremarkboxes} & \Macro{listoffigures}
+      & \Option{types}, \Option{float}
+      & Anweisung zur Ausgabe des jeweiligen Verzeichnisses \\[1ex]
+      \Macro{listremarboxname} & \Macro{listfigurename}
+      & \Option{type}, \Option{float}, \Option{listname}
+      & Überschrift des jeweiligen Verzeichnisses \\[1ex]
+      \Macro{fps@remarkbox} & \Macro{fps@figure}
+      & \Option{type}, \Option{float}, \Option{floattype}
+      & nummerischer Gleitumge\-bungstyp zwecks Reihen\-fol\-gen\-erhalts \\[1ex]
+      \File{lor} & \File{lof}
+      &
+      & Dateiendung der Hilfsdatei für das jeweilige Verzeichnis \\
+      \bottomrule
+    \end{tabularx}
+  \end{table}
+
+  Und hier nun eine mögliche Verwendung der Umgebung:
+\begin{lstcode}
+  \begin{remarkbox}
+    \centering
+    Gleiches sollte immer auf gleiche Weise und
+    mit gleichem Aussehen gesetzt werden.
+    \caption{Erster Hauptsatz der Typografie}
+    \label{rem:typo1}
+  \end{remarkbox}
+\end{lstcode}
+  Ein Ausschitt aus einer Beispielseite mit dieser Umgebung könnte dann so
+  aussehen:
+  \begin{center}\footnotesize
+    \begin{tabular}
+      {|!{\hspace{.1\linewidth}}p{.55\linewidth}!{\hspace{.1\linewidth}}|}
+      \\
+      \centering
+      Gleiches sollte immer auf gleiche Weise und
+      mit gleichem Aussehen gesetzt werden.\\[\abovecaptionskip]
+      {%
+        \usekomafont{caption}\footnotesize{\usekomafont{captionlabel}%
+          Merksatz 1: }Erster Hauptsatz der Typografie
+      }\\
+    \end{tabular}%
+  \end{center}%
 \end{Example}%
 %
 \EndIndex{Cmd}{DeclareNewTOC}%
