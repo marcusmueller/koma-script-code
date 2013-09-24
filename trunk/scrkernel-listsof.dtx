@@ -1,4 +1,4 @@
-% \CheckSum{418}
+% \CheckSum{434}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-listsof.dtx
@@ -159,7 +159,16 @@
 % ermittelt.
 %    \begin{macrocode}
     {flat}{8},{left}{8},%
-    {graduated}{9},{indent}{9},{indented}{9}%
+    {graduated}{9},{indent}{9},{indented}{9},%
+%    \end{macrocode}
+%   \changes{v3.12}{2014/09/24}{neue Werte \texttt{numberline} und
+%     \texttt{nonumberline}}%^^A
+% Außerdem können die nicht nummerierten Einträge ggf. ebenfalls mit
+% \cs{numberline} eingerückt werden. Das geht über ein Feature von
+% \textsf{tocbasic}.
+%    \begin{macrocode}
+    {indenttextentries}{10},{indentunnumbered}{10},{numberline}{10},%
+    {leftaligntextentries}{11},{leftalignunnumbered}{11},{nonumberline}{11}%
   }{#1}%
   \ifx\FamilyKeyState\FamilyKeyStateProcessed
     \ifcase \@tempa\relax
@@ -182,6 +191,10 @@
       \@toclefttrue
     \or
       \@tocleftfalse
+    \or
+      \setuptoc{toc}{numberline}%
+    \or
+      \unsettoc{toc}{numberline}%
     \fi
   \fi
 }
@@ -279,14 +292,23 @@
 %    \begin{macrocode}
     {entryprefix}{6},
 %    \end{macrocode}
+%   \changes{v3.12}{2014/09/24}{neue Werte \texttt{numberline} und
+%     \texttt{nonumberline}}%^^A
+% Außerdem können die nicht nummerierten Einträge ggf. ebenfalls mit
+% \cs{numberline} eingerückt werden. Das geht über ein Feature von
+% \textsf{tocbasic}.
+%    \begin{macrocode}
+    {indenttextentries}{7},{indentunnumbered}{7},{numberline}{7},%
+    {leftaligntextentries}{8},{leftalignunnumbered}{8},{nonumberline}{8},%
+%    \end{macrocode}
 % Dann gibt es Optionen, für die Unterteilung auf Kapitelebene. Allerdings nur
 % für \textsf{scrbook} und \textsf{scrreprt}.
 %    \begin{macrocode}
 %<*book|report>
-    {chapterentry}{7},{withchapterentry}{7},%
-    {nochaptergap}{8},{ignorechapter}{8},%
-    {chaptergapsmall}{9},{smallchaptergap}{9},%
-    {chaptergapline}{10},{onelinechaptergap}{10}%
+    {chapterentry}{9},{withchapterentry}{9},%
+    {nochaptergap}{10},{ignorechapter}{10},%
+    {chaptergapsmall}{11},{smallchaptergap}{11},%
+    {chaptergapline}{12},{onelinechaptergap}{12}%
 %</book|report>
   }{#1}%
   \ifx\FamilyKeyState\FamilyKeyStateProcessed
@@ -360,9 +382,23 @@
           }%
         }%
       }%
+    \or% numberline
+      \doforeachtocfile[float]{%
+        \setuptoc{\@currext}{numberline}%
+      }%
+      \AtAddToTocList[float]{%
+        \setuptoc{\@currext}{numberline}%
+      }
+    \or% nonumberline
+      \doforeachtocfile[float]{%
+        \unsettoc{\@currext}{numberline}%
+      }%
+      \AtAddToTocList[float]{%
+        \unsettoc{\@currext}{numberline}%
+      }
 %<*book|report>
     \or% chapterentry
-      \KOMAExecuteOtions{chapteratlists=entry}%
+      \KOMAExecuteOptions{chapteratlists=entry}%
     \or% chaptergap
       \KOMAExecuteOptions{chapteratlists=\z@}%
     \or% chaptergapsmall
@@ -417,12 +453,14 @@
 % \end{option}
 %
 % \begin{option}{chapteratlists}
-%   \changes{v2.96a}{2006/12/03}{neue Option}
-%   \changes{v2.98c}{2008/03/05}{nicht mehr bei \textsf{scrartcl}}
+%   \changes{v2.96a}{2006/12/03}{neue Option}%^^A
+%   \changes{v2.98c}{2008/03/05}{nicht mehr bei \textsf{scrartcl}}%^^A
 % \begin{macro}{\if@chaptertolists}
-%   \changes{v2.96a}{2006/12/03}{neuer Schalter}
+%   \changes{v2.96a}{2006/12/03}{neuer Schalter}%^^A
+%   \changes{v3.12}{2013/09/24}{Verzeichnisse werden nicht in Verzeichnisse
+%     eingetragen}%^^A
 % \begin{macro}{\@chapterlistsgap}
-%   \changes{v2.96a}{2006/12/03}{neues Macro (intern)}
+%   \changes{v2.96a}{2006/12/03}{neues Macro (intern)}%^^A
 % Option, um einzugstellen, ob Kapitel in den Verzeichnissen der
 % Gleitumgebungen Spuren hinterlassen. Man kann wahlweise Lücken einstellen
 % (Voreinstellung mit 10\,pt) oder die Kapitelüberschrift eintragen lassen.
@@ -440,6 +478,7 @@
     \@chaptertolistsfalse\renewcommand*{\@chapterlistsgap}{#1}%
   }%
 }
+\BeforeTOCHead{\@chaptertolistsfalse}
 %</book|report>
 %    \end{macrocode}
 % \end{macro}  
@@ -719,6 +758,8 @@
 %
 % \begin{macro}{\addtocentrydefault}
 %   \changes{v3.08}{2010/11/01}{Neu}
+%   \changes{v3.12}{2013/09/24}{Verwendung der neuen
+%     \texttt{tocbasic}-Anweisung \cs{tocbasic@addxcontentsline}}
 % Seit Version~3.08 werden Einträge ins Inhaltsverzeichnis in der
 % Voreinstellung über diese Anweisung vorgenommen. Das erste Argument ist
 % dabei die Gliederungsebene. Das zweite Argument ist die (formatierte)
@@ -727,11 +768,7 @@
 % Inhaltsverzeichnis soll.
 %    \begin{macrocode}
 \newcommand{\addtocentrydefault}[3]{%
-  \ifstr{#2}{}{%
-    \addcontentsline{toc}{#1}{#3}%
-  }{%
-    \addcontentsline{toc}{#1}{\protect\numberline{#2}#3}%
-  }%
+  \tocbasic@addxcontentsline{toc}{#1}{#2}{#3}%
 }
 %    \end{macrocode}
 % \end{macro}

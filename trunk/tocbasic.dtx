@@ -1,4 +1,4 @@
-% \CheckSum{1240}
+% \CheckSum{1312}
 % \iffalse meta-comment
 % ======================================================================
 % tocbasic.dtx
@@ -66,7 +66,7 @@
 %%% From File: tocbasic.dtx
 %<*dtx|package|driver|doc|load>
 % \fi
-\def\tocbasicversion{2013/05/03 v3.12}
+\def\tocbasicversion{2013/09/24 v3.12}
 % \iffalse
 %</dtx|package|driver|doc|load>
 %<*dtx>
@@ -734,55 +734,117 @@ Commands, that shouldn't be expanded while writing, should be prefixed by
 \EndIndex{Cmd}{addtoeachtocfile}%
 % \fi
 
+
+%\iffalse^^A meta-comment
+\begin{Declaration}
+%\fi^^A meta-comment
+% \DescribeMacro{\addxcontentsline}
+% The command
+  \Macro{addxcontentsline}%
+  \Parameter{extension}\Parameter{level}\OParameter{number}%^^A
+  \Parameter{text}
+%\iffalse^^A meta-comment
+\end{Declaration}
+\BeginIndex{Cmd}{addxcontentsline}%
+The command \Macro{addxcontentsline}
+%\fi^^A meta-comment
+adds an entry of given \PName{level} to toc-file with \PName{extension}. If
+the \Parameter{number} is empty or omitted the entry won't have a number for
+the entry with the given \PName{text}. Entries without number may be left
+aligned to the number of the numbered entries of the same \PName{level} or
+indented like the text of the numbered entries of the same \PName{level},
+depending on the \PValue{numberline} feature.
+
+\begin{Example}
+  Maybe you are not using a \KOMAScript{} class but need a not numbered
+  chapter with entry to the table of contents. This may be done using
+\begin{lstcode}
+  \cleardoublepage
+  \csname phantomsection\endcsname
+  \addxcontentsline{toc}{chapter}
+             {Chapters without Numbers}
+  \chapter*{Chapters without Numbers}
+  \markboth{Chapters without Numbers}{}
+\end{lstcode}
+  As you can see, you simply have to replace usual \Macro{addcontentsline} by
+  \Macro{addxcontentsline} to support the \Package{tocbasic} feature
+  \PValue{numberline}.
+\end{Example}
+
+Note, that \Macro{addxcontentsline} uses
+\Macro{add\PName{level}\PName{extension}entry} if such a macro exists and
+\Macro{tocbasic@addxcontentsline} otherwise. Therefore you cannot define
+a macro \Macro{add\PName{level}\PName{extension}entry} using
+\Macro{addxcontentsline} but \Macro{tocbasic@addxcontentsline}.
+
+It is recommended to use \Macro{addxcontentsline} instead of
+\Macro{addcontentsline} whenever possible.%
+%\iffalse^^A meta-comment
+\EndIndex{Cmd}{addxcontentsline}
+%\fi^^A meta-comment
+
+
 % \iffalse
 \begin{Declaration}
-  \Macro{addcontentslinetoeachtocfile}\OParameter{owner}\Parameter{level}%
-  \Parameter{contentsline}
+% \fi
+% \DescribeMacro{\addcontentslinetoeachfile}
+% \DescribeMacro{\addxcontentslinetoeachfile}
+% The command
+  \Macro{addcontentslinetoeachtocfile}\OParameter{owner}\Parameter{level}%^^A
+  \Parameter{contentsline}\\
+% \iffalse
+  \Macro{addxcontentslinetoeachtocfile}\OParameter{owner}%^^A
+  \Parameter{level}\OParameter{number}\Parameter{text}
 \end{Declaration}
 \BeginIndex{Cmd}{addcontentslinetoeachtocfile}%
-This command
-%<*dtx>
-% \fi
-\DescribeMacro{\addcontentslinetoeachfile}
-Command \Macro{addcontentslinetoeachtocfile}\OParameter{owner}%^^A
-\Parameter{level}\Parameter{contentsline} 
-% \iffalse
-%</dtx>
+\BeginIndex{Cmd}{addxcontentslinetoeachtocfile}%
+The first command
 % \fi
 is something like \Macro{addcontentsline} from \LaTeX{} kernel. In difference
 to that it writes the \PName{contentsline} not only
 into one file, but into all files of all known file extensions or of all known
 file extensions of a given owner.
+
+The Command \Macro{addxcontentslinetoeachtocfile}%^^A
+% \OParameter{owner}\Parameter{level}\OParameter{number}\Parameter{text}%^^A
+\ is similar but uses
+\Macro{addxcontentsline} instead of \Macro{addcontentsline} and
+therefore supports \Package{tocbasic} feature \PValue{numberline}. 
 \begin{Example}
   You are a class author and want to write the chapter entry not only to the
   table of contents toc-file but to all toc-files, while \texttt{\#1} is the
   title, that should be written to the files.
 \begin{lstcode}
-    \addcontentslinetoeachtocfile{chapter}{%
-      \protect\numberline{\thechapter}#1}
+    \addxcontentslinetoeachtocfile
+              {chapter}[\thechapter]{#1}%
 \end{lstcode}
   In this case the current chapter number should be expanded while writing
   into the file. So it isn't protected from expansion using \Macro{protect}.
 \end{Example}
-While writing
-\Macro{@currext}\IndexCmd{@currext}\important{\Macro{@currext}} is the file
-extension of the file into which \PName{contentsline} will be written.
+While writing \Macro{@currext}\IndexCmd{@currext}\important{\Macro{@currext}}
+is the file extension of the file into which \PName{contentsline} will be
+written.
+
+It is recommended to use \Macro{addxcontentslinetoeachtocfile} instead
+of \Macro{addcontentslinetoeachtocfile} whenever possible.
 % \iffalse
+\EndIndex{Cmd}{addxcontentslinetoeachtocfile}%
 \EndIndex{Cmd}{addcontentslinetoeachtocfile}%
 % \fi
+
 
 % \iffalse
 %<*dtx>
 % \fi
-\DescribeMacro{\listoftoc}
-\DescribeMacro{\listoftoc*}
-\DescribeMacro{\listofeachtoc}
+\DescribeMacro{\listoftoc}%^^A
+\DescribeMacro{\listoftoc*}%^^A
+\DescribeMacro{\listofeachtoc}%^^A
 Commands
 % \iffalse
 %</dtx>
 \begin{Declaration}
 % \fi
-  \Macro{listoftoc}\OParameter{list of title}\Parameter{extension}
+  \Macro{listoftoc}\OParameter{list of title}\Parameter{extension}%^^A
 % \iffalse
 \\
 %<*dtx>
@@ -791,7 +853,7 @@ Commands
 % \iffalse
 %</dtx>
 % \fi
-  \Macro{listoftoc*}\Parameter{extension}
+  \Macro{listoftoc*}\Parameter{extension}%^^A
 % \iffalse
 \\
 %<*dtx>
@@ -800,7 +862,7 @@ Commands
 % \iffalse
 %</dtx>
 % \fi
-  \Macro{listofeachtoc}\OParameter{owner}
+  \Macro{listofeachtoc}\OParameter{owner}%^^A
 % \iffalse
 \\
 %<*dtx>
@@ -1129,6 +1191,11 @@ features. \Package{tocbasic} does know following features:
   \OptionValue{listof}{numbered}\important{\OptionValue{listof}{numbered}}%
   \IndexOption{listof~=\PValue{numbered}} for all file extensions of the owner
   \PValue{float}.
+\item[\texttt{numberline}] \leavevmode\ChangedAt{v3.12}{\Package{tocbasic}}%
+  redefines \Macro{nonumberline} to use \Macro{numberline}. With this the not
+  numbered entries generated by \KOMAScript{} or using \Macro{nonumberline} at
+  the very beginning of the last argument of \Macro{addcontentline} will also
+  be indented like numbered entries of the same type.
 \item[\texttt{onecolumn}] \leavevmode\ChangedAt{v3.01}{\Package{tocbasic}}%
   typesets the corresponding table of contents or list of something with
   internal one column mode of
@@ -1469,6 +1536,26 @@ be defined and used in \Macro{tocbasic@listhead} automatically.
 % \iffalse
 \EndIndex{Cmd}{tocbasic@listhead@\PName{extension}}%
 % \fi
+
+%\iffalse^^A meta-comment
+\begin{Declaration}
+%\fi^^A meta-comment
+% \DescribeMacro{\tocbasic@addxcontentsline}
+% The command
+  \Macro{tocbasic@addxcontentsline}%
+  \Parameter{extension}\Parameter{level}\Parameter{number}\Parameter{text}
+%\iffalse^^A meta-comment
+\end{Declaration}
+\BeginIndex{Cmd}{tocbasic@addxcontentsline}%
+This command
+%\fi^^A meta-comment
+uses \Macro{addcontentsline} to either create a numbered or not numbered text
+entry to toc-file with given \PName{extension}. Note, that all parameters of
+\Macro{tocbasic@addxcontentsline} are mandatory. But you may use an
+empty \PName{number} argument, if you don't want a number.
+%\iffalse^^A meta-comment
+\EndIndex{Cmd}{tocbasic@addxcontentsline}
+%\fi^^A meta-comment
 
 
 \section{A Complete Example}
@@ -2218,6 +2305,11 @@ may be found in \autoref{tab:tocbasic.DeclareNewTOC-options}.
 % \end{macro}
 % \end{macro}
 %
+% \subsection{Adding Entries into Toc-Files}
+%
+% We have a new general command to add entries to several toc-files at
+% once. And we have some special commands for the table of contents.
+%
 % \begin{macro}{\addcontentslinetoeachtocfile}
 %   Something like a combination of \cs{addtoeachtocfile} and
 %   \cs{addcontentsline}.
@@ -2233,6 +2325,99 @@ may be found in \autoref{tab:tocbasic.DeclareNewTOC-options}.
   \doforeachtocfile{\addcontentsline{\@currext}{#1}{#2}}%
 }
 %    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\addxcontentsline}
+%   \changes{v3.12}{2013/09/24}{new}
+%   \changes{v3.12}{2013/09/24}{Take care of new feature \texttt{numberline}}
+% \begin{macro}{\@addxcontentsline}
+%   \changes{v3.12}{2013/09/24}{new (internal)}
+% This will be used instead of \cs{addcontentsline} to generate numbered or
+% not numbered entries to a toc-file. First argument is the toc-file, second
+% the entry type, e.g., \texttt{chapter}, the third is the entry number or
+% empty and the fourth and last is the entry text.
+%    \begin{macrocode}
+\newcommand*{\addxcontentsline}[2]{%
+  \@ifnextchar [%]
+  {\@addxcontentsline{#1}{#2}}%
+  {\@addxcontentsline{#1}{#2}[]}%
+}
+\newcommand*{\@addxcontentsline}{}
+\def\@addxcontentsline#1#2[#3]#4{%
+  \begingroup\expandafter\expandafter\expandafter\endgroup
+  \expandafter\ifx\csname add#2#1entry\endcsname
+    \@nameuse{add#2#1entry}[{#3}]{#4}%
+  \else
+    \tocbasic@addxcontentsline{#1}{#2}{#3}{#4}%
+  \fi
+}
+%    \end{macrocode}
+% \begin{macro}{\nonumberline}
+%   \changes{v3.12}{2013/09/24}{new}
+% Either \cs{relax} or \cs{numberline} depending on the feature
+% \texttt{numberline}.
+%    \begin{macrocode}
+\newcommand*{\nonumberline}{}%
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\addxcontentsline}
+% This may be used to either use a heading type command or the general default
+% one. You are not allowed to use it in the definition of a heading type
+% command like \cs{addchaptertocentry}! You may use
+% \cs{tocbasic@addxcontentsline} at the definition of those commands.
+%    \begin{macrocode}
+\newcommand*{\tocbasic@addxcontentsline}[4]{%
+  \if\relax\detokenize{#3}\relax
+    \addcontentsline{#1}{#2}{\protect\nonumberline#4}%
+  \else
+    \addcontentsline{#1}{#2}{\protect\numberline{#3}#4}%
+  \fi
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\addxcontentslinetoeachtocfile}
+%   \changes{v3.12}{2013/09/24}{new}
+% \begin{macro}{\@addxcontentslinetoeachtocfile}
+%   \changes{v3.12}{2013/09/24}{new (internal)}
+% \begin{macro}{\@@addxcontentslinetoeachtocfile}
+%   \changes{v3.12}{2013/09/24}{new (internal)}
+% \begin{macro}{\@@@addxcontentslinetoeachtocfile}
+%   \changes{v3.12}{2013/09/24}{new (internal)}
+% \begin{macro}{\@@@@addxcontentslinetoeachtocfile}
+%   \changes{v3.12}{2013/09/24}{new (internal)}
+% Similar to \cs{addcontentslinetoeachtocfile} using
+% \cs{addxcontentsline} instead of \cs{addcontentsline}.
+%    \begin{macrocode}
+\newcommand{\addxcontentslinetoeachtocfile}{%
+  \@ifnextchar [%]
+    \@addxcontentslinetoeachtocfile\@@addxcontentslinetoeachtocfile
+}
+\newcommand{\@addxcontentslinetoeachtocfile}[2][]{%
+  \@ifnextchar [%]
+    {\@@@addxcontentslinetoeachtocfile[{#1}]{#2}}%
+    {\@@@addxcontentslinetoeachtocfile[{#1}]{#2}[]}
+}
+\newcommand*{\@@@addxcontentslinetoeachtocfile}{}
+\def\@@@addxcontentslinetoeachtocfile[#1]#2[#3]#4{%
+  \doforeachtocfile[{#1}]{\addxcontentsline{\@currext}{#2}[#3]{#4}}%
+}
+\newcommand{\@@addxcontentslinetoeachtocfile}[1]{%
+  \@ifnextchar [%]
+    {\@@@@addxcontentslinetoeachtocfile{#1}}%
+    {\@@@@addxcontentslinetoeachtocfile{#1}[]}%
+}
+\newcommand*{\@@@@addxcontentslinetoeachtocfile}{}
+\def\@@@@addxcontentslinetoeachtocfile#1[#2]#3{%
+  \doforeachtocfile{\addxcontentsline{\@currext}{#1}[{#2}]{#3}}%
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 %
 %
@@ -2353,6 +2538,7 @@ may be found in \autoref{tab:tocbasic.DeclareNewTOC-options}.
         \fi
       }%
     }{}%
+    \iftocfeature{\@currext}{numberline}{\def\nonumberline{\numberline{}}}{}%
     \tocbasic@listhead{#1}%
     \begingroup\expandafter\expandafter\expandafter\endgroup
     \expandafter\ifx\csname microtypesetup\endcsname\relax
@@ -2398,8 +2584,10 @@ may be found in \autoref{tab:tocbasic.DeclareNewTOC-options}.
 % \end{macro}
 %
 % \begin{macro}{\tocbasic@listhead}
-%   \changes{v3.02a}{2009/01/20}{no explicite marks if ``numbered''}
-%   \changes{v3.09a}{2011/04/12}{again no explicite marks if ``numbered''}
+%   \changes{v3.02a}{2009/01/20}{no explicite marks if ``numbered''}%
+%   \changes{v3.09a}{2011/04/12}{again no explicite marks if ``numbered''}%
+%   \changes{v3.12}{2013/09/24}{usage of new
+%     \cs{tocbasic@addxcontentsline}}%
 %   Setting the headings of a list of something. The heading is the only
 %   argument.
 %    \begin{macrocode}
@@ -2415,7 +2603,7 @@ may be found in \autoref{tab:tocbasic.DeclareNewTOC-options}.
             \subsection*{##1}%
             \ifx\@mkboth\@gobbletwo\else\markright{\MakeMarkcase{##1}}\fi
             \iftocfeature{\@currext}{totoc}{%
-              \addcontentsline{toc}{subsection}{##1}%
+              \addxcontentsline{toc}{subsection}{##1}%
             }{}%
           }%
         }{%
@@ -2425,7 +2613,7 @@ may be found in \autoref{tab:tocbasic.DeclareNewTOC-options}.
             \section*{##1}%
             \@mkboth{\MakeMarkcase{##1}}{\MakeMarkcase{##1}}%
             \iftocfeature{\@currext}{totoc}{%
-              \addcontentsline{toc}{section}{##1}%
+              \addxcontentsline{toc}{section}{##1}%
             }{}%
           }%
         }%
@@ -2438,7 +2626,7 @@ may be found in \autoref{tab:tocbasic.DeclareNewTOC-options}.
           }{%
             \section*{##1}%
             \iftocfeature{\@currext}{totoc}{%
-              \addcontentsline{toc}{section}{##1}%
+              \addxcontentsline{toc}{section}{##1}%
             }{}%
             \ifx\@mkboth\@gobbletwo\else\markright{\MakeMarkcase{##1}}\fi
           }%
@@ -2449,7 +2637,7 @@ may be found in \autoref{tab:tocbasic.DeclareNewTOC-options}.
             \chapter*{##1}%
             \@mkboth{\MakeMarkcase{##1}}{\MakeMarkcase{##1}}%
             \iftocfeature{\@currext}{totoc}{%
-              \addcontentsline{toc}{chapter}{##1}%
+              \addxcontentsline{toc}{chapter}{##1}%
             }{}%
           }%
         }%
@@ -2527,6 +2715,8 @@ may be found in \autoref{tab:tocbasic.DeclareNewTOC-options}.
 %   \begin{description}
 %   \item[\texttt{totoc}] writes the title of the list of to the table of
 %     contents
+%   \item[\texttt{numberline}] redefines \cs{nonumberline} to use
+%     \cs{numberline}
 %   \item[\texttt{numbered}] uses a numbered headings for the list of
 %   \item[\texttt{leveldown}] uses not the top level heading (e.\,g.,
 %     \cs{chapter} with book) but the first sub level (e.\,g., \cs{section} with

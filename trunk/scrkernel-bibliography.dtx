@@ -1,4 +1,4 @@
-% \CheckSum{405}
+% \CheckSum{419}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-bibliography.dtx
@@ -58,7 +58,7 @@
 %%% From File: scrkernel-bibliography.dtx
 %<*driver>
 % \fi
-\ProvidesFile{scrkernel-bibliography.dtx}[2013/03/05 v3.12 KOMA-Script 
+\ProvidesFile{scrkernel-bibliography.dtx}[2013/09/24 v3.12 KOMA-Script 
                                                         (bibliography)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
@@ -262,11 +262,16 @@
 % \subsection{Optionen für das Literaturverzeichnis}
 %
 % \begin{option}{bibliography}
-%   \changes{v2.98c}{2008/02/15}{Neu}%
-%   \changes{v3.10}{2011/08/31}{\cs{MakeMarkcase} wird beachtet}%
-%   \changes{v3.12}{2013/02/06}{neuer Wert \texttt{leveldown}}
-%   \changes{v3.12}{2013/02/06}{neuer Wert \texttt{standardlevel}}
-%   \changes{v3.12}{2013/03/05}{an die Änderungen in \textsf{scrbase} angepasst}
+%   \changes{v2.98c}{2008/02/15}{Neu}%^^A
+%   \changes{v3.10}{2011/08/31}{\cs{MakeMarkcase} wird beachtet}%^^A
+%   \changes{v3.12}{2013/02/06}{neuer Wert \texttt{leveldown}}%^^A
+%   \changes{v3.12}{2013/02/06}{neuer Wert \texttt{standardlevel}}%^^A
+%   \changes{v3.12}{2013/03/05}{an die Änderungen in \textsf{scrbase}
+%     angepasst}%^^A
+%   \changes{v3.12}{2013/09/28}{Verwendung von \cs{addxcontentsline} statt
+%     \cs{addcontentsline}}%^^A
+%   \changes{v3.12}{2013/09/28}{Es werden keine Kapiteleinträge in andere
+%     Verzeichnisse geschrieben.}%^^A
 %   Dies ist der Generalschlüssel für alle Optionen, die das
 %   Literaturverzeichnis betreffen. Neu ist, dass verschiedene Stile definiert
 %   werden können. Desweiteren kann man \texttt{totoc} und
@@ -313,20 +318,24 @@
 %<*article>
         \ifbib@leveldown
           \subsection*{%
-                \addcontentsline{toc}{subsection}{\refname}%
+                \addxcontentsline{toc}{subsection}{\refname}%
                 \refname
               }%
           \ifx\@mkboth\@gobble\else\markright{\MakeMarkcase{\refname}}\fi 
         \else
-          \addsec{\refname}%
+          \addsec{\refname}
           \@mkboth{\MakeMarkcase{\refname}}{\MakeMarkcase{\refname}}%
         \fi
 %</article>
 %<*book|report>
         \ifbib@leveldown
-          \addsec{\bibname}%
+          \addsec{\bibname}
         \else
-          \addchap{\bibname}%
+          \if@chaptertolists
+            \@chaptertolistsfalse\addchap{\bibname}\@chaptertoliststrue
+          \else
+            \addchap{\bibname}
+          \fi
           \@mkboth{\MakeMarkcase{\bibname}}{\MakeMarkcase{\bibname}}%
         \fi
 %</book|report>
@@ -346,7 +355,11 @@
         \ifbib@leveldown
           \section{\bibname}%
         \else
-          \chapter{\bibname}%
+          \if@chaptertolists
+            \@chaptertolistsfalse\chapter{\bibname}\@chaptertoliststrue
+          \else
+            \chapter{\bibname}
+          \fi
           \@mkboth{\MakeMarkcase{\chaptermarkformat \bibname}}%
                   {\MakeMarkcase{\chaptermarkformat \bibname}}%
         \fi
