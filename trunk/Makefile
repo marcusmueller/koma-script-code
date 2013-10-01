@@ -149,7 +149,7 @@ CLS_MAIN_DTX    = scrbeta.dtx \
 		  scrkernel-sections.dtx \
 		  scrkernel-typearea.dtx \
 		  scrkernel-title.dtx \
-		  scrkvars.dtx \
+		  scrkernel-variables.dtx \
 		  scrkernel-version.dtx \
 		  scrlfile.dtx \
 		  scrwfile.dtx \
