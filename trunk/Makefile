@@ -130,7 +130,7 @@ CLS_MAIN	= scrbook.cls \
 CLS_MAIN_DTX    = scrbeta.dtx \
 		  scrkernel-basics.dtx \
 		  scrkernel-bibliography.dtx \
-		  scrkcile.dtx \
+		  scrkernel-circularletters.dtx \
 		  scrkernel-compatibility.dtx \
 		  scrkernel-floats.dtx \
 		  scrkernel-fonts.dtx \
