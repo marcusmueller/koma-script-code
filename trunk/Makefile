@@ -145,7 +145,7 @@ CLS_MAIN_DTX    = scrbeta.dtx \
 		  scrkernel-notepaper.dtx \
 		  scrkernel-pagestyles.dtx \
 		  scrkernel-paragraphs.dtx \
-		  scrkplen.dtx \
+		  scrkernel-pseudolengths.dtx \
 		  scrkernel-sections.dtx \
 		  scrkernel-typearea.dtx \
 		  scrkernel-title.dtx \
