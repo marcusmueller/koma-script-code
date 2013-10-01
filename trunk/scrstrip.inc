@@ -51,105 +51,34 @@
 
 % ---------- start of docstrip -----------------------------------------
 
-\let\ifbeta=\iftrue
+\KOMAdefVariable{AUTHOR}{Markus Kohm}
+\KOMAdefVariable{EMAIL}{[komascript at gmx info]}
+\KOMAdefVariable{COPYRIGHTFROM}{1994}
+\KOMAdefVariable{COPYRIGHTTILL}{2013}
 
-\ifToplevel{\ifx\generate\undefined
-    \Msg{************************************************************}
-    \Msg{*}
-    \Msg{* This installation requires docstrip version 2.3c or}
-    \Msg{* later, but an old version of docstrip has been input.}
-    \Msg{* You have to update docstrip and maybe LaTeX first!}
-    \Msg{*}
-    \Msg{************************************************************}
-    \errhelp{Install a new version of docstrip.}
-    \errmessage{Old docstrip in input path}
-    \batchmode
-    \csname @@end\endcsname
-  \fi
-  \Msg{************************************************************}
-  \Msg{*}
-  \Msg{* KOMA-Script}
-  \Msg{* a versatile LaTeX2e bundle}
-  \Msg{*}
-  \Msg{* This is `\batchfile', a batchfile to unpack some or all}
-  \Msg{* parts of KOMA-Script. See `liesmich.txt' (german) or}
-  \Msg{* `readme.txt' (english) for additional information.}
-  \Msg{*}
-  \Msg{* If some - maybe old - files of KOMA-Script are already}
-  \Msg{* installed, you will be ask, if it is allowed to overwrite}
-  \Msg{* them. Answering `yes' doesn't mean, that `\batchfile'}
-  \Msg{* WILL overwrite such files. It means only, that}
-  \Msg{* `\batchfile' or installation MAY overwrite them.}
-  \Msg{*}
-  \Msg{************************************************************}
-}
-
-% ---------- some docstrip switchs -------------------------------------
+\let\ifbeta\iftrue
 
 \ifToplevel{%
+  \Msg{+======================================================================}
+  \Msg{| KOMA-Script}
+  \Msg{| a versatile LaTeX2e bundle}
+  \Msg{+----------------------------------------------------------------------}
+  \Msg{| This batchfile will unpack some or all parts of KOMA-Script.}
+  \Msg{| On errors press either `h' or ask an expert for help after reading}
+  \Msg{| `README'.}
+  \Msg{+----------------------------------------------------------------------}
+% ---------- some docstrip switchs -------------------------------------
   \keepsilent
   \askforoverwritefalse
-%  \askforoverwritetrue
-%  \ifx\askonceonly\undefined\else\askonceonly\fi
-}
-
 % ---------- validity --------------------------------------------------
-\ifToplevel{%
-  \let\manifest\inFile
-  \Msg{* Testing validity of KOMA-Script distribution:}
-  \def\readloop{%
-    \ifeof\manifest\else
-      \read\manifest to \manifestfile\relax
-      \ifx\manifestfile\empty
-      \else
-        \openin\inputcheck \manifestfile\relax
-        \ifeof\inputcheck
-          \@addto\missingfiles{\comma\manifestfile}%
-          \def\comma{,^^J\noexpand\spaces}%
-        \fi
-        \closein\inputcheck
-      \fi
-      \expandafter\readloop
-    \fi
-  }%
-  \begingroup
-    \endlinechar=256
-    \let\missingfiles\empty
-    \let\comma\empty
-    \openin\manifest manifest.txt\relax
-    \readloop
-    \closein\manifest
-    \ifx\missingfiles\empty
-      \Msg{* KOMA-Script distribution seams to be valid.}%
-    \else
-      \edef\cmp{doc/scrguien.pdf\comma doc/scrguien.html\comma
-        doc/scrguide.pdf\comma doc/scrguide.html}%
-      \ifx\missingfiles\cmp
-        \Msg{* KOMA-Script distribution may be valid.}%
-        \Msg{* WARNING: Manuals not found but needed for a legal 
-          distribution!}%
-      \else
-        \def\spaces{\space\space\space\space\space}%
-        \edef\spaces{* \spaces\spaces\spaces}%
-        \Msg{* Missing files: \missingfiles.}%
-        \Msg{* This seams not to be a valid KOMA-Script distribution.}%
-        \Msg{* You should not try to install this!}%
-        \errhelp{You should ask your distributor for a valid and legal
-          KOMA-Script distribution.}%
-        \errmessage{Validity test of KOMA-Script distribution failed}%
-        \batchmode
-        \csname @@end\endcsname
-      \fi
-    \fi
-  \endgroup
+  \KOMAvalidityTest{manifest.txt}
 }
 
 % ---------- defining preambles ----------------------------------------
 
 \preamble
 
-Copyright (c) 1994-2012
-Markus Kohm and any individual authors listed elsewhere in this file.
+\noexpand\KOMAuseVariable{COPYRIGHT}
 
 This file was generated from file(s) of the KOMA-Script bundle.
 ---------------------------------------------------------------

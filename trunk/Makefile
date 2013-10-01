@@ -177,13 +177,13 @@ CLS_MAIN_INS	= scrmain.ins
 
 CLS_MAIN_SUBINS	= scrlfile.ins scraddr.ins scrpage.ins
 
-ALPHA_INS       = tocstyle.dtx tocbasic.dtx scrjura.dtx scrwfile.dtx
+ALPHA_INS       = tocstyle.dtx scrjura.dtx scrwfile.dtx
 
 ALPHA_DOC       = tocstyle.pdf scrjura.pdf scrhack.pdf
 
 ALPHA_DTX       = $(subst .pdf,.dtx,$(ALPHA_DOC))
 
-DTX_IS_INS      = tocstyle.dtx tocbasic.dtx scrjura.dtx scrwfile.dtx
+DTX_IS_INS      = tocstyle.dtx scrjura.dtx scrwfile.dtx
 
 CLS_MAIN_SRC	= $(CLS_MAIN_DTX) $(CLS_MAIN_INS) $(CLS_MAIN_SUBINS) \
 		  scrsource.tex
