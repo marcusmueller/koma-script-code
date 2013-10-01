@@ -140,7 +140,7 @@ CLS_MAIN_DTX    = scrbeta.dtx \
 		  scrkernel-letterclassoptions.dtx \
 		  japanlco.dtx \
 		  scrkernel-listsof.dtx \
-		  scrklist.dtx \
+		  scrkernel-listsandtabulars.dtx \
 		  scrkernel-miscellaneous.dtx \
 		  scrkernel-notepaper.dtx \
 		  scrkernel-pagestyles.dtx \
