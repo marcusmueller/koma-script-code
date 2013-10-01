@@ -37,7 +37,7 @@ steptwo() {
     [ $# -ne 1 ] && error "exactly one parameter expected!"
     pushd $1
     base=`dirs +1`
-    version=`grep 'CheckKOMAScriptVersion{' scrkvers.dtx | grep -o '2.*KOMA'`
+    version=`grep 'CheckKOMAScriptVersion{' scrkernel-version.dtx | grep -o '2.*KOMA'`
     version=${version% KOMA}
 
     for ins in *.ins *.inc; do
@@ -98,7 +98,7 @@ EOF
 
     [ "$versionpostfix" = "$version" ] || \
 	error "Cannot prepare for KOMA-Script $version!" \
-	      "You should change scrkvers.dtx before release!"
+	      "You should change scrkernel-version.dtx before release!"
 
     popd
     exit 0
