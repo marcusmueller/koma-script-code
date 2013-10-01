@@ -150,7 +150,7 @@ CLS_MAIN_DTX    = scrbeta.dtx \
 		  scrkernel-typearea.dtx \
 		  scrkernel-title.dtx \
 		  scrkvars.dtx \
-		  scrkvers.dtx \
+		  scrkernel-version.dtx \
 		  scrlfile.dtx \
 		  scrwfile.dtx \
 		  scraddr.dtx \
@@ -272,7 +272,7 @@ bindist:tdsdist
 	$(INSTALL) $(notdir $(DISTDIR))-bin/komascript-texmf/doc/latex/koma-script/*.txt $(notdir $(DISTDIR))-bin
 	$(INSTALL) $(notdir $(DISTDIR))-bin/komascript-texmf/doc/latex/koma-script/README $(notdir $(DISTDIR))-bin
 	$(INSTALL) $(notdir $(DISTDIR))-bin/komascript-texmf/doc/latex/koma-script/koma*.html $(notdir $(DISTDIR))-bin
-	$(GREP) 'CheckKOMAScriptVersion{' $(notdir $(DISTDIR))-bin/komascript-texmf/source/latex/koma-script/scrkvers.dtx | grep -o '2.*t' > $(notdir $(DISTDIR))-bin/VERSION
+	$(GREP) 'CheckKOMAScriptVersion{' $(notdir $(DISTDIR))-bin/komascript-texmf/source/latex/koma-script/scrkernel-version.dtx | grep -o '2.*t' > $(notdir $(DISTDIR))-bin/VERSION
 	# build the bin.zip
 	$(RMDIR) $(notdir $(DISTDIR))-bin/komascript-texmf
 	$(SRM) $(notdir $(DISTDIR))-bin.zip
@@ -298,7 +298,7 @@ ctandist:tdsdist
 	  $(notdir $(DISTDIR))-ctan/texmf/doc/latex/koma-script/README \
 	  $(notdir $(DISTDIR))-ctan/texmf/source/latex/koma-script/
 	# generate VERSION at main source
-	$(GREP) 'CheckKOMAScriptVersion{' $(notdir $(DISTDIR))-ctan/texmf/source/latex/koma-script/scrkvers.dtx | grep -o '2.*t' \
+	$(GREP) 'CheckKOMAScriptVersion{' $(notdir $(DISTDIR))-ctan/texmf/source/latex/koma-script/scrkernel-version.dtx | grep -o '2.*t' \
 	  > $(notdir $(DISTDIR))-ctan/texmf/source/latex/koma-script/VERSION
 	# generate README.distributors at upmost
 	$(HEAD) 18 $(notdir $(DISTDIR))-ctan/texmf/source/latex/koma-script/README > $(notdir $(DISTDIR))-ctan/README.distributors

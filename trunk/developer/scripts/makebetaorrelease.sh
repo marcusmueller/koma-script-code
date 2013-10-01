@@ -4,7 +4,7 @@
 #
 
 datestr=`date +%Y/%m/%d`
-versionstr=`grep '\@CheckKOMAScriptVersion{' scrkvers.dtx | sed s/.*{// | cut -d' ' -f 2- | sed 's/ *KOMA-Script.*//; s/^v//'`
+versionstr=`grep '\@CheckKOMAScriptVersion{' scrkernel-version.dtx | sed s/.*{// | cut -d' ' -f 2- | sed 's/ *KOMA-Script.*//; s/^v//'`
 
 force=false
 if [ "$1" == "--force" ]; then
@@ -55,13 +55,13 @@ if ! grep 'scr@v@'"${versionstr}" scrkernel-compatibility.dtx; then
     fi
 fi
 
-sed 's!\(\\@CheckKOMAScriptVersion{\)[^}]*!\1'"${datestr} v${versionstr}${additional} KOMA-Script!" scrkvers.dtx > scrkvers.dtx.new
-mv -f scrkvers.dtx.new scrkvers.dtx
+sed 's!\(\\@CheckKOMAScriptVersion{\)[^}]*!\1'"${datestr} v${versionstr}${additional} KOMA-Script!" scrkernel-version.dtx > scrkernel-version.dtx.new
+mv -f scrkernel-version.dtx.new scrkernel-version.dtx
 
 echo "Do next:"
 echo "  make"
-echo "  svn ci scrkvers.dtx scrkernel-compatibility.dtx -m 'prepared for ${versionstr}${additional}'"
+echo "  svn ci scrkernel-version.dtx scrkernel-compatibility.dtx -m 'prepared for ${versionstr}${additional}'"
 echo "  developer/scripts/addrelease.sh '${datestr}' '${versionstr}' \"$@\""
 echo "(NOTE: Don't execute addrelease.sh on BETA versions.)"
 echo "or:"
-echo "  rm scrkvers.dtx scrkernel-compatibility.dtx;svn up scrkvers.dtx scrkernel-compatibility.dtx"
+echo "  rm scrkernel-version.dtx scrkernel-compatibility.dtx;svn up scrkernel-version.dtx scrkernel-compatibility.dtx"
