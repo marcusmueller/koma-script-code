@@ -42,35 +42,22 @@
 % ---------- end of docstrip -----------------------------------------
 
 \ifToplevel{%
-  \Msg{************************************************************}
-  \Msg{*}
-  \Msg{* KOMA-Script}
-  \Msg{* a versatile LaTeX2e bundle}
-  \Msg{*}
+  \Msg{| Unpacking finished successfully.}
+  \Msg{+----------------------------------------------------------------------}
   \ifbeta
-    \Msg{* THIS IS A BETA VERSION. YOU SHOULD NOT INSTALL OR USE IT!}
-    \Msg{* THERE MAY BE A LOT OF BUGS AT THIS VERSION!}
-    \Msg{* PLEASE INSTALL THE RELEASE YOU CAN FIND AT CTAN!}
+    \Msg{| YOU SHOULD NOTE, THAT THIS IS NOT AN OFFICIAL RELEASE!}
+    \Msg{| THIS VERSION IS INTENDED TO BE USED FOR TESTING ONLY!}
+    \Msg{| USAGE FOR PURPOSES OTHER THAN INDENTED IS DANGEROUS!}
+    \Msg{| DON'T EXPECT ANY SUPPORT FOR THIS VERSION!}
   \else
-    \Msg{* To finish the installation you have to move some}
-    \Msg{* files into a directory searched by TeX.}
-    \Msg{* See INSTALL.TXT (english) or INSTALLD.TXT (german)}
-    \Msg{* for additional information.}
-    \Msg{*}
-    \ifx\idocfiles\empty\else
-      \Msg{* You may also produce the implementation documentation,}
-      \Msg{* but you don't need. To produce it, run file(s)}
-      \Msg{* \idocfiles}
-      \Msg{* through LaTeX after finishing the installation.}
-      \Msg{*}
-    \fi
-    \Msg{* You will find the manual reading `README' (English),}
-    \Msg{* or `koma-script.pdf'.}
-    \Msg{*}
-    \Msg{* Happy TeXing}
+    \Msg{| To finish the installation you have to move some files into}
+    \Msg{| a directory searched by TeX, e.g., `tex/latex/koma-script/'}
+    \Msg{| of a local or personal TEXMF tree.}
+    \Msg{| See `INSTALL.txt' (English) or `INSTALLD.txt' (German)}
+    \Msg{| for additional information about the installation and}
+    \Msg{| the user manual.}
   \fi
-  \Msg{*}
-  \Msg{************************************************************}
+  \Msg{+======================================================================}
 }
 
 \endinput
