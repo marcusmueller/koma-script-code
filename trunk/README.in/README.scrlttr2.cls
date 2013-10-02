@@ -1,4 +1,4 @@
-scrlttr2 - versatil letter class with separation of text area and note paper
+scrlttr2 - versatile letter class with separation of text area and note paper
 ------------------------------------------------------------------------------
 Maintainer:     Markus Kohm
 E-Mail:         komascript at gmx info

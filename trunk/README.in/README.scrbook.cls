@@ -1,4 +1,4 @@
-scrbook - versatil class may be used as a drop-in replacement of book
+scrbook - versatile class may be used as a drop-in replacement of book
 ------------------------------------------------------------------------------
 Maintainer:     Markus Kohm
 E-Mail:         komascript at gmx info
