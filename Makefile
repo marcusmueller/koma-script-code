@@ -242,10 +242,19 @@ ifdef PREPARERELEASE
 endif
 	$(CD) $(notdir $(DISTDIR)) && \
 	  $(MAKE)
+ifdef PREPARERELEASE
+	$(MKDIR) $(notdir $(DISTDIR))/README.in
+	$(INSTALL) README.in/README.*.sty README.in/README.*.cls $(notdir $(DISTDIR))/README.in
+	developer/scripts/preparerelease.sh 3 $(notdir $(DISTDIR))
+	$(RMDIR) $(notdir $(DISTDIR))/README.in
+endif
 	# install to temporary directory
 	$(MKDIR) $(notdir $(DISTDIR))-bin/komascript-texmf
 	$(CD) $(notdir $(DISTDIR)) && \
 	  $(MAKE) INSTALLTEXMF=$(PWD)/$(notdir $(DISTDIR))-bin/komascript-texmf install
+ifdef PREPARERELEASE
+	developer/scripts/preparerelease.sh final $(notdir $(DISTDIR))
+endif
 	$(RMDIR) $(notdir $(DISTDIR))
 	$(SRM) $(notdir $(DISTDIR))-bin/komascript-texmf/ls-R
 	# build the tds.zip
