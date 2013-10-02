@@ -45,7 +45,7 @@
 %
 % ======================================================================
 
-\ProvidesFile{tocbasic.tex}[2013/08/28 KOMA-Script package tocbasic]
+\ProvidesFile{tocbasic.tex}[2013/10/02 KOMA-Script package tocbasic]
 
 \chapter{Verzeichnisse verwalten mit Hilfe von \Package{tocbasic}}
 \labelbase{tocbasic}
@@ -84,7 +84,7 @@ bekannten Dateierweiterungen\textnote{Dateierweiterung, Verzeichnis}, die für
 Verzeichnisse stehen, zu verwalten. Einträge in Dateien mit solchen
 Dateierweiterungen werden typischerweise mit
 \Macro{addtocontents}\important{\Macro{addtocontents},
-  \Macro{addcontentsline}} oder \Macro{addcontentsline} vorgenommen. Darüber
+  \Macro{addxcontentsline}} oder \Macro{addxcontentsline} vorgenommen. Darüber
 hinaus gibt es Anweisungen, mit denen eine Aktion für all diese
 Dateierweiterungen durchgeführt werden können. Außerdem gibt es Anweisungen,
 um Einstellungen für die Datei vorzunehmen, die zu einer gegebenen
@@ -372,23 +372,69 @@ wie bei \Macro{addtocontents} mit \Macro{protect} geschützt werden.
 
 
 \begin{Declaration}
-  \Macro{addcontentslinetoeachtocfile}\OParameter{Besitzer}\Parameter{Ebene}\Parameter{Inhalt}
+  \Macro{addxcontentsline}\Parameter{Dateierweiterung}\Parameter{Ebene}%
+                          \OParameter{Gliederungsnummer}\Parameter{Inhalt}
+\end{Declaration}
+\BeginIndex{Cmd}{addxcontentsline}%
+Diese\ChangedAt{v3.12}{\Package{tocbasic}}
+Anweisung ähnelt sehr der Anweisung
+\Macro{addcontentsline}\IndexCmd{addcontentsline} aus dem
+\LaTeX-Kern. Allerdings besitzt sie ein zusätzliches optionales Argument für
+die \PName{Gliederungsnummer} des Eintrags, während diese bei
+\Macro{addcontentsline} im Argument \PName{Inhalt} mit angegeben wird. Die
+Anweisung wird verwendet, um nummerierte oder nicht nummerierte Einträge in
+das über die \PName{Dateierweiterung} spezifierte Verzeichnis
+aufzunehmen. Dabei ist \PName{Ebene} der symbolische Name der Gliederungsebene
+und \PName{Inhalt} der entsprechende Eintrag. Die Seitenzahl wird automatisch
+bestimmt.
+
+Die Anweisung selbst testet zunächst, ob eine Anweisung
+\Macro{add\PName{Ebene}\PName{Dateierweiterung}entry} definiert ist. Wenn dies
+der Fall ist, wird diese für den Eintrag verwendet, wobei
+\PName{Gliederungsnummer} als optionales Argument in \PName{Inhalt} als
+obligatorisches Argument übergeben wird. Ein Beispiel für eine solche
+Anweisung, die von den \KOMAScript-Klassen bereitgestellt wird, wäre
+\Macro{addparttocentry} (siehe \autoref{sec:maincls-experts.experts},
+\autopageref{desc:maincls-experts.cmd.addparttocentry}).  Ist die entsprechend
+Anweisung nicht definiert, wird stattdessen die interne Anweisung
+\Macro{tocbasic@addxcontentsline} verwendet. Diese erhält alle vier Argument
+als obligatorische Argumente und verwendet dann seinerseits
+\Macro{addcontentsline}, um den gewünschten Eintrag vorzunehmen. Näheres zu
+\Macro{tocbasic@addxcontentsline} ist \autoref{sec:tocbasic.internals},
+\autopageref{desc:tocbasic.cmd.tocbasic@addxcontentsline} zu entnehmen.
+
+Ein Vorteil der Verwendung von \Macro{addxcontentsline} gegenüber
+\Macro{addcontentsline} ist zum einen, dass die Eigenschaft
+\PValue{numberline} (siehe \autopageref{desc:tocbasic.cmd.setuptoc}) beachtet
+wird. Zum anderen kann die Form der Einträge über die Definition
+entsprechender, für die \PName{Ebene} und \PName{Dateierweiterung}
+spezifischer Anweisungen konfiguriert werden.%
+%
+\EndIndex{Cmd}{addxcontentsline}%
+
+
+\begin{Declaration}
+  \Macro{addxcontentslinetoeachtocfile}%
+  \OParameter{Besitzer}\Parameter{Ebene}\OParameter{Gliederungsnummer}%
+  \Parameter{Inhalt}\\
+  \Macro{addcontentslinetoeachtocfile}%
+  \OParameter{Besitzer}\Parameter{Ebene}\Parameter{Inhalt}%
 \end{Declaration}
 \BeginIndex{Cmd}{addcontentslinetoeachtocfile}%
-Diese Anweisung ist mit \Macro{addcontentsline} aus dem \LaTeX-Kern
-vergleichbar. Der Unterschied besteht darin, dass diese Anweisung
-\PName{Inhalt} nicht nur in eine einzelne Datei, sondern in alle Dateien eines
-angegebenen \PName{Besitzers} und bei Verzicht auf das optionale Argument in
-alle Dateien aus der Liste der bekannten Dateierweiterungen schreibt.
+Diese Anweisungen sind mit der oben erklärten Anweisung
+\Macro{addxcontentsline}\ChangedAt{v3.12}{\Package{tocbasic}}
+beziehungsweise \Macro{addcontentsline} aus dem \LaTeX-Kern vergleichbar. Der
+Unterschied besteht darin, dass diese Anweisungen \PName{Inhalt} nicht nur in
+eine einzelne Datei, sondern in alle Dateien eines angegebenen
+\PName{Besitzers} und bei Verzicht auf das erste optionale Argument in alle
+Dateien aus der Liste der bekannten Dateierweiterungen schreibt.
 \begin{Example}
   Angenommen, Sie sind Klassen-Autor und wollen den Kapiteleintrag nicht nur in
   das Inhaltsverzeichnis, sondern in alle Verzeichnisdateien schreiben. Nehmen
   wir weiter an, dass aktuell \PName{\#1} den Titel enthält, der geschrieben
   werden soll.
 \begin{lstcode}
-  \addcontentslinetoeachtocfile{chapter}{%
-    \protect\numberline{\thechapter}#1%
-  }%
+  \addxcontentslinetoeachtocfile{chapter}[\thechapter]{#1}
 \end{lstcode}
   In diesem Fall soll natürlich die aktuelle Kapitelnummer direkt beim
   Schreiben in die Verzeichnisdatei expandiert werden, weshalb sie nicht mit
@@ -397,7 +443,14 @@ alle Dateien aus der Liste der bekannten Dateierweiterungen schreibt.
 Während des Schreibens von \PName{Inhalt} ist auch hier wie schon bei
 \Macro{addtoeachtocfile}
 \Macro{@currext}\IndexCmd{@currext}\important{\Macro{@currext}} die
-Dateierweiterung der Datei, in die aktuell geschrieben wird.
+Dateierweiterung der Datei, in die aktuell geschrieben wird.%
+
+Anweisung\ChangedAt{v3.12}{\Package{tocbasic}}
+\Macro{addxcontentslinetoeachtocfile} ist wann immer möglich gegenüber
+\Macro{addcontentslinetoeachtocfile} der Vorrang zu gewähren, da die
+Erweiterungen von \Macro{addxcontentsline} nur damit Anwendung finden. Näheres
+zu diesen Erweiterungen und Vorteilen ist in der vorausgehenden Erklärung der
+Anweisung \Macro{addxcontentsline} zu finden.%
 %
 \EndIndex{Cmd}{addcontentslinetoeachtocfile}%
 
@@ -633,6 +686,27 @@ getrennte Aneinanderreihung von \PName{Eigenschaften}. Das Paket
   \OptionValue{listof}{leveldown}\important{\OptionValue{listof}{leveldown}}%
   \IndexOption{listof~=\PValue{leveldown}}
   für alle Dateierweiterungen des Besitzers \PValue{float}.
+\item[\PValue{numberline}] \ChangedAt{v3.12}{\Package{tocbasic}}%
+  bedeutet, dass auch diejenigen Einträge, die mit \Macro{addxcontentsline}
+  oder \Macro{addxcontentslinetoceachtocfile} in das Verzeichnis geschrieben
+  werden und bei denen das optionale Argument für die Nummer fehlt oder leer
+  ist, mit einer (leeren) \Macro{numberline}-Anweisung verstehen werden. Das
+  führt in der Regel dazu, dass diese Einträge nicht linksbündig mit der
+  Nummer, sondern mit dem Text der nummerierten Einträge gleicher Ebene
+  gesetzt werden. Die \KOMAScript-Klassen setzen diese Eigenschaft bei
+  Verwendung der Option \OptionValue{listof}{numberline}%
+  \important{\OptionValue{listof}{numberline}}%
+  \IndexOption{listof~=\PValue{numberline}} für die Dateierweiterungen des
+  Besitzers \PValue{float} und bei Verwendung der Option
+  \OptionValue{toc}{numberline}\important{\OptionValue{toc}{numberline}}%
+  \IndexOption{toc~=\PValue{numberline}} für die Dateierweiterung
+  \PValue{toc}. Entsprechend wird die Eigenschaft bei Verwendung von Option
+  \OptionValue{listof}{nonumberline}%
+  \important{\OptionValue{listof}{nonumberline}}%
+  \IndexOption{listof~=\PValue{nonumberline}} oder
+  \OptionValue{toc}{nonumberline}%
+  \important{\OptionValue{toc}{nonumberline}}%
+  \IndexOption{toc~=\PValue{nonumberline}} wieder zurückgesetzt.
 \item[\PValue{nobabel}] bedeutet, dass die normalerweise automatisch
   verwendete Erweiterung für die Sprachumschaltung mit
   \Package{babel}\IndexPackage{babel} für diese Dateierweiterung nicht
@@ -925,6 +999,33 @@ definiert, so verwendet \Macro{tocbasic@listhead} diese. Anderenfalls
 definiert \Macro{tocbasic@listhead} diese und ruft sie dann auf.
 %
 \EndIndex{Cmd}{tocbasic@listhead@\PName{Dateierweiterung}}
+
+\begin{Declaration}
+  \Macro{tocbasic@addxcontentsline}%
+  \Parameter{Dateierweiterung}\Parameter{Ebene}%
+  \Parameter{Gliederungsnummer}\Parameter{Eintrag}\\
+  \Macro{nonumberline}
+\end{Declaration}
+\BeginIndex{Cmd}{tocbasic@addxcontentsline}%
+\BeginIndex{Cmd}{nonumberline}%
+Die\ChangedAt{v3.12}{\Package{tocbasic}} Anweisung
+\Macro{tocbasic@addxcontentsline} nimmt einen \PName{Eintrag} der angegebenen
+\PName{Ebene} in das über die \PName{Dateierweiterung} spezifizierte
+Verzeichnis vor. Ob der Eintrag nummeriert wird oder nicht, hängt davon ab, ob
+das Argument \PName{Gliederungsnummer} leer ist oder nicht. Im Falle eines
+leeren Argument wird dem \PName{Eintrag} ein \Macro{nonumberline} ohne
+Argument vorangestellt. Anderenfalls wird wie gewohnt \Macro{numberline} mit
+\PName{Gliederungsnummer} als Argument verwendet.
+
+Die Anweisung \PName{nonumberline} wird innerhalb \Macro{listoftoc} (siehe
+\autoref{sec:tocbasic.toc}, \autopageref{desc:tocbasic.cmd.listoftoc})
+entsprechend der Eigenschaft \PValue{numberline} (siehe
+\autoref{sec:tocbasic.toc}, \autopageref{desc:tocbasic.cmd.setuptoc})
+umdefiniert. Dadurch wirkt sich das Setzen oder Löschen dieser Eigenschaft
+bereits beim nächsten \LaTeX-Lauf aus.%
+%
+\EndIndex{Cmd}{nonumberline}%
+\EndIndex{Cmd}{tocbasic@addxcontentsline}%
 
 
 \section{Ein komplettes Beispiel}
