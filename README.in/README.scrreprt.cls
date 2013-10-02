@@ -1,4 +1,4 @@
-scrreprt - versatil class may be used as a drop-in replacement of report
+scrreprt - versatile class may be used as a drop-in replacement of report
 ------------------------------------------------------------------------------
 Maintainer:     Markus Kohm
 E-Mail:         komascript at gmx info
