@@ -82,9 +82,6 @@ endef
 MAKE_FILES	= Makefile Makefile.baserules Makefile.baseinit
 # ----------------------------------------------------------------------
 # make classes, packages, etc.
-INS_TEMPLATES	= scrstrip.inc \
-		  scrstrop.inc
-
 CLS_MAIN	= scrbook.cls \
 		  scrreprt.cls \
 		  scrartcl.cls \
@@ -175,7 +172,7 @@ CLS_MAIN_DVI	= scrsource.dvi
 
 CLS_MAIN_INS	= scrmain.ins
 
-CLS_MAIN_SUBINS	= scrlfile.ins scraddr.ins scrpage.ins
+CLS_MAIN_SUBINS	= scrstrip.inc scrstrop.inc scrdocstrip.tex
 
 ALPHA_INS       = tocstyle.dtx scrjura.dtx scrwfile.dtx
 
@@ -195,7 +192,7 @@ $(ALPHA_DOC): $(ALPHA_DTX)
 	$(MKINDEX) $(subst .pdf,,$@)
 	$(LATEX) $(BATCHMODE) $(PDFOUTPUT) $(subst .pdf,.dtx,$@)
 
-$(CLS_MAIN): $(CLS_MAIN_DVI) $(CLS_MAIN_INS) $(INS_TEMPLATES) $(MAKE_FILES)
+$(CLS_MAIN): $(CLS_MAIN_DVI) $(CLS_MAIN_INS) $(MAKE_FILES)
 	$(TEXUNPACK) $(CLS_MAIN_INS)
 	$(foreach alphains,$(ALPHA_INS),$(TEXUNPACK) $(alphains);)
 
@@ -220,7 +217,7 @@ GENERATED	= $(NODIST_GENERATED) ChangeLog \
 		  tocbasic.ins tocbasic.tex \
 	 	  tocstyle.ins tocstyle.tex tocstyle.dvi tocstyle.drv
 
-MISC_SRC	= $(INS_TEMPLATES) $(MAKE_FILES) \
+MISC_SRC	= $(MAKE_FILES) \
                   scrdoc.dtx ChangeLog ChangeLog.2
 
 DIST_SRC	= $(MISC_SRC) $(CLS_SRC)
