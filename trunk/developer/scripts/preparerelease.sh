@@ -94,11 +94,86 @@ For installation see INSTALL.txt (english) or INSTALLD.txt
 (german, UTF-8).
 
 --------------------------------------------------------------------
+
+Classes and Packages:
+
 EOF
 
+    popd
+    exit 0
+}
+
+stepthree() {
+    [ $# -ne 1 ] && error "exactly one parameter expected!"
+    pushd $1
+
+    for f in $( ls README.in/README.* ); do
+	name=${f#README.in/README.}
+	rm testversion.* versiontest.sh
+	if [ $name == ${name%.cls}.cls ]; then
+	    # Version test for class
+	    cat > testversion.tex <<EOF
+\\documentclass{${name%.cls}}
+\\makeatletter
+\\newwrite\\versionfile
+\\immediate\\openout\\versionfile versiontest.sh
+\\def\\writeversion#1 KOMA-Script#2\\@nil{%
+  \\immediate\\write\\versionfile {fileversion='#1'}%
+}
+\\expandafter\\expandafter\\expandafter\\writeversion\\csname ver@${name}\endcsname KOMA-Script\\@nil
+\\immediate\\closeout\\versionfile
+\\@@end\\end
+\\makeatother
+\\begin{document}\\end{document}
+EOF
+	else
+	    # Version test for package
+	    cat > testversion.tex <<EOF
+\\documentclass{minimal}
+\\makeatletter
+\\immediate\\newwrite\\versionfile
+\\immediate\\openout\\versionfile versiontest.sh
+\\def\\writeversion#1 KOMA-Script#2\\@nil{%
+  \\immediate\\write\\versionfile {fileversion='#1'^^J}%
+}
+\\def\\@pr@videpackage[#1]{%
+  \\typeout{>>> TRACE #1: to \\the\\versionfile<<<}%
+  \\writeversion#1 KOMA-Script\\@nil
+  \\csname endinput\\endcsname
+}
+\\usepackage{${name%.sty}}
+\\immediate\\closeout\\versionfile
+\\makeatother
+\\begin{document}\\end{document}
+EOF
+	fi
+	pdflatex -draftmode -interaction=batchmode testversion.tex \
+	    || error "Cannot determine version of ${name}."
+	chmod a+x versiontest.sh
+	. ./versiontest.sh
+	rm testversion.* versiontest.sh
+	echo '==============================================================================' >> README
+	sed -e 's#^\(Version:\s*\).*$#\1'"${fileversion}"'#' $f >> README
+    done
+    echo '==============================================================================' >> README
+
+    popd
+    exit 0
+}
+
+stepfinal() {
+    [ $# -ne 1 ] && error "exactly one parameter expected!"
+    pushd $1
+    base=`dirs +1`
+    version=`grep 'CheckKOMAScriptVersion{' scrkernel-version.dtx | grep -o '2.*KOMA'`
+    version=${version% KOMA}
+
+    versionpostfix=${version#* * }
+    year=`date '+%Y'`
+
     [ "$versionpostfix" = "$version" ] || \
-	error "Cannot prepare for KOMA-Script $version!" \
-	      "You should change scrkernel-version.dtx before release!"
+	error "Cannot prepare for KOMA-Script $version." \
+	      "You should change scrkernel-version.dtx before release."
 
     popd
     exit 0
@@ -108,6 +183,11 @@ case $step in
     1)  stepone "$@"
 	;;
     2)  steptwo "$@"
+	;;
+    3)  stepthree "$@"
+	;;
+    final)
+	stepfinal "$@"
 	;;
     *)
 	error "unknown preparation level!"
