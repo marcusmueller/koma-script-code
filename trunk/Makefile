@@ -122,7 +122,10 @@ CLS_MAIN	= scrbook.cls \
 		  NipponLH.lco \
 		  NipponLL.lco \
 		  NipponRL.lco \
-		  KakuLL.lco
+		  KakuLL.lco \
+		  scrlayer.sty \
+		  scrlayer-scrpage.sty \
+		  scrlayer-notecolumn.sty
 
 CLS_MAIN_DTX    = scrbeta.dtx \
 		  scrkernel-basics.dtx \
@@ -158,7 +161,10 @@ CLS_MAIN_DTX    = scrbeta.dtx \
                   scrhack.dtx \
 		  scrjura.dtx \
 		  tocbasic.dtx \
-		  tocstyle.dtx
+		  tocstyle.dtx \
+		  scrlayer.dtx \
+		  scrlayer-scrpage.dtx \
+		  scrlayer-notecolumn.dtx
 
 STATIC_DOC      = README \
 	          INSTALL.txt \
@@ -215,7 +221,8 @@ GENERATED	= $(NODIST_GENERATED) ChangeLog \
 		  scrjura.ins \
 		  scrwfile.ins scrwfile.tex scrwfile.drv \
 		  tocbasic.ins tocbasic.tex \
-	 	  tocstyle.ins tocstyle.tex tocstyle.dvi tocstyle.drv
+	 	  tocstyle.ins tocstyle.tex tocstyle.dvi tocstyle.drv \
+		  scrlayer.tex scrlayer-scrpage.tex scrlayer-notecolumn.tex
 
 MISC_SRC	= $(MAKE_FILES) \
                   scrdoc.dtx ChangeLog ChangeLog.2
