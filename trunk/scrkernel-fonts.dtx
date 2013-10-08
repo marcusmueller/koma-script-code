@@ -1,4 +1,4 @@
-% \CheckSum{2857}
+% \CheckSum{3178}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-fonts.dtx
@@ -618,6 +618,48 @@
 % Diese Anweisung bietet berechnete Schriftgrößen als Fallbacklösung an. Das
 % optionale erste Argument ist dabei der Grundlinienabstand. Das zweite
 % Argument ist die gewünschte Grundschriftgröße.
+% \begin{macro}{\scr@setlength}
+%   \changes{v3.12}{2013/10/08}{neue Anweisung (intern)}%^^A
+% Setzt die Länge in |#1| auf den Wert |#2| plus |#3| minus |#4|, wobei
+% allerdings für |#2|, |#3| und |#4| Mindestwerte von 1\,pt verwendet werden.
+%    \begin{macrocode}
+\newcommand*\scr@setlength[4]{%
+  \ifnum\scr@compatibility<\@nameuse{scr@v@3.12}\relax
+    \setlength{#1}{#2 \@plus#3 \@minus#4}%
+  \else
+    \ifdim #2<\ifdim #2=\z@ \z@ \else \p@\fi
+      \ifdim #3<\ifdim #3=\z@ \z@ \else \p@\fi
+        \ifdim #4<\ifdim #4=\z@ \z@ \else \p@\fi
+          \setlength{#1}{\p@ \@plus\p@ \@minus\p@}%
+        \else
+          \setlength{#1}{\p@ \@plus\p@ \@minus#4}%
+        \fi
+      \else
+        \ifdim #4<\ifdim #4=\z@ \z@ \else \p@\fi
+          \setlength{#1}{\p@ \@plus#3 \@minus\p@}%
+        \else
+          \setlength{#1}{\p@ \@plus#3 \@minus#4}%
+        \fi
+      \fi
+    \else
+      \ifdim #3<\ifdim #3=\z@ \z@ \else \p@\fi
+        \ifdim #4<\ifdim #4=\z@ \z@ \else \p@\fi
+          \setlength{#1}{#2 \@plus\p@ \@minus\p@}%
+        \else
+          \setlength{#1}{#2 \@plus\p@ \@minus#4}%
+        \fi
+      \else
+        \ifdim #4<\ifdim #4=\z@ \z@ \else \p@\fi
+          \setlength{#1}{#2 \@plus#3 \@minus\p@}%
+        \else
+          \setlength{#1}{#2 \@plus#3 \@minus#4}%
+        \fi
+      \fi
+    \fi
+  \fi
+}
+%    \end{macrocode}
+% \end{macro}
 %    \begin{macrocode}
 \newcommand*{\changefontsizes}[2][1.2\@tempdima]{%
 %<!extend>  \ClassWarning{\KOMAClassName}{%
@@ -647,16 +689,28 @@
 %    \end{macrocode}
 % Ab hier ist \cs{@tempdimc} die gewünschte Grundschriftgröße in pt und
 % \cs{@tempb} der Faktor für den Grundlinienabstand auf 2 Stellen hinter dem
-% Komma.
+% Komma. Zunächst ist auch \cs{@tempdima} noch die geforderte
+% Grundschriftgröße und \cs{@tempdimb} der geforderte
+% Grundlinienabstand. Allerdings verändern sich \cs{@tempdima} und
+% \cs{@tempdimb} im Laufe der nachfolgenden Definitionen abhängig von der zu
+% definierenden Schriftgröße.
 %
 % Berechnungen für und Definition von \cs{normalsize}:
 %    \begin{macrocode}
-    \setlength{\abovedisplayskip}{%
-      \@tempdima \@plus .25\@tempdima \@minus .58\@tempdima}%
-    \setlength{\abovedisplayshortskip}{\z@ \@plus .25\@tempdima}%
+    \ifnum\scr@compatibility<\@nameuse{scr@v@3.12}\relax
+      \setlength{\abovedisplayskip}{%
+        \@tempdima \@plus .25\@tempdima \@minus .58\@tempdima}%
+      \setlength{\abovedisplayshortskip}{\z@ \@plus .25\@tempdima}%
+      \setlength{\belowdisplayshortskip}{%
+        .55\@tempdima \@plus .3\@tempdima \@minus .25\@tempdima}%
+    \else
+      \scr@setlength{\abovedisplayskip}%
+                    {.8333\@tempdimb}{.1667\@tempdimb}{.5\@tempdimb}%
+      \scr@setlength{\abovedisplayshortskip}{\z@}{.25\@tempdimb}{\z@}%
+      \scr@setlength{\belowdisplayshortskip}%
+                    {.5\@tempdimb}{.25\@tempdimb}{.25\@tempdimb}%
+    \fi
     \setlength{\belowdisplayskip}{\abovedisplayskip}%
-    \setlength{\belowdisplayshortskip}{%
-      .55\@tempdima \@plus .3\@tempdima \@minus .25\@tempdima}%
     \edef\normalsize{%
       \noexpand\@setfontsize\noexpand\normalsize
       {\the\@tempdima}{\the\@tempdimb}%
@@ -671,12 +725,20 @@
 %    \begin{macrocode}
     \setlength{\@tempdima}{0.9125\@tempdimc}%
     \setlength{\@tempdimb}{\@tempb\@tempdima}%
-    \setlength{\abovedisplayskip}{%
-      \@tempdima \@plus .25\@tempdima \@minus .58\@tempdima}%
-    \setlength{\abovedisplayshortskip}{\z@ \@plus .25\@tempdima}%
+    \ifnum\scr@compatibility<\@nameuse{scr@v@3.12}\relax
+      \setlength{\abovedisplayskip}{%
+        \@tempdima \@plus .25\@tempdima \@minus .58\@tempdima}%
+      \setlength{\abovedisplayshortskip}{\z@ \@plus .25\@tempdima}%
+      \setlength{\belowdisplayshortskip}{%
+        .55\@tempdima \@plus .3\@tempdima \@minus .25\@tempdima}%
+    \else
+      \scr@setlength{\abovedisplayskip}%
+                    {.8333\@tempdimb}{.1667\@tempdimb}{.5\@tempdimb}%
+      \scr@setlength{\abovedisplayshortskip}{\z@}{.25\@tempdimb}{\z@}%
+      \scr@setlength{\belowdisplayshortskip}%
+                    {.5\@tempdimb}{.25\@tempdimb}{.25\@tempdimb}%
+    \fi
     \setlength{\belowdisplayskip}{\abovedisplayskip}%
-    \setlength{\belowdisplayshortskip}{%
-      .55\@tempdima \@plus .3\@tempdima \@minus .25\@tempdima}%
     \edef\small{%
       \noexpand\@setfontsize\noexpand\small
       {\the\@tempdima}{\the\@tempdimb}%
@@ -691,12 +753,20 @@
 %    \begin{macrocode}
     \setlength{\@tempdima}{.83334\@tempdimc}%
     \setlength{\@tempdimb}{\@tempb\@tempdima}%
-    \setlength{\abovedisplayskip}{%
-      \@tempdima \@plus .25\@tempdima \@minus .58\@tempdima}%
-    \setlength{\abovedisplayshortskip}{\z@ \@plus .25\@tempdima}%
+    \ifnum\scr@compatibility<\@nameuse{scr@v@3.12}\relax
+      \setlength{\abovedisplayskip}{%
+        \@tempdima \@plus .25\@tempdima \@minus .58\@tempdima}%
+      \setlength{\abovedisplayshortskip}{\z@ \@plus .25\@tempdima}%
+      \setlength{\belowdisplayshortskip}{%
+        .55\@tempdima \@plus .3\@tempdima \@minus .25\@tempdima}%
+    \else
+      \scr@setlength{\abovedisplayskip}%
+                    {.8333\@tempdimb}{.1667\@tempdimb}{.5\@tempdimb}%
+      \scr@setlength{\abovedisplayshortskip}{\z@}{.25\@tempdimb}{\z@}%
+      \scr@setlength{\belowdisplayshortskip}%
+                    {.5\@tempdimb}{.25\@tempdimb}{.25\@tempdimb}%
+    \fi
     \setlength{\belowdisplayskip}{\abovedisplayskip}%
-    \setlength{\belowdisplayshortskip}{%
-      .55\@tempdima \@plus .3\@tempdima \@minus .25\@tempdima}%
     \edef\footnotesize{%
       \noexpand\@setfontsize\noexpand\footnotesize
       {\the\@tempdima}{\the\@tempdimb}%
@@ -774,30 +844,45 @@
 % Abstände für diese Schriftgröße.
 %    \begin{macrocode}
     \normalsize
-    \setlength{\footnotesep}{.7\@tempdimc}%
-    \setlength{\skip\footins}{.9\@tempdimc \@plus .3333\@tempdimc \@minus
-      .6\@tempdimc}%
-    \setlength{\floatsep}{\@tempdimc \@plus .1667\@tempdimc \@minus
-      .3333\@tempdimc}%
-    \setlength{\textfloatsep}{1.6667\@tempdimc \@plus .1667\@tempdimc \@minus
-      .3333\@tempdimc}%
-    \setlength{\intextsep}{\@tempb\@tempdimc \@plus .3333\@tempdimc \@minus
-      .3333\@tempdimc}%
-    \setlength{\dblfloatsep}{\@tempb\@tempdimc \@plus .1667\@tempdimc \@minus
-      .3333\@tempdimc}%
-    \setlength{\dbltextfloatsep}{\textfloatsep}%
-    \setlength{\@fptop}{0\p@ \@plus 1fil}%
-    \setlength{\@fpsep}{.8333\@tempdimc \@plus 2fil}%
-    \setlength{\@fpbot}{\@fptop}%
-    \setlength{\@dblfptop}{0\p@ \@plus 1fil}%
-    \setlength{\@dblfpsep}{.8333\@tempdimc \@plus 2fil}%
-    \setlength{\@dblfpbot}{\@fptop}%
+%    \end{macrocode}
+% Ab hier kann nun \cs{f@size} für die Schriftgröße und \cs{f@baselineskip}
+% für den normalen Grundlinienabstand (ohne \cs{baselinestretch}) verwendet
+% werden. Allerdings ist das keine Länge!
+%    \begin{macrocode}
+    \ifnum\scr@compatibility<\@nameuse{scr@v@3.12}\relax
+      \setlength{\footnotesep}{.7\@tempdimc}%
+      \setlength{\skip\footins}{.9\@tempdimc \@plus .3333\@tempdimc \@minus
+        .6\@tempdimc}%
+      \setlength{\floatsep}{\@tempdimc \@plus .1667\@tempdimc \@minus
+        .3333\@tempdimc}%
+      \setlength{\textfloatsep}{1.6667\@tempdimc \@plus .1667\@tempdimc \@minus
+        .3333\@tempdimc}%
+      \setlength{\intextsep}{\@tempb\@tempdimc \@plus .3333\@tempdimc \@minus
+        .3333\@tempdimc}%
+      \setlength{\dblfloatsep}{\@tempb\@tempdimc \@plus .1667\@tempdimc \@minus
+        .3333\@tempdimc}%
+      \setlength{\dbltextfloatsep}{\textfloatsep}%
+      \setlength{\@fptop}{0\p@ \@plus 1fil}%
+      \setlength{\@fpsep}{.8333\@tempdimc \@plus 2fil}%
+      \setlength{\@fpbot}{\@fptop}%
+      \setlength{\@dblfptop}{0\p@ \@plus 1fil}%
+      \setlength{\@dblfpsep}{.8333\@tempdimc \@plus 2fil}%
+      \setlength{\@dblfpbot}{\@fptop}%
+    \fi
 %    \end{macrocode}
 % Berechnungen für und Definition von \cs{@listi} und \cs{@listI}:
 %    \begin{macrocode}
-    \setlength{\topsep}{.8333\@tempdimc \@plus .3333\@tempdimc \@minus
-      .5\@tempdimc}%
-    \setlength{\parsep}{.4167\@tempdimc \@plus .2083\@tempdimc \@minus \p@}%
+    \ifnum\scr@compatibility<\@nameuse{scr@v@3.12}\relax
+      \setlength{\topsep}{.8333\@tempdimc \@plus .3333\@tempdimc \@minus
+        .5\@tempdimc}%
+      \setlength{\parsep}{.4167\@tempdimc \@plus .2083\@tempdimc \@minus \p@}%
+    \else
+      \setlength{\@tempdimb}{\f@baselineskip}%
+      \scr@setlength{\parsep}%
+                    {.3333\@tempdimb}{.1667\@tempdimb}{.0833\@tempdimb}%
+      \scr@setlength{\topsep}%
+                    {.6667\@tempdimb}{.1667\@tempdimb}{.3333\@tempdimb}%
+    \fi
     \@tempswafalse
     \begingroup
       \def\@list@extra{\aftergroup\@tempswatrue}%
@@ -813,9 +898,16 @@
 %    \end{macrocode}
 % Berechnungen für und Definition von \cs{@listi@small}:
 %    \begin{macrocode}
-    \setlength{\topsep}{.75\@tempdimc \@plus .25\@tempdimc \@minus
-      .41667\@tempdimc}%
-    \setlength{\parsep}{.375\@tempdimc \@plus .16667\@tempdimc \@minus \p@}%
+    \ifnum\scr@compatibility<\@nameuse{scr@v@3.12}\relax
+      \setlength{\topsep}{.75\@tempdimc \@plus .25\@tempdimc \@minus
+        .41667\@tempdimc}%
+      \setlength{\parsep}{.375\@tempdimc \@plus .16667\@tempdimc \@minus \p@}%
+    \else
+      \scr@setlength{\parsep}%
+                    {.1667\@tempdimb}{.0833\@tempdimb}{.0833\@tempdimb}%
+      \scr@setlength{\topsep}%
+                    {.3333\@tempdimb}{.1667\@tempdimb}{.1667\@tempdimb}%
+    \fi
     \@tempswafalse
     \begingroup
       \def\@list@extra{\aftergroup\@tempswatrue}%
@@ -830,9 +922,16 @@
 %    \end{macrocode}
 % Berechnungen für und Definition von \cs{@listi@footnotesize}:
 %    \begin{macrocode}
-    \setlength{\topsep}{.5\@tempdimc \@plus .16667\@tempdimc \@minus
-      .16667\@tempdimc}%
-    \setlength{\parsep}{.25\@tempdimc \@plus .16667\@tempdimc \@minus \p@}%
+    \ifnum\scr@compatibility<\@nameuse{scr@v@3.12}\relax
+      \setlength{\topsep}{.5\@tempdimc \@plus .16667\@tempdimc \@minus
+        .16667\@tempdimc}%
+      \setlength{\parsep}{.25\@tempdimc \@plus .16667\@tempdimc \@minus \p@}%
+    \else
+      \scr@setlength{\parsep}%
+                    {.125\@tempdimb}{.0625\@tempdimb}{.0625\@tempdimb}%
+      \scr@setlength{\topsep}%
+                    {.25\@tempdimb}{.125\@tempdimb}{.125\@tempdimb}%
+    \fi
     \@tempswafalse
     \begingroup
       \def\@list@extra{\aftergroup\@tempswatrue}%
@@ -847,8 +946,15 @@
 %    \end{macrocode}
 % Berechnungen für und Definition von \cs{@listii}:
 %    \begin{macrocode}
-    \setlength{\topsep}{.4167\@tempdimc \@plus .2083\@tempdimc \@minus \p@}%
-    \setlength{\parsep}{.2083\@tempdimc \@plus \p@ \@minus \p@}%
+    \ifnum\scr@compatibility<\@nameuse{scr@v@3.12}\relax
+      \setlength{\topsep}{.4167\@tempdimc \@plus .2083\@tempdimc \@minus \p@}%
+      \setlength{\parsep}{.2083\@tempdimc \@plus \p@ \@minus \p@}%
+    \else
+      \scr@setlength{\parsep}%
+                    {.1667\@tempdimb}{.0833\@tempdimb}{.0833\@tempdimb}%
+      \scr@setlength{\topsep}%
+                    {.3333\@tempdimb}{.1667\@tempdimb}{.0833\@tempdimb}%
+    \fi
     \@tempswafalse
     \begingroup
       \def\@list@extra{\aftergroup\@tempswatrue}%
@@ -864,8 +970,13 @@
 %    \end{macrocode}
 % Berechnungen für und Definition von \cs{@listiii}:
 %    \begin{macrocode}
-    \setlength{\topsep}{.2083\@tempdimc \@plus \p@ \@minus \p@}%
-    \setlength{\parsep}{\p@ \@plus\z@ \@minus\p@}%
+    \ifnum\scr@compatibility<\@nameuse{scr@v@3.12}\relax
+      \setlength{\topsep}{.2083\@tempdimc \@plus \p@ \@minus \p@}%
+    \else
+      \scr@setlength{\topsep}%
+                    {.1667\@tempdimb}{.0833\@tempdimb}{.0833\@tempdimb}%
+    \fi
+    \setlength{\partopsep}{\z@ \@plus\z@ \@minus\p@}%
     \@tempswafalse
     \begingroup
       \def\@list@extra{\aftergroup\@tempswatrue}%
@@ -875,7 +986,7 @@
       \labelwidth=\dimexpr \leftmargin-\labelsep
       \topsep \the\topsep
       \parsep \z@
-      \partopsep \the\parsep
+      \partopsep \the\partopsep
       \itemsep \topsep
       \if@tempswa\noexpand\@list@extra\fi
     }%
@@ -888,7 +999,7 @@
       \csname @listiv\endcsname
     \endgroup
     \edef\@listiv{\leftmargin\leftmarginiv
-      \labelwidth=\dimexpr \leftmargin-\labelsep
+      \labelwidth=\dimexpr \leftmargin-\labelsep\relax
       \if@tempswa\noexpand\@list@extra\fi
     }%
 %    \end{macrocode}
@@ -900,7 +1011,7 @@
       \csname @listv\endcsname
     \endgroup
     \edef\@listv{\leftmargin\leftmarginv
-      \labelwidth=\dimexpr \leftmargin-\labelsep
+      \labelwidth=\dimexpr \leftmargin-\labelsep\relax
       \if@tempswa\noexpand\@list@extra\fi
     }%
 %    \end{macrocode}
@@ -912,21 +1023,49 @@
       \csname @listvi\endcsname
     \endgroup
     \edef\@listvi{\leftmargin\leftmarginvi
-      \labelwidth=\dimexpr \leftmargin-\labelsep
+      \labelwidth=\dimexpr \leftmargin-\labelsep\relax
       \if@tempswa\noexpand\@list@extra\fi
     }%
     \@listi
 %    \end{macrocode}
-% Einige Platzierungsabstände sind ebenfalls schriftgrößenabhängig:
-% \changes{v2.97c}{2007/07/04}{\cs{intextsep} setzen}
-% \changes{v2.97c}{2007/07/04}{\cs{dblfloatsep} setzen}
-% \changes{v2.97c}{2007/07/04}{\cs{partopsep} setzen}
+% Einige Platzierungsabstände sind ebenfalls schriftgrößenabhängig. %^^A
+% \changes{v2.97c}{2007/07/04}{\cs{intextsep} setzen}%^^A
+% \changes{v2.97c}{2007/07/04}{\cs{dblfloatsep} setzen}%^^A
+% \changes{v2.97c}{2007/07/04}{\cs{partopsep} setzen}%^^A
+% \changes{v3.12}{2013/10/08}{Berechnung einiger Größen verändert}%^^A
+% Ab Version~3.12 wird deren Berechnung korrigiert. Viele der Größen sind nun
+% nicht mehr von der Schriftgröße, sondern dem Grundlinienabstand abhängig.
 %    \begin{macrocode}
-    \setlength{\@tempdimb}{\@tempb\@tempdima}%
-    \setlength{\@tempdima}{\dimexpr \@tempdimb-\@tempdimc}%
-    \setlength\intextsep{\@tempdimb \@plus.2\@tempdima \@minus.2\@tempdima}%
-    \setlength\dblfloatsep\intextsep
-    \setlength\partopsep{.2\@tempdimc \@plus.1\@tempdimc \@minus.1\@tempdimc}%
+    \ifnum\scr@compatibility<\@nameuse{scr@v@3.12}\relax
+      \setlength{\@tempdimb}{\@tempb\@tempdima}%
+      \setlength{\@tempdima}{\dimexpr \@tempdimb-\@tempdimc}%
+      \setlength\intextsep{\@tempdimb \@plus.2\@tempdima \@minus.2\@tempdima}%
+      \setlength\dblfloatsep\intextsep
+      \setlength\partopsep{.2\@tempdimc \@plus.1\@tempdimc \@minus.1\@tempdimc}%
+    \else
+      \setlength{\@tempdimb}{\f@baselineskip}%
+      \setlength{\footnotesep}{.555\@tempdimb}%
+      \scr@setlength{\skip\footins}%
+                    {.75\@tempdimb}{.3333\@tempdimb}{.1667\@tempdimb}%
+      \scr@setlength{\floatsep}%
+                    {\@tempdimb}{.1667\@tempdimb}{.1667\@tempdimb}%
+      \scr@setlength{\textfloatsep}%
+                    {1.6667\@tempdimb}{.1667\@tempdimb}{.3333\@tempdimb}%
+      \setlength{\intextsep}{\floatsep}%
+      \setlength{\dblfloatsep}{\floatsep}%
+      \setlength{\dbltextfloatsep}{\textfloatsep}%
+      \setlength{\@fptop}{\z@ \@plus 1fil}%
+      \setlength{\@fpsep}{.6667\@tempdimb \@plus 2fil}%
+      \setlength{\@fpbot}{\@fptop}%
+      \setlength{\@dblfptop}{\@fptop}%
+      \setlength{\@dblfpsep}{\@fpsep}%
+      \setlength{\@dblfpbot}{\@fptop}%
+      \scr@setlength{\partopsep}{.2\@tempdimb}{.1\@tempdimb}{.1\@tempdimb}%
+%    \end{macrocode}
+% Hinweis: \cs{topsep} und \cs{parsep} werden hier nicht gesetzt, weil dies
+% bereits durch das \cs{@listi} zurvor erfolgte.
+%    \begin{macrocode}
+    \fi
   }%
 }
 %    \end{macrocode}
