@@ -53,7 +53,7 @@ tocbasic.tex: ../../tocbasic.tex
 	if [ -L $@ ] || ! [ -f $@ ]; then $(SYMLINK) $< .; else touch $@; fi
 
 ../../tocbasic.tex: ../../tocbasic.dtx
-	cd ../.. && tex \\nonstopmode\\input tocbasic.dtx
+	cd ../.. && tex \\nonstopmode\\input $(basename $<)
 # ----------------------------------------------------------------------
 
 # ----------------------------------------------------------------------
@@ -63,7 +63,17 @@ scrwfile.tex: ../../scrwfile.tex
 	if [ -L $@ ] || ! [ -f $@ ]; then $(SYMLINK) $< .; else touch $@; fi
 
 ../../scrwfile.tex: ../../scrwfile.dtx
-	cd ../.. && tex \\nonstopmode\\input scrwfile.dtx
+	cd ../.. && tex \\nonstopmode\\input $(basename $<)
+# ----------------------------------------------------------------------
+
+# ----------------------------------------------------------------------
+# NOTE: Remove these rules after real translation of scrlayer-scrpage.tex 
+#       is available.
+scrlayer-scrpage.tex: ../../scrlayer-scrpage.tex
+	if [ -L $@ ] || ! [ -f $@ ]; then $(SYMLINK) $< .; else touch $@; fi
+
+../../scrlayer-scrpage.tex: ../../scrlayer-scrpage.dtx
+	cd ../.. && tex \\nonstopmode\\input $(basename $<)
 # ----------------------------------------------------------------------
 
 #
