@@ -55,8 +55,8 @@ export MAINTAINDIR := $(DISTDIR)-maintain
 # ----------------------------------------------------------------------
 # More than once used:
 # Make implementation documentation
-define makedvifromdtx
-	if ! $(LATEX) $(NONSTOPMODE) $(DVIOUTPUT) $<; then \
+define makepdffromdtx
+	if ! $(LATEX) $(NONSTOPMODE) $(PDFOUTPUT) $<; then \
 	    $(RM) -v $@; \
 	    exit 1; \
 	fi
@@ -65,7 +65,7 @@ define makedvifromdtx
         while $$oncemore; \
 	do \
 	    if ! $(MKINDEX) $(basename $<) \
-	       || ! $(LATEX) $(NONSTOPMODE) $(DVIOUTPUT) $<; then \
+	       || ! $(LATEX) $(NONSTOPMODE) $(PDFOUTPUT) $<; then \
 	        $(RM) -v $@; \
 	        exit 1; \
 	    fi; \
@@ -174,7 +174,7 @@ STATIC_DOC      = README \
 		  manifest.txt \
 		  komabug.tex
 
-CLS_MAIN_DVI	= scrsource.dvi
+CLS_MAIN_DVI	= scrsource.pdf
 
 CLS_MAIN_INS	= scrmain.ins
 
@@ -202,8 +202,8 @@ $(CLS_MAIN): $(CLS_MAIN_DVI) $(CLS_MAIN_INS) $(MAKE_FILES)
 	$(TEXUNPACK) $(CLS_MAIN_INS)
 	$(foreach alphains,$(ALPHA_INS),$(TEXUNPACK) $(alphains);)
 
-scrsource.dvi: scrsource.tex $(CLS_MAIN_DTX) $(MAKE_FILES) scrdoc.cls
-	$(makedvifromdtx)
+scrsource.pdf: scrsource.tex $(CLS_MAIN_DTX) $(MAKE_FILES) scrdoc.cls
+	$(makepdffromdtx)
 
 scrdoc.cls: scrdoc.dtx
 	$(SSYMLINK) scrdoc.dtx scrdoc.cls
