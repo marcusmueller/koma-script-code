@@ -46,7 +46,9 @@
 % ======================================================================
 
 
-\ProvidesFile{typearea.tex}[2013/10/15 KOMA-Script guide (chapter: typearea)]
+\KOMAProvidesFile{typearea.tex}%
+                 [$Date$
+                  KOMA-Script guide (chapter: typearea)]
 \chapter{Satzspiegelberechnung mit \Package{typearea.sty}}
 \labelbase{typearea}
 
@@ -1186,7 +1188,7 @@ obige Erläuterungen. Voreingestellt sind normalerweise
 \OptionValue{footinclude}{false}. Dies kann sich jedoch bei den
 \KOMAScript-Klassen je nach Klassenoption oder bei Verwendung anderer
 \KOMAScript-Pakete generell ändern (siehe \autoref{sec:maincls.options} und
-\autoref{cha:scrpage}).
+\autoref{cha:scrpage} oder \autoref{cha:scrlayer-scrpage}).
 
 Bitte beachten Sie unbedingt\textnote{Achtung!}, dass diese Optionen bei
 Verwendung einer der \KOMAScript-Klassen als Klassenoptionen oder per
@@ -1323,7 +1325,7 @@ Erfordernissen anpassen.
   \documentclass[headlines=2.1]{scrartcl}
 \end{lstcode}
   Befehle, mit denen dann der Inhalt der zweizeiligen Kopfzeile
-  definiert werden kann, sind in \autoref{cha:scrpage} zu finden.
+  definiert werden kann, sind in \autoref{cha:scrlayer-scrpage} zu finden.
 \end{Example}
 
 In einigen Fällen ist es nützlich, wenn man die Kopfhöhe nicht in Zeilen,
@@ -1334,6 +1336,12 @@ kennt. Es ist jedoch zu beachten, dass bei Verwendung einer \LaTeX-Länge wie
 \Length{baselineskip} nicht deren Größe zum Zeitpunkt des Setzens der Option,
 sondern zum Zeitpunkt der Berechnung des Satzspiegels und der Rändern
 entscheidend ist.
+
+Es ist zu beachten\textnote{Achtung!}, dass \LaTeX{} im optionalen Argument
+von \Macro{documentclass} oder \Macro{usepackage} die Verwendung von
+\LaTeX-Längen wie \Length{baselineskip} nicht unterstützt, sondern mit einer
+Fehlermeldung quitiert. Das ist auch der Grund, warum neben
+\Option{heightheight} auch noch \Option{headlines} implementiert wurde.
 
 Bitte beachten Sie unbedingt\textnote{Achtung!}, dass diese Optionen bei
 Verwendung einer der \KOMAScript-Klassen als Klassenoptionen oder per
@@ -1350,6 +1358,93 @@ Option \Option{DIV} mit den Werten \PValue{last} oder \PValue{current} (siehe
 %
 \EndIndex{Option}{headheight~=\PName{Höhe}}%
 \EndIndex{Option}{headlines~=\PName{Anzahl}}
+
+
+\BeginIndex{Option}{footlines~=\PName{Anzahl}}%
+\BeginIndex{Option}{footheight~=\PName{Höhe}}%
+\begin{Declaration}
+  \KOption{footlines}\PName{Zeilenanzahl}\\
+  \KOption{footheight}\PName{Höhe}
+\end{Declaration}%
+Ebenso wie für den Kopf fehlt aber noch die Angabe, wie hoch der Fuß sein
+soll. Hierzu dienen die Optionen \Option{footlines} und
+\Option{footheight}\ChangedAt{v3.12}{\Package{typearea}}. Allerdings ist die
+Höhe des Fußes im Gegensatz zur Höhe des Kopfes keine Länge des \LaTeX-Kerns
+selbst. Daher definiert \Package{typearea} zur Einführung eine neue Länge
+\Length{footheight}\IndexLength[mainindex]{footheight}, falls diese noch nicht
+existiert. Ob diese dann auch beispielsweise von Klassen und Paketen für die
+Gestaltung von Kopf und Fuß verwendet wird, hängt von den verwendeten Paketen
+ab. Das \KOMAScript-Paket \Package{scrlayer-scrpage} berücksicht diese auf
+jeden Fall und arbeitet somit aktiv mit \Package{typearea} zusammen. Die
+\KOMAScript-Klassen berücksichten \Length{footheight} hingegen nicht, da sie
+ohne Paketunterstützung nur Seitenstile mit einzeilige Seitenfüße
+anbieten.
+
+Die Option \Option{footlines}\important{\Option{footlines}} setzt man
+vergleichbar zu \Option{headlines} auf die Anzahl der Kopfzeilen.
+Normalerweise arbeitet das \Package{typearea}-Paket mit 1,25
+Kopfzeilen. Dieser Wert stellt einen Kompromiss dar. Zum einen ist er groß
+genug, um auch für eine über- und unterstrichene Fußzeile (siehe
+\autoref{sec:maincls.options}) Platz zu bieten, zum anderen ist er klein
+genug, um das Randgewicht nicht zu stark zu verändern, wenn mit einer
+einfachen Fußzeile ohne Trennlinien gearbeitet wird. Damit ist der
+voreingestellte Wert in den meisten Standardfällen ein guter Wert.  In einigen
+Fällen will oder muss man aber die Fußhöhe genauer den tatsächlichen
+Erfordernissen anpassen.
+
+\begin{Example}
+  Angenommen, im Fuß soll eine zweizeilige Copyright-Angabe gesetzt
+  werden. Zwar gibt es in \LaTeX{} selbst keinen Test, ob der für den Fuß
+  vorgesehene Platz dafür genügend Raum bietet, die Überschreitung der
+  vorgesehenen Höhe führt aber wahrscheinlich zu einer unausgeglichenen
+  Verteilung von Satzspiegeln und Rändern. Außerdem würde beispielsweise das
+  Paket \Package{scrlayer-scrpage}, mit dem ein solcher Fußinhalt gesetzt
+  werden könnte, durchaus eine entsprechende Überprüfung durch und meldet
+  gegebenenfalls auch Überschreitungen. Daher ist es sinnvoll, die benötigte
+  größere Fußhöhe bereits bei der Berechnung des Satzspiegels anzugeben:
+\begin{lstcode}
+  \documentclass[a4paper]{article}
+  \usepackage[footlines=2.1]{typearea}
+\end{lstcode}
+  Es ist auch wieder möglich und bei Verwendung einer \KOMAScript-Klasse
+  empfehlenswert, diese Option direkt an die Klasse zu übergeben:
+\begin{lstcode}
+  \documentclass[footlines=2.1]{scrartcl}
+\end{lstcode}
+  Befehle, mit denen dann der Inhalt der zweizeiligen Fußzeile
+  definiert werden kann, sind in \autoref{cha:scrlayer-scrpage} zu finden.
+\end{Example}
+
+In einigen Fällen ist es nützlich, wenn man die Fußhöhe nicht in Zeilen,
+sondern direkt als Längenwert angeben kann. Dies ist mit Hilfe der alternativ
+verwendbaren Option \Option{footheight}\important{\Option{footheight}}
+möglich. Als \PName{Höhe} sind alle Längen und Größen verwendbar, die \LaTeX{}
+kennt. Es ist jedoch zu beachten, dass bei Verwendung einer \LaTeX-Länge wie
+\Length{baselineskip} nicht deren Größe zum Zeitpunkt des Setzens der Option,
+sondern zum Zeitpunkt der Berechnung des Satzspiegels und der Rändern
+entscheidend ist.
+
+Es ist zu beachten\textnote{Achtung!}, dass \LaTeX{} im optionalen Argument
+von \Macro{documentclass} oder \Macro{usepackage} die Verwendung von
+\LaTeX-Längen wie \Length{baselineskip} nicht unterstützt, sondern mit einer
+Fehlermeldung quitiert. Das ist auch der Grund, warum neben
+\Option{footheight} auch noch \Option{footlines} implementiert wurde.
+
+Bitte beachten Sie unbedingt\textnote{Achtung!}, dass diese Optionen bei
+Verwendung einer der \KOMAScript-Klassen als Klassenoptionen oder per
+\Macro{KOMAoptions} beziehungsweise \Macro{KOMAoption} nach dem Laden der
+Klasse übergeben werden müssen. Eine Änderung dieser Optionen nach dem Laden
+von \Package{typearea} führt nicht\textnote{keine automatische
+  Neuberechnung} zu einer automatischen Neuberechnung des
+Satzspiegels. Vielmehr wirkt sich die Änderung erst bei der nächsten
+Neuberechnung des Satzspiegels aus. Zur Neuberechnung des Satzspiegels siehe
+Option \Option{DIV} mit den Werten \PValue{last} oder \PValue{current} (siehe
+\autopageref{desc:typearea.option.DIV.last}) oder die Anweisung
+\Macro{recalctypearea} (siehe
+\autopageref{desc:typearea.cmd.recalctypearea}).%
+%
+\EndIndex{Option}{footheight~=\PName{Höhe}}%
+\EndIndex{Option}{footlines~=\PName{Anzahl}}
 
 
 \BeginIndex{Cmd}{areaset}%
