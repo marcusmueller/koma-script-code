@@ -76,5 +76,15 @@ scrlayer-scrpage.tex: ../../scrlayer-scrpage.tex
 	cd ../.. && tex \\nonstopmode\\input $(basename $<)
 # ----------------------------------------------------------------------
 
+# ----------------------------------------------------------------------
+# NOTE: Remove these rules after real translation of scrlayer.tex 
+#       is available.
+scrlayer.tex: ../../scrlayer.tex
+	if [ -L $@ ] || ! [ -f $@ ]; then $(SYMLINK) $< .; else touch $@; fi
+
+../../scrlayer.tex: ../../scrlayer.dtx
+	cd ../.. && tex \\nonstopmode\\input $(basename $<)
+# ----------------------------------------------------------------------
+
 #
 # end of file `Makefile'
