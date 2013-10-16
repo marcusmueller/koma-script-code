@@ -49,15 +49,1700 @@
                                       (chapter:scrlayer-scrpage)]
 
 \chapter{Kopf- und Fußzeilen mit \Package{scrlayer-scrpage}}
-\labelbase{scrlayer.scrpage}
+\labelbase{scrlayer-scrpage}
 %
 \BeginIndex{Package}{scrlayer-scrpage}%
+Bis \KOMAScript~3.11b war das Paket \Package{scrpage2}\IndexPackage{scrpage2}
+das Mittel der Wahl, wenn es darum ging, den Kopf und den Fuß der Seite über
+das hinaus zu verändern, was die \KOMAScript-Klassen mit den Seitenstilen
+\Pagestyle{headings}, \Pagestyle{myheadings}, \Pagestyle{plain} und
+\Pagestyle{empty} boten. Bis 2001 gab es dafür auch noch das Paket
+\Package{scrpage}\IndexPackage{scrpage}, das aber seit 2013 nicht mehr mit
+\KOMAScript{} zusammen verteilt wird.
 
+Seit 2013 ist das Paket \Package{scrlayer} als neuer, grundlegender Baustein
+in \KOMAScript{} enthalten. Dieses Paket bietet ein Ebenenmodell, sowie ein
+darauf basierendes Seitenstil-Modell an. Für die direkte Verwendung durch den
+durchschnittlichen Anwender ist die Schnittstelle dieses Pakets jedoch fast
+schon zu flexibel und damit einhergehend auch nicht leicht zu
+durchschauen. Näheres zu dieser Schnittstelle ist \autoref{cha:scrlayer} in
+\autoref{part:forExperts} zu entnehmen. Darüber hinaus sind viele Anwender
+bereits mit den Anweisungen aus \Package{scrpage2} vertraut.
+
+Daher wurde mit \Package{scrlayer-scrpage} ein Paket geschaffen, das basierend
+auf \Package{scrlayer} eine mit \Package{scrpage2} weitgehend kompatible
+Anwender-Schnittstelle bereitstellt. Wer bereits mit \Package{scrpage2}
+vertraut ist und dort keine unsauberen Rückgriffe auf interne Anweisungen
+getätigt hat, kann daher in der Regel \Package{scrpage2} recht einfach durch
+\Package{scrlayer-scrpage} ersetzen. Das gilt mit der genannten Einschränkung
+auch für die meisten Beispiele in \LaTeX-Büchern oder im Internet.
+
+Neben den genannten \KOMAScript-Paketen wäre auch \Package{fancyhdr} (siehe
+\cite{package:fancyhdr}) grundsätzlich geeignet, zusammen mit den
+\KOMAScript-Klassen verwendet zu werden. Allerdings unterstützt dieses Paket
+diverse Möglichkeiten von \KOMAScript{}, angefangen von Änderungen der Schrift
+über das Elemente-Modell (siehe \Macro{setkomafont}, \Macro{addtokomafont} und
+\Macro{usekomafont} in \autoref{sec:maincls.textmarkup}, ab
+\autopageref{desc:maincls.cmd.setkomafont}) bis hin zum konfigurierbaren
+Format der Gliederungsnummern in Kopf (siehe Option \Option{numbers} und
+beispielsweise \Macro{chaptermarkformat} in \autoref{sec:maincls.structure},
+\autopageref{desc:maincls.option.numbers} und
+\autopageref{desc:maincls.cmd.chaptermarkformat}), nicht. Daher wird für die
+Verwendung mit den \KOMAScript-Klassen das neue Paket
+\Package{scrlayer-scrpage} empfohlen. Bei Problemen damit kann auch auf
+\Package{scrpage2} zurückgegriffen werden. Natürlich kann
+\Package{scrlayer-scrpage} auch mit anderen Klassen, beispielsweise den
+Standardklassen verwendet werden.
+
+\LoadCommon{0} % \section{Frühe oder späte Optionenwahl}
+
+\LoadCommon{20} % \section{Höhe von Kopf und Fuß}
+
+\section{Verwendung vordefinierter Seitenstile}
+\label{sec:scrlayer-scrpage.predefined.pagestyles}
+
+Die einfachste Möglichkeit, mit \Package{scrlayer-scrpage} zu seinem
+Wunschdesign für Kopf und Fuß der Seite zu gelangen, ist die Verwendung eines
+vorgefertigten Seitenstils.
+
+\begin{Declaration}
+  \Pagestyle{scrheadings}\\
+  \Pagestyle{plain.scrheadings}
+\end{Declaration}
+\BeginIndex{Pagestyle}{scrheadings}%
+\BeginIndex{Pagestyle}{plain.scrheadings}%
+Das Paket \Package{scrlayer-scrpage} stellt zwei Seitenstile zur Verfügung,
+die nach eigenen Wünschen umgestaltet werden können. Als erstes wäre der
+Seitenstil \Pagestyle{scrheadings} zu nennen. Dieser ist als Seitenstil mit
+Kolumnentitel vorgesehen. Er ähnelt in der Voreinstellung dem Seitenstil
+\Pagestyle{headings}\IndexPagestyle{headings} der Standard- oder der
+\KOMAScript-Klassen. Was genau im Kopf und Fuß ausgegeben wird, ist über die
+nachfolgend beschriebenen Befehle und Optionen einstellbar.
+
+Als zweites ist der Seitenstil \Pagestyle{plain.scrheadings} zu nennen. Dieser
+ist als Seitenstil ohne Kolumnentitel vorgesehen. Er ähnelt in der
+Voreinstellung dem Seitenstil \Pagestyle{plain}\IndexPagestyle{plain} der
+Standard- oder der \KOMAScript-Klassen. Was genau im Kopf und Fuß ausgegeben
+wird, ist auch hier über die nachfolgend beschriebenen Befehle und Optionen
+einstellbar.
+
+Natürlich kann auch \Pagestyle{scrheadings} als Seitenstil ohne Kolumnentitel
+und \Pagestyle{plain.scrheadings} als Seitenstil mit Kolumnentitel
+konfiguriert werden. Es ist jedoch zweckmäßig, sich an die vorgenannte
+Konvention zu halten. Die beiden Seitenstile beeinflussen sich nämlich in
+gewisser Weise gegenseitig. Sobald einer der Seitenstile ausgewählt wird, ist
+\Pagestyle{scrheadings} auch unter dem Namen \Pagestyle{headings} und der
+Seitenstil \Pagestyle{plain.scrheadings} auch unter dem Namen
+\Pagestyle{plain} aktivierbar. Das hat den Vorteil, dass bei Klassen, die
+automatisch zwischen \Pagestyle{headings} und \Pagestyle{plain} umschalten,
+durch einmalige Auswahl von \Pagestyle{scrheadings} oder
+\Pagestyle{plain.scrheadings} nun zwischen diesen beiden Stilen umgeschaltet
+wird. Direkte Anpassungen der entsprechenden Klassen sind nicht
+erforderlich. Die beiden Seitenstile stellen also quasi ein Paar dar, das als
+Ersatz für \Pagestyle{headings} und \Pagestyle{plain} verwendet werden kann.
+
+Es sei an dieser Stelle noch erwähnt, dass \Pagestyle{plain.scrheadings} aus
+Gründen der Kompatibilität mit \Package{scrpage2} auch unter dem Alias-Namen
+\Pagestyle{scrplain} angesprochen werden kann.%
+\EndIndex{Pagestyle}{plain.scrheadings}%
+\EndIndex{Pagestyle}{scrheadings}%
+
+\begin{Declaration}
+  \Macro{lehead}\OParameter{Inhalt plain.scrheadings}%
+                \Parameter{Inhalt scrheadings}\\
+  \Macro{cehead}\OParameter{Inhalt plain.scrheadings}%
+                \Parameter{Inhalt scrheadings}\\
+  \Macro{rehead}\OParameter{Inhalt plain.scrheadings}%
+                \Parameter{Inhalt scrheadings}\\
+  \Macro{lohead}\OParameter{Inhalt plain.scrheadings}%
+                \Parameter{Inhalt scrheadings}\\
+  \Macro{cohead}\OParameter{Inhalt plain.scrheadings}%
+                \Parameter{Inhalt scrheadings}\\
+  \Macro{rohead}\OParameter{Inhalt plain.scrheadings}%
+                \Parameter{Inhalt scrheadings}
+\end{Declaration}
+\BeginIndex{Cmd}{lehead}%
+\BeginIndex{Cmd}{cehead}%
+\BeginIndex{Cmd}{rehead}%
+\BeginIndex{Cmd}{lohead}%
+\BeginIndex{Cmd}{cohead}%
+\BeginIndex{Cmd}{rohead}%
+Was in den Kopf der Seitenstile \Pagestyle{plain.scrheadings} und
+\Pagestyle{scrheadings} geschrieben wird, ist mit Hilfe dieser Befehle
+einstellbar. Dabei setzt das optionale Argument jeweils den Inhalt eines
+Elements in \Pagestyle{plain.scrheadings}, während das obligatorische Argument
+jeweils einen Inhalt in \Pagestyle{scrheadings} setzt.
+
+Die Inhalte für gerade, also linke Seiten werden mit den Befehlen
+\Macro{lehead}, \Macro{cehead} und \Macro{rehead} gesetzt. Das »\texttt{e}« an
+zweiter Stelle des Befehlsnamens steht dabei für »\emph{even}« (engl. für
+»gerade«).
+
+Die Inhalte für ungerade, also rechte Seiten werden mit den Befehlen
+\Macro{lohead}, \Macro{cohead} und \Macro{rohead} gesetzt. Das »\texttt{o}« an
+zweiter Stelle des Befehlsnamens steht dabei für »\emph{odd}« (engl. für
+»ungerade«).
+
+Es\textnote{Achtung!} sei an dieser Stelle noch einmal darauf hingewiesen,
+dass im einseitigen Satz nur rechte Seiten existieren und diese von \LaTeX{}
+unabhängig von ihrer Nummer als ungerade Seiten gezeichnet werden.
+
+Jeder Kopf eines Seitenstils besitzt ein linksbündiges Element, das mit
+\Macro{lehead} respektive \Macro{lohead} gesetzt werden kann. Das »\texttt{l}«
+am Anfang des Befehlsnamens steht hier für »\emph{left aligned}« (engl. für
+»linksbündig«).
+
+Ebenso besitzt jeder Kopf eines Seitenstils ein zentriert gesetztes Element,
+das mit \Macro{cehead} respektive \Macro{cohead} gesetzt werden kann. Das
+»\texttt{c}« am Anfang des Befehlsnamens steht hier für »\emph{centered}«
+(engl. für »zentriert«).
+
+Entsprechend besitzt jeder Kopf eines Seitenstil auch ein rechtsbündiges
+Element, das mit \Macro{rehead} respektive \Macro{rohead} gesetzt werden
+kann. Das »\texttt{r}« am Anfang des Befehlsnamens steht hier für »\emph{right
+aligned}« (engl. für »rechtsbündig«).
+
+\BeginIndex{FontElement}{pagehead}%
+\BeginIndex{FontElement}{pageheadfoot}%
+Diese Elemente besitzen jedoch nicht jedes für sich eine Schriftzuordnung mit
+Hilfe der Befehle \Macro{setkomafont} und \Macro{addtokomafont} (siehe
+\autoref{sec:maincls.textmarkup}, \autopageref{desc:maincls.cmd.setkomafont}),
+sondern alle zusammen das Element \FontElement{pagehead}. Vor diesem wird
+außerdem noch das Element \FontElement{pageheadfoot} angewandt. Die
+Voreinstellungen für diese beiden Elemente sind
+\autoref{tab:scrlayer-scrpage.fontelements} zu entnehmen.%
+\EndIndex{FontElement}{pageheadfoot}%
+\EndIndex{FontElement}{pagehead}%
+
+In \autoref{fig:scrlayer-scrpage.head} ist die Bedeutung der einzelnen Befehle
+für den Kopf der Seiten im doppelseitigen Modus noch einmal skizziert.
 %
-\EndIndex{Package}{scrlayer-scrpage}
+\begin{desclist}
+  \desccaption[{Elemente, deren Schrift bei \Package{scrlayer-scrpage} mit
+    \Macro{setkomafont} und \Macro{addtokomafont} verändert werden kann, sowie
+    deren Voreinstellung}]%
+  {Elemente, deren Schrift bei \Package{scrlayer-scrpage} mit
+    \Macro{setkomafont} und \Macro{addtokomafont} verändert werden kann, sowie
+    deren Voreinstellung, falls die Elemente beim Laden von
+    \Package{scrlayer-scrpage} nicht bereits definiert sind%
+    \label{tab:scrlayer-scrpage.fontelements}%
+  }%
+  {Elemente, deren Schrift verändert werden kann (\emph{Fortsetzung})}%
+  \feentry{footbotline}{%
+    Linie unter dem Fuß eines mit \Package{scrlayer-scrpage} definierten
+    Seitenstils. Das Element wird nach \Macro{normalfont}\IndexCmd{normalfont}
+    und nach den Elementen
+    \FontElement{pageheadfoot}\IndexFontElement{pageheadfoot} und
+    \FontElement{pagefoot}\IndexFontElement{pagefoot} angewandt. Es wird
+    empfohlen dieses Element lediglich für Farbänderungen zu verwenden.\par
+    Voreinstellung: \emph{leer}%
+  }%
+  \feentry{footsepline}{%
+    Linie über dem Fuß eines mit \Package{scrlayer-scrpage} definierten
+    Seitenstils. Das Element wird nach \Macro{normalfont}\IndexCmd{normalfont}
+    und nach den Elementen
+    \FontElement{pageheadfoot}\IndexFontElement{pageheadfoot} und
+    \FontElement{pagefoot}\IndexFontElement{pagefoot} angewandt. Es wird
+    empfohlen dieses Element lediglich für Farbänderungen zu verwenden.\par
+    Voreinstellung: \emph{leer}%
+  }%
+  \feentry{headsepline}{%
+    Linie unter dem Kopf eines mit \Package{scrlayer-scrpage} definierten
+    Seitenstils. Das Element wird nach \Macro{normalfont}\IndexCmd{normalfont}
+    und nach den Elementen
+    \FontElement{pageheadfoot}\IndexFontElement{pageheadfoot} und
+    \FontElement{pagehead}\IndexFontElement{pagehead} angewandt. Es wird
+    empfohlen dieses Element lediglich für Farbänderungen zu verwenden.\par
+    Voreinstellung: \emph{leer}%
+  }%
+  \feentry{headtopline}{%
+    Linie über dem Kopf eines mit \Package{scrlayer-scrpage} definierten
+    Seitenstils. Das Element wird nach \Macro{normalfont}\IndexCmd{normalfont}
+    und nach den Elementen
+    \FontElement{pageheadfoot}\IndexFontElement{pageheadfoot} und
+    \FontElement{pagehead}\IndexFontElement{pagehead} angewandt. Es wird
+    empfohlen dieses Element lediglich für Farbänderungen zu verwenden.\par
+    Voreinstellung: \emph{leer}%
+  }%
+  \feentry{pagefoot}{%
+    Inhalt eines Fußes eines mit \Package{scrlayer-scrpage} definierten
+    Seitenstils. Das Element wird nach \Macro{normalfont}\IndexCmd{normalfont}
+    und nach dem Element
+    \FontElement{pageheadfoot}\IndexFontElement{pageheadfoot} angewandt.\par
+    Voreinstellung: \emph{leer}%
+  }%
+  \feentry{pagehead}{%
+    Inhalt eines Kopfes eines mit \Package{scrlayer-scrpage} definierten
+    Seitenstils. Das Element wird nach \Macro{normalfont}\IndexCmd{normalfont}
+    und nach Element \FontElement{pageheadfoot}\IndexFontElement{pageheadfoot}
+    angewandt.\par
+    Voreinstellung: \emph{leer}%
+  }%
+  \feentry{pageheadfoot}{%
+    Inhalt eines Kopfes oder Fußes eines mit \Package{scrlayer-scrpage}
+    definierten Seitenstils. Das Element wird nach
+    \Macro{normalfont}\IndexCmd{normalfont} angewandt.\par
+    Voreinstellung: \Macro{normalcolor}\Macro{slshape}%
+  }%
+  \feentry{pagenumber}{%
+    Die mit \Macro{pagemark} gesetzte Paginierung. Bei einer etwaigen
+    Umdefinierung von \Macro{pagemark} ist dafür zu sorgen, dass die
+    Umdefinierung auch ein \Macro{usekomafont}\PParameter{pagenumber}
+    enthält!\par
+    Voreinstellung: \Macro{normalfont}%
+  }%
+\end{desclist}
+%
+\begin{figure}[tp]
+  \centering
+  \begin{picture}(\textwidth,30mm)(0,-10mm)
+    \thinlines
+    \small\ttfamily
+    % linke Seite
+    \put(0,20mm){\line(1,0){.49\textwidth}}%
+    \put(0,0){\line(0,1){20mm}}%
+    \multiput(0,0)(0,-1mm){10}{\line(0,-1){.5mm}}%
+    \put(.49\textwidth,5mm){\line(0,1){15mm}}%
+    \put(.05\textwidth,10mm){%
+      \iffree{\color{red}}{}%
+      \put(-.5em,0){\line(1,0){4em}}%
+      \multiput(3.5em,0)(.25em,0){5}{\line(1,0){.125em}}%
+      \put(-.5em,0){\line(0,1){\baselineskip}}%
+      \put(-.5em,\baselineskip){\line(1,0){4em}}%
+      \multiput(3.5em,\baselineskip)(.25em,0){5}{\line(1,0){.125em}}%
+      \makebox(4em,5mm)[l]{\Macro{lehead}}%
+    }%
+    \put(.465\textwidth,10mm){%
+      \iffree{\color{blue}}{}%
+      \put(-4em,0){\line(1,0){4em}}%
+      \multiput(-4em,0)(-.25em,0){5}{\line(1,0){.125em}}%
+      \put(0,0){\line(0,1){\baselineskip}}%
+      \put(-4em,\baselineskip){\line(1,0){4em}}%
+      \multiput(-4em,\baselineskip)(-.25em,0){5}{\line(1,0){.125em}}%
+      \put(-4.5em,0){\makebox(4em,5mm)[r]{\Macro{rehead}}}%
+    }%
+    \put(.2525\textwidth,10mm){%
+      \iffree{\color{green}}{}%
+      \put(-2em,0){\line(1,0){4em}}%
+      \multiput(2em,0)(.25em,0){5}{\line(1,0){.125em}}%
+      \multiput(-2em,0)(-.25em,0){5}{\line(1,0){.125em}}%
+      \put(-2em,\baselineskip){\line(1,0){4em}}%
+      \multiput(2em,\baselineskip)(.25em,0){5}{\line(1,0){.125em}}%
+      \multiput(-2em,\baselineskip)(-.25em,0){5}{\line(1,0){.125em}}%
+      \put(-2em,0){\makebox(4em,5mm)[c]{\Macro{cehead}}}%
+    }%
+    % rechte Seite
+    \put(.51\textwidth,20mm){\line(1,0){.49\textwidth}}%
+    \put(.51\textwidth,5mm){\line(0,1){15mm}}%
+    \put(\textwidth,0){\line(0,1){20mm}}%
+    \multiput(\textwidth,0)(0,-1mm){10}{\line(0,-1){.5mm}}%
+    \put(.5325\textwidth,10mm){%
+      \iffree{\color{blue}}{}%
+      \put(0,0){\line(1,0){4em}}%
+      \multiput(4em,0)(.25em,0){5}{\line(1,0){.125em}}%
+      \put(0,0){\line(0,1){\baselineskip}}%
+      \put(0em,\baselineskip){\line(1,0){4em}}%
+      \multiput(4em,\baselineskip)(.25em,0){5}{\line(1,0){.125em}}%
+      \put(.5em,0){\makebox(4em,5mm)[l]{\Macro{lohead}}}%
+    }%
+    \put(.965\textwidth,10mm){%
+      \iffree{\color{red}}{}%
+      \put(-4em,0){\line(1,0){4em}}%
+      \multiput(-4em,0)(-.25em,0){5}{\line(1,0){.125em}}%
+      \put(0,0){\line(0,1){\baselineskip}}%
+      \put(-4em,\baselineskip){\line(1,0){4em}}%
+      \multiput(-4em,\baselineskip)(-.25em,0){5}{\line(1,0){.125em}}%
+      \put(-4.5em,0){\makebox(4em,5mm)[r]{\Macro{rohead}}}%
+    }%
+    \put(.75\textwidth,10mm){%
+      \iffree{\color{green}}{}%
+      \put(-2em,0){\line(1,0){4em}}%
+      \multiput(2em,0)(.25em,0){5}{\line(1,0){.125em}}%
+      \multiput(-2em,0)(-.25em,0){5}{\line(1,0){.125em}}%
+      \put(-2em,\baselineskip){\line(1,0){4em}}%
+      \multiput(2em,\baselineskip)(.25em,0){5}{\line(1,0){.125em}}%
+      \multiput(-2em,\baselineskip)(-.25em,0){5}{\line(1,0){.125em}}%
+      \put(-2em,0){\makebox(4em,5mm)[c]{\Macro{cohead}}}%
+    }%
+    % Befehle für beide Seiten
+    \iffree{\color{blue}}{}%
+    \put(.5\textwidth,0){\makebox(0,\baselineskip)[c]{\Macro{ihead}}}%
+    \iffree{\color{green}}{}%
+    \put(.5\textwidth,-5mm){\makebox(0,\baselineskip)[c]{\Macro{chead}}}
+    \iffree{\color{red}}{}%
+    \put(.5\textwidth,-10mm){\makebox(0,\baselineskip)[c]{\Macro{ohead}}}
+    \put(\dimexpr.5\textwidth-2em,.5\baselineskip){%
+      \iffree{\color{blue}}{}%
+      \put(0,0){\line(-1,0){1.5em}}%
+      \put(-1.5em,0){\vector(0,1){5mm}}%
+      \iffree{\color{green}}{}%
+      \put(0,-1.25\baselineskip){\line(-1,0){\dimexpr .25\textwidth-2em\relax}}%
+      \put(-\dimexpr
+      .25\textwidth-2em\relax,-1.25\baselineskip){\vector(0,1){\dimexpr
+          5mm+1.25\baselineskip\relax}}
+      \iffree{\color{red}}{}%
+      \put(0,-2.5\baselineskip){\line(-1,0){\dimexpr .45\textwidth-4em\relax}}%
+      \put(-\dimexpr
+      .45\textwidth-4em\relax,-2.5\baselineskip){\vector(0,1){\dimexpr
+          5mm+2.5\baselineskip\relax}}
+    }%
+    \put(\dimexpr.5\textwidth+2em,.5\baselineskip){%
+      \iffree{\color{blue}}{}%
+      \put(0,0){\line(1,0){1.5em}}%
+      \put(1.5em,0){\vector(0,1){5mm}}%
+      \iffree{\color{green}}{}%
+      \put(0,-1.25\baselineskip){\line(1,0){\dimexpr .25\textwidth-2em\relax}}
+      \put(\dimexpr
+      .25\textwidth-2em\relax,-1.25\baselineskip){\vector(0,1){\dimexpr
+          5mm+1.25\baselineskip\relax}}
+      \iffree{\color{red}}{}%
+      \put(0,-2.5\baselineskip){\line(1,0){\dimexpr .45\textwidth-4em\relax}}
+      \put(\dimexpr
+      .45\textwidth-4em\relax,-2.5\baselineskip){\vector(0,1){\dimexpr
+          5mm+2.5\baselineskip\relax}}
+   }%
+  \end{picture}
+  \caption[Befehle zum Setzen des Seitenkopfes]%
+          {Die Bedeutung der Befehle zum Setzen der Inhalte des Kopfs eines
+            Seitenstils für die Seitenköpfe einer schematischen Doppelseite}
+  \label{fig:scrlayer-scrpage.head}
+\end{figure}
+%
+\begin{Example}
+  Angenommen, Sie verfassen einen kurzen Artikel und wollen, dass im Kopf der
+  Seiten links der Name des Autors und rechts der Titel des Artikels
+  steht. Sie schreiben daher beispielsweise:
+\begin{lstcode}
+  \documentclass{scrartcl}
+  \usepackage{scrlayer-scrpage}
+  \lohead{Peter Musterheinzel}
+  \rohead{Seitenstile mit \KOMAScript}
+  \pagestyle{scrheadings}
+  \begin{document}
+  \title{Seitenstile mit \KOMAScript}
+  \author{Peter Musterheinzel}
+  \maketitle
+  \end{document}
+\end{lstcode}
+  Doch, was ist das? Auf der ersten Seite erscheint nur eine Seitenzahl im
+  Fuß, der Kopf hingegen bleibt leer!
+
+  Die Erklärung dafür ist einfach. Die Klasse \Package{scrartcl} schaltet für
+  die Seite mit dem Titelkopf in der Voreinstellung auf den Seitenstil
+  \Pagestyle{plain}. Nach der Anweisung
+  \Macro{pagestyle}\PParameter{scrheadings} in der Präambel unseres Beispiels
+  führt dies tatsächlich zur Verwendung des Seitenstils
+  \Pagestyle{plain.scrheadings} für die Seite mit dem Titelkopf. Dieser
+  Seitenstil ist bei Verwendung einer \KOMAScript-Klasse mit leerem Kopf und
+  Seitenzahl im Fuß vorkonfiguriert. Da im Beispiel das optionale Argument von
+  \Macro{lohead} und \Macro{rohead} gar nicht verwendet wird, bleibt der
+  Seitenstil \Pagestyle{plain.scrheadings} unverändert. Das Ergebnis ist für
+  die erste Seite also tatsächlich korrekt.
+
+  Fügen Sie jetzt im Beispiel nach \Macro{maketitle} so viel Text ein,
+  dass eine zweite Seite ausgegeben wird. Sie können dazu auch einfach
+  \Macro{usepackage}\PParameter{lipsum}\IndexPackage{lipsum} in der
+  Dokumentpräambel und \Macro{lipsum}\IndexCmd{lipsum} nach \Macro{maketitle}
+  ergänzen. Wie Sie sehen werden, enthält der Kopf der zweiten Seite nun genau
+  wie gewünscht den Namen des Autors und den Titel des Dokuments.
+
+  Zum Vergleich sollten Sie nun noch das optionale Argument der Anweisungen
+  \Macro{lohead} und \Macro{rohead} mit einem Inhalt versehen. Ändern Sie das
+  Beispiel dazu wie folgt ab:
+\begin{lstcode}
+  \documentclass{scrartcl}
+  \usepackage{scrlayer-scrpage}
+  \lohead[Peter Musterheinzel]
+         {Peter Musterheinzel}
+  \rohead[Seitenstile mit \KOMAScript]
+         {Seitenstile mit \KOMAScript}
+  \pagestyle{scrheadings}
+  \usepackage{lipsum}
+  \begin{document}
+  \title{Seitenstile mit \KOMAScript}
+  \author{Peter Musterheinzel}
+  \maketitle
+  \lipsum
+  \end{document}
+\end{lstcode}
+  Nun haben Sie den Kopf auch auf der ersten Seite direkt über dem Titelkopf
+  selbst. Das kommt daher, dass Sie mit den beiden optionalen Argumenten den
+  Seitenstil \Pagestyle{plain.scrheadings} nun ebenfalls entsprechend
+  konfiguriert haben. Wie Sie am Ergebnis vermutlich auch erkennen, ist es
+  jedoch besser, diesen Seitenstil unverändert zu lassen, da der Kolumnentitel
+  über dem Titelkopf doch eher störend ist.
+\end{Example}
+
+Erlauben Sie mir einen wichtigen Hinweis:\textnote{Achtung!} Sie sollten
+niemals die Überschrift oder die Nummer einer Gliederungsebene mit Hilfe einer
+dieser Anweisungen als Kolumnentitel in den Kopf der Seite setzen. Aufgrund
+der Asynchronizität von Seitenaufbau und Seitenausgabe kann es sonst leicht
+geschehen, dass die falsche Nummer oder die falsche Überschrift im
+Kolumnentitel ausgegeben wird. Stattdessen ist der Mark-Mechanismus idealer
+Weise in Verbindung mit den Automatismen, die im nächsten Abschnitt erklärt
+werden, zu verwenden.%
+\EndIndex{Cmd}{rohead}%
+\EndIndex{Cmd}{cohead}%
+\EndIndex{Cmd}{lohead}%
+\EndIndex{Cmd}{rehead}%
+\EndIndex{Cmd}{cehead}%
+\EndIndex{Cmd}{lehead}%
+
+\begin{Declaration}
+  \Macro{lefoot}\OParameter{Inhalt plain.scrheadings}%
+                \Parameter{Inhalt scrheadings}\\
+  \Macro{cefoot}\OParameter{Inhalt plain.scrheadings}%
+                \Parameter{Inhalt scrheadings}\\
+  \Macro{refoot}\OParameter{Inhalt plain.scrheadings}%
+                \Parameter{Inhalt scrheadings}\\
+  \Macro{lofoot}\OParameter{Inhalt plain.scrheadings}%
+                \Parameter{Inhalt scrheadings}\\
+  \Macro{cofoot}\OParameter{Inhalt plain.scrheadings}%
+                \Parameter{Inhalt scrheadings}\\
+  \Macro{rofoot}\OParameter{Inhalt plain.scrheadings}%
+                \Parameter{Inhalt scrheadings}
+\end{Declaration}
+\BeginIndex{Cmd}{lefoot}%
+\BeginIndex{Cmd}{cefoot}%
+\BeginIndex{Cmd}{refoot}%
+\BeginIndex{Cmd}{lofoot}%
+\BeginIndex{Cmd}{cofoot}%
+\BeginIndex{Cmd}{rofoot}%
+Was in den Fuß der Seitenstile \Pagestyle{plain.scrheadings} und
+\Pagestyle{scrheadings} geschrieben wird, ist mit Hilfe dieser Befehle
+einstellbar. Dabei setzt das optionale Argument jeweils den Inhalt ein
+Elements in \Pagestyle{plain.scrheadings}, während das obligatorische Argument
+jeweils einen Inhalt in \Pagestyle{scrheadings} setzt.
+
+Die Inhalte für gerade, also linke Seiten werden mit den Befehlen
+\Macro{lefoot}, \Macro{cefoot} und \Macro{refoot} gesetzt. Das »\texttt{e}« an
+zweiter Stelle des Befehlsnamens steht dabei für »\emph{even}« (engl. für
+»gerade«).
+
+Die Inhalte für ungerade, also rechte Seiten werden mit den Befehlen
+\Macro{lofoot}, \Macro{cofoot} und \Macro{rofoot} gesetzt. Das »\texttt{o}« an
+zweiter Stelle des Befehlsnamens steht dabei für »\emph{odd}« (engl. für
+»ungerade«).
+
+Es\textnote{Achtung!} sei an dieser Stelle noch einmal darauf hingewiesen,
+dass im einseitigen Satz nur rechte Seiten existieren und diese von \LaTeX{}
+unabhängig von ihrer Nummer als ungerade Seiten gezeichnet werden.
+
+Jeder Fuß eines Seitenstils besitzt ein linksbündiges Element, das mit
+\Macro{lefoot} respektive \Macro{lofoot} gesetzt werden kann. Das »\texttt{l}«
+am Anfang des Befehlsnamens steht hier für »\emph{left aligned}« (engl. für
+»linksbündig«).
+
+Ebenso besitzt jeder Fuß eines Seitenstils ein zentriert gesetztes Element,
+das mit \Macro{cefoot} respektive \Macro{cofoot} gesetzt werden kann. Das
+»\texttt{c}« am Anfang des Befehlsnamens steht hier für »\emph{centered}«
+(engl. für »zentriert«).
+
+Entsprechend besitzt jeder Fuß eines Seitenstil auch ein rechtsbündiges
+Element, das mit \Macro{refoot} respektive \Macro{rofoot} gesetzt werden
+kann. Das »\texttt{r}« am Anfang des Befehlsnamens steht hier für »\emph{right
+aligned}« (engl. für »rechtsbündig«).
+
+\BeginIndex{FontElement}{pagefoot}%
+\BeginIndex{FontElement}{pageheadfoot}%
+Diese Elemente besitzen jedoch nicht jedes für sich eine Schriftzuordnung mit
+Hilfe der Befehle \Macro{setkomafont} und \Macro{addtokomafont} (siehe
+\autoref{sec:maincls.textmarkup}, \autopageref{desc:maincls.cmd.setkomafont}),
+sondern alle zusammen das Element \FontElement{pagefoot}. Vor diesem wird
+außerdem noch das Element \FontElement{pageheadfoot} angewandt. Die
+Voreinstellungen für diese beiden Elemente sind
+\autoref{tab:scrlayer-scrpage.fontelements} zu entnehmen.%
+\EndIndex{FontElement}{pageheadfoot}%
+\EndIndex{FontElement}{pagefoot}%
+
+In \autoref{fig:scrlayer-scrpage.foot} ist die Bedeutung der einzelnen Befehle
+für den Fuß der Seiten im doppelseitigen Modus noch einmal skizziert.
+%
+\begin{figure}[bp]
+  \centering
+  \begin{picture}(\textwidth,30mm)
+    \thinlines
+    \small\ttfamily
+    % linke Seite
+    \put(0,0){\line(1,0){.49\textwidth}}%
+    \put(0,0){\line(0,1){20mm}}%
+    \multiput(0,20mm)(0,1mm){10}{\line(0,1){.5mm}}%
+    \put(.49\textwidth,0){\line(0,1){15mm}}%
+    \put(.05\textwidth,5mm){%
+      \iffree{\color{red}}{}%
+      \put(-.5em,0){\line(1,0){4em}}%
+      \multiput(3.5em,0)(.25em,0){5}{\line(1,0){.125em}}%
+      \put(-.5em,0){\line(0,1){\baselineskip}}%
+      \put(-.5em,\baselineskip){\line(1,0){4em}}%
+      \multiput(3.5em,\baselineskip)(.25em,0){5}{\line(1,0){.125em}}%
+      \makebox(4em,5mm)[l]{\Macro{lefoot}}%
+    }%
+    \put(.465\textwidth,5mm){%
+      \iffree{\color{blue}}{}%
+      \put(-4em,0){\line(1,0){4em}}%
+      \multiput(-4em,0)(-.25em,0){5}{\line(1,0){.125em}}%
+      \put(0,0){\line(0,1){\baselineskip}}%
+      \put(-4em,\baselineskip){\line(1,0){4em}}%
+      \multiput(-4em,\baselineskip)(-.25em,0){5}{\line(1,0){.125em}}%
+      \put(-4.5em,0){\makebox(4em,5mm)[r]{\Macro{refoot}}}%
+    }%
+    \put(.2525\textwidth,5mm){%
+      \iffree{\color{green}}{}%
+      \put(-2em,0){\line(1,0){4em}}%
+      \multiput(2em,0)(.25em,0){5}{\line(1,0){.125em}}%
+      \multiput(-2em,0)(-.25em,0){5}{\line(1,0){.125em}}%
+      \put(-2em,\baselineskip){\line(1,0){4em}}%
+      \multiput(2em,\baselineskip)(.25em,0){5}{\line(1,0){.125em}}%
+      \multiput(-2em,\baselineskip)(-.25em,0){5}{\line(1,0){.125em}}%
+      \put(-2em,0){\makebox(4em,5mm)[c]{\Macro{cefoot}}}%
+    }%
+    % rechte Seite
+    \put(.51\textwidth,0){\line(1,0){.49\textwidth}}%
+    \put(.51\textwidth,0){\line(0,1){15mm}}%
+    \put(\textwidth,0){\line(0,1){20mm}}%
+    \multiput(\textwidth,20mm)(0,1mm){10}{\line(0,1){.5mm}}%
+    \put(.5325\textwidth,5mm){%
+      \iffree{\color{blue}}{}%
+      \put(0,0){\line(1,0){4em}}%
+      \multiput(4em,0)(.25em,0){5}{\line(1,0){.125em}}%
+      \put(0,0){\line(0,1){\baselineskip}}%
+      \put(0em,\baselineskip){\line(1,0){4em}}%
+      \multiput(4em,\baselineskip)(.25em,0){5}{\line(1,0){.125em}}%
+      \put(.5em,0){\makebox(4em,5mm)[l]{\Macro{lofoot}}}%
+    }%
+    \put(.965\textwidth,5mm){%
+      \iffree{\color{red}}{}%
+      \put(-4em,0){\line(1,0){4em}}%
+      \multiput(-4em,0)(-.25em,0){5}{\line(1,0){.125em}}%
+      \put(0,0){\line(0,1){\baselineskip}}%
+      \put(-4em,\baselineskip){\line(1,0){4em}}%
+      \multiput(-4em,\baselineskip)(-.25em,0){5}{\line(1,0){.125em}}%
+      \put(-4.5em,0){\makebox(4em,5mm)[r]{\Macro{rofoot}}}%
+    }%
+    \put(.75\textwidth,5mm){%
+      \iffree{\color{green}}{}%
+      \put(-2em,0){\line(1,0){4em}}%
+      \multiput(2em,0)(.25em,0){5}{\line(1,0){.125em}}%
+      \multiput(-2em,0)(-.25em,0){5}{\line(1,0){.125em}}%
+      \put(-2em,\baselineskip){\line(1,0){4em}}%
+      \multiput(2em,\baselineskip)(.25em,0){5}{\line(1,0){.125em}}%
+      \multiput(-2em,\baselineskip)(-.25em,0){5}{\line(1,0){.125em}}%
+      \put(-2em,0){\makebox(4em,5mm)[c]{\Macro{cofoot}}}%
+    }%
+    % Befehle für beide Seiten
+    \iffree{\color{blue}}{}%
+    \put(.5\textwidth,15mm){\makebox(0,\baselineskip)[c]{\Macro{ifoot}}}%
+    \iffree{\color{green}}{}%
+    \put(.5\textwidth,20mm){\makebox(0,\baselineskip)[c]{\Macro{cfoot}}}
+    \iffree{\color{red}}{}%
+    \put(.5\textwidth,25mm){\makebox(0,\baselineskip)[c]{\Macro{ofoot}}}
+    \put(\dimexpr.5\textwidth-2em,.5\baselineskip){%
+      \iffree{\color{blue}}{}%
+      \put(0,15mm){\line(-1,0){1.5em}}%
+      \put(-1.5em,15mm){\vector(0,-1){5mm}}%
+      \iffree{\color{green}}{}%
+      \put(0,20mm){\line(-1,0){\dimexpr .25\textwidth-2em\relax}}%
+      \put(-\dimexpr .25\textwidth-2em\relax,20mm){\vector(0,-1){10mm}}%
+      \iffree{\color{red}}{}%
+      \put(0,25mm){\line(-1,0){\dimexpr .45\textwidth-4em\relax}}%
+      \put(-\dimexpr .45\textwidth-4em\relax,25mm){\vector(0,-1){15mm}}%
+    }%
+    \put(\dimexpr.5\textwidth+2em,.5\baselineskip){%
+      \iffree{\color{blue}}{}%
+      \put(0,15mm){\line(1,0){1.5em}}%
+      \put(1.5em,15mm){\vector(0,-1){5mm}}%
+      \iffree{\color{green}}{}%
+      \put(0,20mm){\line(1,0){\dimexpr .25\textwidth-2em\relax}}%
+      \put(\dimexpr .25\textwidth-2em\relax,20mm){\vector(0,-1){10mm}}%
+      \iffree{\color{red}}{}%
+      \put(0,25mm){\line(1,0){\dimexpr .45\textwidth-4em\relax}}%
+      \put(\dimexpr .45\textwidth-4em\relax,25mm){\vector(0,-1){15mm}}%
+    }%
+  \end{picture}
+  \caption[Befehle zum Setzen des Seitenfußes]%
+          {Die Bedeutung der Befehle zum Setzen der Inhalte des Fußes eines
+            Seitenstils für die Seitenfüße einer schematischen Doppelseite.}
+  \label{fig:scrlayer-scrpage.foot}
+\end{figure}
+%
+\begin{Example}
+  Kommen wir zu dem Beispiel des kurzen Artikels zurück. Angenommen Sie wollen
+  nun links im Fuß zusätzlich den Verlag angegeben haben. Daher ergänzen Sie
+  das Beispiel zu
+\begin{lstcode}
+  \documentclass{scrartcl}
+  \usepackage{scrlayer-scrpage}
+  \lohead{Peter Musterheinzel}
+  \rohead{Seitenstile mit \KOMAScript}
+  \lofoot{Verlag Naseblau, Irgendwo}
+  \pagestyle{scrheadings}
+  \usepackage{lipsum}
+  \begin{document}
+  \title{Seitenstile mit \KOMAScript}
+  \author{Peter Musterheinzel}
+  \maketitle
+  \lipsum
+  \end{document}
+\end{lstcode}
+  Der Verlag wird Ihnen nun aber wiederum nicht auf der Seite mit dem
+  Titelkopf ausgegeben. Die Begründung ist dieselbe wie beim Beispiel zu
+  \Macro{lohead}. Ebenso ist die Lösung, um den Verlag auch auf diese Seite
+  zu bekommen entsprechend:
+\begin{lstcode}
+  \lofoot[Verlag Naseblau, Irgendwo]
+         {Verlag Naseblau, Irgendwo}
+\end{lstcode}
+  Nun entscheiden Sie noch, dass statt der schrägen Schrift in Kopf und Fuß
+  eine aufrechte, aber kleinere Schrift verwendet werden soll. Dies erreichen
+  Sie mit:
+\begin{lstcode}
+  \setkomafont{pageheadfoot}{\small}
+\end{lstcode}
+  Darüber hinaus, soll der Kopf, nicht jedoch der Fuß fett gesetzt werden:
+\begin{lstcode}
+  \setkomafont{pagehead}{\bfseries}
+\end{lstcode}
+  Bei dieser Anweisung ist es wichtig, dass sie erst nach dem Laden von
+  \Package{scrpage-scrlayer} erfolgt, weil davor zwar bereits sowohl
+  \FontElement{pagehead} als auch \FontElement{pageheadfoot} vorhanden sind,
+  aber dasselbe Element, nämlich \FontElement{pageheadfoot}, bezeichnen. Erst
+  durch Laden von \Package{scrpage-scrlayer} werden daraus zwei unabhängige
+  Elemente.
+
+  Ergänzen Sie nun das Beispiel einmal durch ein weiteres \Macro{lipsum} und
+  fügen Sie gleichzeitig Option \Option{twoside} beim Laden von
+  \Class{scrartcl} hinzu. Zum einen wandert die Seitenzahl im Fuß nun von der
+  Mitte nach außen. Das liegt an der geänderten Voreinstellung für
+  \Pagestyle{scrheadings} und \Pagestyle{plain.scrheadings} für doppelseitige
+  Dokumente mit einer \KOMAScript-Klasse.
+
+  Gleichzeitig verschwinden aber auch Autor, Dokumenttitel und Verlag von
+  Seite~2. Diese finden sich erst auf Seite~3 wieder. Das liegt daran, dass
+  wir bisher nur Befehle für ungerade Seiten verwendet haben. Zu erkennen ist
+  das am »\texttt{o}« für \emph{odd} an der zweiten Stelle der
+  Befehlsnamen.
+
+  Nun könnten wir die Befehle einfach kopieren und in der Kopie dieses
+  »\texttt{o}« durch ein »\texttt{e}« für \emph{even} ersetzen. Allerdings ist
+  es bei doppelseitigen Dokumenten meist sinnvoller, wenn die Elemente
+  spiegelverkehrt verwendet werden, dass also Elemente, die auf linken Seiten
+  links stehen, auf rechten Seiten rechts platziert werden und
+  umgekehrt. Daher vertauschen wir auch noch beim ersten Buchstaben
+  »\texttt{l}« durch »\texttt{r}« und umgekehrt:
+\begin{lstcode}
+  \documentclass[twoside]{scrartcl}
+  \usepackage{scrlayer-scrpage}
+  \lohead{Peter Musterheinzel}
+  \rohead{Seitenstile mit \KOMAScript}
+  \lofoot[Verlag Naseblau, Irgendwo}
+         {Verlag Naseblau, Irgendwo}
+  \rehead{Peter Musterheinzel}
+  \lehead{Seitenstile mit \KOMAScript}
+  \refoot[Verlag Naseblau, Irgendwo]
+         {Verlag Naseblau, Irgendwo}
+  \pagestyle{scrheadings}
+  \setkomafont{pageheadfoot}{\small}
+  \setkomafont{pagehead}{\bfseries}
+  \usepackage{lipsum}
+  \begin{document}
+  \title{Seitenstile mit \KOMAScript}
+  \author{Peter Musterheinzel}
+  \maketitle
+  \lipsum\lipsum
+  \end{document}
+\end{lstcode}
+\end{Example}
+%
+Da es etwas umständlich ist, die Angaben bei doppelseitigen Dokumenten wie im
+letzten Beispiel immer getrennt für linke und rechte Seiten zu machen, wird
+nachfolgend eine schönere Lösung für diesen Standardfall eingeführt.
+
+Erlauben Sie mir noch einen wichtigen Hinweis:\textnote{Achtung!} Sie
+sollten niemals die Überschrift oder die Nummer einer Gliederungsebene mit
+Hilfe einer dieser Anweisungen als Kolumnentitel in den Fuß der
+Seite setzen. Aufgrund der Asynchronizität von Seitenaufbau und Seitenausgabe
+kann es sonst leicht geschehen, dass die falsche Nummer oder die falsche
+Überschrift im Kolumnentitel ausgegeben wird. Stattdessen ist der
+Mark-Mechanismus idealer Weise in Verbindung mit den Automatismen, die im
+nächsten Abschnitt erklärt werden, zu verwenden.%
+%
+\EndIndex{Cmd}{rofoot}%
+\EndIndex{Cmd}{cofoot}%
+\EndIndex{Cmd}{lofoot}%
+\EndIndex{Cmd}{refoot}%
+\EndIndex{Cmd}{cefoot}%
+\EndIndex{Cmd}{lefoot}%
+
+
+\begin{Declaration}
+  \Macro{ohead}\OParameter{Inhalt plain.scrheadings}%
+                \Parameter{Inhalt scrheadings}\\
+  \Macro{chead}\OParameter{Inhalt plain.scrheadings}%
+                \Parameter{Inhalt scrheadings}\\
+  \Macro{ihead}\OParameter{Inhalt plain.scrheadings}%
+                \Parameter{Inhalt scrheadings}\\
+  \Macro{ofoot}\OParameter{Inhalt plain.scrheadings}%
+                \Parameter{Inhalt scrheadings}\\
+  \Macro{cfoot}\OParameter{Inhalt plain.scrheadings}%
+                \Parameter{Inhalt scrheadings}\\
+  \Macro{ifoot}\OParameter{Inhalt plain.scrheadings}%
+                \Parameter{Inhalt scrheadings}
+\end{Declaration}
+\BeginIndex{Cmd}{ohead}%
+\BeginIndex{Cmd}{chead}%
+\BeginIndex{Cmd}{ihead}%
+\BeginIndex{Cmd}{ofoot}%
+\BeginIndex{Cmd}{cfoot}%
+\BeginIndex{Cmd}{ifoot}%
+Um Kopf und Fuß im doppelseitigen Layout zu konfigurieren, müsste man mit den
+zuvor erklärten Befehlen die linken und die rechten Seiten getrennt
+voneinander konfigurieren. Meist ist es jedoch so, dass linke und rechte Seite
+mehr oder weniger symmetrisch zueinander sind. Ein Element das auf linken
+Seiten links steht, steht auf rechten Seiten rechts. Ein Element, das auf
+linken Seiten rechts steht, steht auf rechten Seiten links. Mittig angeordnete
+Elemente sind normalerweise auf beiden Seiten mittig angeordnet.
+
+Zur Vereinfachung der Einstellungen für diesen Standardfall gibt es bei
+\Package{scrlayer-scrpage} sozusagen Abkürzungen. Der Befehl \Macro{ohead}
+entspricht einem Aufruf sowohl von \Macro{lehead} als auch \Macro{rohead}. Der
+Befehl \Macro{chead} entspricht sowohl \Macro{cehead} als auch
+\Macro{cohead}. Und Befehl \Macro{ihead} entspricht \Macro{rehead} und
+\Macro{lohead}. Entsprechendes gilt für die Anweisungen des Fußes. In
+\autoref{fig:scrlayer-scrpage.head} auf
+\autopageref{fig:scrlayer-scrpage.head} und
+\autoref{fig:scrlayer-scrpage.foot} auf
+\autopageref{fig:scrlayer-scrpage.foot} werden auch diese Beziehungen
+skizziert.
+%
+\begin{Example}
+  Mit Hilfe der neuen Befehle, lässt sich das letzte Beispiel wie folgt
+  vereinfachen:
+\begin{lstcode}
+  \documentclass[twoside]{scrartcl}
+  \usepackage{scrlayer-scrpage}
+  \ihead{Peter Musterheinzel}
+  \ohead{Seitenstile mit \KOMAScript}
+  \ifoot[Verlag Naseblau, Irgendwo]
+        {Verlag Naseblau, Irgendwo}
+  \pagestyle{scrheadings}
+  \setkomafont{pageheadfoot}{\small}
+  \setkomafont{pagehead}{\bfseries}
+  \usepackage{lipsum}
+  \begin{document}
+  \title{Seitenstile mit \KOMAScript}
+  \author{Peter Musterheinzel}
+  \maketitle
+  \lipsum\lipsum
+  \end{document}
+\end{lstcode}
+  Wie zusehen ist, konnte die Hälfte der Befehle eingespart und trotzdem
+  dasselbe Ergebnis erzielt werden.
+\end{Example}
+%
+Da im einseitigen Layout alle Seiten als ungerade oder rechte Seiten behandelt
+werden, können im einseitigen Layout diese Befehle auch als Synonyme für die
+entsprechenden Befehle für rechte Seiten verwendet werden. In den meisten
+Fällen wird man daher eher diese sechs als die zwölf zuvor vorgestellten
+Befehle verwenden.
+
+Erlauben Sie mir noch einmal einen wichtigen Hinweis:\textnote{Achtung!} Sie
+sollten niemals die Überschrift oder die Nummer einer Gliederungsebene mit
+Hilfe einer dieser Anweisungen als Kolumnentitel in den Kopf oder Fuß der
+Seite setzen. Aufgrund der Asynchronizität von Seitenaufbau und Seitenausgabe
+kann es sonst leicht geschehen, dass die falsche Nummer oder die falsche
+Überschrift im Kolumnentitel ausgegeben wird. Stattdessen ist der
+Mark-Mechanismus idealer Weise in Verbindung mit den Automatismen, die im
+nächsten Abschnitt erklärt werden, zu verwenden.%
+\EndIndex{Cmd}{ifoot}%
+\EndIndex{Cmd}{cfoot}%
+\EndIndex{Cmd}{ofoot}%
+\EndIndex{Cmd}{ihead}%
+\EndIndex{Cmd}{chead}%
+\EndIndex{Cmd}{ohead}%
+
+\begin{Declaration}
+  \KOption{pagestyleset}\PName{Einstellung}
+\end{Declaration}
+\BeginIndex{Option}{pagestyleset~=KOMA-Script}%
+\BeginIndex{Option}{pagestyleset~=standard}%
+In den zurückliegenden Beispielen wurde bereits mehrfach auf die
+Voreinstellung der Seitenstile
+\Pagestyle{scrheadings}\IndexPagestyle{scrheadings} und
+\Pagestyle{plain.scrheadings}\IndexPagestyle{plain.scrheadings}
+hingewiesen. Tatsächlich unterstützt \Package{scrlayer-scrpage} derzeit zwei
+unterschiedliche Voreinstellungen. Diese sind von Hand über Option
+\Option{pagestyleset} auswählbar. 
+
+Mit der \PName{Einstellung} \PValue{KOMA-Script} wird die Voreinstellung
+gewählt, die auch automatisch eingestellt wird, falls die Option nicht
+angegeben ist und eine \KOMAScript-Klasse erkannt wurde. Dabei werden für
+\Pagestyle{scrheadings} im doppelseitigen Satz Kolumnentitel außen im Kopf und
+Seitenzahlen außen im Fuß gesetzt. Im einseitigen Satz wird der Kolumnentitel
+stattdessen mittig im Kopf und die Seitenzahl mittig im Fuß platziert. Für die
+automatischen Kolumnentitel werden Groß- und Kleinbuchstaben verwendet, wie
+diese vorgefunden werden. Dies entspricht der gleichzeitigen Verwendung von
+Option \OptionValue{markcase}{used}\IndexOption{markcase~=used}. Für
+\Pagestyle{plain.scrheadings} entfallen die Kolumnentitel. Die Seitenzahlen
+werden jedoch identisch platziert.
+
+Mit der \PName{Einstellung} \PValue{standard} wird die Voreinstellung gewählt,
+die den Standard-Klassen entspricht. Diese wird auch automatisch eingestellt,
+falls die Option nicht angegeben ist und keine \KOMAScript-Klasse erkannt
+wurde. Dabei wird für \Pagestyle{scrheadings} im doppelseitigen Satz der
+Kolumnentitel im Kopf innen und die Seitenzahl -- ebenfalls im Kopf -- außen
+ausgerichtet platziert. Im einseitigen Satz werden dieselben Einstellungen
+verwendet. Da hierbei nur rechte Seiten existieren, steht der Kolumnentitel
+dann immer linksbündig im Kopf, die Seitenzahl entsprechend rechtsbündig. Die
+automatischen Kolumnentitel werden -- trotz erheblicher typografischer
+Bedenken -- entsprechend
+\OptionValue{markcase}{upper}\IndexOption{markcase~=upper} in Großbuchstaben
+umgewandelt. Von \Pagestyle{scrheadings} erheblich abweichend hat
+\Pagestyle{plain.scrheadings} die Seitenzahl im einseitigen Satz mittig im
+Fuß. Abweichend vom Seitenstil \Pagestyle{plain} der Standardklassen entfällt
+die Seitenzahl im doppelseitigen Modus. Die Standardklassen setzen die
+Seitenzahl stattdessen mittig im Fuß, was im doppelseitigen Satz nicht zum
+übrigen Stil der Seiten passt. Der Kolumnentitel entfällt beim
+\Pagestyle{plain.scrheadings} natürlich in jedem Fall.
+
+Es ist zu beachten\textnote{Achtung!}, dass mit der Verwendung dieser Option
+gleichzeitig der Seitenstil \Pagestyle{scrheadings} aktiviert wird. Dies
+gilt auch, wenn die Option innerhalb eines Dokuments verwendet wird.
+
+\BeginIndex{Option}{komastyle}%
+\BeginIndex{Option}{standardstyle}%
+Die für \Package{scrpage2} dokumentierten Optionen \Option{komastyle} und
+\Option{standardstyle} existieren in \Package{scrlayer-scrpage} nur aus
+Gründen der Kompatibilität. Sie werden jedoch auf Option \Option{pagestyleset}
+abgebildet, gelten als überholt und sollten nicht mehr verwendet werden.%
+\EndIndex{Option}{standardstyle}%
+\EndIndex{Option}{komastyle}%
+\EndIndex{Option}{pagestyleset~=standard}%
+\EndIndex{Option}{pagestyleset~=KOMA-Script}%
+
+\LoadCommon{21} % \section{Beeinflussung von definierten Seitenstilen}
+
+\begin{Declaration}
+  \KOption{headwidth}\PName{Breite\textup{:}Offset}\\
+  \KOption{footwidth}\PName{Breite\textup{:}Offset}
+\end{Declaration}
+\BeginIndex{Option}{headwidth~=\PName{Offset\textup{:}Breite}}%
+\BeginIndex{Option}{footwidth~=\PName{Offset\textup{:}Breite}}%
+In der Voreinstellung sind Kopf\Index{Kopf>Breite} und Fuß\Index{Fuß>Breite}
+genauso breit wie der Satzspiegel. Mit Hilfe dieser beiden
+\KOMAScript-Optionen lässt sich dies jedoch ändern. Die \PName{Breite} ist
+dabei die gewünschte Breite des Kopfes bzw. Fußes. Der \PName{Offset} gibt an,
+wie weit der Kopf bzw. Fuß in Richtung des äußeren Randes -- im einseitigen
+Satz entsprechend in Richtung des rechten Randes -- verschoben werden
+soll. Dabei sind beide Werte optional, können also auch weggelassen
+werden. Falls beide Werte weggelassen werden, kann auch der Doppelpunkt
+entfallen. Ist nur ein Wert aber kein Doppelpunkt angegeben, so handelt es
+sich um die \PName{Breite}.
+
+Sowohl für \PName{Breite} als auch für \PName{Offset} kann jeder gültige
+Längenwert aber auch jede \LaTeX-Länge oder \TeX-Länge oder \TeX-Abstand
+eingesetzt werden. Darüber hinaus sind für beides auch \eTeX-Längenausdrücke
+mit den Grundrechenarten \texttt{+}, \texttt{-}, \texttt{*}, \texttt{/} und
+runden Klammern erlaubt. Näheres zu solchen Längenausdrücken ist
+\cite[Abschnitt~3.5]{manual:eTeX} zu entnehmen. Für \PName{Breite} sind
+außerdem einige symbolische Werte zulässig. Diese sind
+\autoref{tab:scrlayer-scrpage.symbolic.values} zu entnehmen.
+
+Die Voreinstellung für \PName{Breite} ist die Breite des Textbereichs. Die
+Voreinstellung für \PName{Offset} hängt von der gewählten \PName{Breite}
+ab. In der Regel wird im einseitigen Satz die Hälfte des Unterschieds zwischen
+\PName{Breite} und der Breite des Textbereichs verwendet. Damit wird der Kopf
+über dem Textbereich zentriert. Im doppelseitigen Satz wird hingegen nur ein
+Drittel des Unterschieds zwischen \PName{Breite} und der Breite des
+Textbereichs verwendet. Ist \PName{Breite} jedoch die Breite des Textbereichs
+zuzüglich der Marginalienspalte, so ist die Voreinstellung von \PName{Offset}
+immer Null. Falls Ihnen das zu kompliziert ist, sollten Sie den gewünschten
+\PName{Offset} einfach selbst angeben.%
+%
+\begin{table}
+  \centering
+  \caption[Symbolische Werte für Option \Option{headwidth} und
+  \Option{footwidth}]{Erlaubte symbolische Werte für \PName{Breite} bei den
+    Optionen \Option{headwidth} und \Option{footwidth}}
+  \label{tab:scrlayer-scrpage.symbolic.values}
+  \begin{desctabular}
+    \ventry{foot}{%
+      die aktuelle Breite des Fußes%
+    }%
+    \ventry{footbotline}{%
+      die aktuelle Länge der horizontalen Linie unterhalb des Fußes%
+    }%
+    \ventry{footsepline}{ die aktuelle Länge der horizontalen Linie zwischen
+      dem Textbereich und dem Fuß%
+    } \ventry{head}{%
+      die aktuelle Breite des Kopfes%
+    }%
+    \ventry{headsepline}{%
+      die aktuelle Länge der horizontalen Linie zwischen dem Kopf und dem
+      Textbereich%
+    }%
+    \ventry{headtopline}{%
+      die aktuelle Länge der horizontalen Linie über dem Kopf%
+    }%
+    \ventry{marginpar}{%
+      die Breite der Marginalienspalte einschließlich des Abstandes zwischen
+      dem Textbereich und der Marginalienspalte%
+    }%
+    \ventry{page}{%
+      die Breite der Seite unter Berücksichtigung einer eventuell mit Hilfe
+      des Pakets \Package{typearea} definierten Bindekorrektur (siehe Option
+      \Option{BCOR} in \autoref{sec:typearea.typearea},
+      \autopageref{desc:typearea.option.BCOR})%
+    }%
+    \ventry{paper}{%
+      die Breite des Papiers ohne Berücksichtigung einer etwaigen
+      Bindekorrektur%
+    }%
+    \ventry{text}{%
+      die Breite des Textbereichs%
+    }%
+    \ventry{textwithmarginpar}{%
+      die Breite des Textbereichs einschließlich der Marginalienspalte und
+      natürlich des Abstandes zwischen den beiden (Achtung: Nur in diesem Fall
+      ist die Voreinstellung für \PName{Offset} Null)%
+    }%
+  \end{desctabular}
+\end{table}
+%
+\EndIndex{Option}{footwidth~=\PName{Offset\textup{:}Breite}}%
+\EndIndex{Option}{headwidth~=\PName{Offset\textup{:}Breite}}%
+
+\begin{Declaration}
+  \KOption{headtopline}\PName{Dicke\textup{:}Länge}\\
+  \KOption{headsepline}\PName{Dicke\textup{:}Länge}\\
+  \KOption{footsepline}\PName{Dicke\textup{:}Länge}\\
+  \KOption{footbotline}\PName{Dicke\textup{:}Länge}
+\end{Declaration}
+\BeginIndex{Option}{headtopline~=\PName{Dicke\textup{:}Länge}}%
+\BeginIndex{Option}{headsepline~=\PName{Dicke\textup{:}Länge}}%
+\BeginIndex{Option}{footsepline~=\PName{Dicke\textup{:}Länge}}%
+\BeginIndex{Option}{footbotline~=\PName{Dicke\textup{:}Länge}}%
+Während die \KOMAScript-Klassen nur eine Trennlinie unter dem Kopf und eine
+weitere über dem Fuß unterstützen und man diese nur wahlweise ein- und
+ausschalten kann, erlaubt das Paket \Package{scrlayer-scrpage} auch noch eine
+Linie über dem Kopf und unter dem Fuß und man kann bei diesen beiden sowohl
+die \PName{Länge} als auch die \PName{Dicke} konfigurieren.
+
+Beide Werte sind optional. Lässt man die \PName{Dicke} weg, so wird
+0.4\Unit{pt} angenommen, also eine Haarlinie produziert. Verzichtet man auf
+eine Angabe der \PName{Länge}, so wird die Breite des Kopfes respektive des
+Fußes als gewünschter Wert angenommen. Wird beides weggelassen, so kann auch
+der Doppelpunkt entfallen. Wird nur ein Wert ohne Doppelpunkt angegeben, so
+ist dies die \PName{Dicke}.
+
+Natürlich darf die \PName{Länge} nicht nur kürzer als die aktuelle Breite des
+Kopfes respektive des Fußes sein. Sie darf auch länger sein. Siehe dazu auch
+die Optionen \Option{ilines}\IndexOption{ilines},
+\Option{clines}\IndexOption{clines} und \Option{olines}\IndexOption{olines},
+die später in diesem Abschnitt erklärt werden.
+
+\BeginIndex{FontElement}{headtopline}%
+\BeginIndex{FontElement}{headsepline}%
+\BeginIndex{FontElement}{footsepline}%
+\BeginIndex{FontElement}{footbotline}%
+Neben der Dicke und der Länge kann man auch die Farben der Linien
+ändern. Zunächst richtet sich diese natürlich nach der Farbe, die für den Kopf
+und den Fuß eingestellt ist. Davon unabhängig werden aber auch noch die
+Einstellungen für die gleich benannten Elemente \FontElement{headtopline},
+\FontElement{headsepline}, \FontElement{footsepline} und
+\FontElement{footbotline} angewendet. Diese können mit den Anweisungen
+\Macro{setkomafont} und \Macro{addtokomafont} geändert werden (siehe
+\autoref{sec:maincls.textmarkup}, ab
+\autopageref{desc:maincls.cmd.setkomafont}). In der Voreinstellung sind die
+Einstellungen für diese Elemente leer, so dass sie zu keiner Änderung der
+Schrift oder Farbe führen. Änderungen der Schrift sind im Gegensatz zu
+Farbänderungen an dieser Stelle ohnehin nicht sinnvoll und werden daher nicht
+empfohlen.%
+\EndIndex{FontElement}{footbotline}%
+\EndIndex{FontElement}{footsepline}%
+\EndIndex{FontElement}{headsepline}%
+\EndIndex{FontElement}{headtopline}%
+
+\BeginIndex{Cmd}{setheadtopline}%
+\BeginIndex{Cmd}{setheadseoline}%
+\BeginIndex{Cmd}{setfootsepline}%
+\BeginIndex{Cmd}{setfootbotline}%
+Neben den Optionen gab es bei \Package{scrpage2} auch noch die nahezu
+gleichbedeutenden Befehle
+\Macro{setheadtopline}\IndexCmd[indexmain]{setheadtopline},
+\Macro{setheadsepline}\IndexCmd[indexmain]{setheadsepline},
+\Macro{setfootsepline}\IndexCmd[indexmain]{setfootsepline} und
+\Macro{setfootbotline}\IndexCmd[indexmain]{setfootbotline}. Diese Befehle
+hatten als erstes, optionales Argument ebenfalls die \PName{Länge} der
+entsprechende Linie, als zweites, obligatorisches Argument die \PName{Dicke}
+und als zusätzliches drittes, optionales Argument Einstellungen, die direkt
+für die Schrift oder Farbe des entsprechenden Elements verwendet wurden. Diese
+Anweisungen existieren in \Package{scrlayer-scrpage} aus
+Kompatibilitätsgründen ebenfalls, wobei die ersten beiden Argumente
+entsprechend der Werte für die Optionen erweitert wurden. Allerdings sind die
+Befehle gleichzeitig als überholt anzusehen und sollten nicht mehr verwendet
+werden. Es sei an dieser Stelle auch darauf hingewiesen, dass diese Befehle
+nie dazu gedacht waren, die entsprechenden Linien einzuschalten. Vielmehr
+waren sie ausschließlich zur Einstellung von \PName{Länge} und \PName{Dicke}
+der Linien gedacht, wenn diese über die Optionen eingeschaltet wurden. Dies
+wurde von den Anwendern aber leider häufig nicht beachtet!%
+\EndIndex{Cmd}{setfootbotline}%
+\EndIndex{Cmd}{setfootsepline}%
+\EndIndex{Cmd}{setheadseoline}%
+\EndIndex{Cmd}{setheadtopline}%
+%
+\EndIndex{Option}{footbotline~=\PName{Dicke\textup{:}Länge}}%
+\EndIndex{Option}{footsepline~=\PName{Dicke\textup{:}Länge}}%
+\EndIndex{Option}{headsepline~=\PName{Dicke\textup{:}Länge}}%
+\EndIndex{Option}{headtopline~=\PName{Dicke\textup{:}Länge}}%
+
+
+\begin{Declaration}
+  \KOption{plainheadtopline}\PName{Ein-Aus-Wert}\\
+  \KOption{plainheadsepline}\PName{Ein-Aus-Wert}\\
+  \KOption{plainfootsepline}\PName{Ein-Aus-Wert}\\
+  \KOption{plainfootbotline}\PName{Ein-Aus-Wert}
+\end{Declaration}
+\BeginIndex{Option}{plainheadtopline~=\PName{Ein-Aus-Wert}}%
+\BeginIndex{Option}{plainheadsepline~=\PName{Ein-Aus-Wert}}%
+\BeginIndex{Option}{plainfootsepline~=\PName{Ein-Aus-Wert}}%
+\BeginIndex{Option}{plainfootbotline~=\PName{Ein-Aus-Wert}}%
+Mit diesen Optionen können die Einstellungen für die Linien auch auf den
+\Pagestyle{plain}-Seitenstil übernommen werden. Als \PName{Ein-Aus-Wert}
+stehen die Standardwerte für einfache Schalter, die in
+\autoref{tab:truefalseswitch} auf \autopageref{tab:truefalseswitch} angegeben
+sind, zur Verfügung. Bei aktivierter Option werden die entsprechenden
+Linieneinstellungen übernommen. Bei deaktivierter Option wird die
+entsprechende Linie im \Pagestyle{plain}-Seitenstil hingegen nicht angezeigt.
+%
+\EndIndex{Option}{plainfootbotline~=\PName{Ein-Aus-Wert}}%
+\EndIndex{Option}{plainfootsepline~=\PName{Ein-Aus-Wert}}%
+\EndIndex{Option}{plainheadsepline~=\PName{Ein-Aus-Wert}}%
+\EndIndex{Option}{plainheadtopline~=\PName{Ein-Aus-Wert}}%
+
+
+\begin{Declaration}
+  \Option{ilines}\\
+  \Option{clines}\\
+  \Option{olines}
+\end{Declaration}
+\BeginIndex{Option}{ilines}%
+\BeginIndex{Option}{clines}%
+\BeginIndex{Option}{olines}%
+Wie bereits zuvor erklärt wurde, können Trennlinien für den Kopf oder Fuß
+konfiguriert werden, die länger oder kürzer als die Breite des Kopfes
+beziehungsweise des Fußes sind. Bisher blieb die Frage offen, wie diese Linien
+dann ausgerichtet werden. In der Voreinstellung sind sie im einseitigen Satz
+linksbündig und im doppelseitigen Satz bündig mit dem Anfang des inneren
+Randes. Dies entspricht Option \Option{ilines}. Alternativ können sie jedoch
+mit Option \Option{clines} auch horizontal bezüglich der Breite des Kopfes
+beziehungsweise Fußes zentriert werden. Ebenso ist mit Hilfe von Option
+\Option{olines} eine Ausrichtung am äußeren beziehungsweise rechten Rand
+möglich.%
+\EndIndex{Option}{olines}%
+\EndIndex{Option}{clines}%
+\EndIndex{Option}{ilines}%
+
+\section{Definition eigener Seitenstil-Paare}
+\label{sec:scrlayer-scrpage.pagestyle.pairs}
+
+In \autoref{sec:scrlayer-scrpage.predefined.pagestyles} wurden die beiden
+Seitenstile \Pagestyle{scrheadings} und \Pagestyle{plain.scrheadings}
+vorgestellt. Diese bilden quasi ein Paar, bei dem \Pagestyle{scrheadings} als
+Haupt-Seitenstil mit Kolumnentitel vorgesehen ist, während
+\Pagestyle{plain.scrheadings} ein dazu passender \Pagestyle{plain}-Seitenstil
+ohne Kolumnentitel aber üblicherweise mit Paginierung, also mit Seitenzahl
+ist. Neben der Konfiguration dieses vordefinierten Paars bietet
+\Package{scrlayer-scrpage} auch die Möglichkeit, zusätzliche Paare zu
+definieren. Der Name des Haupt-Seitenstils \Pagestyle{scrheadings} dient dabei
+quasi auch als Name des Seitenstil-Paars.
+
+Die allermeisten Anwender werden in der Regel mit dem einen vordefinierten
+Seitenstil-Paar \Pagestyle{scrheadings} auskommen. Die in diesem Abschnitt
+dokumentierten Anweisungen sind daher eher Ergänzungen für besondere Fälle. Da
+mir während des Abfassens dieser Anleitung keine handlichen
+Anwendungsbeispiele eingefallen sind, gibt es auch keine ausführlichen
+Beispiele. Sollte mir im Support einmal eine besonders schöne Anwendung
+begegnen, werde ich solche aber in zukünftigen Fassungen gerne aufgreifen. Ich
+bin jedoch gleichzeitig sicher, dass sich all diese Fälle auch mit dem einen
+Paar \Pagestyle{scrheadings} lösen lassen. Weniger erfahrene Anwender dürfen
+den Rest dieses Kapitels daher gerne überspringen.
+
+\begin{Declaration}
+  \Macro{defpairofpagestyle}%
+  \OParameter{Eltern-Paar}\Parameter{Name}\Parameter{Definition}\\
+  \Macro{newpairofpagestyle}%
+  \OParameter{Eltern-Paar}\Parameter{Name}\Parameter{Definition}\\
+  \Macro{renewpairofpagestyle}%
+  \OParameter{Eltern-Paar}\Parameter{Name}\Parameter{Definition}\\
+  \Macro{providepairofpagestyle}%
+  \OParameter{Eltern-Paar}\Parameter{Name}\Parameter{Definition}
+\end{Declaration}
+\BeginIndex{Cmd}{defpairofpagestyle}%
+\BeginIndex{Cmd}{newpairofpagestyle}%
+\BeginIndex{Cmd}{renewpairofpagestyle}%
+\BeginIndex{Cmd}{providepairofpagestyle}%
+Mit diesen Anweisungen können Paare von Seitenstilen vergleichbar zu
+\Pagestyle{scrheadings} und \Pagestyle{plain.scrheadings} definiert
+werden. Dabei ist \PName{Name} der Name des zu \Pagestyle{scrheadings}
+vergleichbaren Hauptseitenstils, der für die Verwendung mit Kolumnentiteln
+ausgelegt ist. Für den Namen des zugehörigen \Pagestyle{plain}-Seitenstil wird
+\PName{Name} automatisch \PValue{plain.} vorangestellt. \PName{Name} ist also
+gleichzeitig der Name des Paares und des Hauptseitenstils dieses Paares, während
+\PValue{plain.}\PName{Name} der Name des \Pagestyle{plain}-Seitenstils dieses
+Paares ist.
+
+Ist das optionale Argument \PName{Eltern-Paar} angegeben, so ist dies der Name
+eines Seitenstil-Paars, mit dessen Einstellungen das neue Paar initialisiert
+werden soll. Das neue Paar erbt also quasi die Konfiguration des
+\PName{Eltern-Paar}s.
+
+Während in \autoref{sec:scrlayer-scrpage.predefined.pagestyles} der Eindruck
+entstanden ist, dass sich die in jenem Abschnitt erläuterten Anweisungen nur
+auf \Pagestyle{scrheadings} und \Pagestyle{plain.scrheadings} beziehen, gilt
+das tatsächlich nur, solange diese das einzige Seitenstil-Paar
+darstellen. Sobald es mehrere Seitenstil-Paare gibt, beziehen sich diese
+Anweisungen auf das zuletzt aktive Seitenstil-Paar. Dies gilt für
+\Macro{lehead}, \Macro{cehead}, \Macro{rehead}, \Macro{lohead},
+\Macro{cohead}, \Macro{rohead}, \Macro{lefoot}, \Macro{cefoot},
+\Macro{refoot}, \Macro{lofoot}, \Macro{cofoot}, \Macro{rofoot}, \Macro{ihead},
+\Macro{chead}, \Macro{ohead}, \Macro{ifoot}, \Macro{cfoot}, \Macro{ofoot} aus
+\autoref{sec:scrlayer-scrpage.predefined.pagestyles}. 
+
+Genau jene Anweisung, sowie die nachfolgend dokumentierten Anweisungen
+\Macro{clearmainofpairofpagestyles}, \Macro{clearplainofpairofpagestyles} und
+\Macro{clearpairofpagestyles} sind auch für die Verwendung im letzten
+Parameter \PName{Definition} gedacht. In diesem Fall stellen sie eine Art
+Grundkonfiguration des Seitenstil-Paars dar, die immer dann ausgeführt wird,
+wenn das Seitenstil-Paar aktiviert wird. Ein Seitenstil-Paar wird aktiviert,
+indem einer der beiden Seitenstile des Paares aktiviert wird. Dies geschieht
+in der Regel mit Hilfe von \Macro{pagestyle}\IndexCmd{pagestyle}.
+
+Es sei darauf hingewiesen, dass die Anweisungen aus
+\autoref{sec:scrlayer-scrpage.pagestyle.content} ohnehin allgemeiner Natur
+sind und für alle mit \Pagestyle{scrlayer-scrpage} definierten Seitenstile
+gelten.
+
+Während \Macro{defpairofpagestyle} das Paar unabhängig davon, ob entsprechende
+Seitenstile bereits existieren, definiert, geschieht die Definition bei
+\Macro{newpairofpagestyles} und \Macro{providepairofpagestyle} nur, wenn die
+Seitenstile noch nicht definiert sind. Ist mindestens einer der beiden
+Seitenstile des Paares bereits definiert, so wird die neuerliche Definition
+bei \Macro{providepairofpagestyles} ignoriert, während sie bei
+\Macro{newpairofpagestyles} einen Fehler ergeben. Für die Umdefinierung
+bereits existierender Paare kann \Macro{renewpairofpagestyles} verwendet
+werden. Hier wird ein Fehler gemeldet, wenn einer der beiden Seitenstile oder
+beide Seitenstile des Paares noch nicht existieren.%
+\EndIndex{Cmd}{providepairofpagestyle}%
+\EndIndex{Cmd}{renewpairofpagestyle}%
+\EndIndex{Cmd}{newpairofpagestyle}%
+\EndIndex{Cmd}{defpairofpagestyle}%
+
+\begin{Declaration}
+  \Macro{clearmainofpairofpagestyles}\\
+  \Macro{clearplainofpairofpagestyles}\\
+  \Macro{clearpairofpagestyles}
+\end{Declaration}
+\BeginIndex{Cmd}{clearmainofpairofpagestyles}%
+\BeginIndex{Cmd}{clearplainofpairofpagestyles}%
+\BeginIndex{Cmd}{clearpairofpagestyles}%
+Mit der Anweisung \Macro{clearmainofpairofpagestyles} wird der Hauptseitenstil
+des zuletzt aktivierten Seitenstil-Paares leer konfiguriert. Dagegen wird mit der Anweisung \Macro{clearplainofpairofpagestyles} der
+\Pagestyle{plain}-Seitenstil des entsprechenden Seitenstil-Paares leer
+konfiguriert. Anweisung \Macro{clearpairofpagestyles} konfiguriert schließlich
+beide Seitenstile des entsprechenden Paares als leer.
+
+Es ist jedoch zu beachten\textnote{Achtung!}, dass keine dieser Anweisungen
+die Definitionen aus dem Parameter \PName{Definition}, der bei der Definition
+des Seitenstil-Paares angegeben wurde (siehe oben), entfernt. Bei der erneuten
+Auswahl eines Seitenstils des Paares werden jene Einstellungen also erneut
+ausgeführt!
+
+Die Anweisungen können selbst ebenfalls innerhalb von \PName{Definition}
+verwendet werden. Sie können aber auch jederzeit außerhalb der Definition
+eines Seitenstils verwendet werden. In diesem Fall beziehen sie sich auf das
+zuletzt aktivierte Seitenstil-Paar.
+
+\BeginIndex{Cmd}{clearscrheadings}%
+\BeginIndex{Cmd}{clearscrplain}%
+\BeginIndex{Cmd}{clearscrheadfoot}%
+Die Anweisungen \Macro{clearscrheadings}, \Macro{clearscrplain} und
+\Macro{clearscrheadfoot} sind Aliase für diese Anweisungen, die nur aus
+Gründen der Kompatibilität mit \Package{scrpage2} existieren. Sie sollten
+nicht mehr verwendet werden.%
+\EndIndex{Cmd}{clearscrheadfoot}%
+\EndIndex{Cmd}{clearscrplain}%
+\EndIndex{Cmd}{clearscrheadings}%
+%
+\EndIndex{Cmd}{clearpairofpagestyles}%
+\EndIndex{Cmd}{clearplainofpairofpagestyles}%
+\EndIndex{Cmd}{clearmainofpairofpagestyles}%
+
+\section{Definition einfacher Seitenstile mit dreigeteiltem Kopf und Fuß}
+\label{sec:scrlayer-scrpage.pagestyle.triple}
+
+Neben den vordefinierten Seitenstilen und der Definition eigener
+Seitenstil-Paare, bietet \Package{scrlayer-scrpage} auch noch die Möglichkeit
+der Definition von Seitenstilen, bei denen sowohl der Kopf als auch der Fuß fest
+in drei Elemente aufgeteilt ist. Diese Schnittstelle existiert jedoch nur aus
+Gründen der Kompatibilität mit \Package{scrpage2}. Zum
+Zwecke eines konsistenteren Befehlssatzes wurde sie sogar noch
+erweitert. Dennoch wird empfohlen, für neue Dokumente nicht mehr auf diese
+Möglichkeit zurück zu greifen, sondern die deutlich überlegenen Möglichkeiten
+der vorherigen Abschnitte oder des nachfolgende Abschnitts zu nutzen.
+
+\begin{Declaration}
+  \Macro{deftriplepagestyle}%
+  \Parameter{Names des Seitenstils}\\
+  \hphantom{\XMacro{deftriplepagestyle}}%
+  \OParameter{Dicke der äußeren Linie}%
+  \OParameter{Dicke der inneren Linie}\\
+  \hphantom{\XMacro{deftriplepagestyle}}%
+  \Parameter{inneres Kopfelement}%
+  \Parameter{mittlere Kopfelement}%
+  \Parameter{äußeres Kopfelement}\\
+  \hphantom{\XMacro{deftriplepagestyle}}%
+  \Parameter{inneres Fußelement}%
+  \Parameter{mittleres Fußelement}%
+  \Parameter{äußeres Fußelement}\\
+  \Macro{newtriplepagestyle}%
+  \Parameter{Names des Seitenstils}\\
+  \hphantom{\XMacro{newtriplepagestyle}}%
+  \OParameter{Dicke der äußeren Linien}%
+  \OParameter{Dicke der inneren Linien}\\
+  \hphantom{\XMacro{newtriplepagestyle}}%
+  \Parameter{inneres Kopfelement}%
+  \Parameter{mittlere Kopfelement}%
+  \Parameter{äußeres Kopfelement}\\
+  \hphantom{\XMacro{newtriplepagestyle}}%
+  \Parameter{inneres Fußelement}%
+  \Parameter{mittleres Fußelement}%
+  \Parameter{äußeres Fußelement}\\
+  \Macro{renewtriplepagestyle}%
+  \Parameter{Names des Seitenstils}\\
+  \hphantom{\XMacro{renewtriplepagestyle}}%
+  \OParameter{Dicke der äußeren Linie}%
+  \OParameter{Dicke der inneren Linie}\\
+  \hphantom{\XMacro{renewtriplepagestyle}}%
+  \Parameter{inneres Kopfelement}%
+  \Parameter{mittlere Kopfelement}%
+  \Parameter{äußeres Kopfelement}\\
+  \hphantom{\XMacro{renewtriplepagestyle}}%
+  \Parameter{inneres Fußelement}%
+  \Parameter{mittleres Fußelement}%
+  \Parameter{äußeres Fußelement}\\
+  \Macro{providetriplepagestyle}%
+  \Parameter{Names des Seitenstils}\\
+  \hphantom{\XMacro{providetriplepagestyle}}%
+  \OParameter{Dicke der äußeren Linie}%
+  \OParameter{Dicke der inneren Linie}\\
+  \hphantom{\XMacro{providetriplepagestyle}}%
+  \Parameter{inneres Kopfelement}%
+  \Parameter{mittlere Kopfelement}%
+  \Parameter{äußeres Kopfelement}\\
+  \hphantom{\XMacro{providetriplepagestyle}}%
+  \Parameter{inneres Fußelement}%
+  \Parameter{mittleres Fußelement}%
+  \Parameter{äußeres Fußelement}
+\end{Declaration}
+\BeginIndex{Cmd}{deftriplepagestyle}%
+\BeginIndex{Cmd}{newtriplepagestyle}%
+\BeginIndex{Cmd}{renewtriplepagestyle}%
+\BeginIndex{Cmd}{providetriplepagestyle}%
+Mit diesen Anweisungen kann ein einzelner Seitenstil definiert werden, bei dem
+Kopf und Fuß in drei Elemente aufgeteilt sind: ein inneres Element, ein
+mittleres Element und ein äußeres Element. Diese werden über jeweils drei
+obligatorische Argumente angegeben.
+
+Das jeweilige innere Element wird auf linken Seiten rechtsbündig im Kopf
+respektive im Fuß platziert. Auf rechten Seiten wird es hingegen linksbündig
+platziert. Entsprechend wird das mittlere Element sowohl auf linken als auch
+auf rechten Seiten im Kopf respektive Fuß zentriert. Das äußere Element wird
+schließlich auf linken Seiten linksbündig und auf rechten Seiten rechtsbündig
+im Kopf respektive Fuß platziert.
+
+An\textnote{Achtung!} dieser Stelle sei noch einmal daran erinnert, dass im
+einseitigen Satz nur rechte Seiten existieren!
+
+Mit den beiden optionalen Argumenten können Linien in Kopf und Fuß aktiviert
+werden. Dazu gibt man die gewünschte Dicke der Linien als Argument an. Das
+erste optionale Argument betrifft die \PName{Dicke der äußeren Linien}. Diese
+Linien werden über dem Kopf und unter dem Fuß gezeichnet. Das zweite optionale
+Argument betrifft die \PName{Dicke der inneren Linien}. Diese beiden Linien
+werden unterhalb des Kopfes und oberhalb des Fußes gezeichnet. Ist nur ein
+optionales Argument angegeben, so ist dies die \PName{Dicke der inneren
+  Linien}. Die \PName{Dicke der äußeren Linien} ist dann Null, womit nur noch
+die beiden inneren Linien gezeichnet werden. Ist keines der optionalen
+Argumente angegeben, so entfallen alle Linien.
+
+Es ist zu beachten\textnote{Achtung!}, dass leere optionale Argumente nicht
+gleichbedeutend mit dem Weglassen der optionalen Argumente sind! Leere
+optionale Argumente sind in diesem Fall nicht erlaubt. Dagegen sind einfache
+Längenausdrücke, wie sie bereits bei Option \Option{headwidth} (siehe
+\autoref{sec:scrlayer-scrpage.pagestyle.content},
+\autopageref{desc:scrlayer-scrpage.option.headwidth}) erklärt wurden, erlaubt.
+
+Die Bedeutung der einzelnen Argumente ist in
+\autoref{fig:scrlayer-scrpage.triplepagestyle} noch einmal an einer
+schematischen Doppelseite veranschaulicht. Dabei dienen »\textsl{außen}«,
+»\textsl{innen}«, »\textsl{mittig}« als beispielhafte Inhalte. Die zugehörigen
+Pfeile verdeutlichen die Ausbreitung dieser Inhalte. Die \iffree{farbigen
+}{}Texte im Inneren der Seite sind die Namen der Argumente der Befehle. Die
+zugehörigen Pfeile \iffree{in gleicher Farbe }{}weisen auf die entsprechenden
+Elemente der Seite.
+
+\begin{figure}
+  \centering
+  \begin{picture}(\textwidth,80mm)
+    \put(0,50mm){%
+      %\
+      \begin{picture}(\textwidth,30mm)(0,-10mm)
+        \thinlines
+        \small
+        % linke Seite
+        \put(0,20mm){\line(1,0){.49\textwidth}}%
+        \put(0,0){\line(0,1){20mm}}%
+        \multiput(0,0)(0,-1mm){10}{\line(0,-1){.5mm}}%
+        \put(.49\textwidth,5mm){\line(0,1){15mm}}%
+        \put(.05\textwidth,15mm){\thicklines\line(1,0){.415\textwidth}}%
+        \put(.05\textwidth,10mm){\makebox(0em,5mm)[l]{\slshape außen\strut$\longrightarrow$}}%
+        \put(.465\textwidth,10mm){\makebox(0em,5mm)[r]{\slshape $\longleftarrow$innen\strut}}%
+        \put(.2575\textwidth,10mm){\makebox(0em,5mm)[c]{\slshape $\longleftarrow$mittig\strut$\longrightarrow$}}%
+        \put(.05\textwidth,10mm){\thicklines\line(1,0){.415\textwidth}}%
+        % rechte Seite
+        \put(0.51\textwidth,20mm){\line(1,0){.49\textwidth}}%
+        \put(0.51\textwidth,5mm){\line(0,1){15mm}}%
+        \multiput(\textwidth,0)(0,-1mm){10}{\line(0,-1){.5mm}}%
+        \put(\textwidth,0mm){\line(0,1){20mm}}%
+        \put(.535\textwidth,15mm){\thicklines\line(1,0){.415\textwidth}}%
+        \put(.535\textwidth,10mm){\makebox(0em,5mm)[l]{\slshape innen\strut$\longrightarrow$}}%
+        \put(.95\textwidth,10mm){\makebox(0em,5mm)[r]{\slshape $\longleftarrow$außen\strut}}%
+        \put(.7425\textwidth,10mm){\makebox(0em,5mm)[c]{\slshape $\longleftarrow$mittig\strut$\longrightarrow$}}%
+        \put(.535\textwidth,10mm){\thicklines\line(1,0){.415\textwidth}}%
+        % Befehle für beide Seiten
+        \iffree{\color{red}}{}%
+        \put(.5\textwidth,0){\makebox(0,\baselineskip)[c]{\PName{inneres Kopfelement}}}%
+        \put(.5\textwidth,-5mm){\makebox(0,\baselineskip)[c]{\PName{mittleres Kopfelement}}}%
+        \put(.5\textwidth,-10mm){\makebox(0,\baselineskip)[c]{\PName{äußeres Kopfelement}}}%
+        \put(\dimexpr.5\textwidth-2em,.5\baselineskip){%
+          \put(-1.5em,.5\baselineskip){\vector(0,1){7mm}}%
+          \put(-4em,-1\baselineskip){\line(-1,0){\dimexpr .25\textwidth-7em\relax}}%
+          \put(-\dimexpr
+          .25\textwidth-3em\relax,-1\baselineskip){\vector(0,1){\dimexpr
+              7mm+1.5\baselineskip\relax}}
+          \put(-3.25em,-2.25\baselineskip){\line(-1,0){\dimexpr .45\textwidth-8em\relax}}%
+          \put(-\dimexpr
+          .45\textwidth-4.75em\relax,-2.25\baselineskip){\vector(0,1){\dimexpr
+              7mm+2.75\baselineskip\relax}}
+        }%
+        \put(\dimexpr.5\textwidth+2em,.5\baselineskip){%
+          \put(1.5em,.5\baselineskip){\vector(0,1){7mm}}%
+          \put(4em,-1\baselineskip){\line(1,0){\dimexpr .25\textwidth-7em\relax}}
+          \put(\dimexpr
+          .25\textwidth-3em\relax,-1\baselineskip){\vector(0,1){\dimexpr
+              7mm+1.5\baselineskip\relax}}
+          \put(3.25em,-2.25\baselineskip){\line(1,0){\dimexpr .45\textwidth-8em\relax}}
+          \put(\dimexpr
+          .45\textwidth-4.75em\relax,-2.25\baselineskip){\vector(0,1){\dimexpr
+              7mm+2.75\baselineskip\relax}}
+        }%
+      \end{picture}
+      %
+    }%
+    \put(0,0){%
+      \begin{picture}(\textwidth,30mm)
+        \thinlines
+        \small
+        % linke Seite
+        \put(0,0){\line(1,0){.49\textwidth}}%
+        \put(0,0){\line(0,1){20mm}}%
+        \multiput(0,20mm)(0,1mm){10}{\line(0,1){.5mm}}%
+        \put(.49\textwidth,0){\line(0,1){15mm}}%
+        \put(.05\textwidth,15mm){\thicklines\line(1,0){.415\textwidth}}%
+        \put(.05\textwidth,10mm){\makebox(0em,5mm)[l]{\slshape außen\strut$\longrightarrow$}}%
+        \put(.465\textwidth,10mm){\makebox(0em,5mm)[r]{\slshape $\longleftarrow$innen\strut}}%
+        \put(.2575\textwidth,10mm){\makebox(0em,5mm)[c]{\slshape $\longleftarrow$mittig\strut$\longrightarrow$}}%
+        \put(.05\textwidth,10mm){\thicklines\line(1,0){.415\textwidth}}%
+        % rechte Seite
+        \put(.51\textwidth,0){\line(1,0){.49\textwidth}}%
+        \put(.51\textwidth,0){\line(0,1){15mm}}%
+        \put(\textwidth,0){\line(0,1){20mm}}%
+        \multiput(\textwidth,20mm)(0,1mm){10}{\line(0,1){.5mm}}%
+        \put(.535\textwidth,15mm){\thicklines\line(1,0){.415\textwidth}}%
+        \put(.535\textwidth,10mm){\makebox(0em,5mm)[l]{\slshape innen\strut$\longrightarrow$}}%
+        \put(.95\textwidth,10mm){\makebox(0em,5mm)[r]{\slshape $\longleftarrow$außen\strut}}%
+        \put(.7425\textwidth,10mm){\makebox(0em,5mm)[c]{\slshape $\longleftarrow$mittig\strut$\longrightarrow$}}%
+        \put(.535\textwidth,10mm){\thicklines\line(1,0){.415\textwidth}}%
+        % Befehle für beide Seiten
+        \iffree{\color{red}}{}%
+        \put(.5\textwidth,20mm){\makebox(0,\baselineskip)[c]{\PName{inneres Fußelement}}}%
+        \put(.5\textwidth,25mm){\makebox(0,\baselineskip)[c]{\PName{mittleres Fußelement}}}%
+        \put(.5\textwidth,30mm){\makebox(0,\baselineskip)[c]{\PName{äußeres Fußelement}}}%
+        \put(\dimexpr.5\textwidth-2em,.5\baselineskip){%
+          \put(-1.5em,\dimexpr 20mm-.5\baselineskip\relax){\vector(0,-1){6mm}}%
+          \put(-3.5em,25mm){\line(-1,0){\dimexpr .25\textwidth-6.5em\relax}}%
+          \put(-\dimexpr .25\textwidth-3em\relax,25mm){\vector(0,-1){\dimexpr
+              .5\baselineskip + 11mm\relax}}%
+          \put(-3em,30mm){\line(-1,0){\dimexpr .45\textwidth-7.5em\relax}}%
+          \put(-\dimexpr .45\textwidth-4.5em\relax,30mm){\vector(0,-1){\dimexpr
+              .5\baselineskip + 16mm\relax}}%
+        }%
+        \put(\dimexpr.5\textwidth+2em,.5\baselineskip){%
+          \put(1.5em,\dimexpr 20mm-.5\baselineskip\relax){\vector(0,-1){6mm}}%
+          \put(3.5em,25mm){\line(1,0){\dimexpr .25\textwidth-6.5em\relax}}%
+          \put(\dimexpr .25\textwidth-3em\relax,25mm){\vector(0,-1){\dimexpr
+              .5\baselineskip + 11mm\relax}}%
+          \put(3em,30mm){\line(1,0){\dimexpr .45\textwidth-7.5em\relax}}%
+          \put(\dimexpr .45\textwidth-4.5em\relax,30mm){\vector(0,-1){\dimexpr
+              .5\baselineskip + 16mm\relax}}%
+        }%
+      \end{picture}
+    }%
+    \thinlines\small\iffree{\color{blue}}{}%
+    \put(0.055\textwidth,45mm){\vector(0,1){25mm}}%
+    \put(0.945\textwidth,45mm){\vector(0,1){25mm}}%
+    \put(0.055\textwidth,45mm){\vector(0,-1){30mm}}%
+    \put(0.945\textwidth,45mm){\vector(0,-1){30mm}}%
+    \put(0.055\textwidth,45mm){\line(1,0){\dimexpr
+        .445\textwidth-6.5em\relax}}%
+    \put(0.945\textwidth,45mm){\line(-1,0){\dimexpr
+        .445\textwidth-6.5em\relax}}%
+    \put(0.5\textwidth,45mm){\makebox(0,0)[c]{\PName{Dicke der inneren
+          Linien}}}%
+    \iffree{\color{green}}{}%
+    \put(0.025\textwidth,40mm){\line(0,1){35mm}}%
+    \put(0.025\textwidth,75mm){\vector(1,0){3.75mm}}%
+    \put(0.975\textwidth,40mm){\line(0,1){35mm}}%
+    \put(0.975\textwidth,40mm){\line(0,1){35mm}}%
+    \put(0.975\textwidth,75mm){\vector(-1,0){3.75mm}}%
+    \put(0.025\textwidth,40mm){\line(0,-1){30mm}}%
+    \put(0.025\textwidth,10mm){\vector(1,0){3.75mm}}%
+    \put(0.975\textwidth,40mm){\line(0,-1){30mm}}%
+    \put(0.975\textwidth,40mm){\line(0,-1){30mm}}%
+    \put(0.975\textwidth,10mm){\vector(-1,0){3.75mm}}%
+    \put(0.025\textwidth,40mm){\line(1,0){\dimexpr
+        .475\textwidth-6.5em\relax}}%
+    \put(0.975\textwidth,40mm){\line(-1,0){\dimexpr
+        .475\textwidth-6.5em\relax}}%
+    \put(0.5\textwidth,40mm){\makebox(0,0)[c]{\PName{Dicke der äußeren Linien}}}%
+  \end{picture}
+  \caption[{Elemente dreigeteilter Seitenstile}]{Elemente einer Doppelseite
+    der dreigeteilten Seitenstile mit den Anweisungen
+    \Macro{deftriplepagestyle}, \Macro{newtriplepagestyle},
+    \Macro{providetriplepagestyle} und \Macro{renewtriplepagestyle}}
+  \label{fig:scrlayer-scrpage.triplepagestyle}
+\end{figure}
+
+
+Mit den hier dokumentierten Anweisungen ist es nicht möglich, einzelne Linien
+zu aktivieren, beispielsweise nur eine Linie unter dem Seitenkopf aber keine
+Linie über dem Seitenfuß zu haben. Verwenden Sie dafür stattdessen die
+Anweisungen aus einem der vorherigen oder aus dem nachfolgenden Abschnitt.
+
+Die\textnote{Achtung!} Länge der einzelnen Elemente ist nicht durch das
+Vorhandensein eines Nachbarelements beschränkt. Dadurch kann es bei
+ungünstiger Verwendung passieren, dass ein Element eines oder beide
+Nachbarelemente überschreibt. Der Anwender ist selbst für die Vermeidung
+dieses ungünstigen Falles verantwortlich. Bei lebenden Kolumnentiteln ist dies
+beispielsweise durch Verwendung des optionalen Arguments der
+Gliederungsbefehle möglich. Siehe dazu die Anleitung zu den
+Gliederungsbefehlen der jeweiligen Klasse.
+
+Während \Macro{deftriplepagestyle} einen Seitenstil unabhängig davon, ob er
+bereits früher definiert wurde, immer definiert, werden mit
+\Macro{newtriplepagestyle} und \Macro{providetriplepagestyle} nur Seitenstile
+definiert, die derzeit noch nicht definiert sind. Ist ein Seitenstil hingegen
+bereits definiert, so erhält man mit \Macro{newtriplepagestyle} eine
+Fehlermeldung, während \Macro{providetriplepagestyle} die neue Definition
+einfach verwirft. Ein vorhandener Seitenstil kann auch mit
+\Macro{renewtriplepagestyle} umdefiniert werden. Diese Anweisung meldet einen
+Fehler, falls ein Seitenstil dieses Namens noch nicht definiert war.%
+
+\BeginIndex{Cmd}{deftripstyle}%
+Die bei \Package{scrpage2} vorhandene Anweisung \Macro{deftripstyle}
+entspricht damit der neuen Anweisung \Macro{deftriplepagestyle}. Sie wurde aus
+Gründen der Vereinheitlichung der Namen der Anweisungen jedoch umbenannt und
+sollte nicht mehr verwendet werden. Wird sie dennoch verwendet, resultiert
+daraus eine Warnung.%
+\EndIndex{Cmd}{deftripstyle}%
+\EndIndex{Cmd}{providetriplepagestyle}%
+\EndIndex{Cmd}{renewtriplepagestyle}%
+\EndIndex{Cmd}{newtriplepagestyle}%
+\EndIndex{Cmd}{deftriplepagestyle}%
+
+
+\section{Definition komplexer Seitenstile}
+\label{sec:scrlayer-scrpage.pagestyle.experts}
+
+Neben den vordefinierten Seitenstilen und der Definition eigener
+Seitenstil-Paare, sowie der nicht mehr empfohlenen Möglichkeit der Definition
+von Seitenstilen, bei denen sowohl der Kopf als auch der Fuß fest in drei
+Elemente aufgeteilt ist, bietet \Package{scrlayer-scrpage} auch noch eine eher
+grundlegende Möglichkeit der Definition von Seitenstilen. Die in den
+vorherigen Abschnitten erläuterten Konzepte greifen bei der Implementierung
+alle auf diese Möglichkeit zurück. Aufgrund ihrer Komplexität wird diese
+Schnittstelle jedoch nur erfahrenen Anwendern empfohlen. Weniger erfahrene
+Anwender können mit den vorgenannten Möglichkeiten bereits nahezu alles
+erreichen, was auch mit dieser grundlegenden Schnittstelle möglich
+ist. Weniger erfahrene Anwender dürfen den Rest dieses Kapitels daher gerne
+überspringen.
+
+\begin{Declaration}
+  \Macro{defpagestyle}%
+  \Parameter{Name}\Parameter{Kopfdefinition}\Parameter{Fußdefinition}\\
+  \Macro{newpagestyle}%
+  \Parameter{Name}\Parameter{Kopfdefinition}\Parameter{Fußdefinition}\\
+  \Macro{providepagestyle}%
+  \Parameter{Name}\Parameter{Kopfdefinition}\Parameter{Fußdefinition}\\
+  \Macro{renewpagestyle}%
+  \Parameter{Name}\Parameter{Kopfdefinition}\Parameter{Fußdefinition}%
+\end{Declaration}
+\BeginIndex{Cmd}{defpagestyle}%
+\BeginIndex{Cmd}{newpagestyle}%
+\BeginIndex{Cmd}{providepagestyle}%
+\BeginIndex{Cmd}{renewpagestyle}%
+Diese Anweisungen dienen der Definition eines einzelnen Seitenstils mit
+maximaler Flexibilität. Dabei \PName{Name} der Name des Seitenstils, der
+definiert werden soll.
+
+Die beiden Parameter \PName{Kopfdefinition} und \PName{Fußdefinition} haben
+den identischen Aufbau:
+\begin{quote}\raggedright
+  \texttt{(\PName{Länge der oberen Linie},\PName{Dicke der oberen Linie})\%\\
+    \Parameter{Definition für linke Seiten im doppelseitigen Layout}\%\\
+    \Parameter{Definition für rechte Seiten im doppelseitigen Layout}\%\\
+    \Parameter{Definition für Seiten im einseitigen Layout}\%\\
+    (\PName{Länge der unteren Linie},\PName{Dicke der unteren Linie})%
+  }
+\end{quote}
+Dabei sind die Argumente in den runden Klammern optional, das heißt, sie
+können zusammen mit den Klammern weggelassen werden. In diesem Fall richtigen
+sich die Längen und Dicken je nach Linie nach den Angaben der Option
+\Option{headtopline}, \Option{headsepline}, \Option{footsepline} oder
+\Option{footbotline} (siehe \autoref{sec:scrlayer-scrpage.pagestyle.content},
+\autopageref{desc:scrlayer-scrpage.option.headtopline}).
+
+Die drei Argumente mit den Definitionen sind obligatorisch und werden je nach
+Seite und Layouteinstellung verwendet. Der Inhalt der Definitionen ist frei
+wählbar. Für Seitenstile mit Kolumnentitel wird jedoch die Verwendung von
+\Macro{headmark}, \Macro{leftmark} oder \Macro{rightmark} innerhalb der
+Definitionen empfohlen. Keinesfalls sollte man hier direkt eine
+Gliederungsnummer oder einen Überschriftentext als Kolumnentitel
+angeben. Aufgrund des asynchronen Seitenaufbaus von \LaTeX{} kann sonst die
+falsche Nummer oder der falsche Text im Seitenkopf erscheinen.
+
+Bei \Macro{defpagestyle} wird der Seitenstil unabhängig davon, ob er bereits
+existiert oder nicht, neu definiert. Demgegenüber meldet \Macro{newpagestyle}
+einen Fehler, wenn bereits ein Seitenstil gleichen Namens existiert. Im
+Unterschied dazu, wird die Definition bei \Macro{providepagestyle} ignoriert,
+falls der \PName{Name} bereits für einen Seitenstil verwendet wurde. Umgekehrt
+kann mit \Macro{renewpagestyle} nur ein bereits vorhandener Seitenstil
+umdefiniert werden. Für einen neuen Namen meldet diese Anweisung dagegen einen
+Fehler.
+
+Intern basiert diese Anweisung auf der Anweisung \Macro{DeclareLayerPageStyle}
+des Pakets \Package{scrlayer}. Dabei werden für einen Seitenstil \PName{Name}
+die Ebenen \PName{Name}\PValue{.head.above.line} für die Linie über dem Kopf,
+\PName{Name}\PValue{.head.odd} für den Kopf von rechten Seiten im
+doppelseitigen Layout, \PName{Name}\PValue{.head.even} für den Kopf von linken
+Seiten im doppelseitigen Layout, \PName{Name}\PValue{.head.oneside} für den
+Kopf von Seiten im einseitigen Layout, \PName{Name}\PValue{.head.below} für
+die Linie unter dem Kopf, \PName{Name}\PValue{.foot.above.line} für die Linie
+über dem Fuß, \PName{Name}\PValue{.foot.odd} für den Fuß von rechten Seiten im
+doppelseitigen Layout, \PName{Name}\PValue{.foot.even} für den Fuß von linken
+Seiten im doppelseitigen Layout, \PName{Name}\PValue{.foot.oneside} für den
+Fuß von Seiten im einseitigen Layout und \PName{Name}\PValue{.foot.below} für
+die Linie unter dem Fuß definiert. Näheres zu Ebenen und Ebenen-Seitenstilen
+ist \autoref{cha:scrlayer} ab \autopageref{cha:scrlayer} in
+\autoref{part:forExperts} zu entnehmen.%
+%
+\begin{Example}
+  Angenommen, Sie wollen den gesamten Kopf des Seitenstil
+  \Pagestyle{scrheadings} mit einer Farbe hinterlegen. Da Sie die
+  Einleitung zu diesem Kapitel gelesen haben, wissen Sie, dass
+  \Pagestyle{scrheadings} letztlich ein Ebenen-Seitenstil ist, der unter
+  anderem aus den Ebenen \PValue{scrheadings.head.even},
+  \PValue{scrheadings.head.odd} und \PValue{scrheadings.head.oneside}
+  besteht. Sie definieren nun drei weitere Ebenen für deren Hintergrund und
+  fügen diese am Anfang des Seitenstils ein:
+\begin{lstcode}
+ \documentclass{scrartcl}
+  \usepackage[automark]{scrlayer-scrpage}
+  \usepackage{xcolor}
+  \usepackage{blindtext}
+  \DeclareLayer[clone=scrheadings.head.oneside,
+    contents={%
+      \color{yellow}\rule[-\dp\strutbox]{\layerwidth}{\layerheight}%
+    }%
+  ]{scrheadings.head.oneside.background}
+  \DeclareLayer[clone=scrheadings.head.odd,
+    contents={%
+      \color{yellow}\rule[-\dp\strutbox]{\layerwidth}{\layerheight}%
+    }%
+  ]{scrheadings.head.odd.background}
+  \DeclareLayer[clone=scrheadings.head.even,
+    contents={%
+      \color{yellow}\rule[-\dp\strutbox]{\layerwidth}{\layerheight}%
+    }%
+  ]{scrheadings.head.even.background}
+  \AddLayersAtBeginOfPageStyle{scrheadings}{%
+    scrheadings.head.oneside.background,%
+    scrheadings.head.odd.background,%
+    scrheadings.head.even.background%
+  }
+  \pagestyle{scrheadings}
+  \begin{document}
+  \blinddocument
+  \end{document}
+\end{lstcode}
+  Wie Sie sehen, wurden in dem Beispiel drei Ebenen verwendet, damit Position
+  und Größe der Hintergrund-Ebenen per Option \Option{clone} einfach jeweils
+  von der Ebene für den Kopf kopiert werden konnten. Das ist einfacher, als
+  nur eine Hintergrundebene zu verwenden und für diese die Position
+  umständlich dynamisch zu bestimmen.
+
+  Der farbige Hintergrund selbst wurde in diesem Beispiel mit einer
+  \Macro{rule}-Anweisung gesetzt. Für die Größe wurde dabei mit
+  \Macro{layerwidth} und \Macro{layerheight} die aktuelle Breite und Höhe der
+  Ebene verwendet. Diese wurde per optionalem Argument um die Höhe der
+  Unterlängen \Macro{dp}\Macro{strutbox} nach unten verschoben.
+\end{Example}
+%
+Statt wie im Beispiel für die Hintergrundfarbe neue Ebenen hinzuzufügen, hätte
+man das Problem übrigens auch mit \Macro{colorbox} und \Macro{chead} lösen
+können. Es wird empfohlen, eine entsprechende Lösung als Übung zu
+erarbeiten. Ebenso hätte man die Hintergrundebenen auch einzeln und jeweils
+unmittelbar vor der entsprechenden Inhaltsebene einfügen können. Auch dies
+sei als Übung empfohlen.%
+\EndIndex{Cmd}{renewpagestyle}%
+\EndIndex{Cmd}{providepagestyle}%
+\EndIndex{Cmd}{newpagestyle}%
+\EndIndex{Cmd}{defpagestyle}%
+
+\begin{Declaration}
+  \KOption{hmode}\PValue{Ein-Aus-Wert}
+\end{Declaration}
+\BeginIndex{Option}{hmode}%
+Bei \Package{scrpage2} wurden die Köpfe und Füße der Seitenstile noch
+grundsätzlich im horizontalen Modus ausgegeben. Bei \Package{scrlayer-scrpage}
+wird hingegen in der Voreinstellung erst durch entsprechende Ausgaben selbst
+in den horizontalen Modus geschaltet. Aktiviert man jedoch Option
+\Option{hmode} verhält sich \Package{scrlayer-scrpage} auch in dieser Hinsicht
+kompatibel mit \Package{scrpage2} und schaltet bereits vor der Ausgabe in den
+horizontalen Modus. Dies kann Auswirkungen sowohl auf die Verarbeitung von
+Leerzeichen am Anfang der Ausgabe als auch auf die vertikale Ausrichtung
+haben.
+
+Die Option versteht die Standardwerte für einfache Schalter, die in
+\autoref{tab:truefalseswitch} auf \autopageref{tab:truefalseswitch} angegeben
+sind. In der Voreinstellung ist der Schalter deaktiviert.%
+\EndIndex{Option}{hmode}%
+%
+\EndIndex{Package}{scrlayer-scrpage}%
 
 %%% Local Variables:
 %%% mode: latex
+%%% mode: flyspell
 %%% coding: iso-latin-1
+%%% ispell-local-dictionary: "de_DE"
 %%% TeX-master: "../guide"
 %%% End: 
