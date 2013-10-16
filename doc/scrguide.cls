@@ -92,8 +92,31 @@
 %
 % \section{Load the Base Class and Packages}
 %
+% \begin{macro}{\KOMAProvidesFile}
+% \begin{macro}{\@KOMAProvidesFile}
+%   Extended version of |\ProvidesFile|, that uses the date from the
+%   repository.
+%    \begin{macrocode}
+\newcommand*{\KOMAProvidesFile}[1]{%
+  \@ifnextchar [%]
+  {\@KOMAProvidesFile{#1}}{\ProvidesFile{#1}\relax}%
+}
+\newcommand*{\@KOMAProvidesFile}{}
+\def\@KOMAProvidesFiles#1[$#2: #3-#4-#5 #6$#7]{%
+  \ifstr{#2}{Date}{%
+    \ProvidesFile{#1}[#3/#4/#5 #6 #7]\relax
+  }{%
+    \ClassError{scrguide}{missmatch repository date string}{%
+      It seams, that you haven't used $%
+      Date: YYYY-MM-DD $ for the date of \string\KOMAProvidesFile.}%
+    \ProvidesFile{#1}[$#2: #3/#4/#5 #6$#7]\relax
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % NOTE: I use \texttt{latin1} instead of the prefered \texttt{utf8} because of
-%       problems of package \textsf{listings}.
+%       problems of early versions of package \textsf{listings}.
 %    \begin{macrocode}
 \LoadClassWithOptions{scrbook}
 \RequirePackage[latin1]{inputenc}
