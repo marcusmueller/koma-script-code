@@ -75,7 +75,7 @@ TEX_CHAPTERS     = preface.tex introduction.tex \
                    adrconvnote.tex scrextend.tex \
                    expertpart.tex scrbase.tex scrlfile.tex scrwfile.tex \
 		   tocbasic.tex scrhack.tex \
-		   scrlayer.tex \
+		   scrlayer.tex scrlayer-notecolumn.tex \
                    typearea-experts.tex scrbookreportarticle-experts.tex \
                    scrlttr2-experts.tex \
                    $(TEX_APPENDICES)
@@ -96,6 +96,11 @@ EXAMPLE_LETTER_LETTERS = $(foreach num,\
 
 EXAMPLE_LETTER_DTX_RESULT = $(EXAMPLE_LETTER_LETTERS) musterlogo.eps ich.lco
 
+ifeq ($(LANGUAGE),ngerman)
+EXAMPLE_NOTECOLUMN_SRC = scrlayer-notecolumn-example.tex
+EXAMPLE_NOTECOLUMN_PDF = $(addsuffix .pdf,$(basename $(EXAMPLE_NOTECOLUMN_SRC)))
+endif
+
 PLENGTH_DTX      = $(DOCDIR)plength.dtx
 
 PLENGTH_DTX_RESULT = plength.drv plenDIN.mp varDIN.mp plinc.mp \
@@ -111,11 +116,12 @@ EXAMPLE_LETTER_SRC = $(EXAMPLE_LETTER_LETTERS) $(PDF_EPS) ich.lco
 
 EXAMPLE_LETTER_PDF = $(addsuffix .pdf,$(basename $(EXAMPLE_LETTER_LETTERS)))
 
-GENERATED_SRC    = $(EXAMPLE_LETTER_PDF) $(PLENGTH_PDF)
+GENERATED_SRC    = $(EXAMPLE_LETTER_PDF) $(PLENGTH_PDF) \
+                   $(EXAMPLE_NOTECOLUMN_PDF)
 
 GENERATED_CLEAN  = $(GENERATED_SRC) \
 		   $(EXAMPLE_LETTER_DTX_RESULT) letter-label.tex \
-		   $(PDF_EPS) \
+		   $(EXAMPLE_NOTECOLUMN_PDF) $(PDF_EPS) \
                    $(PLENGTH_DTX_RESULT) 
 
 TEX_SRC		= guide-$(LANGUAGELONG).tex $(TEX_CHAPTERS) $(TEX_MISC)
@@ -279,6 +285,11 @@ $(EXAMPLE_LETTER_PDF): $(EXAMPLE_LETTER_SRC)
 
 $(EXAMPLE_LETTER_DTX_RESULT): $(EXAMPLE_LETTER_DTX)
 	$(PDFLATEX) $<
+
+ifdef EXAMPLE_NOTECOLUMN_SRC
+$(EXAMPLE_NOTECOLUMN_PDF): $(EXAMPLE_NOTECOLUMN_SRC)
+	$(PDFLATEX) $<
+endif
 
 guide.ind: guide.idx
 	$(MAKEINDEX) $@ $<

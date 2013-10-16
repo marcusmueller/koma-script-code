@@ -86,5 +86,15 @@ scrlayer.tex: ../../scrlayer.tex
 	cd ../.. && tex \\nonstopmode\\input $(basename $<)
 # ----------------------------------------------------------------------
 
+# ----------------------------------------------------------------------
+# NOTE: Remove these rules after real translation of scrlayer-notecolumn.tex 
+#       is available.
+scrlayer-notecolumn.tex: ../../scrlayer-notecolumn.tex
+	if [ -L $@ ] || ! [ -f $@ ]; then $(SYMLINK) $< .; else touch $@; fi
+
+../../scrlayer-notecolumn.tex: ../../scrlayer-notecolumn.dtx
+	cd ../.. && tex \\nonstopmode\\input $(basename $<)
+# ----------------------------------------------------------------------
+
 #
 # end of file `Makefile'
