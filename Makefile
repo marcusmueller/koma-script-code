@@ -237,7 +237,7 @@ MAINTAIN_FILES  = $(MAINTAIN_SRC)
 # ----------------------------------------------------------------------
 
 # ----------------------------------------------------------------------
-# additional ruls
+# additional rules
 tdsdist:dist
 	# extract dist and make all
 	$(UNTARGZ) $(DISTDIR).tar.gz
