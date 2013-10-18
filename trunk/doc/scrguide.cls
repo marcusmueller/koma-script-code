@@ -97,12 +97,13 @@
 %   Extended version of |\ProvidesFile|, that uses the date from the
 %   repository.
 %    \begin{macrocode}
-\newcommand*{\KOMAProvidesFile}[1]{%
+\newcommand*{\KOMAProvidesFile}{}
+\def\KOMAProvidesFile#1{%
   \@ifnextchar [%]
   {\@KOMAProvidesFile{#1}}{\ProvidesFile{#1}\relax}%
 }
-\newcommand*{\@KOMAProvidesFile}{}
-\def\@KOMAProvidesFiles#1[$#2: #3-#4-#5 #6$#7]{%
+%\newcommand*{\@KOMAProvidesFile}{}
+\def\@KOMAProvidesFile#1[$#2: #3-#4-#5 #6$#7]{%
   \ifstr{#2}{Date}{%
     \ProvidesFile{#1}[#3/#4/#5 #6 #7]\relax
   }{%
