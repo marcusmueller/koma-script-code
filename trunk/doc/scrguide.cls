@@ -102,7 +102,7 @@
   \@ifnextchar [%]
   {\@KOMAProvidesFile{#1}}{\ProvidesFile{#1}\relax}%
 }
-%\newcommand*{\@KOMAProvidesFile}{}
+\newcommand*{\@KOMAProvidesFile}{}
 \def\@KOMAProvidesFile#1[$#2: #3-#4-#5 #6$#7]{%
   \ifstr{#2}{Date}{%
     \ProvidesFile{#1}[#3/#4/#5 #6 #7]\relax
