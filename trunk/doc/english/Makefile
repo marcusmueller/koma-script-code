@@ -69,11 +69,11 @@ scrwfile.tex: ../../scrwfile.tex
 # ----------------------------------------------------------------------
 # NOTE: Remove these rules after real translation of scrlayer-scrpage.tex 
 #       is available.
-scrlayer-scrpage.tex: ../../scrlayer-scrpage.tex
-	if [ -L $@ ] || ! [ -f $@ ]; then $(SYMLINK) $< .; else touch $@; fi
-
-../../scrlayer-scrpage.tex: ../../scrlayer-scrpage.dtx
-	cd ../.. && tex \\nonstopmode\\input $(basename $<)
+#scrlayer-scrpage.tex: ../../scrlayer-scrpage.tex
+#	if [ -L $@ ] || ! [ -f $@ ]; then $(SYMLINK) $< .; else touch $@; fi
+#
+#../../scrlayer-scrpage.tex: ../../scrlayer-scrpage.dtx
+#	cd ../.. && tex \\nonstopmode\\input $(basename $<)
 # ----------------------------------------------------------------------
 
 # ----------------------------------------------------------------------
