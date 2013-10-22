@@ -1,0 +1,967 @@
+% ======================================================================
+% scrlayer-scrpage.tex
+% Copyright (c) Markus Kohm, 2013
+%
+% This file is part of the LaTeX2e KOMA-Script bundle.
+%
+% This work may be distributed and/or modified under the conditions of
+% the LaTeX Project Public License, version 1.3c of the license.
+% The latest version of this license is in
+%   http://www.latex-project.org/lppl.txt
+% and version 1.3c or later is part of all distributions of LaTeX 
+% version 2005/12/01 or later and of this work.
+%
+% This work has the LPPL maintenance status "author-maintained".
+%
+% The Current Maintainer and author of this work is Markus Kohm.
+%
+% This work consists of all files listed in manifest.txt.
+% ----------------------------------------------------------------------
+% scrlayer-scrpage.tex
+% Copyright (c) Markus Kohm, 2013
+%
+% Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
+% Version 1.3c, verteilt und/oder veraendert werden.
+% Die neuste Version dieser Lizenz ist
+%   http://www.latex-project.org/lppl.txt
+% und Version 1.3c ist Teil aller Verteilungen von LaTeX
+% Version 2005/12/01 oder spaeter und dieses Werks.
+%
+% Dieses Werk hat den LPPL-Verwaltungs-Status "author-maintained"
+% (allein durch den Autor verwaltet).
+%
+% Der Aktuelle Verwalter und Autor dieses Werkes ist Markus Kohm.
+% 
+% Dieses Werk besteht aus den in manifest.txt aufgefuehrten Dateien.
+% ======================================================================
+%
+% Chapter about scrlayer-scrpage of the KOMA-Script guide
+%
+% ----------------------------------------------------------------------
+%
+% Kapitel ueber scrlayer-scrpage in der KOMA-Script-Anleitung
+%
+% ============================================================================
+
+\KOMAProvidesFile{scrlayer-scrpage.tex}%
+                 [$Date: 2013-10-16 13:01:50 +0200 (Mi, 16. Okt 2013) $
+                  KOMA-Script guide (chapter:scrlayer-scrpage)]
+\translator{Markus Kohm}
+
+\chapter[{Adapting Page Headers and Footers with scrlayer-scrpage}]
+  {Adapting\ChangedAt{v3.12}{\Package{scrlayer-scrpage}} Page Headers and
+  Footers with scrlayer-scrpage}
+\labelbase{scrlayer-scrpage}
+%
+\BeginIndex{Package}{scrlayer-scrpage}%
+
+Until \KOMAScript~3.11b package \Package{scrpage2} has been the recommended
+suggestion to adapt page headers and footers, if the page
+styles\Pagestyle{headings}, \Pagestyle{myheadings}, \Pagestyle{plain}, and
+\Pagestyle{empty} provided by the \KOMAScript{} classes were not sufficient
+enough. Until 2001 also Package \Package{scrpage} was a supported solution if
+the same purpose. Then it became obsolete. 2013, more than ten years later, it
+has been removed from the regular \KOMAScript~distribution.
+
+In 2013 package \Package{scrlayer}\IndexPackage{scrlayer} became a basic
+module of \KOMAScript. That package provides a layer scheme and a new page
+style scheme based upon the layer scheme. Nevertheless, the flexibility and
+complexity of that package may be to much for the average user. More about
+that package may be found in \autoref{cha:scrlayer} of
+\autoref{part:forExperts}. Beyond possible problems with the controllability
+of \Package{scrlayer} lots of users already know the user interface of package
+\Package{scrpage2}.
+
+Because of this the additional package \Package{scrlayer-scrpage} provides a
+user interface above the basis of \Package{scrlayer}, that is mostly
+compatible with \Package{scrpage2}. So if you are already familiar with
+\Package{scrpage2} and if you don't use dirty tricks with that package, it
+should be easy for you to use \Package{scrlayer-scrpage} instead of
+\Package{scrpage2}. Most examples to \Package{scrpage2} in \LaTeX{} books or
+online resources should also work with \Package{scrlayer-scrpage} at least
+with some minor code changes.
+
+Beside the aforementioned \KOMAScript{} packages, you could in general also
+use \Package{fancyhdr}\IndexPackage{fancyhdr} (see \cite{package:fancyhdr})
+even together with a \KOMAScript{} class. But unfortunately that package
+doesn't know and support several \KOMAScript{} features, e.\,g., the element
+scheme (see \Macro{setkomafont}, \Macro{addtokomafont}, and
+\Macro{usekomafont} in \autoref{sec:maincls.textmarkup}, from
+\autopageref{desc:maincls.cmd.setkomafont}) or the configurable format of
+numbers for running heads (see option \Option{numbers} and, e.\,g.,
+\Macro{chaptermarkformat} in \autoref{sec:maincls.structure},
+\autopageref{desc:maincls.option.numbers} and
+\autopageref{desc:maincls.cmd.chaptermarkformat}). Because of this usage of
+package \Package{scrlayer-scrpage} is recommended if you're using a
+\KOMAScript{} class. Of course you can use \Package{scrlayer-scrpage} with
+other classes, namely the \LaTeX{} standard classes, too.
+
+\LoadCommon{0} % \section{Early or late Selection of Options}
+
+\LoadCommon{20} % \section{Head and Foot Width}
+
+\section{Usage of Predefined Page Styles}
+\label{sec:scrlayer-scrpage.predefined.pagestyles}
+
+The easiest facility to get a requested design of page head and foot with
+\Package{scrlayer-scrpage} is the usage of a predefined page style.
+
+\begin{Declaration}
+  \Pagestyle{scrheadings}\\
+  \Pagestyle{plain.scrheadings}
+\end{Declaration}
+\BeginIndex{Pagestyle}{scrheadings}%
+\BeginIndex{Pagestyle}{plain.scrheadings}%
+Package \Package{scrlayer-scrpage} provides two page style, that may be
+reconfigured depending on your own requests. Let's first of all talk about
+page style \Pagestyle{scrheadings}. This has been designed to be used with
+running heads. Its defaults are similar to the page style
+\Pagestyle{headings}\IndexPagestyle{headings} of \LaTeX's standard classes or
+the \KOMAScript{} classes. The commands and options, that may be used to
+configure the exact contents of the header and footer, will be described
+consecutively.
+
+Second there's page style \Pagestyle{plain.scrheadings}. This has been
+designed to be used without any running head. Its defaults are very similar to
+page style \Pagestyle{plain}\IndexPagestyle{plain} of \LaTeX's standard
+classes or the \KOMAScript{} classes. Once more the commands and options, that
+may be used to configure the exact contents of the header and footer, will be
+described consecutively.
+
+Fore sure, you could configure \Pagestyle{scrheadings} to be a page style
+without running head and \Pagestyle{plain.scrheadings} to be a page style with
+running heads. Nevertheless its more useful, to fit the conventions declared
+above. The main reason for this is, that both page styles influence each
+other. Concretely: If you select one of these page style,
+\Pagestyle{scrheadings} will become accessible as \Pagestyle{headings} and the
+page style \Pagestyle{plain.scrheadings} will become accessible as
+\Pagestyle{plain}. The advantage of this is, that with classes (or packages),
+that automatically switch between \Pagestyle{headings} and \Pagestyle{plain},
+using \Pagestyle{scrheadings} or \Pagestyle{plain.scrheadings} one time would
+result in switching between \Pagestyle{scrheadings} and
+\Pagestyle{plain.scrheadings} instead of switching between
+\Pagestyle{headings} and \Pagestyle{plain}. Patches or other adaptions of the
+classes (or packages) won't be necessary. So these page styles are something
+like a pair, that may be used as a replacement for \Pagestyle{headings} and
+\Pagestyle{plain}.
+
+At this point I'd like to mention, that for compatibility with
+\Package{scrpage2} page style \Pagestyle{plain.scrheadings} can also be used
+with the alias name \Pagestyle{scrplain}\IndexPagestyle[indexmain]{scrplain}.
+%
+\EndIndex{Pagestyle}{plain.scrheadings}%
+\EndIndex{Pagestyle}{scrheadings}%
+
+\begin{Declaration}
+  \Macro{lehead}\OParameter{plain.scrheadings's content}%
+                \Parameter{scrheadings's content}\\
+  \Macro{cehead}\OParameter{plain.scrheadings's content}%
+                \Parameter{scrheadings's content}\\
+  \Macro{rehead}\OParameter{plain.scrheadings's content}%
+                \Parameter{scrheadings's content}\\
+  \Macro{lohead}\OParameter{plain.scrheadings's content}%
+                \Parameter{scrheadings's content}\\
+  \Macro{cohead}\OParameter{plain.scrheadings's content}%
+                \Parameter{scrheadings's content}\\
+  \Macro{rohead}\OParameter{plain.scrheadings's content}%
+                \Parameter{scrheadings's content}
+\end{Declaration}
+\BeginIndex{Cmd}{lehead}%
+\BeginIndex{Cmd}{cehead}%
+\BeginIndex{Cmd}{rehead}%
+\BeginIndex{Cmd}{lohead}%
+\BeginIndex{Cmd}{cohead}%
+\BeginIndex{Cmd}{rohead}%
+The contents of the header of page style \Pagestyle{plain.scrheadings} and
+\Pagestyle{scrheadings} can be defined using these commands. Thereby the
+optional argument defines the content of an element of page style
+\Pagestyle{plain.scrheadings}, while the mandatory argument sets the content
+of the corresponding element of page style \Pagestyle{scrheadings}.
+
+Contents of left\,---\,so called even\,---\,pages can be set with
+\Macro{lehead}, \Macro{cehead}, and \Macro{rohead}. Remark: The ``\texttt{e}''
+at the second position of the commands' names mean ``\emph{even}''.
+
+Contents of right\,---\,so called odd\,---\,pages can be set with
+\Macro{lohead}, \Macro{cohead}, and \Macro{rohead}. Remark: The ``\texttt{o}''
+at the second position of the commands' names mean ``\emph{odd}''.
+
+Please note\textnote{Attention!}, that there are only odd pages within single
+side layouts independent of whether or not they have a odd page number.
+
+Each header consists of a left aligned element, that will be defined by
+\Macro{lehead} respectively \Macro{lohead}. Remark: The ``\texttt{l}'' at the
+first position of the commands' names mean ``\emph{left aligned}''.
+
+Similarly each header has a centred element, that will be defined by
+\Macro{cehead} respectively \Macro{cohead}. Remark: The ``\texttt{c}'' at the
+first position of the command' names mean ``\emph{centred}''.
+
+Similarly each header has a right aligned element, that will be defined by
+\Macro{rehead} respectively \Macro{rohead}. Remark: The ``\texttt{r}'' at the
+first position of the commands' names mean ``\emph{right aligned}''.
+
+\BeginIndex{FontElement}{pagehead}%
+\BeginIndex{FontElement}{pageheadfoot}%
+However, these elements don't have a font attribution, that may be changed
+using commands \Macro{setkomafont} and \Macro{addtokomafont} (see
+\autoref{sec:maincls.textmarkup}, \autopageref{desc:maincls.cmd.setkomafont}),
+on their own but altogether as an element named \FontElement{pagehead}. And
+before the font of that element additionally the font of element
+\FontElement{pageheadfoot} will be used. See
+\autoref{tab:scrlayer-scrpage.fontelements} for the defaults of the fonts of
+these elements.%
+\EndIndex{FontElement}{pageheadfoot}%
+\EndIndex{FontElement}{pagehead}%
+
+The meanings of the described commands within two side layouts are also
+sketched in \autoref{fig:scrlayer-scrpage.head}.%
+%
+\begin{desclist}
+  \desccaption[{Elements of \Package{scrlayer-scrpage} whose type style can be
+    changed with \KOMAScript{} command \Macro{setkomafont} or
+    \Macro{addtokomafont}}]%
+  {Elements of \Package{scrlayer-scrpage} whose type style can be changed with
+    \KOMAScript{} command \Macro{setkomafont} or \Macro{addtokomafont} and the
+    default of those, if they haven't been defined before loading
+    \Package{scrlayer-scrpage}%
+    \label{tab:scrlayer-scrpage.fontelements}%
+  }%
+  {Elements whose type style can be changed (\emph{continuation})}%
+  \feentry{footbotline}{%
+    Horizontal line below the footer of a page style defined using
+    \Package{scrlayer-scrpage}. The font will be used after
+    \Macro{normalfont}\IndexCmd{normalfont} and the fonts of elements
+    \FontElement{pageheadfoot}\IndexFontElement{pageheadfoot} and
+    \FontElement{pagefoot}\FontElement{pagefoot}. It is recommended to use
+    this element for colour changes only.\par
+    Default: \emph{empty}%
+   }%
+  \feentry{footsepline}{%
+    Horizontal line above the footer of a page style defined using
+    \Package{scrlayer-scrpage}. The font will be used after
+    \Macro{normalfont}\IndexCmd{normalfont} and the fonts of elements
+    \FontElement{pageheadfoot}\IndexFontElement{pageheadfoot} and
+    \FontElement{pagefoot}\FontElement{pagefoot}. It is recommended to use
+    this element for colour changes only.\par
+    Default: \emph{empty}%
+   }%
+  \feentry{headsepline}{%
+    Horizontal line below the header of a page style defined using
+    \Package{scrlayer-scrpage}. The font will be used after
+    \Macro{normalfont}\IndexCmd{normalfont} and the fonts of elements
+    \FontElement{pageheadfoot}\IndexFontElement{pageheadfoot} and
+    \FontElement{pagehead}\FontElement{pagehead}. It is recommended to use
+    this element for colour changes only.\par
+    Default: \emph{empty}%
+  }%
+  \feentry{headtopline}{%
+    Horizontal line above the header of a page style defined using
+    \Package{scrlayer-scrpage}. The font will be used after
+    \Macro{normalfont}\IndexCmd{normalfont} and the fonts of elements
+    \FontElement{pageheadfoot}\IndexFontElement{pageheadfoot} and
+    \FontElement{pagehead}\FontElement{pagehead}. It is recommended to use
+    this element for colour changes only.\par
+    Default: \emph{empty}%
+  }%
+  \feentry{pagefoot}{%
+    Contents of the page footer of a page style defined using
+    \Package{scrlayer-scrpage}. The font will be used after
+    \Macro{normalfont}\IndexCmd{normalfont} and the font of element
+    \FontElement{pageheadfoot}\IndexFontElement{pageheadfoot}.\par
+    Default: \emph{empty}%
+  }%
+  \feentry{pagehead}{%
+    Contents of the page header of a page style defined using
+    \Package{scrlayer-scrpage}. The font will be used after
+    \Macro{normalfont}\IndexCmd{normalfont} and the font of element
+    \FontElement{pageheadfoot}\IndexFontElement{pageheadfoot}.\par
+    Default: \emph{empty}%
+  }%
+  \feentry{pageheadfoot}{%
+    Contents of the page header or footer of a page style defined using
+    \Package{scrlayer-scrpage}. The font will be used after
+    \Macro{normalfont}\IndexCmd{normalfont}.\par
+    Default: \Macro{normalcolor}\Macro{slshape}%
+  }%
+  \feentry{pagenumber}{%
+    Pagination set with \Macro{pagemark}. If you redefine \Macro{pagemark} you
+    have to take care, that your redefinition also uses
+    \Macro{usekomafont}\PParameter{pagenumber}!\par
+    Default: \Macro{normalfont}%
+  }%
+\end{desclist}
+%
+\begin{figure}[tp]
+  \centering
+  \begin{picture}(\textwidth,30mm)(0,-10mm)
+    \thinlines
+    \small\ttfamily
+    % left/even page
+    \put(0,20mm){\line(1,0){.49\textwidth}}%
+    \put(0,0){\line(0,1){20mm}}%
+    \multiput(0,0)(0,-1mm){10}{\line(0,-1){.5mm}}%
+    \put(.49\textwidth,5mm){\line(0,1){15mm}}%
+    \put(.05\textwidth,10mm){%
+      \iffree{\color{red}}{}%
+      \put(-.5em,0){\line(1,0){4em}}%
+      \multiput(3.5em,0)(.25em,0){5}{\line(1,0){.125em}}%
+      \put(-.5em,0){\line(0,1){\baselineskip}}%
+      \put(-.5em,\baselineskip){\line(1,0){4em}}%
+      \multiput(3.5em,\baselineskip)(.25em,0){5}{\line(1,0){.125em}}%
+      \makebox(4em,5mm)[l]{\Macro{lehead}}%
+    }%
+    \put(.465\textwidth,10mm){%
+      \iffree{\color{blue}}{}%
+      \put(-4em,0){\line(1,0){4em}}%
+      \multiput(-4em,0)(-.25em,0){5}{\line(1,0){.125em}}%
+      \put(0,0){\line(0,1){\baselineskip}}%
+      \put(-4em,\baselineskip){\line(1,0){4em}}%
+      \multiput(-4em,\baselineskip)(-.25em,0){5}{\line(1,0){.125em}}%
+      \put(-4.5em,0){\makebox(4em,5mm)[r]{\Macro{rehead}}}%
+    }%
+    \put(.2525\textwidth,10mm){%
+      \iffree{\color{green}}{}%
+      \put(-2em,0){\line(1,0){4em}}%
+      \multiput(2em,0)(.25em,0){5}{\line(1,0){.125em}}%
+      \multiput(-2em,0)(-.25em,0){5}{\line(1,0){.125em}}%
+      \put(-2em,\baselineskip){\line(1,0){4em}}%
+      \multiput(2em,\baselineskip)(.25em,0){5}{\line(1,0){.125em}}%
+      \multiput(-2em,\baselineskip)(-.25em,0){5}{\line(1,0){.125em}}%
+      \put(-2em,0){\makebox(4em,5mm)[c]{\Macro{cehead}}}%
+    }%
+    % right/odd page
+    \put(.51\textwidth,20mm){\line(1,0){.49\textwidth}}%
+    \put(.51\textwidth,5mm){\line(0,1){15mm}}%
+    \put(\textwidth,0){\line(0,1){20mm}}%
+    \multiput(\textwidth,0)(0,-1mm){10}{\line(0,-1){.5mm}}%
+    \put(.5325\textwidth,10mm){%
+      \iffree{\color{blue}}{}%
+      \put(0,0){\line(1,0){4em}}%
+      \multiput(4em,0)(.25em,0){5}{\line(1,0){.125em}}%
+      \put(0,0){\line(0,1){\baselineskip}}%
+      \put(0em,\baselineskip){\line(1,0){4em}}%
+      \multiput(4em,\baselineskip)(.25em,0){5}{\line(1,0){.125em}}%
+      \put(.5em,0){\makebox(4em,5mm)[l]{\Macro{lohead}}}%
+    }%
+    \put(.965\textwidth,10mm){%
+      \iffree{\color{red}}{}%
+      \put(-4em,0){\line(1,0){4em}}%
+      \multiput(-4em,0)(-.25em,0){5}{\line(1,0){.125em}}%
+      \put(0,0){\line(0,1){\baselineskip}}%
+      \put(-4em,\baselineskip){\line(1,0){4em}}%
+      \multiput(-4em,\baselineskip)(-.25em,0){5}{\line(1,0){.125em}}%
+      \put(-4.5em,0){\makebox(4em,5mm)[r]{\Macro{rohead}}}%
+    }%
+    \put(.75\textwidth,10mm){%
+      \iffree{\color{green}}{}%
+      \put(-2em,0){\line(1,0){4em}}%
+      \multiput(2em,0)(.25em,0){5}{\line(1,0){.125em}}%
+      \multiput(-2em,0)(-.25em,0){5}{\line(1,0){.125em}}%
+      \put(-2em,\baselineskip){\line(1,0){4em}}%
+      \multiput(2em,\baselineskip)(.25em,0){5}{\line(1,0){.125em}}%
+      \multiput(-2em,\baselineskip)(-.25em,0){5}{\line(1,0){.125em}}%
+      \put(-2em,0){\makebox(4em,5mm)[c]{\Macro{cohead}}}%
+    }%
+    % commands for both pages
+    \iffree{\color{blue}}{}%
+    \put(.5\textwidth,0){\makebox(0,\baselineskip)[c]{\Macro{ihead}}}%
+    \iffree{\color{green}}{}%
+    \put(.5\textwidth,-5mm){\makebox(0,\baselineskip)[c]{\Macro{chead}}}
+    \iffree{\color{red}}{}%
+    \put(.5\textwidth,-10mm){\makebox(0,\baselineskip)[c]{\Macro{ohead}}}
+    \put(\dimexpr.5\textwidth-2em,.5\baselineskip){%
+      \iffree{\color{blue}}{}%
+      \put(0,0){\line(-1,0){1.5em}}%
+      \put(-1.5em,0){\vector(0,1){5mm}}%
+      \iffree{\color{green}}{}%
+      \put(0,-1.25\baselineskip){\line(-1,0){\dimexpr .25\textwidth-2em\relax}}%
+      \put(-\dimexpr
+      .25\textwidth-2em\relax,-1.25\baselineskip){\vector(0,1){\dimexpr
+          5mm+1.25\baselineskip\relax}}
+      \iffree{\color{red}}{}%
+      \put(0,-2.5\baselineskip){\line(-1,0){\dimexpr .45\textwidth-4em\relax}}%
+      \put(-\dimexpr
+      .45\textwidth-4em\relax,-2.5\baselineskip){\vector(0,1){\dimexpr
+          5mm+2.5\baselineskip\relax}}
+    }%
+    \put(\dimexpr.5\textwidth+2em,.5\baselineskip){%
+      \iffree{\color{blue}}{}%
+      \put(0,0){\line(1,0){1.5em}}%
+      \put(1.5em,0){\vector(0,1){5mm}}%
+      \iffree{\color{green}}{}%
+      \put(0,-1.25\baselineskip){\line(1,0){\dimexpr .25\textwidth-2em\relax}}
+      \put(\dimexpr
+      .25\textwidth-2em\relax,-1.25\baselineskip){\vector(0,1){\dimexpr
+          5mm+1.25\baselineskip\relax}}
+      \iffree{\color{red}}{}%
+      \put(0,-2.5\baselineskip){\line(1,0){\dimexpr .45\textwidth-4em\relax}}
+      \put(\dimexpr
+      .45\textwidth-4em\relax,-2.5\baselineskip){\vector(0,1){\dimexpr
+          5mm+2.5\baselineskip\relax}}
+   }%
+  \end{picture}
+  \caption[Commands to define the page head]%
+          {The meaning of the commands to define the contents of the page head
+            of the page styles sketched on a schematic double page}
+  \label{fig:scrlayer-scrpage.head}
+\end{figure}
+%
+\begin{Example}
+  Assumed you're writing a short article and you want the title of that
+  article be shown left aligned and the author's name be
+  shown right aligned at the page head. You may use, e.\,g.:
+\begin{lstcode}
+  \documentclass{scrartcl}
+  \usepackage{scrlayer-scrpage}
+  \lohead{John Doe}
+  \rohead{Page style with \KOMAScript}
+  \pagestyle{scrheadings}
+  \begin{document}
+  \title{Page styles with \KOMAScript}
+  \author{John Doe}
+  \maketitle
+  \end{document}
+\end{lstcode}
+  But what happens: On the first page there's only a page number at the page
+  foot, but the header is empty!
+
+  The explanation is very easy. Document class \Class{scrartcl} switches to
+  page style \Pagestyle{plain} for the page with the title head. After command
+  \Macro{pagestyle}\PParameter{scrheadings} in the preamble of the short
+  document this will actually result in page style
+  \Pagestyle{plain.scrheadings}. Using a \KOMAScript{} class the default of
+  this page style is an empty page header and a page number in the footer. In
+  the example code the optional arguments of \Macro{lohead} and \Macro{rohead}
+  are omitted. So page style \Pagestyle{plain.scrheadings} stays in the
+  unchanged default. So the result for the first page is indeed correct.
+
+  Please add some text below \Macro{maketitle} until a second page will be
+  printed. Alternatively you may just add
+  \Macro{usepackage}\PParameter{lipsum}\IndexPackage{lipsum} into the document
+  preamble and \Macro{lipsum}\IndexCmd{lipsum} below \Macro{maketitle}. You'll
+  see, that the head of the second page will show the author and the document
+  title as we wanted.
+
+  To see the difference you should also add an optional Argument to
+  \Macro{lohead} and \Macro{rohead} with some contents. To do so, change the
+  example above:
+ \begin{lstcode}
+  \documentclass{scrartcl}
+  \usepackage{scrlayer-scrpage}
+  \lohead[John Doe]
+         {John Doe}
+  \rohead[Page style with \KOMAScript]
+         {Page style with \KOMAScript}
+  \pagestyle{scrheadings}
+  \begin{document}
+  \title{Page styles with \KOMAScript}
+  \author{John Doe}
+  \maketitle
+  \end{document}
+\end{lstcode}
+  Now you'll get a page header also above the title head of the first
+  page. That's because you've reconfigured page style
+  \Pagestyle{plain.scrheadings} with the two optional arguments. Most of you
+  will also recognise, that it would be better to leave this page style
+  unchanged, because the running head above the document title is certainly
+  annoying.
+\end{Example}
+
+Allow me an important note:\textnote{Attention!} You should never put a
+section heading or section number into the running head using these commands
+directly. This could result in a wrong number or heading text in the running
+head, because of the asynchronous page generation and output of \TeX. Instead
+you should use the mark mechanism ideally together with the automatism
+described in the following section.%
+\EndIndex{Cmd}{rohead}%
+\EndIndex{Cmd}{cohead}%
+\EndIndex{Cmd}{lohead}%
+\EndIndex{Cmd}{rehead}%
+\EndIndex{Cmd}{cehead}%
+\EndIndex{Cmd}{lehead}%
+
+\begin{Declaration}
+  \Macro{lefoot}\OParameter{plain.scrheadings's content}%
+                \Parameter{scrheadings's content}\\
+  \Macro{cefoot}\OParameter{plain.scrheadings's content}%
+                \Parameter{scrheadings's content}\\
+  \Macro{refoot}\OParameter{plain.scrheadings's content}%
+                \Parameter{scrheadings's content}\\
+  \Macro{lofoot}\OParameter{plain.scrheadings's content}%
+                \Parameter{scrheadings's content}\\
+  \Macro{cofoot}\OParameter{plain.scrheadings's content}%
+                \Parameter{scrheadings's content}\\
+  \Macro{rofoot}\OParameter{plain.scrheadings's content}%
+                \Parameter{scrheadings's content}
+\end{Declaration}
+\BeginIndex{Cmd}{lefoot}%
+\BeginIndex{Cmd}{cefoot}%
+\BeginIndex{Cmd}{refoot}%
+\BeginIndex{Cmd}{lofoot}%
+\BeginIndex{Cmd}{cofoot}%
+\BeginIndex{Cmd}{rofoot}%
+The contents of the footer of page style \Pagestyle{plain.scrheadings} and
+\Pagestyle{scrheadings} can be defined using these commands. Thereby the
+optional argument defines the content of an element of page style
+\Pagestyle{plain.scrheadings}, while the mandatory argument sets the content
+of the corresponding element of page style \Pagestyle{scrheadings}.
+
+Contents of left\,---\,so called even\,---\,pages can be set with
+\Macro{lefoot}, \Macro{cefoot}, and \Macro{rohead}. Remark: The ``\texttt{e}''
+at the second position of the commands' names mean ``\emph{even}''.
+
+Contents of odd pages can be set with \Macro{lofoot}, \Macro{cofoot}, and
+\Macro{rofoot}. Remark: The ``\texttt{o}'' at the second position of the
+commands' names mean ``\emph{odd}''.
+
+Please note\textnote{Attention!}, that there are only odd pages within single
+side layouts independent of whether or not they have a odd page number.
+
+Each footer consists of a left aligned element, that will be defined by
+\Macro{lefoot} respectively \Macro{lofoot}. Remark: The ``\texttt{l}'' at the
+first position of the commands' names mean ``\emph{left aligned}''.
+
+Similarly each footer has a centred element, that will be defined by
+\Macro{cefoot} respectively \Macro{cofoot}. Remark: The ``\texttt{c}'' at the
+first position of the command' names mean ``\emph{centred}''.
+
+Similarly each footer has a right aligned element, that will be defined by
+\Macro{refoot} respectively \Macro{rofoot}. Remark: The ``\texttt{r}'' at the
+first position of the commands' names mean ``\emph{right aligned}''.
+
+\BeginIndex{FontElement}{pagefoot}%
+\BeginIndex{FontElement}{pageheadfoot}%
+However, these elements don't have a font attribution, that may be changed
+using commands \Macro{setkomafont} and \Macro{addtokomafont} (see
+\autoref{sec:maincls.textmarkup}, \autopageref{desc:maincls.cmd.setkomafont}),
+on their own but altogether as an element named \FontElement{pagefoot}. And
+before the font of that element additionally the font of element
+\FontElement{pageheadfoot} will be used. See
+\autoref{tab:scrlayer-scrpage.fontelements} for the defaults of the fonts of
+these elements.%
+\EndIndex{FontElement}{pageheadfoot}%
+\EndIndex{FontElement}{pagefoot}%
+
+The meanings of the described commands within two side layouts are also
+sketched in \autoref{fig:scrlayer-scrpage.foot}.%
+%
+\begin{figure}[bp]
+  \centering
+  \begin{picture}(\textwidth,30mm)
+    \thinlines
+    \small\ttfamily
+    % left page
+    \put(0,0){\line(1,0){.49\textwidth}}%
+    \put(0,0){\line(0,1){20mm}}%
+    \multiput(0,20mm)(0,1mm){10}{\line(0,1){.5mm}}%
+    \put(.49\textwidth,0){\line(0,1){15mm}}%
+    \put(.05\textwidth,5mm){%
+      \iffree{\color{red}}{}%
+      \put(-.5em,0){\line(1,0){4em}}%
+      \multiput(3.5em,0)(.25em,0){5}{\line(1,0){.125em}}%
+      \put(-.5em,0){\line(0,1){\baselineskip}}%
+      \put(-.5em,\baselineskip){\line(1,0){4em}}%
+      \multiput(3.5em,\baselineskip)(.25em,0){5}{\line(1,0){.125em}}%
+      \makebox(4em,5mm)[l]{\Macro{lefoot}}%
+    }%
+    \put(.465\textwidth,5mm){%
+      \iffree{\color{blue}}{}%
+      \put(-4em,0){\line(1,0){4em}}%
+      \multiput(-4em,0)(-.25em,0){5}{\line(1,0){.125em}}%
+      \put(0,0){\line(0,1){\baselineskip}}%
+      \put(-4em,\baselineskip){\line(1,0){4em}}%
+      \multiput(-4em,\baselineskip)(-.25em,0){5}{\line(1,0){.125em}}%
+      \put(-4.5em,0){\makebox(4em,5mm)[r]{\Macro{refoot}}}%
+    }%
+    \put(.2525\textwidth,5mm){%
+      \iffree{\color{green}}{}%
+      \put(-2em,0){\line(1,0){4em}}%
+      \multiput(2em,0)(.25em,0){5}{\line(1,0){.125em}}%
+      \multiput(-2em,0)(-.25em,0){5}{\line(1,0){.125em}}%
+      \put(-2em,\baselineskip){\line(1,0){4em}}%
+      \multiput(2em,\baselineskip)(.25em,0){5}{\line(1,0){.125em}}%
+      \multiput(-2em,\baselineskip)(-.25em,0){5}{\line(1,0){.125em}}%
+      \put(-2em,0){\makebox(4em,5mm)[c]{\Macro{cefoot}}}%
+    }%
+    % right page
+    \put(.51\textwidth,0){\line(1,0){.49\textwidth}}%
+    \put(.51\textwidth,0){\line(0,1){15mm}}%
+    \put(\textwidth,0){\line(0,1){20mm}}%
+    \multiput(\textwidth,20mm)(0,1mm){10}{\line(0,1){.5mm}}%
+    \put(.5325\textwidth,5mm){%
+      \iffree{\color{blue}}{}%
+      \put(0,0){\line(1,0){4em}}%
+      \multiput(4em,0)(.25em,0){5}{\line(1,0){.125em}}%
+      \put(0,0){\line(0,1){\baselineskip}}%
+      \put(0em,\baselineskip){\line(1,0){4em}}%
+      \multiput(4em,\baselineskip)(.25em,0){5}{\line(1,0){.125em}}%
+      \put(.5em,0){\makebox(4em,5mm)[l]{\Macro{lofoot}}}%
+    }%
+    \put(.965\textwidth,5mm){%
+      \iffree{\color{red}}{}%
+      \put(-4em,0){\line(1,0){4em}}%
+      \multiput(-4em,0)(-.25em,0){5}{\line(1,0){.125em}}%
+      \put(0,0){\line(0,1){\baselineskip}}%
+      \put(-4em,\baselineskip){\line(1,0){4em}}%
+      \multiput(-4em,\baselineskip)(-.25em,0){5}{\line(1,0){.125em}}%
+      \put(-4.5em,0){\makebox(4em,5mm)[r]{\Macro{rofoot}}}%
+    }%
+    \put(.75\textwidth,5mm){%
+      \iffree{\color{green}}{}%
+      \put(-2em,0){\line(1,0){4em}}%
+      \multiput(2em,0)(.25em,0){5}{\line(1,0){.125em}}%
+      \multiput(-2em,0)(-.25em,0){5}{\line(1,0){.125em}}%
+      \put(-2em,\baselineskip){\line(1,0){4em}}%
+      \multiput(2em,\baselineskip)(.25em,0){5}{\line(1,0){.125em}}%
+      \multiput(-2em,\baselineskip)(-.25em,0){5}{\line(1,0){.125em}}%
+      \put(-2em,0){\makebox(4em,5mm)[c]{\Macro{cofoot}}}%
+    }%
+    % both pages
+    \iffree{\color{blue}}{}%
+    \put(.5\textwidth,15mm){\makebox(0,\baselineskip)[c]{\Macro{ifoot}}}%
+    \iffree{\color{green}}{}%
+    \put(.5\textwidth,20mm){\makebox(0,\baselineskip)[c]{\Macro{cfoot}}}
+    \iffree{\color{red}}{}%
+    \put(.5\textwidth,25mm){\makebox(0,\baselineskip)[c]{\Macro{ofoot}}}
+    \put(\dimexpr.5\textwidth-2em,.5\baselineskip){%
+      \iffree{\color{blue}}{}%
+      \put(0,15mm){\line(-1,0){1.5em}}%
+      \put(-1.5em,15mm){\vector(0,-1){5mm}}%
+      \iffree{\color{green}}{}%
+      \put(0,20mm){\line(-1,0){\dimexpr .25\textwidth-2em\relax}}%
+      \put(-\dimexpr .25\textwidth-2em\relax,20mm){\vector(0,-1){10mm}}%
+      \iffree{\color{red}}{}%
+      \put(0,25mm){\line(-1,0){\dimexpr .45\textwidth-4em\relax}}%
+      \put(-\dimexpr .45\textwidth-4em\relax,25mm){\vector(0,-1){15mm}}%
+    }%
+    \put(\dimexpr.5\textwidth+2em,.5\baselineskip){%
+      \iffree{\color{blue}}{}%
+      \put(0,15mm){\line(1,0){1.5em}}%
+      \put(1.5em,15mm){\vector(0,-1){5mm}}%
+      \iffree{\color{green}}{}%
+      \put(0,20mm){\line(1,0){\dimexpr .25\textwidth-2em\relax}}%
+      \put(\dimexpr .25\textwidth-2em\relax,20mm){\vector(0,-1){10mm}}%
+      \iffree{\color{red}}{}%
+      \put(0,25mm){\line(1,0){\dimexpr .45\textwidth-4em\relax}}%
+      \put(\dimexpr .45\textwidth-4em\relax,25mm){\vector(0,-1){15mm}}%
+    }%
+  \end{picture}
+  \caption[Commands to define the page footer]%
+          {The meaning of the commands to define the contents of the page
+            footer of the page styles sketched on a schematic double page}%
+  \label{fig:scrlayer-scrpage.foot}
+\end{figure}
+%
+\begin{Example}
+  Let's return to the example of the short article. Assumed you want to print
+  the publisher at the left side of the page footer. So you'd change the
+  example above into:
+\begin{lstcode}
+  \documentclass{scrartcl}
+  \usepackage{scrlayer-scrpage}
+  \lohead{John Doe}
+  \rohead{Page style with \KOMAScript}
+  \lofoot{Smart Alec Publishing}
+  \pagestyle{scrheadings}
+  \usepackage{lipsum}
+  \begin{document}
+  \title{Page styles with \KOMAScript}
+  \author{John Doe}
+  \maketitle
+  \lipsum
+  \end{document}
+\end{lstcode}
+  Once again the publisher isn't printed on the first page with the title
+  head. For the reason see the explanation about \Macro{lohead} in the example
+  above. And again the solution to print the publisher on the first page would
+  be similar:
+\begin{lstcode}
+  \lofoot[Smart Alec Publishing]
+         {Smart Alec Publishing}
+\end{lstcode}
+  But now you also want to replace the slanted font used in page head and
+  footer by a upright smaller font. This may be done using:
+\begin{lstcode}
+  \setkomafont{pageheadfoot}{\small}
+\end{lstcode}
+  Furthermore, the head but not the footer should be bold:
+\begin{lstcode}
+  \setkomafont{pagehead}{\bfseries}
+\end{lstcode}
+  For the last command it's important to have it just after
+  \Package{scrpage-scrlayer} has been loaded, because
+  the \KOMAScript{} class already defines \FontElement{pagehead} and
+  \FontElement{pageheadfoot} but with the same meaning. Only loading
+  \Package{scrpage-scrlayer} changes the meaning of \FontElement{pagehead} and
+  make it an element independent from \FontElement{pageheadfoot}.
+
+  Now, please add one more \Macro{lipsum} and add option \Option{twoside} to
+  the loading of \Class{scrartcl}. First of all, you will see the page number
+  moving from the middle of the page footer to the outer margin. This is
+  because of the changed defaults of \Pagestyle{scrheadings} and
+  \Pagestyle{plain.scrheadings} with double sided layout and a \KOMAScript{}
+  class.
+
+  Simultaneously the author, document title and publisher will vanish from
+  page~2. It only appears on page~3. This is because of using only commands
+  for odd pages. You can recognise this by the ``\texttt{o}'' on the second
+  position of the commands' names.
+
+  Now, we could simply copy those commands and replace the ``\texttt{o}'' by
+  an ``\texttt{e}'' to define the contents of \emph{even} pages. But with
+  double sided layout it makes more sense to use mirror-inverted elements. So
+  the left element of an odd page should become the right element of the even
+  page and visa versa. To achieve this, we also replace the first letter
+  ``\texttt{l}'' by ``\texttt{r}'':
+\begin{lstcode}
+  \documentclass[twoside]{scrartcl}
+  \usepackage{scrlayer-scrpage}
+  \lohead{John Doe}
+  \rohead{Page style with \KOMAScript}
+  \lofoot[Smart Alec Publishing]
+         {Smart Alec Publishing}
+  \rehead{John Doe}
+  \lohead{Page style with \KOMAScript}
+  \refoot[Smart Alec Publishing]
+         {Smart Alec Publishing}
+  \pagestyle{scrheadings}
+  \usepackage{lipsum}
+  \begin{document}
+  \title{Page styles with \KOMAScript}
+  \author{John Doe}
+  \maketitle
+  \lipsum\lipsum
+  \end{document}
+\end{lstcode}
+\end{Example}
+%
+After reading the example you may find, that it is somehow uncomfortable to
+duplicate commands to have the same contents on mirror positions of the page
+header or footer of a double page. Because of this, you will learn to know an
+easier solution for this standard case next.
+
+Before allow me an important note:\textnote{Attention!} You should never put a
+section heading or section number into the running footer using these commands
+directly. This could result in a wrong number or heading text in the running
+footer, because of the asynchronous page generation and output of \TeX. Instead
+you should use the mark mechanism ideally together with the automatism
+described in the following section.%
+\EndIndex{Cmd}{rofoot}%
+\EndIndex{Cmd}{cofoot}%
+\EndIndex{Cmd}{lofoot}%
+\EndIndex{Cmd}{refoot}%
+\EndIndex{Cmd}{cefoot}%
+\EndIndex{Cmd}{lefoot}%
+
+\begin{Declaration}
+  \Macro{ohead}\OParameter{plain.scrheadings's content}%
+                \Parameter{scrheadings's content}\\
+  \Macro{chead}\OParameter{plain.scrheadings's content}%
+                \Parameter{scrheadings's content}\\
+  \Macro{ihead}\OParameter{plain.scrheadings's content}%
+                \Parameter{scrheadings's content}\\
+  \Macro{ofoot}\OParameter{plain.scrheadings's content}%
+                \Parameter{scrheadings's content}\\
+  \Macro{cfoot}\OParameter{plain.scrheadings's content}%
+                \Parameter{scrheadings's content}\\
+  \Macro{ifoot}\OParameter{plain.scrheadings's content}%
+                \Parameter{scrheadings's content}
+\end{Declaration}
+\BeginIndex{Cmd}{ohead}%
+\BeginIndex{Cmd}{chead}%
+\BeginIndex{Cmd}{ihead}%
+\BeginIndex{Cmd}{ofoot}%
+\BeginIndex{Cmd}{cfoot}%
+\BeginIndex{Cmd}{ifoot}%
+To define the contents of page headers and footers of odd and the even pages
+of a double side layout using the commands described before, you would have to
+define the contents of the even page different from the contents of the odd
+page. But in general the pages should be symmetric. An element, that should be
+printed left aligned on an even page, should be right aligned on an odd page
+and vise versa. Elements, that are centred on odd pages should be centred on
+even pages too.
+
+To simplify the definition of such symmetric page styles,
+\Package{scrlayer-scrpage} provides a kind of abbreviation. Command
+\Macro{ohead} is same like usage of both \Macro{lehead} and
+\Macro{rohead}. Command \Macro{chead} is same like \Macro{cehead} and
+\Macro{cohead}. And command \Macro{ihead} is same like \Macro{rehead} and
+\Macro{lohead}. You may find corresponding command for the page footer too. A
+sketch of these commands may be find also in
+\autoref{fig:scrlayer-scrpage.head} on \autopageref{fig:scrlayer-scrpage.head}
+and \autoref{fig:scrlayer-scrpage.foot} on
+\autopageref{fig:scrlayer-scrpage.foot} together with the relationships of all
+the page header and footer commands.
+%
+\begin{Example}
+  You can simplify the example before using the new commands:
+\begin{lstcode}
+  \documentclass[twoside]{scrartcl}
+  \usepackage{scrlayer-scrpage}
+  \ihead{John Doe}
+  \ohead{Page style with \KOMAScript}
+  \ifoot[Smart Alec Publishing]
+        {Smart Alec Publishing}
+  \pagestyle{scrheadings}
+  \usepackage{lipsum}
+  \begin{document}
+  \title{Page styles with \KOMAScript}
+  \author{John Doe}
+  \maketitle
+  \lipsum\lipsum
+  \end{document}
+\end{lstcode}
+  As you can see, you can spare half of the commands but get the same result.
+\end{Example}
+%
+In single side layout all pages are odd pages. So in single side layout these
+commands are synonymous for the odd page commands. So in most cases you will
+only need these six commands instead of the twelve described before.
+
+Once again, allow me an important note:\textnote{Attention!} You should never
+put a section heading or section number into the running header or footer
+using these commands directly. This could result in a wrong number or heading
+text in the running header or footer, because of the asynchronous page
+generation and output of \TeX. Instead you should use the mark mechanism
+ideally together with the automatism described in the following section.%
+\EndIndex{Cmd}{ihead}%
+\EndIndex{Cmd}{chead}%
+\EndIndex{Cmd}{ohead}%
+\EndIndex{Cmd}{ifoot}%
+\EndIndex{Cmd}{cfoot}%
+\EndIndex{Cmd}{ofoot}%
+
+
+\begin{Declaration}
+  \KOption{pagestyleset}\PName{settings}
+\end{Declaration}
+\BeginIndex{Option}{pagestyleset~=KOMA-Script}%
+\BeginIndex{Option}{pagestyleset~=standard}%
+%
+\BeginIndex{Option}{komastyle}%
+\BeginIndex{Option}{standardstyle}%
+%
+\EndIndex{Option}{standardstyle}%
+\EndIndex{Option}{komastyle}%
+\EndIndex{Option}{pagestyleset~=standard}%
+\EndIndex{Option}{pagestyleset~=KOMA-Script}%
+
+\LoadCommon{21} % \section{Beeinflussung von definierten Seitenstilen}
+
+\begin{Declaration}
+  \KOption{headwidth}\PName{width\textup{:}offset}\\
+  \KOption{footwidth}\PName{width\textup{:}offset}
+\end{Declaration}
+\BeginIndex{Option}{headwidth~=\PName{offset\textup{:}width}}%
+\BeginIndex{Option}{footwidth~=\PName{offset\textup{:}width}}%
+%
+\EndIndex{Option}{footwidth~=\PName{offset\textup{:}width}}%
+\EndIndex{Option}{headwidth~=\PName{offset\textup{:}width}}%
+
+\begin{Declaration}
+  \KOption{headtopline}\PName{thickness\textup{:}length}\\
+  \KOption{headsepline}\PName{thickness\textup{:}length}\\
+  \KOption{footsepline}\PName{thickness\textup{:}length}\\
+  \KOption{footbotline}\PName{thickness\textup{:}length}
+\end{Declaration}
+\BeginIndex{Option}{headtopline~=\PName{thickness\textup{:}length}}%
+\BeginIndex{Option}{headsepline~=\PName{thickness\textup{:}length}}%
+\BeginIndex{Option}{footsepline~=\PName{thickness\textup{:}length}}%
+\BeginIndex{Option}{footbotline~=\PName{thickness\textup{:}length}}%
+%
+\BeginIndex{FontElement}{headtopline}%
+\BeginIndex{FontElement}{headsepline}%
+\BeginIndex{FontElement}{footsepline}%
+\BeginIndex{FontElement}{footbotline}%
+%
+\EndIndex{FontElement}{footbotline}%
+\EndIndex{FontElement}{footsepline}%
+\EndIndex{FontElement}{headsepline}%
+\EndIndex{FontElement}{headtopline}%
+%
+\BeginIndex{Cmd}{setheadtopline}%
+\BeginIndex{Cmd}{setheadseoline}%
+\BeginIndex{Cmd}{setfootsepline}%
+\BeginIndex{Cmd}{setfootbotline}%
+%
+\EndIndex{Cmd}{setfootbotline}%
+\EndIndex{Cmd}{setfootsepline}%
+\EndIndex{Cmd}{setheadseoline}%
+\EndIndex{Cmd}{setheadtopline}%
+%
+\EndIndex{Option}{footbotline~=\PName{thickness\textup{:}length}}%
+\EndIndex{Option}{footsepline~=\PName{thickness\textup{:}length}}%
+\EndIndex{Option}{headsepline~=\PName{thickness\textup{:}length}}%
+\EndIndex{Option}{headtopline~=\PName{thickness\textup{:}length}}%
+
+
+\begin{Declaration}
+  \KOption{plainheadtopline}\PName{simple switch}\\
+  \KOption{plainheadsepline}\PName{simple switch}\\
+  \KOption{plainfootsepline}\PName{simple switch}\\
+  \KOption{plainfootbotline}\PName{simple switch}
+\end{Declaration}
+\BeginIndex{Option}{plainheadtopline~=\PName{simple switch}}%
+\BeginIndex{Option}{plainheadsepline~=\PName{simple switch}}%
+\BeginIndex{Option}{plainfootsepline~=\PName{simple switch}}%
+\BeginIndex{Option}{plainfootbotline~=\PName{simple switch}}%
+%
+\EndIndex{Option}{plainfootbotline~=\PName{simple switch}}%
+\EndIndex{Option}{plainfootsepline~=\PName{simple switch}}%
+\EndIndex{Option}{plainheadsepline~=\PName{simple switch}}%
+\EndIndex{Option}{plainheadtopline~=\PName{simple switch}}%
+
+\begin{Declaration}
+  \Option{ilines}\\
+  \Option{clines}\\
+  \Option{olines}
+\end{Declaration}
+\BeginIndex{Option}{ilines}%
+\BeginIndex{Option}{clines}%
+\BeginIndex{Option}{olines}%
+%
+\EndIndex{Option}{olines}%
+\EndIndex{Option}{clines}%
+\EndIndex{Option}{ilines}%
+
+\emph{Sorry, parts of this section has been translated not yet. Please see
+  \autoref{sec:scrpage.basics.buildIn} for at least some
+  information. Additional information may be found in the implementation
+  manual \File{scrlayer-scrpage.pdf}.}
+
+
+\section{Definition of new Pairs of Page Styles}
+\label{sec:scrlayer-scrpage.pagestyle.pairs}
+
+\emph{Sorry, this section has been translated not yet. Because of this
+  information may be found in the implementation manual
+  \File{scrlayer-scrpage.pdf} only.}
+
+\section{Definition of Simple Page Style with Three Parts Head and Foot }
+\label{sec:scrlayer-scrpage.pagestyle.triple}
+
+\emph{Sorry, this section has been translated not yet. Please see
+  \autoref{sec:scrpage.UI.user} for at least some
+  information. Additional information may be found in the implementation
+  manual \File{scrlayer-scrpage.pdf}.}
+
+\section{Definition of Complex Page Styles}
+\label{sec:scrlayer-scrpage.pagestyle.experts}
+ 
+\emph{Sorry, this section has been translated not yet. Please see
+  \autoref{sec:scrpage.UI.expert} for at least some
+  information. Additional information may be found in the implementation
+  manual \File{scrlayer-scrpage.pdf}.}
+
+%
+\EndIndex{Package}{scrlayer-scrpage}%
+
+%%% Local Variables:
+%%% mode: latex
+%%% mode: flyspell
+%%% coding: us-ascii
+%%% ispell-local-dictionary: "en_GB"
+%%% TeX-master: "../guide"
+%%% End: 
+
