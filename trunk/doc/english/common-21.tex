@@ -62,6 +62,350 @@
 \section{Manipulation of Defined Page Styles}
 \label{sec:\csname label@base\endcsname.pagestyle.content}
 
+\IfCommon{scrlayer}{%
+  Even though \Package{scrlayer} itself doesn't define a concrete page style
+  with content\,---\,the already mentioned page style \Pagestyle{@everystyle@}
+  and \Pagestyle{empty} initially are defined without any level and so empty
+  and without content\,---\,, it provides some options and commands for the
+  manipulation of the contents.%
+}
+
+\IfCommon{scrlayer-scrpage}{%
+  In \autoref{sec:scrlayer-scrpage.predefined.pagestyles} you've been told,
+  how the page styles \Pagestyle{scrheadings} and
+  \Pagestyle{plain.scrheadings} habe been predefined by default and how you
+  can change these default generally. But information about the generation of,
+  i.\,e., the running heads, the manipulation of the widths of page head and
+  footer, and how you can get horizontal lines printed above or below the page
+  head or footer are still missing. Even though all these are features of
+  package \Package{scrlayer}, they will be described consecutively, because
+  these basic features of \Package{scrlayer} are also an evident part of the
+  features of \Package{scrlayer-scrpage}.%
+}
+
+\ifshortversion\IgnoreThistrue\IfCommon{scrlayer-scrpage}{\IgnoreThisfalse}\fi
+\ifIgnoreThis %++++++++++++++++++++++++++++++++++++++++ not scrlayer-scrpage +
+\else %----------------------------------------------- only scrlayer-scrpage -
+
+\begin{Declaration}
+  \Macro{automark}\OParameter{section level of the right mark}%
+                  \Parameter{section level of the left mark}\\
+  \Macro{automark*}\OParameter{section level of the right mark}%
+                  \Parameter{section level of the left mark}\\
+  \Macro{manualmark}\\
+  \Option{automark}\\
+  \KOption{autooneside}\PName{simple switch}\\
+  \Option{manualmark}
+\end{Declaration}
+\BeginIndex{Cmd}{automark}%
+\BeginIndex{Cmd}{manualmark}%
+\BeginIndex{Option}{automark}%
+\BeginIndex{Option}{manualmark}%
+\BeginIndex{Option}{autooneside~=\PName{simple switch}}%
+With the \LaTeX{} standard classes or the \KOMAScript{} classes the decision
+whether using automatic running heads\Index{running heads>automatic}, or
+static or manual running heads\Index{running heads>static}\Index{running
+  heads>manual} would be done using either page style \Pagestyle{headings} or
+\Pagestyle{myheadings}. Automatic running heads are replications of a
+significant, characterizing text of the page mostly inside the page head,
+sometimes in the page footer.
+
+The article classes\OnlyAt{\Class{article}\and \Class{scrartcl}}
+\Class{article} or \Class{scrartcl} with page style
+\Pagestyle{headings}\IndexPagestyle{headings} use the section heading, which
+is either the mandatory or the optional argument of \Macro{section}, for the
+automatic running head of single side documents. Double side documents use
+this section heading as the \emph{left mark} and at once use the subsection
+heading as the \emph{right mark}. The left mark will be printed on left pages,
+which founds the name \emph{left mark}. The right mark will be printed on
+right\,---\,in single side mode this means every\,---\,page. The classes by
+default also remove the right mark whenever they put the section heading into
+the left mark.
+
+The report and book classes \OnlyAt{\Class{report}\and
+  \Class{scrreprt}\and \Class{book}\and \Class{scrbook}} start one level
+higher. So they use the chapter heading to be the right mark in single side
+layout. In double side layout the use the chapter heading to be the left mark
+and the section heading to be the right mark.
+
+If you are using \Pagestyle{myheadings} instead of
+\Pagestyle{headings}\IndexPagestyle{myheadings}, the marks in the page header
+still exists and would be printed same like using \Pagestyle{headings}. But
+section commands won't automatically set the marks any longer. So you can fill
+them up only using the commands \Macro{markright} and \Macro{markboth}, that
+will be described later in this section.
+
+This difference between two page style has been abolished with
+\Package{scrpage2} and also with \Package{scrlayer}. Instead of distinguish
+between automatic and manual running head by the selection of a page style,
+two new commands, \Macro{automark} and \Macro{manualmark}, are
+provided. Thereby \Macro{manualmark} switches to manual marks and deactivates
+the automatic filling of the marks. In contrast to this \Macro{automark} and
+\Macro{automark*} can be used to define, which section levels should be used
+for the automatic mark filling. The optional argument is the \PName{section
+  level of the right mark}, the mandatory argument the \PName{section level of
+  the left mark}. The arguments always should be the name of a section level
+like  \PValue{part}, \PValue{chapter}, \PValue{section}, \PValue{subsection},
+\PValue{subsubsection}, \PValue{paragraph}, or \PValue{subparagraph}.
+
+Generally the higher level should be used for the left mark and the lower
+level for the right mark. This is only a convention and not a need, but it
+makes sense.
+
+The difference in \Macro{automark} and \Macro{automark*} is, that
+\Macro{automark} deleted all prior usages of \Macro{automark} or
+\Macro{automark*}, while \Macro{automark*} changes only the behaviour of the
+section levels of it's arguments. So you can even build more complex cases.
+
+\begin{Example}
+  Assumed you want the chapter heading to be the running head of even pages
+  and the section heading to be the running head of odd pages like this is
+  usual for books. But on odd pages you also want the chapter headings as a
+  running head as long as the first section appears. To do so, you first have
+  to load \Package{scrlayer-scrpage} and select page style
+  \Pagestyle{scrheadings}. So you're document starts with:
+\begin{lstcode}
+  \documentclass{scrbook}
+  \usepackage{scrlayer-scrpage}
+  \pagestyle{scrheadings}
+\end{lstcode}
+  Next you will setup the chapter heading to be not only the left but also the
+  right mark:
+\begin{lstcode}
+  \automark[chapter]{chapter}
+\end{lstcode}
+  Then the section heading should also become a right mark:
+\begin{lstcode}
+   \automark*[section]{}
+\end{lstcode}
+  Here the star version is used, because the prior \Macro{automark} command
+  should be still valid. Additionally the mandatory argument for the
+  \PName{section level of the left mark} is empty, because this mark should be
+  unchanged.
+
+  Now you just need some document contents to see a result:
+\begin{lstcode}
+  \usepackage{lipsum}
+  \begin{document}
+  \chapter{Chapter Heading}
+  \lipsum[1-20]
+  \section{Section Heading}
+  \lipsum[21-40]
+  \end{document}
+\end{lstcode}
+  We once again use package \Package{lipsum}\IndexPackage{lipsum} to generate
+  some dummy text with command \Macro{lipsum}\IndexCmd{lipsum}. The package is
+  really useful.
+
+  If you'd test the example, you'd see, that the chapter start page will be
+  without running head as usual. This is, because it automatically uses the
+  \Pagestyle{plain} page style \Pagestyle{plain.scrheadings}. Pages~2--4 have
+  the chapter headings in the running head. After the section heading on
+  page~4 the running head of page~5 changes into this section heading. From
+  this page to the end the running head alternates between chapter and section
+  heading from page to page.
+\end{Example}
+
+Instead of the commands you may also use the options \Option{manualmark} and
+\Option{automark} to switch between manual and automatic running
+heads. Thereby \Option{automark} always uses the default
+\begin{lstcode}[belowskip=\dp\strutbox]
+  \automark[section]{chapter}
+\end{lstcode}
+for classes with \Macro{chapter} and
+\begin{lstcode}[belowskip=\dp\strutbox]
+  \automark[subsection]{section}
+\end{lstcode}
+for classes without \Macro{chapter}.
+
+But normally in single side mode you don't want, that the lower level
+influences the right mark. Instead of this you want the higher level, that
+will fill only the left mark in double side layout, to be the running head of
+all pages. The default option \Option{autooneside} corresponds with this
+behaviour. The option understands the values for simple switches, that can be
+found in  \autoref{tab:truefalseswitch} on
+\autopageref{tab:truefalseswitch}. If you'd deactivate the option, in single
+side layout the optional and the obligatory arguments of \Macro{automark} and
+\Macro{automark*} will influence the running head again.%
+%
+\begin{Example}
+  Assumed, you have a single sided report but want similar running heads like
+  for the book in the example before. Concretely the chapter headings should
+  be used as a running head as long as the first section appears. From the
+  first section on, the section heading should be used. So we modify the
+  example before a little bit:
+\begin{lstcode}
+  \documentclass{scrreprt}
+  \usepackage[autooneside=false]{scrlayer-scrpage}
+  \pagestyle{scrheadings}
+  \automark[section]{chapter}
+  \usepackage{lipsum}
+  \begin{document}
+  \chapter{Chapter Heading}
+  \lipsum[1-20]
+  \section{Section Heading}
+  \lipsum[21-40]
+  \end{document}
+\end{lstcode}
+  You can see, that we don't need a \Macro{automark*} command in this
+  case. Please try the example also with \Option{autooneside} set to
+  \PValue{true} or remove the option and it's value. You should find a
+  difference at the running head in the pages' head from page~4 on.
+\end{Example}
+
+Please note\textnote{Attention!}, that loading the package only doesn't have
+any effect on the fact whether automatic or manual running heads are used or
+what kind of section headings do fill up the marks. Only using an explicit
+option \Option{automark} or \Option{manualmark} or one of the commands
+\Macro{automark} or \Macro{manualmark} can reach a well defined state.%
+\EndIndex{Option}{autooneside~=\PName{simple switch}}%
+\EndIndex{Option}{manualmark}%
+\EndIndex{Option}{automark}%
+\EndIndex{Cmd}{manualmark}%
+\EndIndex{Cmd}{automark}%
+\fi % ******************************************** End only scrlayer-scrpage *
+
+\ifshortversion\IgnoreThistrue\IfCommon{scrlayer}{\IgnoreThisfalse}\fi
+\ifIgnoreThis %++++++++++++++++++++++++++++++++++++++++++++++++ not scrlayer +
+\else %------------------------------------------------------- only scrlayer -
+
+\begin{Declaration}
+  \KOption{draft}\PName{simple switch}
+\end{Declaration}
+\BeginIndex{Option}{draft~=\PName{simple switch}}%
+%
+\EndIndex{Cmd}{MakeMarkcase}%
+\fi %***************************************************** End only scrlayer *
+
+\ifshortversion\IgnoreThistrue\IfCommon{scrlayer-scrpage}{\IgnoreThisfalse}\fi
+\ifIgnoreThis %++++++++++++++++++++++++++++++++++++++++ not scrlayer-scrpage +
+\else %----------------------------------------------- only scrlayer-scrpage -
+\begin{Declaration}
+  \KOption{markcase}\PName{Wert}
+\end{Declaration}
+\BeginIndex{Option}{markcase~=\PName{Wert}}%
+%
+\EndIndex{Option}{markcase~=\PName{Wert}}%
+
+\begin{Declaration}
+  \Macro{leftmark}\\
+  \Macro{rightmark}\\
+  \Macro{headmark}\\
+  \Macro{pagemark}
+\end{Declaration}
+\BeginIndex{Cmd}{leftmark}%
+\BeginIndex{Cmd}{rightmark}%
+\BeginIndex{Cmd}{headmark}%
+\BeginIndex{Cmd}{pagemark}%
+%
+\EndIndex{Cmd}{pagemark}%
+\EndIndex{Cmd}{headmark}%
+\EndIndex{Cmd}{rightmark}%
+\EndIndex{Cmd}{leftmark}%
+
+\begin{Declaration}
+  \Macro{partmarkformat}\\
+  \Macro{chaptermarkformat}\\
+  \Macro{sectionmarkformat}\\
+  \Macro{subsectionmarkformat}\\
+  \Macro{subsubsectionmarkformat}\\
+  \Macro{paragraphmarkformat}\\
+  \Macro{subparagraphmarkformat}
+\end{Declaration}
+\BeginIndex{Cmd}{partmarkformat}%
+\BeginIndex{Cmd}{chaptermarkformat}%
+\BeginIndex{Cmd}{sectionmarkformat}%
+\BeginIndex{Cmd}{subsectionmarkformat}%
+\BeginIndex{Cmd}{subsubsectionmarkformat}%
+\BeginIndex{Cmd}{paragraphmarkformat}%
+\BeginIndex{Cmd}{subparagraphmarkformat}%
+%
+\EndIndex{Cmd}{subparagraphmarkformat}%
+\EndIndex{Cmd}{paragraphmarkformat}%
+\EndIndex{Cmd}{subsubsectionmarkformat}%
+\EndIndex{Cmd}{subsectionmarkformat}%
+\EndIndex{Cmd}{sectionmarkformat}%
+\EndIndex{Cmd}{chaptermarkformat}%
+\EndIndex{Cmd}{partmarkformat}%
+
+\begin{Declaration}
+  \Macro{partmark}\Parameter{Text}\\
+  \Macro{chaptermark}\Parameter{Text}\\
+  \Macro{sectionmark}\Parameter{Text}\\
+  \Macro{subsectionmark}\Parameter{Text}\\
+  \Macro{subsubsectionmark}\Parameter{Text}\\
+  \Macro{paragraphmark}\Parameter{Text}\\
+  \Macro{subparagraphmark}\Parameter{Text}
+\end{Declaration}
+\BeginIndex{Cmd}{partmark}%
+\BeginIndex{Cmd}{chaptermark}%
+\BeginIndex{Cmd}{sectionmark}%
+\BeginIndex{Cmd}{subsectionmark}%
+\BeginIndex{Cmd}{subsubsectionmark}%
+\BeginIndex{Cmd}{paragraphmark}%
+\BeginIndex{Cmd}{subparagraphmark}%
+%
+\EndIndex{Cmd}{subparagraphmark}%
+\EndIndex{Cmd}{paragraphmark}%
+\EndIndex{Cmd}{subsubsectionmark}%
+\EndIndex{Cmd}{subsectionmark}%
+\EndIndex{Cmd}{sectionmark}%
+\EndIndex{Cmd}{chaptermark}%
+\EndIndex{Cmd}{partmark}%
+
+\begin{Declaration}
+  \Macro{markleft}\Parameter{left mark}\\
+  \Macro{markright}\Parameter{right mark}\\
+  \Macro{markboth}\Parameter{left mark}\Parameter{right mark}
+\end{Declaration}
+\BeginIndex{Cmd}{markleft}%
+\BeginIndex{Cmd}{markright}%
+\BeginIndex{Cmd}{markboth}%
+
+%
+\EndIndex{Cmd}{markboth}%
+\EndIndex{Cmd}{markright}%
+\EndIndex{Cmd}{markleft}%
+
+\fi %********************************************* End only scrlayer-scrpage *
+
+
+\ifshortversion\IgnoreThistrue\IfCommon{scrlayer}{\IgnoreThisfalse}\fi
+\ifIgnoreThis %++++++++++++++++++++++++++++++++++++++++++++++++ not scrlayer +
+\else %------------------------------------------------------- only scrlayer -
+
+\begin{Declaration}
+  \Macro{GenericMarkFormat}\Parameter{name of the section level}
+\end{Declaration}
+\BeginIndex{Cmd}{GenericMarkFormat}%
+% ToDo: Add an example!
+\EndIndex{Cmd}{GenericMarkFormat}%
+
+\begin{Declaration}
+  \Macro{@mkleft}\Parameter{left mark}\\
+  \Macro{@mkright}\Parameter{right mark}\\
+  \Macro{@mkdouble}\Parameter{mark}\\
+  \Macro{@mkboth}\Parameter{left mark}\Parameter{right mark}
+\end{Declaration}
+\BeginIndex{Cmd}{@mkleft}%
+\BeginIndex{Cmd}{@mkright}%
+\BeginIndex{Cmd}{@mkdouble}%
+\BeginIndex{Cmd}{@mkboth}%
+%
+\EndIndex{Cmd}{@mkboth}%
+\EndIndex{Cmd}{@mkdouble}%
+\EndIndex{Cmd}{@mkright}%
+\EndIndex{Cmd}{@mkleft}%
+
+
+\fi %***************************************************** End only scrlayer *
+
+
+\ifshortversion%
+\IfCommon{scrlayer}{%
+}%
+\fi
+
 \emph{Sorry, this section has been translated not yet. Please see
   \autoref{sec:scrpage.basics} for at least some
   information. Additional information may be found in the implementation
