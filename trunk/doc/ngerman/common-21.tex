@@ -645,21 +645,80 @@ diese Anweisungen nützlich sein.%
 \end{Declaration}
 \BeginIndex{Cmd}{GenericMarkFormat}%
 Diese Anweisung wird in der Voreinstellung zur Formatierung aller
-Gliederungsnummern in automatischen Kolumnentiteln mit Ausnahme der
-Teile-Ebene und der Kapitel-Ebene verwendet. Dabei verwendet die Anweisung in
-der Voreinstellung \Macro{@seccntmarkformat}, wenn eine solche Anweisung wie
-bei den \KOMAScript-Klassen definiert ist. Anderenfalls wird mit
+Gliederungsnummern in automatischen Kolumnentiteln unterhalb der
+Unterabschnitte und bei Klassen ohne \Macro{chapter} zusätzlich auch für die
+Ebene der Abschnitt und Unterabschnitte verwendet, soweit die entsprechenden
+Mark-Anweisungen nicht bereits anderweitig definiert sind. Dabei verwendet die
+Anweisung in der Voreinstellung \Macro{@seccntmarkformat}, wenn eine solche
+Anweisung wie bei den \KOMAScript-Klassen definiert ist. Anderenfalls wird mit
 \Macro{@seccntformat} eine Anweisung verwendet, die bereits von \LaTeX-Kern
-bereitgestellt wird. All diesen Anweisungen gemeinsam ist, dass sie als
-Argument den Namen der Gliederung, also beispielsweise \PValue{chapter} oder
-\PValue{section} \emph{ohne} vorangestellten umgekehrten Schrägstrich
-(engl. \emph{backslash}) erwarten.
+bereitgestellt wird. Als Argument erwartet sie dabei den Namen der Gliederung,
+also beispielsweise \PValue{chapter} oder \PValue{section} \emph{ohne}
+vorangestellten umgekehrten Schrägstrich (engl. \emph{backslash}).
 
 Durch Umdefinierung dieser Anweisung kann damit die Standardformatierung aller
 Gliederungsnummern im Kolumnentitel geändert werden, die darauf
 zurückgreifen. Ebenso kann eine Klasse darüber eine andere
 Standardformatierung vorgeben, ohne alle Befehle einzeln ändern zu müssen.%
-% ToDo: Hier noch ein Beispiel einfügen!
+%
+\begin{Example}
+  Angenommen, Sie wollen, dass bei allen Gliederungsnummern im Kolumnentitel
+  eines Artikels die Nummer als weiße Schrift auf einem schwarzen Lasten
+  ausgegeben wird. Da bei Artikeln mit \Class{article} die Anweisungen
+  \Macro{sectionmarkformat} und \Macro{subsectionmarkformat} von
+  \Package{scrlayer} mit Hilfe von \Macro{GenericMarkFormat} definiert werden
+  genügt dafür die entsprechende Umdefinierung dieser einen Anweisung:
+\begin{lstcode}
+  \documentclass{article}
+  \usepackage{blindtext}
+  \usepackage[automark]{scrlayer-scrpage}
+  \pagestyle{scrheadings}
+  \usepackage{xcolor}
+  \newcommand*{\numberbox}[1]{%
+    \colorbox{black}{\strut~\textcolor{white}{#1}~}}
+  \renewcommand*{\GenericMarkFormat}[1]{%
+    \protect\numberbox{\csname the#1\endcsname}\enskip}
+  \begin{document}
+  \blinddocument
+  \end{document}
+\end{lstcode}
+  Für die Farbumschaltungen werden Anweisungen des Paket
+  \Package{xcolor}\IndexPackage{xcolor} verwendet. Näheres dazu ist der
+  Anleitung zum Paket zu entnehmen. Außerdem wird eine unsichtbare Stütze mit
+  \Macro{strut} eingefügt. Diese Anweisung sollte in keiner ausführlichen
+  \LaTeX-Einführung fehlen. Für den Kasten mit der Nummer wird eine eigene
+  Hilfsanweisung \Macro{numberbox} definiert. Diese wird in der Umdefinierung
+  von \Macro{GenericMarkFormat} mit \Macro{protect} vor der Expansion
+  geschützt. Dies ist notwendig, weil sonst durch das \Macro{MakeUppercase}
+  für den Versalsatz der Kolumnentitel nicht mehr die Farben »\texttt{black}«
+  und »\texttt{white}«, sondern die Farben »\texttt{BLACK}« und
+  »\texttt{WHITE}« verlangt werden, die gar nicht definiert sind. Alternative
+  könnte man \Macro{numberbox} auch mit Hilfe von \Macro{DeclareRobustCommand*}
+  statt mit \Macro{newcommand*} definieren (siehe \cite{latex:clsguide}).
+
+  Wollte man dasselbe mit einer \KOMAScript-Klasse oder mit den
+  Standardklassen \Class{book} oder \Class{report} erreichen, so müsste man
+  übrigens zusätzlich \Macro{sectionmarkformat} und
+  \Macro{subsectionmarkformat} beziehungsweise \Macro{chaptermarkformat} und
+  \Macro{sectionmarkformat} umdefinieren, da diese bei Verwendung der
+  genannten Klassen \Macro{GenericMarkFormat} nicht verwenden:
+\begin{lstcode}
+  \documentclass{scrbook}
+  \usepackage{blindtext}
+  \usepackage[automark]{scrlayer-scrpage}
+  \pagestyle{scrheadings}
+  \usepackage{xcolor}
+  \newcommand*{\numberbox}[1]{%
+    \colorbox{black}{\strut~\textcolor{white}{#1}~}}
+  \renewcommand*{\GenericMarkFormat}[1]{%
+    \protect\numberbox{\csname the#1\endcsname}\enskip}
+  \renewcommand*{\chaptermarkformat}{\GenericMarkFormat{chapter}}
+  \renewcommand*{\sectionmarkformat}{\GenericMarkFormat{section}}
+  \begin{document}
+  \blinddocument
+  \end{document}
+\end{lstcode}
+\end{Example}
 \EndIndex{Cmd}{GenericMarkFormat}%
 
 \begin{Declaration}
