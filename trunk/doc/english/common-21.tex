@@ -51,7 +51,7 @@
                                      Manipulation of defined page styles)]
 \translator{Markus Kohm}
 
-% Date version of the translated file: 0000-00-00
+% Date version of the translated file: 2013-10-23
 
 \makeatletter
 \@ifundefined{ifCommonscrlayer}{\newif\ifCommonscrlayer}{}%
@@ -273,6 +273,31 @@ option \Option{automark} or \Option{manualmark} or one of the commands
   \KOption{draft}\PName{simple switch}
 \end{Declaration}
 \BeginIndex{Option}{draft~=\PName{simple switch}}%
+This \KOMAScript{} option understands the values for simple switches, that are
+sown in \autoref{tab:truefalseswitch} on \autopageref{tab:truefalseswitch}. If
+the option is active, all elements of the page styles will also show dimension
+lines. This might be useful while draft editing. If the option has been set as
+a global option (see the optional argument of \Macro{documentclass}), but you
+don't want the dimension lines, you can deactivate them for the package only
+using \OptionValue{draft}{false} as an optional argument of \Macro{usepackage}
+while loading the package.%
+\EndIndex{Option}{draft~=\PName{Ein-Aus-Wert}}%
+
+\begin{Declaration}
+  \Macro{MakeMarkcase}\Parameter{string}
+\end{Declaration}
+\BeginIndex{Cmd}{MakeMarkcase}%
+The automatic running head and only this uses \Macro{MakeMarkcase} for its
+output. If the commands hasn't been defined, e.\,g., by the class, while
+loading \Package{scrlayer}, it would be defined with the default of outputting
+the argument \PName{string} without changes. But the default may change either
+redefining \Macro{MakeMarkcase} or using option \Option{markcase}, that
+\ifshortversion has been described in
+  \autoref{sec:scrlayer-scrpage.pagestyle.content}%
+\else will be described next%
+\fi%
+. Depending on the setting the argument could, e.\,g., be converted into upper
+or lower cases.
 %
 \EndIndex{Cmd}{MakeMarkcase}%
 \fi %***************************************************** End only scrlayer *
@@ -284,6 +309,62 @@ option \Option{automark} or \Option{manualmark} or one of the commands
   \KOption{markcase}\PName{Wert}
 \end{Declaration}
 \BeginIndex{Option}{markcase~=\PName{Wert}}%
+As already mentioned with \Package{scrlayer} you may switch between manual and
+automatic running heads. Using automatic running heads the corresponding marks
+will be filled by the section heading commands. Some culture areas do convert
+the running heads into upper case letters in opposite to the German
+typographic habit. The \LaTeX{} standard classes do so by default. Package
+\Package{scrlayer} optionally provides this too. Therefore you'd use option
+\OptionValue{markcase}{upper}. The bottom line of this is a redefinition of
+\Macro{MakeMarkcase}\IndexCmd[indexmain]{MakeMarkcase}, a command, that is
+used by \Package{scrlayer} for automatic running heads.
+
+Unfortunately \LaTeX's command for upper case letter typesetting,
+\Macro{MakeUppercase}\IndexCmd{MakeUppercase} results in an very inadequate
+typesetting, because it neither uses letter spacing nor does it space
+balancing. One reason for this behaviour might be, that a glyph analyzing
+would be needed, to incorporate the letter shapes and their combination while
+space balancing. Because of this \KOMAScript{} author suggests to abstain from
+upper case letter typesetting for running heads. This may be achieved using
+\OptionValue{markcase}{used}. Nevertheless, some classes would add
+\Macro{MarkUppercase} or even \TeX{} command \Macro{uppercase} into the
+running heads. For such cases option \OptionValue{markcase}{noupper} can be
+used. This will also deactivate \Macro{MakeUppercase} and \Macro{uppercase}
+inside the running heads.
+
+You can find all valid values for \Option{markcase} in
+\autoref{tab:scrlayer-scrpage.markcase}.%
+%
+\begin{table}
+  \centering
+  \caption[Possible values for option \Option{markcase}]{Possible Values for
+    option \Option{markcase} to select upper/lower case letter typesetting in
+    automatic running heads}%
+  \label{tab:scrlayer-scrpage.markcase}%
+  \begin{desctabular}
+    \pventry{lower}{\IndexOption{markcase~=\PValue{lower}}%
+      redefines \Macro{MakeMarkcase} to convert the automatic running heads
+      into lower case letters using \Macro{MakeLowercase}
+      (lower case typesetting).%
+    }%
+    \pventry{upper}{\IndexOption{markcase~=\PValue{upper}}%
+      redefines \Macro{MakeMarkcase} to convert the automatic running heads
+      into upper case letters using \Macro{MakeUppercase}
+      (upper case typesetting).%
+    }%
+    \pventry{used}{\IndexOption{markcase~=\PValue{used}}%
+      redefines \Macro{MakeMarkcase} to use automatic running heads without
+      any case changes.%
+    }%
+    \entry{\PValue{ignoreuppercase}, \PValue{nouppercase},
+      \PValue{ignoreupper},
+      \PValue{noupper}}{\IndexOption{markcase~=\PValue{noupper}}%
+      redefines not only \Macro{MakeMarkcase} but also locally to the running
+      heads \Macro{MakeUppercase} and \Macro{uppercase} to leave the automatic
+      running heads unchanged.%
+    }%
+  \end{desctabular}
+\end{table}
 %
 \EndIndex{Option}{markcase~=\PName{Wert}}%
 
@@ -297,6 +378,67 @@ option \Option{automark} or \Option{manualmark} or one of the commands
 \BeginIndex{Cmd}{rightmark}%
 \BeginIndex{Cmd}{headmark}%
 \BeginIndex{Cmd}{pagemark}%
+If you want to differ from the predefined page styles, usually you need to
+decide, where to place the marks' contents. With \Macro{leftmark} you can put
+the contents of the left mark.
+
+Similar you can use \Macro{rightmark} to put the contents of the right
+mark. For more information about some intricacies of this see the further
+description of \Macro{rightmark} in \autoref{sec:maincls-experts.addInfos},
+\autopageref{desc:maincls-experts.cmd.rightmark}.
+
+Somehow easier would be usage of \Macro{headmark}. This extension of
+\Package{scrlayer} would either be \Macro{leftmark} or \Macro{rightmark}
+depending on whether the current page is a even or odd one.
+
+Strictly thought command \Macro{pagemark} isn't concerned with \TeX's mark
+mechanism. It is only used to output a formatted page number.
+\BeginIndex{FontElement}{pagenumber}%
+The font of element
+\FontElement{pagenumber}\important{\FontElement{pagenumber}} will be used for
+the output. This may be changed using command \Macro{setkomafont} or
+\Macro{addtokomafont} (see also \autoref{sec:maincls.textmarkup},
+\autopageref{desc:maincls.cmd.setkomafont}).%
+\EndIndex{FontElement}{pagenumber}%
+%
+\begin{Example}
+  Assumed, you want to use a left aligned running head and right aligned page
+  number in the head of the pages of a document in single side layout. The
+  following minimal but working examples would do so:
+\begin{lstcode}
+  \documentclass{scrreprt}
+  \usepackage{blindtext}
+  \usepackage[automark]{scrlayer-scrpage}
+  \pagestyle{scrheadings}
+  \ihead{\headmark}
+  \ohead[\pagemark]{\pagemark}
+  \chead{}
+  \cfoot[]{}
+  \begin{document}
+  \blinddocument
+  \end{document}
+\end{lstcode}
+  Here package \Package{blindtext}\IndexPackage{blindtext} with its command
+  \Macro{blinddocument}\IndexCmd{blinddocument} has been used to easily
+  generate an example document contents.
+
+  Commands \Macro{ihead} and \Macro{ohead} has been used to place the wanted
+  marks. Thereby the page mark will be place not only to pages in page style
+  \Pagestyle{scrheadings} but using the optional argument also to pages in
+  page style \Pagestyle{plain.scrheadings}.
+
+  Because of both page styles already have marks in the middle of the page
+  head and page foot, those elements will be cleared using \Macro{chead} and
+  \Macro{cfoot} with empty arguments. Alternatively you'd use
+  \Macro{clearpairofpagestyles} \emph{before} \Macro{ihead}. You will find a
+  description of this command in
+  \autoref{sec:scrlayer-scrpage.pagestyle.pairs}.
+\end{Example}
+
+Please note\textnote{Attention!}, that the empty optional argument of
+\Macro{cfoot} in the example above it not the same like omitting the optional
+argument. Please try it out and have a look at the difference in the footer of
+the first page.%
 %
 \EndIndex{Cmd}{pagemark}%
 \EndIndex{Cmd}{headmark}%
@@ -319,6 +461,20 @@ option \Option{automark} or \Option{manualmark} or one of the commands
 \BeginIndex{Cmd}{subsubsectionmarkformat}%
 \BeginIndex{Cmd}{paragraphmarkformat}%
 \BeginIndex{Cmd}{subparagraphmarkformat}%
+Usually the \KOMAScript{} classes and package \Package{scrlayer} use these
+commands internally to bring the section numbers into a wanted form. Thereby
+they also support the \Macro{autodot} mechanism of the \KOMAScript{}
+classes. If wanted these commands may be redefined to get another form of
+section numbers.%
+%
+\begin{Example}
+  Assumed, you don't want section numbers but section heading text only in the
+  running head. So:
+\begin{lstcode}
+  \renewcommand*{\sectionmarkformat}{}
+\end{lstcode}
+  would be a simple solution for this.
+\end{Example}
 %
 \EndIndex{Cmd}{subparagraphmarkformat}%
 \EndIndex{Cmd}{paragraphmarkformat}%
@@ -344,6 +500,22 @@ option \Option{automark} or \Option{manualmark} or one of the commands
 \BeginIndex{Cmd}{subsubsectionmark}%
 \BeginIndex{Cmd}{paragraphmark}%
 \BeginIndex{Cmd}{subparagraphmark}%
+Most classes use these commands to setup the marks corresponding with the
+section commands. Thereby the only argument is the text without the number of
+the section heading, that should be used for the running head. For the number
+simply the number of the current section level will be used, if the current
+level uses numbers.
+
+If users redefine these commands, they should\textnote{Attention!} take care
+to also use counter \Counter{secnumdepth} for the test whether or not the
+section level should output a number. This is even the case, if the user
+doesn't change counter \Counter{secnumdepth} himself, because packages and
+classes may do so locally and rely on correct handling of
+\Counter{secnumdepth}.
+
+However, package \Package{scrlayer} redefines these commands whenever you use
+\Macro{automark} or \Macro{manualmark} or the corresponding options, to
+activate or deactivate the wanted running heads.%
 %
 \EndIndex{Cmd}{subparagraphmark}%
 \EndIndex{Cmd}{paragraphmark}%
@@ -361,7 +533,81 @@ option \Option{automark} or \Option{manualmark} or one of the commands
 \BeginIndex{Cmd}{markleft}%
 \BeginIndex{Cmd}{markright}%
 \BeginIndex{Cmd}{markboth}%
+Independent of whether currently manual or automatic running heads are active,
+you may change the contents of the \PName{left mark} or the \PName{right mark}
+at any time using these commands. You should note, that the resulting contents
+of \Macro{leftmark}\IndexCmd{leftmark} is the \PName{left
+  mark} of the last \Macro{markleft} or \Macro{markboth} command of the
+current page. In opposite to this the resulting contents of
+\Macro{rightmark}\IndexCmd{rightmark} is the \PName{right mark} of the first
+\Macro{rightmark} or \Macro{markboth} command of the current page.
 
+If you are using manual running heads, the marks will stay valid until one of
+the corresponding commands will be used again. If you are using automatic
+running heads the marks can loose their validity with the next section heading
+depending on the configuration of the automatism.
+
+You may also use these commands together with the star versions of the section
+commands.%
+%
+\begin{Example}
+  Assumed you are using a preface with several pages just before the table of
+  contents, that should not have an entry at the table of contents
+  itself. Because of using a separation line at the page head, you want also a
+  running head for this preface:
+\begin{lstcode}
+  \documentclass[headsepline]{book}
+  \usepackage{scrlayer-scrpage}
+  \pagestyle{scrheadings}
+  \usepackage{blindtext}
+  \begin{document}
+  \chapter*{Preface}
+  \markboth{Preface}{Preface}
+  \blindtext[20]
+  \tableofcontents
+  \blinddocument
+  \end{document}
+\end{lstcode}
+  First of all this seams to result as wanted. But have a second look: In
+  difference to the other running heads ``\texttt{Preface}'' isn't in upper
+  case letters. But you can fix this easily:
+\begin{lstcode}
+  \documentclass[headsepline]{book}
+  \usepackage{scrlayer-scrpage}
+  \pagestyle{scrheadings}
+  \usepackage{blindtext}
+  \begin{document}
+  \chapter*{Preface}
+  \markboth{\MakeMarkcase{Preface}}{\MakeMarkcase{Preface}}
+  \blindtext[20]
+  \tableofcontents
+  \blinddocument
+  \end{document}
+\end{lstcode}
+  Here command \Macro{MakeMarkcase} has been used to the same letter case the
+  automatic running heads are using.
+
+  Now, let's move command \Macro{tableofcontents} before the preface. Let's
+  remove the \Macro{markboth} command too. You'll find, that the preface now
+  has the running head ``\texttt{CONTENTS}''. This is because of a quirk of
+  \Macro{chapter*} (see also  \autoref{sec:maincls.structure} on
+  \autopageref{desc:maincls.cmd.chapter*}). If in such cases the running head
+  should be removed, \Macro{markboth} with two empty arguments would be
+  useful:
+\begin{lstcode}
+  \documentclass[headsepline]{book}
+  \usepackage{scrlayer-scrpage}
+  \pagestyle{scrheadings}
+  \usepackage{blindtext}
+  \begin{document}
+  \tableofcontents
+  \chapter*{Preface}
+  \markboth{}{}
+  \blindtext[20]
+  \blinddocument
+  \end{document}
+\end{lstcode}
+\end{Example}
 %
 \EndIndex{Cmd}{markboth}%
 \EndIndex{Cmd}{markright}%
@@ -378,7 +624,82 @@ option \Option{automark} or \Option{manualmark} or one of the commands
   \Macro{GenericMarkFormat}\Parameter{name of the section level}
 \end{Declaration}
 \BeginIndex{Cmd}{GenericMarkFormat}%
-% ToDo: Add an example!
+At the running head this command will be used by default for the formatting of
+all section numbers below the subsection and with classes without
+\Macro{chapter} also for the section an subsection level, if the mark commands
+for those numbers haven't been defined before loading
+\Package{scrlayer}. Thereby the package uses \Macro{@seccntmarkformat} if such
+a command has been defined, like the \KOMAScript{} classes do. Otherwise
+\Macro{@seccntformat} will be used, which is provided by the \LaTeX{}
+kernel. The expected, mandatory argument of the command is the \PName{name of
+  a section level}, i.\,e., \PValue{chapter} or \PValue{section}
+\emph{without} the backslash prefix.
+
+You can change the default formatting of the numbers, that use this command,
+by redefining only this single command. Classes can change the default
+formatting also by defining this command.%
+%
+\begin{Example}
+  Assumed, you want the section numbers of all levels at the running head of
+  an article to be printed in white colour inside a black coloured box. Using
+  standard \LaTeX{} \Class{article} class, package \Package{scrlayer} defines
+  the number mark commands \Macro{sectionmarkformat} and
+  \Macro{subsectionmarkformat} using \Macro{GenericMarkFormat}. So you need to
+  redefine only this single command:
+\begin{lstcode}
+  \documentclass{article}
+  \usepackage{blindtext}
+  \usepackage[automark]{scrlayer-scrpage}
+  \pagestyle{scrheadings}
+  \usepackage{xcolor}
+  \newcommand*{\numberbox}[1]{%
+    \colorbox{black}{\strut~\textcolor{white}{#1}~}}
+  \renewcommand*{\GenericMarkFormat}[1]{%
+    \protect\numberbox{\csname the#1\endcsname}\enskip}
+  \begin{document}
+  \blinddocument
+  \end{document}
+\end{lstcode}
+  The colour has been done using package
+  \Package{xcolor}\IndexPackage{xcolor}. See the package manual for more
+  information about this. Additionally a not visible strut has been
+  used. Every complete \LaTeX{} introduction should explain the related
+  command \Macro{strut}. A helper macro \Macro{numberbox} has been defined for
+  the formatting of the number within a box. In the redefinition of
+  \Macro{GenericMarkFormat} this has been prefixed by
+  \Macro{protect} to protect it from expansion. This is necessary because
+  otherwise the upper case letter conversion of \Macro{MakeUppercase} that
+  will be used for the running head, would result in an ask for colours
+  ``\texttt{BLACK}'' and ``\texttt{WHITE}'' instead of ``\texttt{black}'' and
+  ``\texttt{white}'' and those colours are undefined. Alternatively you may
+  defined \Macro{numberbox} using \Macro{DeclareRobustCommand*} instead of
+  \Macro{newcommand*} and then omit \Macro{protect} (see
+  \cite{latex:clsguide}).
+
+  If you'd do the same with a \KOMAScript{} class or with one of the \LaTeX{}
+  standard classes \Class{book} or \Class{report}, you'd additionally have to
+  redefine \Macro{sectionmarkformat} and \Macro{subsectionmarkformat}
+  respectively \Macro{chaptermarkformat} and \Macro{sectionmarkformat} too,
+  because then these wouldn't have been defined using
+  \Macro{GenericMarkFormat}:
+\begin{lstcode}
+  \documentclass{scrbook}
+  \usepackage{blindtext}
+  \usepackage[automark]{scrlayer-scrpage}
+  \pagestyle{scrheadings}
+  \usepackage{xcolor}
+  \newcommand*{\numberbox}[1]{%
+    \colorbox{black}{\strut~\textcolor{white}{#1}~}}
+  \renewcommand*{\GenericMarkFormat}[1]{%
+    \protect\numberbox{\csname the#1\endcsname}\enskip}
+  \renewcommand*{\chaptermarkformat}{\GenericMarkFormat{chapter}}
+  \renewcommand*{\sectionmarkformat}{\GenericMarkFormat{section}}
+  \begin{document}
+  \blinddocument
+  \end{document}
+\end{lstcode}
+\end{Example}
+%
 \EndIndex{Cmd}{GenericMarkFormat}%
 
 \begin{Declaration}
@@ -391,7 +712,31 @@ option \Option{automark} or \Option{manualmark} or one of the commands
 \BeginIndex{Cmd}{@mkright}%
 \BeginIndex{Cmd}{@mkdouble}%
 \BeginIndex{Cmd}{@mkboth}%
-%
+Sometimes inside classes and package the marks for running heads should be
+filled up only if automatic running heads are active (see option
+\Option{automark} and command \Macro{automark} on
+\autopageref{desc:scrlayer-scrpage.cmd.automark}). In the \LaTeX{} standard
+classes only \Macro{@mkboth} has been used for this. This command is either
+\Macro{@gobbletwo}, that simply destroys both mandatory arguments, or
+\Macro{markboth}, a command that fills up the left and \PValue{left mark} and
+the \PValue{right mark}. Packages like \Package{babel} also change
+\Macro{\@mkboth}, i.\,e., to add language switching to the running head.
+
+But if a class or package author only wants to change either the \PName{left
+  mark} or the \PName{right mark} without the other one, a proper command is
+missing. Package \Package{scrlayer} itself needs such commands for the
+implementation of all cases of automatic running heads. So if command
+\Macro{@mkleft} to fill up only the left mark or \Macro{@mkright} to fill up
+only the right mark or \Macro{@mkdouble} to fill up both marks with the same
+content is undefined while loading \Package{scrlayer}, the package will define
+them. Thereby the actual definition of \Macro{@mkboth} will be used as an
+indicator whether or not automatic running heads should be used. The new
+commands will full up the marks only in the case of automatic running heads.
+
+Class- and package authors can use these commands too, if they want so fill up
+only one of the marks or both marks with the same content but only if
+automatic running heads are activated. This condition is also the difference
+to the commands \Macro{markleft}, \Macro{markright}, and \Macro{markboth}.%
 \EndIndex{Cmd}{@mkboth}%
 \EndIndex{Cmd}{@mkdouble}%
 \EndIndex{Cmd}{@mkright}%
@@ -403,13 +748,11 @@ option \Option{automark} or \Option{manualmark} or one of the commands
 
 \ifshortversion%
 \IfCommon{scrlayer}{%
+  For more information about manipulation of the contents of page styles see
+  also \autoref{sec:scrlayer-scrpage.pagestyle.content} from
+  \autopageref{sec:scrlayer-scrpage.pagestyle.content}.%
 }%
 \fi
-
-\emph{Sorry, this section has been translated not yet. Please see
-  \autoref{sec:scrpage.basics} for at least some
-  information. Additional information may be found in the implementation
-  manual \File{scrlayer-scrpage.pdf}.}
 
 %%% Local Variables:
 %%% mode: latex
