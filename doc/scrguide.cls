@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2013/08/28 v1.7b internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2013/10/13 v1.7c internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -1075,6 +1075,8 @@
 % \end{environment}
 %
 % \begin{macro}{\start@desctab}
+%   \changes{v1.7c}{2013/10/13}{\cs{leavevmode}\cs{ignorespaces} added to
+%     \cs{nentry}}
 %   This is the \emph{worker} macro of \texttt{desctable} and
 %   \texttt{desctabular}. It does the complete calculations and definition of
 %   the entry (something like |\item|) commands.
@@ -1087,7 +1089,7 @@
   \addtolength{\labelwidth}{-2\tabcolsep}%
   \newcommand{\nentry}[2]{%
     \multicolumn{2}{p{\labelwidth}}{\raggedright##1}\tabularnewline*%
-    \hspace*{#1} & ##2\tabularnewline%
+    \hspace*{#1} & \leavevmode\ignorespaces ##2\tabularnewline%
   }%
   \newcommand{\entry}[2]{\nentry{##1}{##2}[.5\baselineskip]}%
   \newcommand*{\pentry}[1]{%
