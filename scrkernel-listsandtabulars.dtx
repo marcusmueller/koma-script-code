@@ -1,4 +1,4 @@
-% \CheckSum{264}
+% \CheckSum{293}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-listsandtabulars.dtx
@@ -58,7 +58,7 @@
 %%% From File: $Id$
 %<*driver>
 % \fi
-\ProvidesFile{scrkernel-listsandtabulars.dtx}[2010/04/29 v3.05b KOMA-Script 
+\ProvidesFile{scrkernel-listsandtabulars.dtx}[2013/10/26 v3.12 KOMA-Script 
                                                        (lists and tabulars)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
@@ -393,6 +393,9 @@
 %   \changes{v3.05b}{2010/04/29}{\cs{partopsep} muss auf 0 statt \cs{parskip}
 %     gesetzt werden, weil es zu \cs{topsep} addiert wird}
 % Der Rest wird von diesem Makro erledigt.
+% \begin{macro}{\scr@addmargin@startpage}
+%   \changes{v3.12}{2013/10/26}{neu (intern, lokal)}
+%   \changes{v3.12}{2013/10/26}{Test auf Seitenumbruch in \texttt{addmargin*}}
 %    \begin{macrocode}
 %</class>
 \newenvironment{addmargin}{%
@@ -404,8 +407,23 @@
 \newenvironment{addmargin*}{%
   \@tempswafalse
   \if@twoside\ifthispageodd{}{\@tempswatrue}\fi
+  \edef\scr@addmargin@startpage{\csname tpo@\scr@tpo\endcsname}%
   \@addmargin
 }{%
+  \unskip\nobreak\ifthispageodd{}{}%
+  \expandafter\ifx\csname tpo@\scr@tpo\endcsname\scr@addmargin@startpage\else
+%<class>    \ClassWarning{\KOMAClassName}{%
+%<package>  \PackageWarning{scrextend}{%
+      page break inside `addmargin*' environment.\MessageBreak
+      A `addmargin*' environment starting on page
+      \scr@addmargin@startpage\MessageBreak
+      ends on page \csname tpo@\scr@tpo\endcsname.\MessageBreak
+      This will result in potential wrong margins on\MessageBreak
+      every other page.\MessageBreak
+      So maybe you should change the `addmargin*'\MessageBreak
+      environment, that ends%
+    }%
+  \fi
   \advance\@listdepth\@ne
   \endlist
 }
@@ -434,6 +452,7 @@
 }
 %<*class>
 %    \end{macrocode}
+%  \end{macro}
 %  \end{macro}
 %  \end{environment}
 %  \end{environment}
