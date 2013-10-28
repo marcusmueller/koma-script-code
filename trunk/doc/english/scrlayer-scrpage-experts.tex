@@ -48,7 +48,7 @@
                   KOMA-Script guide (chapter: scrlayer-scrpage-experts)]
 \translator{Markus Kohm}
 
-% Date version of the translated file: 0000-00-00
+% Date version of the translated file: 2013-10-28
 
 \chapter[{Additional Features of \Package{scrlayer-scrpage}}]
   {Additional Features\ChangedAt{v3.12}{\Package{scrlayer-scrpage}} with
@@ -489,6 +489,16 @@ one.%
 
 \section{Definition of Complex Page Styles}
 \label{sec:scrlayer-scrpage.pagestyle.experts}
+
+Beside predefined page styles and the definition of new pairs of page styles,
+and beside the definition of page styles with tripartite head and foot, that
+aren't recommended any longer, package \Package{scrlayer-scrpage} provides
+also a more basic features to define new page styles. All already described
+page style definitions of \Package{scrlayer-scrpage} use internally these basic
+features. Because of the complexity of this user interface it is recommended
+for advanced users only. Less advanced users should be able to reach almost all
+using one of the previously described features. So less advanced users don't
+need to read this section.
  
 \begin{Declaration}
   \Macro{defpagestyle}%
@@ -504,24 +514,140 @@ one.%
 \BeginIndex{Cmd}{newpagestyle}%
 \BeginIndex{Cmd}{providepagestyle}%
 \BeginIndex{Cmd}{renewpagestyle}%
+These commands can be used to define a single page style with maximum
+flexibility. Thereby \PName{name} is the name of the page style, that should
+be defined.
 
+The arguments \PName{head definition} and \PName{foot definition} have
+identical structure:
+\begin{quote}\raggedright
+  \texttt{%
+    (\PName{length of the line above},\PName{thickness of the line above})\%\\
+    \Parameter{definition for the left page in two-side layout}\%\\
+    \Parameter{definition for the right page in two-side layout}\%\\
+    \Parameter{definition for all pages in one-side laypout}\%\\
+    (\PName{length of the line below},\PName{thickness of the line below})%
+  }
+\end{quote}
+Thereby the arguments in the round brackets are options, this means, you may
+omit them together with the brackets. In that case, the length and thickness
+of the corresponding horizontal line would be given by the \KOMAScript{}
+options \Option{headtopline}, \Option{headsepline}, \Option{footsepline} or
+\Option{footbotline} (see \autoref{sec:scrlayer-scrpage.pagestyle.content},
+\autopageref{desc:scrlayer-scrpage.option.headtopline}).
+
+All three definition arguments are mandatory and will be used depending on the
+page and the layout settings. The contents of the definitions are
+arbitrary. But for page styles with running heads usage of \Macro{headmark},
+\Macro{leftmark}, or \Macro{rightmark} is recommended inside the
+definition. In no case section numbers or section headings should be used in
+the definition. Ignoring this could result in wrong numbers or texts in the
+page head or footer, because of the asynchronous page building of \LaTeX{}.
+
+Command \Macro{defpagestyle} will define the page style independent from
+whether or not a page style with the same \PName{name} already exists. Command
+\Macro{newpagestyle} would throw an error, if such a page style already
+exists. In difference to this, \Macro{providepagestyle} will simple do nothing
+in such a case. In opposite to \Macro{newpagestyle} command
+\Macro{renewpagestyle} would throw the error, if a page style with the
+\PName{name} doesn't already exist, and therefor may be used to redefine an
+existing page style.
+
+All these commands base on command \Macro{DeclareLayerPageStyle} of package
+\Package{scrlayer} internally. Thereby for a page style \PName{Name} the
+layer \PName{Name}\PValue{.head.above.line} will be defined for the horizontal
+line above the page head, the layer \PName{Name}\PValue{.head.odd} will be
+defined for the page head of odd pages in two-side layout,
+\PName{Name}\PValue{.head.even} will be defined for the page head of even pages
+in two-side layout, \PName{Name}\PValue{.head.oneside} will be defined for the
+page head of all pages in one-side layout, \PName{Name}\PValue{.head.below}
+will be defined for the horizontal line below the page head,
+\PName{Name}\PValue{.foot.above.line} will be defined for the horizontal line
+above the page foot, \PName{Name}\PValue{.foot.odd} will be defined for the
+page foot of odd pages in two-side layout, \PName{Name}\PValue{.foot.even} for
+the page foot of even pages in two-side layout,
+\PName{Name}\PValue{.foot.oneside} for the page foot of all pages in one-side
+layout, and last but not least \PName{Name}\PValue{.foot.below} for the
+horizontal line below the page foot. More information about layers and layer
+page styles can be found from \autopageref{cha:scrlayer} in
+\autoref{cha:scrlayer} also in \autoref{part:forExperts}.%
 %
+\begin{Example}
+  Assumed, you want to background the whole head of page style
+  \Pagestyle{scrheadings} with a colour. Because you read the introduction to
+  this chapter, you know, that \Pagestyle{scrheadings} last but not least is a
+  layer page style with, e.\,g., layers \PValue{scrheadings.head.even},
+  \PValue{scrheadings.head.odd}, and \PValue{scrheadings.head.oneside}. So you
+  define three more layers for the backgrounds and add them at the very
+  beginning of the page style:
+\begin{lstcode}
+ \documentclass{scrartcl}
+  \usepackage[automark]{scrlayer-scrpage}
+  \usepackage{xcolor}
+  \usepackage{blindtext}
+  \DeclareLayer[clone=scrheadings.head.oneside,
+    contents={%
+      \color{yellow}\rule[-\dp\strutbox]{\layerwidth}{\layerheight}%
+    }%
+  ]{scrheadings.head.oneside.background}
+  \DeclareLayer[clone=scrheadings.head.odd,
+    contents={%
+      \color{yellow}\rule[-\dp\strutbox]{\layerwidth}{\layerheight}%
+    }%
+  ]{scrheadings.head.odd.background}
+  \DeclareLayer[clone=scrheadings.head.even,
+    contents={%
+      \color{yellow}\rule[-\dp\strutbox]{\layerwidth}{\layerheight}%
+    }%
+  ]{scrheadings.head.even.background}
+  \AddLayersAtBeginOfPageStyle{scrheadings}{%
+    scrheadings.head.oneside.background,%
+    scrheadings.head.odd.background,%
+    scrheadings.head.even.background%
+  }
+  \pagestyle{scrheadings}
+  \begin{document}
+  \blinddocument
+  \end{document}
+\end{lstcode}
+  As you can see, the example uses three layers, so the position and size of
+  that background layers may simply be copied from the corresponding head
+  layer using option \Option{clone}. This is much easier than using only one
+  background layer and dynamically calculate the position time by time.
+
+  The coloured background have been printed using a \Macro{rule} command in
+  this example. The size arguments of this \Macro{rule} are given by
+  \Macro{layerwidth} and \Macro{layerheight} which contain the current width
+  and height of the layer itself. The optional argument of \Macro{rule} has
+  been used to move the rule down by the height of a descender.
+\end{Example}
+%
+Instead of using new layers for the background colours like in the example
+above, \Macro{colorbox} and \Macro{chead} could have been used. It is
+recommended to build such a solution as an exercise. Another change could be
+to add the background layers one by one and just before the contents
+layers. You may do this as an exercise too.%
 \EndIndex{Cmd}{renewpagestyle}%
 \EndIndex{Cmd}{providepagestyle}%
 \EndIndex{Cmd}{newpagestyle}%
 \EndIndex{Cmd}{defpagestyle}%
 
 \begin{Declaration}
-  \KOption{hmode}\PValue{Ein-Aus-Wert}
+  \KOption{hmode}\PValue{simple switch}
 \end{Declaration}
 \BeginIndex{Option}{hmode}%
-%
-\EndIndex{Option}{hmode}%
+Package \Package{scrpage2} outputs page heads and page foots in horizontal
+mode always. In opposite to this \Package{scrlayer-scrpage} doesn't switch
+into horizontal mode itself, but the output of horizontal material will do
+so. Nevertheless, you can activate option \Option{hmode} to make
+\Package{scrlayer-scrpage} more compatible with \Package{scrpage2} in this
+aspect. But this would have implications to, i.\,e., white
+spaces at the start of the output or the vertical alignment of the output.
 
-\emph{Sorry, this section has been translated not yet. Please see
-  \autoref{sec:scrpage.UI.expert} for at least some
-  information. Additional information may be found in the implementation
-  manual \File{scrlayer-scrpage.pdf}.}
+The options knows the standard values for simple switches, that are given at
+\autoref{tab:truefalseswitch} on \autopageref{tab:truefalseswitch}. The option
+is deactivated by default.%
+\EndIndex{Option}{hmode}%
 %
 \EndIndex{Package}{scrlayer-scrpage}%
 
