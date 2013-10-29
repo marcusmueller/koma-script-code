@@ -67,26 +67,6 @@ scrwfile.tex: ../../scrwfile.tex
 # ----------------------------------------------------------------------
 
 # ----------------------------------------------------------------------
-# NOTE: Remove these rules after real translation of scrlayer-scrpage.tex 
-#       is available.
-#scrlayer-scrpage.tex: ../../scrlayer-scrpage.tex
-#	if [ -L $@ ] || ! [ -f $@ ]; then $(SYMLINK) $< .; else touch $@; fi
-#
-#../../scrlayer-scrpage.tex: ../../scrlayer-scrpage.dtx
-#	cd ../.. && tex \\nonstopmode\\input $(basename $<)
-# ----------------------------------------------------------------------
-
-# ----------------------------------------------------------------------
-# NOTE: Remove these rules after real translation of scrlayer.tex 
-#       is available.
-scrlayer.tex: ../../scrlayer.tex
-	if [ -L $@ ] || ! [ -f $@ ]; then $(SYMLINK) $< .; else touch $@; fi
-
-../../scrlayer.tex: ../../scrlayer.dtx
-	cd ../.. && tex \\nonstopmode\\input $(basename $<)
-# ----------------------------------------------------------------------
-
-# ----------------------------------------------------------------------
 # NOTE: Remove these rules after real translation of scrlayer-notecolumn.tex 
 #       is available.
 scrlayer-notecolumn.tex: ../../scrlayer-notecolumn.tex
