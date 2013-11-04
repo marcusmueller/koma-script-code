@@ -1,4 +1,4 @@
-% \CheckSum{1487}
+% \CheckSum{1494}
 % \iffalse meta-comment
 % ======================================================================
 % scrjura.dtx
@@ -70,7 +70,7 @@
 %<driver>\ProvidesFile{scrjura.drv}
 %<package>\ProvidesPackage{scrjura}
 %<*dtx|package|driver>
-                [2013/10/02 v0.7 KOMA-Script for jurists
+                [2013/11/04 v0.7 KOMA-Script for jurists
 %</dtx|package|driver>
 %<driver>                 (driver)%
 %<package>                (package)%
@@ -778,7 +778,10 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % \end{option}
 %
 % \begin{option}{juratotoc}
-%   Mit dieser Option wird der Schalter |\if@juratotoc| auf |\iftrue| gesetzt.
+%   Mit dieser Option wird der Zähler \Counter{juratoclevel} auf einen
+%   gewünschten Wert oder 2 oder 10000 gesetzt.
+%   \changes{v0.7}{2013/11/04}{Verwendung der renovierten Schnittstelle mit
+%     \cs{FamilyKeyState}}
 % \begin{macro}{\if@juratotoc}
 %   \changes{v0.6}{2011/09/29}{Schalter durch Zähler überflüssig}
 % \begin{Counter}{juratoclevel}
@@ -791,19 +794,16 @@ standard classes created by The LaTeX3 Project 1994-1996.
 \newcounter{juratoclevel}\setcounter{juratoclevel}{\@M}
 \KOMA@key{juratotoc}[true]{%
   \begingroup
-    \newif\if@setjuratoclevel\@setjuratocleveltrue
-    \let\juratoclevel@@FamilyUnknownKeyValue\FamilyUnknownKeyValue
-    \renewcommand*{\FamilyUnknownKeyValue}[4]{%
-      \setcounter{juratoclevel}{#1}%
-      \@setjuratoclevelfalse
-    }%
     \KOMA@set@ifkey{juratoclevel}{@tempswa}{#1}%
-    \if@setjuratoclevel
+    \ifx\FamilyKeyState\FamilyKeyStateProcessed
       \if@tempswa
         \setcounter{juratoclevel}{2}%
       \else
         \setcounter{juratoclevel}{\@M}%
       \fi
+    \else
+      \setcounter{juratoclevel}{#1}%
+      \FamilyKeyStateProcessed
     \fi
   \endgroup
 }
@@ -815,9 +815,13 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % \end{option}
 %
 % \begin{option}{juratocnumberwidth}
-%   \changes{v0.6}{2011/09/29}{neu}
+%   \changes{v0.6}{2011/09/29}{neu}%^^A
+%   \changes{v0.7}{2013/11/04}{Verwendung der renovierten Schnittstelle mit
+%     \cs{FamilyKeyStateProcessed}}%^^A
 % \begin{option}{juratocindent}
-%   \changes{v0.6}{2011/09/29}{neu}
+%   \changes{v0.6}{2011/09/29}{neu}%^^A
+%   \changes{v0.7}{2013/11/04}{Verwendung der renovierten Schnittstelle mit
+%     \cs{FamilyKeyStateProcessed}}%^^A
 % \begin{macro}{\cpar@numberwidth}
 %   \changes{v0.6}{2011/09/29}{neu (intern)}
 % \begin{macro}{\cpar@indent}
@@ -830,10 +834,12 @@ standard classes created by The LaTeX3 Project 1994-1996.
 \KOMA@key{juratocnumberwidth}{%
   \begingroup\setlength{\@tempdima}{#1}\endgroup
   \renewcommand*{\cpar@numberwidth}{#1}%
+  \FamilyKeyStateProcessed
 }
 \KOMA@key{juratocindent}{%
   \begingroup\setlength{\@tempdima}{#1}\endgroup
   \renewcommand*{\cpar@indent}{#1}%
+  \FamilyKeyStateProcessed
 }
 %    \end{macrocode}
 % \end{macro}
@@ -855,16 +861,17 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % \end{option}
 %
 % \begin{option}{parnumber}
-%   \changes{v0.6}{2011/09/29}{neue Option}
-%   \changes{v0.6a}{2012/10/15}{Meldung bei falschen Werten korrigiert}
+%   \changes{v0.6}{2011/09/29}{neue Option}%^^A
+%   \changes{v0.6a}{2012/10/15}{Meldung bei falschen Werten korrigiert}%^^A
+%   \changes{v0.7}{2013/11/04}{Verwendung der renovierten Schnittstelle mit
+%     \cs{FamilyKeyStateProcessed}}%^^A
 %   Die (automatische) Absatznummerierung lässt sich nun auch per Option ein-
 %   und ausschalten.
 %    \begin{macrocode}
 \newif\ifparnumber
 \KOMA@key{parnumber}[true]{%
-  \ifstr{#1}{auto}{\AutoPar}{%
-    \ifstr{#1}{manual}{\ManualPar}{%
-      \def\FamilyElseValue{, `auto', `manual'}%
+  \ifstr{#1}{auto}{\AutoPar\FamilyKeyStateProcessed}{%
+    \ifstr{#1}{manual}{\ManualPar\FamilyKeyStateProcessed}{%
       \KOMA@set@ifkey{parnumber}{parnumber}{#1}%
     }%
   }%
@@ -873,6 +880,8 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % \end{option}
 %
 % \begin{option}{paragraphmark}
+%   \changes{v0.7}{2013/11/04}{Verwendung der renovierten Schnittstelle mit
+%     \cs{FamilyKeyStateProcessed}}%^^A
 % \begin{option}{markright}
 % \begin{option}{markboth}
 % \begin{macro}{\Paragraphmark}
@@ -892,31 +901,35 @@ standard classes created by The LaTeX3 Project 1994-1996.
       {right}{3},%
       {both}{4}%
     }{#1}%
-  \ifcase\number\@tempa
-    \endgroup
-    \let\Paragraphmark\@gobble
-  \or
-    \endgroup
-    \renewcommand*{\Paragraphmark}[1]{%
-      \markright{\csname MakeMarkcase\endcsname{##1}}}%
-  \or
-    \endgroup
-    \renewcommand*{\Paragraphmark}[1]{%
-      \markboth{\csname MakeMarkcase\endcsname{##1}}%
-               {\csname MakeMarkcase\endcsname{##1}}}%
-  \or
-    \endgroup
-    \renewcommand*{\Paragraphmark}[1]{%
-      \ifx
-        \@mkboth\@gobbletwo
-      \else
-        \markright{\csname MakeMarkcase\endcsname{##1}}%
-      \fi}%
-  \or
-    \endgroup
-    \renewcommand*{\Paragraphmark}[1]{%
-      \@mkboth{\csname MakeMarkcase\endcsname{##1}}%
-              {\csname MakeMarkcase\endcsname{##1}}}%
+  \ifx\FamilyKeyState\FamilyKeyStateProcessed
+    \ifcase\number\@tempa
+      \endgroup
+      \let\Paragraphmark\@gobble
+    \or
+      \endgroup
+      \renewcommand*{\Paragraphmark}[1]{%
+        \markright{\csname MakeMarkcase\endcsname{##1}}}%
+    \or
+      \endgroup
+      \renewcommand*{\Paragraphmark}[1]{%
+        \markboth{\csname MakeMarkcase\endcsname{##1}}%
+                 {\csname MakeMarkcase\endcsname{##1}}}%
+    \or
+      \endgroup
+      \renewcommand*{\Paragraphmark}[1]{%
+        \ifx
+          \@mkboth\@gobbletwo
+        \else
+          \markright{\csname MakeMarkcase\endcsname{##1}}%
+        \fi}%
+    \or
+      \endgroup
+      \renewcommand*{\Paragraphmark}[1]{%
+        \@mkboth{\csname MakeMarkcase\endcsname{##1}}%
+                {\csname MakeMarkcase\endcsname{##1}}}%
+    \else
+      \endgroup
+    \fi
   \else
     \endgroup
   \fi
@@ -931,7 +944,9 @@ standard classes created by The LaTeX3 Project 1994-1996.
 %
 % \begin{option}{ref}
 %   \changes{v0.5d}{2010/06/07}{neue Einstellungen \texttt{nopar},
-%     \texttt{nosentence}, \texttt{OnlyParagraph}}
+%     \texttt{nosentence}, \texttt{OnlyParagraph}}%^^A
+%   \changes{v0.7}{2013/11/04}{Verwendung der renovierten Schnittstelle mit
+%     \cs{FamilyKeyStateProcessed}}%^^A
 % \begin{option}{parcitename}
 % \begin{option}{sentencecitename}
 % Die Form, in der Absätze und Sätze referenziert werden. Es gibt eine lange,
@@ -967,39 +982,41 @@ standard classes created by The LaTeX3 Project 1994-1996.
       {paragraphonly}{44},{onlyparagraph}{44},%
       {ParagraphOnly}{44},{OnlyParagraph}{44}%
     }{#1}%
-    \@tempcnta=\@tempa\relax
-    \@tempcntb=\z@
-    \@whilenum \@tempcnta>9 \do{%
-      \advance\@tempcnta -10\relax
-      \advance\@tempcntb \@ne\relax
-    }%
-    \ifcase \@tempcnta
-    \or
-      \aftergroup\def\aftergroup\parcite@format
-      \aftergroup{\aftergroup0\aftergroup}%
-    \or
-      \aftergroup\def\aftergroup\parcite@format
-      \aftergroup{\aftergroup1\aftergroup}%
-    \or
-      \aftergroup\def\aftergroup\parcite@format
-      \aftergroup{\aftergroup2\aftergroup}%
-    \or
-      \aftergroup\def\aftergroup\parcite@format
-      \aftergroup{\aftergroup-\aftergroup1\aftergroup}%
-    \fi
-    \ifcase \@tempcntb
-    \or
-      \aftergroup\def\aftergroup\sentencecite@format
-      \aftergroup{\aftergroup0\aftergroup}%
-    \or
-      \aftergroup\def\aftergroup\sentencecite@format
-      \aftergroup{\aftergroup1\aftergroup}%
-    \or
-      \aftergroup\def\aftergroup\sentencecite@format
-      \aftergroup{\aftergroup2\aftergroup}%
-    \or
-      \aftergroup\def\aftergroup\sentencecite@format
-      \aftergroup{\aftergroup-\aftergroup1\aftergroup}%
+    \ifx\FamilyKeyState\FamilyKeyStateProcessed
+      \@tempcnta=\@tempa\relax
+      \@tempcntb=\z@
+      \@whilenum \@tempcnta>9 \do{%
+        \advance\@tempcnta -10\relax
+        \advance\@tempcntb \@ne\relax
+      }%
+      \ifcase \@tempcnta
+      \or
+        \aftergroup\def\aftergroup\parcite@format
+        \aftergroup{\aftergroup0\aftergroup}%
+      \or
+        \aftergroup\def\aftergroup\parcite@format
+        \aftergroup{\aftergroup1\aftergroup}%
+      \or
+        \aftergroup\def\aftergroup\parcite@format
+        \aftergroup{\aftergroup2\aftergroup}%
+      \or
+        \aftergroup\def\aftergroup\parcite@format
+        \aftergroup{\aftergroup-\aftergroup1\aftergroup}%
+      \fi
+      \ifcase \@tempcntb
+      \or
+        \aftergroup\def\aftergroup\sentencecite@format
+        \aftergroup{\aftergroup0\aftergroup}%
+      \or
+        \aftergroup\def\aftergroup\sentencecite@format
+        \aftergroup{\aftergroup1\aftergroup}%
+      \or
+        \aftergroup\def\aftergroup\sentencecite@format
+        \aftergroup{\aftergroup2\aftergroup}%
+      \or
+        \aftergroup\def\aftergroup\sentencecite@format
+        \aftergroup{\aftergroup-\aftergroup1\aftergroup}%
+      \fi
     \fi
   \endgroup
 }
