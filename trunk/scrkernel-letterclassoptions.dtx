@@ -1,4 +1,4 @@
-% \CheckSum{1439}
+% \CheckSum{1467}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-letterclassoptions.dtx
@@ -58,7 +58,7 @@
 %%% From File: $Id$
 %<*driver>
 % \fi
-\ProvidesFile{scrkernel-letterclassoptions.dtx}[2013/10/04 v3.12 KOMA-Script 
+\ProvidesFile{scrkernel-letterclassoptions.dtx}[2013/11/05 v3.12 KOMA-Script 
                                                        (letter class options)]
 % \iffalse
 \documentclass{scrdoc}
@@ -204,13 +204,15 @@
 % Papiergröße nicht überein, so wird bei \cs{opening} eine Warnung
 % ausgegeben.
 % \begin{macro}{\@PapersizeWarning}
-%   \changes{v2.8q}{2002/03/25}{Neu (intern)}
+%   \changes{v2.8q}{2002/03/25}{Neu (intern)}%^^A
+%   \changes{v3.12}{2013/11/05}{Abweichung von 1\,mm nach unten und oben
+%     erlaubt}%^^A
 % \begin{macro}{\@@PapersizeWarning}
-%   \changes{v2.8q}{2002/03/25}{Neu (intern)}
+%   \changes{v2.8q}{2002/03/25}{Neu (intern)}%^^A
 % \begin{macro}{\LOPNP@size}
-%   \changes{v2.8q}{2002/03/25}{Neu (intern)}
+%   \changes{v2.8q}{2002/03/25}{Neu (intern)}%^^A
 % \begin{macro}{\LOPNP@option}
-%   \changes{v2.8q}{2002/03/25}{Neu (intern)}
+%   \changes{v2.8q}{2002/03/25}{Neu (intern)}%^^A
 % Zur einfacheren Realisierung wird mit vier internen Hilfsmakros
 % gearbeitet.
 %    \begin{macrocode}
@@ -218,13 +220,26 @@
 \newcommand*{\LOPNP@size}{}
 \newcommand*{\@PapersizeWarning}{%
   \begingroup%
-    \edef\@tempc{\noexpand\@tempswatrue
-      \noexpand\ifdim\paperwidth=\the\paperwidth\noexpand\else
-      \noexpand\@tempswafalse\noexpand\fi
-      \noexpand\ifdim\paperheight=\the\paperheight\noexpand\else
-      \noexpand\@tempswafalse\noexpand\fi
+    \edef\@tempc{\noexpand\@tempswafalse
+      \noexpand\ifdim\paperwidth<\the\dimexpr\paperwidth-.1mm\relax
+      \relax
+      \noexpand\else
+        \noexpand\ifdim\paperwidth>\the\dimexpr\paperwidth+.1mm\relax
+        \relax
+        \noexpand\else
+          \noexpand\ifdim\paperheight<\the\dimexpr\paperheight-.1mm\relax
+          \relax
+          \noexpand\else
+            \noexpand\ifdim\paperheight>\the\dimexpr\paperheight+.1mm\relax
+            \relax
+            \noexpand\else
+              \noexpand\@tempswatrue
+            \noexpand\fi
+          \noexpand\fi
+        \noexpand\fi
+      \noexpand\fi
       \noexpand\@@PapersizeWarning
-      }  
+    }%
     \def\@tempb{letter}\ifx\LOPNP@size\@tempb%
       \setlength{\paperheight}{11in}\setlength{\paperwidth}{8.5in}%
     \else\def\@tempb{legal}\ifx\LOPNP@size\@tempb%
@@ -271,7 +286,7 @@
 %    \begin{macrocode}
 \newcommand*{\LetterOptionNeedsPapersize}[2]{%
   \edef\LOPNP@size{#2}\edef\LOPNP@option{#1}%
-  }
+}
 %    \end{macrocode}
 % \end{macro}
 %
