@@ -1,4 +1,4 @@
-% \CheckSum{2238}
+% \CheckSum{2390}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -1208,7 +1208,7 @@
   \else \if #1+\relax
     \else
       \def\scr@next{%
-        \afterassignment\ifrelax@to@nnil
+        \afterassignment\scr@ifrelax@to@nnil
         \@tempcnta=#1#2\relax\@nnil
       }%
       \if #10\else\if #11\else\if #12\else\if #13\else\if #14\else
@@ -1251,7 +1251,7 @@
   \else \if #1+\relax
     \else
       \def\scr@next{%
-        \afterassignment\ifrelax@to@nnil
+        \afterassignment\scr@ifrelax@to@nnil
         \@tempdima=#1#2\@nnil
       }%
       \if #1,\else\if #1.\else
@@ -1296,7 +1296,7 @@
   \else \if #1+\relax
     \else
       \def\scr@next{%
-        \afterassignment\ifrelax@to@nnil
+        \afterassignment\scr@ifrelax@to@nnil
         \@tempskipa=#1#2\@nnil
       }%
       \if #1,\else\if #1.\else
@@ -2244,7 +2244,7 @@
 %   \changes{v3.00}{2008/04/30}{Neue Anweisung}
 %   \changes{v3.11a}{2012/05/25}{Argument in Fehlermeldung korrigiert}
 % Über diese Anweisung wird der Wert dann gesetzt. Dabei ist das erste
-% Argument die Familie, das zweite der Name des Schlüsselt, das dritte der
+% Argument die Familie, das zweite der Name des Schlüssels, das dritte der
 % Schalter und das vierte schließlich der gewünschte Wert.
 %    \begin{macrocode}
 \newcommand*{\FamilySetBool}[4]{%
@@ -2310,6 +2310,165 @@
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
+%
+% \begin{macro}{\FamilyCounterKey}
+%   \changes{v3.12}{2013/11/05}{neu}%^^A
+%   Dieses Makro definiert einen Schlüssel, der einen \LaTeX-Zähler an Hand
+%   des Wertes setzt. Das erste, optionale Argument ist das Familienmitglied,
+%   das zweite, obligatorische Argument ist die Familie, das dritte der Name
+%   des Schlüssels, das vierte der name des \LaTeX-Zählers. Erlaubt sind alle
+%   Integer-Werte.
+%    \begin{macrocode}
+%<*base>
+\newcommand*{\FamilyCounterKey}[4][.\@currname.\@currext]{%
+  \@ifundefined{c@#4}{\newcounter{#4}}{}%
+  \DefineFamilyKey[{#1}]{#2}{#3}{\FamilySetCounter{#2}{#3}{#4}{##1}}%
+}
+%    \end{macrocode}
+% \begin{macro}{\FamilySetCounter}
+%   \changes{v3.12}{2013/11/05}{neu}%^^A
+%   Über diese Anwesiung wird der Wert dann gesetzt. Dabei ist das erste
+%   Argument die Familie, das zweite der Name des Schlüssels, das dritte der
+%   Name des \LaTeX-Zählers, das vierte schließlich der gewünschte Wert.
+%    \begin{macrocode}
+\newcommand*{\FamilySetCounter}[4]{%
+  \ifiscount{#4}{\value{#3}=#4\FamilyKeyStateProcessed}{%
+    \ifisdimen{#4}{\value{#3}=#4\FamilyKeyStateProcessed}{%
+      \ifisskip{#4}{\value{#3}=#4\FamilyKeyState\Processed}{%
+        \ifisnumexpr{#4}{\value{#3}=#4\FamilyKeyStateProcessed}{%
+          \ifisdimexpr{#4}{\value{#3}=#4\FamilyKeyStateProcessed}{%
+            \ifisinteger{#4}{\value{#3}=#4\FamilyKeyStateProcessed}{%
+              \ifiscounter{#4}{\value{#3}=\value{#4}\FamilyKeyStateProcessed}{%
+                \FamilyKeyStateUnknownValue
+              }%
+            }%
+          }%
+        }%
+      }%
+    }%
+  }%
+}
+%</base>
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \begin{macro}{\FamilyCounterMacroKey}
+%   \changes{v3.12}{2013/11/05}{neu}%^^A
+% \begin{macro}{\FamilySetCounterMacro}
+%   \changes{v3.12}{2013/11/05}{neu}%^^A
+%   Diese Anweisungen arbeitet fast wie \cs{FamilyCounterKey} und
+%   \cs{FamilySetCounter}, allerdings wird nicht ein Zähler gesetzt, sondern
+%   ein Makro auf einen Wert definiert. Dabei ist das erste Argument die
+%   Familie, das zweite der Name des Schlüssels, das dritte das Makro, das
+%   vierte schließlich der gewünschte Wert.
+%    \begin{macrocode}
+%<*base>
+\newcommand*{\FamilyCounterMacroKey}[4][.\@currname.\@currext]{%
+  \ifdefined#4\else\let#4\z@\fi
+  \DefineFamilyKey[{#1}]{#2}{#3}{\FamilySetCounterMacro{#2}{#3}{#4}{##1}}%
+}
+\newcommand*{\FamilySetCounterMacro}[4]{%
+  \begingroup
+    \ifiscount{#4}{\@tempcnta=#4\FamilyKeyStateProcessed}{%
+      \ifisdimen{#4}{\@tempcnta=#4\FamilyKeyStateProcessed}{%
+        \ifisskip{#4}{\@tempcnta=#4\FamilyKeyState\Processed}{%
+          \ifisnumexpr{#4}{\@tempcnta=#4\FamilyKeyStateProcessed}{%
+            \ifisdimexpr{#4}{\@tempcnta=#4\FamilyKeyStateProcessed}{%
+              \ifisinteger{#4}{\@tempcnta=#4\FamilyKeyStateProcessed}{%
+                \ifiscounter{#4}{%
+                  \@tempcnta=\value{#4}\FamilyKeyStateProcessed}{%
+                  \FamilyKeyStateUnknownValue
+                }%
+              }%
+            }%
+          }%
+        }%
+      }%
+    }%
+  \expandafter\expandafter\expandafter\endgroup
+  \expandafter\def\expandafter#3\expandafter{\the\@tempcnta}%
+}    
+%</base>
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\FamilyLengthKey}
+%   \changes{v3.12}{2013/11/05}{neu}%^^A
+%   Dieses Makro definiert einen Schlüssel, der eine \LaTeX-Länge an Hand
+%   des Wertes setzt. Das erste, optionale Argument ist das Familienmitglied,
+%   das zweite, obligatorische Argument ist die Familie, das dritte der Name
+%   des Schlüssels, das vierte der name der \LaTeX-Länge.
+%    \begin{macrocode}
+%<*base>
+\newcommand*{\FamilyLengthKey}[4][.\@currname.\@currext]{%
+  \ifdefined#4\else\newlength{#4}\fi
+  \DefineFamilyKey[{#1}]{#2}{#3}{\FamilySetLength{#2}{#3}{#4}{##1}}%
+}
+%    \end{macrocode}
+% \begin{macro}{\FamilySetLength}
+%   \changes{v3.12}{2013/11/05}{neu}%^^A
+%   Über diese Anwesiung wird der Wert dann gesetzt. Dabei ist das erste
+%   Argument die Familie, das zweite der Name des Schlüssels, das dritte der
+%   Name der \LaTeX-Länge, das vierte schließlich der gewünschte Wert.
+%    \begin{macrocode}
+\newcommand*{\FamilySetLength}[4]{%
+  \ifiscount{#4}{#3=#4\FamilyKeyStateProcessed}{%
+    \ifisdimen{#4}{#3=#4\FamilyKeyStateProcessed}{%
+      \ifisskip{#4}{#3=#4\FamilyKeyState\Processed}{%
+        \ifisnumexpr{#4}{#3=#4\FamilyKeyStateProcessed}{%
+          \ifisdimexpr{#4}{#3=#4\FamilyKeyStateProcessed}{%
+            \ifisglue{#4}{#3=#4\FamilyKeyStateProcessed}{%
+              \FamilyKeyStateUnknownValue
+            }%
+          }%
+        }%
+      }%
+    }%
+  }%
+}
+%</base>
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \begin{macro}{\FamilyLengthMacroKey}
+%   \changes{v3.12}{2013/11/05}{neu}%^^A
+% \begin{macro}{\FamilySetLengthMacro}
+%   \changes{v3.12}{2013/11/05}{neu}%^^A
+%   Diese Anweisungen arbeitet fast wie \cs{FamilyCounterKey} und
+%   \cs{FamilySetCounter}, allerdings wird nicht ein Zähler gesetzt, sondern
+%   ein Makro auf einen Wert definiert. Dabei ist das erste Argument die
+%   Familie, das zweite der Name des Schlüssels, das dritte das Makro, das
+%   vierte schließlich der gewünschte Wert.
+%    \begin{macrocode}
+%<*base>
+\newcommand*{\FamilyLengthMacroKey}[4][.\@currname.\@currext]{%
+  \ifdefined#4\else\let#4\z@\fi
+  \DefineFamilyKey[{#1}]{#2}{#3}{\FamilySetLengthMacro{#2}{#3}{#4}{##1}}%
+}
+\newcommand*{\FamilySetLengthMacro}[4]{%
+  \begingroup
+    \ifiscount{#4}{\@tempskipa=#4\FamilyKeyStateProcessed}{%
+      \ifisdimen{#4}{\@temskipa=#4\FamilyKeyStateProcessed}{%
+        \ifisskip{#4}{\@tempkipa=#4\FamilyKeyState\Processed}{%
+          \ifisnumexpr{#4}{\@tempskipa=#4\FamilyKeyStateProcessed}{%
+            \ifisdimexpr{#4}{\@tempskipa=#4\FamilyKeyStateProcessed}{%
+              \ifisglue{#4}{\@tempskipa=#4\FamilyKeyStateProcessed}{%
+                \FamilyKeyStateUnknownValue
+              }%
+            }%
+          }%
+        }%
+      }%
+    }%
+  \expandafter\expandafter\expandafter\endgroup
+  \expandafter\def\expandafter#3\expandafter{\the\@tempskipa}%
+}    
+%</base>
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
 %
 % \begin{macro}{\FamilyNumericalKey}
 %   \changes{v3.00}{2008/04/30}{Neue Anweisung}
