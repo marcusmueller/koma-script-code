@@ -209,7 +209,7 @@ scrdoc.cls: scrdoc.dtx
 	$(SSYMLINK) scrdoc.dtx scrdoc.cls
 
 # ----------------------------------------------------------------------
-CLS_FILES	= scrdoc.cls scrdocstrip.tex $(CLS_MAIN)
+CLS_FILES	= scrdoc.cls $(CLS_MAIN)
 
 CLS_DVIS	= $(CLS_MAIN_DVI)
 
