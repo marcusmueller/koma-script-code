@@ -1,4 +1,4 @@
-% \CheckSum{1676}
+% \CheckSum{2010}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -925,6 +925,263 @@
 %</base>
 %    \end{macrocode}
 %  \end{macro}
+%
+% \begin{macro}{ifstrstart}
+%   \changes{v3.12}{2013/11/05}{neu}%^^A
+% Falls die Expansion des ersten Arguments mit der Expansion des zweiten
+% Arguments beginnt, wird das dritte Argument ausgeführt, sonst das vierte.
+%    \begin{macrocode}
+%<*base>
+\newcommand*{\ifstrstart}[2]{%
+  \begingroup
+    \edef\reserved@a{\noexpand\@ifstrstart{#1}{#2}}%
+    \reserved@a{\aftergroup\@firstoftwo}{\aftergroup\@secondoftwo}%
+  \endgroup
+}
+%    \end{macrocode}
+% \begin{macro}{@ifstrstart}
+%   \changes{v3.12}{2013/11/05}{neu (intern)}%^^A
+% Hilfsmakro, damit die Argumente vollständig expandiert werden können.
+%    \begin{macrocode}
+\newcommand*{\@ifstrstart}[2]{%
+  \def\reserved@a ##1#2##2\@nil{%
+    \if\relax\detokenize{##1}\relax
+      \expandafter\@firstoftwo
+    \else
+      \expandafter\@secondoftwo
+    \fi
+  }%
+  \reserved@a#1#2\@nil
+}
+%</base>
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\ifisdimen}
+%   \changes{v3.12}{2013/11/05}{neu}%^^A
+% Falls die Expansion des ersten Arguments eine \cs{dimen} ist, wird das
+% zweite Argument ausgeführt, sonst das dritte.
+%    \begin{macrocode}
+%<*base>
+\newcommand*{\ifisdimen}[1]{%
+  \begingroup
+    \edef\reserved@a{#1}%
+    \expandafter\expandafter\expandafter\def
+    \expandafter\expandafter\expandafter\reserved@a
+    \expandafter\expandafter\expandafter{\expandafter\meaning\reserved@a}%
+    \expandafter\def\expandafter\reserved@b\expandafter{\string\dimen}%
+    \ifstrstart{\reserved@a}{\reserved@b}{%
+      \afterassignment\ifrelax@to@nnil
+      \@tempdima=#1\relax\@nnil{%
+        \aftergroup\@firstoftwo
+      }{%
+        \aftergroup\@secondoftwo
+      }%
+    }{\aftergroup\@secondoftwo}%
+  \endgroup
+}
+%    \end{macrocode}
+% \begin{macro}{\ifrelax@to@nnil}
+%   \changes{v3.12}{2013/11/05}{neu (intern)}%^^A
+% Hilfsmakro, zur Verwendung beispielsweise nach Zuweissungen. Falls alles bis
+% zum ersten \cs{@nnil} aus genau einem \cs{relax} besteht, wird das erste
+% Argument ausgeführt, sonst das zweite.
+%    \begin{macrocode}
+\newcommand*{\ifrelax@to@nnil}{}
+\def\ifrelax@to@nnil#1\@nnil{%
+  \begingroup
+    \def\reserved@a{#1}\def\reserved@b{\relax}%
+    \ifx\reserved@a\reserved@b
+      \aftergroup\@firstoftwo
+    \else
+      \aftergroup\@secondoftwo
+    \fi
+  \endgroup
+}
+%</base>
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\ifisdimexpr}
+%   \changes{v3.12}{2013/11/05}{neu}
+% Falls die Expansion des ersten Arguments eine \cs{dimexpr} ist, wird das
+% zweite Argument ausgeführt, sonst das dritte. Achtung: Falls der Ausdruck
+% ungültig ist, so wird ein Fehler gemeldet!
+%    \begin{macrocode}
+%<*base>
+\newcommand*{\ifisdimexpr}[1]{%
+  \begingroup
+    \edef\reserved@a{#1}%
+    \expandafter\expandafter\expandafter\def
+    \expandafter\expandafter\expandafter\reserved@a
+    \expandafter\expandafter\expandafter{\expandafter\meaning\reserved@a}%
+    \expandafter\def\expandafter\reserved@b\expandafter{\string\dimexpr}%
+    \ifstrstart{\reserved@a}{\reserved@b}{%
+      \afterassignment\ifemptyorrelax@to@nnil
+      \@tempdima=#1\relax\@nnil{%
+        \aftergroup\@firstoftwo
+      }{%
+        \aftergroup\@secondoftwo
+      }%
+    }{\aftergroup\@secondoftwo}%
+  \endgroup
+}
+%    \end{macrocode}
+% \begin{macro}{\ifemptyorrelax@to@nnil}
+%   \changes{v3.12}{2013/11/05}{neu (intern)}%^^A
+% Hilfsmakro, zur Verwendung beispielsweise nach Zuweissungen. Falls alles bis
+% zum ersten \cs{@nnil} leer ist oder aus genau einem \cs{relax} besteht, wird
+% das erste Argument ausgeführt, sonst das zweite.
+%    \begin{macrocode}
+\newcommand*{\ifemptyorrelax@to@nnil}{}
+\def\ifemptyorrelax@to@nnil#1\@nnil{%
+  \begingroup
+    \def\reserved@a{#1}\def\reserved@b{\relax}%
+    \ifx\reserved@a\reserved@b
+      \aftergroup\@firstoftwo
+    \else
+      \ifx\reserved@a\@empty
+        \aftergroup\@firstoftwo
+      \else
+        \aftergroup\@secondoftwo
+      \fi
+    \fi
+  \endgroup
+}
+%</base>
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\ifisskip}
+%   \changes{v3.12}{2013/11/05}{neu}%^^A
+% Falls die Expansion des ersten Arguments ein \cs{skip} ist, wird das
+% zweite Argument ausgeführt, sonst das dritte.
+%    \begin{macrocode}
+%<*base>
+\newcommand*{\ifisskip}[1]{%
+  \begingroup
+    \edef\reserved@a{#1}%
+    \expandafter\expandafter\expandafter\def
+    \expandafter\expandafter\expandafter\reserved@a
+    \expandafter\expandafter\expandafter{\expandafter\meaning\reserved@a}%
+    \expandafter\def\expandafter\reserved@b\expandafter{\string\skip}%
+    \ifstrstart{\reserved@a}{\reserved@b}{%
+      \afterassignment\ifrelax@to@nnil
+      \@tempskipa=#1\relax\@nnil{%
+        \aftergroup\@firstoftwo
+      }{%
+        \aftergroup\@secondoftwo
+      }%
+    }{\aftergroup\@secondoftwo}%
+  \endgroup
+}
+%</base>
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ifisglueexpr}
+%   \changes{v3.12}{2013/11/05}{neu}
+% Falls die Expansion des ersten Arguments eine \cs{glueexpr} ist, wird das
+% zweite Argument ausgeführt, sonst das dritte. Achtung: Falls der Ausdruck
+% ungültig ist, so wird ein Fehler gemeldet!
+%    \begin{macrocode}
+%<*base>
+\newcommand*{\ifisglueexpr}[1]{%
+  \begingroup
+    \edef\reserved@a{#1}%
+    \expandafter\expandafter\expandafter\def
+    \expandafter\expandafter\expandafter\reserved@a
+    \expandafter\expandafter\expandafter{\expandafter\meaning\reserved@a}%
+    \expandafter\def\expandafter\reserved@b\expandafter{\string\glueexpr}%
+    \ifstrstart{\reserved@a}{\reserved@b}{%
+      \afterassignment\ifemptyorrelax@to@nnil
+      \@tempskipa=#1\relax\@nnil{%
+        \aftergroup\@firstoftwo
+      }{%
+        \aftergroup\@secondoftwo
+      }%
+    }{\aftergroup\@secondoftwo}%
+  \endgroup
+}
+%</base>
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ifiscount}
+%   \changes{v3.12}{2013/11/05}{neu}
+% Falls die Expansion des ersten Arguments ein \cs{count} ist, wird das
+% zweite Argument ausgeführt, sonst das dritte. Für \LaTeX-Zähler siehe
+% stattdessen \cs{ifiscounter}.
+%    \begin{macrocode}
+%<*base>
+\newcommand*{\ifiscount}[1]{%
+  \begingroup
+    \edef\reserved@a{#1}%
+    \expandafter\expandafter\expandafter\def
+    \expandafter\expandafter\expandafter\reserved@a
+    \expandafter\expandafter\expandafter{\expandafter\meaning\reserved@a}%
+    \expandafter\def\expandafter\reserved@b\expandafter{\string\count}%
+    \ifstrstart{\reserved@a}{\reserved@b}{%
+      \afterassignment\ifrelax@to@nnil
+      \@tempcnta=#1\relax\@nnil{%
+        \aftergroup\@firstoftwo
+      }{%
+        \aftergroup\@secondoftwo
+      }%
+    }{\aftergroup\@secondoftwo}%
+  \endgroup
+}
+%</base>
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ifisnumexpr}
+%   \changes{v3.12}{2013/11/05}{neu}
+% Falls die Expansion des ersten Arguments eine \cs{numexpr} ist, wird das
+% zweite Argument ausgeführt, sonst das dritte. Achtung: Falls der Ausdruck
+% ungültig ist, so wird ein Fehler gemeldet!
+%    \begin{macrocode}
+%<*base>
+\newcommand*{\ifisnumexpr}[1]{%
+  \begingroup
+    \edef\reserved@a{#1}%
+    \expandafter\expandafter\expandafter\def
+    \expandafter\expandafter\expandafter\reserved@a
+    \expandafter\expandafter\expandafter{\expandafter\meaning\reserved@a}%
+    \expandafter\def\expandafter\reserved@b\expandafter{\string\numexpr}%
+    \ifstrstart{\reserved@a}{\reserved@b}{%
+      \afterassignment\ifemptyorrelax@to@nnil
+      \@tempcnta=#1\relax\@nnil{%
+        \aftergroup\@firstoftwo
+      }{%
+        \aftergroup\@secondoftwo
+      }%
+    }{\aftergroup\@secondoftwo}%
+  \endgroup
+}
+%</base>
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ifiscounter}
+%   \changes{v3.12}{2013/11/05}{neu}
+% Falls die Expansion des ersten Arguments ein \LaTeX-Zähler ist, wird das
+% zweite Argument ausgeführt, sonst das dritte.
+%    \begin{macrocode}
+%<*base>
+\newcommand*{\ifiscounter}[1]{%
+  \begingroup
+    \@ifundefined{c@#1}%
+                 {\aftergroup\@secondoftwo}%
+                 {\aftergroup\@firstoftwo}%
+  \endgroup
+}
+%</base>
+%    \end{macrocode}
+% \end{macro}
 %
 % \begin{macro}{\ifnumber}
 %   \changes{v3.12}{2013/10/30}{using \cs{aftergroup} instead of
