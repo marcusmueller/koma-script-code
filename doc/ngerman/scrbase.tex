@@ -1191,48 +1191,61 @@ sondern hinter \Macro{begin}\PParameter{document} einfügen. Das Paket
 \Package{scrbase} bietet ihm für die Definition selbst einige zusätzliche
 Anweisungen.
 
+\BeginIndex{Cmd}{defcaptionname}%
 \BeginIndex{Cmd}{providecaptionname}%
 \BeginIndex{Cmd}{newcaptionname}%
 \BeginIndex{Cmd}{renewcaptionname}%
 \begin{Declaration}
+  \Macro{defcaptionname}%
+    \Parameter{Sprachliste}\Parameter{Begriff}\Parameter{Inhalt}\\
   \Macro{providecaptionname}%
-    \Parameter{Sprache}\Parameter{Begriff}\Parameter{Inhalt}\\
+    \Parameter{Sprachliste}\Parameter{Begriff}\Parameter{Inhalt}\\
   \Macro{newcaptionname}%
-    \Parameter{Sprache}\Parameter{Begriff}\Parameter{Inhalt}\\
+    \Parameter{Sprachliste}\Parameter{Begriff}\Parameter{Inhalt}\\
   \Macro{renewcaptionname}%
-    \Parameter{Sprache}\Parameter{Begriff}\Parameter{Inhalt}
+    \Parameter{Sprachliste}\Parameter{Begriff}\Parameter{Inhalt}\\
+  \Macro{defcaptionname*}%
+    \Parameter{Sprachliste}\Parameter{Begriff}\Parameter{Inhalt}\\
+  \Macro{providecaptionname*}%
+    \Parameter{Sprachliste}\Parameter{Begriff}\Parameter{Inhalt}\\
+  \Macro{newcaptionname*}%
+    \Parameter{Sprachliste}\Parameter{Begriff}\Parameter{Inhalt}\\
+  \Macro{renewcaptionname*}%
+    \Parameter{Sprachliste}\Parameter{Begriff}\Parameter{Inhalt}
 \end{Declaration}
 Mit Hilfe dieser drei Anweisungen ist es möglich, einem \PName{Begriff} in
-Abhängigkeit der \PName{Sprache} einen \PName{Inhalt} zuzuweisen. Der
-\PName{Begriff} ist dabei immer ein Makro. Die Arbeitsweise der drei
-Anweisungen unterscheidet sich je nachdem, ob eine \PName{Sprache} und ein
-\PName{Begriff} innerhalb dieser \PName{Sprache} zum Zeitpunkt des Aufrufs
-bereits definiert ist.
+Abhängigkeit der Sprache einen \PName{Inhalt} zuzuweisen. Mehrere Sprachen
+können durch Komma voneinander getrennt als
+\PName{Sprachliste}\ChangedAt{v3.12}{\Package{scrbase}} angegeben werden.
 
-Ist eine \PName{Sprache} nicht definiert, so tut \Macro{providecaptionname}
+Der \PName{Begriff} ist immer ein Makro. Die Arbeitsweise der drei Anweisungen
+unterscheidet sich je nachdem, ob eine Sprache und ein \PName{Begriff}
+innerhalb dieser Sprache zum Zeitpunkt des Aufrufs bereits definiert ist.
+
+Ist eine Sprache nicht definiert, so tut \Macro{providecaptionname}
 nichts weiter, als dies in der \File{log}-Datei zu vermerken. Dabei wird für
 jede Sprache nur einmal eine entsprechende Information in die \File{log}-Datei
 geschrieben. Ist die Sprache definiert, enthält aber bisher keinen
 entsprechenden \PName{Begriff}, so wird er mit dem angegebenen \PName{Inhalt}
-definiert. Ist der \PName{Begriff} hingegen in der \PName{Sprache} bereits
+definiert. Ist der \PName{Begriff} hingegen in der Sprache bereits
 definiert, so wird er nicht umdefiniert, sondern ein entsprechender Hinweis in
 die \File{log}-Datei geschrieben.
 
 Die Anweisung \Macro{newcaptionname} verhält sich etwas anders. Ist bei ihr
-die \PName{Sprache} nicht definiert, dann wird diese neu definiert, indem eine
-entsprechende Anweisung definiert wird. Für die \PName{Sprache}
+eine Sprache nicht definiert, dann wird diese neu definiert, indem eine
+entsprechende Anweisung definiert wird. Für die Sprache
 \PValue{ngerman} wäre das beispielsweise \Macro{captionsngerman}. Außerdem
-wird darüber auch in der \File{log}-Datei informiert. Ist die \PName{Sprache}
-definiert, der \PName{Begriff} in dieser \PName{Sprache} aber noch nicht
+wird darüber auch in der \File{log}-Datei informiert. Ist die Sprache
+definiert, der \PName{Begriff} in dieser Sprache aber noch nicht
 vorhanden, so wird er mit dem gewünschten \PName{Inhalt} definiert. Ist der
-\PName{Begriff} in der \PName{Sprache} bereits vorhanden, so wird eine
+\PName{Begriff} in der Sprache bereits vorhanden, so wird eine
 Fehlermeldung ausgegeben.
 
 Die Anweisung \Macro{renewcaptionname} verhält sich noch einmal anders. Ist
-die \PName{Sprache} nicht definiert, so wird eine Fehlermeldung
-ausgegeben. Ist die \PName{Sprache} definiert, der \PName{Begriff} in dieser
-\PName{Sprache} jedoch nicht, so wird ebenfalls eine Fehlermeldung
-ausgegeben. Ist der \PName{Begriff} in der \PName{Sprache} definiert, so wird
+eine Sprache nicht definiert, so wird eine Fehlermeldung
+ausgegeben. Ist die Sprache definiert, der \PName{Begriff} in dieser
+Sprache jedoch nicht, so wird ebenfalls eine Fehlermeldung
+ausgegeben. Ist der \PName{Begriff} in der Sprache definiert, so wird
 er auf den gewünschten \PName{Inhalt} umdefiniert.
 
 \KOMAScript{} selbst verwendet \Macro{providecaptionname} um die Begriffe aus
@@ -1240,18 +1253,37 @@ er auf den gewünschten \PName{Inhalt} umdefiniert.
 
 \begin{Example}
   Möchten Sie statt »Abbildung« in den Abbildungsunterschriften lieber »Abb.«
-  stehen haben, so erreichen Sie dies mit
+  stehen haben, so erreichen Sie dies mit:
 \begin{lstcode}
   \renewcaptionname{ngerman}{\figurename}{Abb.}
 \end{lstcode}
+  Soll dieselbe Änderung nicht nur für die Sprache \PValue{ngerman}, sondern
+  auch für Sprache \PValue{naustrian}, also für Österreichisch gelten, so ist
+  es nicht notwendig eine zweite Anweisung:
+\begin{lstcode}
+  \renewcaptionname{naustrian}{\figurename}{Abb.}
+\end{lstcode}
+  hinzuzufügen. Stattdessen kann einfach, die \PName{Sprachliste} erweitert
+  werden:
+\begin{lstcode}
+  \renewcaptionname{ngerman,naustrian{\figurename}{Abb.}
+\end{lstcode}
+  In gleicher Weise können auch \PValue{german} und \PValue{austrian}, also
+  Deutsch und Österreichisch nach der veralteten Rechtschreibung, hinzugefügt
+  werden.
 \end{Example}
 
-Da\important{Achtung!} mit \Macro{renewcaptionname} nur bereits vorhandene
-Begriffe in vorhandenen Sprachen umdefiniert werden können, müssen Sie diese
-Anweisung nach \Macro{begin}\PParameter{document} setzen oder mit Hilfe von
-\Macro{AtBeginDocument} verzögern. Außerdem werden Sie eine Fehlermeldung
-erhalten, wenn Sie kein Paket zur Sprachumschaltung auf \PValue{ngerman}
-verwenden.
+Seit \KOMAScript~3.12\ChangedAt{v3.12}{\Package{scrbase}} ist es auch nicht
+mehr erforderlich, die Definierung oder Umdefinierung mit Hilfe von
+\Macro{AtBeginDocument} bis \Macro{begin}\PParameter{document} zu
+verzögern. Stattdessen erledigt \Package{scrbase} dies selbst, falls die
+Anweisungen in der Dokumentpräambel aufgerufen werden. Außerdem prüft
+\Package{scrbase} nun auch, ob ein umzudefinierender Begriff statt in
+\Macro{captions\PName{Sprache}} in \Macro{extras\PName{Sprache}} zu definieren
+ist. Die neuen Sternvarianten der Befehle verwenden grundsätzlich
+\Macro{captions\PName{Sprache}}. Damit funktioniert nun in der Regel auch das
+Umdefinieren von sprachabhängigen Bezeichnern von Paketen wie
+\Package{hyperref}, die dafür \Macro{extras\PName{Sprache}} verwenden.
 
 In \autoref{tab:scrbase.commonNames} ist ein Überblick über die üblicherweise
 von Klassen und Sprachpaketen definierten Begriffe und deren Verwendung zu
@@ -1357,7 +1389,8 @@ finden.
 \EndIndex{Cmd}{renewcaptionname}%
 \EndIndex{Cmd}{newcaptionname}%
 \EndIndex{Cmd}{providecaptionname}%
-
+\EndIndex{Cmd}{defcaptionname}%
+%
 \EndIndex{}{Sprachdefinition}%
 
 
