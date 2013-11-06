@@ -50,7 +50,7 @@
                   KOMA-Script package scrbase]
 \translator{Markus Kohm}
 
-% Date of the translated German file: 2013/11/05
+% Date of the translated German file: 2013/11/06
 
 \chapter{Basic Functions at Package \Package{scrbase}}
 \labelbase{scrbase}
@@ -1141,61 +1141,90 @@ provides some additional commands for defining language-dependent terms.
 
 
 \begin{Declaration}
+  \Macro{defcaptionname}%
+    \Parameter{language list}\Parameter{term}\Parameter{definition}\\
   \Macro{providecaptionname}%
-    \Parameter{language}\Parameter{term}\Parameter{definition}\\
+    \Parameter{language list}\Parameter{term}\Parameter{definition}\\
   \Macro{newcaptionname}%
-    \Parameter{language}\Parameter{term}\Parameter{definition}\\
+    \Parameter{language list}\Parameter{term}\Parameter{definition}\\
   \Macro{renewcaptionname}%
-    \Parameter{language}\Parameter{term}\Parameter{definition}
+    \Parameter{language list}\Parameter{term}\Parameter{definition}\\
+  \Macro{defcaptionname*}%
+    \Parameter{language list}\Parameter{term}\Parameter{definition}\\
+  \Macro{providecaptionname*}%
+    \Parameter{language list}\Parameter{term}\Parameter{definition}\\
+  \Macro{newcaptionname*}%
+    \Parameter{language list}\Parameter{term}\Parameter{definition}\\
+  \Macro{renewcaptionname*}%
+    \Parameter{language list}\Parameter{term}\Parameter{definition}
 \end{Declaration}
+\BeginIndex{Cmd}{defcaptionname}%
 \BeginIndex{Cmd}{providecaptionname}%
 \BeginIndex{Cmd}{newcaptionname}%
 \BeginIndex{Cmd}{renewcaptionname}%
 Using one of these commands, the user can assign a \PName{definition} for a
-particular \PName{language} to a \PName{term}.  The \PName{term} is always a
-macro. The commands differ dependent on whether a given \PName{language} or a
-\PName{term} within a given \PName{language} are already defined or not at the
+particular language to a \PName{term}. Several languages can be concatenated
+with comma to a \PName{language list}.  The \PName{term} is always a
+macro. The commands differ dependent on whether a given language or a
+\PName{term} within a given language are already defined or not at the
 time the command is called.
 
-If \PName{language} is not defined, then \Macro{providecaptionname} does
+If a language is not defined, then \Macro{providecaptionname} does
 nothing other than writes a message in the log file. This happens only once
-for each language.  If \PName{language} is defined but \PName{term} is not yet
+for each language.  If a language is defined but \PName{term} is not yet
 defined for it, then it will be defined using \PName{definition}.  The
-\PName{term} will not be redefined if the \PName{language} already has such a
+\PName{term} will not be redefined if the language already has such a
 definition; instead, an appropriate message is written to the log file.
 
-The command \Macro{newcaptionname} has a slightly different behaviour.  If the
-\PName{language} is not yet defined, then a new language command will be
-created and a message written to the log file. For \PName{language}
+The command \Macro{newcaptionname} has a slightly different behaviour.  If a
+language is not yet defined, then a new language command will be
+created and a message written to the log file. For language
 \PValue{USenglish}, e.\,g.\, this would be the language command
-\Macro{captionsUSenglish}. If \PName{term} is not yet defined in
-\PName{language}, then it will be defined using \PName{definition}.  If
-\PName{term} already exists in \PName{language}, then this results in an error
+\Macro{captionsUSenglish}. If \PName{term} is not yet defined in a
+language, then it will be defined using \PName{definition}.  If
+\PName{term} already exists in a language, then this results in an error
 message.
 
 The command \Macro{renewcaptionname} again behaves differently. It requires an
-existing definition of \PName{term} in \PName{language}.  If neither
-\PName{language} nor \PName{term} exist or \PName{term} is unknown in a
+existing definition of \PName{term} in the languages.  If neither
+a language nor \PName{term} exist or \PName{term} is unknown in a
 defined language then a error message will be given. Otherwise, the
-\PName{term} for \PName{language} will be redefined according to
+\PName{term} for the language will be redefined according to
 \PName{definition}.
 
 \KOMAScript{} itself employs \Macro{providecaptionname} in order to define the
 commands in \autoref{sec:scrlttr2-experts.languages}.
 
 \begin{Example}
-  If you prefer ``fig.'' instead of ``figure'', you may achieve this using:
+  If you prefer ``fig.'' instead of ``figure'' in \PValue{USenglish}, you may
+  achieve this using:
 \begin{lstcode}
   \renewcaptionname{USenglish}{\figurename}{fig.}
 \end{lstcode}
+  If you want the same change not only in \PValue{USenglish} but also in
+  \PValue{UKenglish} you don't need an additional
+\begin{lstcode}
+  \renewcaptionname{UKenglish}{\figurename}{fig.}
+\end{lstcode}
+  but can simply extend the \PName{language list}:
+\begin{lstcode}
+  \renewcaptionname{USenglish,UKenglish}{\figurename}{fig.}
+\end{lstcode}
+  You can extend the \PName{language list} in the same manner by
+  \PValue{american}, \PValue{australian}, \PValue{british}, \PValue{canadian},
+  and \PValue{newzealand}.
 \end{Example}
   
-Since\textnote{Attention!} only existing terms in available languages can be
-redefined using \Macro{renewcaptionname}, you have to put the command after
-\Macro{begin}\PParameter{document} or delay the command by using
-\Macro{AtBeginDocument}. Furthermore, you will get an error message if there
-isn't a package used that switches language selection to, e.\,g.,
-\PName{USenglish} in the example above.
+Since \KOMAScript~3.12\ChangedAt{v3.12}{\Package{scrbase}} you do not need to
+delay the definition or redefinition until \Macro{begin}\PParameter{document}
+using \Macro{AtBeginDocument} any longer, because \Package{scrbase} does the
+delay automatically for (re)definitions in the document's
+preamble. Additionally \Package{scrbase} tests if a redefinition should be
+made in \Macro{extras\PName{language}} instead of
+\Macro{captions\PName{language}} and will do so automatically. The new star
+variants of the commands always use \Macro{extras\PName{language}}. So
+redefinition of language depending terms of packages like \Package{hyperref}
+that use \Macro{extras\PName{language}} should work as expected by the user.
 
 Language dependent terms usually defined by classes and language
 packages are listed and described in \autoref{tab:scrbase.commonNames}.
@@ -1300,6 +1329,7 @@ packages are listed and described in \autoref{tab:scrbase.commonNames}.
 \EndIndex{Cmd}{providecaptionname}%
 \EndIndex{Cmd}{newcaptionname}%
 \EndIndex{Cmd}{renewcaptionname}%
+\EndIndex{Cmd}{defcaptionname}%
 %
 \EndIndex{}{language>definition}
 
