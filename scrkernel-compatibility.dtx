@@ -1,4 +1,4 @@
-% \CheckSum{109}
+% \CheckSum{142}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-compatibility.dtx
@@ -85,7 +85,19 @@
 % \changes{v2.95}{2006/03/16}{%
 %   erste Version aus der Aufteilung von \textsf{scrclass.dtx}}
 %
-% \section{Kompatibilität zu früheren Versionen}
+%
+% \section{Kompatibilität mit den Standardklassen oder 
+%  zu früheren Versionen}
+%
+% \KOMAScript{} ist bezüglich der Anwenderschnittstelle von vornherein
+% aufwärtskompatibel mit den Standardklassen. Allerdings unterscheiden sich
+% diverse Voreinstellungen doch sehr erheblich von denen der
+% Standardklassen. In Zukunft soll man beim Laden der Klassen (nicht jedoch
+% später!) mit Option \texttt{emulatestandardclasses} die Voreinstellungen
+% anpassen können. Dabei wird jedoch nicht komplette Umbruchkompatibilität mit
+% den Standardklassen erreicht, sondern nur einige Einstellungen werden
+% angepasst.
+%
 %
 % Manchmal ist es sinnvoll, dass sich eine neue Version von \KOMAScript{}
 % etwas anders verhält als frühere Versionen. Gleichzeitig ist es aber für den
@@ -100,7 +112,53 @@
 %<*option>
 % \fi
 %
-% \subsection{Option}
+% \subsection{Optionen für die Kompatibilität mit den Standardklassen}
+% Hier gibt es derzeit nur eine Optione, die nur beim Laden aber nicht zur
+% Laufzeit verwendet werden kann:
+%
+% \begin{option}{emulatestandardclasses}
+%   \changes{v3.12}{2013/11/11}{Neue Option}
+%   Diese Option muss sich auf diverse andere Einstellungen auswirken und
+%   sollte deshalb so früh wie möglich verwendet werden. Vieles ändert sie
+%   sofort, manches aber auch erst später.
+% \begin{macro}{\if@scr@emulatestandardclasses}
+%   \changes{v3.12}{2013/11/11}{Neuer Schalter (intern)}
+%   Für die späteren Änderungen wird ein Schalter benötigt, der jedoch nicht
+%   wie gewohnt geändert werden kann.
+%    \begin{macrocode}
+%<*class>
+\newif\if@scr@emulatestandardclasses
+\let\scr@emulatestandardclassestrue\relax
+\let\scr@emulatestandardclassesfalse\relax
+\DeclareOption{emulatestandardclasses}{%
+  \let\if@scr@emulatestandardclasses\iftrue
+  \KOMAExecuteOptions{%
+    fontsize=10pt,%
+%<book|report>    headings=standardclasses,%
+    cleardoublepage=current
+  }%
+  \newcommand*{\defaultpapersize}{letter}%
+  \AtEndOfClass{%
+    \setkomafont{descriptionlabel}{\bfseries}%
+    \setkomafont{dictum}{\normalfont\small}%
+    \setkomafont{caption}{}%
+    \setkomafont{captionlabel}{}%
+    \setcapindent{0pt}%
+    \RequirePackage[pagestyleset=standard,markcase=upper]{scrlayer-scrpage}%
+    \PreventPackageFromLoading{scrpage2}%
+    \setkomafont{pagenumber}{\normalfont}%
+    \setkomafont{pageheadfoot}{\normalfont}%
+    \cfoot[\pagemark]{}%
+%<article|report>    \pagestyle{plain}%
+  }%
+}
+%</class>
+%    \end{macrocode}
+% \end{macro}
+% \end{option}
+%
+%
+% \subsection{Option für die Kompatibilität zu früheren Versionen}
 % Die gesamte Kompatibilitätssteuerung erfolgt mit einer einzigen Option, bei
 % der man angibt, zu welcher Version Kompatibilität hergestellt werden
 % soll. Dies bedeutet ggf. dann auch, dass einzelne neuere Möglichkeiten nicht
