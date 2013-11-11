@@ -1,4 +1,4 @@
-% \CheckSum{2233}
+% \CheckSum{2328}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-typearea.dtx
@@ -695,9 +695,9 @@
   \edef\@tempa{#1}%
   \def\@tempb{last}\ifx\@tempa\@tempb\let\@tempa=\@lastdiv\fi
   \def\@tempb{current}\ifx\@tempa\@tempb\else
-    \def\@tempb{default}\ifx\@tempa\@tempb\ta@div=0 \else
-      \def\@tempb{calc}\ifx\@tempa\@tempb\ta@div=2 \else
-        \def\@tempb{classic}\ifx\@tempa\@tempb\ta@div=3 \else
+    \def\@tempb{default}\ifx\@tempa\@tempb\ta@div=\z@ \else
+      \def\@tempb{calc}\ifx\@tempa\@tempb\ta@div=\tw@ \else
+        \def\@tempb{classic}\ifx\@tempa\@tempb\ta@div=\thr@@ \else
           \ta@div=\@tempa
         \fi
       \fi
@@ -1437,8 +1437,16 @@
 %   entsprechen, werden nicht explizit gesetzt}
 % \changes{v2.97c}{2007/07/18}{Option \texttt{twoside} wird explizit passend
 %   gesetzt}
+% \changes{v3.12}{2013/11/11}{die voreingestellte Papiergröße kann via
+%   \cs{defaultpagesize} auch in \texttt{typearea.cfg} verändert werden}
+% \begin{macro}{\defaultpapersize}
+%   \changes{v3.12}{2013/11/11}{Neue Anweisung}
 %    \begin{macrocode}
-\KOMAExecuteOptions{paper=A4}
+\providecommand*{\defaultpapersize}{A4}
+%    \end{macrocode}
+% \end{macro}
+%    \begin{macrocode}
+\KOMAExecuteOptions{paper=\defaultpapersize}
 \if@twoside
   \if@semitwoside
     \KOMAExecuteOptions{twoside=semi}
@@ -1513,6 +1521,45 @@
 % \textsf{typearea} verlangt wird, die zur gleichen Release wie 
 % die Klassen gehört. Wobei die Warnungen je nach Zusammentreffen der
 % Versionen unterschiedlich ausfallen können.
+%
+% Für die Kompatibilität mit den Standardklassen muss jetzt ggf. noch der
+% Seitenspiegel angepasst werden. Dies geschieht aber nur, wenn ein
+% vordefinierter Wert verwendet wurde:
+%    \begin{macrocode}
+\if@scr@emulatestandardclasses
+  \ifnum\@lastdiv=\z@
+    \setlength{\textwidth}{\dimexpr \paperwidth-2in\relax}
+    \ifdim \f@size\p@<10.5\p@
+        \setlength{\@tempdimb}{345\p@}
+    \else\ifdim \f@size\p@<11.5\p@
+        \setlength{\@tempdimb}{360\p@}
+      \else
+        \setlength{\@tempdimb}{390\p@}
+      \fi
+    \fi
+    \if@twocolumn
+      \ifdim\@textwidth>2\@tempdimb\relax
+        \setlength{\textwidth}{2\@tempdimb}
+      \fi
+    \else
+      \ifdim\textwidth>\@tempdimb
+        \setlength{\textwidth}{\@tempdimb}
+      \fi
+    \fi
+    \@settopoint\textwidth
+    \setlength{\@tempdima}{\dimexpr \paperheight-3.5in\relax}
+    \divide\@tempdima\baselineskip
+    \@tempcnta=\@tempdima
+    \setlength{\textheight}{\@tempcnta\baselineskip}
+    \addtolength{\textheight}{\topskip}
+    \edef\reserved@a{%
+      \noexpand\@areasetadvancedtrue
+      \noexpand\areaset[current]{\noexpand\textwidth}{\noexpand\textheight}%
+      \if@areasetadvanced\else\noexpand\@areasetadvancedfalse\fi
+    }\reserved@a
+  \fi
+\fi
+%    \end{macrocode}
 %
 %    \begin{macrocode}
 %</class>
@@ -1958,7 +2005,7 @@
       DIV values. Using DIV calculation for good line\MessageBreak
       width%
     }%
-    \ta@div=2
+    \ta@div=\tw@
   \else
     \xdef\@tempa{\ta@divlist{}}%
     \@tempdima=#1pt
@@ -2046,9 +2093,9 @@
     \areaset[current]{\textwidth}{\textheight}%
   \else
     \def\@tempb{current}\ifx\@tempa\@tempb\else
-      \def\@tempb{default}\ifx\@tempa\@tempb\ta@div=0 \else
-        \def\@tempb{calc}\ifx\@tempa\@tempb\ta@div=2 \else
-          \def\@tempb{classic}\ifx\@tempa\@tempb\ta@div=3 \else
+      \def\@tempb{default}\ifx\@tempa\@tempb\ta@div=\z@ \else
+        \def\@tempb{calc}\ifx\@tempa\@tempb\ta@div=\tw@ \else
+          \def\@tempb{classic}\ifx\@tempa\@tempb\ta@div=\thr@@ \else
             \ta@div=\@tempa
           \fi
         \fi
