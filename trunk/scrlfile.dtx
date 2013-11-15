@@ -1,4 +1,4 @@
-% \CheckSum{599}
+% \CheckSum{646}
 % \iffalse meta-comment
 % ======================================================================
 % scrlfile.dtx
@@ -148,7 +148,7 @@
 %
 % \changes{v2.95}{2002/06/11}{%
 %   First version split from hugh scrclass.dtx}
-%
+% \sloppy
 %
 % \section[Hook loading files, packages or classes]{%
 %   Hooks loading files, packages or classes\footnote{You'll find a
@@ -372,6 +372,14 @@
 % Note: To replace classes you have to load \textsf{scrlfile} using
 % \cs{RequirePackage} before loading the class.
 %
+% \DescribeMacro{\UnReplaceInput}%^^A
+% \DescribeMacro{\UnReplacePackage}%^^A
+% \DescribeMacro{\UnReplaceClass}%^^A
+% After defining a replacement of a input file, package, or class (see the
+% previously described commands for information about replacement definition),
+% you may un-define this replacement. The commands expect one argument: the
+% name of the input file, package, or class.
+%
 % \DescribeMacro{\PreventPackageFromLoading}
 % \DescribeMacro{\PreventPackageFromLoading*}
 % \DescribeMacro{\ResetPreventPackageFromLoading}
@@ -587,27 +595,62 @@
 %  \end{macro}
 %  \end{macro}
 %
-%  \begin{macro}{\ReplaceInput}
-%    \changes{v2.96}{2006/07/19}{new command}
+% \begin{macro}{\ReplaceInput}
+%   \changes{v2.96}{2006/07/19}{new command}
+%   \changes{v3.12}{2013/11/15}{implemented}
 % Defining the replacement by definition of \cs{\#1-@alias}.
 %    \begin{macrocode}
-\newcommand*{\ReplaceFile}[2]{%
+\newcommand*{\ReplaceInput}[2]{%
   \expandafter\edef\csname #1-@alias\endcsname{#2}%
 }
 %    \end{macrocode}
-%  \end{macro}
+% \begin{macro}{\ReplaceFile}
+%   \changes{v2.96}{2006/07/19}{new command}
+%   \changes{v3.12}{2013/11/15}{throw error}
+% Sorry, but I've implemented the wrong command some time ago.
+%    \begin{macrocode}
+\newcommand*{\ReplaceFile}{%
+  \PackageError{scrlfile}{%
+    usage of not documented command `\string\ReplaceFile'%
+  }{%
+    Command `\string\ReplaceFile' has been implemented accidentally in
+    KOMA-Script 2.96\MessageBreak
+    and replaced by `\string\ReplaceInput' in KOMA-Script 3.12.\MessageBreak
+    You should replace `\string\ReplaceFile' by `\string\ReplaceInput' to
+    avoid this error\MessageBreak
+    message%
+  }%
+  \ReplaceInput
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
 %
-%  \begin{macro}{\ReplacePackage}
-%    \changes{v2.96}{2006/07/19}{new command}
-%  \begin{macro}{\ReplaceClass}
-%    \changes{v2.96}{2006/07/19}{new command}
-%  \begin{macro}{\@replacefilewithext}
-%    \changes{v2.96}{2006/07/19}{new helper command}
+% \begin{macro}{\UnReplaceInput}
+%   \changes{v3.12}{2013/11/15}{new command}
+% Do not longer replace a file.
+%    \begin{macrocode}
+\newcommand*{\UnReplaceInput}[1]{%
+  \ifcsname #1-@alias\endcsname\else
+    \expandafter\let\csname #1-@alias\endcsname\relax
+  \fi
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ReplacePackage}
+%   \changes{v2.96}{2006/07/19}{new command}
+% \begin{macro}{\ReplaceClass}
+%   \changes{v2.96}{2006/07/19}{new command}
+% \begin{macro}{\@replacefilewithext}
+%   \changes{v2.96}{2006/07/19}{new helper command}^^A
 % Note that replacing a package or class will not replace the input of the
 % file of the package or class but only the input of package or class.
 %    \begin{macrocode}
 \newcommand*{\@replacefilewithext}[3]{%
-  \expandafter\edef\csname #1.#3-@aliasname\endcsname{#2}%
+  \ifcsname #1.#3-@aliasname\endcsname\else
+    \expandafter\edef\csname #1.#3-@aliasname\endcsname{#2}%
+  \fi
 }
 \newcommand*{\ReplacePackage}[2]{%
   \@replacefilewithext{#1}{#2}\@pkgextension
@@ -616,9 +659,32 @@
   \@replacefilewithext{#1}{#2}\@clsextension
 }
 %    \end{macrocode}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\UnReplacePackage}
+%   \changes{v3.12}{2013/11/15}{new command}
+% \begin{macro}{\UnReplaceClass}
+%   \changes{v3.12}{2013/11/15}{new command}
+% \begin{macro}{\@unreplacefilewithext}
+%   \changes{v3.12}{2013/11/15}{new helper command}^^A
+% Do not nolonger replace a class or package.
+%    \begin{macrocode}
+\newcommand*{\@unreplacefilewithext}[2]{%
+  \expandafter\let\csname #1.#2-@aliasname\endcsname\relax
+}
+\newcommand*{\UnReplacePackage}[1]{%
+  \@unreplacefilewithext{#1}\@pkgextension
+}
+\newcommand*{\UnReplaceClass}[1]{%
+  \@unreplacefilewithext{#1}\@clsextension
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% 
 %
 %  \begin{macro}{\scr@replacefile@msg}
 %    \changes{v2.96}{2006/07/19}{new helper command}
