@@ -1,4 +1,4 @@
-% \CheckSum{646}
+% \CheckSum{695}
 % \iffalse meta-comment
 % ======================================================================
 % scrlfile.dtx
@@ -384,7 +384,7 @@
 % \DescribeMacro{\PreventPackageFromLoading*}
 % \DescribeMacro{\ResetPreventPackageFromLoading}
 % \DescribeMacro{\StorePreventPackageFromLoading}
-% The command \cs{PreventPackageFromLoading}\marg{package list}
+% The command \cs{PreventPackageFromLoading}\oarg{do instead}\marg{package list}
 % does not replace a package by another but prevents packages from beeing
 % loaded even if they should be loaded using \cs{RequirePackage} or
 % \cs{usepackage}. The \meta{package list} is a comma seperated list of
@@ -398,7 +398,11 @@
 % The normal version of \cs{PreventPackageFromLoading} with empty argument
 % results in a warning message. The star version
 % \cs{PreventPackageFromLoading*} writes only an info into the log-file, if
-% the argument is empty. Both commands are not robust!
+% the argument is empty.
+%
+% Both versions have an optional argument with code, that will be executed
+% instead of loading the package. Both commands are not robust!
+%
 %
 % \DescribeMacro{\BeforeClosingMainAux}
 % The command \cs{BeforeClosingMainAux}\marg{instructions}
@@ -861,11 +865,15 @@
 %   \changes{v3.12}{2012/06/15}{new star version allowes empty argument with
 %     info instead of warning}
 % \begin{macro}{\@PreventPackageFromLoading}
-%   \changes{v3.12}{2012/06/15}{New (internal)}
+%   \changes{v3.12}{2012/06/15}{New (internal)}^^A
+% \begin{macro}{\@@PreventPackageFromLoading}
+%   \changes{v3.12}{2013/11/22}{New (internal)}^^A
+%   \changes{v3.12}{2013/11/22}{\cs{usepackage} before \cs{documentclass}
+%     fixed}^^A
 % \begin{macro}{\scrlfile@excludedpackages}
-%   \changes{v3.08}{2010/11/04}{New (internal)}
+%   \changes{v3.08}{2010/11/04}{New (internal)}^^A
 % \begin{macro}{\scrlfile@saved@RequirePackage}
-%   \changes{v3.08}{2010/11/04}{New (internal)}
+%   \changes{v3.08}{2010/11/04}{New (internal)}^^A
 %    \begin{macrocode}
 \newcommand*{\scrlfile@excludedpackages}{}
 \let\scrlfile@excludedpackages\@empty
@@ -874,15 +882,20 @@
   \@ifstar{\@PreventPackageFromLoading\PackageInfo}%
           {\@PreventPackageFromLoading\PackageWarning}%
 }
-\newcommand*{\@PreventPackageFromLoading}[2]{%
+\newcommand*{\@PreventPackageFromLoading}[1]{%
+  \@ifnextchar [%]
+    {\@@PreventPackageFromLoading#1}{\@@PreventPackageFromLoading#1[]}%
+}
+\newcommand*{\@@PreventPackageFromLoading}{}
+\def\@@PreventPackageFromLoading#1[#2]#3{%
 %    \end{macrocode}
 % We do nothing, if the argument was empty:
 %    \begin{macrocode}
-  \edef\reserved@b{#2}%
+  \edef\reserved@b{\zap@space#3 \@empty}%
   \ifx \reserved@b\@empty
     #1{scrlfile}{%
-      \string\PreventPackageFromLoading\space with empty argument\MessageBreak
-      ignored%
+      \string\PreventPackageFromLoading\space with empty packages\MessageBreak
+      argument ignored%
     }%
   \else
 %    \end{macrocode}
@@ -892,7 +905,7 @@
     \ifx\scrlfile@excludedpackages\@empty
       \let\scrlfile@saved@RequirePackage\RequirePackage
       \let\RequirePackage\scrlfile@RequirePackage
-      \def\reserved@a#2{%  
+      \def\reserved@a##1##{%  
         \@latex@error
         {\noexpand \usepackage before \string\documentclass}%
         {\noexpand \usepackage may only appear in the document
@@ -919,7 +932,13 @@
 %    \begin{macrocode}
     \expandafter\@for \expandafter\reserved@a\expandafter:\expandafter=%
     \reserved@b\do {%
-      \ifx\reserved@a\@empty\else
+      \ifx\reserved@a\@empty
+        #1{scrlfile}{%
+          empty package argument for
+          \string\PreventPackageFromLoading\MessageBreak
+          ignored%
+        }%
+      \else
         \expandafter\@ifpackageloaded\expandafter{\reserved@a}{%
           #1{scrlfile}{%
             package `\reserved@a' already loaded.\MessageBreak
@@ -928,6 +947,9 @@
         }{%
           \edef\scrlfile@excludedpackages{\scrlfile@excludedpackages,%
             \reserved@a}%
+          \if\relax\detokenize{#2}\relax\else
+            \@namedef{scrlfile@exclude@package@\reserved@a @do}{#2}%
+          \fi
         }%
       \fi
     }%
@@ -965,23 +987,37 @@
 %    \end{macrocode}
 % \begin{macro}{\scrlfile@RequirePackage}
 %   \changes{v3.08}{2010/11/04}{New (internal)}
+%   \changes{v3.12}{2013/11/22}{tolerate spaces}
+%   \changes{v3.12}{2013/11/22}{execute the optional argument of
+%     \cs{PreventPackageFromLoading}}
 % This macro will replace \cs{RequirePackage} whenever the exlude list is not
 % empty
 %    \begin{macrocode}
 \newcommand*{\scrlfile@RequirePackage}[2][]{%
   \let\reserved@c\@empty
-  \@for\reserved@b:=#2\do {%
+  \let\reserved@d\@empty
+  \edef\reserved@b{\zap@space#2 \@empty}%
+  \expandafter\@for\expandafter\reserved@b\expandafter:\expandafter=\reserved@b
+  \do {%
     \begingroup
       \@tempswatrue
       \@for\reserved@a:=\scrlfile@excludedpackages\do {%
         \ifx\reserved@a\reserved@b
-          \PackageInfo{scrlfile}{Excluding package `\reserved@b'\MessageBreak
-            from loading}%
           \@tempswafalse
         \fi
       }%
       \if@tempswa
         \xdef\reserved@c{\reserved@c,\reserved@b}%
+      \else
+        \ifx\reserved@b\@empty\else
+          \PackageInfo{scrlfile}{Excluding package `\reserved@b'\MessageBreak
+            from loading}%
+          \@ifundefined{scrlfile@exclude@package@\reserved@b @do}{%
+          }{%
+            \expandafter\g@addto@macro\expandafter\reserved@d
+            \csname scrlfile@exclude@package@\reserved@b @do\endcsname
+          }%
+        \fi
       \fi
     \endgroup
   }%
@@ -991,9 +1027,11 @@
     \edef\reserved@a{\noexpand\scrlfile@saved@RequirePackage[#1]{%
         \expandafter\@gobble\reserved@c\@empty}}%
   \fi
+  \expandafter\reserved@d
   \reserved@a
 }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
