@@ -115,14 +115,14 @@ provide. Generally users need not to care about this.
   \Macro{fi}%
 \end{Declaration}
 \BeginIndex{Cmd}{if@chapter}%
-If \Macro{if@chapter} is defined and \Macro{iftrue}, \Package{scrlayer} will
-work including the chapter level, e.g., at option \Option{automark}. If it is
-defined, but not \Macro{iftrue}, it only handles part, section, subsection,
-sub\dots subsection, paragraph, subparagraph, sub\dots subparagraph. If the
-macro isn't defined, \Package{scrlayer} searches for \Macro{chapter}. If
-\Macro{chapter} is defined and not \Macro{relax}, \Package{scrlayer} will
-define \Macro{if@chapter} to \Macro{iftrue}, otherwise \Macro{if@chapter} will
-become \Macro{iffalse}.%
+If \Macro{if@chapter} is \Macro{iftrue}, \Package{scrlayer} will additionally
+consider the chapter level, e.g., processing option \Option{automark}. If it
+is defined, but differs from \Macro{iftrue}, only part, section, subsection,
+sub\dots subsection, paragraph, subparagraph, sub\dots subparagraph will be
+considered. If the macro isn't defined, \Package{scrlayer} searches for
+\Macro{chapter}. If \Macro{chapter} is defined and not \Macro{relax},
+\Package{scrlayer} will define \Macro{if@chapter} to \Macro{iftrue}, otherwise
+\Macro{if@chapter} will become \Macro{iffalse}.%
 \EndIndex{Cmd}{if@chapter}
 
 \begin{Declaration}
@@ -132,12 +132,12 @@ become \Macro{iffalse}.%
 \BeginIndex{Cmd}{if@mainmatter}%
 Classes like \Class{book} define \Macro{frontmatter}, \Macro{mainmatter}, and
 \Macro{backmatter}. They also use \Macro{if@mainmatter} to distinguish whether
-or the current matter is the main matter. Classes like \Class{report} and
+or not the current matter is the main matter. Classes like \Class{report} and
 \Class{article} don't have \Macro{frontmatter}, \Macro{mainmatter}, or
 \Macro{backmatter} and therefore also don't have \Macro{if@mainmatter}.
 
 For \Package{scrlayer} it's easier not to test always for the existence of the
-matter commands, but to have \Macro{if@mainmatter} even with classes like
+matter commands, but to use \Macro{if@mainmatter} even with classes like
 \Class{report} and \Class{article}, simply set to \Macro{iftrue}. So if
 \Macro{if@mainmatter} is not defined, it will be defined to \Macro{iftrue}.
 
@@ -146,9 +146,9 @@ Some classes have \Macro{frontmatter}, \Macro{mainmatter}, or
 \Package{scrlayer} will also define \Macro{if@mainmatter} to be \Macro{iftrue}
 and it'll extend definition of \Macro{frontmatter}, \Macro{mainmatter}, and
 \Macro{backmatter} to set \Macro{if@mainmatter} properly. Other matter
-commands are not known, not tested, and not extended. So if there other matter
-commands \Package{scrlayer} needs help of the class author to get
-\Macro{if@mainmatter} set correctly.%
+commands are not known, not tested, and not extended. So if there are other
+matter commands \Package{scrlayer} needs help of the class author to set
+\Macro{if@mainmatter} correctly.%
 \EndIndex{Cmd}{if@mainmatter}
 
 \begin{Declaration}
@@ -156,67 +156,68 @@ commands \Package{scrlayer} needs help of the class author to get
   \Parameter{level name}\Parameter{level depth}
 \end{Declaration}
 \BeginIndex{Cmd}{DeclareSectionNumberDepth}%
-Generally each section level is related to a numerical depth. \LaTeX{} needs
-this to manage hierarchic section levels. But normally only the document
-class, that defines the section commands, itself knows the numerical depth of
-a section level and uses these numerical values inside the corresponding
-commands, where they are needed.
+Generally each section level is related to an integer number indicating its
+depth in the document structure. \LaTeX{} needs this to manage hierarchic
+section levels. But normally only the document class, that defines the section
+commands, itself knows that \PName{level depth} of a section level and uses
+these numerical values inside the corresponding commands, when needed.
 
 But \Package{scrlayer} also needs information about the section hierarchy.
 With command \Macro{DeclareSectionNumberDepth} you can map
-the name of a heading level to a section numbering depth. With standard class
+the name of a heading level to a \PName{level depth}. With standard class
 book, e.g., the \PName{level name} could be \PValue{part}, \PValue{chapter},
 \PValue{section}, \PValue{subsection}, \PValue{subsubsection},
 \PValue{paragraph}, or \PValue{subparagraph} and the corresponding
 \PName{level depth}s would be -1, 0, 1, 2, 3, 4, and 5. 
 
-Package \Package{scrlayer} tries to determine the numeric depth on its own
-while loading and while \Macro{begin}\PParameter{document}. But, if it fails,
-i.\,e., if there exist completely different section commands, it would be
-useful, to be able to define the relationship explicitly. For such cases
-\Macro{DeclareSectionNumberDepth} could be useful.%
+Package \Package{scrlayer} tries to determine the \PName{level depth}s on its
+own while loading and again while \Macro{begin}\PParameter{document}. But, if
+it fails, i.\,e., if completely different section commands are used, it would
+be useful, to be able to define the relationship explicitly. For such cases
+\Macro{DeclareSectionNumberDepth} gives the class author the opportunity to
+define the relationship explicitly.%
 \EndIndex{Cmd}{DeclareSectionNumberDepth}
 
 \section{Declaration of Layers}
 \label{sec:scrlayer.layers}
 
-A layer is a kind of logical sheet of transparent paper (in opposite to a
+A layer is a kind of virtual sheet of transparent paper (in opposite to a
 physical sheet of paper). One layer is stacked onto another layer and opaque
 material on one layer may hide material on the layers below. The stack of all
 layers together makes the physical page. Package \Package{scrlayer}
 provides two such layer stacks for each page: a background layer stack and a
 foreground layer stack. The background layer stack is behind the normal page
 contents, the foreground layer stack is above the normal page contents. So the
-normal contents is a kind of a separating layer.
+normal contents is a kind of a separating layer between the background layer
+stack and the foreground layer stack.
 
-A layer has several attributes. The first attribute is, whether or not
-the layer is part of the foreground or the background. Background
-layers will be printed before the main contents of the page. Optically
-they will be behind the main contents. Foreground layers will be
-printed after the main contents of the page. Optically they will be in
-front of the main contents. By default, a layer is both, a background
-layer \emph{and} a foreground layer and therefore will be printed
-twice.
+A layer has several attributes. The first attribute states, whether or not the
+layer is part of the foreground or the background. During page building
+background layers will be printed first, followed by the main contents and the
+foreground layers. Therefore, in the output the background layers show up
+behind the main contents and the foreground layers in front of the main
+contents. By default, a layer is both, a background layer \emph{and} a
+foreground layer and therefore will be printed twice.
 
-The second and third attributes are the horizontal and vertical position of
-the layer. The forth and fifth attributes are the horizontal and vertical size
-of the layer. As you can see, a layer may be smaller or larger than the
-paper.
+The horizontal position of the layer is set by the second attribute, the
+vertical position by the third. The forth and fifth attributes determine the
+horizontal and vertical size of the layer. As you can see, a layer may be
+smaller or larger than the paper.
 
-But how are the horizontal and vertical positions measured? The answer
-is the sixth attribute, the alignment. We can measure from the left edge of
-the paper to the left edge of the layer, or from the left edge of the paper to
-the middle of the layer, or from the left edge of the paper to the right edge
-of the layer. We can measure from the top edge of the paper to the top edge of
-the layer, or to the middle of the layer, or to the bottom edge of the layer.
+But having two numerical values of the second and third attribute does not
+directly give us a position of the layer on the page. For each dimension we
+need two reference points, one on the page and one on the layer. The
+numerical value than states the distance between the reference these.
+Reference points in layouts are also known as alignment and are set by the
+sixth attribute.
 
-The seventh attribute is, whether or not a layer should be
+The seventh attribute states, whether or not a layer should be
 printed onto left or right pages. By default a layer will be printed at both,
 left and right pages. Note, that \LaTeX{} names left pages as even pages and
 right pages as odd pages and that there are no left or even pages in
 single-sided mode.
 
-The eighth attribute is, whether or not a layer should be printed in
+The eighth attribute states, whether or not a layer should be printed in
 single-side mode or in two-side mode. By default a layer will be printed in
 both, single-side mode and two-side mode. Nevertheless an even page layer will
 never be printed in single-side mode and therefore isn't really a two-side
@@ -224,10 +225,10 @@ mode layer.
 
 The ninth attribute is, whether or not a layer should be
 printed onto float pages or non-float pages. \LaTeX{} produces float pages for
-float environment like tables or figures, if they are allowed to be printed on
+float environments like tables or figures, if they are allowed to be printed on
 a page without normal page contents (see option \PValue{p} for
 \Environment{figure} or \Environment{table}). So in some kind of view a float
-page is a page, that may flow at whole. Non-float pages aren't pages
+page is a page, that may itself flow. Non-float pages aren't pages
 without floats, but pages, that aren't float pages. They may contain floats
 inside the text, on the top of the page, or on the bottom of the page. Very
 large floats may seem to be page floats, while in reality they are top floats.
@@ -235,9 +236,10 @@ large floats may seem to be page floats, while in reality they are top floats.
 The tenth and last attribute is the contents of the layer. This is simply,
 what should be printed, whenever the layer will be printed.
 
-So we have ten attributes yet. Below in this manual we will see additional
-attributes, that may be build by these ten attributes. Because of this, we
-call these ten attributes the primary attributes.
+So we have ten attributes yet. Below in this manual we will describe
+additional attributes. However, they are just defined for convenience and can
+be expressed by a combination of the ten attributes stated above. We call
+these ten attributes the primary attributes.
 
 \begin{Declaration}
   \Macro{DeclareLayer}\OParameter{option list}\Parameter{layer name}\\
@@ -253,39 +255,39 @@ call these ten attributes the primary attributes.
 \BeginIndex{Cmd}{ModifyLayer}%
 These commands can be used to define a layer. The \PName{layer name} has to be
 fully expandable and should expand to letters only. Some additional characters
-would be tolerated but aren't recommended.
+are tolerated but aren't recommended.
 
 Command \Macro{DeclareLayer} doesn't care whether or not a layer with the
 given \PName{layer name} already exists. It will under all circumstances
 define the layer with the attribute defined by the \PName{option list}.
 An
-\PName{option} may be either a key or a key followed by an
+\PName{option} can be either a key or a key followed by an
 equal sign followed by a value. Several options may be concatenated to
 a \PName{option list} and have to be separated by comma. If you'd like to have
 a comma or a white space inside the value of an option, you should put the
 value inside curly brackets. See \autoref{tab:scrlayer.layerkeys} for
-more information about the names of the key and the corresponding
+more information on keys, values, and the corresponding
 attributes.
 
-The difference between \Macro{DeclareLayer} and \Macro{DeclareNewLayer} is,
-that using \Macro{DeclareNewLayer} would result in an error, if a layer with
-the same \PName{layer name} already exists. So you may prevent yourself using
-the same \PName{layer name} more than once by mistake. This would be useful,
-e.\,g., if a class or package also defines layers internally.
+In contrast to \Macro{DeclareLayer} using \Macro{DeclareNewLayer} results in
+an error, if a layer with the same \PName{layer name} already exists. So you
+may prevent yourself using the same \PName{layer name} more than once by
+mistake. This would be useful, e.\,g., if a class or package also defines
+layers internally.
 
-The difference between \Macro{DeclareLayer} and \Macro{ProvideLayer} is, that
-using \Macro{ProvideLayer} would be simply ignored, if a layer with the same
-\PName{layer name} already exists. So it is something like: \emph{declare the
-  layer only, if it hasn't been declared already.}
+If you use \Macro{ProvideLayer} instead of \Macro{DeclareLayer}, the
+declaration will be ignroed incase a layer with the same layer name already
+exists. It could be paraphrased by: \emph{declare the layer only, if it hasn't
+  been declared already.}
 
 If an existing layer should be redefined, \Macro{RedeclareLayer} or
 \Macro{ModifyLayer} can be used. \Macro{RedeclareLayer} would simply define
 the layer as if it would be defined newly. In difference to this,
 \Macro{ModifyLayer} would change only those attributes, that are represented
-by an option of the \PName{option list}. All other attributes stay unchanged
-and won't be reset to the initial default state. Using either
-\Macro{RedeclareLayer} or \Macro{ModifyLayer} with a \PName{layer name}, that
-isn't the name of an already defined layer, will result in an error.
+by an option of the \PName{option list}. All other attributes will stay
+unchanged and won't be reset to the initial default state. Using either
+\Macro{RedeclareLayer} or \Macro{ModifyLayer} will result in an error, in case
+there has not been a layer with \PName{layer name} defined before.
 
 \begin{desclist}
   \desccaption{%
@@ -500,8 +502,8 @@ isn't the name of an already defined layer, will result in an error.
 \BeginIndex{Cmd}{layeryoffset}%
 \BeginIndex{Cmd}{layerwidth}%
 \BeginIndex{Cmd}{layerheight}%
-These commands are valid while output of the layer contents. So they may be used
-inside the \PName{code} of option \Option{contents} of the previously
+These commands are valid while output of the layer's contents. So they may be
+used inside the \PName{code} of option \Option{contents} of the previously
 described commands only. In this case they give the effective position and
 dimension of the layer, that will be used for the output. This is indeed not
 the effective dimension of the layer's contents, i.\,e., if the contents are
