@@ -1056,6 +1056,8 @@
 %   to allow page breaks.
 %    \begin{macrocode}
 \newenvironment{desctable}[1][\descdefaultindent]{%
+  \ClassError{scrguide}{deprecated environment}{%
+    please replace desctable by desclist}%
   \onelinecaptionsfalse
   \start@desctab{#1}%
   \newcommand{\Endfirsthead}{\toprule\endfirsthead}%
@@ -1136,8 +1138,11 @@
     \setbox\desccaptionb@xfirst\vbox{%
       \tabular{p{\labelwidth}}%
         \multicolumn{1}{@{}p{\dimexpr\labelwidth+2\tabcolsep}@{}}{%
-          \captionaboveof{table}[##1]{##2}%
-        }\tabularnewline[\dimexpr \abovecaptionskip\abovecaptionskipcorrection\relax]
+          \captionaboveof{table}[##1]{##2\unskip\strut}%
+        }\tabularnewline[%
+        \dimexpr \abovecaptionskip-\normalbaselineskip\relax
+%        \dimexpr \abovecaptionskip-\abovecaptionskipcorrection\relax
+        ]
         \toprule\tabularnewline
       \endtabular
       \vskip -\baselineskip
@@ -1166,21 +1171,35 @@
     \ifx\relax##1\relax\else\vskip##1\relax\fi
   }%
   \renewcommand{\nentry}[2]{%
+    \typeout{TRACE: Generate entry}%
     \setbox\descentryb@x\vbox{%
       \ifx\desccaptionb@xnext\desccaptionb@xfirst\copy\desccaptionb@xnext\fi
-      \tabular{lp{\descwidth}}%
+      \makebox[\linewidth][l]{\begin{tabular}{lp{\descwidth}}%
         \multicolumn{2}{p{\labelwidth}}{\raggedright##1}\tabularnewline
         \hspace*{#1} & ##2\tabularnewline
-      \endtabular
+      \end{tabular}}%
     }%
+    \typeout{TRACE: entry done}%
     \begingroup
-      \dimen@ \ht\descentryb@x \advance \dimen@ \dp\descentryb@x
-      \advance \dimen@ \ht\descfootb@x \advance \dimen@ \dp\descfootb@x
+      \dimen@ \ht\descentryb@x
+      \advance \dimen@ \dp\descentryb@x
+      \ifdim \ht\descfootb@x>\ht\strutbox
+        \advance \dimen@ \ht\descfootb@x
+      \else
+        \advance \dimen@ \ht\strutbox
+      \fi
+      \ifdim \dp\descfootb@x>\dp\strutbox
+        \advance \dimen@ \dp\descfootb@x
+      \else
+        \advance \dimen@ \dp\strutbox
+      \fi
       \advance \dimen@ \baselineskip
       \dimen@ii \pagegoal \advance \dimen@ii -\pagetotal
-      \typeout{TRACE: \the\dimen@>\the\dimen@ii?}%
+      \typeout{TRACE: \the\dimen@>\the\dimen@ii\space (footbox
+        ht=\the\ht\descfootb@x, dp=\the\dp\descfootb@x; strutbox
+        ht=\the\ht\strutbox, dp=\the\dp\strutbox)?}%
       \ifdim \dimen@>\dimen@ii
-        \typeout{TRACE: Break table}%
+        \typeout{TRACE: Break table \thetable}%
         \ifx\desccaptionb@xnext\@empty
           \csname @desclistentryhook\endcsname
           {\copy\descfootb@x}%
@@ -1217,7 +1236,7 @@
   }%
   \csname @desclistentryhook\endcsname
   {\copy\descfootb@x}%
-  \par
+  \par\nobreak
   \vskip -\baselineskip \vskip \intextsep
 }
 %    \end{macrocode}
@@ -1238,45 +1257,26 @@
   columns=fullflexible,keepspaces,%
   aboveskip=.4\baselineskip,%
   belowskip=0pt%
-}
-\lstdefinestyle{code}{%
+} \lstdefinestyle{code}{%
   style=basics,%
   language=[LaTeX]TeX,%
   moretexcs={%
-    @auxout,
-    @currext,
-    @empty,
-    @float,
-    @ifpackagelater,
-    @ifundefined,
-    @rightmark,
-    @secondoftwo,
-    @tempswafalse,@tempswatrue,
-    @undefined,
-    AtBeginDocument,AtEndDocument,
-    appendix,
-    ClassWarningNoLine,CurrentOption,
-    DeclareOption,DeclareRobustCommand,dimexpr,
-    end@float,
-    ExecuteOptions,
-    if@filesw,if@tempswa,if@twoside,
-    includegraphics,
-    MessageBreak,
+    @auxout, @currext, @empty, @float, @ifpackagelater, @ifundefined,
+    @rightmark, @secondoftwo, @tempswafalse,@tempswatrue, @undefined,
+    AtBeginDocument,AtEndDocument, appendix, ClassWarningNoLine,CurrentOption,
+    DeclareOption,DeclareRobustCommand,dimexpr, end@float, ExecuteOptions,
+    if@filesw,if@tempswa,if@twoside, includegraphics, MessageBreak,
     onehalfspacing,
     PackageError,PackageInfo,PackageWarning,PassOptionsToPackage,
     ProcessOptions,protected@write,ProvidesFile,ProvidesPackage,
-    RequirePackage,RequirePackageWithOptions,
-    setkey,setlength,
+    RequirePackage,RequirePackageWithOptions, setkey,setlength,
     textsuperscript}%
-}
-\lstdefinestyle{output}{%
+} \lstdefinestyle{output}{%
   style=basics,breaklines,prebreak=\mbox{$\hookleftarrow$}%
-}
-\lstdefinestyle{KOMA}{%
+} \lstdefinestyle{KOMA}{%
   style=code,%
   moretexcs={%
-    @addtoplength,@setplength,@newplength,
-    activateareas,
+    @addtoplength,@setplength,@newplength, activateareas,
     addchap,addrentry,Address,addcontentslinetoeachtocfile,addsec,
     addtoeachtocfile,
     addtokomafont,addtolengthplength,addtoreffields,addtotoclist,
@@ -1285,25 +1285,23 @@
     appendixmore,appendixname,areaset,autodot,automark,AtAddToTocList,
     AtBeginLetter,
     BeforeClosingMainAux,BeforePackage,bib@beginhook,bib@endhook,
+    blinddocument,blindtext,Blinddocument,Blindtext,
     cc,captionabove,captionaboveof,captionbelow,captionbelowof,captionformat,
-    captionof,cefoot,cfoot,chapapp,
-    chapappifchapterprefix,
+    captionof,cefoot,cfoot,chapapp, chapappifchapterprefix,
     chapter,chapterformat,chaptermarkformat,chapterpagestyle,chead,
     cleardoubleevenemptypage,clearscrheadfoot,closing,cofoot,Comment,
     DeclareNewTOC,
     dedication,deffootnote,deffootnotemark,DefineFamily,DefineFamilyKey,
     DefineFamilyMember,defpagestyle,deftripstyle,
     dictum,dictumauthorformat,dictumrule,dictumwidth,doforeachtocfile,
-    encl,extratitle,
-    FamilyBoolKey,FamilyExecuteOptions,FamilyNumericalKey,%
+    encl,extratitle, FamilyBoolKey,FamilyExecuteOptions,FamilyNumericalKey,%
     FamilyOption,FamilyOptions,FamilyProcessOptions,FamilySetBool,
     figureformat,figurename,firstfoot,firsthead,FirstName,footfont,footref,
-    FreeI,FreeII,FreeIII,FreeIV,
-    headfont,headmark,
+    FreeI,FreeII,FreeIII,FreeIV, headfont,headmark,
     ifattoclist,ifoot,ihead,ifkomavarempty,ifstr,ifthispageodd,InputAddressFile,
-    KOMAoption,KOMAoptions,KOMAScript,
-    l@addto@macro,LastName,LetterOptionNeedsPapersize,listoffigures,
-    listoftables,listoftoc,LoadLetterOption,lohead,lowertitleback,
+    KOMAoption,KOMAoptions,KOMAScript, l@addto@macro,
+    LastName,lefoot,lehead,LetterOptionNeedsPapersize,lipsum,listoffigures,
+    listoftables,listoftoc,LoadLetterOption,lofoot,lohead,lowertitleback,
     MakeMarkcase,maketitle,manualmark,marginline,minisec,
     multfootsep,multiplefootnoteseparator,
     Name,nameday,newbibstyle,newcaptionname,newkomavar,nexthead,
@@ -1312,11 +1310,11 @@
     part,partformat,partname,partpagestyle,pnumfont,
     PreventPackageFromLoading,publishers,ps,
     raggedsection,raggedpart,raggedsignature,recalctypearea,
-    refL,refS,refN,refParagraph,refParagraphN,refPar,refParL,refParS,refParN,
-    refSentence,refSentenceL,refSentenceS,refSentenceN,
-    rehead,
+    refL,refS,refN,refoot,
+    refParagraph,refParagraphN,refPar,refParL,refParS,refParN,
+    refSentence,refSentenceL,refSentenceS,refSentenceN,rehead,
     removereffields,ReplaceInput,ReplacePackage,ResetPreventPackageFromLoading,
-    sectionmarkformat,Sentence,sentencename,sentenceshortname,
+    rohead, sectionmarkformat,Sentence,sentencename,sentenceshortname,
     setbibpreamble,setcapindent,setcapwidth,
     setchapterpreamble,setfootbotline,setfootsepline,setfootwidth,
     setheadsepline,setheadtopline,setheadwidth,setindexpreamble,setkomafont,
@@ -1327,19 +1325,13 @@
     tableformat,tablename,tableofcontents,textsubscript,thechapter,thefigure,
     thefootnotemark,thepar,thepart,thesection,thesentence,thesubsection,
     thetable,thistime,
-    titlehead,tocbasic@extend@babel,TOCclone,todaysname,typearea,
-    unitfactor,
-    unsettoc,usekomafont,useplength,usekomavar,uppertitleback
-  }%
-}
-\lstset{style=basics}
-\lstnewenvironment{lstoutput}[1][]{%
+    titlehead,tocbasic@extend@babel,TOCclone,todaysname,typearea, unitfactor,
+    unsettoc,usekomafont,useplength,usekomavar,uppertitleback }%
+} \lstset{style=basics} \lstnewenvironment{lstoutput}[1][]{%
   \lstset{style=output,basicstyle=\ttfamily\small,#1}%
-}{}
-\lstnewenvironment{lstcode}[1][]{%
+}{} \lstnewenvironment{lstcode}[1][]{%
   \lstset{style=KOMA,basicstyle=\ttfamily\small,#1}%
-}{}
-\newcommand*{\lstinputcode}[1][]{%
+}{} \newcommand*{\lstinputcode}[1][]{%
   \lstinputlisting[style=KOMA,basicstyle=\ttfamily\small,#1]%
 }
 %    \end{macrocode}
