@@ -4,7 +4,7 @@ eval 'exec perl -S $0 ${1+"$@"}'
 
 # ======================================================================
 # genhtmlidx.pl
-# Copyright (c) Markus Kohm, 2002-2006
+# Copyright (c) Markus Kohm, 2002-2013
 #
 # This file is part of the LaTeX2e KOMA-Script bundle.
 #
@@ -22,7 +22,7 @@ eval 'exec perl -S $0 ${1+"$@"}'
 # This work consists of all files listed in manifest.txt.
 # ----------------------------------------------------------------------
 # genhtmlidx.pl
-# Copyright (c) Markus Kohm, 2002-2006
+# Copyright (c) Markus Kohm, 2002-2013
 #
 # Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 # Version 1.3c, verteilt und/oder veraendert werden.
@@ -62,6 +62,7 @@ my @counter;
 my @floatstyle;
 my @fontelement;
 my @file;
+my @length;
 
 my $baselink;
 my $htmlhead;
@@ -106,6 +107,8 @@ while ( $auxfile=shift ) {
 		    push @fontelement,$entry;
 		} elsif ( "$2" eq "package" ) {
 		    push @file,$entry;
+		} elsif ( "$2" eq "length" ) {
+		    push @length,$entry;
 		} else {
 		    print STDERR "Unknown type $2!\n";
 		}
@@ -146,6 +149,7 @@ print "<ul>\n";
 print "<li><a href=\"#option\">$titles{option}</a></li>" if ( @option );
 print "<li><a href=\"#macro\">$titles{macro}</a></li>" if ( @macro );
 print "<li><a href=\"#environment\">$titles{environment}</a></li>" if ( @environment );
+print "<li><a href=\"#length\">$titles{length}</a></li>" if ( @length );
 print "<li><a href=\"#plength\">$titles{plength}</a></li>" if ( @plength );
 print "<li><a href=\"#variable\">$titles{variable}</a></li>" if ( @variable );
 print "<li><a href=\"#pagestyle\">$titles{pagestyle}</a></li>" if ( @pagestyle );
@@ -158,6 +162,7 @@ print "</ul>\n";
 process "option","",\@option;
 process "macro","\\",\@macro;
 process "environment","",\@environment;
+process "length","",\@length;
 process "plength","",\@plength;
 process "variable","",\@variable;
 process "pagestyle","",\@pagestyle;
