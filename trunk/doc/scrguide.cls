@@ -1269,7 +1269,8 @@
     onehalfspacing,
     PackageError,PackageInfo,PackageWarning,PassOptionsToPackage,
     ProcessOptions,protected@write,ProvidesFile,ProvidesPackage,
-    RequirePackage,RequirePackageWithOptions, setkey,setlength,
+    RequirePackage,RequirePackageWithOptions,setkey,setlength,
+    SelectInputMappings,
     textsuperscript}%
 } \lstdefinestyle{output}{%
   style=basics,breaklines,prebreak=\mbox{$\hookleftarrow$}%
