@@ -1281,7 +1281,7 @@
     addtoeachtocfile,
     addtokomafont,addtolengthplength,addtoreffields,addtotoclist,
     adrchar,adrentry,AfterBibliographyPreamble,AfterCalculatingTypearea,
-    AfterFile,AfterPackage,AfterStartingTOC,
+    AfterFile,AfterPackage,AfterStartingTOC,AfterTOCHead,
     appendixmore,appendixname,areaset,autodot,automark,AtAddToTocList,
     AtBeginLetter,
     BeforeClosingMainAux,BeforePackage,bib@beginhook,bib@endhook,
