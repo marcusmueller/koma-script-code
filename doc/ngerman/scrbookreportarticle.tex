@@ -45,8 +45,9 @@
 %
 % ============================================================================
 
-\ProvidesFile{scrbookreportarticle.tex}[2013/10/08 KOMA-Script guide (chapter:
-scrbook, scrreprt, scrartcl)]
+\KOMAProvidesFile{scrbookreportarticle.tex}
+                 [$Date$
+                  KOMA-Script guide (chapter: scrbook, scrreprt, scrartcl)]
 
 \chapter{Die Hauptklassen \Class{scrbook}, \Class{scrreprt}, \Class{scrartcl}}
 \labelbase{maincls}%
@@ -117,7 +118,7 @@ Tabellen.
 
 \LoadCommon{0} % \section{Frühe oder späte Optionenwahl}
 
-\iffree{}{\clearpage}% Umbruchkorrektur!!!
+%\iffree{}{\clearpage}% Umbruchkorrektur!!!
 
 \LoadCommon{1} % \section{Kompatibilität zu früheren Versionen von \KOMAScript}
 
@@ -136,7 +137,8 @@ Tabellen.
   nur alle ersten Zeilen eines Satzspiegels mit ihrer Grundlinie auf der
   gleichen Höhe liegen, sondern auch die letzten Zeilen einer
   Doppelseite. Enthält eine Seite nur Text ohne Absätze und Überschriften, so
-  hat man das automatisch. Aber bereits dann, wenn Absätze mit einem halben
+  hat man das automatisch, wenn bei der Konstruktion des Satzspiegels einige
+  Grundregeln befolgt wurden. Aber bereits dann, wenn Absätze mit einem halben
   Grundlinienabstand markiert werden, genügt es, wenn die Anzahl der Absätze
   auf der einen Seite um eine ungerade Zahl von der auf der anderen Seite
   abweicht, damit dieses Ziel nicht mehr erreicht werden kann. Es ist dann
@@ -466,19 +468,20 @@ Inhaltsverzeichniseinträge ist außerdem über die Elemente
 und \Class{scrreprt} über
 \FontElement{chapterentry}\IndexFontElement{chapterentry} beziehungsweise
 \FontElement{sectionentry}\IndexFontElement{sectionentry} für \Class{scrartcl}
-einstellbar. Die Schrift der
-Seitenzahlen kann jeweils davon abweichend über die Elemente
+einstellbar. Die Schrift der Seitenzahlen kann jeweils davon abweichend über
+die Elemente
 \FontElement{partentrypagenumber}\IndexFontElement{partentrypagenumber}%
 \important{\FontElement{partentrypagenumber}} und
 \FontElement{chapterentrypagenumber}\IndexFontElement{chapterentrypagenumber}%
 \important[i]{\FontElement{chapterentrypagenumber}\\
-  \FontElement{sectionentrypagenumber}} respektive
+  \FontElement{sectionentrypagenumber}} (\Class{scrbook} und \Class{scrreprt})
+beziehungsweise
 \FontElement{sectionentrypagenumber}\IndexFontElement{sectionentrypagenumber}
-eingestellt werden (siehe auch \autoref{sec:maincls.textmarkup},
-\autopageref{desc:maincls.cmd.setkomafont}, sowie
-\autoref{tab:maincls.elementsWithoutText},
+(\Class{scrartcl}) eingestellt werden (siehe auch
+\autoref{sec:maincls.textmarkup}, \autopageref{desc:maincls.cmd.setkomafont},
+sowie \autoref{tab:maincls.elementsWithoutText},
 \autopageref{tab:maincls.elementsWithoutText}). Die Voreinstellungen der
-Elemente ist \autoref{tab:maincls.tocelements} zu entnehmen.
+Elemente sind \autoref{tab:maincls.tocelements} zu entnehmen.
 \begin{table}
 %  \centering
 %  \caption
@@ -706,8 +709,13 @@ Linien im Kopf und Fuß.%
   jederzeit} gesetzt werden. Verwendet\textnote{Tipp!} man \Macro{pagestyle}
 vor Anweisungen, die einen Seitenumbruch herbeiführen, und soll die Änderung
 erst ab der neuen Seite gelten, so ist ein \Macro{cleardoublepage} davor
-nützlich. Üblicherweise verwendet man \Macro{pagestyle} aber nur einmal zu
+nützlich. 
+%
+\iffalse % Umbruchkorrektur
+Üblicherweise verwendet man \Macro{pagestyle} aber nur einmal zu
 Beginn des Dokuments oder in der Präambel.
+%
+\fi
 
 Für\important{\Macro{thispagestyle}} eine Änderung des Seitenstils nur der
 aktuellen Seite verwendet man stattdessen die Anweisung
@@ -716,9 +724,9 @@ automatisch.  Beispielsweise wird bei allen Kapitelanfangsseiten implizit die
 Anweisung \Macro{thispagestyle}\PParameter{\Macro{chapterpagestyle}}
 ausgeführt.
 
-Bitte\textnote{Achtung!} beachten Sie auch, dass die Umschaltung zwischen
+Bitte\textnote{Achtung!} beachten Sie, dass die Umschaltung zwischen
 automatischen und manuellen Kolumnentiteln bei Verwendung \iffree{des Pakets
-  \Package{scrpage2}\important{\Package{scrpage2}} oder }{}des Pakets
+  \Package{scrpage2}\important{\Package{scrpage2}} oder }{}von
 \Package{scrlayer-scrpage}\important{\Package{scrlayer-scrpage}} nicht mehr
 über den Seitenstil, sondern mit speziellen Anweisungen erfolgt. Die beiden
 Seitenstile \Pagestyle{headings} und \Pagestyle{myheadings} sollten nicht
@@ -789,8 +797,7 @@ finden.
   Sie dies wie folgt erreichen:
 \begin{lstcode}
   \setkomafont{pageheadfoot}{%
-    \normalfont\normalcolor\itshape\small
-  }
+    \normalfont\normalcolor\itshape\small}
   \setkomafont{pagenumber}{\normalfont\bfseries}
 \end{lstcode}
   Wollen Sie hingegen lediglich, dass zusätzlich zur bereits voreingestellten
@@ -825,7 +832,7 @@ Definitionen verwenden.  Dadurch bleiben Sie zu \KOMAScript{} möglichst
 kompatibel. Verwenden Sie diese Befehle in Ihren eigenen Definitionen nicht,
 so bleiben Schriftänderungen wie in den vorangehenden Beispielen
 unbeachtet. \iffree{Die Pakete}{Das Paket}
-\Package{scrlayer-scrpage}\IndexPackage{scrlayer-scrpage}\iffree{ und
+\Package{scrlayer-scrpage}\IndexPackage{scrlayer-scrpage} \iffree{und
   Package{scrpage2}\IndexPackage{scrpage2} sorgen}{sorgt} selbst für maximale
 Kompatibilität.%
 \EndIndex{FontElement}{pagenumber}%
@@ -853,8 +860,10 @@ und \Macro{markright}. Dabei wird die \PName{linke Marke} normalerweise im
 Kopf linker Seiten und die \PName{rechte Marke} im Kopf rechter Seiten
 verwendet. Im einseitigen Satz existiert nur die rechte Marke.  Bei Verwendung
 des Paketes
-\Package{scrpage2}\IndexPackage{scrpage2}\important{\Package{scrpage2}} steht
-außerdem die Anweisung
+\Package{scrlayer-scrpage}\IndexPackage{scrlayer-scrpage}\important{\Package{scrlayer-scrpage}}\iffree{
+  oder
+  \Package{scrpage2}\IndexPackage{scrpage2}\important{\Package{scrpage2}}}{}
+steht außerdem die Anweisung
 \Macro{markleft}\IndexCmd{markleft}\important{\Macro{markleft}} zur Verfügung.
 
 Die Anweisungen können auch zusammen mit anderen Seitenstilen verwendet
@@ -923,7 +932,7 @@ werden.
   Kapitelanfangsseiten\Index{Kapitel>Seitenstil}%
   \textnote{Kapitel\-anfangs\-seiten}
   definiert. Diesem Seitenstil haben Sie den passenden Namen \PValue{chapter}
-  gegeben. Um diesen nun auch tatsächlich zu verwenden, definieren Sie
+  gegeben. Um diesen auch tatsächlich zu verwenden, definieren Sie
   \Macro{chapterpagestyle} entsprechend um:
 \begin{lstcode}
   \renewcommand*{\chapterpagestyle}{chapter}
@@ -965,8 +974,7 @@ werden.
 
 \begin{Explain}
   Wer nun glaubt, er könne auf Kapitelanfangsseiten ebenfalls mit
-  lebenden Kolumnentiteln arbeiten, indem er einfach eine Definition
-  wie
+  lebenden Kolumnentiteln arbeiten, indem er einfach
 \begin{lstcode}
   \renewcommand*{\chapterpagestyle}{headings}
 \end{lstcode}
@@ -1328,7 +1336,6 @@ Eine Zusammenfassung der möglichen Einstellungen für Option \Option{headings}
 finden Sie in \autoref{tab:maincls.headings}. Beispiele zu Verwendung einiger
 der möglichen Einstellungen sind in den nachfolgenden Beschreibungen
 der Gliederungsbefehle enthalten.
-\iffree{}{\vskip-\ht\strutbox\enlargethispage*{\ht\strutbox}}% Umbruchkorrektur
 \begin{desclist}
   \renewcommand*{\abovecaptionskipcorrection}{-\normalbaselineskip}%
   \desccaption[{Mögliche Werte für Option \Option{headings}}]{%
@@ -1552,10 +1559,11 @@ Einstellung\important{\Option{headings}}
 \OptionValue{headings}{optiontohead}\IndexOption[indexmain]{headings~=\PValue{optiontohead}}
 wird das optionale Argument bei \KOMAScript{} hingegen nur noch für den
 Kolumnentitel verwendet. Ein konkreter Eintrag in den Kolumnentitel erfolgt
-natürlich nur, wenn ein Seitenstil\Index{Seiten>Stil} gewählt wird, bei dem die
-entsprechende Gliederungsebene überhaupt für den Kolumnentitel verwendet
+natürlich nur, wenn ein Seitenstil\Index{Seiten>Stil} gewählt wird, bei dem
+die entsprechende Gliederungsebene überhaupt für den Kolumnentitel verwendet
 wird. Siehe hierzu \autoref{sec:maincls.pagestyle} sowie
-\autoref{cha:scrpage}. Mit der Einstellung
+\autoref{cha:scrlayer-scrpage}\iffree{ beziehungsweise
+  \autoref{cha:scrpage}}{}. Mit der Einstellung
 \OptionValue{headings}{optiontotoc}\IndexOption[indexmain]{headings~=\PValue{optiontotoc}}
 wird das optionale Argument hingegen ausschließlich für den Eintrag ins
 Inhaltsverzeichnis verwendet. Auch dies selbstverständlich nur, wenn die
@@ -1575,10 +1583,10 @@ dies der Fall, so wird das optionale Argument der Gliederungsbefehle selbst
 statt als \PName{Kurzform} als \PName{Optionenliste} interpretiert. Dabei
 werden die beiden Optionen
 \Option{head=}\PName{Kolumnentitel}\important{\Option{head}} und
-\Option{tocentry=}\PName{Inhaltsverzeichniseintrag} akzeptiert. Um ein
-Gleichheitszeichen oder ein Komma in einem der beiden Werte dieser Optionen
-unter zu bringen, muss dieses in zusätzliche geschweifte Klammern gesetzt
-werden.
+\Option{tocentry=}\PName{Inhaltsverzeichniseintrag}\important{\Option{tocentry}}
+akzeptiert. Um ein Gleichheitszeichen oder ein Komma in einem der beiden Werte
+dieser Optionen unter zu bringen, muss dieses in zusätzliche geschweifte
+Klammern gesetzt werden.
 
 Bitte\textnote{Achtung!} beachten Sie, dass dieser Mechanismus nur
 funktioniert, solange \KOMAScript{} die Kontrolle über die Gliederungsbefehle
@@ -2113,8 +2121,12 @@ das Element \FontElement{disposition} wirkt.%
 %    »Mauseschnappfalle«, das dem Tierschutz zum Opfer gefallen ist.
   \end{ShowOutput}
   Zum Verständnis der Verwendung des Pakets
-  \Package{selinput}\IndexPackage{selinput} und der darin definierten
-  Anweisung \Macro{SelectInputMappings} sei auf \cite{package:selinput}
+  \Package{selinput}\IndexPackage{selinput} und 
+  %
+  \iffalse % Umbruchkorrektur
+  der darin definierten Anweisung %
+  \fi %
+  \Macro{SelectInputMappings} sei auf \cite{package:selinput}
   verwiesen.
 \end{Example}
 %
@@ -2358,7 +2370,7 @@ gibt, existieren die beiden Anweisungen auch nur bei diesen Klassen.%
   \Macro{sectionmarkformat} und \Macro{subsectionmarkformat}.
 
   Da\ChangedAt{v3.12}{\Class{scrbook}\and \Class{scrreprt}\and
-    \Class{scrartcl}} \KOMAScript{} die zusätzlichen Gliederungsanweisungen
+    \Class{scrartcl}} \KOMAScript{} zusätzlich die Gliederungsanweisungen
   \Macro{addchap} und \Macro{addsec} bereitstellt, die nicht nummerierte
   Überschriften erzeugen, existieren für diese auch korrespondierende
   Anweisungen für den Kolumnentitel. Es ist zu beachten\textnote{Achtung!},
@@ -2367,17 +2379,16 @@ gibt, existieren die beiden Anweisungen auch nur bei diesen Klassen.%
   \Counter{secnumdepth} auf -1 setzen. Dies sollte man beispielsweise bei der
   Umdefinierung von \Macro{chaptermark} und \Macro{sectionmark}
   berücksichtigen oder \Macro{addchapmark} und \Macro{addsecmark} ebenfalls
-  passend umdefinieren.
+  dazu passend umdefinieren.
 
-  \OnlyAt{\Class{scrbook}\and \Class{scrreprt}}Während bei \Class{scrartcl}
-  \Macro{chaptermark}, \Macro{addchapmark} und \Macro{chaptermarkformat} nicht
-  existieren, gibt es die Anweisungen
+  Während\OnlyAt{\Class{scrbook}\and \Class{scrreprt}} bei \Class{scrartcl}
+  weder \Macro{chaptermark} noch \Macro{addchapmark} oder
+  \Macro{chaptermarkformat} existieren, gibt es die beiden Anweisungen
   \OnlyAt{\Class{scrartcl}}\Macro{subsectionmark} und
-  \Macro{subsectionmarkformat} nur bei \Class{scrartcl}. Dies ändert sich
-  allerdings bei Verwendung des Pakets
-  \Package{scrlayer-scrpage}\IndexPackage{scrlayer-scrpage}\iffree{ oder
-    \Package{scrpage2}\IndexPackage{scrpage2}}{} (siehe
-  \autoref{cha:scrlayer-scrpage}\iffree{ beziehungsweise
+  \Macro{subsectionmarkformat} nur bei \Class{scrartcl}. Bei Verwendung des
+  Pakets \Package{scrlayer-scrpage}\IndexPackage{scrlayer-scrpage}\iffree{
+    oder \Package{scrpage2}\IndexPackage{scrpage2}}{} ändert sich dies jedoch
+  (siehe \autoref{cha:scrlayer-scrpage}\iffree{ beziehungsweise
     \autoref{cha:scrpage}}).
 \end{Explain}
 So wie mit \Macro{chapterformat} und \Macro{othersectionlevelsformat} die
@@ -2390,7 +2401,8 @@ Originaldefinitionen aus den {\KOMAScript}-Klassen sind:
 \begin{lstcode}
   \newcommand*{\chaptermarkformat}{%
     \chapappifchapterprefix{\ }\thechapter\autodot\enskip}
-  \newcommand*{\sectionmarkformat}{\thesection\autodot\enskip}
+  \newcommand*{\sectionmarkformat}{%
+    \thesection\autodot\enskip}
   \newcommand*{\subsectionmarkformat}{%
     \thesubsection\autodot\enskip}
 \end{lstcode}
@@ -2403,10 +2415,8 @@ Originaldefinitionen aus den {\KOMAScript}-Klassen sind:
     \chapapp~\thechapter\autodot\enskip}
 \end{lstcode}
 \end{Example}
-Wie Sie sehen, finden hier bei der Umdefinierung die Anweisungen
-\Macro{chapappifchapterprefix} und \Macro{chapapp} Verwendung, die weiter oben
-erklärt wurden.%
-%
+Wie Sie sehen, finden hier die beiden Anweisungen \Macro{chapapp} und
+\Macro{chapappifchapterprefix} Verwendung, die weiter oben erklärt wurden.%
 \EndIndex{Cmd}{chaptermark}%
 \EndIndex{Cmd}{sectionmark}%
 \EndIndex{Cmd}{subsectionmark}%
@@ -2500,16 +2510,13 @@ optionale Argument \PName{Position} bestimmt über ein bis zwei
 Buchstaben die Position, an der die Präambel ausgegeben wird. Für die
 vertikale Position existieren derzeit zwei Möglichkeiten:
 %\iffree{}{\pagebreak}% Umbruchoptimierung
-\begin{labeling}[~--]{\quad\PValue{o}}\itemsep=0pt
+\begin{labeling}[~--]{\quad\PValue{o}}\itemsep=-\parsep
 \item [\quad\PValue{o}] über der Überschrift
 \item [\quad\PValue{u}] unter der Überschrift
 \end{labeling}
-\iffree{Es kann jeweils eine Präambel unter und eine Präambel über der
-  Überschrift gesetzt werden.}{Beide Möglichkeiten können nacheinander genutzt
-  werden.}
-
-Für die horizontale Position existieren derzeit drei Möglichkeiten:
-\begin{labeling}[~--]{\quad\PValue{o}}\itemsep=0pt
+Es kann jeweils eine Präambel unter und über der Überschrift gesetzt werden,
+mit drei Möglichkeiten für die horizontale Position:
+\begin{labeling}[~--]{\quad\PValue{o}}\itemsep=-\parsep
 \item [\quad\PValue{l}] linksbündig
 \item [\quad\PValue{r}] rechtsbündig
 \item [\quad\PValue{c}] zentriert
@@ -3165,7 +3172,8 @@ der Gleitumgebungen verwendet werden. Der erste optionale Parameter
 Ob der \PName{Titel} rechts oder links daneben gesetzt wird, kann mit
 dem optionalen Parameter \PName{Anordnung} bestimmt werden. Es darf
 genau einer der folgenden Buchstaben angegeben werden:
-\begin{labeling}[~--]{\quad\PValue{o}}\setlength{\itemsep}{0pt}%
+\iffree{}{\enlargethispage*{\dp\strutbox}}% Umbruchkorrektur
+\begin{labeling}[~--]{\quad\PValue{o}}\setlength{\itemsep}{-\parsep}%
 \item[\quad\PValue{l}] links
 \item[\quad\PValue{r}] rechts
 \item[\quad\PValue{i}] innen: auf rechten Seiten links, auf
@@ -3180,10 +3188,11 @@ Voreinstellung\ChangedAt{v3.00}{\Class{scrbook}\and \Class{scrreprt}\and
 \autopageref{desc:maincls.option.captions}) und deren Werte
 \PValue{innerbeside}\IndexOption[indexmain]{captions~=\PValue{innerbeside}},
 \PValue{leftbeside}\IndexOption[indexmain]{captions~=\PValue{leftbeside}},
-\PValue{outerbeside}\IndexOption[indexmain]{captions~=\PValue{outerbeside}} und
-\PValue{rightbeside}\IndexOption[indexmain]{captions~=\PValue{rightbeside}} verändert
-werden. Bei Verwendung der Anordnung außen oder innen werden unter Umständen
-zwei \LaTeX-Läufe benötigt, um die korrekte Anordnung zu erreichen.
+\PValue{outerbeside}\IndexOption[indexmain]{captions~=\PValue{outerbeside}}
+und
+\PValue{rightbeside}\IndexOption[indexmain]{captions~=\PValue{rightbeside}}
+verändert werden. Bei Verwendung der Anordnung außen oder innen werden unter
+Umständen zwei \LaTeX-Läufe benötigt, um die korrekte Anordnung zu erreichen.
 
 Normalerweise nehmen der Inhalt der Umgebung und der \PName{Titel} die
 gesamte verfügbare Breite ein. Es besteht jedoch die Möglichkeit, mit
@@ -3216,14 +3225,15 @@ Einstellung\ChangedAt{v3.00}{\Class{scrbook}\and \Class{scrreprt}\and
 \Option{captions}\IndexOption{captions} (siehe
 \autopageref{desc:maincls.option.captions}) und deren Werte
 \PValue{topbeside}\IndexOption[indexmain]{captions~=\PValue{topbeside}},
-\PValue{centeredbeside}\IndexOption[indexmain]{captions~=\PValue{centeredbeside}} und
-\PValue{bottombeside}\IndexOption[indexmain]{captions~=\PValue{bottombeside}} verändert
-werden. Bei der Einstellung \PValue{topbeside} werden die oberen Grundlinien
-von Gleitobjektinhalt und \PName{Titel} auf einer Höhe ausgerichtet, während
-bei \PValue{centeredbeside} eine Zentrierung stattfindet. In diesem
-Zusammenhang sei erwähnt, dass Abbildungen normalerweise die Grundlinie unten
-haben. Dies kann beispielsweise mit der Anweisung
-\Macro{raisebox}\IndexCmd{raisebox} verändert werden.
+\PValue{centeredbeside}\IndexOption[indexmain]{captions~=\PValue{centeredbeside}}
+und
+\PValue{bottombeside}\IndexOption[indexmain]{captions~=\PValue{bottombeside}}
+verändert werden. Bei der Einstellung \PValue{topbeside} werden die oberen
+Grundlinien von Gleitobjektinhalt und \PName{Titel} auf einer Höhe
+ausgerichtet, während bei \PValue{centeredbeside} eine Zentrierung
+stattfindet. In diesem Zusammenhang sei erwähnt, dass Abbildungen
+normalerweise die Grundlinie unten haben. Dies kann beispielsweise mit der
+Anweisung \Macro{raisebox}\IndexCmd{raisebox} verändert werden.
 
 \begin{Example}
   Ein Beispiel für die Verwendung der
@@ -3259,22 +3269,29 @@ haben. Dies kann beispielsweise mit der Anweisung
     \label{fig:maincls.captionbeside}
   \end{figure}
   Die Gesamtbreite ist also die aktuell verfügbare Breite
-  \PValue{\Macro{linewidth}}. Diese wird jedoch mit \PValue{2em} nach
+  \PValue{\Macro{linewidth}}. Diese wird jedoch mit um $\Length{marginparwidth}
+  + \Length{marginparsep}$ nach
   außen verschoben. Der Titel oder die Beschreibung steht innen neben
-  der Abbildung. Damit erscheint die Abbildung selbst um 2\Unit{em} in
-  den Rand gerückt.
+  der Abbildung. Damit erscheint die Abbildung selbst bis in die
+  Marginalienspalte in den Rand gerückt.
   
+\iffalse% Umbruchkorrekturtext
   Mit \Macro{dimexpr} wird hier eine \eTeX-Anweisung verwendet, da
   \KOMAScript{} dessen Verwendung voraussetzt und bei jeder halbwegs aktuellen
-  \LaTeX-Distribution ohnehin \eTeX{} verwendet wird.
+  \LaTeX-Distribution ohnehin \eTeX{} verwendet wird.%
+\fi
 
   Die Zentrierung der Bildbeschreibung mit
 \begin{lstcode}
   \KOMAoption{captions}{centeredbeside}
 \end{lstcode}
-  zeigt \autoref{fig:maincls.captionbesidecentered}. Auch der typografisch
-  weniger bewanderte Anfänger wird sofort
-  erkennen, dass von dieser Ausrichtung normalerweise abzusehen ist.
+  zeigt \autoref{fig:maincls.captionbesidecentered}. %
+\iffalse % Umbruchalternativen
+  Auch der typografisch weniger bewanderte Anfänger wird sofort
+  erkennen, dass von dieser Ausrichtung normalerweise abzusehen ist.%
+\else
+  Das ist jedoch sicher keine empfehlswerte Lösung.%
+\fi
 
   \begin{figure}
     \KOMAoption{captions}{centeredbeside}
@@ -4017,14 +4034,14 @@ aufgelistet, sondern auf externe Inhalte verwiesen
 wird. Mit dieser Begründung
 könnte man argumentieren, dass das Literaturverzeichnis ein eigenes Kapitel
 bzw. einen eigenen Abschnitt darstellt und somit eine
-Nummer\important[i]{\begin{tabular}[t]{@{}l@{}}
+Nummer verdiene.  Die
+Einstellung \OptionValue{bibliography}{totocnumbered}%
+\important[i]{\begin{tabular}[t]{@{}l@{}}
     \Option{bibliography=}\\
     \quad\PValue{totocnumbered}
-  \end{tabular}} verdiene.  Die
-Einstellung \OptionValue{bibliography}{totocnumbered}%
-\IndexOption{bibliography~=\PValue{totocnumbered}} führt genau dazu,
-einschließlich des dann fälligen Eintrags im Inhaltsverzeichnis.  Ich selbst
-bin der Meinung, dass bei dieser Argumentation auch ein klassisches,
+  \end{tabular}}\IndexOption{bibliography~=\PValue{totocnumbered}} führt genau
+dazu, einschließlich des dann fälligen Eintrags im Inhaltsverzeichnis.  Ich
+selbst bin der Meinung, dass bei dieser Argumentation auch ein klassisches,
 kommentiertes Quellenverzeichnis ein eigenes Kapitel wäre. Außerdem ist das
 Literaturverzeichnis letztlich nichts, was man selbst geschrieben
 hat. Deshalb\important{\OptionValue{bibliography}{totoc}}
@@ -4053,10 +4070,10 @@ beispielsweise auch verwendet werden, wenn das Literaturverzeichnis zusammen
 mit anderen Verzeichnissen unter einer gemeinsamen Überschrift erscheinen
 soll. Daher ist diese Option auch in \Class{scrartcl} verfügbar.
 
-Eine Zusammenfassung der möglichen Werte für die \PName{Einstellung} von
-\Option{bibliography} ist in \autoref{tab:maincls.bibliography} zu finden. Es
-ist jedoch zu beachten, dass mit \Macro{newbibstyle}\IndexCmd{newbibstyle}
-weitere Werte definiert werden können.
+Eine Zusammenfassung möglicher Werte für \PName{Einstellung} ist
+\autoref{tab:maincls.bibliography} zu entnehmen. Es ist jedoch zu beachten,
+dass mit \Macro{newbibstyle}\IndexCmd{newbibstyle} weitere Werte definiert
+werden können.
 
 \begin{table}
   \caption[{Mögliche Werte für Option \Option{bibliography}}]{Vordefinierte
@@ -4105,8 +4122,8 @@ Mit der Anweisung \Macro{setbibpreamble} kann eine Präambel für das
 Literaturverzeichnis gesetzt werden. Bedingung dafür ist, dass die Präambel
 vor der Anweisung zum Setzen des Literaturverzeichnisses gesetzt wird. Dies
 muss nicht unmittelbar davor sein. Es kann also beispielsweise am Anfang des
-Dokuments erfolgen. Ebenso\textnote{Achtung!} wie die Optionen
-\OptionValue{bibliography}{totoc} und
+Dokuments erfolgen. Ebenso\textnote{Achtung!} wie Option
+\OptionValue{bibliography}{totoc} oder
 \OptionValue{bibliography}{totocnumbered} kann die Anweisung aber nur
 erfolgreich sein, wenn nicht ein Paket geladen wird, das dies durch
 Umdefinierung der \Environment{thebibliography}-Umgebung verhindert. Obwohl
@@ -4273,9 +4290,12 @@ ist im Makro \Macro{indexpagestyle} abgelegt (siehe
 
 Für die Erstellung, Sortierung und Ausgabe des Stichwortverzeichnisses
 sind die üblichen Standard-\LaTeX-Pakete und Zusatzprogramme
-zuständig. Von {\KOMAScript} werden genau wie von den Standardklassen
-lediglich die grundlegenden Makros und Umgebungen dafür zur Verfügung
-gestellt.%
+zuständig.%
+\iffalse % Umbruchoptimierung
+  \ Von {\KOMAScript} werden genau wie von den Standardklassen
+  lediglich die grundlegenden Makros und Umgebungen dafür zur Verfügung
+  gestellt.%
+\fi
 %
 \EndIndex{Cmd}{setindexpreamble}%
 %
@@ -4289,6 +4309,8 @@ gestellt.%
 
 %%% Local Variables:
 %%% mode: latex
+%%% mode: flyspell
 %%% coding: iso-latin-1
-%%% TeX-master: "guide.tex"
+%%% ispell-local-dictionary: "de_DE"
+%%% TeX-master: "../guide.tex"
 %%% End:
