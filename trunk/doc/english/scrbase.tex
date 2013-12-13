@@ -130,10 +130,10 @@ use it with or without \PName{value} either as a global option with
 As already mentioned in \autoref{sec:scrbase.loadit}, \Package{scrbase} uses
 package \Package{keyval} for keys and values of keys. Nevertheless
 \Package{scrbase} extends the functionality of \Package{keyval}. Whereas only
-one family owns all keys of \Package{keyval}, \Package{scrbase} knows also
-family members. Now, a key may be owned by a family or by one or more family
-members. Additionally a value may be assigned to the key of a family member,
-of a family or of all family members.
+one family owns all keys of \Package{keyval}, \Package{scrbase} recognises
+also family members. Therefore, a key may be owned by a family or by one or
+more family members. Additionally, a value may be assigned to the key of a
+family member, to the key of a family, or to the keys of all family members.
 
 \begin{Declaration}
   \Macro{DefineFamily}\Parameter{family}\\
@@ -142,42 +142,43 @@ of a family or of all family members.
 \BeginIndex{Cmd}{DefineFamily}%
 \BeginIndex{Cmd}{DefineFamilyMember}%
 \Package{scrbase} needs to know the members of a family for different
-reasons. So it's necessary first to define a new family using
-\Macro{DefineFamily}, that produces also an empty member list. If the family
-has already been defined nothing would happen. Nothing means also, that an
+reasons. First, you have to define a new family using
+\Macro{DefineFamily}, which produces an empty member list. If the family
+has already been defined nothing would happen. Nothing also means that an
 already existing member list would not be overwritten.
 
-A new member may be added to the family using \Macro{DefineFamilyMember}. If
-the family doesn't exist, this would result in an error message. If the member
-already exists, nothing happens. If the member is omitted, the member won't
-stay empty, but ``\texttt{.}\Macro{@currname}\texttt{.}\Macro{@currext}'' will
-be assumed. While loading a class or package \Macro{@currname} and
-\Macro{@currext} together represent the file name of the class or package.
+Next, a new member can be added to the family using
+\Macro{DefineFamilyMember}. If the family does not exist, this would result in
+an error message. If the member already exists, nothing happens. If the
+optional \PName{family member} is omitted, the default value
+``\texttt{.}\Macro{@currname}\texttt{.}\Macro{@currext}'' is used. During
+class or package loading \Macro{@currname} and \Macro{@currext} together
+represent the file name of the class or package.
 
-Theoretically is would be possible, to define a member without a name using an
-empty optional argument \PName{family member}. But this would be same like the
-family itself. It is recommended to use only letters and digits at the
-\PName{family} an start the \PName{family member} with another char like a
-period. Otherwise it could happen, that members of one family are same like
-members of another family.
+Theoretically, it is possible, to define a member without a name using an
+empty optional \PName{family member} argument. But this is the same as the
+family itself. It is recommended that only letters and digits be used for
+\PName{family} and the first character of \PName{family member} should not be
+a letter or digit. Otherwise, it could happen that members of one family are
+the same as members of another family.
 
-\Package{scrbase} itself defines family ``\PValue{KOMA}'' and adds member
-``\PValue{.scrbase.sty}'' to is. Generally family ``\PValue{KOMA}'' is
-reserved to \KOMAScript{}. For your own packages it is recommended to use the
-name of the bundle as \PName{family} and the name of the package as
-\PName{family member} of that \PName{family}.
+\Package{scrbase} assigns family ``\PValue{KOMA}'' to itself and adds member
+``\PValue{.scrbase.sty}'' to it. Family ``\PValue{KOMA}'' is reserved to
+\KOMAScript{}. For your own packages, use the name of the bundle as
+\PName{family} and the name of the package as \PName{family member} of that
+\PName{family}.
 %
 \begin{Example}
-  Assume you're writing a bundle ``master butcher''. Within that bundle you
-  have packages \File{salami.sty}, \File{liversausage.sty}, and
-  \File{kielbasa.sty}. Therefor you decide to use family name
-  ``\PValue{butcher}'' and add the lines
+  Assume you are writing a bundle called ``master butcher''. Within that
+  bundle you have packages \File{salami.sty}, \File{liversausage.sty}, and
+  \File{kielbasa.sty}. Therefore, you decide to use family name
+  ``\PValue{butcher}'' and,to each of the package file, you add the lines
 \begin{lstcode}
   \DefineFamily{butcher}
   \DefineFamilyMember{butcher}
 \end{lstcode}
-  to each of the package files. While loading the three packages this will
-  all the members ``\PValue{.salami.sty}'', ``\PValue{.liversausage.sty}'',
+  When loading the three packages, this will
+  add the members ``\PValue{.salami.sty}'', ``\PValue{.liversausage.sty}'',
   and ``\PValue{.kielbasa.sty}'' to the family ``\PValue{butcher}''. After
   loading all three packages, all three member will be defined.
 \end{Example}
@@ -202,15 +203,15 @@ name of the bundle as \PName{family} and the name of the package as
 \BeginIndex{Cmd}{FamilyKeyStateProcessed}%
 \BeginIndex{Cmd}{FamilyKeyStateUnknownValue}%
 \BeginIndex{Cmd}{FamilyKeyStateNeedValue}%
-This command defines a \PName{key}. If a \PName{family member} is given, the
-\PName{key} will become an attribute of that member of the also given
-\PName{family}. If a \PName{family member} isn't given, the member
-``\texttt{.}\Macro{@currname}\texttt{.}\Macro{@currext}'' will be assumed. If
-later a value will be assigned to the \PName{key}, the \PName{action} will be
-executed and the value will be an argument of this. So inside of
-\PName{action} ``\lstinline{#1}'' would be that value. If the value will be
-omitted, the \PName{default} will be used instead. If there's no
-\PName{default}, the \PName{key} can be used only with value.
+The command \Macro{DefineFamilyKey} defines a \PName{key}. If a \PName{family
+  member} is given, the \PName{key} becomes an attribute of that member in the
+given \PName{family}. If a \PName{family member} is not given, the member
+``\texttt{.}\Macro{@currname}\texttt{.}\Macro{@currext}'' is assumed. If,
+later, a value is assigned to the \PName{key}, the \PName{action} will be
+executed and the value made an argument of \PName{action}. So inside
+\PName{action} ``\lstinline{#1}'' would be that value. If the value is
+omitted, the \PName{default} is used instead. If there is no \PName{default},
+the \PName{key} can be used only with a value being defined.
 
 \begin{Explain}
   \phantomsection\label{explain:scrbase.macro.DefineFamilyKey}%
@@ -224,47 +225,47 @@ omitted, the \PName{default} will be used instead. If there's no
   \define@key{`\PName{family\,member}'}{`\PName{key}'}
              [`\PName{default}']{`\PName{extended action}'}
 \end{lstcode}
-  with \Macro{define@key} is provided by package
+  with \Macro{define@key} provided by package
   \Package{keyval}\IndexPackage{keyval} (see \cite{package:keyval}). However,
-  the call of \Macro{define@key} and the \PName{action} will in fact be
+  the call of \Macro{define@key} and the \PName{action} is, in fact, 
   extended by additional arrangements.
 \end{Explain}
 
 Success\ChangedAt{v3.12}{\Package{scrbase}} or failure of the execution of the
 \PName{action} should be reported back to \Package{scrbase} by
-\Macro{FamilyKeyState}. The package itself will take care for additional
+\Macro{FamilyKeyState}. The package itself will take care of additional
 procedures if needed. You should not report errors by yourself! The default
 state before execution of \PName{action} is
-\Macro{FamilyKeyStateUnknown}. This signals, that it is not known whether or
-not the execution is successful. If this state doesn't change until end of
+\Macro{FamilyKeyStateUnknown}. This signals that it is not known whether or
+not the execution is successful. If this state does not change until end of
 execution of the \PName{action}, \Package{scrbase} will write a message into
-the \File{log} file and supposes state \Macro{FamilyKeyStateProcessed} during
+the \File{log} file and assumes state \Macro{FamilyKeyStateProcessed} during
 the further procedure.
 
-State \Macro{FamilyKeyStateProcessed} signals, that the option and the value
+State \Macro{FamilyKeyStateProcessed} signals that the option and the value
 assignment to the option are completely and successfully finished. You may
-switch to this state by using \Macro{FamilyKeyStateProcessed} itself simply.
+switch to this state by using \Macro{FamilyKeyStateProcessed} itself.
 
-State \Macro{FamilyKeyStateUnknownValue} indicates, that the option was
+State \Macro{FamilyKeyStateUnknownValue} indicates that the option was
 handled, but the value, that should be assigned to the key, was unknown or not
-allowed. You may use \Macro{FamilyKeyStateUnknownValue} itself to switch to
+allowed. You should use \Macro{FamilyKeyStateUnknownValue} to switch to
 this state.
 
-State \Macro{FamilyKeyStateNeedValue} signals, that the option couldn't be
-set, because it needs a value, but not value have been assigned to the
-key. This state will be used automatically, whenever an option, that has been
-defined without \PName{default} value, will be used without value
-assignment. You could also set the state using \Macro{FamilyKeyStateNeedValue}
-yourself, but you shouldn't.
+State \Macro{FamilyKeyStateNeedValue} signals that the option could not be
+set because it needs a value, but no value was assigned to the
+key. This state is used automatically, whenever an option has been
+defined without \PName{default} value and is used without value
+assignment. You should not set the state using \Macro{FamilyKeyStateNeedValue}
+yourself.
 
 Last but not least you may switch to additional failure states, simply
-re-defining \Macro{FamilyKeyState} with a very short message
-text. Generally the four predefined states should be sufficient.
+re-defining \Macro{FamilyKeyState} with a very short text message.
+Generally, the four predefined states should be sufficient.
 
 \begin{Example}
   Assume each of the three packages from the previous example should get a
-  key \PValue{coldcuts}. If this is used, a switch should be set at each of
-  the packages. For package \Package{salami} this may be, e.\,g.,
+  key named \PValue{coldcuts}. When used, a switch is set at each of
+  the packages. For package \Package{salami} this may be:
 \begin{lstcode}
   \newif\if@Salami@Aufschnitt
   \DefineFamilyKey{butcher}%
@@ -275,10 +276,10 @@ text. Generally the four predefined states should be sufficient.
   }
 \end{lstcode}
   Available values for the key are \PValue{true} or \PValue{false} in this
-  case. Instead of testing on inappropriate values, success will be signaled
-  in any case in this example. If the key will be used later, this has to be
-  done with one of the allowed values or without assignment. In the second
-  case the default \PName{true} will be used.
+  case. Instead of testing on inappropriate values, success will be signalled
+  for any case in this example. If the key is used later, it is executed with
+  one of the allowed values or without assignment. In the second case, the
+  default \PName{true} will be used.
 
   The definitions in the other packages are similar. Only ``\texttt{salami}''
   has to be replaced by the corresponding names.
@@ -297,38 +298,37 @@ text. Generally the four predefined states should be sufficient.
 \end{Declaration}
 \BeginIndex{Cmd}{FamilyProcessOptions}%
 Generally the extension of keys of families to keys of families and family
-members was mentioned to use keys or key-value settings as class or package
-options. This command therefor is an extension of \Macro{ProcessOption*} from
-\LaTeX{} kernel (see \cite{latex:clsguide}. Thereby the command processes not
-only options that has been declared using \Macro{DeclareOption}. It processes
-even all keys of the given family member. If the optional argument
+members, as mentioned earlier, uses keys or key-value settings as class or
+package options. The command \Macro{FamilyProcessOptions} is an extension of
+\Macro{ProcessOption*} from \LaTeX{} kernel (see \cite{latex:clsguide}, which
+processes not only options that has been declared using \Macro{DeclareOption},
+it processes all keys of the given family member. If the optional argument
 \PName{family member} is omitted, family member
-``\texttt{.}\Macro{@currname}\texttt{.}\Macro{@currext}'' will be used.
+``\texttt{.}\Macro{@currname}\texttt{.}\Macro{@currext}'' is used.
 
-Somehow special are keys, that are not attached to a family member, but to a
-family. These are keys with an empty family member. Such keys will be set also
-and before the keys of the family members.
+Somehow special are keys that are not attached to a family member, but to a
+family. These are keys with an empty family member. Such keys are set before
+the keys of the family members.
 \begin{Example}
   If a package in the previous example would be extended by the line
 \begin{lstcode}
   \FamilyProcessOptions{butcher}
 \end{lstcode}
-  then the user may select the option \Option{coldcut} while loading the
-  package. If the option will be used globally, this means at the optional
+  then the user may select the option \Option{coldcut} when loading the
+  package. If the option is used globally, this means at the optional
   argument of \Macro{documentclass}, then the option would be passed
-  automatically to all three packages, if all three packages will be loaded
+  automatically to all three packages, if all three packages are loaded
   later.
 \end{Example}
-Please note\textnote{Attention!} that packages process global options always
-before local options, that has been assigned locally to the package. In
-opposite to unknown options while processing of global options, that will only
-result in an information in the \File{log}-file, unknown options assigned to
-the package result in error messages.
+Please note\textnote{Attention!} that packages always process global options
+before local options. When processing unknown options initiate an entry in the
+\File{log}-file and the option is otherwise ignored. By contrast, unknown
+options assigned to the package locally leads to an error message.
 
 \Macro{FamilyProcessOptions} may be interpreted either as an extension of
 \Macro{ProcessOption*} or as an extension of the \PName{key=value} mechanism
-of \Package{keyval}. Finally \PName{key=value} pairs become options with help
-of \Macro{FamilyProcessOptions}.%
+of \Package{keyval}. Ultimately, with the help of
+\Macro{FamilyProcessOptions}, \PName{key=value} pairs become options.%
 %
 \EndIndex{Cmd}{FamilyProcessOptions}%
 
@@ -339,17 +339,17 @@ of \Macro{FamilyProcessOptions}.%
 \end{Declaration}
 \BeginIndex{Cmd}{FamilyExecuteOptions}%
 This command is an extension of \Macro{ExecuteOptions} from the \LaTeX{}
-kernel (see \cite{latex:clsguide}). Thereby the command processes not only
-options, that has been defined using \Macro{DeclareOption}. Also all keys of
-the given family member will be processed. If the optional argument
-\Macro{family member} is omitted, then
+kernel (see \cite{latex:clsguide}). The command processes not only options
+that are defined using \Macro{DeclareOption}, but also processes all keys of
+the given \PName{family member}. If the optional argument \Macro{family
+  member} is omitted, then
 ``\texttt{.}\Macro{@currname}\texttt{.}\Macro{@currext}'' is used.
 
-Somehow special are keys, that are not attached to a family member, but to a
-family. These are keys with an empty family member. Such keys will be set also
-and before the keys of the family members.
+Somehow special are keys of empty family members, which are not attached to a
+family member, but to a family. Such keys are set before the keys of family
+members.
 \begin{Example}
-  Assume option \Option{coldcut} should be set by default already in the
+  Assume option \Option{coldcut} should be set by default in the
   previous example. In this case only line
 \begin{lstcode}
   \FamilyExecuteOptions{butcher}{coldcut}
@@ -364,25 +364,24 @@ and before the keys of the family members.
   \Macro{FamilyOptions}\Parameter{family}\Parameter{options list}%
 \end{Declaration}
 \BeginIndex{Cmd}{FamilyOptions}%
-Thereby \PName{options list} is like:
+Hence \PName{options list} is like:
 \begin{flushleft}\vskip\dp\strutbox\begin{tabular}{l}
     \PName{key}\texttt{=}\PName{value}\texttt{,}%
     \PName{key}\texttt{=}\PName{value}\dots
 \end{tabular}\vskip\dp\strutbox\end{flushleft}
-whereby the value assignment may be omitted for \PName{key}s, that have a
+after which the value assignment may be omitted for \PName{key}s, that have a
 defined default.
 
-In opposite to average options, that has been defined using
-\Macro{DeclareOption}, the \PName{key}s may also be set after loading a class
-or package. For this the user uses \Macro{FamilyOptions}. Thereby the
-\PName{key}s of all members of the given family will be set. If a \PName{key}
-also exists as an family attribute, then the family key will be set
-first. After this the member keys will follow in the order, the members has
-been defined. If a given \PName{key} does exist neither in the family nor in
-any member of the family, then \Macro{FamilyOptions} will result in an
-error. Package \Package{scrbase} reports an error also, if there are members
-with key \PName{key}, but all those members signal failure via
-\Macro{FamilyKeyState}.
+In contrast to average options that are defined using \Macro{DeclareOption},
+the \PName{key}s also may be set after loading a class or package. For this,
+the user calls \Macro{FamilyOptions}. Thereafter, the \PName{key}s of all
+members of the specified family are set. If a \PName{key} also exists as a
+family attribute, then the family key is set first. After this, the member
+keys follow in the order in which the members have been defined. If a given
+\PName{key} does not exist, either for the family or for any member of the
+family, then \Macro{FamilyOptions} will result in an error. Package
+\Package{scrbase} reports an error also if there are members with key
+\PName{key}, but all those members signal failure via \Macro{FamilyKeyState}.
 \begin{Example}
   You extend your butcher project by a package \Package{sausagesalad}. If this
   package has been loaded, all sausage package should generate cold cut:
@@ -394,15 +393,15 @@ with key \PName{key}, but all those members signal failure via
   \FamilyProcessOptions{butcher}\relax
   \FamilyOptions{butcher}{coldcut}
 \end{lstcode}
-  If currently non of the sausage packages has been loaded, then an error
-  message would result because of undefined option ``\Option{coldcut}''. Dies
-  may be avoided changing the last line of the previous code into:
+  If currently none of the sausage packages are loaded, then an error
+  message results because of undefined option ``\Option{coldcut}''. This is
+  avoided by changing the last line of the code to:
 \begin{lstcode}[moretexcs={Family@Options}]
   \Family@Options{butcher}{coldcut}{}
 \end{lstcode}
-  Nevertheless, sausage packages, that will be loaded after
-  \Package{sausagesalad}, won't produce cold cut. This may be changed
-  additionally, by changing the last line again:
+  Despite this, sausage packages loaded after
+  \Package{sausagesalad} still do not produce cold cut. This may be corrected
+  by editing the last line of the code again to:
 \begin{lstcode}[moretexcs={Family@Options}]
   \AtBeginDocument{%
     \Family@Options{butcher}{coldcut}{%
@@ -412,8 +411,7 @@ with key \PName{key}, but all those members signal failure via
     }%
   }%
 \end{lstcode}
-  This will also throw a warning message, if non of the sausage packages will
-  be loaded.
+  This may throw a warning message if none of the sausage packages are loaded.
 \end{Example}
 %
 \EndIndex{Cmd}{FamilyOptions}%
@@ -424,22 +422,23 @@ with key \PName{key}, but all those members signal failure via
                       \Parameter{option}\Parameter{values list}%
 \end{Declaration}
 \BeginIndex{Cmd}{FamilyOption}%
-Beside options that have concurrently excluding values, there may be options,
-that have several values at the same time. Using \Macro{FamilyOptions} for
-that kind of options would result in using the same option several times with
+Besides options that have concurrently excluding values, there may be options
+that produce several values at the same time. Using \Macro{FamilyOptions} for
+that type of option would result in using the same option several times with
 different value assignments. Instead of this, \Macro{FamilyOption} may be used
 to assign a whole \PName{values list} to the same \PName{option}. The
-\PName{values list} is a comma separated list of values:
+\PName{values list} is a comma separated list of values, also known as
+\emph{csv}:
 \begin{flushleft}\begin{tabular}{l}
     \PName{value}\texttt{,}\PName{value}\dots
 \end{tabular}\end{flushleft}
-By the way please note, that usage of a comma inside a value may be done only,
-if the value is put into braces. The general functionality of this command
-is the same like that of the previous command \Macro{FamilyOptions}.
+By the way, please note that usage of a comma inside a value may be done only
+if the value is put inside braces. The general functionality of this command
+is the same as that of the previous command \Macro{FamilyOptions}.
 \begin{Example}
   Package \Package{sausagesalad} should have one mire option, to add
-  additional ingredients. Each of the ingredients will set a switch like done
-  before for the cold cut.
+  additional ingredients. Each of the ingredients sets a switch as was done
+  previously for the cold cut.
 \begin{lstcode}
   \newif\if@saladwith@onions
   \newif\if@saladwith@gherkins
@@ -448,8 +447,9 @@ is the same like that of the previous command \Macro{FamilyOptions}.
     \csname @saladwith@#1true\endcsname
   }
 \end{lstcode}
-  Here the three ingredients ``onions'', ``gherkins'', and ``chillies'' has
-  been defined. An error message for not defined ingredients doesn't exist.
+  Here the three ingredients ``onions'', ``gherkins'', and ``chillies'' have
+  been defined. An error message for ``not defined'' ingredients does not
+  exist.
 
   For a salad with onions and gherkins the user may use
 \begin{lstcode}
@@ -470,13 +470,13 @@ is the same like that of the previous command \Macro{FamilyOptions}.
   \Macro{AtEndOfFamilyOptions}\Parameter{action}%
 \end{Declaration}
 \BeginIndex{Cmd}{AtEndOfFamilyOptions}%
-Sometimes\ChangedAt{v3.12}{\Package{scrbase}} it's useful to delay the
-execution of an \PName{action}, that is part of a value assignment to a key,
+Sometimes\ChangedAt{v3.12}{\Package{scrbase}} it is useful to delay the
+execution of an \PName{action} that is part of a value assignment to a key
 until all assignments inside one \Macro{FamilyProcessOptions},
 \Macro{FamilyExecuteOptions}, \Macro{FamilyOptions}, or \Macro{FamilyOption}
-has been finished. This may be done, using \Macro{AtEndOfFamilyOptions} inside
-an option definition. Reporting failure states of \PName{action} isn't
-possible in this case. Furthermore, the command shouldn't be used outside an
+is finished. This may be done using \Macro{AtEndOfFamilyOptions} inside
+an option definition. Reporting failure states of \PName{action} is not
+possible in this case. Furthermore, the command should not be used outside an
 option definition.
 %
 \EndIndex{Cmd}{AtEndOfFamilyOptions}%
@@ -490,33 +490,33 @@ option definition.
 \end{Declaration}
 \BeginIndex{Cmd}{FamilyBoolKey}%
 \BeginIndex{Cmd}{FamilySetBool}%
-In the previous examples boolean switches often have been used. In the example
-with option \Option{coldcut} is was necessary, that the user assigns either
-value \PValue{true} or value \PValue{false}. There aren't any error message on
-wrong value assignment. Because of such boolean switches are an often needed
-feature, \Package{scrbase} provides \Macro{FamilyBoolKey} for definition of
-such options. Thereby the arguments \PName{family member}, \PName{family}, and
-\PName{key} are same like used by \Macro{DefineFamilyKey} (see
+In the previous examples, boolean switches often have been used. In the example
+with option \Option{coldcut}, it is necessary that the user assigns either
+value \PValue{true} or value \PValue{false}. There is no error message for
+wrong value assignment. Because of this, boolean switches are a necessary
+feature. Package \Package{scrbase} provides \Macro{FamilyBoolKey} for definition of
+such options. Therefore, the arguments \PName{family member}, \PName{family}, and
+\PName{key} are the same as that used by \Macro{DefineFamilyKey} (see
 \autopageref{desc:scrbase.cmd.DefineFamilyKey}). Argument \PName{switch name}
 is the name of the switch without the prefix \Macro{if}. If a switch with this
-name doesn't exist already, \Macro{FamilyBoolKey} will define it and
+name does not exist already, \Macro{FamilyBoolKey} will define it and
 initialize it to \PName{false}. Internally \Macro{FamilyBooKey} uses
 \Macro{FamilySetBool} as \PName{action} of \Macro{DefineFamilyKey}. The
 \PName{default} for those options is always \PValue{true}.
 
-\Macro{FamilySetBool} on the other side understands \PName{value} \PValue{on}
+On the other hand, \Macro{FamilySetBool} understands \PName{value} \PValue{on}
 and \PValue{yes} beside \PName{true} for switching on and \PName{off} and
 \PName{no} beside \PName{false} for switching off. Unknown values will result
 in a call of \Macro{FamilyUnknownKeyValue} with the arguments \PName{family},
 \PName{key}, and \PName{value}, which results in setting of
-\Macro{FamilyKeyState}. Depending on the used command and other family
-members, may this result in an error message about unknown value assignment
+\Macro{FamilyKeyState}. Depending on the command used and other family
+members, this may result in an error message about unknown value assignment
 (see also \autopageref{desc:scrbase.cmd.FamilyUnkownKeyValue} and
 \autopageref{desc:scrbase.cmd.FamilyKeyState}).
 \begin{Example}
-  The key \Option{coldcut} should be declared somehow more robust. Additionally
-  all sausage packages should use the same key. So either all or none of them
-  will produce cold cut.
+  The key \Option{coldcut} should be declared somehow more
+  robust. Additionally, all sausage packages should use the same key. So
+  either all or none of them will produce cold cut.
 \begin{lstcode}
   \FamilyBoolKey{butcher}{coldcut}%
                          {@coldcut}
@@ -529,8 +529,8 @@ members, may this result in an error message about unknown value assignment
      ...
   \fi
 \end{lstcode}
-  This would be the same in each of the three sausage packages. With this the
-  attribute ``coldcut'' may be defined as a family option:
+  This would be the same in each of the three sausage packages, thereby
+  defining the attribute ``coldcut'' as a family option:
 \begin{lstcode}[moretexcs={define@key}]
   \@ifundefined{if@coldcut}{%
     \expandafter\newif\csname if@coldcut\endcsname
@@ -547,7 +547,7 @@ members, may this result in an error message about unknown value assignment
                            {@coldcut}
 \end{lstcode}
   using the additional information at
-  \autopageref{explain:scrbase.macro.DefineFamilyKey}, that's not only valid
+  \autopageref{explain:scrbase.macro.DefineFamilyKey}, this is not only valid
   for \Macro{DefineFamilyKey} but for \Macro{FamilyBoolKey} too.
 \end{Example}
 %
@@ -568,10 +568,10 @@ members, may this result in an error message about unknown value assignment
 \end{Declaration}
 \BeginIndex{Cmd}{FamilyNumericalKey}%
 \BeginIndex{Cmd}{FamilySetNumerical}%
-In opposite to switches that may be either true or false, also key exists,
+In contrast to switches that may be either true or false, a key exists
 that accept several values. For example an alignment may not only be left or
-not left, but, e.\,g., left, centered, or right. Internally such
-differentiations are often made using \Macro{ifcase}. This \TeX{} command
+not left, but left, centered, or right. Internally such
+differentiation often is made using \Macro{ifcase}. This \TeX{} command
 expects a numerical value. Because of this the command to define a macro by
 a \PName{key} has been named \Macro{FamilyNumericalKey} in
 \Package{scrbase}. The \PName{values list} thereby has the form:
@@ -580,16 +580,16 @@ a \PName{key} has been named \Macro{FamilyNumericalKey} in
     \Parameter{value}\Parameter{definition}\texttt{,}%
     \dots
 \end{tabular}\vskip\dp\strutbox\end{flushleft}
-So the \PName{values list} does not only define the supported values to the
-\PName{key}. For each of the \PName{value}s it also gives the
-\PName{definition} of macro \Macro{\PName{command}}. Usually
-\PName{definition} is just a numerical value. Nevertheless other content is
-possible and allowed. Currently the only limitation is, that
-\PName{definition} has to be fully expandable and will be expanded while the
+Therefore, the \PName{values list} does not solely define the supported values to the
+\PName{key}. For each of the \PName{value}s, the
+\PName{definition} of macro \Macro{\PName{command}} also is given. Usually,
+\PName{definition} is just a numerical value. Nevertheless, other content is
+possible and allowed. Currently, the only limitation is that
+\PName{definition} has to be fully expandable and will be expanded during the
 assignment.
 \begin{Example}
   The sausage may be cut different. For example the cold cut may stay uncut or
-  will by cut roughly or may be cut thinly. This information should be stored
+  will be cut roughly or may be cut thinly. This information should be stored
   in command \Macro{cuthow}.
 \begin{lstcode}
   \FamilyNumericalKey{butcher}%
@@ -613,10 +613,10 @@ assignment.
 \end{lstcode}
   In all three cases \Macro{cuthow} would be defined with content
   \PValue{none}. It may be very useful to provide several values for the same
-  result like shown in this example.
+  result as shown in this example.
 
   Now, it's most likely, that the kind of cutting will not be printed, but
-  should be evaluated later. In this case a textual definition wouldn't be
+  should be evaluated later. In this case a textual definition would not be
   useful. If the key is defined like this:
 \begin{lstcode}
   \FamilyNumericalKey{butcher}%
@@ -626,7 +626,7 @@ assignment.
                        {thin}{2}%
                      }
 \end{lstcode}
-  then a condition like this:
+  then a condition like the following may be used:
 \begin{lstcode}
   \ifcase\cuthow
     % no cut
@@ -636,9 +636,8 @@ assignment.
     % thin cut
   \fi
 \end{lstcode}
-  may be used.
 \end{Example}
-Internally \Macro{FamilyNumericalKey} uses \Macro{FamilySetNumerical} as
+Internally, \Macro{FamilyNumericalKey} uses \Macro{FamilySetNumerical} as
 \PName{action} of \Macro{DefineFamilyKey}. If a unknown value is assigned to
 such a key, \Macro{FamilySetNumerical} will call \Macro{FamilyUnkownKeyValue}
 with the arguments \PName{family}, \PName{key} and \PName{value}. This will
@@ -655,10 +654,10 @@ normally result in an error message about assigning an unknown value.
                          \OParameter{default}\Parameter{command}
 \end{Declaration}
 \BeginIndex{Cmd}{FamilyStringKey}%
-This defines\ChangedAt{v3.08}{\Package{scrbase}} a \PName{key}, that accepts
-every value. The value will be stored into the given \Macro{command}. If their
-isn't a optional argument for the \PName{default}, \Macro{FamilyStringKey} is
-the same like
+This defines\ChangedAt{v3.08}{\Package{scrbase}} a \PName{key} that accepts
+every value. The value will be stored into the given \Macro{command}. If there
+is no optional argument for the \PName{default}, \Macro{FamilyStringKey} is
+the same as:
 \begin{quote}
 \Macro{DefineFamilyKey}\OParameter{family member}\Parameter{family}%
 \Parameter{key}\\
@@ -666,8 +665,8 @@ the same like
 \PParameter{\Macro{def}\PName{command}\string{\#1\string}%
 \Macro{FamilyKeyStateProcessed}}.
 \end{quote}
-If an optional argument \PName{default} has been used, \Macro{FamilyStringKey}
-is the same like
+If an optional argument \PName{default} is used, \Macro{FamilyStringKey}
+is the same as:
 \begin{quote}
 \Macro{DefineFamilyKey}\OParameter{family member}\Parameter{family}%
 \Parameter{key}\\
@@ -675,13 +674,12 @@ is the same like
 \OParameter{default}%
 \PParameter{\Macro{def}\PName{command}\string{\#1\string}}.
 \end{quote}
-If \PName{command} hasn't been defined already, an empty macro will be
-defined.
+If \PName{command} is not been defined, an empty macro will be defined.
 \begin{Example}
   By default an amount of 250\Unit{g} sausage salad should be produced. The
   amount should be configurable by an option. The wanted amount will be stored
   in the macro \Macro{saladweight}. The option should be named
-  \PValue{saladweight} too:
+  \PValue{saladweight}, too:
 \begin{lstcode}
   \newcommand*{\saladweight}{250g}
   \FamilyStringKey{butcher}%
@@ -692,11 +690,11 @@ defined.
 \begin{lstcode}
   \FamilyOptions{butcher}{saladweight}
 \end{lstcode}
-  That may be done, because the default weight has been set as default at the
+  This may be done, because the default weight has been set as default at the
   definition of the option above.
 \end{Example}
-In this case there aren't unknown values, because all values are simply used
-for a macro definition. Nevertheless, you should note, that paragraph breaks
+In this case there are not unknown values because all values are simply used
+for a macro definition. Nevertheless, you should note that paragraph breaks
 at the value assignment to the key are not allowed.
 %
 \EndIndex{Cmd}{FamilyStringKey}%
@@ -714,10 +712,10 @@ separated list of allowed values in the form:
 \begin{flushleft}\vskip\dp\strutbox\begin{tabular}{l}
     `\PName{value}'\texttt{,} `\PName{value}' \dots
 \end{tabular}\vskip\dp\strutbox\end{flushleft}
-Certainly\ChangedAt{v3.12}{\Package{scrbase}} \PName{values list} is currently
+Currently\ChangedAt{v3.12}{\Package{scrbase}}, \PName{values list} is 
 not used by \Package{scrbase}.
 \begin{Example}
-  Now, for the cold cut the choices should be cut or no cut and in case of cut
+  Now, for the cold cut, the choices should be cut or no-cut and in case of cut
   rough or thin. Rough should be the default for cutting.
 \begin{lstcode}
   \@ifundefined{if@thincut}{%
@@ -744,17 +742,19 @@ not used by \Package{scrbase}.
 \end{lstcode}
   Let's have a look at the definition of \Option{butcher}:
   First of all, we try to set the boolean switch of cold cut using
-  \Macro{FamilySetBool}. After this command we test, whether or not
+  \Macro{FamilySetBool}. After this command, we test whether or not
   \Macro{FamilyKeyState} signals the success of the command with state
   \Macro{FamilyKeyStateProcessed}. If so, only the thin cut has to be
-  deactivated. In the other case, the value will be tested to be equal to
-  \PValue{thin}. In that case, cold cut and thin cut are activated and the
-  state will be switched to \Macro{FamilyKeyStateProcessed}. If the last test
-  failed also, the failure state of \Macro{FamilySetBool} is still valid at
-  the end of the execution.
+  deactivated. 
 
-  Command \Macro{ifstr}, that has been used for the thin test, will be
-  described at \autopageref{desc:scrbase.cmd.ifstr} in
+  In the other case, the value will be tested to be equal to \PValue{thin}. In
+  that case, cold cut and thin cut are activated and the state will be
+  switched to \Macro{FamilyKeyStateProcessed}. If the last test failed also,
+  the failure state of \Macro{FamilySetBool} is still valid at the end of the
+  execution.
+
+  Command \Macro{ifstr} is used for the thin test. It is
+  described on \autopageref{desc:scrbase.cmd.ifstr} in
   \autoref{sec:scrbase.if}.
 \end{Example}
 %
@@ -764,17 +764,16 @@ not used by \Package{scrbase}.
   \Macro{FamilyElseValues}
 \end{Declaration}
 \BeginIndex{Cmd}{FamilyElseValues}%
-With former releases\ChangedAt{v3.12}{\Package{scrbase}} of \Package{scrbase}
-additional allowed values reported by \Macro{FamilyUnknownKeyValue} could be
+With former releases\ChangedAt{v3.12}{\Package{scrbase}} of \Package{scrbase},
+additional allowed values reported by \Macro{FamilyUnknownKeyValue} can be
 set re-defining \Macro{FamilyElseValues} in the form:
 \begin{flushleft}\vskip\dp\strutbox\begin{tabular}{l}
     \texttt{,} `\PName{value}'\texttt{,} `\PName{value}' \dots
 \end{tabular}\vskip\dp\strutbox\end{flushleft}
-Since release~3.12 \Macro{FamilyUnknownValue} doesn't report errors itself but
-signals them using \Macro{FamilyKeyState}. Therefore \Macro{FamilyElseValues}
-became deprecated. Nevertheless, it's former usage will be recognized by
-\Package{scrbase} and results in a code change demand message.
-%
+Since release~3.12 \Macro{FamilyUnknownValue} does not report errors itself,
+but signals them using \Macro{FamilyKeyState}. Therefore,
+\Macro{FamilyElseValues} became deprecated. Nevertheless, its former usage is
+recognised by \Package{scrbase} and results in a code change demand message.%
 \EndIndex{Cmd}{FamilyElseValues}%
 
 
@@ -782,7 +781,7 @@ became deprecated. Nevertheless, it's former usage will be recognized by
 \label{sec:scrbase.if}
 
 The package \Package{scrbase} provides several commands for conditional
-execution. Thereby not the \TeX{} syntax of conditionals, e.\,g.,
+execution. other than the \TeX{} syntax of conditionals, e.\,g.,
 % Umbruchkorrektur
 \begin{lstcode}[belowskip=\dp\strutbox]
   \iftrue
@@ -791,21 +790,21 @@ execution. Thereby not the \TeX{} syntax of conditionals, e.\,g.,
     ...
   \fi
 \end{lstcode}
-but the \LaTeX{} syntax also known from \LaTeX{} commands like
+yet the \LaTeX{} syntax also known from \LaTeX{} commands like
 \Macro{IfFileExists}, \Macro{@ifundefined}, \Macro{@ifpackageloaded}, and many
-others will be used. Nevertheless, some package authors prefer to use the
-\TeX{} syntax even for users at the \LaTeX{} interface level. In fact the
-conditionals of \Package{scrbase} are very basic conditionals, this could
-result in conditionals with the same name but different syntax and though in
-naming conflicts. Because of this \Package{scrbase} firstly defines these
-conditionals as internal commands with prefix \Macro{scr@}. Additional user
-commands without this prefix are additionally defined. But the definition of
-the user commands may be suppressed with option \Option{internalonly} (see
+others, is used. Nevertheless, some package authors prefer to use the \TeX{}
+syntax even for users at the \LaTeX{} interface level that could inevitably
+lead to naming conflicts with the \Package{scrbase} conditionals. In fact, the
+conditionals of \Package{scrbase} are very basic. Because of this
+\Package{scrbase} firstly defines these conditionals as internal commands with
+prefix \Macro{scr@}. Additional user commands without this prefix are
+subsequently defined. But the definition of the user commands may be
+suppressed with option \Option{internalonly} (see
 \autoref{sec:scrbase.loadit}, \autopageref{desc:scrbase.option.internalonly}).
 
-Authors of packages and classes should use the internal commands like
+Authors of packages and classes should use the internal commands as
 \KOMAScript{} itself does. Nevertheless, for completeness the user commands
-are described additionally.
+are described separately.
 
 
 \begin{Declaration}
@@ -818,12 +817,12 @@ are described additionally.
 \BeginIndex{Cmd}{ifundefinedorrelax}%
 This command has almost the same functionality as \Macro{@ifundefined} from
 the \LaTeX{} kernel (see \cite{latex:source2e}). So the \PName{then
-  instructions} will be executed, if \PName{name} is the name of a command,
-that is currently either not defined or \Macro{relax}. Otherwise the
-\PName{else instructions} will be executed. In opposite to
-\Macro{@ifundefined} \Macro{\PName{name}} won't be defined to be \Macro{relax}
-in the case it wasn't defined before. Using \eTeX{} this case won't at least
-consume any hash memory.%
+  instructions} will be executed if \PName{name} is the name of a command
+that is currently either not defined or \Macro{relax}. Otherwise, the
+\PName{else instructions} will be executed. In contrast to
+\Macro{@ifundefined}, \Macro{\PName{name}} is not defined to be \Macro{relax}
+in the event it was not defined before. Moreover, using \eTeX{} this case will
+not consume any hash memory.%
 %
 \EndIndex{Cmd}{ifundefinedorrelax}%
 \EndIndex{Cmd}{scr@ifundefinedorrelax}%
@@ -838,11 +837,10 @@ consume any hash memory.%
 \BeginIndex{Cmd}{scr@ifpdftex}%
 \BeginIndex{Cmd}{ifpdftex}%
 If pdf\TeX{} has been used, the \PName{then instructions} will be executed,
-otherwise the \PName{else instructions}. Whether or not a PDF-file will be
-out, doesn't matter. Nevertheless, this pdf\TeX{} test seems so make sense
-seldom only. Generally it's recommended to test for the wanted commands
-instead (see previous \Macro{scr@ifundefinedorrelax} and
-\Macro{ifundefinedorrelax}).
+otherwise the \PName{else instructions}. Whether or not a PDF-file is
+generated does not matter, and the pdf\TeX{} test is rarely useful. In
+general, test for the desired command instead (see previous
+\Macro{scr@ifundefinedorrelax} and \Macro{ifundefinedorrelax}).
 %
 \EndIndex{Cmd}{ifpdftex}%
 \EndIndex{Cmd}{scr@ifpdftex}%
@@ -857,9 +855,9 @@ instead (see previous \Macro{scr@ifundefinedorrelax} and
 \BeginIndex{Cmd}{scr@ifVTeX}%
 \BeginIndex{Cmd}{ifVTeX}%
 If V\TeX{} has been used, the \PName{then instructions} will be executed,
-otherwise the \PName{else instructions}. This test seems so make sense
-seldom only. Generally it's recommended to test for the wanted commands instead
-(see previous \Macro{scr@ifundefinedorrelax} and \Macro{ifundefinedorrelax}).
+otherwise the \PName{else instructions}. This test is seldom useful. Test for
+the desired command instead (see previous \Macro{scr@ifundefinedorrelax} and
+\Macro{ifundefinedorrelax}).
 %
 \EndIndex{Cmd}{ifVTeX}%
 \EndIndex{Cmd}{scr@ifVTeX}%
@@ -873,9 +871,9 @@ seldom only. Generally it's recommended to test for the wanted commands instead
 \end{Declaration}
 \BeginIndex{Cmd}{scr@ifpdfoutput}%
 \BeginIndex{Cmd}{ifpdfoutput}%
-While PDF-file generation the \PName{then instructions} will be executed,
-otherwise the \PName{else instructions}. Whether, e.\,g., pdf\TeX{} or V\TeX{}
-is used to generate the PDF-file doesn't matter.
+When generating a PDF-file the \PName{then instructions} will be executed,
+otherwise the \PName{else instructions}. Whether pdf\TeX{} or V\TeX{} or
+another \TeX{} engine is used to generate the PDF-file does not matter.
 %
 \EndIndex{Cmd}{ifpdfoutput}%
 \EndIndex{Cmd}{scr@ifpdfoutput}%
@@ -889,12 +887,11 @@ is used to generate the PDF-file doesn't matter.
 \end{Declaration}
 \BeginIndex{Cmd}{scr@ifpsoutput}%
 \BeginIndex{Cmd}{ifpsoutput}%
-While PostScript-file generation the \PName{then instructions} will be executed,
-otherwise the \PName{else instructions}. V\TeX{} provides direct PostScript
-generation, that will be recognized here. If V\TeX{} is not used but a switch
-\Macro{if@dvips} has been defined, the decision depends on that
-switch. \KOMAScript{}, e.\,g., provides \Macro{if@dvips} in
-\Package{typearea}.
+When generating a PostScript-file the \PName{then instructions} will be
+executed, otherwise the \PName{else instructions}. V\TeX{} provides direct
+PostScript generation that will be recognised here. If V\TeX{} is not used,
+but a switch \Macro{if@dvips} has been defined, the decision depends on that
+switch. \KOMAScript{} provides \Macro{if@dvips} in \Package{typearea}.
 %
 \EndIndex{Cmd}{ifpsoutput}%
 \EndIndex{Cmd}{scr@ifpsoutput}%
@@ -908,7 +905,7 @@ switch. \KOMAScript{}, e.\,g., provides \Macro{if@dvips} in
 \end{Declaration}
 \BeginIndex{Cmd}{scr@ifdvioutput}%
 \BeginIndex{Cmd}{ifdvioutput}%
-While DVI-file generation the \PName{then instructions} will be executed,
+When generating a DVI-file the \PName{then instructions} will be executed,
 otherwise the \PName{else instructions}. If neither a direct PDF-file
 generation nor a direct PostScript-file generation has been detected, DVI-file
 generation is assumed.
@@ -924,8 +921,8 @@ generation is assumed.
 \BeginIndex{Cmd}{ifnotundefined}%
 \eTeX{} will be used to test, whether or not a command with the given
 \PName{name} has already been defined. The \PName{then instructions} will be
-executed, if the command is defined, the \PName{else instructions}
-otherwise. There isn't a corresponding internal command.
+executed if the command is defined, otherwise the \PName{else
+  instructions}. There is not a corresponding internal command.
 %
 \EndIndex{Cmd}{ifnotundefined}%
 
@@ -935,9 +932,10 @@ otherwise. There isn't a corresponding internal command.
   \Parameter{then instructions}\Parameter{else instructions}
 \end{Declaration}
 \BeginIndex{Cmd}{ifstr}%
-Both \PName{string} arguments will be expanded and afterward compared. If the
-expansions are same, the \PName{then instructions} will be executed, otherwise
-the \PName{else instructions}. There isn't a corresponding internal command.
+Both \PName{string} arguments are expanded and afterwards compared. If the
+expansions are the same, the \PName{then instructions} will be executed,
+otherwise the \PName{else instructions}. There is not a corresponding internal
+command.
 %
 \EndIndex{Cmd}{ifstr}%
 
@@ -946,11 +944,11 @@ the \PName{else instructions}. There isn't a corresponding internal command.
   \Parameter{then instructions}\Parameter{else instructions}
 \end{Declaration}
 \BeginIndex{Cmd}{ifstrstart}%
-Both\ChangedAt{v3.12}{\Package{scrbase}} \PName{string} arguments will be
-expanded and afterward compared. If aside from white spaces the first string
+Both\ChangedAt{v3.12}{\Package{scrbase}} \PName{string} arguments are
+expanded and afterwards compared. If aside from white spaces the first string
 starts with the second one, the \PName{then instructions} will be executed,
 otherwise the \PName{else instructions}. The command is not completely
-expandable and there isn't a corresponding internal command.%
+expandable and there is not a corresponding internal command.%
 \EndIndex{Cmd}{ifstrstart}%
 
 \begin{Declaration}
@@ -961,7 +959,7 @@ expandable and there isn't a corresponding internal command.%
 If\ChangedAt{v3.12}{\Package{scrbase}} the expansion of\PName{code} results in
 a \Macro{dimen}, which is also known as \TeX{} length register, the
 \PName{then instructions} will be executed, otherwise the \PName{else
-  instructions}. The command is not completely expandable and there isn't a
+  instructions}. The command is not completely expandable and there is not a
 corresponding internal command.%
 \EndIndex{Cmd}{ifisdimen}%
 
@@ -973,8 +971,8 @@ corresponding internal command.%
 If\ChangedAt{v3.12}{\Package{scrbase}} \PName{code} expands to something with
 the syntax of the value of a length, the \PName{then instructions} will be
 executed, otherwise the \PName{else instructions}. Please
-note,\textnote{Attention!} that currently an invalid unit will result in an
-error message. The command is not completely expandable and there isn't a
+note\textnote{Attention!} that currently an invalid unit will result in an
+error message. The command is not completely expandable and there is not a
 corresponding internal command.%
 \EndIndex{Cmd}{ifisdimension}%
 
@@ -986,9 +984,9 @@ corresponding internal command.%
 If\ChangedAt{v3.12}{\Package{scrbase}} the expansion of\PName{code} results in
 a \Macro{dimexpr}, which is also known as \TeX{} length expression, the
 \PName{then instructions} will be executed, otherwise the \PName{else
-  instructions}. Note,\textnote{Attention!} that illegal expressions will
+  instructions}. Note\textnote{Attention!} that illegal expressions will
 result in error messages. The command is not completely expandable and there
-isn't a corresponding internal command.%
+is not a corresponding internal command.%
 \EndIndex{Cmd}{ifisdimexpr}%
 
 \begin{Declaration}
@@ -999,7 +997,7 @@ isn't a corresponding internal command.%
 If\ChangedAt{v3.12}{\Package{scrbase}} the expansion of\PName{code} results in
 a \Macro{skip}, which is also known as \TeX{} distance register, the
 \PName{then instructions} will be executed, otherwise the \PName{else
-  instructions}. The command is not completely expandable and there isn't a
+  instructions}. The command is not completely expandable and there is not a
 corresponding internal command.%
 \EndIndex{Cmd}{ifisskip}%
 
@@ -1011,8 +1009,8 @@ corresponding internal command.%
 If\ChangedAt{v3.12}{\Package{scrbase}} \PName{code} expands to something with
 the syntax of the value of a skip, the \PName{then instructions} will be
 executed, otherwise the \PName{else instructions}. Please
-note,\textnote{Attention!} that currently an invalid unit will result in an
-error message. The command is not completely expandable and there isn't a
+note\textnote{Attention!} that currently an invalid unit will result in an
+error message. The command is not completely expandable and there is not a
 corresponding internal command.%
 \EndIndex{Cmd}{ifisglue}%
 
@@ -1026,7 +1024,7 @@ a \Macro{glueexpr}, which is also known as \TeX{} distance expression, the
 \PName{then instructions} will be executed, otherwise the \PName{else
   instructions}. Note,\textnote{Attention!} that illegal expressions will
 result in error messages. The command is not completely expandable and there
-isn't a corresponding internal command.%
+is not a corresponding internal command.%
 \EndIndex{Cmd}{ifisglueexpr}%
 
 \begin{Declaration}
@@ -1037,8 +1035,8 @@ isn't a corresponding internal command.%
 If\ChangedAt{v3.12}{\Package{scrbase}} the expansion of\PName{code} results in
 a \Macro{count}, which is also known as \TeX{} counter register, the
 \PName{then instructions} will be executed, otherwise the \PName{else
-  instructions}. The command is not completely expandable and there isn't a
-corresponding internal command. For test with \LaTeX{} counters see
+  instructions}. The command is not completely expandable and there is not a
+corresponding internal command. For test with \LaTeX{} counters, see
 \Macro{ifiscounter}.%
 \EndIndex{Cmd}{ifiscount}%
 
@@ -1048,10 +1046,10 @@ corresponding internal command. For test with \LaTeX{} counters see
 \end{Declaration}
 \BeginIndex{Cmd}{ifisnumber}%
 If\ChangedAt{v3.12}{\Package{scrbase}} \PName{code} expands to something with
-the syntax of the value of a counter, that would be a negative or positive
+the syntax of the value of a counter, which would be a negative or positive
 integer, the \PName{then instructions} will be executed, otherwise the
 \PName{else instructions}. The command is not completely expandable and there
-isn't a corresponding internal command.%
+is not a corresponding internal command.%
 \EndIndex{Cmd}{ifisnumber}%
 
 \begin{Declaration}
@@ -1062,9 +1060,9 @@ isn't a corresponding internal command.%
 If\ChangedAt{v3.12}{\Package{scrbase}} the expansion of\PName{code} results in
 a \Macro{numexpr}, which is also known as \TeX{} number expression, the
 \PName{then instructions} will be executed, otherwise the \PName{else
-  instructions}. Note,\textnote{Attention!} that illegal expressions will
+  instructions}. Note\textnote{Attention!} that illegal expressions will
 result in error messages. The command is not completely expandable and there
-isn't a corresponding internal command.%
+is not a corresponding internal command.%
 \EndIndex{Cmd}{ifisnumexpr}%
 
 \begin{Declaration}
@@ -1075,7 +1073,7 @@ isn't a corresponding internal command.%
 If\ChangedAt{v3.12}{\Package{scrbase}} \PName{counter} is an already defined
 \LaTeX{} counter, the \PName{then instructions} will be executed, otherwise
 the \PName{else instructions}.  The command is not completely expandable and
-there isn't a corresponding internal command.%
+there is not a corresponding internal command.%
 \EndIndex{Cmd}{ifiscounter}%
 
 \begin{Declaration}
@@ -1083,10 +1081,10 @@ there isn't a corresponding internal command.%
   \Parameter{then instructions}\Parameter{else instructions}
 \end{Declaration}
 \BeginIndex{Cmd}{ifnumber}%
-Note, that this does not compare numbers.  The \PName{then instructions} will
-be executed, if the expansion of \PName{string} consists of digits
-only. Otherwise the \PName{else instructions} will be used. There's no
-corresponding internal command for this.
+Note that this does not compare numbers.  The \PName{then instructions} will
+be executed if the expansion of \PName{string} consists of digits
+only. Otherwise the \PName{else instructions} will be used. There is not a
+corresponding internal command.
 %
 \EndIndex{Cmd}{ifnumber}%
 
@@ -1096,10 +1094,10 @@ corresponding internal command for this.
   \Parameter{then instructions}\Parameter{else instructions}
 \end{Declaration}
 \BeginIndex{Cmd}{ifdimen}%
-Note, that this does not compare dimensions. The \PName{then instructions} will
+Note that this does not compare dimensions. The \PName{then instructions} will
 be executed, if the expansion of \PName{string} consists of digits and a valid
-unit of length. Otherwise the \PName{else instructions} will be used. There's no
-corresponding internal command for this.
+unit of length. Otherwise, the \PName{else instructions} will be used. There
+is not a corresponding internal command.
 %
 \EndIndex{Cmd}{ifdimen}%
 
@@ -1110,11 +1108,11 @@ corresponding internal command for this.
 \end{Declaration}
 \BeginIndex{Cmd}{if@atdocument}%
 This command exists intentionally as internal command only. In the document
-preamble \Macro{if@atdocument} is same like \Macro{iffalse}. After
-\Macro{begin}\PParameter{document} it's same like \Macro{iftrue}. Authors of
-classes and packages may use this, if a command should work somehow different
-depending in whether it has been used in the preamble or inside the documents
-body. Please note\textnote{Attention!}, that this is a condition in \TeX{}
+preamble \Macro{if@atdocument} is same as \Macro{iffalse}. After
+\Macro{begin}\PParameter{document} it's the same as \Macro{iftrue}. Authors of
+classes and packages may use this if a command should work somehow different
+depending on whether it has been used in the preamble or inside the documents
+body. Please note\textnote{Attention!} that this is a condition in \TeX{}
 syntax not in \LaTeX{} syntax!
 %
 \EndIndex{Cmd}{if@atdocument}%
@@ -1126,17 +1124,17 @@ syntax not in \LaTeX{} syntax!
 \index{language>dependent terms|see{language definition}}
 \index{terms>language-dependent|see{language definition}}
 
-Normally one has to change or define language-dependent terms like
-\Macro{captionsenglish} in such a way that in addition to the available terms
+Normally, one has to change or define language-dependent terms like
+\Macro{captionsenglish} in such a way that, in addition to the available terms,
 the new or redefined terms are defined. This is made more difficult by the
 fact that some packages like \Package{german}\IndexPackage{german} or
 \Package{ngerman}\IndexPackage{ngerman} redefine those settings when the
-packages are loaded. This definitions unfortunately occurs in such a manner as
+packages are loaded. These definitions unfortunately occur in such a manner as
 to destroy all previous private settings. That is also the reason why it makes
-sense to delay own changes with \Macro{AtBeginDocument} until
-\Macro{begin}\PParameter{document}, that is, after package loading is
-completed. The user can also use \Macro{AtBeginDocument}, or redefine the
-language-dependent terms after \Macro{begin}\PParameter{document}, that is,
+sense to delay changes with \Macro{AtBeginDocument} until
+\Macro{begin}\PParameter{document}; that is, after package loading is
+completed. The user can also use \Macro{AtBeginDocument} or redefine the
+language-dependent terms after \Macro{begin}\PParameter{document}; that is,
 not put them in the preamble at all. The package \Package{scrbase}
 provides some additional commands for defining language-dependent terms.
 
@@ -1166,13 +1164,13 @@ provides some additional commands for defining language-dependent terms.
 Using one of these commands, the user can assign a \PName{definition} for a
 particular language to a \PName{term}. Several languages can be concatenated
 with comma to a \PName{language list}.  The \PName{term} is always a
-macro. The commands differ dependent on whether a given language or a
+macro. The commands differ depending on whether a given language or a
 \PName{term} within a given language are already defined or not at the
 time the command is called.
 
 If a language is not defined, then \Macro{providecaptionname} does
-nothing other than writes a message in the log file. This happens only once
-for each language.  If a language is defined but \PName{term} is not yet
+nothing other than write a message in the log file. This happens only once
+for each language.  If a language is defined, but \PName{term} is not yet
 defined for it, then it will be defined using \PName{definition}.  The
 \PName{term} will not be redefined if the language already has such a
 definition; instead, an appropriate message is written to the log file.
@@ -1180,7 +1178,7 @@ definition; instead, an appropriate message is written to the log file.
 The command \Macro{newcaptionname} has a slightly different behaviour.  If a
 language is not yet defined, then a new language command will be
 created and a message written to the log file. For language
-\PValue{USenglish}, e.\,g.\, this would be the language command
+\PValue{USenglish}, for example, this would be the language command
 \Macro{captionsUSenglish}. If \PName{term} is not yet defined in a
 language, then it will be defined using \PName{definition}.  If
 \PName{term} already exists in a language, then this results in an error
@@ -1189,11 +1187,11 @@ message.
 The command \Macro{renewcaptionname} again behaves differently. It requires an
 existing definition of \PName{term} in the languages.  If neither
 a language nor \PName{term} exist or \PName{term} is unknown in a
-defined language then a error message will be given. Otherwise, the
+defined language, then an error message is given. Otherwise, the
 \PName{term} for the language will be redefined according to
 \PName{definition}.
 
-\KOMAScript{} itself employs \Macro{providecaptionname} in order to define the
+\KOMAScript{} employs \Macro{providecaptionname} in order to define the
 commands in \autoref{sec:scrlttr2-experts.languages}.
 
 \begin{Example}
@@ -1203,7 +1201,7 @@ commands in \autoref{sec:scrlttr2-experts.languages}.
   \renewcaptionname{USenglish}{\figurename}{fig.}
 \end{lstcode}
   If you want the same change not only in \PValue{USenglish} but also in
-  \PValue{UKenglish} you don't need an additional
+  \PValue{UKenglish}, you do not need an additional:
 \begin{lstcode}
   \renewcaptionname{UKenglish}{\figurename}{fig.}
 \end{lstcode}
@@ -1218,13 +1216,13 @@ commands in \autoref{sec:scrlttr2-experts.languages}.
   
 Since \KOMAScript~3.12\ChangedAt{v3.12}{\Package{scrbase}} you do not need to
 delay the definition or redefinition until \Macro{begin}\PParameter{document}
-using \Macro{AtBeginDocument} any longer, because \Package{scrbase} does the
+using \Macro{AtBeginDocument} any longer because \Package{scrbase} does the
 delay automatically for (re)definitions in the document's
-preamble. Additionally \Package{scrbase} tests if a redefinition should be
+preamble. Additionally, \Package{scrbase} tests if a redefinition should be
 made in \Macro{extras\PName{language}} instead of
-\Macro{captions\PName{language}} and will do so automatically. The new star
+\Macro{captions\PName{language}} and does so automatically. The new star
 variants of the commands always use \Macro{extras\PName{language}}. So
-redefinition of language depending terms of packages like \Package{hyperref}
+redefinition of language dependent terms for packages like \Package{hyperref}
 that use \Macro{extras\PName{language}} should work as expected by the user.
 
 Language dependent terms usually defined by classes and language
@@ -1338,18 +1336,18 @@ packages are listed and described in \autoref{tab:scrbase.commonNames}.
 \section{Identification of \KOMAScript}
 \label{sec:scrbase.identify}
 
-\Package{scrbase} may be used independent of \KOMAScript{} with
-other packages and classes, nevertheless it's a \KOMAScript{} package. For
-this is also provides commands to identify \KOMAScript{} and itself as a
-\KOMAScript{} package.
+Package \Package{scrbase} may be used independent of \KOMAScript{} with
+other packages and classes. Nevertheless, it is a \KOMAScript{} package. For
+this, \Package{scrbase} also provides commands to identify \KOMAScript{} and
+to identify itself as a \KOMAScript{} package.
 
 \begin{Declaration}
   \Macro{KOMAScript}
 \end{Declaration}
 \BeginIndex{Cmd}{KOMAScript}%
 This command only sets the word ``\KOMAScript'' with sans-serif font and
-a little bit tracking of the capitals. Bay the way: All \KOMAScript{} classes
-and packages define this command, if it hasn't been defined already. The
+a little bit tracking for the capitals. By the way: All \KOMAScript{} classes
+and packages define this command, if it has not been defined already. The
 definition is robust using \Macro{DeclareRobustCommand}.
 %
 \EndIndex{Cmd}{KOMAScript}
@@ -1361,9 +1359,9 @@ definition is robust using \Macro{DeclareRobustCommand}.
 \BeginIndex{Cmd}{KOMAScriptVersion}%
 \KOMAScript{} defines the main version of \KOMAScript{} in this command. It
 has the form ``\PName{date} \PName{version} \texttt{KOMA-Script}''. This main
-version is same for all \KOMAScript{} classes and the \KOMAScript{} packages,
+version is same for all \KOMAScript{} classes and the \KOMAScript{} packages
 that are essential for the classes. Because of this, it may be inquired after
-loading \Package{scrbase} too. This document has been made, e.\,g., using
+loading \Package{scrbase}, too. For example, this document has been made using
 \KOMAScript{} version ``\KOMAScriptVersion''.
 %
 \EndIndex{Cmd}{KOMAScriptVersion}%
@@ -1372,8 +1370,8 @@ loading \Package{scrbase} too. This document has been made, e.\,g., using
 \section{Extension of the \LaTeX{} Kernel}
 \label{sec:scrbase:latexkernel}
 
-Sometimes the \LaTeX{} kernel itself provides commands, but lacks of other,
-similar commands, that would often be useful too. Some of those commands for
+Sometimes the \LaTeX{} kernel itself provides commands, but lacks other,
+similar commands that would often be useful, too. Some of those commands for
 authors of packages and classes are provided by \Package{scrbase}.
 
 \begin{Declaration}
@@ -1383,14 +1381,14 @@ authors of packages and classes are provided by \Package{scrbase}.
 \BeginIndex{Cmd}{PackageInfoNoLine}%
 \BeginIndex{Cmd}{ClassInfoNoLine}%
 For authors of classes and package the \LaTeX{} kernel already provides
-commands like \Macro{ClassInfo} and \Macro{PackageInfo} to write information
-together with the current line number into the log-file. Beside
+commands like \Macro{ClassInfo} and \Macro{PackageInfo} to write information.
+together with the current line number, into the log-file. Besides
 \Macro{PackageWarning} and \Macro{ClassWarning} to throw warning messages with
 line numbers, it also provides \Macro{PackageWarningNoLine} and
 \Macro{ClassWarningNoLine} for warning messages without line
 numbers. Nevertheless, the commands \Macro{ClassInfoNoLine} and
-\Macro{PackageInfoNoLine}, to write information without line numbers into the
-log-file, are missing. Package \Package{scrbase} provides them.
+\Macro{PackageInfoNoLine} for writing information without line numbers into the
+log-file are missing. Package \Package{scrbase} provides them.
 %
 \EndIndex{Cmd}{ClassInfoNoLine}%
 \EndIndex{Cmd}{PackageInfoNoLine}
@@ -1406,8 +1404,8 @@ globally. This may be used only for macros that have no
 arguments. Nevertheless, sometimes a command like this, that works locally to
 a group instead of globally, could be useful. Package \Package{scrbase}
 provides such a command with \Macro{l@addto@macro}. An alternative may be
-usage of package \Package{etoolbox}\IndexPackage{etoolbox}, that provides
-several of such commands for different purpose (see \cite{package:etoolbox}).
+usage of package \Package{etoolbox}\IndexPackage{etoolbox}, which provides
+several of such commands for different purposes (see \cite{package:etoolbox}).
 %
 \EndIndex{Cmd}{l@addto@macro}
 
@@ -1416,7 +1414,7 @@ several of such commands for different purpose (see \cite{package:etoolbox}).
 \label{sec:scrbase:etex}
 
 \eTeX{}, that is meanwhile used by \LaTeX{} and needed by \KOMAScript{},
-provides with \Macro{numexpr}\IndexCmd{numexpr} an extended feature for
+provided with \Macro{numexpr}\IndexCmd{numexpr}, an extended feature for
 calculation of simple arithmetic with \TeX{} counters and
 integers. The four basic arithmetic operations and brackets are
 supported. Correct rounding is done while division. Sometimes additional
@@ -1428,9 +1426,10 @@ operators would be useful.
 \end{Declaration}%
 \BeginIndex{Cmd}{XdivY}%
 \BeginIndex{Cmd}{XmodY}%
-Having a division with remainder, command\ChangedAt{v3.05a}{\Package{scrbase}}
-\Macro{XdivY} gives the value of the integer quotient, command \Macro{XmodY}
-the value of the remainder. This kind of division is defined:
+Having a division with remainder command\ChangedAt{v3.05a}{\Package{scrbase}}
+\Macro{XdivY} gives the value of the integer quotient, with command
+\Macro{XmodY} giving the value of the remainder. This kind of division is
+defined:
 \[
 \textit{dividend} = \textit{divisor} \cdot
 \textit{integer quotient} + \textit{remainder}
@@ -1440,7 +1439,7 @@ is greater or equal to \textit{divisor}, and \textit{divisor} is a natural
 number greater than 0.
 
 The value may be used for assignment to a counter or directly in the
-expression of \Macro{numexpr}. For output the value as an Arabic number is has
+expression of \Macro{numexpr}. For output the value as an Arabic number has
 to be prefixed by \Macro{the}.%
 %
 \EndIndex{Cmd}{XmodY}%
@@ -1457,3 +1456,5 @@ to be prefixed by \Macro{the}.%
 %%% coding: us-ascii
 %%% TeX-master: "../guide.tex"
 %%% End:
+
+%  LocalWords:  differentiations
