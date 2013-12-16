@@ -1,4 +1,4 @@
-% \CheckSum{2222}
+% \CheckSum{2255}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -58,7 +58,7 @@
 %%% From File: $Id$
 %<*driver>
 % \fi
-\ProvidesFile{scrkernel-sections.dtx}[2013/08/26 v3.12 KOMA-Script 
+\ProvidesFile{scrkernel-sections.dtx}[2013/12/16 v3.12 KOMA-Script 
                                                      (disposition)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
@@ -1124,6 +1124,77 @@
 %    \end{macrocode}
 % \end{Counter}
 %
+% \begin{macro}{\partnumdepth}
+%   \changes{v3.12}{2013/12/16}{new read only command}
+% \begin{macro}{\chapternumdepth}
+%   \changes{v3.12}{2013/12/16}{new read only command}
+% \begin{macro}{\sectionnumdepth}
+%   \changes{v3.12}{2013/12/16}{new read only command}
+% \begin{macro}{\subsectionnumdepth}
+%   \changes{v3.12}{2013/12/16}{new read only command}
+% \begin{macro}{\subsubsectionnumdepth}
+%   \changes{v3.12}{2013/12/16}{new read only command}
+% \begin{macro}{\paragraphnumdepth}
+%   \changes{v3.12}{2013/12/16}{new read only command}
+% \begin{macro}{\subparagraphnumdepth}
+%   \changes{v3.12}{2013/12/16}{new read only command}
+% Diese dürfen nur gelesen, sollten aber nie umdefiniert werden und geben die
+% Nummerierungsebene der Gliederungsanweisungen an (nicht zu verwechseln mit
+% der Verzeichnisebene der Gliederungsanweisungen):
+%    \begin{macrocode}
+\newcommand*{\partnumdepth}{%
+%<article> \z@
+%<report|book> \m@ne
+}
+\newcommand*{\chapternumdepth}{\z@}
+\newcommand*{\sectionnumdepth}{\@ne}
+\newcommand*{\subsectionnumdepth}{\tw@}
+\newcommand*{\subsubsectionnumdepth}{\thr@@}
+\newcommand*{\paragraphnumdepth}{4}
+\newcommand*{\subparagraphnumdepth}{5}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\ifnumbered}
+%   \changes{v3.12}{2013/12/16}{new command}
+% \begin{macro}{\ifunnumbered}
+%   \changes{v3.12}{2013/12/16}{new command}
+% Test, ob eine Gliederungsebene (\texttt{\#1}) nummeriert wird. Falls das der
+% Fall ist, wird das zweite Argument verwendet, sonst das dritte. Bei
+% \cs{ifunnumbered} ist die Logik genau vertauscht.
+%    \begin{macrocode}
+\newcommand*{\ifnumbered}[1]{%
+  \scr@ifundefinedorrelax{#1numdepth}{%
+    \@secondoftwo
+  }{%
+    \expandafter\ifnum \@nameuse{#1numdepth}>\c@secnumdepth
+      \expandafter\@secondoftwo
+    \else
+      \expandafter\@firstoftwo
+    \fi
+  }%
+}
+\newcommand*{\ifunnumbered}[1]{%
+  \scr@ifundefinedorrelax{#1numdepth}{%
+    \@firstoftwo
+  }{%
+    \expandafter\ifnum \@nameuse{#1numdepth}>\c@secnumdepth
+      \expandafter\@firstoftwo
+    \else
+      \expandafter\@secondoftwo
+    \fi
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
 % \begin{Counter}{part}
 % \begin{macro}{\thepart}
 % \begin{macro}{\partformat}
@@ -1515,28 +1586,26 @@
       \setkeys{KOMAarg.section}{tocentry={#1},head={#1}}%
     \fi
   \fi
-%<article>  \ifnum \c@secnumdepth >\m@ne
-%<report|book>  \ifnum \c@secnumdepth >-2\relax
+  \ifnumbered{part}{%
     \refstepcounter{part}%
     \@maybeautodot\thepart%
     \ifx\scr@ds@tocentry\@empty\else
       \addparttocentry{\thepart}{\scr@ds@tocentry}%
     \fi
-  \else
+  }{%
     \ifx\scr@ds@tocentry\@empty\else
       \addparttocentry{}{\scr@ds@tocentry}%
     \fi
-  \fi
+  }%
   \begingroup
     \setparsizes{\z@}{\z@}{\z@\@plus 1fil}\par@updaterelative
     \raggedpart
     \interlinepenalty \@M
     \normalfont\sectfont\nobreak
-%<article>    \ifnum \c@secnumdepth >\m@ne
-%<book|report>    \ifnum \c@secnumdepth >-2\relax
+    \ifnumbered{part}{%
       \size@partnumber{\partformat}%
       \partheadmidvskip
-    \fi
+    }{}%
     \size@part{#2}\strut
     \ifx\partmark\@gobble
       \@mkboth{}{}\par
@@ -1824,7 +1893,7 @@
       \setkeys{KOMAarg.section}{tocentry={#1},head={#1}}%
     \fi
   \fi
-  \ifnum \c@secnumdepth >\m@ne
+  \ifnumbered{chapter}{%
 %<book>    \if@mainmatter
       \refstepcounter{chapter}%
       \@maybeautodot\thechapter
@@ -1839,11 +1908,11 @@
       \fi
     \fi
 %</book>
-  \else
+  }{%
     \ifx\scr@ds@tocentry\@empty\else
       \addchaptertocentry{}{\scr@ds@tocentry}%
     \fi
-  \fi
+  }%
   \expandafter\chaptermark\expandafter{\scr@ds@head}%
   \ifdim \@chapterlistsgap>\z@
     \doforeachtocfile{%
@@ -1886,7 +1955,8 @@
     \else
       \let\@tempa\@hangfrom
     \fi
-    \@tempa{\ifnum \c@secnumdepth >\m@ne%
+    \@tempa{%
+      \ifnumbered{chapter}{%
 %<book>        \if@mainmatter 
           \if@chapterprefix
             \expandafter\size@chapterprefix
@@ -1898,7 +1968,7 @@
             \size@chapterprefix{}\endgraf\nobreak\vskip.5\baselineskip
           \fi
 %<book>        \fi
-      \fi
+      }{}%
     }%
     {\raggedsection \interlinepenalty \@M \size@chapter{#1}\par}}%
   \nobreak\chapterheadendvskip
@@ -2275,14 +2345,16 @@
 % letzter Konsequenz sollten hier eigentlich auch die Abstände
 % variabilisiert werden. Vielleicht in einer späteren Version.
 %    \begin{macrocode}
-\newcommand\section{\@startsection{section}{1}{\z@}%
+\newcommand\section{%
+  \@startsection{section}{\sectionnumdepth}{\z@}%
   {-3.5ex \@plus -1ex \@minus -.2ex}%
   {2.3ex \@plus.2ex}%
   {\ifnum \scr@compatibility>\@nameuse{scr@v@2.96}\relax
     \setlength{\parfillskip}{\z@ plus 1fil}\fi
     \raggedsection\normalfont\sectfont\nobreak\size@section}%
 }
-\newcommand\subsection{\@startsection{subsection}{2}{\z@}%
+\newcommand\subsection{%
+  \@startsection{subsection}{\subsectionnumdepth}{\z@}%
   {-3.25ex\@plus -1ex \@minus -.2ex}%
   {1.5ex \@plus .2ex}%
   {\ifnum \scr@compatibility>\@nameuse{scr@v@2.96}\relax
@@ -2290,7 +2362,8 @@
     \raggedsection\normalfont\sectfont\nobreak\size@subsection
   }%
 }
-\newcommand\subsubsection{\@startsection{subsubsection}{3}{\z@}%
+\newcommand\subsubsection{%
+  \@startsection{subsubsection}{\subsubsectionnumdepth}{\z@}%
   {-3.25ex\@plus -1ex \@minus -.2ex}%
   {1.5ex \@plus .2ex}%
   {\ifnum \scr@compatibility>\@nameuse{scr@v@2.96}\relax
@@ -2298,12 +2371,14 @@
     \raggedsection\normalfont\sectfont\nobreak\size@subsubsection
   }%
 }
-\newcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
+\newcommand\paragraph{%
+  \@startsection{paragraph}{\paragraphnumdepth}{\z@}%
   {3.25ex \@plus1ex \@minus.2ex}%
   {-1em}%
   {\raggedsection\normalfont\sectfont\nobreak\size@paragraph}%
 }
-\newcommand\subparagraph{\@startsection{subparagraph}{5}{\parindent}%
+\newcommand\subparagraph{%
+  \@startsection{subparagraph}{\subparagraphnumdepth}{\parindent}%
   {3.25ex \@plus1ex \@minus .2ex}%
   {-1em}%
   {\raggedsection\normalfont\sectfont\nobreak\size@subparagraph}%
