@@ -530,15 +530,14 @@ Zählers kann bestimmt werden, bis zu welcher Gliederungsebene Einträge in das
 Inhaltsverzeichnis erfolgen sollen.  Dies ist übrigens bei den Standardklassen
 ganz genauso.
 
-Bei Verwendung des Pakets \Package{scrlayer}\IndexPackage{scrlayer} (siehe
-\autoref{cha:scrlayer}) muss man sich nicht die nummerischen Werte der
-einzelnen Gliederungsebenen merken. Dann stehen dafür die Makros
-\Macro{partlevel}\IndexCmd{partlevel},
-\Macro{chapterlevel}\IndexCmd{chapterlevel},
-\Macro{sectionlevel}\IndexCmd{sectionlevel} und so
-weiter\IndexCmd{subsectionlevel}\IndexCmd{subsubsectionlevel}%
-\IndexCmd{paragraphlevel} bis hinunter zu
-\Macro{subparagraphlevel}\IndexCmd{subparagraphlevel} zur Verfügung.
+Bitten beachten Sie\textnote{Achtung!}, dass die Werte für \Counter{tocdepth}
+und \Counter{secnumdepth}\IndexCounter{secnumdepth} (siehe
+\autoref{sec:maincls.structure},
+\autopageref{desc:maincls.counter.secnumdepth}) bei \Class{scrartcl} für
+\Macro{part} nicht übereinstimmen. Dies wurde aus Gründen der Kompatibilität
+von der Standardklasse \Class{article} übernommen. Daher sollte die Anweisung
+\Macro{partnumdepth}\IndexCmd{partnumdepth} nicht zum Setzen von
+\Counter{tocdepth} verwendet werden.%
 \begin{Example}
   Angenommen, Sie setzen einen Artikel, bei dem die Gliederungsebene
   \Macro{subsubsection} verwendet wird. Gehen wir weiter davon aus,
@@ -559,9 +558,9 @@ weiter\IndexCmd{subsectionlevel}\IndexCmd{subsubsectionlevel}%
   \documentclass{scrartcl}
   \addtocounter{tocdepth}{-1}
 \end{lstcode}
-  Wie\textnote{Tipp!} viel Sie von \Counter{tocdepth} subtrahieren oder dazu
-  addieren müssen, können Sie natürlich auch einfach nach einem ersten
-  \LaTeX-Lauf im Inhaltsverzeichnis abzählen.
+  Den\textnote{Tipp!} Wert, den Sie zu \Counter{tocdepth} addieren oder davon
+  subtrahieren müssen, können Sie nach mindestens zwei \LaTeX-Läufen einfach im
+  Inhaltsverzeichnis abzählen.
 \end{Example}
 \iffalse % Umbruchausgleichstext
 Falls\textnote{Tipp!} Sie sich nicht merken wollen, welche Nummer zu welcher
@@ -2376,10 +2375,12 @@ gibt, existieren die beiden Anweisungen auch nur bei diesen Klassen.%
   Anweisungen für den Kolumnentitel. Es ist zu beachten\textnote{Achtung!},
   dass diese in der Voreinstellung ebenfalls auf \Macro{chaptermark} und
   \Macro{sectionmark} zurück greifen, dabei aber lokal den Zähler
-  \Counter{secnumdepth} auf -1 setzen. Dies sollte man beispielsweise bei der
+  \Counter{secnumdepth} auf -1 setzen, um die Nummerierung von Kapiteln und
+  Abschnitten abzuschalten. Dies sollte man beispielsweise bei der
   Umdefinierung von \Macro{chaptermark} und \Macro{sectionmark}
-  berücksichtigen oder \Macro{addchapmark} und \Macro{addsecmark} ebenfalls
-  dazu passend umdefinieren.
+  berücksichtigen (siehe \Macro{ifnumbered} auf
+  \autopageref{desc:maincls.cmd.ifnumbered}) oder \Macro{addchapmark} und
+  \Macro{addsecmark} ebenfalls dazu passend umdefinieren.
 
   Während\OnlyAt{\Class{scrbook}\and \Class{scrreprt}} bei \Class{scrartcl}
   weder \Macro{chaptermark} noch \Macro{addchapmark} oder
@@ -2428,25 +2429,95 @@ Wie Sie sehen, finden hier die beiden Anweisungen \Macro{chapapp} und
 
 
 \begin{Declaration}
-  \Counter{secnumdepth}
+  \Counter{secnumdepth}\\
+  \Macro{partnumdepth}\\
+  \Macro{chapternumdepth}\\
+  \Macro{sectionnumdepth}\\
+  \Macro{subsectionnumdepth}\\
+  \Macro{subsubsectionnumdepth}\\
+  \Macro{paragraphnumdepth}\\
+  \Macro{subparagraphnumdepth}
 \end{Declaration}%
 \BeginIndex{Counter}{secnumdepth}\BeginIndex{}{Nummerierung}%
+\BeginIndex{Cmd}{partnumdepth}%
+\BeginIndex{Cmd}{chapternumdepth}%
+\BeginIndex{Cmd}{sectionnumdepth}%
+\BeginIndex{Cmd}{subsectionnumdepth}%
+\BeginIndex{Cmd}{subsubsectionnumdepth}%
+\BeginIndex{Cmd}{paragraphnumdepth}%
+\BeginIndex{Cmd}{subparagraphnumdepth}%
 Normalerweise werden bei den Klassen \Class{scrbook}\IndexClass{scrbook} und
 \Class{scrreprt}\IndexClass{scrreprt} die Gliederungsebenen
 \Macro{part}\IndexCmd{part}\IndexCmd{chapter}\IndexCmd{section} bis
 \Macro{subsection}\IndexCmd{subsection} und bei der Klasse
 \Class{scrartcl}\IndexClass{scrartcl} die Ebenen \Macro{part} bis
 \Macro{subsubsection}\IndexCmd{subsubsection} nummeriert. Gesteuert wird dies
-über den \LaTeX-Zähler \Counter{secnumdepth}. Dabei steht der Wert \(-\)1 für
-\Macro{part}, 0 für \Macro{chapter} und so weiter. Durch Setzen oder Erhöhen
-oder Verringern des Zählers kann bestimmt werden, bis zu welcher
-Gliederungsebene eine Nummerierung erfolgen soll. Dies ist übrigens bei den
-Standardklassen ganz genauso.  Vergleichen Sie hierzu auch die Erklärung zum
-Zähler \Counter{tocdepth} in \autoref{sec:maincls.toc},
-\autopageref{desc:maincls.counter.tocdepth}.%
+über den \LaTeX-Zähler \Counter{secnumdepth}.
+
+Damit\ChangedAt{v3.12}{\Class{scrbook}\and \Class{scrreprt}\and
+  \Class{scrartcl}} sich der Anwender keine abstrakten Nummern merken muss, um
+einstellen zu können, bis zu welcher Gliederungsebene die Überschriften
+nummeriert werden sollen, gibt es die Anweisungen \Macro{partnumdepth} bis
+\Macro{subparagraphnumdepth}. Diese liefern die entsprechende Nummer zur
+jeweiligen Gliederungsebene.
+\begin{Example}
+  Sie wollen, dass in einem Buchprojekt nur die Gliederungsebenen vom Teil
+  (engl. \emph{part}) über das Kapitel (engl. \emph{chapter}) bis zum
+  Abschnitt (engl. \emph{section}) nummeriert werden. Dazu müssen Sie
+  in der Dokumentpräambel den Zähler \Counter{secnumdepth} auf den Wert
+  setzen, den die Anweisung \Macro{sectionnumdepth} liefert:
+\begin{lstcode}
+  \setcounter{secnumdepth}{\sectionnumdepth}
+\end{lstcode}
+\end{Example}
+Eine Umdefinierung der Anweisungen ist nicht vorgesehen und wird ausdrücklich
+nicht empfohlen, da dies zu unvorhergesehenen Ergebnissen sowohl mit
+\KOMAScript{} als auch bei Verwendung von Drittpaketen führen kann.
+
+Der Zähler \Counter{secnumdepth} ist nicht zu verwechseln mit dem Zähler
+\Counter{tocdepth} (siehe \autoref{sec:maincls.toc},
+\autopageref{desc:maincls.counter.tocdepth}). Auch sind die Werte je nach
+Klasse nicht eins zu eins übertragbar.%
 %
+\EndIndex{Cmd}{subparagraphnumdepth}%
+\EndIndex{Cmd}{paragraphnumdepth}%
+\EndIndex{Cmd}{subsubsectionnumdepth}%
+\EndIndex{Cmd}{subsectionnumdepth}%
+\EndIndex{Cmd}{sectionnumdepth}%
+\EndIndex{Cmd}{chapternumdepth}%
+\EndIndex{Cmd}{partnumdepth}%
 \EndIndex{Counter}{secnumdepth}\EndIndex{}{Nummerierung}
 
+\begin{Declaration}
+  \Macro{ifnumbered}\Parameter{Gliederungsebene}%
+  \Parameter{Dann-Teil}\Parameter{Else-Teil}\\
+  \Macro{ifunnumbered}\Parameter{Gliederungsebene}%
+  \Parameter{Dann-Teil}\Parameter{Else-Teil}
+\end{Declaration}
+\BeginIndex{Cmd}{ifnumbered}%
+\BeginIndex{Cmd}{ifunnumbered}%
+Nachdem\ChangedAt{v3.12}{\Class{scrbook}\and \Class{scrreprt}\and
+  \Class{scrartcl}} zuvor erklärt wurde, wie man bestimmen kann, welche
+Gliederungsebenen nummeriert werden sollen, kann mit diesen Anweisungen nun
+Code abhängig davon, ob eine \PName{Gliederungsebene} nummeriert wird oder
+nicht, ausgeführt werden. Wird mit den aktuellen Einstellungen eine
+\PName{Gliederungsebene} nummeriert, so führt \Macro{ifnumbered} den
+\PName{Dann-Teil} aus, während \Macro{ifunnumbered} den \PName{Else-Teil}
+ausführt. Wird mit den aktuellen Einstellungen eine \PName{Gliederungsebene}
+nicht nummeriert, dann führt \Macro{ifnumbered} den \PName{Else-Teil} aus,
+wohingegen \Macro{ifunnumbered} den \PName{Dann-Teil} ausführt. Als
+\PName{Gliederungsebene} wird der englische Name der Ebene angegeben, also
+\PValue{part}, \PValue{chapter}, \PValue{section}, \PValue{subsection},
+\PValue{subsubsection}, \PValue{paragraph} oder \PValue{subparagraph}.
+
+\KOMAScript{} selbst verwendet diesen Test beispielsweise in der Definition
+von \Macro{chaptermark}\IndexCmd{chaptermark} beim Seitenstil
+\Pagestyle{headings}\IndexPagestyle{headings}. Dadurch wird indirekt auch
+sichergestellt, dass Überschriften mit \Macro{addchap} den Kolumnentitel nicht
+mit einer Nummer versehen (siehe auch \Macro{addchapmark},
+\autopageref{desc:maincls.cmd.addchapmark}).%
+\EndIndex{Cmd}{ifnumbered}%
+\EndIndex{Cmd}{ifunnumbered}%
 
 \begin{Declaration}
   \Macro{setpartpreamble}%
@@ -2476,8 +2547,7 @@ Anweisung zum Setzen der \PName{Präambel} muss vor der jeweiligen
   \setpartpreamble{%
     \begin{abstract}
       Dies ist ein Blindtext zur Demonstration.
-    \end{abstract}
-  }
+    \end{abstract}}
   \part{Abteilung Grünschnitt}
 \end{lstcode}
   Je nach Einstellung der Optionen für die
@@ -2513,8 +2583,8 @@ vertikale Position existieren derzeit zwei Möglichkeiten:
 \begin{labeling}[~--]{\quad\PValue{o}}\itemsep=-\parsep
 \item [\quad\PValue{o}] über der Überschrift
 \item [\quad\PValue{u}] unter der Überschrift
-\end{labeling}
-Es kann jeweils eine Präambel unter und über der Überschrift gesetzt werden,
+\end{labeling}\pagebreak[3]% Umbruchkorrektur
+Es kann so jeweils eine Präambel unter und über der Überschrift gesetzt werden,
 mit drei Möglichkeiten für die horizontale Position:
 \begin{labeling}[~--]{\quad\PValue{o}}\itemsep=-\parsep
 \item [\quad\PValue{l}] linksbündig
