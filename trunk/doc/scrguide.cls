@@ -1298,7 +1298,9 @@
     encl,extratitle, FamilyBoolKey,FamilyExecuteOptions,FamilyNumericalKey,%
     FamilyOption,FamilyOptions,FamilyProcessOptions,FamilySetBool,
     figureformat,figurename,firstfoot,firsthead,FirstName,footfont,footref,
-    FreeI,FreeII,FreeIII,FreeIV, headfont,headmark,
+    FreeI,FreeII,FreeIII,FreeIV,
+    GenericMarkFormat
+    headfont,headmark,
     ifattoclist,ifoot,ihead,ifkomavarempty,ifstr,ifthispageodd,InputAddressFile,
     KOMAoption,KOMAoptions,KOMAScript, l@addto@macro,
     LastName,lefoot,lehead,LetterOptionNeedsPapersize,lipsum,listoffigures,
