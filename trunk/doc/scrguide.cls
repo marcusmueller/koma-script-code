@@ -1299,7 +1299,7 @@
     FamilyOption,FamilyOptions,FamilyProcessOptions,FamilySetBool,
     figureformat,figurename,firstfoot,firsthead,FirstName,footfont,footref,
     FreeI,FreeII,FreeIII,FreeIV,
-    GenericMarkFormat
+    GenericMarkFormat,
     headfont,headmark,
     ifattoclist,ifoot,ihead,ifkomavarempty,ifstr,ifthispageodd,InputAddressFile,
     KOMAoption,KOMAoptions,KOMAScript, l@addto@macro,
