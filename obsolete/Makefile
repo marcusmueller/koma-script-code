@@ -49,13 +49,13 @@ dist:   $(DIST_FILES)
 	mkdir -p texmf/source/latex/koma-script-obsolete/
 	cp $(SOURCE_FILES) texmf/source/latex/koma-script-obsolete/
 
-	zip -r koma-script-$(shell date -I).tds.zip texmf
+	zip -r koma-script-obsolete-$(shell date -I).tds.zip texmf
 
 	zip -r koma-script-obsolete-$(shell date -I)-ctan.zip \
 	    koma-script-obsolete-$(shell date -I) \
-	    koma-script-$(shell date -I).tds.zip
+	    koma-script-obsolete-$(shell date -I).tds.zip
 
-	rm -f koma-script-$(shell date -I).tds.zip
+	rm -f koma-script-obsolete-$(shell date -I).tds.zip
 	rm -r texmf koma-script-obsolete-$(shell date -I)
 
 help:
