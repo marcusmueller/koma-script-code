@@ -56,7 +56,7 @@
 \KOMAdefVariable{COPYRIGHTFROM}{1994}
 \KOMAdefVariable{COPYRIGHTTILL}{2013}
 
-\let\ifbeta\iftrue
+\let\ifbeta=\iftrue % with = will be replaced by release process
 
 \ifToplevel{%
   \Msg{+======================================================================}
