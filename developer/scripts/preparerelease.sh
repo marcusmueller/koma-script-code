@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# Copyright (c) Markus Kohm, 2006-2012
+# Copyright (c) Markus Kohm, 2006-2013
 #
 # This file prepares KOMA-Script for release.
 #
@@ -40,7 +40,7 @@ steptwo() {
     version=`grep 'CheckKOMAScriptVersion{' scrkernel-version.dtx | grep -o '2.*KOMA'`
     version=${version% KOMA}
 
-    for ins in *.ins *.inc; do
+    for ins in *.ins *.inc *.dtx; do
 	sed -e 's/{trace,/{/g;s/\(\\let\\ifbeta=\\if\)true/\1false/' -i $ins
     done
 
