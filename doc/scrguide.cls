@@ -1295,6 +1295,7 @@
     dedication,deffootnote,deffootnotemark,DefineFamily,DefineFamilyKey,
     DefineFamilyMember,defpagestyle,deftripstyle,
     dictum,dictumauthorformat,dictumrule,dictumwidth,doforeachtocfile,
+    ellipsispar,
     encl,extratitle, FamilyBoolKey,FamilyExecuteOptions,FamilyNumericalKey,%
     FamilyOption,FamilyOptions,FamilyProcessOptions,FamilySetBool,
     figureformat,figurename,firstfoot,firsthead,FirstName,footfont,footref,
@@ -1309,7 +1310,7 @@
     multfootsep,multiplefootnoteseparator,
     Name,nameday,newbibstyle,newcaptionname,newkomavar,nexthead,
     ofoot,ohead,opening,othersectionlevelsformat,
-    p@section,pagemark,Paragraph,parformat,parname,parshortname,
+    p@section,pagemark,Paragraph,parellipsis,parformat,parname,parshortname,
     part,partformat,partname,partpagestyle,pnumfont,
     PreventPackageFromLoading,publishers,ps,
     raggedsection,raggedpart,raggedsignature,recalctypearea,
