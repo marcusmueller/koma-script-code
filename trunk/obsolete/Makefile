@@ -38,10 +38,14 @@ clean:
 	      *.aux *.dvi *.cls *.idx *.log *.toc *.glo *.gls *.ilg *.ind
 	rm -rf texmf koma-script-obsolete-????-??-??
 
-dist:   $(DIST_FILES)
+dist-ctan: $(DIST_FILES)
 	mkdir koma-script-obsolete-$(shell date -I)
 	cp -f $(CTAN_FILES) koma-script-obsolete-$(shell date -I)
+	zip -r koma-script-obsolete-$(shell date -I)-ctan.zip \
+	    koma-script-obsolete-$(shell date -I)
+	rm -r texmf koma-script-obsolete-$(shell date -I)
 
+dist-tds: $(DIST_FILES)
 	mkdir -p texmf/tex/latex/koma-script-obsolete/
 	cp $(LATEX_FILES) texmf/tex/latex/koma-script-obsolete/
 	mkdir -p texmf/doc/latex/koma-script-obsolete/
@@ -50,16 +54,11 @@ dist:   $(DIST_FILES)
 	cp $(SOURCE_FILES) texmf/source/latex/koma-script-obsolete/
 
 	cd texmf && \
-	zip -r ../koma-script-obsolete.tds.zip .
-
-	zip -r koma-script-obsolete-$(shell date -I)-ctan.zip \
-	    koma-script-obsolete-$(shell date -I) \
-	    koma-script-obsolete.tds.zip
-
-	rm -f koma-script-obsolete.tds.zip
-	rm -r texmf koma-script-obsolete-$(shell date -I)
+	zip -r ../koma-script-obsolete-$(shell date -I).tds.zip .
+	rm -r texmf
 
 help:
-	@echo "all:   generate all files"
-	@echo "clean: remove all generated files and the temporary files and folders"
-	@echo "dist:  generate a CTAN distribution of KOMA-Script obsolete"
+	@echo "all:       generate all files"
+	@echo "clean:     remove all generated files and the temporary files and folders"
+	@echo "dist-ctan: generate a CTAN distribution of KOMA-Script obsolete"
+	@echo "dist-tds:  generate the TDS distribution of KOMA-Script obsolete"
