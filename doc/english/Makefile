@@ -78,8 +78,8 @@ scrlayer-notecolumn.tex: ../../scrlayer-notecolumn.tex
 
 maintainclean_local: distclean_local
 	$(RM) guide.pdf $(GUIDENAME).pdf $(GUIDENAME).html
-	[ -L tocbasic.tex ] && $(RM) tocbasic.tex
-	[ -L scrwfile.tex ] && $(RM) scrwfile.tex
-	[ -L scrlayer-notecolumn.tex ] && $(RM) scrlayer-notecolumn.tex
+	[ -L tocbasic.tex ] && $(RM) tocbasic.tex || true
+	[ -L scrwfile.tex ] && $(RM) scrwfile.tex || true
+	[ -L scrlayer-notecolumn.tex ] && $(RM) scrlayer-notecolumn.tex || true
 #
 # end of file `Makefile'
