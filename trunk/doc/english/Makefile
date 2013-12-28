@@ -1,6 +1,6 @@
 # ======================================================================
 # Makefile
-# Copyright (c) Markus Kohm, 2002-2012
+# Copyright (c) Markus Kohm, 2002-2013
 #
 # This file is part of the LaTeX2e KOMA-Script bundle.
 #
@@ -18,7 +18,7 @@
 # This work consists of all files listed in manifest.txt.
 # ----------------------------------------------------------------------
 # Makefile
-# Copyright (c) Markus Kohm, 2002-2012
+# Copyright (c) Markus Kohm, 2002-2013
 #
 # Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 # Version 1.3c, verteilt und/oder veraendert werden.
@@ -76,5 +76,10 @@ scrlayer-notecolumn.tex: ../../scrlayer-notecolumn.tex
 	cd ../.. && tex \\nonstopmode\\input $(basename $<)
 # ----------------------------------------------------------------------
 
+maintainclean_local: distclean_local
+	$(RM) guide.pdf $(GUIDENAME).pdf $(GUIDENAME).html
+	[ -L tocbasic.tex ] && $(RM) tocbasic.tex
+	[ -L scrwfile.tex ] && $(RM) scrwfile.tex
+	[ -L scrlayer-notecolumn.tex ] && $(RM) scrlayer-notecolumn.tex
 #
 # end of file `Makefile'
