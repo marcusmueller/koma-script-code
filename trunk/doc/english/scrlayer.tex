@@ -276,7 +276,7 @@ layers internally.
 
 If you use \Macro{ProvideLayer} instead of \Macro{DeclareLayer}, the
 declaration will be ignored in case a layer with the same layer name already
-exists. It could be paraphrased by: \emph{declare the layer only, if it has not
+exists. It could be paraphrased by: \emph{declare the layer only if it has not
   been declared already.}
 
 If an existing layer should be redefined, \Macro{RedeclareLayer} or
@@ -554,12 +554,12 @@ be removed.%
   \Macro{layercontentsmeasure}%
 \end{Declaration}
 \BeginIndex{Cmd}{layercontentsmeasure}%
-The command \Macro{layercontentsmeasure} is internally used, if option
-\Option{draft} has been set, so visualise the layers. The visualisation will
-be done with a centimetre ruler at the top and left edge of the layer and an
-inch ruler at the bottom and right edge of the layer. The rulers will be drawn
-behind the content of the layer. If you would, you could also use it as
-exclusive content of a layer.%
+The command \Macro{layercontentsmeasure} prints a ruler at each layer edge, of
+which the top and left one is labelled with centimeters, the right and bottom
+one with inches.  This command is used internally, if option
+\Option{draft}\IndexOption{draft} is enabled. The rulers will be drawn behind
+the content of each layer.  It can also be used as exclusive content of a
+layer.%
 \EndIndex{Cmd}{layercontentsmeasure}
 
 
@@ -578,47 +578,45 @@ The page head will be printed before the main contents of a page. The page
 footer will be printed after the main contents of a page. So this is something
 like the layer attributes \Option{background} and \Option{foreground}.
 
-So it's obvious to declare page styles to be a list of layers. But instead of
+So it suggests itself to declare page styles as a list of layers. But instead of
 having only four attributes \Option{oddpage}, \Option{evenpage},
 \Option{background}, and \Option{foreground} all the attributes of layers
 shown in \autoref{sec:scrlayer.layers} may be used.
 
-The outcome of this is that layer page styles are one type of page styles
-\Package{scrlayer} provides. A layer page style consists of layers and
-several \emph{hooks}. For description of layers see
+The outcome of all such considerations is that layer page styles are one type
+of page styles \Package{scrlayer} provides. A layer page style consists of
+layers and several \emph{hooks}. For description of layers see
 \autoref{sec:scrlayer.layers}.  The \emph{hooks} are points in the expansion
-or execution of page styles and you may add additional code that will be
-expanded there. Advanced users know this already from commands like
-\Macro{AtBeginDocument} (see \cite{latex:usrguide}) or
-\Macro{BeforeClosingMainAux} (see
+or execution of page styles you may add additional code to. Advanced users
+know this already from commands like \Macro{AtBeginDocument} (see
+\cite{latex:usrguide}) or \Macro{BeforeClosingMainAux} (see
 \autopageref{desc:scrlfile.cmd.BeforeClosingMainAux}).
 
-Alias page styles are another type of page styles, provided by
-\Package{scrlayer}. An alias page style simply consists of another page
-style. In other words, the name of an alias page style is an alias name of
-another page style, the aliased or original page style. Because of this, the
-manipulation of an alias page style results in the manipulation of the
-original page style. If the original page style is an alias page style too,
-the manipulation will result in the manipulation of the aliased page style of
-that original page style and so on until a real page style will be
-manipulated. You may not only alias layer page styles made with
-\Package{scrlayer}, but all kind of page styles.
+Alias page styles are another type of page styles provided by
+\Package{scrlayer}. An alias page style wraps another page style. In other
+words, the name of an alias page style is an alias name of another page style,
+the aliased or original page style. Because of this, the manipulation of an
+alias page style results in the manipulation of the original page style. If
+the original page style is an alias page style too, the manipulation will
+result in the manipulation of the aliased page style of that original page
+style and so on until a real page style will be manipulated. Aliasing is not
+restricted to \Package{scrlayer} page styles, but possible for all page
+styles.
 
 \begin{Declaration}
   \Macro{currentpagestyle}
 \end{Declaration}
 \BeginIndex{Cmd}{currentpagestyle}%
 Package scrlayer patches \Macro{pagestyle} to set \Macro{currentpagestyle} to
-the currently active page style. Note, \Macro{thispagestyle} does not
-change \Macro{currentpagestyle}. But if you use \Macro{thispagestyle} the
-result of \Macro{currentpagestyle} may be changed while execution of the
-\LaTeX{} output routine. This may be relevant only, if
-\Macro{currentpagestyle} has been used protected until execution of the output
-routine.
+the currently active page style. Note, \Macro{thispagestyle} does not change
+\Macro{currentpagestyle}. But if you use \Macro{thispagestyle} the result of
+\Macro{currentpagestyle} may be changed while executing the \LaTeX{} output
+routine. However, this change will only occur, if \Macro{currentpagestyle} has
+been actively protected from expansion up to execution of the output routine.
 
 Note, the layer page styles described later in this section, will not need
 the patch of \Macro{pagestyle} to set \Macro{currentpagestyle}. The patch has
-been made for usage with other page styles. Note also, 
+been made for usage with other page styles. Additionally, 
 \Macro{currentpagestyle} is empty before the first \Macro{pagestyle} after
 loading \Package{scrlayer}. So if you define an end user page style interface,
 it may be useful to use an implicit \Macro{pagestyle} to set the current page
@@ -638,10 +636,10 @@ of \Macro{pagestyle}.
 
 The command \Macro{AfterSelectAnyPageStyle} is similar, but the \PName{code}
 will be executed just after the page style has been selected and after
-\Macro{currentpagestyle} has been set to the name of real page style.
+\Macro{currentpagestyle} has been set to the name of the real page style.
 
 Note\textnote{Attention!}, \PName{code} of both commands will be executed
-only, if a page style will be selected using \Macro{pagestyle}, but not,
+only if a page style will be selected using \Macro{pagestyle}, but not,
 e.\,g., if a page style will be selected using \Macro{thispagestyle}. Note
 also, you cannot remove \PName{code} from the hook after adding it. But
 the \PName{code} will be added locally, so you may use a group to limit the
@@ -665,16 +663,16 @@ scope of \PName{code}.%^^A
 \BeginIndex{Cmd}{RedeclarePageStyleAlias}%
 These commands may be used to define a page style with name \PName{alias page
   style name} that is simply an alias for an already existing page style with
-name \PName{original page style name}. If there's already a page style
-\PName{alias page style name} it will be destroyed before creating the alias
-using \Macro{DeclarePageStyleAlias} or \Macro{RedeclarePageStyleAlias}.
+name \PName{original page style name}. If there is already a page style
+\PName{alias page style name}, then using \Macro{DeclarePageStyleAlias} or
+\Macro{RedeclarePageStyleAlias} will destroy the alias before recreating it.
 
 \Macro{DeclareNewPageStyleAlias} will throw an error message, if a page style
 \PName{alias page style name} has already been defined before. It does not
 matter if the already defined page style is a layer page style, an alias page
 style or another page style.
 
-\Macro{ProvidePageStyleAlias} will define the alias only, if a page style
+\Macro{ProvidePageStyleAlias} will define the alias only if a page style
 \PName{alias page style name} has not been defined before. If a page style
 \PName{alias page style name} already exists nothing will be done.
 
@@ -692,13 +690,13 @@ exist, then you will get an error.%
 \end{Declaration}
 \BeginIndex{Cmd}{DestroyPageStyleAlias}%
 This command makes the page style with given \PName{page style name}
-\LaTeX-undefined, if it is an alias for another page style. After this, the
+\LaTeX-undefined, if it is an alias for another page style. Afterwards, the
 page style may be defined newly with, e.g., \Macro{DeclareNewAliasPageStyle}
 or \Macro{ProvideAliasPageStyle}. 
 
 The command is intended to be used inside of
 \Macro{scrlayerOnAutoRemoveInterface} to remove page styles that have been
-declared by an interface and uses removable macros of that interface.%
+declared by an interface and use removable macros of that interface.%
 \EndIndex{Cmd}{DestroyPageStyleAlias}
 
 \begin{Declaration}
@@ -732,15 +730,15 @@ style will consist of the layers given in \PName{layer list}, a comma
 separated list of layer names. Note, the \PName{page style name} and the
 layer names at the \PName{layer list} must be fully expandable and should
 expand to letters. Several other characters are tolerated, but,
-nevertheless, are not recommended.
+nevertheless, not recommended.
 
 The \PName{option list} is a comma separated list of
 \OptionValue{\PName{key}}{\PName{value}} options. These options may be used to
 set additional features. Currently they are used to set the code that should
 be expanded or executed at several \emph{hooks}. See the introduction to this
 section for more general information about \emph{hooks}. See
-\autoref{tab:scrlayer.pagestyle.hooks} for more information about the hooks
-and their purpose.
+\autoref{tab:scrlayer.pagestyle.hooks} for detailed information on specific
+hooks.
 
 \begin{desclist}
   \desccaption{%
@@ -750,68 +748,68 @@ and their purpose.
     The \emph{hook} options for page styles (\emph{Continuation})%
   }%
   \entry{\KOption{onselect}\PName{code}}{%
-    Execute \PName{code} whenever the page style will be selected using, e.g.,
+    Execute \PName{code} whenever the page style is selected using, e.g.,
     \Macro{pagestyle}. Note\textnote{Attention!}, \Macro{thispagestyle}
     does not select the page style immediately, but asynchronously inside
     \LaTeX's output routine.%
   }%
   \entry{\KOption{oninit}\PName{code}}{%
-    Execute \PName{code} whenever the output of the layers of a page style
-    will be initialised. Note\textnote{Attention!}, this will be done
+    Execute \PName{code} whenever the output of page style's layers
+    is initialised. Note\textnote{Attention!}, this is done
     twice for every page: once for background layers and once for foreground
     layers.%
   }%
   \entry{\KOption{ononeside}\PName{code}}{%
-    Execute \PName{code} whenever the output of the layers of a page style in
-    single-side mode will initialised.  Note\textnote{Attention!}, this
-    will be done twice for every page: once for background layers and once for
+    Execute \PName{code} whenever the output of page style's layers in
+    single-side mode is initialised.  Note\textnote{Attention!}, this
+    is done twice for every page: once for background layers and once for
     foreground layers.%
   }%
   \entry{\KOption{ontwoside}\PName{code}}{%
-    Execute \PName{code} whenever the output of the layers of a page style in
-    two-side mode will initialised.  Note\textnote{Attention!}, this will
-    be done twice for every page: once for background layers and once for
+    Execute \PName{code} whenever the output of page style's layers in
+    two-side mode is initialised.  Note\textnote{Attention!}, this is
+    done twice for every page: once for background layers and once for
     foreground layers.%
   }%
   \entry{\KOption{onoddpage}\PName{code}}{%
-    Execute \PName{code} whenever the output of the layers of a page style on
-    an odd page will initialised. Note\textnote{Attention!}, this will be
+    Execute \PName{code} whenever the output of page style's layers on
+    an odd page is initialised. Note\textnote{Attention!}, this is
     done twice for every page: once for background layers and once for
-    foreground layers. Note\textnote{Attention!} also, in single-side
+    foreground layers. Note\textnote{Attention!} also that in single-side
     mode all pages are odd pages, not only pages with odd page numbers.%
   }%
   \entry{\KOption{onevenpage}\PName{code}}{%
-    Execute \PName{code} whenever the output of the layers of a page style on
-    an even page will initialised. Note\textnote{Attention!}, this will
-    be done twice for every page: once for background layers and once for
-    foreground layers. Note\textnote{Attention!} also, there are not even
+    Execute \PName{code} whenever the output of page style's layers on
+    an even page is initialised. Note\textnote{Attention!}, this is
+    done twice for every page: once for background layers and once for
+    foreground layers. Note\textnote{Attention!} also that there are not even
     pages in single-side mode, but all pages are odd pages, not only pages
     with odd page numbers.%
   }%
   \entry{\KOption{onfloatpage}\PName{code}}{%
-    Execute \PName{code} whenever the output of the layers of a page style on
-    a float page will initialised. Note\textnote{Attention!}, this will
+    Execute \PName{code} whenever the output of page style's layers on
+    a float page are initialised. Note\textnote{Attention!}, this is
     be done twice for every page: once for background layers and once for
-    foreground layers. Note\textnote{Attention!} also, float pages are
+    foreground layers. Note\textnote{Attention!} also that float pages are
     only those pages with p-placed floating objects.%
   }%
   \entry{\KOption{onnonfloatpage}\PName{code}}{%
-    Execute \PName{code} whenever the output of the layers of a page style on
-    a non-float page will initialised. Note\textnote{Attention!}, this
-    will be done twice for every page: once for background layers and once for
-    foreground layers. Note\textnote{Attention!} also, non-float pages
+    Execute \PName{code} whenever the output of page style's layers on
+    a non-float page is initialised. Note\textnote{Attention!}, this
+    is done twice for every page: once for background layers and once for
+    foreground layers. Note\textnote{Attention!} also that non-float pages
     are all pages that are not float-pages. Those pages may have t-placed,
     h-placed, b-placed, or no floating objects.%
   }%
   \entry{\KOption{onbackground}\PName{code}}{%
-    Execute \PName{code} whenever the output of the layers of a page style in
-    the background of a page will initialised. Note\textnote{Attention!},
-    this will be done once for every page.%
+    Execute \PName{code} whenever the output of page style's layers in
+    the background of a page is initialised. Note\textnote{Attention!},
+    this is done once for every page.%
   }%
   \entry{\KOption{onforeground}\PName{code}}{%
-    Execute \PName{code} whenever the output of the layers of a page style in
-    the foreground of a page will initialised. Note\textnote{Attention!},
-    this will be done once for every page.%
+    Execute \PName{code} whenever the output page style's layers in
+    the foreground of a page is initialised. Note\textnote{Attention!},
+    this is done once for every page.%
   }%
 \end{desclist}
 
@@ -827,12 +825,12 @@ The difference of \Macro{DeclarePageStyleByLayers} and
 \Macro{ProvidePageStyleByLayers} is that \Macro{ProvidePageStyleByLayers}
 will simply do nothing, if there's already a page style with name \PName{page
   style name}. In difference to \Macro{DeclareNewPageStyleByLayers} it will not
-raise an error in this case.
+raise an error.
 
 The difference of \Macro{DeclarePageStyleByLayers} and
 \Macro{RedeclarePageStyleByLayers} is, that \Macro{RedeclarePageStyleByLayers}
-may be used only, if the real page style of \PName{page style name} already
-exists. Otherwise an error would occur.
+may be used only if the real page style of \PName{page style name} already
+exists. Otherwise an error occurs.
 
 Please have also a look at the notes to following pseudo page style
 \Pagestyle{@everystyle@}.%
@@ -847,15 +845,16 @@ Please have also a look at the notes to following pseudo page style
 \end{Declaration}
 \BeginIndex{Pagestyle}{@everysel@}%
 \BeginIndex{Pagestyle}{empty}%
-There are two somehow special, default layer page styles. The first one is
-\Pagestyle{@everystyle@}. This page style should not be used normally, but the
-layers of this page style will be used by all the other layer page styles. So
-adding a layer to this page style would be similar to adding this layer to all
-other layer page styles even the empty one. There's one difference: Layer
-referencing commands of the page style interface like
+There are two default layer page styles that are somehow special. The first
+one is \Pagestyle{@everystyle@}. This page style should not be used like any
+other page style, but the layers of this page style will be used by all the
+other layer page styles. So adding a layer to this page style is similar to
+adding this layer to all other layer page styles even the empty one. There's
+one difference: Layer referencing commands of the page style interface like
 \Macro{ForEachLayerOfPageStyle}, \Macro{AddLayerToPageStyleBeforeLayer}, or
-\Macro{AddLayerToPageStyleAfterLayer} ignore the layers of
-\Pagestyle{@everystyle@} if they are used for another layer page style.
+\Macro{AddLayerToPageStyleAfterLayer} process only the layers of the page
+style that has been referenced but not the layers implicated by
+\Pagestyle{@everystyle@}.
 
 The other somehow special page style is \Pagestyle{empty}. Normally page style
 \Pagestyle{empty} is defined by the \LaTeX{} kernel, to be a page style
@@ -891,10 +890,10 @@ style \Pagestyle{@everysel@}.%
 \BeginIndex{Option}{onpsforeground~=\PName{code}}%
 There's also a \KOMAScript{} option for each of those \texttt{hooks}. The
 names of the \KOMAScript{} options are similar to the names of the page style
-options, but with ``\texttt{ps}'' inserted behind ``\texttt{on}''. The value of
-the \KOMAScript{} options are the initial defaults of the corresponding
-\texttt{hooks}. This default will be extended by every usage of the page style
-options at the \PName{option list}. You may remove the default, using
+options, but with ``\texttt{ps}'' inserted behind ``\texttt{on}''. The value
+of the \KOMAScript{} options are the initial defaults of the corresponding
+\texttt{hooks}. These defaults will be extended at every declaration of page
+style hook options via \PName{option list}. You may remove the default, using
 \Macro{ModifyLayerPageStyleOptions} described later in this section.%
 \EndIndex{Option}{onpsforeground~=\PName{code}}%
 \EndIndex{Option}{onpsbackground~=\PName{code}}%
@@ -912,13 +911,13 @@ options at the \PName{option list}. You may remove the default, using
   \Macro{ForEachLayerOfPageStyle}\Parameter{page style name}\Parameter{code}
 \end{Declaration}
 \BeginIndex{Cmd}{ForEachLayerOfPageStyle}%
-As long as \KOMAScript{} option \Option{deactivatepagestylelayers} has not been
-activated command \Macro{ForEachLayerOfPageStyle} can be used to process
-\PName{code} for every layer that is a member of the layers list of a page
-style with given \PName{page style name}. Inside of \PName{code} the place
-holder \PValue{\#1} may be used for the name of the current layer.
+As long as \KOMAScript{} option \Option{deactivatepagestylelayers} has not
+been activated command \Macro{ForEachLayerOfPageStyle} can be used to process
+\PName{code} for every member layer of \PName{page style name}'s layers
+list. Inside of \PName{code} the place holder \PValue{\#1} may be used to
+reference the name of the current layer.
 \begin{Example}
-  If you want to output the names of all layers of page style
+  If you want to print the names of all layers of page style
   \PValue{scrheadings}, you may us:
 \begin{lstcode}
   \let\commaatlist\empty
@@ -954,7 +953,7 @@ page styles.%
 \BeginIndex{Cmd}{AddLayersAtEndOfPageStyle}%
 \BeginIndex{Cmd}{RemoveLayersFromPageStyle}%
 You can use these commands to add layers to a layer page style or to remove 
-layers from a layer page style. The page style will be referenced by it
+layers from a layer page style. The page style will be referenced by
 \PName{page style name}. The layers are given by a comma separated
 \PName{layer list}. 
 
@@ -1094,7 +1093,7 @@ only test one layer but several layers at a given, comma separated
 \PName{layer list}. \Macro{IfSomeLayerAtPageStyle} will execute the
 \PName{then code} if \emph{at least one} of the layers at \PName{layer list}
 is a member of the layer list of \PName{page style name}. In difference
-\Macro{IfLayersAtPageStyle} executes the \PName{then code} only, if \emph{all}
+\Macro{IfLayersAtPageStyle} executes the \PName{then code} only if \emph{all}
 of the layers at \PName{layer list} are members of the layer list of
 \PName{page style name}.%
 \EndIndex{Cmd}{IfLayersAtPageStyle}%
@@ -1118,7 +1117,8 @@ style\,---\,this may be set using \Macro{thispagestyle}\,---\,is \PName{page
 
 Note, the layers of the page style will not be destroyed
 automatically. If you want to destroy the layers too, you may use
-\begin{lstcode}
+% Umbruchkorrektur
+\begin{lstcode}[belowskip=\dp\strutbox]
   \ForEachLayerOfPageStyle{...}{\DestroyLayer{#1}}
 \end{lstcode}
 \emph{before} destroying the layer page style.
