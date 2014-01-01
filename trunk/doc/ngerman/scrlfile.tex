@@ -370,9 +370,11 @@ Optionen \Option{dvips} oder \Option{pdftex}, eingefügt werden.%
 \end{Declaration}
 Diese Anweisungen unterscheidet sich in einem Detail von den zuvor erklärten
 Anweisungen. Jene ermöglichen Aktionen vor und nach dem Laden von
-Dateien. Dies ist hier nicht der Fall. Paketautoren haben des Öfteren das
+Dateien. Das ist hier nicht der Fall. Paketautoren haben des Öfteren das
 Problem, dass Sie Anweisungen in die \File{aux}-Datei schreiben wollen,
-nachdem die letzte Seite des Dokuments ausgegeben wurde. Dies wird häufig mit
+nachdem die letzte Seite des Dokuments ausgegeben wurde. Dazu wird -- in
+Unkenntnis der dadurch verursachten Probleme -- häufig Code
+wie der folgende eingesetzt:
 \begin{lstcode}[belowskip=\dp\strutbox]
   \AtEndDocument{%
     \if@filesw
@@ -382,14 +384,14 @@ nachdem die letzte Seite des Dokuments ausgegeben wurde. Dies wird häufig mit
     \fi
   } 
 \end{lstcode}
-versucht. Dies ist jedoch keine echte Lösung des Problems. Wurde die letzte
+Dies ist jedoch keine wirkliche Lösung. Wurde die letzte
 Seite vor \Macro{end}\PParameter{document} bereits ausgegeben, so führt obiges
 zu keiner Ausgabe in die \File{aux}-Datei mehr. Würde man zur Lösung dieses
 Problems nun ein \Macro{immediate} vor \Macro{write} setzen, so hätte man das
 umgekehrte Problem: wurde die letzte Seite bei
 \Macro{end}\PParameter{document} noch nicht ausgegeben, so wird
 \Macro{writethistoaux} zu früh in die \File{aux}-Datei geschrieben. Man sieht
-daher häufig Lösungsversuche wie:
+daher häufig auch Lösungsversuche wie:
 \begin{lstcode}[belowskip=\dp\strutbox]
   \AtEndDocument{%
     \if@filesw
@@ -411,7 +413,7 @@ erzwungen wird. Eine Anweisung wie:
 führt dann nicht mehr dazu, dass der Hinweis am Ende der letzten Seite des
 Dokuments ausgegeben wird, sie würde stattdessen am Ende der nächsten Seite
 ausgegeben. Gleichzeitig würde \Macro{writethistoaux} wieder eine Seite zu
-früh in der \File{aux}-Datei landen.
+früh in die \File{aux}-Datei geschrieben.
 
 Die beste Lösung des Problems wäre nun, wenn man unmittelbar in die
 \File{aux}-Datei schreiben könnte, nachdem das finale \Macro{clearpage}
@@ -427,10 +429,11 @@ innerhalb von \Macro{end}\PParameter{document} ausgeführt, aber bevor die
     \fi
   }
 \end{lstcode}
-Dies ist auch dann erfolgreich, wenn das finale \Macro{clearpage} innerhalb
+Das ist auch dann erfolgreich, wenn das finale \Macro{clearpage} innerhalb
 von \Macro{end}\PParameter{document} tatsächlich zu keiner Ausgabe einer Seite
-mehr führt oder wenn \Macro{clearpage} innerhalb einer
-\Macro{AtEndDocument}-Anweisung verwendet wurde.
+mehr führt oder wenn -- sei es korrekt verwendet oder in Unkenntnis der oben
+erläuterten Probleme -- \Macro{clearpage} innerhalb einer
+\Macro{AtEndDocument}-Anweisung zum Einsatz kam.
 
 Es gibt jedoch für \Macro{BeforeClosingMainAux} eine Einschränkung: Im
 Argument \Macro{Anweisungen} sollte keine Satzanweisung verwendet
@@ -773,10 +776,12 @@ einer gespeicherten Liste wiederhergestellt wird, wird dann der
   \PName{Stattdessencode} ausgeführt werden. Dies ist wie folgt möglich:
 \begin{lstcode}
   \UnPreventPackageFromLoading*{foo}
-  \PreventPackageFromLoading[\typeout{Stattdessencode}]{foo}
+  \PreventPackageFromLoading[%
+    \typeout{Stattdessencode}%
+  ]{foo}
 \end{lstcode}
-  Sollte das Paket zuvor gar nicht vom Laden ausgenommen worden sein, so spielt
-  dies für die Anweisung \Macro{UnPreventPackageFromLoading*} keine Rolle.
+  Für die Anweisung \Macro{UnPreventPackageFromLoading*} ist es unerheblich,
+  ob das Paket zuvor überhaupt vom Laden ausgenommen war.
 
   Natürlich können Sie die Anweisung indirekt auch nutzen, um den
   \PName{Stattdessencode} aller Pakete zu löschen:

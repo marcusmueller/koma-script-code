@@ -235,23 +235,24 @@ eingesetzt. Falls kein \PName{Säumniswert} angegeben wird, kann später der
 
 Erfolg\ChangedAt{v3.12}{\Package{scrbase}} oder Misserfolg der Ausführung der
 \PName{Aktion} werden über
-\Macro{FamilyKeyState}\important{\Macro{FamilyKeyState}} an \Package{scrbase}
-zurück gemeldet, damit dieses je nach Bedarf und Verwendung der Option weitere
-Maßnahmen ergreifen kann. In der Voreinstellung ist \Macro{FamilyKeyState}
-identisch mit \Macro{FamilyKeyStateUnknown}. Das bedeutet, dass es nicht
-sicher ist, ob die Option korrekt verarbeitet werden konnte. Findet
-\Package{scrbase} nach Ausführung der \PName{Aktion} noch immer diesen Zustand
-vor, so wird ein Hinweis in die \File{log}-Datei geschrieben und im weiteren
-der Zustand \Macro{FamilyKeyStateProcessed} angenommen.
+\Macro{FamilyKeyState}%\important{\Macro{FamilyKeyState}} % einige davon sind
+                                                          % schlicht zu breit!
+an \Package{scrbase} zurück gemeldet, damit dieses je nach Bedarf und
+Verwendung der Option weitere Maßnahmen ergreifen kann. In der Voreinstellung
+ist \Macro{FamilyKeyState} identisch mit \Macro{FamilyKeyStateUnknown}. Das
+bedeutet, dass es nicht sicher ist, ob die Option korrekt verarbeitet werden
+konnte. Findet \Package{scrbase} nach Ausführung der \PName{Aktion} noch immer
+diesen Zustand vor, so wird ein Hinweis in die \File{log}-Datei geschrieben
+und im weiteren der Zustand \Macro{FamilyKeyStateProcessed} angenommen.
 
 Der Zustand
-\Macro{FamilyKeyStateProcessed}\important{\Macro{FamilyKeyStateProcessed}}
+\Macro{FamilyKeyStateProcessed}%\important{\Macro{FamilyKeyStateProcessed}}
 signalisiert, dass die Option und die Wertzuweisung an die Option vollständig
 abgeschlossen wurde und alles in Ordnung ist. Auf den Zustand kann einfach
 durch Aufruf von \Macro{FamilyKeyStateProcessed} selbst umgeschaltet werden.
 
 Der Zustand
-\Macro{FamilyKeyStateUnknownValue}\important{\Macro{FamilyKeyStateUnknownValue}}
+\Macro{FamilyKeyStateUnknownValue}%\important{\Macro{FamilyKeyStateUnknownValue}}
 signalisiert, dass die Option zwar verarbeitet wurde, ihr jedoch ein Wert
 zugewiesen werden sollte, der nicht erlaubt ist. Diesen Zustand meldet
 beispielsweise \Package{typearea}, wenn versucht wird, an Option
@@ -260,7 +261,7 @@ den Zustand erfolgt einfach durch Aufruf von
 \Macro{FamilyKeyStateUnknownValue} selbst.
 
 Der Zustand
-\Macro{FamilyKeyStateNeedValue}\important{\Macro{FamilyKeyStateUnknownValue}}
+\Macro{FamilyKeyStateNeedValue}%\important{\Macro{FamilyKeyStateNeedValue}}
 signalisiert, dass die Option nicht verarbeitet werden konnte, weil sie
 zwingend einen Wert erwartet, sie aber ohne Wertzuweisung aufgerufen
 wurde. Dieser Zustand wird automatisch gesetzt, wenn eine Option, die keinen
@@ -703,28 +704,110 @@ expandiert wird.
 \end{lstcode}
   unterschieden werden.
 \end{Example}
-Intern wird von \Macro{FamilyNumericalKey} dann \Macro{DefineFamilyKey}
-mit der Anweisung \Macro{FamilySetNumerical} verwendet. Wird an einen solchen
+Intern wird von \Macro{FamilyNumericalKey} dann \Macro{DefineFamilyKey} mit
+der Anweisung \Macro{FamilySetNumerical} verwendet. Wird an einen solchen
 Schlüssel ein unbekannter Wert übergeben, so wird von
 \Macro{FamilySetNumerical} die Anweisung \Macro{FamilyUnkownKeyValue} mit den
 Argumenten \PName{Familie}, \PName{Schlüssel} und \PName{Wert}
-aufgerufen. Dadurch wird dann eine Fehlermeldung über unbekannte Wertzuweisung
-ausgegeben.
-
-Beim Aufruf von \Macro{FamilySetNumerical} wird wiederum auch der Erfolg oder
-Misserfolg automatisch via \Macro{FamilyKeyState} signalisiert.
+aufgerufen. Dies führt zu einer Fehlersignalisierung in \Macro{FamilyKeyState}
+mit Hilfe des Status \Macro{FamilyKeyStateUnknownValue} und beispielsweise bei
+der Verwendung als lokale Option zu einer Fehlermeldung. Ebenso wird beim
+Aufruf von \Macro{FamilySetNumerical} auch der Erfolg via
+\Macro{FamilyKeyStateProcessed} in \Macro{FamilyKeyState} signalisiert.%
 %
 \EndIndex{Cmd}{FamilySetNumerical}%
 \EndIndex{Cmd}{FamilyNumericalKey}%
 
-\BeginIndex{Cmd}{FamilyStringKey}%
+\begin{Declaration}
+  \Macro{FamilyCounterKey}\OParameter{Mitglied}\Parameter{Familie}%
+  \Parameter{Schlüssel}\Parameter{\LaTeX-Zähler}\\
+%  \hphantom{\XMacro{FamilyCounterKey}}%
+%  \Parameter{\LaTeX-Zähler}
+  \Macro{FamilySetCounter}\Parameter{Familie}%
+  \Parameter{Schlüssel}\Parameter{\LaTeX-Zähler}\Parameter{Wert}
+\end{Declaration}
+\BeginIndex{Cmd}{FamilyCounterKey}%
+\BeginIndex{Cmd}{FamilySetCounter}%
+Während\ChangedAt{v3.12}{\Package{scrbase}} bei \Macro{FamilyNumericalKey} ein
+Makro aufgrund eines symbolischen \PName{Wert}s auf einen korrespondierenden
+nummerischen Wert gesetzt wurde, gibt es natürlich auch Fälle, in denen ein
+\PName{Schlüssel} direkt einen \PName{\LaTeX-Zähler} rerpäsentiert, dem
+unmittelbar ein nummerischen \PName{Wert} zugewiesen werden soll. Dazu dient
+die Anweisung \Macro{FamilyCounterKey}, von der intern dann
+\Macro{FamilySetCounter} aufgerufen wird. Dabei finden einige grundlegende
+Prüfungen des \PName{Wert}-Arguments statt um festzustellen, ob dieses
+Argument für eine Zuweisung an einen Zähler in Frage kommt. Die Zuweisung
+findet nur statt, wenn diese Prüfungen gelingen. Allerdings können hier nicht
+alle Fehler erkannt werden, so dass eine falsche Zuweisung auch zu einer
+Fehlermeldung von \TeX{} selbst führen kann. Erkannte Fehler werden hingegen
+über \Macro{FamilyKeyStateUnknownValue} signalisiert.
+
+Bitte beachten\textnote{Achtung!} Sie, dass diese Anweisungen keinen
+Säumniswert unterstützen.%
+\EndIndex{Cmd}{FamilySetCounter}%
+\EndIndex{Cmd}{FamilyCounterKey}%
+
+\begin{Declaration}
+  \Macro{FamilyCounterMacroKey}\OParameter{Mitglied}\Parameter{Familie}%
+  \Parameter{Schlüssel}\Parameter{Makro}\\
+  \Macro{FamilySetCounterMacro}\Parameter{Familie}%
+  \Parameter{Schlüssel}\Parameter{Makro}\Parameter{Wert}%
+\end{Declaration}
+\BeginIndex{Cmd}{FamilyCounterMacroKey}%
+\BeginIndex{Cmd}{FamilySetCounterMacro}%
+Diese\ChangedAt{v3.12}{\Package{scrbase}} beiden Anweisungen unterscheiden
+sich durch die zuvor erklärten \Macro{FamilyCounterKey} und
+\Macro{FamilySetCounter} nur dadurch, dass nicht ein \LaTeX-Zähler auf einen
+Wert gesetzt wird, sondern ein \PName{Makro} mit diesem Wert definiert
+wird. Auf\textnote{Achtung!} dabei wird kein Säumniswert unterstützt.%
+\EndIndex{Cmd}{FamilySetCounterMacro}%
+\EndIndex{Cmd}{FamilyCounterMacroKey}%
+
+\begin{Declaration}
+  \Macro{FamilyLengthKey}\OParameter{Mitglied}\Parameter{Familie}%
+  \Parameter{Schlüssel}\Parameter{Länge}\\
+  \Macro{FamilySetLength}\Parameter{Familie}%
+  \Parameter{Schlüssel}\Parameter{Länge}\Parameter{Wert}\\
+  \Macro{FamilyLengthMacroKey}\OParameter{Mitglied}\Parameter{Familie}%
+  \Parameter{Schlüssel}\Parameter{Makro}\\
+  \Macro{FamilySetLengthMacro}\Parameter{Familie}%
+  \Parameter{Schlüssel}\Parameter{Makro}\Parameter{Wert}%
+\end{Declaration}
+\BeginIndex{Cmd}{FamilyLengthKey}%
+\BeginIndex{Cmd}{FamilySetLength}%
+\BeginIndex{Cmd}{FamilyLengthMacroKey}%
+\BeginIndex{Cmd}{FamilySetLengthMacro}%
+Über\ChangedAt{v3.12}{\Package{scrbase}} \Macro{FamilyLengthKey} kann ein
+\PName{Schlüssel} definiert werden, der eine \PName{Länge}
+repräsentiert. Dabei spielt es keine Rolle, ob eine \LaTeX-Länge, ein
+\TeX-Abstand oder eine \TeX-Ausdehnung als \PName{Länge} verwendet
+wird. Intern wird die \PName{Länge} über \Macro{FamilySetLength} gesetzt.
+Dabei finden einige grundlegende Prüfungen des \PName{Wert}-Arguments statt um
+festzustellen, ob dieses Argument für eine Zuweisung an eine \PName{Länge} in
+Frage kommt. Die Zuweisung findet nur statt, wenn diese Prüfungen
+gelingen. Allerdings können hier nicht alle Fehler erkannt werden, so dass
+eine falsche Zuweisung auch zu einer Fehlermeldung von \TeX{} selbst führen
+kann. Erkannte Fehler werden hingegen über \Macro{FamilyKeyStateUnknownValue}
+signalisiert.%
+
+Bei Verwendung der Anweisungen \Macro{FamilyLengthMacroKey} und
+\Macro{FamilySetLengthMacro} findet die Speicherung des Werts nicht in einer
+\Macro{Länge}, sondern in einem \Macro{Makro} statt.%
+
+Bitte beachten Sie\textnote{Achtung!}, dass auch diese Anweisungen keinen
+Säumniswert unterstützen.%
+\EndIndex{Cmd}{FamilySetLengthMacro}%
+\EndIndex{Cmd}{FamilyLengthMacroKey}%
+\EndIndex{Cmd}{FamilySetLength}%
+\EndIndex{Cmd}{FamilyLengtKey}%
+
 \begin{Declaration}
   \Macro{FamilyStringKey}\OParameter{Mitglied}\Parameter{Familie}%
   \Parameter{Schlüssel}\\
   \hphantom{\XMacro{FamilyStringKey}}%
   \OParameter{Säumniswert}\Parameter{Makro}
 \end{Declaration}
-%
+\BeginIndex{Cmd}{FamilyStringKey}%
 Hier wird nun\ChangedAt{v3.08}{\Package{scrbase}} ein Schlüssel definiert, der
 jeden beliebigen Wert annehmen kann. Der Wert wird in dem angegebenen
 \PName{Makro} gespeichert. Wird das optionales Argument für den
@@ -775,7 +858,7 @@ Wertzuweisung an den Schlüssel keine Absätze enthalten sein dürfen.
   \Parameter{Wert}\Parameter{Werteliste}
 \end{Declaration}
 Diese Anweisung signalisiert über \Macro{FamilyKeyState} einen Fehler aufgrund
-eines unbekannten oder unerlaubten Werts. Als \PName{Werteliste} wird dabei
+eines unbekannten oder unerlaubten Werts. Dabei wird als \PName{Werteliste}
 eine durch Komma separierte Liste von erlaubten Werten der Form
 \begin{flushleft}\vskip\dp\strutbox\begin{tabular}{l}
     `\PName{Wert}'\texttt{,} `\PName{Wert}' \dots
@@ -810,10 +893,10 @@ erwartet. Allerdings\ChangedAt{v3.12}{\Package{scrbase}} wird die
     \fi
   }%
 \end{lstcode}
-  Dabei wird zunächst versucht, den boolschen Schalter für Aufschnitt über
-  \Macro{FamilySetBool} zu setzen. Ist diese Anweisung erfolgreich, wurde also
+  Zunächst wird versucht, den boolschen Schalter für Aufschnitt über
+  \Macro{FamilySetBool} zu setzen. Gelingt dies, wurde also
   \Macro{FamilyKeyState} zu \Macro{FamilyKeyStateProcessed} definiert, wird
-  nur noch der Feinschnitt abgeschaltet. Anderenfalls wird überprüft, ob an
+  der Feinschnitt abgeschaltet. Anderenfalls wird überprüft, ob an
   Stelle eines gültigen Werts für einen boolschen Schalter der Wert
   \PValue{fein} übergeben wurde. In diesem Fall wird sowohl der Feinschnitt,
   als auch Aufschnitt aktiviert und mit Hilfe von
@@ -1006,8 +1089,8 @@ interne Variante.
 \EndIndex{Cmd}{ifstr}
 
 \begin{Declaration}
-  \Macro{ifstrstart}\Parameter{Zeichenfolge}\Parameter{Zeichenfolge}%
-  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
+  \Macro{ifstrstart}\Parameter{Zeichenfolge}\Parameter{Zeichenfolge}\\
+  \hphantom{\XMacro{ifstrstart}}\Parameter{Dann-Teil}\Parameter{Sonst-Teil}
 \end{Declaration}
 \BeginIndex{Cmd}{ifstrstart}%
 Die\ChangedAt{v3.12}{\Package{scrbase}} beiden Argumente \PName{Zeichenfolge}
@@ -1534,6 +1617,10 @@ arabische Zahl ist \Macro{the} voran zu stellen.%
 
 %%% Local Variables:
 %%% mode: latex
+%%% mode: flyspell
 %%% coding: iso-latin-1
-%%% TeX-master: "guide.tex"
+%%% ispell-local-dictionary: "de_DE"
+%%% TeX-master: "../guide.tex"
 %%% End:
+
+
