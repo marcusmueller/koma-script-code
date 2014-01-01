@@ -1261,7 +1261,8 @@
   style=basics,%
   language=[LaTeX]TeX,%
   moretexcs={%
-    @auxout, @currext, @empty, @float, @ifpackagelater, @ifundefined,
+    @auxout, @currext, @dottedtocline, @empty, @float, @ifpackagelater,
+    @ifundefined,
     @rightmark, @secondoftwo, @tempswafalse,@tempswatrue, @undefined,
     AtBeginDocument,AtEndDocument, appendix, ClassWarningNoLine,CurrentOption,
     DeclareOption,DeclareRobustCommand,dimexpr, end@float, ExecuteOptions,
@@ -1278,7 +1279,8 @@
   style=code,%
   moretexcs={%
     @addtoplength,@setplength,@newplength, activateareas,
-    addchap,addrentry,Address,addcontentslinetoeachtocfile,addsec,
+    addchap,addrentry,Address,addcontentslinetoeachtocfile,
+    addxcontentslinetoeachtocfile,addsec,
     addtoeachtocfile,
     addtokomafont,addtolengthplength,addtoreffields,addtotoclist,
     adrchar,adrentry,AfterBibliographyPreamble,AfterCalculatingTypearea,
@@ -1335,8 +1337,10 @@
     tableformat,tablename,tableofcontents,textsubscript,thechapter,thefigure,
     thefootnotemark,thepar,thepart,thesection,thesentence,thesubsection,
     thetable,thistime,
-    titlehead,tocbasic@extend@babel,TOCclone,todaysname,typearea, unitfactor,
-    unsettoc,usekomafont,useplength,usekomavar,uppertitleback }%
+    titlehead,tocbasic@extend@babel,TOCclone,todaysname,typearea,%
+    UnPreventPackageFromLoading,unitfactor,
+    unsettoc,usekomafont,useplength,usekomavar,uppertitleback% 
+}%
 } \lstset{style=basics} \lstnewenvironment{lstoutput}[1][]{%
   \lstset{style=output,basicstyle=\ttfamily\small,#1}%
 }{} \lstnewenvironment{lstcode}[1][]{%
