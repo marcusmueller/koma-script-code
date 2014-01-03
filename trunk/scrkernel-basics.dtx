@@ -1,4 +1,4 @@
-% \CheckSum{2393}
+% \CheckSum{2410}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -1984,18 +1984,23 @@
       \noexpand\def\noexpand\scr@key@run@errors{%
         \unexpanded\expandafter{\scr@key@run@errors}}%
     \fi
-    \noexpand\def\expandafter\noexpand
-    \csname scr@after@options@#1@hook\endcsname{%
-      \expandafter\unexpanded\expandafter\expandafter\expandafter{%
-        \csname scr@after@options@#1@hook\endcsname
-      }}%
+    \expandafter\ifx\csname scr@after@options@#1@hook\endcsname\relax
+      \noexpand\expandafter\noexpand\let\noexpand\csname
+      scr@after@options@#1@hook\endcsname\relax
+    \else
+      \noexpand\def\expandafter\noexpand
+      \csname scr@after@options@#1@hook\endcsname{%
+        \expandafter\unexpanded\expandafter\expandafter\expandafter{%
+          \csname scr@after@options@#1@hook\endcsname
+        }}%
+    \fi
   }%
   \let\AtEndOfFamilyOptions\scr@AtEndOfFamilyOptions
   \reserved@a
   \let\AtEndOfFamilyOptions\@firstofone
   \ifx\FamilyKeyState\FamilyKeyStateUnknown
     \PackageInfo{scrbase}{Unknown processing state.\MessageBreak
-      Processing option `\scr@key@atlist'\MessageBreak
+      Processing option `\expandafter\detokenize{\scr@key@atlist}'\MessageBreak
       \ifx\FamilyMemberOfKey\@empty\else
         of member `\FamilyMemberOfKey'\MessageBreak
       \fi
