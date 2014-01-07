@@ -14,6 +14,10 @@ LATEX_FILES = scrlettr.cls scrpage.sty
 DIST_FILES = $(SOURCE_FILES) $(DOC_FILES) $(LATEX_FILES)
 CTAN_FILES = $(SOURCE_FILES) $(DOC_FILES)
 
+LC_ALL = C
+RELEASE     = $(shell LC_ALL=C svn info -R . | grep '^Revision:' | sort -u | tail -1 | cut -d' ' -f2)
+RELEASEDATE = $(shell LC_ALL=C svn info -R . | grep '^Last Changed Date:' | sort -u | tail -1 | cut -b20-29)
+
 all: $(DIST_FILES)
 
 scrlettr.pdf: scrlettr.dtx
@@ -49,12 +53,14 @@ dist-tds: $(DIST_FILES)
 	mkdir -p texmf/tex/latex/koma-script-obsolete/
 	cp $(LATEX_FILES) texmf/tex/latex/koma-script-obsolete/
 	mkdir -p texmf/doc/latex/koma-script-obsolete/
-	cp $(DOC_FILES) README texmf/doc/latex/koma-script-obsolete/
+	cp $(DOC_FILES) texmf/doc/latex/koma-script-obsolete/
 	mkdir -p texmf/source/latex/koma-script-obsolete/
 	cp $(SOURCE_FILES) texmf/source/latex/koma-script-obsolete/
-
+	sed -e "s|VERSION WILL BE REPLACED WHILE RELEASE PROCESS|$(RELEASEDATE) r$(RELEASE)|" README > texmf/doc/latex/koma-script-obsolete/README
+	cp texmf/doc/latex/koma-script-obsolete/README \
+	   texmf/source/latex/koma-script-obsolete/README
 	cd texmf && \
-	zip -r ../koma-script-obsolete-$(shell date -I).tds.zip .
+	zip -r ../koma-script-obsolete-$(RELEASEDATE).tds.zip .
 	rm -r texmf
 
 help:
