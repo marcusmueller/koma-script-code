@@ -1272,7 +1272,7 @@
     PackageError,PackageInfo,PackageWarning,PassOptionsToPackage,
     ProcessOptions,protected@write,ProvidesFile,ProvidesPackage,
     RequirePackage,RequirePackageWithOptions,setkey,setlength,
-    SelectInputMappings,
+    SelectInputMappings,setkeys,
     textsuperscript}%
 } \lstdefinestyle{output}{%
   style=basics,breaklines,prebreak=\mbox{$\hookleftarrow$}%
@@ -1296,7 +1296,7 @@
     captionof,cefoot,cfoot,chapapp, chapappifchapterprefix,
     chapter,chapterformat,chaptermarkformat,chapterpagestyle,chead,
     cleardoubleevenemptypage,clearscrheadfoot,closing,cofoot,Comment,
-    DeclareLayer,DeclareNewPageStyleAlias,
+    DeclareLayer,DeclareNewNoteColumn,DeclareNewPageStyleAlias,
     DeclareNewTOC,
     dedication,defcaptionname,deffootnote,deffootnotemark,
     DefineFamily,DefineFamilyKey,
@@ -1319,7 +1319,7 @@
     LastName,layerwidth,layerheight,lefoot,lehead,LetterOptionNeedsPapersize,
     lipsum,listoffigures,
     listoftables,listoftoc,LoadLetterOption,lofoot,lohead,lowertitleback,
-    MakeMarkcase,maketitle,manualmark,marginline,minisec,
+    MakeMarkcase,makenote,maketitle,manualmark,marginline,minisec,
     multfootsep,multiplefootnoteseparator,
     Name,nameday,newbibstyle,newcaptionname,newkomavar,nexthead,
     ofoot,ohead,opening,othersectionlevelsformat,
@@ -1339,8 +1339,8 @@
     setheadsepline,setheadtopline,setheadwidth,setindexpreamble,setkomafont,
     setkomavar,setlengthtoplength,setparsizes,setpartpreamble,setuptoc,
     showfields,showenvelope,showISOenvelope,showUScommercial,showUScheck,
-    StorePreventPackageFromLoading,
-    subject,SubParagraph,subsectionmarkformat,subtitle,
+    storeareas,StorePreventPackageFromLoading,
+    subject,SubParagraph,subsectionmarkformat,subtitle,syncwithnotecolumn,
     tableformat,tablename,tableofcontents,textsubscript,thechapter,thefigure,
     thefootnotemark,thepar,thepart,thesection,thesentence,thesubsection,
     thetable,thistime,
