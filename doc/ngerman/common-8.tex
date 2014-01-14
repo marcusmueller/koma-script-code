@@ -192,7 +192,7 @@ Im \LaTeX-Kern existiert die Anweisung
 Gleitumgebungen ausgegeben werden und anschließend eine neue Seite begonnen
 wird.  Außerdem existiert die Anweisung \Macro{cleardoublepage}, die wie
 \Macro{clearpage} arbeitet, durch die aber im doppelseitigen Layout (siehe
-Option \Option{twoside} in \autoref{sec:typearea.options},
+Option \Option{twoside} in \autoref{sec:typearea.typearea},
 \autopageref{desc:typearea.option.twoside}) eine neue rechte Seite begonnen
 wird. Dazu wird gegebenenfalls eine linke Vakatseite im aktuellen Seitenstil
 ausgegeben.
@@ -227,30 +227,32 @@ verwendet werden.
   \Macro{cleardoubleoddstandardpage} definiert, jedoch mit dem Unterschied,
   dass die nächste Seite eine linke Seite ist. Entsprechendes gilt für die
   Anweisungen \Macro{cleardoubleevenplainpage},
-  \Macro{cleardoubleevenemptypage} und 
-% Umbruchoptimierungsalternative
-\iffalse
-  für die ein Argument erwartende Anweisung 
-\fi
-\Macro{cleardoubleevenusingstyle}.}
+  \Macro{cleardoubleevenemptypage} und %
+  \IfCommon{maincls}{% Umbruchoptimierungsalternative
+    für die ein Argument erwartende Anweisung }%
+  \Macro{cleardoubleevenusingstyle}.}
 
 Die Arbeitsweise der Anweisungen \Macro{cleardoublestandardpage},
 \Macro{cleardoubleemptypage}, \Macro{cleardoubleplainpage} und der ein
-Argument erwartenden Anweisung \Macro{cleardoublepageusingstyle} ist %
-\IfCommon{scrlttr2}{bei \Class{scrlttr2} }%
-\IfCommon{scrextend}{bei \Package{scrextend} }%
-ebenso wie die \IfNotCommon{scrextend}{Standard-}Anweisung
-\Macro{cleardoublepage} von der zuvor erklärten Option
-\Option{cleardoublepage}\important{\Option{cleardoublepage}} abhängig und
-entspricht je nach Einstellung einer der in den vorherigen Absätzen
-erläuterten Anweisungen.
+Argument erwartenden Anweisung \Macro{cleardoublepageusingstyle} %
+\IfCommon{maincls}{ist ebenso wie die Standard-Anweisung
+  \Macro{cleardoublepage} von der in \autoref{sec:maincls.structure},
+  \autopageref{desc:maincls.option.open} erklärten Option
+  \Option{open}\IndexOption{open}\important{\Option{open}} abhängig und
+  entspricht je nach Einstellung einer der in den vorherigen Absätzen
+  erläuterten Anweisungen.
 
-\IfCommon{scrlttr2}{%
+}%
+\IfNotCommon{maincls}{entspricht \IfCommon{scrlttr2}{bei der Klasse
+    \Class{scrlttr2}}\IfCommon{scrextend}{beim Paket \Package{scrextend}}
+  ebenso wie die Standard-Anweisung \Macro{cleardoublepage} den
+  entsprechenden, zuvor erklärten Anweisungen\IfNotCommon{scrlttr2}{ für den
+    Umbruch zur nächsten ungeraden Seite}.}  \IfCommon{scrlttr2}{%
   Die übrigen Anweisungen sind bei \Class{scrlttr2} nur aus Gründen der
-  Vollständigkeit definiert. Näheres zu diesen Anweisungen ist bei Bedarf
+  Vollständigkeit definiert. Näheres zu diesen ist bei Bedarf
   \autoref{sec:maincls.emptypage},
   \autopageref{desc:maincls.cmd.cleardoublepage} zu entnehmen.}%
-\ifCommonscrlttr2\else
+\ifCommonscrlttr\else
 \begin{Example}
   \label{desc:maincls.cmd.cleardoublepage.example}%
   Angenommen Sie wollen innerhalb eines Dokuments als nächstes eine
@@ -267,7 +269,9 @@ erläuterten Anweisungen.
   in der Dokumentpräambel vornehmen. Die Optionen können alternativ auch als
   optionale Argumente von \Macro{documentclass} angegeben werden.
 
-  An der gewünschten Stelle im Dokument schreiben Sie nun:
+  An der gewünschten Stelle 
+  \IfNotCommon{scrextend}{im Dokument }% Umbruchoptimierung!!!
+  schreiben Sie nun:
 \begin{lstcode}
   \cleardoubleevenemptypage
   \thispagestyle{empty}
