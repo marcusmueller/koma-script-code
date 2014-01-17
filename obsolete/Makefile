@@ -15,7 +15,7 @@ DIST_FILES = $(SOURCE_FILES) $(DOC_FILES) $(LATEX_FILES)
 CTAN_FILES = $(SOURCE_FILES) $(DOC_FILES)
 
 LC_ALL = C
-RELEASE     = $(shell LC_ALL=C svn info -R . | grep '^Last Changed Rev:' | sort -u | tail -1 | cut -d' ' -f4)
+RELEASE     = $(shell LC_ALL=C svn info -R . | grep '^Last Changed Rev:' | cut -d' ' -f 4 | sort -nu | tail -1 )
 RELEASEDATE = $(shell LC_ALL=C svn info -R . | grep '^Last Changed Date:' | sort -u | tail -1 | cut -b20-29)
 
 all: $(DIST_FILES)
