@@ -1,8 +1,8 @@
-% \CheckSum{457}
+% \CheckSum{458}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-listsof.dtx
-% Copyright (c) Markus Kohm, 2002-2013
+% Copyright (c) Markus Kohm, 2002-2014
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrkernel-listsof.dtx
-% Copyright (c) Markus Kohm, 2002-2013
+% Copyright (c) Markus Kohm, 2002-2014
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -58,8 +58,21 @@
 %%% From File: $Id$
 %<*driver>
 % \fi
-\ProvidesFile{scrkernel-listsof.dtx}[2013/11/22 v3.12 KOMA-Script
-                                                       (lists of)]
+\ifx\ProvidesFile\undefined\def\ProvidesFile#1[#2]{}\fi
+\begingroup
+  \def\filedate$#1: #2-#3-#4 #5${\gdef\filedate{#2/#3/#4}}
+  \filedate$Date$
+  \def\filerevision$#1: #2 ${\gdef\filerevision{r#2}}
+  \filerevision$Revision$
+  \edef\reserved@a{%
+    \noexpand\endgroup
+    \noexpand\ProvidesFile{scrkernel-listsof.dtx}[%
+                            \filedate\space\filerevision\space
+                            KOMA-Script source
+                            (lists of)%
+                          ]%
+  }%
+\reserved@a
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -127,11 +140,13 @@
 % \end{macro}
 %
 % \begin{option}{toc}
-%   \changes{v2.98c}{2008/03/04}{Neue Option}^^A
+%   \changes{v2.98c}{2008/03/04}{Neue Option}%^^A
 %   \changes{v3.12}{2013/03/05}{Nutzung der Status-Signalisierung mit
-%     \cs{FamilyKeyStateProcessed}}^^A
+%     \cs{FamilyKeyStateProcessed}}%^^A
 %   \changes{v3.12}{2013/08/26}{\cs{KOMA@options} durch
-%     \cs{KOMAExecuteOptions} ersetzt}^^A
+%     \cs{KOMAExecuteOptions} ersetzt}%^^A
+%   \changes{v3.12a}{2014/01/17}{\cs{KOMAExecuteOptions} durch
+%     \cs{KOMAoptions} ersetzt}%^^A
 % Dies ist die zentrale Option für Einstellungen des Inhaltsverzeichnisses.
 %    \begin{macrocode}
 \KOMA@key{toc}{%
@@ -172,21 +187,21 @@
   }{#1}%
   \ifx\FamilyKeyState\FamilyKeyStateProcessed
     \ifcase \@tempa\relax
-      \KOMAExecuteOptions{index=notoc}%
+      \KOMAoptions{index=notoc}%
     \or
-      \KOMAExecuteOptions{index=totoc}%
+      \KOMAoptions{index=totoc}%
     \or
-      \KOMAExecuteOptions{listof=notoc}%
+      \KOMAoptions{listof=notoc}%
     \or
-      \KOMAExecuteOptions{listof=totoc}%
+      \KOMAoptions{listof=totoc}%
     \or
-      \KOMAExecuteOptions{listof=numbered}%
+      \KOMAoptions{listof=numbered}%
     \or
-      \KOMAExecuteOptions{bibliography=nottotoc}%
+      \KOMAoptions{bibliography=nottotoc}%
     \or
-      \KOMAExecuteOptions{bibliography=totoc}%
+      \KOMAoptions{bibliography=totoc}%
     \or
-      \KOMAExecuteOptions{bibliography=totocnumbered}%
+      \KOMAoptions{bibliography=totocnumbered}%
     \or
       \@toclefttrue
     \or
@@ -256,6 +271,8 @@
 %     \cs{FamilyKeyStateProcessed}}^^A
 %   \changes{v3.12}{2013/06/26}{\cs{KOMA@options} durch
 %     \cs{KOMAExecuteOptions} ersetzt}^^A
+%   \changes{v3.12a}{2014/01/17}{\cs{KOMAExecuteOptions} durch
+%     \cs{KOMAoptions} ersetzt}%^^A
 % Dies ist die zentrale Option für die Gleitumgebungsverzeichnisse.
 %    \begin{macrocode}
 \KOMA@key{listof}{%
@@ -398,13 +415,13 @@
       }
 %<*book|report>
     \or% chapterentry
-      \KOMAExecuteOptions{chapteratlists=entry}%
+      \KOMAoptions{chapteratlists=entry}%
     \or% chaptergap
-      \KOMAExecuteOptions{chapteratlists=\z@}%
+      \KOMAoptions{chapteratlists=\z@}%
     \or% chaptergapsmall
-      \KOMAExecuteOptions{chapteratlists=10\p@}%
+      \KOMAoptions{chapteratlists=10\p@}%
     \or% chaptergapline
-      \KOMAExecuteOptions{chapteratlists=\baselineskip}%
+      \KOMAoptions{chapteratlists=\baselineskip}%
 %</book|report>
     \fi
   \fi
@@ -455,6 +472,8 @@
 % \begin{option}{chapteratlists}
 %   \changes{v2.96a}{2006/12/03}{neue Option}%^^A
 %   \changes{v2.98c}{2008/03/05}{nicht mehr bei \textsf{scrartcl}}%^^A
+%   \changes{v3.12a}{2014/01/17}{fehlendes \cs{FamilyKeyStateProcessed}
+%     ergänzt}%^^A
 % \begin{macro}{\if@chaptertolists}
 %   \changes{v2.96a}{2006/12/03}{neuer Schalter}%^^A
 %   \changes{v3.12}{2013/09/24}{Verzeichnisse werden nicht in Verzeichnisse
@@ -477,6 +496,7 @@
   }{%
     \@chaptertolistsfalse\renewcommand*{\@chapterlistsgap}{#1}%
   }%
+  \FamilyKeyStateProcessed
 }
 \BeforeTOCHead{\@chaptertolistsfalse}
 %</book|report>
