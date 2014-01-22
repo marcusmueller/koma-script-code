@@ -1,4 +1,4 @@
-% \CheckSum{2410}
+% \CheckSum{2447}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -2672,31 +2672,41 @@
 }
 %    \end{macrocode}
 % \begin{macro}{\KOMA@UseDeprecatedOption}
-%   \changes{v3.01a}{2008/11/20}{neu (intern)}%
-%   \changes{v3.12}{2013/03/04}{Test für \texttt{version!=first}}%
+%   \changes{v3.01a}{2008/11/20}{neu (intern)}%^^A
+%   \changes{v3.12}{2013/03/04}{Test für \texttt{version!=first}}%^^A
+%   \changes{v3.12a}{2014/01/22}{vertauschte Logic für \texttt{version!=first}
+%     korrigiert}%^^A
 % Die eigentliche Arbeit wird von diesem Makro erledigt. Die Argumente sind
 % 1. Meldungsbefehl, 2. obsolete Option, 3. Setzen des Schlüssels.
 %    \begin{macrocode}
 \newcommand*{\KOMA@UseDeprecatedOption}[3]{%
-  \let\scr@sr@co\CurrentOption
   \begingroup
-    #1{%
-      You've used obsolete option `#2'.\MessageBreak
-      Usage of this option indicates an old document and\MessageBreak
-      \scr@ifundefinedorrelax{KV@KOMA.\@currname.\@currext @version}{%
-        changes compatibility level using\MessageBreak
-        `#3,version=first'.\MessageBreak
-        If you don't want this, y%
-      }{%
-        is deprecated.\MessageBreak
-        Y%
+    \scr@ifundefinedorrelax{KV@KOMA.\@currname.\@currext @version}{%
+      \edef\reserved@a{\noexpand\endgroup
+        \noexpand#1{%
+          You've used obsolete option `#2'.\noexpand\MessageBreak
+          Usage of this option is deprecated.\noexpand\MessageBreak
+          You should simply replace `#2'\noexpand\MessageBreak
+          by `#3'%
+        }%
+        \noexpand\KOMAExecuteOptions{#3}%
+        \noexpand\def\noexpand\CurrentOption{\CurrentOption}%
       }%
-      ou should simply replace\MessageBreak
-      usage of option `#2' by `#3'%
+    }{%
+      \edef\reserved@a{\noexpand\endgroup
+        \noexpand#1{%
+          You've used obsolete option `#2'.\noexpand\MessageBreak
+          Usage of this option indicates an old document\noexpand\MessageBreak
+          and changes compatibility level using\noexpand\MessageBreak
+          `#3,version=first'.\noexpand\MessageBreak
+          If you don't want this, you should simply\noexpand\MessageBreak
+          replace option `#2' by `#3'%
+        }%
+        \noexpand\KOMAExecuteOptions{#3,version=first}%
+        \noexpand\def\noexpand\CurrentOption{\CurrentOption}%
+      }%
     }%
-  \endgroup
-  \KOMAExecuteOptions{#3,version=first}%
-  \let\CurrentOption\scr@sr@co
+  \reserved@a
 }
 %</koma>
 %    \end{macrocode}
@@ -2738,29 +2748,27 @@
 % 1. Meldungsbefehl, 2. obsolete Option, 3. Setzen des Schlüssels.
 %    \begin{macrocode}
 \newcommand*{\KOMA@UseStandardOption}[3]{%
-  \let\scr@sr@co\CurrentOption
-  #1{%
-    You've used standard option `#2'.\MessageBreak
-    This is correct!\MessageBreak
-    Internally I'm using `#3'.\MessageBreak
-    If you'd like to set the option with \string\KOMAoptions,\MessageBreak
-    you'd have to use `#3' there\MessageBreak
-    instead of `#2', too%
-  }%
-  \KOMAExecuteOptions{#3}%
-  \let\CurrentOption\scr@sr@co
+  \begingroup
+    \edef\reserved@a{\noexpand\endgroup
+      \noexpand#1{%
+        You've used standard option `#2'.\noexpand\MessageBreak
+        This is correct!\noexpand\MessageBreak
+        Internally I'm using `#3'.\noexpand\MessageBreak
+        If you'd like to set the option with \string\KOMAoptions,%
+        \noexpand\MessageBreak
+        you'd have to use `#3' there\noexpand\MessageBreak
+        instead of `#2', too%
+      }%
+      \noexpand\KOMAExecuteOptions{#3}%
+      \noexpand\def\noexpand\CurrentOption{\CurrentOption}%
+    }%
+  \reserved@a
 }
+%</koma>
 %    \end{macrocode}
 % \begin{macro}{\scr@sr@co}
 %   \changes{v2.96}{2006/08/20}{neu (intern)}
-% Da das \texttt{xkeyval}-Paket leider \cs{CurrentOption} vernichtet, das aber
-% innerhalb von \cs{ProcessOptions} und \cs{KOMAProcessOptions} nach dem
-% Ausführen der Option noch benötigt wird, muss die Anweisung gesichert
-% werden. Dafür wird ein Hilfsmakro benötigt.
-%    \begin{macrocode}
-\newcommand*{\scr@sr@co}{}
-%</koma>
-%    \end{macrocode}
+%   \changes{v3.12a}{2014/01/22}{beseitigt}
 % \end{macro}^^A \scr@sr@co
 % \end{macro}^^A \KOMA@UseStandardOption
 % \end{macro}^^A \KOMA@@@DeclareStandardOption
