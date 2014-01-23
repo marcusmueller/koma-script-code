@@ -1,6 +1,6 @@
 % ======================================================================
 % scrstrip.inc
-% Copyright (c) Markus Kohm, 2002-2012
+% Copyright (c) Markus Kohm, 2002-2014
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -22,7 +22,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrstrip.inc
-% Copyright (c) Markus Kohm, 2002-2012
+% Copyright (c) Markus Kohm, 2002-2014
 %
 % Diese Datei ist Teil des LaTeX2e-KOMA-Script-Pakets.
 %
@@ -54,7 +54,7 @@
 \KOMAdefVariable{AUTHOR}{Markus Kohm}
 \KOMAdefVariable{EMAIL}{[komascript at gmx info]}
 \KOMAdefVariable{COPYRIGHTFROM}{1994}
-\KOMAdefVariable{COPYRIGHTTILL}{2013}
+\KOMAdefVariable{COPYRIGHTTILL}{2014}
 
 \let\ifbeta=\iftrue % with = will be replaced by release process
 
