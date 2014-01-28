@@ -1285,7 +1285,7 @@
     addtoeachtocfile,
     addtokomafont,addtolengthplength,addtoreffields,addtotoclist,
     adrchar,adrentry,
-    AddLayersAtBeginOfPageStyle,
+    AddLayersAtBeginOfPageStyle,AddLayersToPageStyle,
     AfterBibliographyPreamble,AfterCalculatingTypearea,
     AfterFile,AfterPackage,AfterStartingTOC,AfterTOCHead,
     appendixmore,appendixname,areaset,autodot,automark,AtAddToTocList,
