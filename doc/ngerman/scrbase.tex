@@ -112,10 +112,12 @@ Anwender können sie mit oder ohne Wertangabe entweder als globale Option bei
     [internalonly=/ifVTeX/ifundefinedorrelax]%
     {foo}
 \end{lstcode}
-  Der Klassenname \Class{foo} wird hier als Platzhalter für irgend eine Klasse
+  Der Klassenname \Class{foo} wird hier als Platzhalter für irgendeine Klasse
   verwendet.  Die Bedeutungen der Anweisungen \Macro{ifVTeX} und
   \Macro{ifundefinedorrelax} sowie weitere Verzweigungsanweisungen sind
-  \autoref{sec:scrbase.if} zu entnehmen.
+  \autoref{sec:scrbase.if}, %\autopageref{desc:scrbase.cmd.ifVTeX} und
+  %\autopageref{desc:scrbase.cmd.ifundefinedorrelax} 
+  ab \autopageref{sec:scrbase.if} zu entnehmen.
 \end{Example}
 %
 \EndIndex{Option}{internalonly~=\PName{Wert}}%
@@ -125,7 +127,7 @@ Anwender können sie mit oder ohne Wertangabe entweder als globale Option bei
 \label{sec:scrbase.keyvalue}
 
 Wie bereits in \autoref{sec:scrbase.loadit} erwähnt, setzt \Package{scrbase}
-bei Schlüsseln und deren Werte auf das Paket \Package{keyval}. Allerdings
+bei Schlüsseln und deren Werten auf das Paket \Package{keyval}. Allerdings
 erweitert es dessen Funktionalität. Während bei \Package{keyval} ein Schlüssel
 einer Familie gehört, kennt \Package{scrbase} zu jeder Familie auch noch
 Familienmitglieder. Ein Schlüssel kann dann sowohl einer Familie als auch
@@ -158,8 +160,9 @@ Theoretisch wäre es möglich, mit einem leeren optionalen Argument
 \PName{Mitglied} auch ein Mitglied ohne Name zu definieren. Dies würde jedoch
 der Familie selbst entsprechen. Es wird empfohlen als \PName{Familienname} nur
 Buchstaben und Ziffern zu verwenden und das \PName{Mitglied} immer mit einem
-anderen Zeichen zu verwenden. Anderenfalls könnte es passieren, dass sich
-Mitglieder einer Familie mit Mitgliedern anderer Familien überdecken.
+anderen Zeichen, vorzugsweise einem Punkt, zu beginnen. Anderenfalls könnte
+es passieren, dass sich Mitglieder einer Familie mit Mitgliedern anderer
+Familien überdecken.
 
 \Package{scrbase} definiert selbst bereits die Familie »\PValue{KOMA}« und
 fügt ihr das Mitglied »\PValue{.scrbase.sty}« hinzu. Grundsätzlich ist die
@@ -177,7 +180,7 @@ Pakete im Gesamtpaket als Mitglied zu verwenden.
   \DefineFamily{Fleischermeister}
   \DefineFamilyMember{Fleischermeister}
 \end{lstcode}
-  ein. Dadurch werden dann beim Laden der drei genannten Pakete der Familie
+  ein. Dadurch wird beim Laden der drei genannten Pakete der Familie
   »\PValue{Fleischermeister}« je nach Paket eines der drei Mitglieder
   »\PValue{.Salami.sty}«, »\PValue{.Mettwurst.sty}« und
   »\PValue{.Krakauer.sty}« zugefügt. Am Ende sind dann alle drei Mitglieder
@@ -218,12 +221,12 @@ eingesetzt. Falls kein \PName{Säumniswert} angegeben wird, kann später der
 \begin{Explain}
   \phantomsection\label{explain:scrbase.macro.DefineFamilyKey}%
   Letztlich führt
-\begin{lstcode}[escapeinside=»«]
+\begin{lstcode}[belowskip=\dp\strutbox,escapeinside=»«]
   \DefineFamilyKey[»\PName{Mitglied}«]{»\PName{Familie}«}{»\PName{Schlüssel}«}
                   [»\PName{Säumniswert}«]{»\PName{Aktion}«}
 \end{lstcode}
   zu dem Aufruf
-\begin{lstcode}[moretexcs={define@key},escapeinside=»«]
+\begin{lstcode}[belowskip=\dp\strutbox,moretexcs={define@key},escapeinside=»«]
   \define@key{»\PName{Familie\,Mitglied}«}{»\PName{Schlüssel}«}
              [»\PName{Säumniswert}«]{»\PName{erweiterte Aktion}«}
 \end{lstcode}
@@ -235,25 +238,27 @@ eingesetzt. Falls kein \PName{Säumniswert} angegeben wird, kann später der
 
 Erfolg\ChangedAt{v3.12}{\Package{scrbase}} oder Misserfolg der Ausführung der
 \PName{Aktion} werden über
-\Macro{FamilyKeyState}%\important{\Macro{FamilyKeyState}} % einige davon sind
-                                                          % schlicht zu breit!
+\Macro{FamilyKeyState} %\important{\Macro{FamilyKeyState}} % einige davon sind
+                                                           % schlicht zu breit!
 an \Package{scrbase} zurück gemeldet, damit dieses je nach Bedarf und
-Verwendung der Option weitere Maßnahmen ergreifen kann. In der Voreinstellung
-ist \Macro{FamilyKeyState} identisch mit \Macro{FamilyKeyStateUnknown}. Das
-bedeutet, dass es nicht sicher ist, ob die Option korrekt verarbeitet werden
-konnte. Findet \Package{scrbase} nach Ausführung der \PName{Aktion} noch immer
-diesen Zustand vor, so wird ein Hinweis in die \File{log}-Datei geschrieben
-und im weiteren der Zustand \Macro{FamilyKeyStateProcessed} angenommen.
+Verwendung des Schlüssels weitere Maßnahmen ergreifen kann. In der
+Voreinstellung ist \Macro{FamilyKeyState} identisch mit
+\Macro{FamilyKeyStateUnknown}. Das bedeutet, dass es nicht sicher ist, ob der
+Schlüssel korrekt verarbeitet werden konnte. Findet \Package{scrbase} nach
+Ausführung der \PName{Aktion} noch immer diesen Zustand vor, so wird ein
+Hinweis in die \File{log}-Datei geschrieben und im weiteren der Zustand
+\Macro{FamilyKeyStateProcessed} angenommen.
 
 Der Zustand
-\Macro{FamilyKeyStateProcessed}%\important{\Macro{FamilyKeyStateProcessed}}
-signalisiert, dass die Option und die Wertzuweisung an die Option vollständig
-abgeschlossen wurde und alles in Ordnung ist. Auf den Zustand kann einfach
-durch Aufruf von \Macro{FamilyKeyStateProcessed} selbst umgeschaltet werden.
+\Macro{FamilyKeyStateProcessed} %\important{\Macro{FamilyKeyStateProcessed}}
+signalisiert, dass der Schlüssel und die Wertzuweisung an den Schlüssel
+vollständig abgeschlossen wurde und alles in Ordnung ist. Auf den Zustand kann
+einfach durch Aufruf von \Macro{FamilyKeyStateProcessed} selbst umgeschaltet
+werden.
 
 Der Zustand
-\Macro{FamilyKeyStateUnknownValue}%\important{\Macro{FamilyKeyStateUnknownValue}}
-signalisiert, dass die Option zwar verarbeitet wurde, ihr jedoch ein Wert
+\Macro{FamilyKeyStateUnknownValue} %\important{\Macro{FamilyKeyStateUnknownValue}}
+signalisiert, dass der Schlüssel zwar verarbeitet wurde, ihm jedoch ein Wert
 zugewiesen werden sollte, der nicht erlaubt ist. Diesen Zustand meldet
 beispielsweise \Package{typearea}, wenn versucht wird, an Option
 \Option{twoside} den Wert \PValue{unbekannt} zuzuweisen. Die Umschaltung auf
@@ -261,10 +266,10 @@ den Zustand erfolgt einfach durch Aufruf von
 \Macro{FamilyKeyStateUnknownValue} selbst.
 
 Der Zustand
-\Macro{FamilyKeyStateNeedValue}%\important{\Macro{FamilyKeyStateNeedValue}}
-signalisiert, dass die Option nicht verarbeitet werden konnte, weil sie
-zwingend einen Wert erwartet, sie aber ohne Wertzuweisung aufgerufen
-wurde. Dieser Zustand wird automatisch gesetzt, wenn eine Option, die keinen
+\Macro{FamilyKeyStateNeedValue} %\important{\Macro{FamilyKeyStateNeedValue}}
+signalisiert, dass der Schlüssel nicht verarbeitet werden konnte, weil er
+zwingend einen Wert erwartet, er aber ohne Wertzuweisung aufgerufen
+wurde. Dieser Zustand wird automatisch gesetzt, wenn ein Schlüssel, der keinen
 \PName{Säumniswert} besitzt, ohne Wertzuweisung verwendet wird. Theoretisch
 wäre aber auch eine explizite Umschaltung darauf durch Aufruf von
 \Macro{FamilyKeyStateNeedValue} selbst möglich.
@@ -288,9 +293,9 @@ sollten jedoch die vier vordefinierten Zustände verwendet werden.
     \FamilyKeyStateProcessed
   }
 \end{lstcode}
-  Als Wert sind daher beim Aufruf \PValue{true} oder \PValue{false}
+  Als Wert ist daher beim Aufruf \PValue{true} oder \PValue{false}
   erlaubt. Ein Test auf unerlaubte Werte existiert in diesem Beispiel
-  nicht. Stattdessen wird immer zurück gemeldet, dass die Option vollständig
+  nicht. Stattdessen wird immer zurückgemeldet, dass der Schlüssel vollständig
   und korrekt verarbeitet wurde. Wird der Schlüssel später verwendet, so muss
   entweder einer der erlaubten Werte zugewiesen oder ein Aufruf ohne
   Wertzuweisung verwendet werden. In letzterem Fall wird der Säumniswert
@@ -316,7 +321,7 @@ sollten jedoch die vier vordefinierten Zustände verwendet werden.
 Grundsätzlich ist die Erweiterung der Schlüssel von Familien auf Familien
 und Familienmitglieder dazu gedacht, dass Schlüssel beziehungsweise die
 Wertzuweisung an Schlüssel als ganz normale Klassen- oder Paketoptionen
-verwendet werden kann. Diese Anweisung stellt daher ein Erweiterung von
+verwendet werden können. Diese Anweisung stellt daher eine Erweiterung von
 \Macro{ProcessOptions*} aus dem \LaTeX-Kern dar (siehe
 \cite{latex:clsguide}). Dabei verarbeitet die Anweisung nicht nur Optionen,
 die mit \Macro{DeclareOption} definiert wurden. Es werden auch alle Schlüssel
@@ -353,9 +358,9 @@ werden mit Hilfe von \Macro{FamilyProcessOptions} aus
 
 Wie\textnote{Achtung!} auch \Macro{ProcessOptions} darf
 \Macro{FamilyProcessOptions} nicht während der Ausführung von Optionen
-verwendet werden. Es ist also insbesondere nicht erlaubt, innerhalb der
-Ausführung von Optionen Pakete zu laden, die selbst
-\Macro{FamilyProcessOptions} verwenden.%
+verwendet werden. Es ist also insbesondere auch nicht erlaubt, innerhalb der
+Ausführung von Optionen Pakete zu laden.%, die selbst
+%\Macro{FamilyProcessOptions} verwenden.%
 %
 \EndIndex{Cmd}{FamilyProcessOptions}%
 
@@ -365,7 +370,7 @@ Ausführung von Optionen Pakete zu laden, die selbst
   \Macro{FamilyExecuteOptions}\OParameter{Mitglied}\Parameter{Familie}%
   \Parameter{Optionenliste}
 \end{Declaration}
-Diese Anweisung stellt ein Erweiterung von
+Diese Anweisung stellt eine Erweiterung von
 \Macro{ExecuteOptions} aus dem \LaTeX-Kern dar (siehe
 \cite{latex:clsguide}). Dabei verarbeitet die Anweisung nicht nur Optionen,
 die mit \Macro{DeclareOption} definiert wurden. Es werden auch alle Schlüssel
@@ -400,7 +405,7 @@ werden.%
 Die \PName{Optionenliste} hat dabei die Form:
 \begin{flushleft}\begin{tabular}{l}
     \PName{Schlüssel}\texttt{=}\PName{Wert}\texttt{,}%
-    \PName{Schlüssel}\texttt{=}\PName{Wert}\dots
+    \PName{Schlüssel}\texttt{=}\PName{Wert} \dots
 \end{tabular}\vskip\dp\strutbox\end{flushleft}
 wobei für \PName{Schlüssel}, für die ein Säumniswert definiert ist, die
 Wertzuweisung natürlich auch entfallen kann.
@@ -424,6 +429,7 @@ Mitglieder über \Macro{FamilyKeyState} einen Fehler zurückmeldet.
 \begin{lstcode}
   \ProvidesPackage{Wurstsalat}%
                   [2008/05/06 nonsense package]
+  \RequirePackage{scrbase}
   \DefineFamily{Fleischermeister}
   \DefineFamilyMember{Fleischermeister}
   \FamilyProcessOptions{Fleischermeister}\relax
@@ -431,24 +437,34 @@ Mitglieder über \Macro{FamilyKeyState} einen Fehler zurückmeldet.
 \end{lstcode}
   Sollte noch kein Wurstpaket geladen sein, so würde nun eine Fehlermeldung
   wegen der nicht definierten Option »\Option{Aufschnitt}« ausgegeben. Das
-  kann vermieden werden, wenn die letzte Zeile in
-\begin{lstcode}[moretexcs={Family@Options}]
-  \Family@Options{Fleischermeister}{Aufschnitt}{}
+  kann vermieden werden, wenn vor der letzten Zeile für das Paket selbst
+  ebenfalls einen entsprechenden Schlüssel definiert:
+\begin{lstcode}
+  \DefineFamilyKey{Fleischermeister}%
+                  {Aufschnitt}[true]{}%
 \end{lstcode}
-  geändert wird. Allerdings produzieren so Wurstpakete, die nach
+  Allerdings produzieren so Wurstpakete, die nach
   \Package{Wurstsalat} geladen werden, keinen Aufschnitt. Dies kann man
-  ebenfalls ändern, wenn die letzte Zeile erneut überarbeitet wird:
-\begin{lstcode}[moretexcs={Family@Options}]
+  ebenfalls ändern:
+\begin{lstcode}
   \AtBeginDocument{%
-    \Family@Options{Fleischermeister}{Aufschnitt}{%
-      \PackageWarning{Wurstsalat}{%
-        Wurstsalat benötigt mindestens ein 
-        Wurstpaket}%
-    }%
+    \DefineFamilyKey[.Wurstsalat.sty]%
+                    {Fleischermeister}%
+                    {Aufschnitt}[true]{}%
+  }
+  \DefineFamilyKey{Fleischermeister}%
+                  {Aufschnitt}[true]{%
+    \AtBeginDocument{\FamilyOptions{Aufschnitt=#1}}%
   }%
 \end{lstcode}
-  Statt auf jegliche Meldung zu verzichten, falls kein Wurstpaket geladen
-  ist, wird nun auch gleich noch eine Warnung ausgegeben.
+  Somit wird während \Macro{begin}\PParameter{document} zunächst die Option so
+  definiert, dass sie für das Paket \Package{Wurstsalat} keine Funktion mehr
+  ausübt. Da zu diesem Zeitpunkt \Macro{@currname} und \Macro{@currext} nicht
+  mehr gültig sind, muss dabei das optionale Argument von
+  \Macro{DefineFamilyKey} verwendet werden. Bis zu dieser Umdefinierung der
+  Option wird jedoch eine Definition verwendet, die während
+  \Macro{begin}\PParameter{document} die Option erneut für die gesamte Familie
+  ausführt und damit auch für andere Wurstpakete setzt.
 \end{Example}
 %
 \EndIndex{Cmd}{FamilyOptions}%
@@ -466,11 +482,11 @@ anzugeben. Stattdessen kann man einfach mit \Macro{FamilyOption} einer
 einzigen \PName{Option} eine ganze \PName{Werteliste} zuweisen. Die
 \PName{Werteliste} ist dabei eine durch Komma separierte Liste von Werten:
 \begin{flushleft}\begin{tabular}{l}
-    \PName{Wert}\texttt{,}\PName{Wert}\dots
+    \PName{Wert}\texttt{,}\PName{Wert} \dots
 \end{tabular}\end{flushleft}
 In diesem Zusammenhang sei darauf hingewiesen, dass die Verwendung eines
 Kommas in einem Wert möglich ist, wenn man den Wert in geschweifte Klammern
-setzt. Die weiteren Funktionsweise ist der vorhergehenden Erklärung zu
+setzt. Die weitere Funktionsweise ist der vorhergehenden Erklärung zu
 \Macro{FamilyOptions} zu entnehmen.
 \begin{Example}
   Das Paket \Package{Wurstsalat} soll eine Option bekommen, über die man
@@ -532,7 +548,7 @@ Verwendung dieser Anweisung außerhalb der Ausführung von Optionen.
 \end{Declaration}
 In den vorherigen Beispielen wurden schon mehrfach Schalter gesetzt. Im
 Beispiel der Option \Option{Aufschnitt} war es dabei notwendig, dass der
-Anwender als Werte \PValue{true} oder \PValue{false} angibt. Es existierte
+Anwender als Wert \PValue{true} oder \PValue{false} angibt. Es existierte
 keine Fehlerbehandlung, falls der Anwender einen falschen Wert verwendet. Da
 solche booleschen Schalter ein häufiger Anwendungsfall sind, kann man sie bei
 \Package{scrbase} einfach mit \Macro{FamilyBoolKey} definieren. Dabei sind die
@@ -553,7 +569,7 @@ Ausschalten. Wird ein unbekannter Wert übergeben, so wird die Anweisung
 \Macro{FamilyUnknownKeyValue} mit den Argumenten \PName{Familie},
 \PName{Schlüssel} und \PName{Wert} aufgerufen und so \Macro{FamilyKeyState}
 entsprechend gesetzt. Dadurch wird dann gegebenenfalls eine Meldung über
-unbekannte Wertzuweisung ausgegeben (siehe auch
+eine unbekannte Wertzuweisung ausgegeben (siehe auch
 \autopageref{desc:scrbase.cmd.FamilyUnknownKeyValue} und
 \autopageref{desc:scrbase.cmd.FamilyKeyState}).
 \begin{Example}
@@ -565,7 +581,7 @@ unbekannte Wertzuweisung ausgegeben (siehe auch
   \FamilyBoolKey{Fleischermeister}{Aufschnitt}%
                                   {@Aufschnitt}
 \end{lstcode}
-  Ein Test, ob Aufschnitt produziert wird sähe dann so aus:
+  Ein Test, ob Aufschnitt produziert wird, sähe dann so aus:
 \begin{lstcode}
   \if@Aufschnitt
      ...
@@ -644,7 +660,7 @@ Wert. Daher heißt bei \Package{scrbase} die Anweisung, mit der man via
 \Macro{FamilyNumericalKey}. Die \PName{Werteliste} hat dabei die Form
 \begin{flushleft}\vskip\dp\strutbox\begin{tabular}{l}
     \Parameter{Wert}\Parameter{Definition}\texttt{,}%
-    \Parameter{Wert}\Parameter{Definition}\texttt{,}%
+    \Parameter{Wert}\Parameter{Definition} %
     \dots
 \end{tabular}\vskip\dp\strutbox\end{flushleft}
 Über diese \PName{Werteliste} werden so nicht nur die erlaubten Werte für den
@@ -678,8 +694,8 @@ expandiert wird.
   \FamilyOptions{Fleischermeister}{SalatSchnitt=Nein}
 \end{lstcode}
   angegeben werden. In beiden Fällen würde \Macro{Schnitt} mit dem Inhalt
-  \PValue{Kein} definiert. Es kann durchaus sinnvoll sein, wie in diesem
-  Beispiel dem Anwender mehrere Werte für denselben Zweck anzubieten.
+  \PValue{Kein} definiert. Es kann durchaus sinnvoll sein, dem Anwender wie in
+  diesem Beispiel mehrere Werte für denselben Zweck anzubieten.
 
   Nun ist es sehr wahrscheinlich, dass die Schnittart nicht ausgegeben,
   sondern später ausgewertet werden soll. In diesem Fall sind die textuellen
@@ -812,14 +828,14 @@ Säumniswert unterstützen.%
 Hier wird nun\ChangedAt{v3.08}{\Package{scrbase}} ein Schlüssel definiert, der
 jeden beliebigen Wert annehmen kann. Der Wert wird in dem angegebenen
 \PName{Makro} gespeichert. Wird das optionales Argument für den
-\PName{Säumniswert} weg gelassen, so entspricht die Anweisung:
-\begin{lstcode}[escapeinside=»«]
+\PName{Säumniswert} weggelassen, so entspricht die Anweisung:
+\begin{lstcode}[belowskip=\dp\strutbox plus 1pt,escapeinside=»«]
   \DefineFamilyKey[»\PName{Mitglied}«]{»\PName{Familie}«}{»\PName{Schlüssel}«}
                   {\def»\PName{Makro}«{#1}}
 \end{lstcode}
 Existiert
 das optionale Argument für den \PName{Säumniswert} so entspricht die Anweisung:
-\begin{lstcode}[escapeinside=»«]
+\begin{lstcode}[belowskip=\dp\strutbox plus 1pt,escapeinside=»«]
   \DefineFamilyKey[»\PName{Mitglied}«]{»\PName{Familie}«}{»\PName{Schlüssel}«}
                   [»\PName{Säumniswert}«]
                   {\def»\PName{Makro}«{#1}\FamilyKeyStateProcessed}
@@ -937,7 +953,6 @@ entsprechend anzupassen.%
 Das Paket \Package{scrbase} stellt eine ganze Reihe von
 Verzweigungsanweisungen zur Verfügung. Dabei wird nicht auf die \TeX-Syntax
 von Verzweigungen, wie beispielsweise
-% Umbruchkorrektur
 \begin{lstcode}[belowskip=\dp\strutbox]
   \iftrue
     ...
@@ -1042,7 +1057,7 @@ PDF-Datei mit Hilfe von pdf\TeX{} oder mit Hilfe von V\TeX{} erzeugt wird.
   \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
 \end{Declaration}
 Wird eine PostScript-Datei erzeugt, so wird der \PName{Dann-Teil} ausgeführt,
-anderenfalls der \PName{Sonst-Teil}. V\TeX{} kann PostScript direkt erzeugten,
+anderenfalls der \PName{Sonst-Teil}. V\TeX{} kann PostScript direkt erzeugen,
 was hier auch erkannt wird. Wird hingegen kein V\TeX{} verwendet, ist aber ein
 Schalter \Macro{if@dvips} definiert, so wird die Entscheidung darüber
 getroffen. \KOMAScript{} stellt \Macro{if@dvips} in \Package{typearea} bereit.
@@ -1279,9 +1294,17 @@ Grund ist es sinnvoll die Änderungen mit Hilfe von \Macro{AtBeginDocument} bis
 \Macro{begin}\PParameter{document}, also bis nach dem Laden aller Pakete, zu
 verzögern. Auch der Anwender muss entweder von \Macro{AtBeginDocument}
 Gebrauch machen oder aber seine Änderungen nicht in die Dokumentpräambel,
-sondern hinter \Macro{begin}\PParameter{document} einfügen. Das Paket
-\Package{scrbase} bietet ihm für die Definition selbst einige zusätzliche
-Anweisungen.
+sondern hinter \Macro{begin}\PParameter{document} einfügen.
+
+Darüber hinaus kommt erschwerend hinzu, dass einige Pakete zusätzliche,
+sprachabhängige Begriffe in \Macro{captions\PName{Sprache}} definieren,
+während andere dafür \Macro{extras\PName{Sprache}} verwenden. So muss der
+Anwender sich schon sehr genau auskennen, um die richtige Anweisung auf die
+richtige Weise zu ergänzen.
+
+Das Paket \Package{scrbase} bietet dem Anwender daher für die Definition
+selbst einige zusätzliche Anweisungen, die ihn von vielen dieser Überlegungen
+entlasten.
 
 \BeginIndex{Cmd}{defcaptionname}%
 \BeginIndex{Cmd}{providecaptionname}%
@@ -1341,14 +1364,16 @@ ausgegeben. Ist der \PName{Begriff} in der Sprache definiert, so wird
 er auf den gewünschten \PName{Inhalt} umdefiniert.
 
 \KOMAScript{} selbst verwendet \Macro{providecaptionname} um die Begriffe aus
-\autoref{sec:scrlttr2-experts.languages} zu definieren.
+\autoref{sec:scrlttr2-experts.languages},
+\autopageref{desc:scrlttr2-experts.cmd.yourrefname} zu definieren.
 
 \begin{Example}
-  Möchten Sie statt »Abbildung« in den Abbildungsunterschriften lieber »Abb.«
-  stehen haben, so erreichen Sie dies mit:
+  Möchten Sie »Abb.« statt »Abbildung« in den Abbildungsunterschriften, so
+  erreichen Sie dies mit:
 \begin{lstcode}
   \renewcaptionname{ngerman}{\figurename}{Abb.}
 \end{lstcode}
+
   Soll dieselbe Änderung nicht nur für \PValue{ngerman}, sondern
   auch für die Sprachen \PValue{naustrian} und \PValue{nswissgerman}, also für
   Österreichisch und Schweizer Deutsch gelten, so ist
@@ -1368,10 +1393,17 @@ er auf den gewünschten \PName{Inhalt} umdefiniert.
   nach der veralteten Rechtschreibung, hinzugefügt werden.
 \end{Example}
 \begin{Explain}
-Die Sprachen \PValue{swissgerman} und
-\PValue{nswissgerman} werden übrigens von älteren Versionen von
-\Package{babel} noch nicht unterstützt. Sie sind erst seit Dezember~2013
-Bestandteil des deutschen Sprachpakets für \Package{babel}.
+  Die Sprachen \PValue{swissgerman} und \PValue{nswissgerman} werden übrigens
+  von älteren Versionen von \Package{babel} noch nicht unterstützt. Sie sind
+  erst seit Dezember~2013 Bestandteil des deutschen Sprachpakets für
+  \Package{babel}. Für die Anweisungen \Macro{defcaptionname},
+  \Macro{newcaptionname} und \Macro{providecaptionname} spielt dies kaum eine
+  Rolle, da diese auch Begriffe für nicht existierende Sprachen definieren
+  können. Da mit \Macro{renewcaptionname} jedoch nur existierende Begriffe von
+  existierenden Sprachen umdefiniert werden können, resultiert die
+  Umdefinierung für \Option{nswissgerman} und \Option{swissgerman} bei
+  Verwendung einer älteren Version von \Package{babel} in einer entsprechenden
+  Fehlermeldung.
 \end{Explain}
 
 Seit \KOMAScript~3.12\ChangedAt{v3.12}{\Package{scrbase}} ist es auch nicht
@@ -1382,9 +1414,10 @@ Anweisungen in der Dokumentpräambel aufgerufen werden. Außerdem prüft
 \Package{scrbase} nun auch, ob ein umzudefinierender Begriff statt in
 \Macro{captions\PName{Sprache}} in \Macro{extras\PName{Sprache}} zu definieren
 ist. Die neuen Sternvarianten der Befehle verwenden grundsätzlich
-\Macro{captions\PName{Sprache}}. Damit funktioniert nun in der Regel auch das
-Umdefinieren von sprachabhängigen Bezeichnern von Paketen wie
-\Package{hyperref}, die dafür \Macro{extras\PName{Sprache}} verwenden.
+\Macro{extras\PName{Sprache}}, da dessen Definitionen in der Regel nach
+\Macro{captions\PName{Sprache}} Anwendung finden. Damit funktioniert nun in
+der Regel auch das Umdefinieren von sprachabhängigen Bezeichnern von Paketen
+wie \Package{hyperref}, die dafür \Macro{extras\PName{Sprache}} verwenden.
 
 In \autoref{tab:scrbase.commonNames} ist ein Überblick über die üblicherweise
 von Klassen und Sprachpaketen definierten Begriffe und deren Verwendung zu
@@ -1498,7 +1531,7 @@ finden.
 \section{Identifikation von \KOMAScript}
 \label{sec:scrbase.identify}
 
-Auch wenn \Package{scrbase} unabhängig von \KOMAScript{} auch für andere
+Obwohl \Package{scrbase} unabhängig von \KOMAScript{} auch für andere
 Pakete und Klassen verwendet werden kann, so ist es dennoch ein
 \KOMAScript-Paket. Als solches enthält es auch Anweisungen, die es als
 \KOMAScript-Paket identifizieren.
@@ -1566,7 +1599,7 @@ von \Package{scrbase} bereit gestellt.
 \end{Declaration}%
 Der \LaTeX-Kern bietet mit \Macro{g@addto@macro} eine interne Anweisung, um
 die Definition eines Makro \PName{Anweisung} global um den Code
-\PName{Erweiterung} zu erweitern. Dies funktioniert in dieser Form nur für
+\PName{Erweiterung} zu erweitern. Das funktioniert in dieser Form nur für
 Makros ohne Argumente. Dennoch könnte man diese Anweisung in einigen Fällen
 auch in einer Form benötigen, die lokal zur aktuellen Gruppe arbeitet. Diese
 wird mit \Macro{l@addto@macro} von \Package{scrbase} bereit gestellt. Eine
@@ -1583,7 +1616,7 @@ Anweisungen für unterschiedliche Zwecke bietet (siehe
 
 Das für \LaTeX{} inzwischen verwendete und von \KOMAScript{} vorausgesetzte
 \eTeX{} besitzt mit \Macro{numexpr}\IndexCmd{numexpr} erweiterte Möglichkeiten
-zur Berechnung einfacher Ausrücke mit \TeX-Zählern und ganze Zahlen. Als
+zur Berechnung einfacher Ausdrücke mit \TeX-Zählern und ganzen Zahlen. Als
 Operationen werden dabei die vier Grundrechenarten und Klammern
 unterstützt. Bei der Division wird korrekt gerundet. Manchmal sind weitere
 Operationen nützlich.
@@ -1595,16 +1628,17 @@ Operationen nützlich.
   \Macro{XmodY}\Parameter{Dividend}\Parameter{Divisor}%
 \end{Declaration}%
 Die\ChangedAt{v3.05a}{\Package{scrbase}} Anweisung \Macro{XdivY} liefert den
-Wert des Ganzzahlquotienten, die Anweisung \Macro{XmodY} den Wert des Rests
-der Division mit Rest. Diese Art der Division ist nach der Gleichung
+Wert des ganzzahligen Quotienten, die Anweisung \Macro{XmodY} den Wert des
+Rests der Division mit Rest. Diese Art der Division ist nach der Gleichung
 \[
 \textit{Dividend} = \textit{Divisor} \cdot
-\textit{Ganzzahlquotient} + \textit{Rest}
+\textit{Quotient} + \textit{Rest}
 \]
 %
-definiert, wobei \textit{Dividend} und \textit{Rest} ganze Zahlen und
-\textit{Rest} außerdem größer oder gleich 0 und kleiner als \textit{Divisor}
-ist. Der \textit{Divisor} ist eine natürliche Zahl (ohne die 0).
+definiert, wobei \textit{Dividend}, \textit{Divisor} und \textit{Rest} ganze
+Zahlen und \textit{Rest} außerdem größer oder gleich 0 und kleiner als
+\textit{Divisor} ist. Der \textit{Divisor} ist eine natürliche Zahl (ohne die
+0).
 
 Der Wert kann jeweils zur Zuweisung an einen Zähler oder direkt innerhalb
 eines Ausdrucks mit \Macro{numexpr} verwendet werden. Zur Ausgabe als
