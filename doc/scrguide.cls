@@ -1314,6 +1314,7 @@
     FreeI,FreeII,FreeIII,FreeIV,
     GenericMarkFormat,
     headfont,headmark,
+    ifundefinedorrelax,
     ifattoclist,ifoot,ihead,ifkomavarempty,ifstr,ifthispageodd,InputAddressFile,
     KOMAoption,KOMAoptions,KOMAScript, l@addto@macro,
     LastName,layerwidth,layerheight,lefoot,lehead,LetterOptionNeedsPapersize,
