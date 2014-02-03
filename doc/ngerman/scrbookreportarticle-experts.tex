@@ -146,14 +146,16 @@ diesem Argument mit
 Für das Argument \PName{Nummer} gilt noch eine Besonderheit. Ist das Argument
 leer, so signalisiert dies, dass ein nicht nummerierter Eintrag erzeugt werden
 soll. In der Voreinstellung wird dies mit
-\begin{quote}
+\begin{quote}\small\raggedright
   \Macro{addcontentsline}\PParameter{toc}\Parameter{Ebene}%
-  \Parameter{Überschrift}
+  \PParameter{\%\\
+    \quad\Macro{protect}\Macro{nonumberline} \PName{Überschrift}\%\\
+  }
 \end{quote}
 erreicht. Ist das Argument jedoch nicht leer, so soll ein nummerierter Eintrag
 erzeugt werden und \PName{Nummer} ist die vorformatierte Gliederungsnummer. In
 der Voreinstellung verwendet \KOMAScript{}
-\begin{quote}\raggedright
+\begin{quote}\small\raggedright
   \Macro{addcontentsline}\PParameter{toc}\Parameter{Ebene}%
   \PParameter{\%\\
     \quad\Macro{protect}\Macro{numberline}\Parameter{Nummer}%
@@ -168,8 +170,9 @@ wäre beispielsweise denkbar mit
 \begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
   \renewcommand{\addtocentrydefault}[3]{%
     \ifstr{#3}{}{%
+    }{%
       \ifstr{#2}{}{%
-        \addcontentsline{toc}{#1}{#3}%
+        \addcontentsline{toc}{#1}{\protect\nonumberline#3}%
       }{%
         \addcontentsline{toc}{#1}{\protect\numberline{#2}#3}%
       }%
@@ -206,7 +209,7 @@ Auch \ChangedAt{v3.08}{\Class{scrbook}\and \Class{scrreprt}\and
 \Macro{addtocentrydefault}\IndexCmd{addtocentrydefault}%
 \important{\Macro{addtocentrydefault}} wird von den \KOMAScript-Klassen nur
 dann direkt aufgerufen, wenn für die angegebene \PName{Ebene} keine direkte
-Anweisunge definiert oder diese
+Anweisung definiert oder diese
 \Macro{relax}\IndexCmd{relax}\important{\Macro{relax}} ist. In der
 Voreinstellung sind die angegebenen Anweisungen alle so definiert, dass sie
 ihre \PName{Ebene} und die Argumente direkt an \Macro{addtocentrydefault}
@@ -369,7 +372,7 @@ Die Voreinstellungen für diese sechs Anweisungen von
 \Class{scrreprt} sind \autoref{tab:maincls-experts.headvskip} und
 \autoref{tab:maincls-experts.headvskip2} zu entnehmen. Für
 \Class{scrartcl}\OnlyAt{\Class{scrartcl}} \pagebreak% Umbruchoptimierung!!!
-sind die Voreinstellung der dort definierten drei Anweisungen in
+sind die Voreinstellungen der dort definierten drei Anweisungen in
 \autoref{tab:maincls-experts.headvskip3} zu finden. Auf\textnote{Beispiel!}
 \cite{homepage} gibt es außerdem ein Beispiel, bei dem durch Umdefinierung von
 \Macro{chapterheadstartvskip} und \Macro{chapterheadendvskip} Linien über und
@@ -524,7 +527,7 @@ merken.
   in \autoref{sec:maincls.structure},
   \autopageref{desc:maincls.option.chapterprefix}).  Damit die Konsistenz
   gewahrt bleibt, wollen Sie auch nicht, dass eine solche Zeile im Anhang
-  verwendet wird. Stattdessen sollen in den Anhängen direkt vor dem
+  verwendet wird. Stattdessen soll in den Anhängen direkt vor dem
   Kapitelbuchstaben das Wort »Anhang« in der jeweiligen Sprache stehen. Dies
   soll auch für die Kolumnentitel gelten. Also verwenden Sie nicht die
   Layoutoption \Option{appendixprefix}, sondern
@@ -595,23 +598,23 @@ merken.
 Schon die Standardklassen\textnote{Standardklassen} kennen zur Unterteilung
 der Einträge in das Literaturverzeichnis die Anweisung \Macro{newblock}. Was
 diese Anweisung genau macht, hängt dabei von den Klassenoptionen ab. Wird die
-Option \Option{openbib}\important{\Option{openbib}} verwendet, so wird am Ende
-der Standardklasse die Anweisung \Macro{@openbib@code} und \Macro{newblock}
+Option \Option{openbib}\important{\Option{openbib}} verwendet, so werden am Ende
+der Standardklasse die Anweisungen \Macro{@openbib@code} und \Macro{newblock}
 selbst umdefiniert. Von den Standardklassen wird die Anweisung
 \Macro{@openbib@code} beim Start der Liste für das Literaturverzeichnis --
 genauer: bei der Festlegung der Parameter für diese Liste -- ausgeführt. Es
 darf davon ausgegangen werden, dass auch viele Pakete, die das
 Literaturverzeichnis umdefinieren, diese Anweisung entsprechend abarbeiten.
 
-Bei den \KOMAScript-Klassen\textnote{\KOMAScript} geschieht
-etwas ähnliches. Allerdings wird \Macro{@openbib@code} nicht am Ende der Klasse
+Bei den \KOMAScript-Klassen\textnote{\KOMAScript} geschieht etwas
+ähnliches. Allerdings wird \Macro{@openbib@code} nicht am Ende der Klasse
 umdefiniert. Stattdessen wird mit \Macro{newbibstyle} der Stil
-\PValue{openstyle} für das
-Literaturverzeichnis definiert. Die
+\PValue{openstyle} für das Literaturverzeichnis definiert. Die
 \PName{Anweisungen}, die dabei in der Implementierung angegeben wurden,
 beinhalten die gewünschten Umdefinierung von \Macro{@openbib@code} und von
 \Macro{newblock}. Wird nun mit Hilfe der Option
-\OptionValue{bibliography}{openstyle}\IndexOption{bibliography~=\PValue{openstyle}}%
+\OptionValue{bibliography}{openstyle}%
+\IndexOption{bibliography~=\PValue{openstyle}}%
 \important{\OptionValue{bibliography}{openstyle}} dieser
 Literaturverzeichnisstil gewählt, so werden die \PName{Anweisungen}
 unmittelbar ausgeführt, also \Macro{@openbib@code} und \Macro{newblock}
