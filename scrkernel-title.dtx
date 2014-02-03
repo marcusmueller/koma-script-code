@@ -1,8 +1,8 @@
-% \CheckSum{774}
+% \CheckSum{783}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-title.dtx
-% Copyright (c) Markus Kohm, 2002-2013
+% Copyright (c) Markus Kohm, 2002-2014
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrkernel-title.dtx
-% Copyright (c) Markus Kohm, 2002-2013
+% Copyright (c) Markus Kohm, 2002-2014
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -58,8 +58,15 @@
 %%% From File: $Id$
 %<*driver>
 % \fi
-\ProvidesFile{scrkernel-title.dtx}[2013/10/31 v3.12 KOMA-Script 
-                                                   (title pages)]
+\ifx\ProvidesFile\undefined\def\ProvidesFile#1[#2]{}\fi
+\begingroup
+  \def\filedate$#1: #2-#3-#4 #5${\gdef\filedate{#2/#3/#4}}
+  \filedate$Date$
+  \def\filerevision$#1: #2 ${\gdef\filerevision{#2}}
+  \filerevision$Revision: 1638 $
+\endgroup
+\ProvidesFile{scrkernel-title.dtx}[\filedate r\filerevision 
+                                   KOMA-Script (title pages)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -540,18 +547,23 @@
     \end{titlepage}
 %    \end{macrocode}
 %    \changes{v2.3a}{1995/07/08}{Verwendung von \cs{@makefnmark} in
-%      \cs{@makefntext}}
+%      \cs{@makefntext}}%^^A
 %    \changes{v2.3a}{1995/07/08}{Definition von \cs{@makefnmark} und
-%      \cs{@makefntext} unabhängig von math}
+%      \cs{@makefntext} unabhängig von math}%^^A
 %    \changes{v2.3e}{1995/08/30}{optionales Argument bei der
-%      einseitigen Version erlauben und ignorieren}
+%      einseitigen Version erlauben und ignorieren}%^^A
 %    \changes{v2.3g}{1996/01/14}{mehrfach \cs{null} bei
-%      \cs{next@tpage} ergänzt}
+%      \cs{next@tpage} ergänzt}%^^A
 %    \changes{v2.4l}{1997/02/06}{es ist nicht mehr notwendig
 %      \cs{\@makefntext} umzudefinieren, stattdessen wird nur
-%      \cs{\@makefnmark} umdefiniert}
+%      \cs{\@makefnmark} umdefiniert}%^^A
 %    \changes{v2.8d}{2001/07/05}{\cs{titlepagestyle} statt
-%      \texttt{plain}}
+%      \texttt{plain}}%^^A
+%    \changes{v3.12a}{2014/03/03}{Leerzeichenfehler behoben}%^^A
+%    \changes{v3.12a}{2014/03/03}{Schmutztitel wird nur ausgegeben, wenn er
+%      nicht leer ist}%^^A
+%    \changes{v3.12a}{2014/03/03}{\cs{next@tdpage} aus \cs{@maketitle} und
+%      \cs{@makeextrattitle} entfernt}%^^A
 %    \begin{macrocode}
   \else
     \par
@@ -570,12 +582,14 @@
       \let\titlepage@restore\relax
       \renewcommand*\thefootnote{\@fnsymbol\c@footnote}%
       \let\@oldmakefnmark\@makefnmark
-      \renewcommand*{\@makefnmark}{\rlap\@oldmakefnmark}
+      \renewcommand*{\@makefnmark}{\rlap\@oldmakefnmark}%
       \next@tdpage
       \if@twocolumn
         \ifnum \col@number=\@ne
-          \@makeextratitle
-          \next@tdpage
+          \ifx\@extratitle\@empty\else
+            \@makeextratitle
+            \next@tdpage
+          \fi
           \@maketitle
         \else
           \ifx\@extratitle\@empty\else
@@ -584,7 +598,9 @@
           \twocolumn[\@maketitle]%
         \fi
       \else
-        \@makeextratitle
+        \ifx\@extratitle\@empty\else
+          \@makeextratitle\next@tdpage
+        \fi
         \@maketitle
       \fi
       \thispagestyle{\titlepagestyle}\@thanks
@@ -632,20 +648,22 @@
 }%
 %    \end{macrocode}
 % \begin{macro}{\@maketitle}
-%   \changes{v2.95c}{2006/08/21}{Absatzgrundeinstellungen}
-%   \changes{v3.11c}{2012/02/14}{Schmutztitel in eigene Anweisung verlagert}
+%   \changes{v2.95c}{2006/08/21}{Absatzgrundeinstellungen}%^^A
+%   \changes{v3.11c}{2012/02/14}{Schmutztitel in eigene Anweisung verlagert}%^^A
+%   \changes{v3.12a}{2014/03/03}{\cs{next@tdpage} aus \cs{@maketitle}
+%     entfernt}%^^A
 % \begin{macro}{\@makeextratitle}
-%   \changes{v3.11c}{2013/02/14}{neue Anweisung (intern)}
+%   \changes{v3.11c}{2013/02/14}{neue Anweisung (intern)}%^^A
+%   \changes{v3.12a}{2014/03/03}{\cs{next@tdpage} aus \cs{@makeextrattitle}
+%     entfernt}%^^A
 % Damit wird im Fall des Titelkopfes die eigentliche Arbeit geleistet.
 %    \begin{macrocode}
 \newcommand*{\@makeextratitle}{%
-  \next@tdpage
   \ifx\@extratitle\@empty \else
-    \noindent\@extratitle \next@tdpage
+    \noindent\@extratitle\par
   \fi
 }
 \newcommand*{\@maketitle}{%
-  \next@tdpage
   \global\@topnum=\z@
 %<!extend>  \setparsizes{\z@}{\z@}{\z@\@plus 1fil}\par@updaterelative
 %<extend>  \parskip\z@ \parindent\z@ \parfillskip\z@\@plus 1fil
