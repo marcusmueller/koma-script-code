@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# Copyright (c) Markus Kohm, 2006-2013
+# Copyright (c) Markus Kohm, 2006-2014
 #
 # This file prepares KOMA-Script for release.
 #
@@ -110,7 +110,7 @@ stepthree() {
     for f in $( ls README.in/README.* ); do
 	name=${f#README.in/README.}
 	rm testversion.* versiontest.sh
-	if [ $name == ${name%.cls}.cls ]; then
+	if [[ $name =~ \.cls$ ]]; then
 	    # Version test for class
 	    cat > testversion.tex <<EOF
 \\documentclass{${name%.cls}}
