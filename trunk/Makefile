@@ -1,6 +1,6 @@
 # ======================================================================
 # Makefile
-# Copyright (c) Markus Kohm, 2002-2013
+# Copyright (c) Markus Kohm, 2002-2014
 #
 # This file is part of the LaTeX2e KOMA-Script bundle.
 #
@@ -18,7 +18,7 @@
 # This work consists of all files listed in manifest.txt.
 # ----------------------------------------------------------------------
 # Makefile
-# Copyright (c) Markus Kohm, 2002-2013
+# Copyright (c) Markus Kohm, 2002-2014
 #
 # Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 # Version 1.3c, verteilt und/oder veraendert werden.
@@ -189,7 +189,7 @@ ALPHA_DTX       = $(subst .pdf,.dtx,$(ALPHA_DOC))
 CLS_MAIN_SRC	= $(CLS_MAIN_DTX) $(CLS_MAIN_INS) $(CLS_MAIN_SUBINS) \
 		  scrsource.tex
 
-$(ALPHA_DOC): $(ALPHA_DTX)
+$(ALPHA_DOC): $(ALPHA_DTX) scrdoc.cls
 	$(LATEX) $(BATCHMODE) $(PDFOUTPUT) $(subst .pdf,.dtx,$@)
 	$(MKINDEX) $(subst .pdf,,$@)
 	$(LATEX) $(BATCHMODE) $(PDFOUTPUT) $(subst .pdf,.dtx,$@)
