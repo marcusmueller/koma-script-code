@@ -189,7 +189,7 @@ ALPHA_DTX       = $(subst .pdf,.dtx,$(ALPHA_DOC))
 CLS_MAIN_SRC	= $(CLS_MAIN_DTX) $(CLS_MAIN_INS) $(CLS_MAIN_SUBINS) \
 		  scrsource.tex
 
-$(ALPHA_DOC): $(ALPHA_DTX) scrdoc.cls
+$(ALPHA_DOC): $(ALPHA_DTX) scrdoc.cls $(CLS_MAIN)
 	$(LATEX) $(BATCHMODE) $(PDFOUTPUT) $(subst .pdf,.dtx,$@)
 	$(MKINDEX) $(subst .pdf,,$@)
 	$(LATEX) $(BATCHMODE) $(PDFOUTPUT) $(subst .pdf,.dtx,$@)
