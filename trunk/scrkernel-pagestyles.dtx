@@ -1,4 +1,4 @@
-% \CheckSum{592}
+% \CheckSum{614}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-pagestyles.dtx
@@ -300,7 +300,7 @@
     \def\@tempc{%
       \endgroup%
       \KOMA@unknown@keyval{cleardoublepage}{#1}{%
-        'current' or any defined pagestyle e.g. 'empty','plain'}%
+        'current' or any defined pagestyle e.g. 'empty','plain', 'headings'}%
     }%
     \ifstr{#1}{current}{%
       \def\@tempc{\endgroup%
@@ -317,7 +317,26 @@
           \def\cleardoubleevenpage{\cleardoubleevenpageusingstyle{#1}}%
           \FamilyKeyStateProcessed
         }%
-      }{}%
+      }{%
+%    \end{macrocode}
+% \changes{v3.13}{2014/03/01}{allow page style headings as value for class
+%   option}%^^A
+% At class loading time page style \texttt{headings} is still undefined, but
+% should be allowed as value for option \texttt{cleardoublepage}.
+%    \begin{macrocode}
+        \ifx\@currname\KOMAClassName
+          \ifx\@currext\@clsextension
+            \ifstr{#1}{headings}{%
+              \def\@tempc{\endgroup%
+                \def\cleardoublepage{\cleardoublepageusingstyle{#1}}%
+                \def\cleardoubleoddpage{\cleardoubleoddpageusingstyle{#1}}%
+                \def\cleardoubleevenpage{\cleardoubleevenpageusingstyle{#1}}%
+                \FamilyKeyStateProcessed
+              }%
+            }{}%
+          \fi
+        \fi
+      }%
     }%
   \@tempc
 }
