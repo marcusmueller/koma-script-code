@@ -50,7 +50,7 @@
                   KOMA-Script package scrbase]
 \translator{Markus Kohm\and Melvin Hendrix}
 
-% Date of the translated German file: 2013/11/06
+% Date of the translated German file: 2014/03/12
 
 \chapter{Basic Functions of Package \Package{scrbase}}
 \labelbase{scrbase}
@@ -396,23 +396,34 @@ family, then \Macro{FamilyOptions} will result in an error. Package
 \end{lstcode}
   If currently none of the sausage packages are loaded, then an error
   message results because of undefined option ``\Option{coldcut}''. This is
-  avoided by changing the last line of the code to:
-\begin{lstcode}[moretexcs={Family@Options}]
-  \Family@Options{butcher}{coldcut}{}
+  avoided by adding before the last line of the code above:
+\begin{lstcode}
+  \DefineFamilyKey{butcher}%
+                  {coldcut}[true]{}%
 \end{lstcode}
   Despite this, sausage packages loaded after
   \Package{sausagesalad} still do not produce cold cut. This may be corrected
   by editing the last line of the code again to:
-\begin{lstcode}[moretexcs={Family@Options}]
+\begin{lstcode}
   \AtBeginDocument{%
-    \Family@Options{butcher}{coldcut}{%
-      \PackageWarning{sausagesalad}{%
-        sausage salad needs at least 
-        one sausage package}%
-    }%
+    \DefineFamiyKey[.sausagesalad.sty]%
+                   {butcher}%
+                   {coldcut}[true]{}%
+  }
+  \DefineFamilyKey{butcher}%
+                  {coldcut}[true]{%
+    \AtBeginDocument{\FamilyOptions{butcher}%
+                                   {coldcut=#1}}%
   }%
 \end{lstcode}
-  This may throw a warning message if none of the sausage packages are loaded.
+  With this, the option will be defined while
+  \Macro{begin}\PParameter{document} to do nothing for package
+  \Package{sausagesalad}. Because \Macro{@currname} and \Macro{@currext} are
+  not longer valid at this time, the optional argument on
+  \Macro{DefineFamilyKey} has to be used. But until this re-definition of the
+  option another definition is used, that will call the option again while
+  \Macro{begin}\PParameter{document} for the whole family and so also for
+  other sausage salad packages.
 \end{Example}
 %
 \EndIndex{Cmd}{FamilyOptions}%
@@ -647,6 +658,85 @@ normally result in an error message about assigning an unknown value.
 \EndIndex{Cmd}{FamilySetNumerical}%
 \EndIndex{Cmd}{FamilyNumericalKey}%
 
+\begin{Declaration}
+  \Macro{FamilyCounterKey}\OParameter{family member}\Parameter{family}%
+  \Parameter{key}\Parameter{\LaTeX{} counter}\\
+%  \hphantom{\XMacro{FamilyCounterKey}}%
+%  \Parameter{\LaTeX{} counter}
+  \Macro{FamilySetCounter}\Parameter{family}%
+  \Parameter{key}\Parameter{\LaTeX{} counter}\Parameter{value}
+\end{Declaration}
+\BeginIndex{Cmd}{FamilyCounterKey}%
+\BeginIndex{Cmd}{FamilySetCounter}%
+Beside\ChangedAt{v3.12}{\Package{scrbase}} \Macro{FamilyNumercialKey} that
+defines a macro to a numeric value depending on a symbolic value, there are
+circumstances when a \PName{key} directly represents a \PName{\LaTeX{}
+  counter}, that should be assigned directly to a numeric value. In those
+cases, \Macro{FamilyCounterKey} can be used that internally will call
+\Macro{FamilySetCounter}. A primary test of the \PName{value} argument is done
+that only detects whether or not usage of \PName{value} as a number is
+plausible. The assignment is done, only if this plausibility test is
+successful. Nevertheless the assignment can still fail and result in a \TeX{}
+error. But if the plausibility test fails already, this is signalled by
+\Macro{FamilyKeyStateUnknownValue}.
+
+Please note\textnote{Attention!}, this command does not support an optional
+\PName{default}.%
+\EndIndex{Cmd}{FamilySetCounter}%
+\EndIndex{Cmd}{FamilyCounterKey}%
+
+\begin{Declaration}
+  \Macro{FamilyCounterMacroKey}\OParameter{family member}\Parameter{family}%
+  \Parameter{key}\Parameter{macro}\\
+  \Macro{FamilySetCounterMacro}\Parameter{family}%
+  \Parameter{key}\Parameter{macro}\Parameter{value}%
+\end{Declaration}
+\BeginIndex{Cmd}{FamilyCounterMacroKey}%
+\BeginIndex{Cmd}{FamilySetCounterMacro}%
+These\ChangedAt{v3.12}{\Package{scrbase}} two commands differ from the
+previously described \Macro{FamilyCounterKey} and \Macro{FamilySetCounter}
+only by the fact, that they do not assign a \PName{value} to a \PName{\LaTeX
+  counter}, but define a \Macro{macro} with the
+\PName{value}. Note\textnote{Attention}, that also an optional \PName{default}
+is not supported.%
+\EndIndex{Cmd}{FamilySetCounterMacro}%
+\EndIndex{Cmd}{FamilyCounterMacroKey}%
+
+\begin{Declaration}
+  \Macro{FamilyLengthKey}\OParameter{family member}\Parameter{family}%
+  \Parameter{key}\Parameter{length}\\
+  \Macro{FamilySetLength}\Parameter{family}%
+  \Parameter{key}\Parameter{length}\Parameter{value}\\
+  \Macro{FamilyLengthMacroKey}\OParameter{family member}\Parameter{family}%
+  \Parameter{key}\Parameter{Makro}\\
+  \Macro{FamilySetLengthMacro}\Parameter{family}%
+  \Parameter{key}\Parameter{Makro}\Parameter{value}%
+\end{Declaration}
+\BeginIndex{Cmd}{FamilyLengthKey}%
+\BeginIndex{Cmd}{FamilySetLength}%
+\BeginIndex{Cmd}{FamilyLengthMacroKey}%
+\BeginIndex{Cmd}{FamilySetLengthMacro}%
+With\ChangedAt{v3.12}{\Package{scrbase}} \Macro{FamilyLengthKey} you can
+define a \PName{key} that represents a \PName{length}. It does not matter
+whether the \PName{length} is a \LaTeX{} length, a \TeX{} skip or a \TeX{}
+dimension. Internally the \PName{length} will be set to the \PName{value}
+using \Macro{FamilySetLength}. Thereby a primary test is used to decide,
+whether or not it is plausible to assign \PName{length} to \PName{value}. The
+assignment is done only if this plausibility test is successful. Nevertheless,
+not all assignment errors can be recognised, so an inaccurate \PName{value}
+can still result in \TeX{} error. Recognised errors however will be signalled
+by \Macro{FamilyKeyStateUnknownValue}.
+
+In difference to this, \Macro{FamilyLengthMacroKey} and
+\Macro{FamilySetLengthMacro} do not assign \PName{value} to a \PName{length},
+but define a \Macro{macro} with this \PName{value}.
+
+Please note\textnote{Attention!}, these commands do not support an optional
+\PName{default} argument.%
+\EndIndex{Cmd}{FamilySetLengthMacro}%
+\EndIndex{Cmd}{FamilyLengthMacroKey}%
+\EndIndex{Cmd}{FamilySetLength}%
+\EndIndex{Cmd}{FamilyLengthKey}%
 
 \begin{Declaration}
   \Macro{FamilyStringKey}\OParameter{family member}\Parameter{family}%
