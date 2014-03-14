@@ -66,16 +66,6 @@ scrwfile.tex: ../../scrwfile.tex
 	cd ../.. && tex \\nonstopmode\\input $(basename $<)
 # ----------------------------------------------------------------------
 
-# ----------------------------------------------------------------------
-# NOTE: Remove these rules after real translation of scrlayer-notecolumn.tex 
-#       is available.
-scrlayer-notecolumn.tex: ../../scrlayer-notecolumn.tex
-	if [ -L $@ ] || ! [ -f $@ ]; then $(SYMLINK) $< .; else touch $@; fi
-
-../../scrlayer-notecolumn.tex: ../../scrlayer-notecolumn.dtx
-	cd ../.. && tex \\nonstopmode\\input $(basename $<)
-# ----------------------------------------------------------------------
-
 maintainclean_local: distclean_local
 	$(RM) guide.pdf $(GUIDENAME).pdf $(GUIDENAME).html
 	[ -L tocbasic.tex ] && $(RM) tocbasic.tex || true
