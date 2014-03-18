@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2014/01/29 v1.7d internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2014/03/18 v1.7e internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -105,12 +105,12 @@
 \newcommand*{\@KOMAProvidesFile}{}
 \def\@KOMAProvidesFile#1[$#2: #3-#4-#5 #6$#7]{%
   \ifstr{#2}{Date}{%
-    \ProvidesFile{#1}[#3/#4/#5 #6 #7]\relax
+    \ProvidesFile{#1}[#3/#4/#5 \detokenize{#6 #7}]\relax
   }{%
     \ClassError{scrguide}{missmatch repository date string}{%
       It seams, that you haven't used $%
       Date: YYYY-MM-DD $ for the date of \string\KOMAProvidesFile.}%
-    \ProvidesFile{#1}[$#2: #3/#4/#5 #6$#7]\relax
+    \ProvidesFile{#1}[$#2: #3/#4/#5 \detokenize{#6}$\detokenize{#7}]\relax
   }%
 }
 %    \end{macrocode}
