@@ -270,8 +270,8 @@ Generally, the four predefined states should be sufficient.
 \begin{lstcode}
   \newif\if@Salami@Aufschnitt
   \DefineFamilyKey{butcher}%
-                  {coldcut}[true]{%
-    \expandafter\let\expandafter\if@salami@coldcut
+                  {coldcuts}[true]{%
+    \expandafter\let\expandafter\if@salami@coldcuts
     \csname if#1\endcsname
     \FamilyKeyStateProcessed
   }
@@ -315,7 +315,7 @@ the keys of the family members.
 \begin{lstcode}
   \FamilyProcessOptions{butcher}
 \end{lstcode}
-  then the user may select the option \Option{coldcut} when loading the
+  then the user may select the option \Option{coldcuts} when loading the
   package. If the option is used globally, this means at the optional
   argument of \Macro{documentclass}, then the option would be passed
   automatically to all three packages, if all three packages are loaded
@@ -350,10 +350,10 @@ Somehow special are keys of empty family members, which are not attached to a
 family member, but to a family. Such keys are set before the keys of family
 members.
 \begin{Example}
-  Assume option \Option{coldcut} should be set by default in the
+  Assume option \Option{coldcuts} should be set by default in the
   previous example. In this case only line
 \begin{lstcode}
-  \FamilyExecuteOptions{butcher}{coldcut}
+  \FamilyExecuteOptions{butcher}{coldcuts}
 \end{lstcode}
   has to be added.
 \end{Example}
@@ -385,43 +385,43 @@ family, then \Macro{FamilyOptions} will result in an error. Package
 \PName{key}, but all those members signal failure via \Macro{FamilyKeyState}.
 \begin{Example}
   You extend your butcher project by a package \Package{sausagesalad}. If this
-  package has been loaded, all sausage package should generate cold cut:
+  package has been loaded, all sausage package should generate cold cuts:
 \begin{lstcode}
   \ProvidesPackage{sausagesalad}%
                   [2008/05/06 nonsense package]
   \DefineFamily{butcher}
   \DefineFamilyMember{butcher}
   \FamilyProcessOptions{butcher}\relax
-  \FamilyOptions{butcher}{coldcut}
+  \FamilyOptions{butcher}{coldcuts}
 \end{lstcode}
-  If currently none of the sausage packages are loaded, then an error
-  message results because of undefined option ``\Option{coldcut}''. This is
-  avoided by adding before the last line of the code above:
+  If currently none of the sausage packages are loaded, the undefined option
+  \Option{coldcuts} leads to an error message.  This is avoided by adding
+  before the last line of the code above:
 \begin{lstcode}
   \DefineFamilyKey{butcher}%
-                  {coldcut}[true]{}%
+                  {coldcuts}[true]{}%
 \end{lstcode}
-  Despite this, sausage packages loaded after
-  \Package{sausagesalad} still do not produce cold cut. This may be corrected
+  However, sausage packages loaded after
+  \Package{sausagesalad} still do not produce cold cuts. This may be corrected
   by editing the last line of the code again to:
 \begin{lstcode}
   \AtBeginDocument{%
     \DefineFamiyKey[.sausagesalad.sty]%
                    {butcher}%
-                   {coldcut}[true]{}%
+                   {coldcuts}[true]{}%
   }
   \DefineFamilyKey{butcher}%
-                  {coldcut}[true]{%
+                  {coldcuts}[true]{%
     \AtBeginDocument{\FamilyOptions{butcher}%
-                                   {coldcut=#1}}%
+                                   {coldcuts=#1}}%
   }%
 \end{lstcode}
-  With this, the option will be defined while
+  This code does following: First the option will be defined while
   \Macro{begin}\PParameter{document} to do nothing for package
   \Package{sausagesalad}. Because \Macro{@currname} and \Macro{@currext} are
   not longer valid at this time, the optional argument on
   \Macro{DefineFamilyKey} has to be used. But until this re-definition of the
-  option another definition is used, that will call the option again while
+  option, a second definition is made, that calls the option again while
   \Macro{begin}\PParameter{document} for the whole family and so also for
   other sausage salad packages.
 \end{Example}
@@ -450,7 +450,7 @@ is the same as that of the previous command \Macro{FamilyOptions}.
 \begin{Example}
   Package \Package{sausagesalad} should have one mire option, to add
   additional ingredients. Each of the ingredients sets a switch as was done
-  previously for the cold cut.
+  previously for the cold cuts.
 \begin{lstcode}
   \newif\if@saladwith@onions
   \newif\if@saladwith@gherkins
@@ -503,7 +503,7 @@ option definition.
 \BeginIndex{Cmd}{FamilyBoolKey}%
 \BeginIndex{Cmd}{FamilySetBool}%
 In the previous examples, boolean switches often have been used. In the example
-with option \Option{coldcut}, it is necessary that the user assigns either
+with option \Option{coldcuts}, it is necessary that the user assigns either
 value \PValue{true} or value \PValue{false}. There is no error message for
 wrong value assignment. Because of this, boolean switches are a necessary
 feature. Package \Package{scrbase} provides \Macro{FamilyBoolKey} for definition of
@@ -526,37 +526,37 @@ members, this may result in an error message about unknown value assignment
 (see also \autopageref{desc:scrbase.cmd.FamilyUnkownKeyValue} and
 \autopageref{desc:scrbase.cmd.FamilyKeyState}).
 \begin{Example}
-  The key \Option{coldcut} should be declared somehow more
+  The key \Option{coldcuts} should be declared somehow more
   robust. Additionally, all sausage packages should use the same key. So
-  either all or none of them will produce cold cut.
+  either all or none of them will produce cold cuts.
 \begin{lstcode}
-  \FamilyBoolKey{butcher}{coldcut}%
-                         {@coldcut}
+  \FamilyBoolKey{butcher}{coldcuts}%
+                         {@coldcuts}
 \end{lstcode}
-  A test, whether or not to produce cold cut, may be:
+  A test, whether or not to produce cold cuts, may be:
 \begin{lstcode}
-  \if@coldcut
+  \if@coldcuts
      ...
   \else
      ...
   \fi
 \end{lstcode}
   This would be the same in each of the three sausage packages, thereby
-  defining the attribute ``coldcut'' as a family option:
+  defining the attribute ``coldcuts'' as a family option:
 \begin{lstcode}[moretexcs={define@key}]
-  \@ifundefined{if@coldcut}{%
-    \expandafter\newif\csname if@coldcut\endcsname
+  \@ifundefined{if@coldcuts}{%
+    \expandafter\newif\csname if@coldcuts\endcsname
   }{}%
-  \DefineFamilyKey[]{butcher}{coldcut}[true]{%
-    \FamilySetBool{butcher}{coldcut}%
-                           {@coldcut}%
+  \DefineFamilyKey[]{butcher}{coldcuts}[true]{%
+    \FamilySetBool{butcher}{coldcuts}%
+                           {@coldcuts}%
                            {#1}%
   }
 \end{lstcode}
   or shorter:
 \begin{lstcode}
-  \FamilyBoolKey[]{butcher}{coldcut}%
-                           {@coldcut}
+  \FamilyBoolKey[]{butcher}{coldcuts}%
+                           {@coldcuts}
 \end{lstcode}
   using the additional information at
   \autopageref{explain:scrbase.macro.DefineFamilyKey}, this is not only valid
@@ -600,7 +600,7 @@ possible and allowed. Currently, the only limitation is that
 \PName{definition} has to be fully expandable and will be expanded during the
 assignment.
 \begin{Example}
-  The sausage may be cut different. For example the cold cut may stay uncut or
+  The sausage may be cut different. For example the cold cuts may stay uncut or
   will be cut roughly or may be cut thinly. This information should be stored
   in command \Macro{cuthow}.
 \begin{lstcode}
@@ -806,25 +806,25 @@ separated list of allowed values in the form:
 Currently\ChangedAt{v3.12}{\Package{scrbase}}, \PName{values list} is 
 not used by \Package{scrbase}.
 \begin{Example}
-  Now, for the cold cut, the choices should be cut or no-cut and in case of cut
+  Now, for the cold cuts, the choices should be cut or no-cut and in case of cut
   rough or thin. Rough should be the default for cutting.
 \begin{lstcode}
   \@ifundefined{if@thincut}{%
     \expandafter
     \newif\csname if@thincut\endcsname}{}%
-  \@ifundefined{if@coldcut}{%
+  \@ifundefined{if@coldcuts}{%
     \expandafter
-    \newif\csname if@coldcut\endcsname}{}
+    \newif\csname if@coldcuts\endcsname}{}
   \DefineFamilyKey{butcher}%
-                  {coldcut}[true]{%
-    \FamilySetBool{butcher}{coldcut}%
-                           {@coldcut}%
+                  {coldcuts}[true]{%
+    \FamilySetBool{butcher}{coldcuts}%
+                           {@coldcuts}%
                            {#1}%
     \ifx\FamilyKeyState\FamilyKeyStateProcessed
       \@thincutfalse
     \else
       \ifstr{#1}{thin}{%
-        \@coldcuttrue
+        \@coldcutstrue
         \@thincuttrue
         \FamilyKeyStateProcessed
       }{}%
@@ -832,14 +832,14 @@ not used by \Package{scrbase}.
   }%
 \end{lstcode}
   Let's have a look at the definition of \Option{butcher}:
-  First of all, we try to set the boolean switch of cold cut using
+  First of all, we try to set the boolean switch of cold cuts using
   \Macro{FamilySetBool}. After this command, we test whether or not
   \Macro{FamilyKeyState} signals the success of the command with state
   \Macro{FamilyKeyStateProcessed}. If so, only the thin cut has to be
   deactivated. 
 
   In the other case, the value will be tested to be equal to \PValue{thin}. In
-  that case, cold cut and thin cut are activated and the state will be
+  that case, cold cuts and thin cut are activated and the state will be
   switched to \Macro{FamilyKeyStateProcessed}. If the last test failed also,
   the failure state of \Macro{FamilySetBool} is still valid at the end of the
   execution.
