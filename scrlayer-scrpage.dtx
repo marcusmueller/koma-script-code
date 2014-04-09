@@ -1,4 +1,4 @@
-% \CheckSum{2336}
+% \CheckSum{2362}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlayer-scrpage.dtx
@@ -583,7 +583,9 @@
 % with \KOMAScript{} options. Those options will become the primary interface.
 %
 % \begin{option}{headwidth}
+%   \changes{v0.9.1757}{2014/04/09}{new: two offsets available}
 % \begin{option}{footwidth}
+%   \changes{v0.9.1757}{2014/04/09}{new: two offsets available}
 %   \begin{description}
 %   \item[\texttt{=\meta{special dimensional expression}:\meta{special
 %     dimensional expression}}:] see \Macro{sls@settowidthof} for information
@@ -602,11 +604,11 @@
 %<*options>
 \KOMA@key{headwidth}{%
   \begingroup
-    \sls@split@at@colon#1::\@nil
+    \sls@split@at@iicolons#1:::\@nil
     \ifx\reserved@a\@empty \let\reserved@a\sls@headwidth\fi
     \edef\reserved@a{%
       \noexpand\endgroup
-      \noexpand\sls@set@hf@width{head}{\reserved@b}{\reserved@a}%
+      \noexpand\sls@set@hf@width{head}{\reserved@b}{\reserved@c}{\reserved@a}%
     }%
   \reserved@a
   \FamilyKeyStateProcessed
@@ -615,11 +617,11 @@
 \scrlayer@AddCsToInterface{KV@KOMA.scrlayer-scrpage.sty@headwidth@default}
 \KOMA@key{footwidth}{%
   \begingroup
-    \sls@split@at@colon#1::\@nil
+    \sls@split@at@iicolons#1::\@nil
     \ifx\reserved@a\@empty \let\reserved@a\sls@footwidth\fi
     \edef\reserved@a{%
       \noexpand\endgroup
-      \noexpand\sls@set@hf@width{foot}{\reserved@b}{\reserved@a}%
+      \noexpand\sls@set@hf@width{foot}{\reserved@b}{\reserved@c}{\reserved@a}%
     }%
   \reserved@a
   \FamilyKeyStateProcessed
@@ -627,46 +629,51 @@
 \scrlayer@AddCsToInterface{KV@KOMA.scrlayer-scrpage.sty@footwidth}
 \scrlayer@AddCsToInterface{KV@KOMA.scrlayer-scrpage.sty@footwidth@default}
 %    \end{macrocode}
-% \begin{macro}{\sls@split@at@colon}
+% \begin{macro}{\sls@split@at@iicolons}
 %   \begin{description}
 %   \item[\texttt{\meta{balanced}:^^A
 %     \meta{balanced}:^^A
 %     \meta{balanced}\Macro{@nil}}:] first \meta{balanced} will be stored into
 %     \Macro{reserved@a}, second into \Macro{reserved@b}, third will be eaten
-%     and warn about if it es neither empty and nor a colon.
+%     and warn about if it is neither empty and nor a colon.
 %   \end{description}
 % This little helper is used, e.g., by options \Option{headwidth} and
 % \Option{footwidth}.
 %    \begin{macrocode}
-\scrlayerAddToInterface\sls@split@at@colon{%
-  \def\sls@split@at@colon#1:#2:#3\@nil{%
-    \ifstr{#3}{}{}{%
-      \ifstr{#3}{:}{}{%
-        \PackageWarning{scrlayer}{extra `:' found!\MessageBreak
-          You've used more than one colon at the argument\MessageBreak
-          of a two value option.\MessageBreak
-          The extra value(s) will be ignored%
+\scrlayerAddToInterface\sls@split@at@iicolons{%
+  \def\sls@split@at@iicolons#1:#2:#3:#4\@nil{%
+    \ifstr{#4}{}{}{%
+      \ifstr{#4}{:}{}{%
+        \ifstr{#4}{::}{}{%
+          \PackageWarning{scrlayer}{extra `:' found!\MessageBreak
+            You've used more than two colons at the argument\MessageBreak
+            of a two value option.\MessageBreak
+            The extra value(s) will be ignored%
+          }%
         }%
       }%
     }%
     \def\reserved@a{#1}%
     \def\reserved@b{#2}%
+    \def\reserved@c{#3}%
   }%
 }
 %    \end{macrocode}
-% \end{macro}^^A \sls@split@at@colon
+% \end{macro}^^A \sls@split@at@iicolons
 % \begin{macro}{\sls@set@hf@width}
+%   \changes{v0.9.1757}{2014/04/09}{new: two offsets available}
 %   \begin{description}
 %   \item[\Parameter{head} or \Parameter{foot}:] to complete the macro names
 %     for page head or footer.
-%   \item[\Parameter{special dimensional expression}:] the offset
+%   \item[\Parameter{special dimensional expression}:] the offset odd page
+%   \item[\Parameter{special dimensional expression}:] the offset even page
 %   \item[\Parameter{special dimensional expression}:] the width
 %   \end{description}
 % This helper will generally set up width an offset of either head or footer.
 %    \begin{macrocode}
 \scrlayerAddToInterface\sls@set@hf@width{%
-  \newcommand*{\sls@set@hf@width}[3]{%
-    \sls@settowidthof{\@tempdima}{#3}%
+  \newcommand*{\sls@set@hf@width}[4]{%
+    \sls@settowidthof{\@tempdima}{#4}%
     \ifdim\@tempdima>\paperwidth
       \PackageWarning
         {scrlayer-scrpage}%
@@ -699,8 +706,13 @@
       \fi
     }{%
       \sls@settowidthof{\@tempdimb}{#2}%
-    }
-    \addtolength{\@tempdima}{-\@tempdimb}%
+    }%
+    \ifstr{#3}{}{%
+      \addtolength{\@tempdima}{-\@tempdimb}%
+    }{%
+      \sls@settowidthof{\@tempdima}{#3}%
+      \setlength{\@tempdima}{-\@tempdima}%
+    }%
     \ifdim\@tempdimb<\z@
       \setlength{\@tempdimb}{-\@tempdimb}%
       \expandafter\edef\csname sls@odd#1shift\endcsname{-\the\@tempdimb}%
@@ -969,6 +981,34 @@
 }
 %    \end{macrocode}
 % \end{macro}^^A \sls@set@values
+% \begin{macro}{\sls@split@at@colon}
+%   \begin{description}
+%   \item[\texttt{\meta{balanced}:^^A
+%     \meta{balanced}:^^A
+%     \meta{balanced}\Macro{@nil}}:] first \meta{balanced} will be stored into
+%     \Macro{reserved@a}, second into \Macro{reserved@b}, third will be eaten
+%     and warn about if it is neither empty and nor a colon.
+%   \end{description}
+% This little helper is used, e.g., by options \Option{headwidth} and
+% \Option{footwidth}.
+%    \begin{macrocode}
+\scrlayerAddToInterface\sls@split@at@colon{%
+  \def\sls@split@at@colon#1:#2:#3\@nil{%
+    \ifstr{#3}{}{}{%
+      \ifstr{#3}{:}{}{%
+        \PackageWarning{scrlayer}{extra `:' found!\MessageBreak
+          You've used more than one colon at the argument\MessageBreak
+          of a two value option.\MessageBreak
+          The extra value(s) will be ignored%
+        }%
+      }%
+    }%
+    \def\reserved@a{#1}%
+    \def\reserved@b{#2}%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}^^A \sls@split@at@colon
 % \begin{macro}{\sls@headabove@linelength}
 % \begin{macro}{\sls@headabove@linethickness}
 % \begin{macro}{\sls@headbelow@linelength}
