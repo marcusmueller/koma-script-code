@@ -1,6 +1,6 @@
 # ======================================================================
 # Makefile
-# Copyright (c) Markus Kohm, 2002-2013
+# Copyright (c) Markus Kohm, 2002-2014
 #
 # This file is part of the LaTeX2e KOMA-Script bundle.
 #
@@ -18,7 +18,7 @@
 # This work consists of all files listed in manifest.txt.
 # ----------------------------------------------------------------------
 # Makefile
-# Copyright (c) Markus Kohm, 2002-2013
+# Copyright (c) Markus Kohm, 2002-2014
 #
 # Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 # Version 1.3c, verteilt und/oder veraendert werden.
@@ -98,7 +98,7 @@ STATIC_DOC_SRC  = koma-script.html
 STATIC_DOC_LINKS= komascript.html komascr.html \
 		  scrbook.html scrreprt.html scrartcl.html scrlttr2.html \
 		  scrextend.html \
-		  typearea.html scrpage2.html scraddr.html scrlfile.html \
+		  typearea.html scraddr.html scrlfile.html \
 		  scrwfile.html \
 		  scrtime.html scrdate.html tocbasic.html \
 		  scrlayer.html scrlayer-scrpage.html \
@@ -107,13 +107,18 @@ STATIC_DOC_LINKS= komascript.html komascr.html \
 
 DOC_SRC		= scrguide.cls scrguide.ist scrguide.gst \
 	          guide.tex guide.bib plength.dtx \
-		  linkalias.tex
+		  linkalias.tex \
+		  scrpage2.tex
+
+DOC_FILES       = scrpage2.pdf
+
+DOC_DIR         = doc
 
 STATIC_DOC      = $(STATIC_DOC_SRC) $(STATIC_DOC_LINKS)
 
 DIST_SRC	= $(MISC_SRC) $(DOC_SRC) $(STATIC_DOC_SRC)
 
-DIST_FILES	= $(DIST_SRC) $(STATIC_DOC_LINKS)
+DIST_FILES	= $(DIST_SRC) $(STATIC_DOC_LINKS) $(DOC_FILES)
 
 BIN_DIR         = bin
 
@@ -126,8 +131,13 @@ MAINTAIN_FILES	= $(DIST_FILES)
 # local rules
 prepare_local: $(STATIC_DOC_LINKS)
 
-default_local: $(STATIC_DOC)
+default_local: $(STATIC_DOC) $(DOC_FILES)
 	$(make_recursive)
+
+scrpage2.pdf: $(DOC_SRC)
+	$(LATEX) $(NONSTOPMODE) $(PDFOUTPUT) scrpage2.tex
+	$(LATEX) $(NONSTOPMODE) $(PDFOUTPUT) scrpage2.tex
+	$(LATEX) $(NONSTOPMODE) $(PDFOUTPUT) scrpage2.tex
 
 $(STATIC_DOC_LINKS): $(STATIC_DOC_SRC)
 	$(SYMLINK) $< $@
@@ -146,7 +156,7 @@ install_local: $(DIST_FILES)
 	$(INSTALL) $(DIST_SRC) $(INSTALLSRCDIR)
 	$(foreach file,$(STATIC_DOC),$(SYMLINK) ../../../../doc/latex/koma-script/$(file) $(INSTALLSRCDIR)/$(file);)
 	$(INSTALLEXECUTABLE) $(BIN_FILES) $(INSTALLSRCDIR)/$(BIN_DIR)
-	$(INSTALL) $(STATIC_DOC) $(INSTALLDOCDIR)
+	$(INSTALL) $(STATIC_DOC) $(DOC_FILES) $(INSTALLDOCDIR)
 	$(make_recursive)
 	$(SECHO) ------------------------------------------------------------
 	$(SECHO) Installed files at $(INSTALLSRCDIR):
@@ -156,7 +166,7 @@ install_local: $(DIST_FILES)
 	$(SECHO) $(BIN_FILES)
 	$(SECHO) ------------------------------------------------------------
 	$(SECHO) Installed files at $(INSTALLDOCDIR):
-	$(SECHO) $(STATIC_DOC)
+	$(SECHO) $(STATIC_DOC) $(DOC_FILES)
 	$(SECHO) ------------------------------------------------------------
 	$(SECHO) Links at $(INSTALLSRCDIR):
 	$(SECHO) $(SATIC_DOC)
@@ -182,6 +192,7 @@ uninstall_local:
 	$(make_recursive)
 
 clean_local:
+	$(SRM) *.aux *.glo *.idx *.lof *.log *.lot *.synctex.gz *.toc
 	$(make_recursive)
 
 dist_local: $(DIST_FILES)
@@ -190,6 +201,7 @@ dist_local: $(DIST_FILES)
 	$(MKDIR) $(DISTDIR)/$(BIN_DIR)
 	$(CP) $(DIST_FILES) $(DISTDIR)
 	$(CP) $(BIN_FILES) $(DISTDIR)/$(BIN_DIR)
+	$(CP) $(DOC_FILES) $(DISTDIR)/$(DOC_DIR)
 	$(make_recursive)
 
 maintain_local:
@@ -201,10 +213,11 @@ maintain_local:
 	$(make_recursive)
 
 distclean_local:
+	$(SRM) scrpage2-ngerman.tex scrpage2-english.tex \
 	$(make_recursive)
 
 maintainclean_local:
-	$(SRM) ChangeLog.svn ChangeLog.bak $(STATIC_DOC_LINKS)
+	$(SRM) ChangeLog.svn ChangeLog.bak $(STATIC_DOC_LINKS) $(DOC_FILES)
 	$(make_recursive)
 
 edit:
