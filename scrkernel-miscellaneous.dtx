@@ -1,4 +1,4 @@
-% \CheckSum{223}
+% \CheckSum{272}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-miscellaneous.dtx
@@ -134,6 +134,70 @@
 % \StopEventually{\PrintIndex\PrintChanges}
 %
 % \iffalse
+%<*init>
+% \fi
+% \subsection{Test auf die eine \KOMAScript-Klasse}
+%
+%    \begin{macrocode}
+%<*package&letter>
+\scr@ifundefinedorrelax{KOMAClassName}{%
+  \PackageWarningNoLine{scrletter}{%
+    Cannot detect any KOMA-Script class.\MessageBreak
+    Package `scrletter' is an extension to\MessageBreak
+    KOMA-Script classes.\MessageBreak
+    Usage with another class is not supported.\MessageBreak
+    Expect several errors while using it with\MessageBreak
+    another class.%
+  }%
+}{}
+%    \end{macrocode}
+
+% \begin{macro}{\scr@renewforletter}
+%   \changes{v3.20}{2014/04/10}{neu Anweisung}%^^A
+% Wird wie \cs{renewcommand} verwendet, verzögert die Umdefinierung aber bis
+% zu einem optionalen Zeitpunkt. Dazu wird intern
+% \cs{scrletter@extra@\meta{macro}} definiert.
+% \begin{macro}{\@renewforletter}
+%   \changes{v3.20}{2014/04/10}{neu Anweisung (intern)}%^^A
+% \begin{macro}{\do@renewforletter@list}
+%   \changes{v3.20}{2014/04/10}{neu Anweisung (intern)}%^^A
+% Die do-Liste der später umzudefinierenden Anweisungen.
+% \begin{macro}{\do@renewforletter}
+%   \changes{v3.20}{2014/04/10}{neu Anweisung (intern)}%^^A
+% Definiert die in der do-Liste gespeicherten Anweisungen um.
+%    \begin{macrocode}
+\newcommand*{\scr@renewforletter}{%
+  \@ifstar {\@renewforletter*}%
+           {\@renewforletter{}}%
+}
+\newcommand*{\@renewforletter}[2]{%
+  \g@addto@macro\do@renewforletter@list{\do#2}%
+  \edef\reserved@a{%
+    \noexpand\newcommand\noexpand#1\expandafter\noexpand
+    \csname scrletter@extra@\string#2\endcsname
+  }%
+  \expandafter\reserved@a
+}
+\newcommand*{\do@renewforletter@list}{}
+\newcommand*{\do@renewforletter}{%
+  \begingroup
+    \def\do##1{%
+      \aftergroup\let\aftergroup##1
+      \expandafter\aftergroup\csname scrletter@extra@\string##1\endcsname
+    }%
+    \do@renewforletter@list
+  \endgroup
+  \let\do@renewforletter@list\@empty
+}
+%</package&letter>
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \iffalse
+%</init>
 %<*option>
 % \fi
 %
@@ -154,6 +218,7 @@
 % Sicht der Klassen, ob Zeilenüberhänge mit einem schwarzen Balken
 % angezeigt werden sollen oder nicht.
 %    \begin{macrocode}
+%<*class|extend>
 \KOMA@key{draft}[true]{%
   \KOMA@set@ifkey{draft}{@tempswa}{#1}%
   \ifx\FamilyKeyState\FamilyKeyStateProcessed
@@ -167,6 +232,7 @@
 \KOMA@DeclareStandardOption
 %<package&extend>[scrextend]
 {final}{draft=false}
+%</class|extend>
 %    \end{macrocode}
 % \end{option}
 % \end{option}
@@ -222,12 +288,12 @@
 % \changes{v3.11c}{2013/03/04}{Option \texttt{headings!=big} nicht für die
 %   Briefklasse}
 %    \begin{macrocode}
-%<*!extend>
+%<*class>
 \KOMAExecuteOptions{%
   parskip=false,%
 %<!letter>  headings=big%
 }
-%</!extend>
+%</class>
 \KOMAProcessOptions\relax
 %    \end{macrocode}
 %
@@ -365,11 +431,11 @@
 % \cs{framebox} und dem Inhalt, \cs{fboxrule} ist die Dicke des
 % Rahmens.
 %    \begin{macrocode}
-%<*!extend>
+%<*class>
 \setlength{\skip\@mpfootins}{\skip\footins}
 \setlength\fboxsep{3\p@}
 \setlength\fboxrule{.4\p@}
-%</!extend>
+%</class>
 %    \end{macrocode}
 %  \end{Length}
 %  \end{Length}
@@ -428,6 +494,7 @@
 % Definition eines neuen \emph{true}-\emph{page}-\emph{odd} Labels.
 % Wird in der \texttt{aux}-Datei verwendet.
 %    \begin{macrocode}
+%<*class|extend>
 \newcommand*{\new@tpo@label}{\@newl@bel{tpo}}
 %    \end{macrocode}
 %  \end{macro}
@@ -507,6 +574,7 @@
     \expandafter\@secondoftwo
   \fi
 }
+%</class|extend>
 %    \end{macrocode}
 %  \end{macro}
 %
@@ -526,12 +594,14 @@
 % unverändert auf die Definition aus dem \LaTeX-Kern zurückgegriffen
 % wird.
 %    \begin{macrocode}
+%<*class|extend>
 \DeclareRobustCommand*\textsubscript[1]{%
   \@textsubscript{\selectfont#1}%
 }
 \providecommand*{\@textsubscript}[1]{%
   {\m@th\ensuremath{_{\mbox{\fontsize\sf@size\z@#1}}}}%
 }
+%</class|extend>
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}

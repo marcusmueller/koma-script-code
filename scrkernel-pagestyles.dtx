@@ -1,4 +1,4 @@
-% \CheckSum{614}
+% \CheckSum{678}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-pagestyles.dtx
@@ -99,6 +99,9 @@
 %
 % \iffalse
 %<*option>
+% \fi
+%
+% \iffalse
 %<*class>
 % \fi
 %
@@ -220,6 +223,7 @@
 %
 % \iffalse
 %</class>
+%<*class|extend>
 % \fi
 %
 % \begin{option}{cleardoublepage}
@@ -398,6 +402,7 @@
 %
 %
 % \iffalse
+%</class|extend>
 %</option>
 %<*body>
 %<*class>
@@ -563,13 +568,15 @@
 % \end{KOMAfont}
 % \end{KOMAfont}
 %
+%
 % \begin{macro}{\pagemark}
 %   \changes{v2.95}{2006/03/15}{nun für alle Klassen}
 %   \changes{v3.05}{2010/02/05}{eine zusätzliche Gruppe eingefügt}
 %   Das ist die Seitenmarke, die nun für alle Klassen verwendet wird. Damit
 %   wird es leichter, \textsf{fancyhdr} statt \textsf{scrpage2} zu verwenden.
 %    \begin{macrocode}
-\newcommand*{\pagemark}{{\usekomafont{pagenumber}{%
+\newcommand*
+  {\pagemark}{{\usekomafont{pagenumber}{%
 %<letter>    \pagename\ %
     \thepage}}}
 %    \end{macrocode}
@@ -754,6 +761,37 @@
   \let\@mkboth\@gobbletwo
 }
 %</letter>
+%</class>
+%    \end{macrocode}
+% Das Briefpaket verwendet \textsf{scrlayer-scrpage} für die Seitenstile:
+%    \begin{macrocode}
+%<*package&letter>
+\RequirePackage{scrlayer-scrpage}
+\newpairofpagestyles{letter}{%
+  \clearpairofpagestyles
+  \lehead[\ifnum\@pageat=\z@\pagemark\fi]%
+         {\usekomavar{nexthead}}%
+  \lohead[\ifnum\@pageat=\z@\pagemark\fi]%
+         {\usekomavar{nexthead}}%
+  \chead[\ifnum\@pageat=\@ne\pagemark\fi]%
+        {}%
+  \rehead[\ifnum\@pageat=\tw@\pagemark\fi]%
+         {}%
+  \rohead[\ifnum\@pageat=\tw@\pagemark\fi]%
+         {}%
+  \lefoot[\ifnum\@pageat=\thr@@\pagemark\fi]%
+         {\usekomavar{nextfoot}}%
+  \lofoot[\ifnum\@pageat=\thr@@\pagemark\fi]%
+         {\usekomavar{nextfoot}}%
+  \cfoot[\ifnum\@pageat=4 \pagemark\fi]%
+        {}%
+  \refoot[\ifnum\@pageat=5 \pagemark\fi]%
+         {}%
+  \rofoot[\ifnum\@pageat=5 \pagemark\fi]%
+         {}%
+}
+%</package&letter>
+%<*class>
 %    \end{macrocode}
 %  \end{macro}
 %  \end{macro}
@@ -764,7 +802,6 @@
 %
 % So etwas gibt es derzeit nicht für Briefe.
 % \iffalse
-%</class>
 %<*!letter>
 % \fi
 %
@@ -795,7 +832,6 @@
 %
 % \iffalse
 %</!letter>
-%<*class>
 % \fi
 %
 % \subsection{Standardeinstellungen}
@@ -807,7 +843,7 @@
 %    \end{macrocode}
 % Die Nummerierung erfolgt hingegen immer mit arabischen Zahlen:
 %    \begin{macrocode}
-\pagenumbering{arabic}
+%<class>\pagenumbering{arabic}
 %    \end{macrocode}
 %
 % Im zweiseitigen Satz wird die letzte Zeile bündig gesetzt, im
