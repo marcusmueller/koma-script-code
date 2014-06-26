@@ -1,8 +1,8 @@
-% \CheckSum{3156}
+% \CheckSum{3167}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-notepaper.dtx
-% Copyright (c) Markus Kohm, 2006-2013
+% Copyright (c) Markus Kohm, 2006-2014
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrkernel-notepaper.dtx
-% Copyright (c) Markus Kohm, 2006-2013
+% Copyright (c) Markus Kohm, 2006-2014
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -58,7 +58,7 @@
 %%% From File: $Id$
 %<*driver>
 % \fi
-\ProvidesFile{scrkernel-notepaper.dtx}[2013/07/31 v3.12 KOMA-Script
+\ProvidesFile{scrkernel-notepaper.dtx}[2014/06/26 v3.13 KOMA-Script
                                                        (note-paper)]
 % \iffalse
 \documentclass{scrdoc}
@@ -339,6 +339,7 @@
 %   \changes{v3.03}{2009/03/04}{neu (intern)}
 % Die Speicherung erfolgt wiederum in einem Makro.
 %    \begin{macrocode}
+%<*class>
 \newcommand*{\if@afield}{%
   \ClassWarning{\KOMAClassName}{%
     Usage of \string\if@afield\space deprecated.\MessageBreak
@@ -369,6 +370,7 @@
     This may result in erros.  A better solution would be\MessageBreak
     to change the code}%
   \KOMAoptions{addrfield=false}}
+%</class>
 \newcommand*{\@afieldmode}{\@ne}
 \KOMA@ncmdkey{addrfield}[true]{@afieldmode}{%
   {false}{0},{off}{0},{no}{0},%
@@ -918,6 +920,7 @@
 % Besonderheiten für Briefen begründet. Zunächst die Voreinstellung für
 % Briefbögen.
 %    \begin{macrocode}
+%<*class>
 \newcommand*{\@firsthead}{%
   \ClassWarning{scrlttr2}{%
     Deprecated usage of \string\@firsthead.\MessageBreak
@@ -926,6 +929,7 @@
   }%
   \usekomavar{firsthead}%
 }
+%</class>
 \newkomavar{firsthead}
 \setkomavar{firsthead}{%
   \parbox[b]{\useplength{firstheadwidth}}%
@@ -1166,6 +1170,7 @@
 %
 % Der Benutzer kann die Voreinstellung mit einer einfachen Anweisung ändern:
 %    \begin{macrocode}
+%<*class>
 \newcommand{\firsthead}{%
   \ClassWarning{scrlttr2}{%
     Deprecated usage of \string\firsthead.\MessageBreak
@@ -1174,6 +1179,7 @@
   }
   \setkomavar{firsthead}%
 }
+%</class>
 %    \end{macrocode}
 % \end{macro}
 %
@@ -1304,11 +1310,13 @@
 %   \changes{v2.97d}{2007/10/09}{Voreinstellung korrigiert}
 % Die Feldwerte in der Geschäftszeile.
 %    \begin{macrocode}
+%<*class>
 \ifnum\scr@compatibility=\@nameuse{scr@v@2.97}\relax
   \newkomafont{refvalue}{\sffamily\scriptsize}
 \else
+%</class>
   \newkomafont{refvalue}{}
-\fi
+%<class>\fi
 %    \end{macrocode}
 % \end{KOMAfont}
 %
@@ -1325,7 +1333,9 @@
 %   \changes{v2.95}{2006/03/23}{jetzt mit \cs{newkomafont}}
 % Der Brieftitel.
 %    \begin{macrocode}
-\newkomafont{title}{\normalcolor\sffamily\bfseries}
+%<package>\scr@ifundefinedorrelax{scr@fnt@title}{%
+  \newkomafont{title}{\normalcolor\sffamily\bfseries}%
+%<package>}{}
 %    \end{macrocode}
 % \end{KOMAfont}
 %
@@ -1333,7 +1343,9 @@
 %   \changes{v2.95}{2006/03/23}{jetzt mit \cs{newkomafont}}
 % Der Betreff.
 %    \begin{macrocode}
-\newkomafont{subject}{\normalcolor\bfseries}
+%<package>\scr@ifundefinedorrelax{scr@fnt@subject}{%
+  \newkomafont{subject}{\normalcolor\bfseries}%
+%<package>}{}
 %    \end{macrocode}
 % \end{KOMAfont}
 %
@@ -1639,6 +1651,7 @@
 %    \begin{macrocode}
 % Der Fuß des Briefbogens ist in der Voreinstellung leer.
 \newkomavar{firstfoot}
+%<*class>
 \newcommand*{\@firstfoot}{%
   \ClassWarning{scrlttr2}{%
     Deprecated usage of \string\@firstfoot.\MessageBreak
@@ -1658,6 +1671,7 @@
   }
   \setkomavar{firstfoot}%
 }
+%</class>
 %    \end{macrocode}
 % \end{KOMAvar}
 % \end{macro}
@@ -1886,22 +1900,21 @@
   \begingroup%
     \vbox to #2{#1#3}%
     \if@savevbox@warning\@savevbox@warningfalse%
-    \setbox0\vbox{#3}%
-    \setlength{\@tempdima}{#2}%
-    \setlength{\@tempdimb}{\ht0}\addtolength{\@tempdimb}{\dp0}%
-    \ifdim \@tempdimb>\@tempdima%
-      \addtolength{\@tempdimb}{-\@tempdima}%
-      \ClassWarning{%
-        scrlttr2%
-      }{%
-        #4 is \the\@tempdimb\space too high.\MessageBreak
-        You have to change `\string#5'\MessageBreak
-        or you have to define a smaller\MessageBreak
-        #4 using \string#6.\MessageBreak
-        Because of this too high #4\MessageBreak
-        you've got an overfull \string\vbox\space message%
-      }%
-    \fi%
+      \setbox0\vbox{#3}%
+      \setlength{\@tempdima}{#2}%
+      \setlength{\@tempdimb}{\ht0}\addtolength{\@tempdimb}{\dp0}%
+      \ifdim \@tempdimb>\@tempdima%
+        \addtolength{\@tempdimb}{-\@tempdima}%
+%<class>        \ClassWarning{scrlttr2}{%
+%<package>        \PackageWarning{scrletter}{%
+          #4 is \the\@tempdimb\space too high.\MessageBreak
+          You have to change `\string#5'\MessageBreak
+          or you have to define a smaller\MessageBreak
+          #4 using \string#6.\MessageBreak
+          Because of this too high #4\MessageBreak
+          you've got an overfull \string\vbox\space message%
+        }%
+      \fi%
     \fi%
   \endgroup%
 }
@@ -2782,13 +2795,15 @@
 %    \begin{macrocode}
             \setbox0\hbox{\usekomafont{refname}\strutbox}%
             \ifdim\ht0>\ht\strutbox
-              \ClassWarningNoLine{scrlttr}{%
+%<class>              \ClassWarningNoLine{scrlttr2}{%
+%<package>              \PackageWarningNoLine{scrletter}{%
                 Font element `refname' should not be larger than
                 \string\normalsize!}%
             \fi
             \setbox0\hbox{\usekomafont{refvalue}\strutbox}%
             \ifdim\ht0>\ht\strutbox
-              \ClassWarningNoLine{scrlttr}{%
+%<class>              \ClassWarningNoLine{scrlttr2}{%
+%<package>              \PackageWarningNoLine{scrletter}{%
                 Font element `refvalue' should not be larger than
                 \string\normalsize!}%
             \fi
@@ -2819,23 +2834,29 @@
 %
 % \begin{macro}{\@maketitle}
 %   \changes{v2.3b}{1996/01/14}{Verwendung von \cs{sectfont} für den
-%     \cs{title}}
-%   \changes{v2.8p}{2001/09/22}{\cs{titlefont} an Stelle von \cs{sectfont}}
-%   \changes{v2.8q}{2001/11/13}{\cs{@parskipfalse}\cs{@parskip@indent}}
-%   \changes{v2.9t}{2004/09/16}{\cs{par} in Größe und Schrift des Titels}
-%   \changes{v2.95}{2006/03/22}{\cs{usekomafont} and Stelle fon \cs{titlefont}}
+%     \cs{title}}%^^A
+%   \changes{v2.8p}{2001/09/22}{\cs{titlefont} an Stelle von \cs{sectfont}}%^^A
+%   \changes{v2.8q}{2001/11/13}{\cs{@parskipfalse}\cs{@parskip@indent}}%^^A
+%   \changes{v2.9t}{2004/09/16}{\cs{par} in Größe und Schrift des Titels}%^^A
+%   \changes{v2.95}{2006/03/22}{\cs{usekomafont} and Stelle von
+%     \cs{titlefont}}%^^A
+%   \changes{v3.13}{2014/06/26}{umbenannt in \cs{@makelettertitle}}%^^A
+% \end{macro}
+% \begin{macro}{\@makelettertitle}
+%   \changes{v3.13}{2014/06/26}{neu (ehemals \cs{@maketitle}}%^^A
 % \begin{macro}{\@subjfield}
 %   \changes{v2.8q}{2001/10/19}{\cs{centerline} durch \cs{centering}
-%     ersetzt}
-%   \changes{v2.8q}{2001/11/13}{\cs{@parskipfalse}\cs{@parskip@indent}}
-%   \changes{v2.8q}{2002/01/31}{wird mit hängendem Einzug gesetzt}
-%   \changes{v2.95}{2006/03/23}{Absatzeinzug mit cs{setparsizes} einstellen}
+%     ersetzt}%^^A
+%   \changes{v2.8q}{2001/11/13}{\cs{@parskipfalse}\cs{@parskip@indent}}%^^A
+%   \changes{v2.8q}{2002/01/31}{wird mit hängendem Einzug gesetzt}%^^A
+%   \changes{v2.95}{2006/03/23}{Absatzeinzug mit cs{setparsizes}
+%     einstellen}%^^A
 %   \changes{v3.01}{2008/11/03}{Verwendung der neuen Pseudolängen
-%     \texttt{subjectbeforevskip} und \texttt{subjectaftervskip}}
+%     \texttt{subjectbeforevskip} und \texttt{subjectaftervskip}}%^^A
 % Der eigentliche Titel wir mit |\@maketitle| gesetzt. Dies sollte jedoch
 % ebenso wie beim Betreff (|\@subjfield|) \emph{nicht} manuell geschehen.
 %    \begin{macrocode}
-\newcommand*{\@maketitle}{%
+\newcommand*{\@makelettertitle}{%
   \ifkomavarempty{title}{%
     \typeout{Title: no}%
   }{%
@@ -2941,6 +2962,7 @@
 %   \changes{v3.08}{2010/10/28}{Neu}
 % Die Voreinstellung ist ebenfalls von Optionen abhängig.
 %    \begin{macrocode}
+%<*class>
 \newcommand*{\@nexthead}{%
   \ClassWarning{scrlttr2}{%
     Deprecated usage of \string\@nexthead.\MessageBreak
@@ -2949,6 +2971,7 @@
   }%
   \usekomavar{nexthead}%
 }
+%</class>
 \newkomavar{nexthead}
 \setkomavar{nexthead}{%
   \rlap{\parbox[c]{\textwidth}{\raggedright\strut
@@ -2979,6 +3002,7 @@
 % Die Voreinstellung ist wiederum mit einer einfachen Benutzeranweisung
 % änderbar.
 %    \begin{macrocode}
+%<*class>
 \newcommand{\nexthead}{%
   \ClassWarning{scrlttr2}{%
     Deprecated usage of \string\nexthead.\MessageBreak
@@ -2987,6 +3011,7 @@
   }
   \setkomavar{nexthead}%
 }
+%</class>
 %    \end{macrocode}
 % \end{macro}
 %
@@ -3004,6 +3029,7 @@
 % Je nach Optioneneinstellung kann sich die Seitenmarke in der Voreinstellung
 % auch im Fuß befinden.
 %    \begin{macrocode}
+%<*class>
 \newcommand*{\@nextfoot}{%
   \ClassWarning{scrlttr2}{%
     Deprecated usage of \string\@nextfoot.\MessageBreak
@@ -3012,6 +3038,7 @@
   }%
   \usekomavar{nextfoot}%
 }
+%</class>
 \newkomavar{nextfoot}
 \setkomavar{nextfoot}{%
   \ifnum\@pageat>2
@@ -3026,6 +3053,7 @@
 % \end{macro}
 % Auch diese Einstellung ist per Benutzeranweisung leicht zu ändern.
 %    \begin{macrocode}
+%<*class>
 \newcommand{\nextfoot}{%
   \ClassWarning{scrlttr2}{%
     Deprecated usage of \string\nextfoot.\MessageBreak
@@ -3034,6 +3062,7 @@
   }
   \setkomavar{nextfoot}%
 }
+%</class>
 %    \end{macrocode}
 % \end{macro}
 %
@@ -3175,7 +3204,7 @@
   \@foldmarks\@firstheadfootfield\@addrfield\@locfield
   \ifdim\useplength{subjectvpos}=\z@\else\@subjfield\fi
   \@datefield
-  \@maketitle
+  \@makelettertitle
   \ifdim\useplength{subjectvpos}=\z@\if@subjafter\else\@subjfield\fi\fi
   {\setparsizes{\z@}{\z@}{\z@ plus 1fil}\par@updaterelative#1\par}%
   {\setlength{\@tempdima}{\baselineskip}%
@@ -3449,7 +3478,9 @@
         }%
         \if@tempswa
           \aftergroup\@scrsymbolsfalse
-          \ClassWarning{scrlttr2}{Option `symbolicnames'
+%<class>          \ClassWarning{scrlttr2}{%
+%<package>          \PackageWarning{scrletter}{%
+            Option `symbolicnames'
             ignorred.\MessageBreak
             You've tried to set option `symbolicnames'\MessageBreak
             after \string\begin{document}, but without\MessageBreak
@@ -3462,8 +3493,14 @@
         \fi
       \endgroup
     \else
+%<*class>
       \ifstr{\@currname.\@currext}{scrlttr2.cls}{%
         \expandafter\AtEndOfClass
+%</class>
+%<*package>
+      \ifstr{\@currname.\@currext}{scrletter.sty}{%
+        \expandafter\AtEndOfPackage
+%</package>
       }{%
         \expandafter\@firstofone
       }%
