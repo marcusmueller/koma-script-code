@@ -58,8 +58,16 @@
 %%% From File: $Id$
 %<*driver>
 % \fi
-\ProvidesFile{scrkernel-pagestyles.dtx}[2013/01/13 v3.12a KOMA-Script
-                                                         (page style)]
+\ifx\ProvidesFile\undefined\def\ProvidesFile#1[#2]{}\fi
+\begingroup
+  \def\filedate$#1: #2-#3-#4 #5${\gdef\filedate{#2/#3/#4}}
+  \filedate$Date$
+  \def\filerevision$#1: #2 ${\gdef\filerevision{#2}}
+  \filerevision$Revision$
+\endgroup
+\ProvidesFile{scrkernel-pagestyles.dtx}[\filedate\space 
+                                           v3.13.\filerevision\space
+                                           KOMA-Script (page styles)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -132,9 +140,8 @@
 % \end{macro}
 % \end{macro}
 % Gleichzeitig wird dem \textsf{typearea}-Paket mitgeteilt, dass der
-% Kopf zum Textbereich zu rechnen ist. Dies geschieht allerdings in
-% umgekehrter Richtung nicht. Die Optionen sind also nicht
-% symmetrisch.
+% Kopf zum Textbereich zu rechnen ist. Dies geschieht min. seit \KOMAScript{}
+% 2.98c in beide Richtungen. Es ist leider nicht ganz klar, wie das zuvor war.
 %    \begin{macrocode}
 \KOMA@key{headsepline}[true]{%
   \KOMA@set@ifkey{headsepline}{@hsl}{#1}%
@@ -168,6 +175,8 @@
 %   \changes{v3.12}{2013/08/26}{\cs{KOMA@options} durch
 %     \cs{KOMAoptions} ersetzt}^^A
 %   \changes{v3.12}{2013/08/26}{ggf. Satzspiegel neu berechnen}^^A
+%   \changes{v3.13}{2014/07/07}{Satzspiegel wird nicht neu berechnet}^^A
+%   \changes{v3.13}{2014/07/07}{\texttt{headinclude}-Fehler beseitigt}^^A
 % \begin{option}{footnosepline}
 %   \changes{v2.97d}{2007/10/03}{\cs{PackageInfo} durch \cs{PackageInfoNoLine}
 %     ersetzt}
@@ -184,16 +193,15 @@
 % \end{macro}
 % \end{macro}
 % Gleichzeitig wird dem \texttt{typearea}-Paket mitgeteilt, dass der
-% Fuﬂ zum Textbereich zu rechnen ist. Auch hier sind die Optionen
-% nicht symmetrisch.
+% Fuﬂ zum Textbereich (nicht) zu rechnen ist.
 %    \begin{macrocode}
 \KOMA@key{footsepline}[true]{%
   \KOMA@set@ifkey{footsepline}{@fsl}{#1}%
   \ifx\FamilyKeyState\FamilyKeyStateProcessed
     \@ifundefined{typearea}{%
-      \PassOptionsToPackage{typearea}{headinclude=#1}%
+      \PassOptionsToPackage{typearea}{footinclude=#1}%
     }{%
-      \KOMAoptions{footinclude=#1,DIV=current}%
+      \KOMAoptions{footinclude=#1}%
     }%
   \fi
 }
