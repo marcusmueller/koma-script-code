@@ -1,4 +1,4 @@
-% \CheckSum{2255}
+% \CheckSum{2273}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -2398,12 +2398,15 @@
 % \end{macro}
 % \begin{macro}{\minisec}
 %   \changes{v2.8q}{2002/02/28}{\cs{nobreak} nach \cs{sectfont}
-%     behebt einen Bug im color Paket}
+%     behebt einen Bug im color Paket}%^^A
 %   \changes{v2.9o}{2003/01/31}{\cs{nobreak} nach dem Gruppenende
-%     behebt einen Bug im color Paket}
+%     behebt einen Bug im color Paket}%^^A
 %   \changes{v2.96a}{2006/11/30}{Standardwert für \cs{parfillskip} (abhängig
-%     von Option \texttt{version})}
-%   \changes{v2.96a}{2006/12/03}{alle nicht benötigten \cs{nobreak} entfernt}
+%     von Option \texttt{version})}%^^A
+%   \changes{v2.96a}{2006/12/03}{alle nicht benötigten \cs{nobreak}
+%     entfernt}%^^A
+%   \changes{v3.13a}{2014/08/07}{Absicherung der Abstände bei
+%     aufeinanderfolgenden Überschriften entsprechend \cs{@startsection}}%^^A
 % \begin{KOMAfont}{minisec}
 %   \changes{v2.96a}{2006/12/03}{\texttt{minisec} ist ein eigenes
 %     Fontelement}
@@ -2411,7 +2414,19 @@
 % immer ohne Nummer und ohne Eintrag ins Inhaltsverzeichnis erfolgt.
 %    \begin{macrocode}
 \newkomafont{minisec}{}
-\newcommand\minisec[1]{\@afterindentfalse \vskip 1.5ex
+\newcommand\minisec[1]{%
+  \ifnum \scr@compatibility<\@nameuse{scr@v@3.13a}\relax
+    \@afterindentfalse \vskip 1.5ex
+  \else
+    \if@noskipsec \leavevmode \fi
+    \par
+    \@afterindentfalse
+    \if@nobreak
+      \everypar{}%
+    \else
+      \addpenalty\@secpenalty\addvspace{1.5ex}%
+    \fi
+  \fi
   {\parindent \z@
     \ifnum \scr@compatibility>\@nameuse{scr@v@2.96}\relax
       \setlength{\parfillskip}{\z@ plus 1fil}\fi
