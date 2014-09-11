@@ -1,4 +1,4 @@
-% \CheckSum{2273}
+% \CheckSum{2404}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -936,6 +936,115 @@
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
+% \begin{macro}{\@startsection}
+%   \changes{v3.13a}{2014/09/11}{Vollständige Neudefinition zur Optimierung
+%     der Erweiterung für das optionale Argument}%^^A
+% \begin{macro}{\scr@startsection}
+%   \changes{v3.13a}{2014/09/11}{Neue interne Anweisung}%^^A
+% \begin{macro}{\scr@saved@startsection}
+%   \changes{v3.13a}{2014/09/11}{Neue interne Anweisung}%^^A
+%    \begin{macrocode}
+\newcommand*{\scr@saved@startsection}[6]{%
+  \if@noskipsec \leavevmode \fi
+  \par
+  \@tempskipa #4\relax
+  \@afterindenttrue
+  \ifdim \@tempskipa <\z@
+    \@tempskipa -\@tempskipa \@afterindentfalse
+  \fi
+  \if@nobreak
+    \everypar{}%
+  \else
+    \addpenalty\@secpenalty\addvspace\@tempskipa
+  \fi
+  \@ifstar
+    {\@ssect{#3}{#4}{#5}{#6}}%
+    {\@dblarg{\@sect{#1}{#2}{#3}{#4}{#5}{#6}}}%
+}
+\ifx\@startsection\scr@saved@startsection
+  \newcommand*{\scr@startsection}[6]{%
+    \if@noskipsec \leavevmode \fi
+    \par
+    \@tempskipa #4\relax
+    \@afterindenttrue
+    \ifdim \@tempskipa <\z@
+      \@tempskipa -\@tempskipa \@afterindentfalse
+    \fi
+    \if@nobreak
+      \everypar{}%
+    \else
+      \addpenalty\@secpenalty\addvspace\@tempskipa
+    \fi
+    \@ifstar
+      {\@ssect{#3}{#4}{#5}{#6}}%
+      {\scr@section@dblarg{\@sect{#1}{#2}{#3}{#4}{#5}{#6}}}%
+  }
+\else
+  \ClassWarningNoLine{\KOMAClassName}{`\string\@startsection' has been
+    changed.\MessageBreak
+    \KOMAClassName\space needs it's own Definition of
+    `\string\@startsection'\MessageBreak
+    to provide extended features for the optional argument\MessageBreak
+    of `\string\section` etc.\MessageBreak
+    Generally it defines `\string\@startsection` completely new\MessageBreak
+    to achieve this. Because of the unexpected definition\MessageBreak
+    an alternative approach will be used.\MessageBreak
+    If this fails and if there isn't a new release of\MessageBreak
+    KOMA-Scriptt that fixes the problem, please\MessageBreak
+    send a report to the KOMA-Script author%
+  }%
+  \let\scr@saved@startsection\@startsection
+  \newcommand*{\scr@startsection}[6]{%
+    \@ifstar
+      {\scr@saved@startsection{#1}{#2}{#3}{#4}{#5}{#6}*}%
+      {\scr@section@dblarg{\scr@saved@startsection{#1}{#2}{#3}{#4}{#5}{#6}}}%
+  }
+\fi
+%    \end{macrocode}
+% \begin{macro}{\scr@section@dblarg}
+%   \changes{v3.13a}{2014/09/11}{Neue interne Anweisung}%^^A
+% \begin{macro}{\scr@section@xdblarg}
+%   \changes{v3.13a}{2014/09/11}{Neue interne Anweisung}%^^A
+%    \begin{macrocode}
+\newcommand{\scr@section@dblarg}[1]{%
+  \kernel@ifnextchar[%]
+    {#1}%
+    {\scr@section@xdblarg{#1}}%
+}
+\newcommand{\scr@section@xdblarg}[2]{%
+  \begingroup
+    \edef\reserved@a{%
+      \unexpanded{\endgroup\let\scr@osectarg\z@#1[{#2}]{#2}\def\scr@osectarg}%
+      {\scr@osectarg}}%
+  \reserved@a
+}
+%    \end{macrocode}
+% \end{macro}%^^A \scr@section@xdblarg
+% \end{macro}%^^A \scr@section@dblarg
+% \end{macro}%^^A \scr@saved@startsection
+% \end{macro}%^^A \scr@startsection
+%    \begin{macrocode}
+\renewcommand*{\@startsection}{%
+  \ifnum \scr@osectarg=\z@
+    \expandafter\scr@saved@startsection
+  \else
+    \expandafter\scr@startsection
+  \fi
+}
+%    \end{macrocode}
+% \end{macro}%^^A \@startsection
+% \begin{macro}{\SecDef}
+%   \changes{v3.13a}{2014/09/11}{neue Anweisung}
+% \begin{macro}{\secdef}
+%   \changes{v3.13a}{2014/09/11}{Vollständige Neudefinition zur Optimierung
+%     der Erweiterung für das optionale Argument}%^^A
+%    \begin{macrocode}
+\newcommand*{\SecDef}[2]{\@ifstar{#2}{\scr@section@dblarg{#1}}}
+\CheckCommand*{\secdef}[2]{\@ifstar{#2}{\@dblarg{#1}}}
+\let\secdef\SecDef
+%    \end{macrocode}
+% \end{macro}%^^A \secdef
+% \end{macro}%^^A \SecDef
 % \begin{macro}{\scr@sect}
 %   \changes{v3.10}{2011/08/30}{entfällt}
 % \begin{macro}{\@sect}
@@ -1461,6 +1570,7 @@
 %     hinzugefügt}
 %   \changes{v2.8q}{2002/02/28}{\cs{nobreak} nach \cs{sectfont}
 %     behebt einen Bug im color Paket}
+%   \changes{v3.13a}{2014/09/11}{Verwendung von \cs{SecDef}}
 % \begin{macro}{\@part}
 %   \changes{v2.4b}{1996/03/29}{\cs{size@partnumer} durch
 %     \cs{size@partnumber} ersetzt}
@@ -1555,7 +1665,7 @@
 \newcommand\part{\par
   \partheadstartvskip%
   \@afterindentfalse
-  \secdef\@part\@spart
+  \SecDef\@part\@spart
 }
 %</article>
 %<*report|book>
@@ -1570,7 +1680,7 @@
   \partheadstartvskip
   \vbox to\z@{\vss\use@preamble{part@o}\strut\par}%
   \vskip-\baselineskip\nobreak%
-  \secdef\@part\@spart
+  \SecDef\@part\@spart
 }
 %</report|book>
 \newcommand*{\@part}{}
@@ -1679,6 +1789,7 @@
 %     \texttt{plain}}
 %   \changes{v2.95a}{2006/07/10}{support of preamble added}
 %   \changes{v3.11b}{2012/07/29}{missing negativ \cs{vskip} added}
+%   \changes{v3.13a}{2014/09/11}{Verwendung von \cs{SecDef}}
 % \begin{macro}{\@addpart}
 %   \changes{v2.8c}{2001/06/29}{neu (intern)}
 %   \changes{v2.8l}{2001/08/17}{erst eintragen, dann ausgeben}
@@ -1711,7 +1822,7 @@
   \vbox to\z@{\vss\use@preamble{part@o}\strut\par}%
   \vskip-\baselineskip\nobreak%
 %</report|book>
-  \secdef\@addpart\@saddpart
+  \SecDef\@addpart\@saddpart
 }
 \newcommand*{\@addpart}{}
 \def\@addpart[#1]#2{%
@@ -1781,6 +1892,7 @@
 %   \changes{v3.08}{2010/11/01}{Verwendung von \cs{addchaptertocentry}}%^^A
 %   \changes{v3.10}{2011/08/30}{Integration der Erweiterung für das optionale
 %     Argument der Gliederungsbefehle}%^^A
+%   \changes{v3.13a}{2014/09/11}{Verwendung von \cs{SecDef}}
 % \begin{macro}{\@makechapterhead}
 %   \changes{v2.7b}{2001/01/05}{Kapitel können grundsätzlich mit
 %     einer Präambel versehen werden}
@@ -1873,7 +1985,7 @@
   \thispagestyle{\chapterpagestyle}%
   \global\@topnum\z@
   \@afterindentfalse
-  \secdef\@chapter\@schapter
+  \SecDef\@chapter\@schapter
 }
 %    \end{macrocode}
 %   \changes{v3.06}{2010/06/02}{einschalten des \texttt{tocbasic}-Features
@@ -2076,6 +2188,7 @@
 %   \changes{v3.08}{2010/11/01}{Verwendung von \cs{addchaptertocentry}}
 %   \changes{v3.10}{2011/08/30}{Integration der Erweiterung für das optionale
 %     Argument der Gliederungsbefehle}
+%   \changes{v3.13a}{2014/09/11}{Verwendung von \cs{SecDef}}
 % \KOMAScript{} bietet in \textsf{scrbook} und \textsf{scrreprt} den
 % zusätzlichen Gliederungsbefehl \cs{addchap}. Es handelt sich dabei
 % um einen mit \cs{chapter*} vergleichbaren Befehl, bei dem jedoch der
@@ -2128,7 +2241,7 @@
   \thispagestyle{\chapterpagestyle}%
   \global\@topnum\z@
   \@afterindentfalse
-  \secdef\@addchap\@saddchap%
+  \SecDef\@addchap\@saddchap%
 }%
 \newcommand*{\@addchap}{}%
 \def\@addchap[#1]#2{%
@@ -2221,6 +2334,7 @@
 %     \cs{markright} ersetzt}
 %   \changes{v2.7a}{2001/01/04}{\cs{addsec} für eine bessere
 %     Unterstützung von \textsf{hyperref} geändert}
+%   \changes{v3.13a}{2014/09/11}{Verwendung von \cs{SecDef}}
 % \begin{macro}{\@addsec}
 %   \changes{v3.10}{2011/08/30}{Verwendung von \cs{addsectiontocentry}}
 %   \changes{v3.10}{2011/08/30}{Integration der Erweiterung für das optionale
@@ -2234,7 +2348,7 @@
 % Kolumnentitel korrigiert wird und ein Eintrag ins Inhaltsverzeichnis
 % erfolgt (nicht in der Stern-Variante).
 %    \begin{macrocode}
-\newcommand*\addsec{\secdef\@addsec\@saddsec}
+\newcommand*\addsec{\SecDef\@addsec\@saddsec}
 \newcommand*{\@addsec}{}
 \def\@addsec[#1]#2{\section*{#2}%
   \ifnum \scr@osectarg=\z@
@@ -2314,6 +2428,7 @@
 %   \changes{v2.96a}{2006/11/30}{Standardwert für \cs{parfillskip} (abhängig
 %     von Option \texttt{version})}
 %   \changes{v2.96a}{2006/12/03}{alle nicht benötigten \cs{nobreak} entfernt}
+%   \changes{v3.13a}{2014/09/11}{Verwendung von \cs{scr@startsection}}
 % \begin{macro}{\subsection}
 %   \changes{v2.8p}{2001/09/22}{\cs{sectfont} wird nun vor
 %     \cs{size@subsection} aufgerufen}
@@ -2322,6 +2437,7 @@
 %   \changes{v2.96a}{2006/11/30}{Standardwert für \cs{parfillskip} (abhängig
 %     von Option \texttt{version})}
 %   \changes{v2.96a}{2006/12/03}{alle nicht benötigten \cs{nobreak} entfernt}
+%   \changes{v3.13a}{2014/09/11}{Verwendung von \cs{scr@startsection}}
 % \begin{macro}{\subsubsection}
 %   \changes{v2.3d}{1995/08/19}{wird bei \texttt{scrartcl} nun
 %     ebenfalls numeriert und ins Inhaltsverzeichnis geschrieben}
@@ -2332,6 +2448,7 @@
 %   \changes{v2.96a}{2006/11/30}{Standardwert für \cs{parfillskip} (abhängig
 %     von Option \texttt{version})}
 %   \changes{v2.96a}{2006/12/03}{alle nicht benötigten \cs{nobreak} entfernt}
+%   \changes{v3.13a}{2014/09/11}{Verwendung von \cs{scr@startsection}}
 % \begin{macro}{\paragraph}
 %   \changes{v2.8p}{2001/09/22}{\cs{sectfont} wird nun vor
 %     \cs{size@paragraph} aufgerufen}
@@ -2344,6 +2461,7 @@
 %   \changes{v2.8q}{2002/02/28}{\cs{nobreak} nach \cs{sectfont}
 %     behebt einen Bug im color Paket}
 %   \changes{v2.96a}{2006/12/03}{alle nicht benötigten \cs{nobreak} entfernt}
+%   \changes{v3.13a}{2014/09/11}{Verwendung von \cs{scr@startsection}}
 % Die Standardgliederungsbefehle \cs{section} bis \cs{subparagraph}
 % sind mit der im Kernel dafür vorgesehenen Schnittstelle
 % definiert. Im Unterschied zu den Standardklassen erfolgt die
@@ -2353,7 +2471,7 @@
 % variabilisiert werden. Vielleicht in einer späteren Version.
 %    \begin{macrocode}
 \newcommand\section{%
-  \@startsection{section}{\sectionnumdepth}{\z@}%
+  \scr@startsection{section}{\sectionnumdepth}{\z@}%
   {-3.5ex \@plus -1ex \@minus -.2ex}%
   {2.3ex \@plus.2ex}%
   {\ifnum \scr@compatibility>\@nameuse{scr@v@2.96}\relax
@@ -2361,7 +2479,7 @@
     \raggedsection\normalfont\sectfont\nobreak\size@section}%
 }
 \newcommand\subsection{%
-  \@startsection{subsection}{\subsectionnumdepth}{\z@}%
+  \scr@startsection{subsection}{\subsectionnumdepth}{\z@}%
   {-3.25ex\@plus -1ex \@minus -.2ex}%
   {1.5ex \@plus .2ex}%
   {\ifnum \scr@compatibility>\@nameuse{scr@v@2.96}\relax
@@ -2370,7 +2488,7 @@
   }%
 }
 \newcommand\subsubsection{%
-  \@startsection{subsubsection}{\subsubsectionnumdepth}{\z@}%
+  \scr@startsection{subsubsection}{\subsubsectionnumdepth}{\z@}%
   {-3.25ex\@plus -1ex \@minus -.2ex}%
   {1.5ex \@plus .2ex}%
   {\ifnum \scr@compatibility>\@nameuse{scr@v@2.96}\relax
@@ -2379,13 +2497,13 @@
   }%
 }
 \newcommand\paragraph{%
-  \@startsection{paragraph}{\paragraphnumdepth}{\z@}%
+  \scr@startsection{paragraph}{\paragraphnumdepth}{\z@}%
   {3.25ex \@plus1ex \@minus.2ex}%
   {-1em}%
   {\raggedsection\normalfont\sectfont\nobreak\size@paragraph}%
 }
 \newcommand\subparagraph{%
-  \@startsection{subparagraph}{\subparagraphnumdepth}{\parindent}%
+  \scr@startsection{subparagraph}{\subparagraphnumdepth}{\parindent}%
   {3.25ex \@plus1ex \@minus .2ex}%
   {-1em}%
   {\raggedsection\normalfont\sectfont\nobreak\size@subparagraph}%
