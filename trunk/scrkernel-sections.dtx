@@ -1,4 +1,4 @@
-% \CheckSum{2404}
+% \CheckSum{2443}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -970,14 +970,16 @@
     \ifdim \@tempskipa <\z@
       \@tempskipa -\@tempskipa \@afterindentfalse
     \fi
+    \csname scr@startsection@hook\endcsname
     \if@nobreak
       \everypar{}%
     \else
       \addpenalty\@secpenalty\addvspace\@tempskipa
     \fi
     \@ifstar
-      {\@ssect{#3}{#4}{#5}{#6}}%
-      {\scr@section@dblarg{\@sect{#1}{#2}{#3}{#4}{#5}{#6}}}%
+      {\csname scr@preto@ssect@hook\endcsname\@ssect{#3}{#4}{#5}{#6}}%
+      {\csname scr@preto@sect@hook\endcsname
+        \scr@section@dblarg{\@sect{#1}{#2}{#3}{#4}{#5}{#6}}}%
   }
 \else
   \ClassWarningNoLine{\KOMAClassName}{`\string\@startsection' has been
@@ -991,7 +993,10 @@
     an alternative approach will be used.\MessageBreak
     If this fails and if there isn't a new release of\MessageBreak
     KOMA-Scriptt that fixes the problem, please\MessageBreak
-    send a report to the KOMA-Script author%
+    send a report to the KOMA-Script author.\MessageBreak
+    Note, that this alternative approach does not\MessageBreak
+    execute `\string\scr@startsection@hook', \MessageBreak
+    `\string\scr@preto@ssect@hook', or `\string\scr@preto@sect@hook'%
   }%
   \let\scr@saved@startsection\@startsection
   \newcommand*{\scr@startsection}[6]{%
@@ -1001,6 +1006,44 @@
   }
 \fi
 %    \end{macrocode}
+% \begin{macro}{\At@startsection}
+%   \changes{v3.14}{2014/09/11}{Neue Anweisung für Paketautoren}
+% Mit Hilfe dieser Anweisung kann Code in die Ausführung von \KOMAScript's
+% eigenem \cs{scr@startsection} an der Stelle eingefügt werden, an der
+% \cs{if@afterindent} und \cs{@tempskipa} bereits korrekt eingestellt sind,
+% aber noch bevor \emph{pentaly} und Abstand gesetzt wurden bzw. \cs{everypar}
+% gelöscht wurde.
+%    \begin{macrocode}
+\newcommand*{\At@startsection}[1]{%
+  \@ifundefined{scr@startsection@hook}{\let\scr@startsection@hook\@empty}{}%
+  \l@addto@macro{\scr@startsection@hook}{#1}%
+}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\Before@ssect}
+%   \changes{v3.14}{2014/09/11}{Neue Anweisung für Paketautoren}
+% Mit Hilfe dieser Anweisung kann Code in die Ausführung von \KOMAScript's
+% eigenem \cs{scr@startsection} unmittelbar vor dem Aufruf von \cs{@ssect}
+% eingefügt werden.
+%    \begin{macrocode}
+\newcommand*{\Before@ssect}[1]{%
+  \@ifundefined{scr@preto@ssect@hook}{\let\scr@preto@ssect@hook\@empty}{}%
+  \l@addto@macro{\scr@preto@ssect@hook}{#1}%
+}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\Before@sect}
+%   \changes{v3.14}{2014/09/11}{Neue Anweisung für Paketautoren}
+% Mit Hilfe dieser Anweisung kann Code in die Ausführung von \KOMAScript's
+% eigenem \cs{scr@startsection} unmittelbar vor dem Aufruf von \cs{@sect}
+% eingefügt werden.
+%    \begin{macrocode}
+\newcommand*{\Before@sect}[1]{%
+  \@ifundefined{scr@preto@sect@hook}{\let\scr@preto@sect@hook\@empty}{}%
+  \l@addto@macro{\scr@preto@sect@hook}{#1}%
+}
+%    \end{macrocode}
+% \end{macro}
 % \begin{macro}{\scr@section@dblarg}
 %   \changes{v3.13a}{2014/09/11}{Neue interne Anweisung}%^^A
 % \begin{macro}{\scr@section@xdblarg}
