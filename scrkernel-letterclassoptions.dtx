@@ -1,4 +1,4 @@
-% \CheckSum{1457}
+% \CheckSum{1498}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-letterclassoptions.dtx
@@ -66,7 +66,7 @@
   \filerevision$Revision$
 \endgroup
 \ProvidesFile{scrkernel-letterclassoptions.dtx}
-             [\filedate\space v3.13b.\filerevision\space
+             [\filedate\space v3.14.\filerevision\space
               KOMA-Script (letter class options)]
 % \iffalse
 \documentclass{scrdoc}
@@ -156,7 +156,8 @@
 % \subsection{Makros für Letter-Class-Options}
 %
 % \begin{macro}{\LoadLetterOption}
-%   \changes{v2.8q}{2001/10/08}{Neu}
+%   \changes{v2.8q}{2001/10/08}{Neu}^^A
+%   \changes{v3.14}{2014/10/04}{Leerzeichen werden ignoriert}^^A
 % Bei der neuen Briefklasse existiert eine Anweisung, mit der eine
 % \emph{\textbf{l}etter-\texttt{c}lass-\texttt{o}ption}-Datei geladen
 % werden kann. Das Laden wird mit entsprechender Information in der
@@ -185,20 +186,23 @@
   \@tempcnta=\@restore@catcode@level\relax
   \advance\@tempcnta by \@ne\relax
   \edef\@restore@catcode@level{\the\@tempcnta}%
-  \InputIfFileExists{#1.lco}{%
-%<class>    \ClassInfo{scrlttr2%
-%<package>    \PackageInfo{scrletter%
+  \KV@@sp@def\reserved@a{#1}%
+  \edef\reserved@a{\noexpand\InputIfFileExists{\reserved@a.lco}{%
+%<class>      \noexpand\ClassInfo{scrlttr2%
+%<package>      \noexpand\PackageInfo{scrletter%
       }{Letter-Class-Option `#1' loaded}%
     }{%
-%<class>    \ClassError{scrlttr2%
-%<package>    \PackageError{scrletter%
+%<class>      \noexpand\ClassError{scrlttr2%
+%<package>      \noexpand\PackageError{scrletter%
       }{%
-      Letter-Class-Option file `#1.lco' not found%
+        Letter-Class-Option file `#1.lco' not found%
       }{%
-      You've told me to load the Letter-Class-Option `#1'. So I have
-      to load\MessageBreak
-      the file `#1.lco'. But the file isn't available.}%
+        You've told me to load the Letter-Class-Option `#1'. So I have
+        to load\noexpand\MessageBreak
+        the file `#1.lco'. But the file isn't available.}%
     }%
+  }%
+  \reserved@a
   \@tempcnta=\@restore@catcode@level\relax
   \advance\@tempcnta by \m@ne\relax
   \edef\@restore@catcode@level{\the\@tempcnta}%
@@ -207,7 +211,27 @@
   \fi
 }
 %    \end{macrocode} 
-% \end{macro}
+% \end{macro}^^A \LoadLetterOption
+% \begin{macro}{\LoadLetterOptions}
+%   \changes{v3.14}{2014/10/04}{Neue Anweisung}^^A
+% Funktioniert prinzipiell wie \cs{LoadLetterOption}, aber es werden mehrere,
+% durch Komma getrennte Optionen unterstützt.
+%    \begin{macrocode}
+\newcommand*{\LoadLetterOptions}[1]{%
+  \begingroup
+    \def\reserved@a{\endgroup}%
+    \@for\reserved@b:=#1\do{%
+      \ifx\reserved@b\@empty\else
+        \ifx\reserved@b\space\else
+          \edef\reserved@a{\expandafter\unexpanded\expandafter{\reserved@a
+              \LoadLetterOption}{\reserved@b}\relax}%
+        \fi
+      \fi
+    }%
+  \reserved@a
+}
+%    \end{macrocode}
+% \end{macro}^^A \LoadLetterOptions
 %
 % \begin{macro}{\LetterOptionNeedsPapersize}
 %   \changes{v2.8q}{2001/10/17}{Neu}
