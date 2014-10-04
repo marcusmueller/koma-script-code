@@ -1,4 +1,4 @@
-% \CheckSum{3167}
+% \CheckSum{3169}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-notepaper.dtx
@@ -58,8 +58,16 @@
 %%% From File: $Id$
 %<*driver>
 % \fi
-\ProvidesFile{scrkernel-notepaper.dtx}[2014/06/26 v3.13 KOMA-Script
-                                                       (note-paper)]
+\ifx\ProvidesFile\undefined\def\ProvidesFile#1[#2]{}\fi
+\begingroup
+  \def\filedate$#1: #2-#3-#4 #5${\gdef\filedate{#2/#3/#4}}
+  \filedate$Date$
+  \def\filerevision$#1: #2 ${\gdef\filerevision{#2}}
+  \filerevision$Revision: 1767 $
+\endgroup
+\ProvidesFile{scrkernel-notepaper.dtx}
+             [\filedate\space v3.13b.\filerevision\space
+              KOMA-Script (note-paper)]
 % \iffalse
 \documentclass{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -914,7 +922,9 @@
 %   \changes{v3.08}{2010/10/28}{der Kopf des Briefbogens wird über eine
 %     Variable realisiert}
 % \begin{KOMAvar}{firsthead}
-%   \changes{v3.08}{2010/10/28}{Neu}
+%   \changes{v3.08}{2010/10/28}{Neu}%^^A
+%   \changes{v3.13b}{2014/10/04}{neuer \emph{hook} nur für
+%     \texttt{DINmtext.lco}}%^^A
 % Bei \texttt{scrlttr2} gibt es die üblichen Seitenstile, allerdings
 % ist deren Verhalten etwas anders als gewohnt. Dies ist in den
 % Besonderheiten für Briefen begründet. Zunächst die Voreinstellung für
@@ -940,6 +950,7 @@
         {\usekomafont{fromrule}{\rule{\useplength{firstheadwidth}}{.4pt}}}\\
       }%
       \ifkomavarempty{fromaddress}{}{%
+        \csname scr@default@firsthead@fromaddress@hook\endcsname
         \ignorespaces\usekomavar{fromaddress}%
       }%
     }%
