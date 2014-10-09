@@ -1,4 +1,4 @@
-% \CheckSum{272}
+% \CheckSum{405}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-miscellaneous.dtx
@@ -58,8 +58,16 @@
 %%% From File: $Id$
 %<*driver>
 % \fi
-\ProvidesFile{scrkernel-miscellaneous.dtx}[2013/12/08 v3.12 KOMA-Script 
-                            (miscellaneous, maybe everything or nothing)]
+\ifx\ProvidesFile\undefined\def\ProvidesFile#1[#2]{}\fi
+\begingroup
+  \def\filedate$#1: #2-#3-#4 #5${\gdef\filedate{#2/#3/#4}}
+  \filedate$Date$
+  \def\filerevision$#1: #2 ${\gdef\filerevision{#2}}
+  \filerevision$Revision$
+\endgroup
+\ProvidesFile{scrkernel-miscellaneous.dtx}[\filedate\space\filerevision\spac
+                                           KOMA-Script (miscellaneous, maybe
+                                           everything or nothing)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -651,6 +659,91 @@
 %</class>
 %    \end{macrocode}
 % \end{macro}^^A \scr@package@not@recommended
+%
+% \subsection{Workarounds für fremde Pakete}
+% \label{sec:packageworkarounds}
+%
+% \changes{v3.13a}{2014/10/09}{\textsf{titlesec} hat ein schwerwiegendes
+%   Problem}
+% Das Paket \textsf{titlesec} hat ein schwerwiegendes Problem, wenn
+% Überschriften nicht per \cs{@startsection} definiert sind. Ich werde hier
+% einmal versuchen, mich darum herum zu lavieren. Eine wirklich gute Lösung
+% ist das sicher nicht. Man sollte das Paket schlicht besser nicht mit
+% \KOMAScript{} zusammen verwenden.
+%    \begin{macrocode}
+%<*class>
+%<*!letter>
+\BeforePackage{titlesec}{%
+  \let\scr@ttl@saved@section\section
+  \let\scr@ttl@saved@subsection\subsection
+  \let\scr@ttl@saved@subsubsection\subsubsection
+  \let\scr@ttl@saved@paragraph\paragraph
+  \let\scr@ttl@saved@subparagraph\subparagraph
+}
+\AfterPackage{titlesec}{%
+  \@ifpackagelater{titlesec}{2014/10/09}{%
+    \ClassInfo{\KOMAClassName}{%
+      Deactivating the `titlesec` workaround,\MessageBreak
+      because package is newer than expected%
+    }%
+  }{%
+    \PackageWarning{\KOMAClassName}{%
+      Activating an ugly workaround for a missing\MessageBreak
+      feature of package `titlesec`%
+    }%
+    \def\scr@ttl@@extract#1\scr@startsection#2#3#4#5#6#7#8{%
+      \@tempskipa=#5
+      \@tempskipb=#6
+      \ifdim\@tempskipa<\z@
+        \toks@{\titlespacing*#8{#4}}%
+        \@tempskipa-\@tempskipa
+      \else
+        \toks@{\titlespacing#8{#4}}%
+      \fi
+      \@ifundefined{ttl@space}{}{%
+        \ttl@assign\@tempskipa*\ttl@space\relax\beforetitleunit}%
+      \ifdim\@tempskipb<\z@
+        \if@tempswa
+          \titleformat#8[runin]%
+             {\ttl@fonts\ttl@sizes{#3}}{\@seccntformat{#2}}%
+             {\z@}\ttl@passexplicit
+        \else
+          \titleformat#8[runin]%
+             {#7}{\@seccntformat{#2}}%
+             {\z@}\ttl@passexplicit
+        \fi
+        \@tempskipb-\@tempskipb
+      \else
+        \if@tempswa
+          \titleformat#8%
+            {\ttl@fil\ttl@fonts\ttl@sizes{#3}}{\@seccntformat{#2}}%
+            {\z@}\ttl@passexplicit 
+        \else
+          \titleformat#8%
+            {#7}{\@seccntformat{#2}}%
+            {\z@}\ttl@passexplicit
+        \fi
+        \@ifundefined{ttl@space}{}{%
+          \ttl@assign\@tempskipb*\ttl@space\relax\aftertitleunit}%
+      \fi
+      \edef\ttl@a{\the\toks@{\the\@tempskipa}{\the\@tempskipb}}
+      \ttl@a}%
+    \expandafter\scr@ttl@@extract\scr@ttl@saved@section\section
+    \expandafter\scr@ttl@@extract\scr@ttl@saved@subsection\subsection
+    \expandafter\scr@ttl@@extract\scr@ttl@saved@subsubsection\subsubsection
+    \expandafter\scr@ttl@@extract\scr@ttl@saved@paragraph\paragraph
+    \expandafter\scr@ttl@@extract\scr@ttl@saved@subparagraph\subparagraph
+    \let\scr@ttl@saved@section\relax
+    \let\scr@ttl@saved@subsection\relax
+    \let\scr@ttl@saved@subsubsection\relax
+    \let\scr@ttl@saved@paragraph\relax
+    \let\scr@ttl@saved@subparagraph\relax
+    \let\scr@ttl@@extract\relax
+  }%
+}
+%</!letter>
+%</class>
+%    \end{macrocode}
 %
 %
 % \iffalse
