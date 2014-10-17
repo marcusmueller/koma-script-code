@@ -1,4 +1,4 @@
-% \CheckSum{2448}
+% \CheckSum{2461}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -343,8 +343,8 @@
     \expandafter{\reserved@a}{#2}{#3}%
   }%
 }
-\newcommand*{\scr@define@family@key}{}
-\def\scr@define@family@key#1#2#3[#4]#5{%
+\newcommand{\scr@define@family@key}{}
+\long\def\scr@define@family@key#1#2#3[#4]#5{%
   \scr@if@familymember{#1}{#2}{define a key}{%
     \define@key{#2#1}{#3}[{#4}]{%
       \def\FamilyOfKey{#2}\def\FamilyMemberOfKey{#1}%
@@ -354,7 +354,7 @@
     }%
   }%
 }
-\newcommand*{\scr@define@family@key@nodefault}[4]{%
+\newcommand{\scr@define@family@key@nodefault}[4]{%
   \scr@if@familymember{#1}{#2}{define a key}{%
     \define@key{#2#1}{#3}{%
       \def\FamilyOfKey{#2}\def\FamilyMemberOfKey{#1}%
@@ -1718,19 +1718,26 @@
 % \subsection{Definition von KOMA-\textsf{keyval}-Schlüsseln (Hauptteil)}
 %
 % \begin{macro}{\FamilyExecuteOptions}
-%   \changes{v3.00}{2008/04/30}{Neue Anweisung}
-%   \changes{v3.04b}{2010/01/29}{\cs{edef} durch \cs{protected@edef} ersetzt}
-%   \changes{v3.04b}{2010/02/02}{\cs{scr@key@atlist} und \cs{scr@key@name}
-%     vor Überschreiben in \cs{serkeys} geschützt}
-%   \changes{v3.12}{2013/03/04}{neue Implementierung}
+%   \changes{v3.00}{2008/04/30}{Neue Anweisung}^^A
+%   \changes{v3.04b}{2010/01/29}{\cs{edef} durch \cs{protected@edef} ersetzt}^^A
+%   \changes{v3.04b}{2010/02/02}{\cs{scr@key@atlist} und \cs{scr@key@name}^^A
+%     vor Überschreiben in \cs{serkeys} geschützt}^^A
+%   \changes{v3.12}{2013/03/04}{neue Implementierung}^^A
 %   \changes{v3.12}{2013/03/04}{darf auch noch nach der Präambel verwendet
-%     werden}
+%     werden}^^A
+%   \changes{v3.14}{2014/10/17}{das dritte Argument wird \cs{long}
+%   verarbeitet}^^A
+% \begin{macro}{\@FamilyExecuteOptions}
+%   \changes{v3.14}{2014/10/17}{Neue streng interne Anweisung}^^A
 % Entspriche \cs{ExecuteOptions} jedoch \textsf{keyval}-Optionen. Insbesondere
 % ist die Anweisung reentrant! Es ist jedoch zu beachten, dass der hook lokal
 % zum jeweiligen Aufruf ist.
 %    \begin{macrocode}
 %<*base>
-\newcommand*{\FamilyExecuteOptions}[3][.\@currname.\@currext]{%
+\newcommand*{\FamilyExecuteOptions}[2][.\@currname.\@currext]{%
+  \@FamilyExecuteOptions[{#1}]{#2}%
+}
+\newcommand{\@FamilyExecuteOptions}[3][.\@currname.\@currext]{%
   \@namedef{scr@after@options@#1@hook}{\@namedef{scr@after@options@#1@hook}{}}%
   \@for\scr@key@atlist:=#3\do{%
     \expandafter\scr@key@split@name@value\scr@key@atlist==\@nil
@@ -1818,6 +1825,7 @@
 %</base>
 %    \end{macrocode}
 % \end{macro}^^A \scr@show@key@state@error
+% \end{macro}^^A \@FamilyExecuteOptions
 % \end{macro}^^A \FamilyExecuteOptions
 %
 % \begin{macro}{\KOMAExecuteOptions}
@@ -1836,12 +1844,15 @@
 % \end{macro}
 %
 % \begin{macro}{\FamilyOptions}
-%   \changes{v3.00}{2008/04/30}{Neue Anweisung}
-%   \changes{v3.12}{2013/03/02}{Neue Implementierung}
-%   \changes{v3.12}{2013/03/02}{\cs{scr@after@options@\#1@hook}}
+%   \changes{v3.00}{2008/04/30}{Neue Anweisung}^^A
+%   \changes{v3.12}{2013/03/02}{Neue Implementierung}^^A
+%   \changes{v3.12}{2013/03/02}{\cs{scr@after@options@\#1@hook}}^^A
+%   \changes{v3.14}{2014/10/17}{zweites Argument wird \cs{long} behandelt}^^A
+% \begin{macro}{\@FamilyOptions}
+%   \changes{v3.14}[2014/10/17]{Neue streng interne Anweisung}^^A
 % \begin{macro}{\Family@Options}
-%   \changes{v3.00}{2008/04/30}{Neues Makro (intern)}%
-%   \changes{v3.12}{2013/03/04}{entfernt}
+%   \changes{v3.00}{2008/04/30}{Neues Makro (intern)}%^^A
+%   \changes{v3.12}{2013/03/04}{entfernt}^^A
 % \end{macro}^^A \FamilyOptions
 % Es werden Schlüssel einer Familie verwendet. Existiert ein Schlüssel nicht,
 % oder ist der Wert für alle Schlüssel unbekannt, so wird ein Fehler
@@ -1850,7 +1861,8 @@
 % erwähnt, dass der hook dabei nur die jeweilige Anweisung umfasst.
 %    \begin{macrocode}
 %<*base>
-\newcommand*{\FamilyOptions}[2]{%
+\newcommand{\FamilyOptions}[1]{\@FamilyOptions{#1}}
+\newcommand{\@FamilyOptions}[2]{%
   \@namedef{scr@after@options@#1@hook}{\@namedef{scr@after@options@#1@hook}{}}%
 %    \end{macrocode}
 % \begin{description}
@@ -2069,13 +2081,14 @@
 %   \changes{v2.97e}{2007/11/10}{verwendet \cs{KV@@sp@def} zur Entsorgung von
 %     Leerzeichen}
 %   \changes{v3.00}{2008/04/30}{umbenannt von \cs{KOMA@key@split@name@value}}
+%   \changes{v3.13}{2014/10/17}{\cs{long}}
 %    \begin{macrocode}
 \newif\ifscr@key@found@
 \newcommand*{\scr@key@atlist}{}
 \newcommand*{\scr@key@name}{}
 \newcommand*{\scr@key@value}{}
 \newcommand*{\scr@key@split@name@value}{}
-\def\scr@key@split@name@value#1=#2=#3\@nil{%
+\long\def\scr@key@split@name@value#1=#2=#3\@nil{%
   \KV@@sp@def\scr@key@name{#1}%
   \KV@@sp@def\scr@key@value{#2}%
 }
@@ -2085,13 +2098,16 @@
 % \end{macro}^^A \scr@key@value
 % \end{macro}^^A \scr@key@name
 % \end{macro}^^A \scr@key@atlist
+% \end{macro}^^A \@FamilyOptions
 % \end{macro}^^A \FamilyOptions
 %
 % \begin{macro}{\FamilyOption}
-%   \changes{v3.00}{2008/04/30}{Neue Anweisung}
+%   \changes{v3.00}{2008/04/30}{Neue Anweisung}^^A
+% \begin{macro}{\@FamilyOptions}
+%   \changes{v3.14}[2014/10/17]{Neue streng interne Anweisung}^^A
 % \begin{macro}{\Family@Option}
-%   \changes{v3.00}{2008/04/30}{Neu (intern)}
-%   \changes{v3.12}{2013/03/04}{entfernt}
+%   \changes{v3.00}{2008/04/30}{Neu (intern)}^^A
+%   \changes{v3.12}{2013/03/04}{entfernt}^^A
 % \end{macro}
 %   \changes{v3.04b}{2010/01/29}{\cs{edef} durch \cs{protected@edef} ersetzt}
 % Im Gegensatz zu \cs{FamilyOptions} kann man mit dieser Anweisung nur eine
@@ -2101,7 +2117,8 @@
 % dritte, obligatorische Argument ist die Liste der Werte für diese Option.
 %    \begin{macrocode}
 %<*base>
-\newcommand*{\FamilyOption}[3]{%
+\newcommand*{\FamilyOption}[2]{\@FamilyOption{#1}{#2}}
+\newcommand{\@FamilyOption}[3]{%
   \expandafter\KV@@sp@def\expandafter\scr@key@name\expandafter{#2}%
 %    \end{macrocode}
 % Der einfachste Weg ist nun schlicht, die Liste der Werte durchzugehen und so
@@ -2130,6 +2147,7 @@
 }
 %</base>
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 %
@@ -2222,12 +2240,13 @@
 %   \changes{v3.10}{2011/09/12}{no error while processing global options}%^^A
 %   \changes{v3.11a}{2012/05/28}{prevent remove from list of unused global
 %     options globally}%^^A
+%   \changes{v3.14}{2014/10/17}{\cs{long}}^^A
 % Dieses Makro berichtet über Fehler wegen unbekannter Wertübergabe an einen
 % Schlüssel. Das erste Argument ist die Familie, das zweite der Schlüssel,
 % das dritte der Wert und das vierte die Liste der möglichen Werte.
 %    \begin{macrocode}
 %<*base>
-\newcommand*{\FamilyUnknownKeyValue}[4]{%
+\newcommand{\FamilyUnknownKeyValue}[4]{%
   \FamilyKeyStateUnknownValue
   \ifx\FamilyElseValues\@empty\else
     \PackageWarning{scrbase}{non empty \string\FamilyElseValue
