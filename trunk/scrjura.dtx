@@ -1,4 +1,4 @@
-% \CheckSum{1492}
+% \CheckSum{1643}
 % \iffalse meta-comment
 % ======================================================================
 % scrjura.dtx
@@ -70,7 +70,7 @@
 %<driver>\ProvidesFile{scrjura.drv}
 %<package>\ProvidesPackage{scrjura}
 %<*dtx|package|driver>
-                [2014/01/28 v0.7a KOMA-Script for jurists
+                [2014/11/03 v0.7b KOMA-Script for jurists
 %</dtx|package|driver>
 %<driver>                 (driver)%
 %<package>                (package)%
@@ -1032,19 +1032,22 @@ standard classes created by The LaTeX3 Project 1994-1996.
 \KOMAProcessOptions\relax
 %    \end{macrocode}
 %
-% \begin{macro}{\jura@env@type}
-%   \changes{v0.5d}{2010/04/28}{neu (intern)}
+% \begin{macro}{\scrjura@env@type}
+%   \changes{v0.5d}{2010/04/28}{neu (intern)}^^A
+%   \changes{v0.7b}{2014/11/03}{\cs{jura@env@type} umbenannt}^^A
 % Dieses Makro wird in Abhängigkeit der gerade aktiven
 % \textsf{scrjura}-Umgebung definiert.
 %    \begin{macrocode}
-\newcommand*{\jura@env@type}{}
+\newcommand*{\scrjura@env@type}{}
 %    \end{macrocode}
 % \end{macro}
 %
 % \begin{macro}{\ellipsispar}
-%   \changes{v0.7}{2013/05/02}{neu}
+%   \changes{v0.7}{2013/05/02}{neu}^^A
+%   \changes{v0.7b}{2014/11/03}{\cs{thecontractAbsoluteParagraph}
+%     flexibilisiert}^^A
 % \begin{macro}{\parellipsis}
-%   \changes{v0.7}{2013/05/02}{neu}
+%   \changes{v0.7}{2013/05/02}{neu}^^A
 % Paragraphen auslassen aber mit zählen.
 %    \begin{macrocode}
 \newcommand*{\ellipsispar}[1][1]{%
@@ -1052,8 +1055,8 @@ standard classes created by The LaTeX3 Project 1994-1996.
     \KOMAoptions{parnumber=manual}\parellipsis\par
     \addtocounter{par}{#1}%
     \protected@write\@auxout{}{%
-      \string\newmaxpar{\jura@env@type}%
-                       {\thecontractAbsoluteParagraph}%
+      \string\newmaxpar{\scrjura@env@type}%
+                       {\csname the\scrjura@env@type AbsoluteParagraph\endcsname}%
                        {\thepar}%
     }%
   \endgroup
@@ -1091,26 +1094,25 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % Unterbrechung.
 %    \begin{macrocode}
 \newcommand*{\contract}{%
-  \ifx\jura@env@type\@empty
-    \let\@doendpe\contract@doendpe
+  \ifx\scrjura@env@type\@empty
+    \let\@doendpe\scrjura@doendpe
     \let\Paragraph\contract@paragraph
     \let\c@Paragraph\c@contractParagraph
     \edef\cl@Paragraph{\cl@Paragraph\cl@contractParagraph}%
     \let\SubParagraph\contract@subparagraph
     \let\c@SubParagraph\c@contractSubParagraph
     \edef\cl@SubParagraph{\cl@SubParagraph\cl@contractSubParagraph}%
-    \let\Par\contract@everypar
     \let\Sentence\contract@sentence
-    \renewcommand*{\jura@env@type}{contract}%
+    \renewcommand*{\scrjura@env@type}{contract}%
     \aliaskomafont{Paragraph}{contract.Paragraph}%
   \else
-    \PackageError{contract}{nested `contract' detected}{%
+    \PackageError{scrjura}{nested `contract` detected}{%
       You may not use a `contract' environment inside\MessageBreak
-      a `\jura@env@type' environment or after loading\MessageBreak
-      package `scrjura' with option `\jura@env@type'!}%
+      a `\scrjura@env@type' environment or after loading\MessageBreak
+      package `scrjura' with option `\scrjura@env@type'!}%
   \fi
 }
-\let\if@jura@skiphyperref\iftrue
+\let\if@scrjura@skiphyperref\iftrue
 \let\cl@Paragraph\@empty
 \let\cl@SubParagraph\@empty
 \newcounter{contractParagraph}
@@ -1133,6 +1135,105 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % \end{Counter}
 % \end{macro}
 % \end{environment}
+%
+% \begin{macro}{\newjuraenvironment}
+%   \changes{v1.0}{2014/11/04}{Neue Anweisung}
+% Diese Anweisunge soll irgendwann einmal dazu dienen, weitere
+% Umgebungen einfach definieren zu können. Allerdings wird das vor Version 1.0
+% offiziell nichts werden. Bis dahin funktioniert die Anweisung bzw. die damit
+% definierten Umgebungen nicht korrekt und sollten nicht verwendet werden!
+%    \begin{macrocode}
+\DefineFamily{KOMAarg}
+\DefineFamilyMember[.scrjura.sty]{KOMAarg}
+\DefineFamilyKey[.scrjura.sty]{KOMAarg}{Paragraph}{%
+  \expandafter\gdef\csname \scrjura@env@type @Paragraph\endcsname{#1}%
+}
+\DefineFamilyKey[.scrjura.sty]{KOMAarg}{SubParagraph}{%
+  \expandafter\gdef\csname \scrjura@env@type @SubParagraph\endcsname{#1}%
+}
+\DefineFamilyKey[.scrjura.sty]{KOMAarg}{Sentence}{%
+  \expandafter\gdef\csname \scrjura@env@type @Sentence\endcsname{#1}%
+}
+\DefineFamilyKey[.scrjura.sty]{KOMAarg}{ParagraphNumberFormat}{%
+  \expandafter\gdef\csname \scrjura@env@type @Paragraphformat \endcsname
+  ##1{#1{##1}}
+  \expandafter\xdef\csname \scrjura@env@type @Paragraphformat\endcsname{%
+    \noexpand\protect\expandafter\noexpand
+    \csname \scrjura@env@type @Paragraphformat \endcsname
+  }%
+}
+\DefineFamilyMember[.scrjura.arg]{KOMA}
+\newcommand*{\newjuraenvironment}[4][]{%
+%    \end{macrocode}
+% Die Zähler definieren:
+%    \begin{macrocode}
+  \newcounter{#2Paragraph}%
+  \newcounter{#2AbsoluteParagraph}%
+  \newcounter{#2SubParagraph}%
+  \begingroup
+    \edef\scrjura@env@type{#2}%
+    \FamilyExecuteOptions[.scrjura.sty]{KOMAarg}{#1}%
+  \endgroup
+  \@ifundefined{#2@Paragraphformat}{%
+    \expandafter\DeclareRobustCommand\expandafter*%
+    \csname #2@Paragraphformat\endcsname[1]{\Paragraphformat{##1}}%
+  }{}%
+%    \end{macrocode}
+% Umgebung:
+%    \begin{macrocode}
+  \newenvironment{#2}{%
+    \par
+    \ifx\scrjura@env@type\@empty
+      \edef\scrjura@env@type{#2}%
+      \let\@doendpe\scrjura@doendpe
+      \expandafter\let\expandafter\c@Paragraph\csname c@#2Paragraph\endcsname
+      \edef\cl@Paragraph{\cl@Paragraph\csname cl@#2Paragraph\endcsname}%
+      \expandafter\let\expandafter\c@SubParagraph
+        \csname c@#2SubParagraph\endcsname
+      \edef\cl@SubParagraph{\cl@SubParagraph
+        \csname cl@#2SubParagraph\endcsname}%
+      \expandafter\let\expandafter\Sentence\csname #2@Sentence\endcsname
+      \@ifundefined{#2@Paragraph}{%
+        \let\Paragraph\contract@paragraph
+      }{%
+        \expandafter\let\expandafter\Paragraph
+        \csname #2@Paragraph\endcsname
+      }%
+      \@ifundefined{#2@SubParagraph}{%
+        \let\SubParagraph\contract@subparagraph
+      }{%
+        \expandafter\let\expandafter\SubParagraph
+        \csname #2@SubParagraph\endcsname
+      }%
+      \@ifundefined{#2@Sentence}{%
+        \let\Sentence\contract@sentence
+      }{%
+        \expandafter\let\expandafter\Sentence\csname #2@Sentence\endcsname
+      }%
+      \@ifundefined{scr@fnt@#2}{%
+        \@ifundefined{scr@fnt@instead@#2}{%
+          \aliaskomafont{Paragraph}{contract.Paragraph}%
+        }{%
+          \aliaskomafont{Paragraph}{\csname scr@fnt@instead@#2\endcsname}%
+        }%
+      }{%
+        \aliaskomafont{Paragraph}{contract.Paragraph}%
+      }%
+      #3%
+    \else
+      \PackageError{scrjura}{nested scrjura environments detected}{%
+        You must not use a `#2' environment inside\MessageBreak
+        a `\scrjura@env@type' environment or after loading\MessageBreak
+        package `scrjura' with option `\scrjura@env@type'!}%
+    \fi
+  }{%
+    #4%
+    \par
+  }%
+}
+\@onlypreamble\newjuraenvironment
+%    \end{macrocode}
+% \end{macro}^^A \newjuraenvironment
 %
 % \begin{macro}{\contract@paragraph}
 %   Das ist das Macro, das in Verträgen |\Paragraph| zur Verfügung stellt.
@@ -1253,10 +1354,12 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % soll. Trotzdem werden generell die Absatznummern eingeschaltet. Dann werden
 % die Optionen initialisiert und ausgeführt.
 %   \changes{v0.7}{2013/04/18}{Zähler \texttt{contractAbsoluteParagraph} wird
-%     erhöht}
+%     erhöht}^^A
+%   \changes{v0.7b}{2014/11/03}{\texttt{contractAbsoluteParagraph}
+%     flexibilisiert}^^A
 %    \begin{macrocode}
 \newcommand*{\contract@paragraph}[1]{%
-  \stepcounter{contractAbsoluteParagraph}%
+  \stepcounter{\scrjura@env@type AbsoluteParagraph}%
   \ManualPar\parnumbertrue
   \let\contract@title\relax
   \let\contract@entry\relax
@@ -1290,17 +1393,19 @@ standard classes created by The LaTeX3 Project 1994-1996.
       \let\@elt\@stpelt
       \cl@Paragraph
     \endgroup
-    \protected@edef\theParagraph{\contract@Paragraphformat{\contract@number}}%
+    \protected@edef\theParagraph{%
+      \csname \scrjura@env@type @Paragraphformat\endcsname{\contract@number}%
+    }%
     \protected@edef\@currentlabel{\theParagraph}%
   \fi
   \stepcounter{@AbsParagraph}%
   \begingroup\expandafter\expandafter\expandafter\endgroup
   \expandafter\ifx\csname if@skiphyperref\endcsname\relax
   \else
-    \expandafter\let\csname if@jura@skiphyperref\expandafter\endcsname
+    \expandafter\let\csname if@scrjura@skiphyperref\expandafter\endcsname
     \csname if@skiphyperref\endcsname
   \fi
-  \if@jura@skiphyperref\else
+  \if@scrjura@skiphyperref\else
     \hyper@refstepcounter{@AbsParagraph}%
     \typeout{absolute Nummer: \the@AbsParagraph^^JLabel: `\@currentHref'}%
   \fi
@@ -1334,7 +1439,7 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % Zum Schluss wird noch dafür gesorgt, dass auch die Absätze korrekt
 % nummeriert werden können etc.
 %    \begin{macrocode}
-    \jura@afterheading{contract}%
+    \scrjura@afterheading
   \fi
 }
 %    \end{macrocode}
@@ -1350,7 +1455,7 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % |\contract@paragraph|
 %    \begin{macrocode}
 \newcommand*{\contract@subparagraph}[1]{%
-  \stepcounter{contractAbsoluteParagraph}%
+  \stepcounter{\scrjura@env@type AbsoluteParagraph}%
   \ManualPar\parnumbertrue
   \let\contract@title\relax
   \let\contract@entry\relax
@@ -1379,10 +1484,10 @@ standard classes created by The LaTeX3 Project 1994-1996.
   \begingroup\expandafter\expandafter\expandafter\endgroup
   \expandafter\ifx\csname if@skiphyperref\endcsname\relax
   \else
-    \expandafter\let\csname if@jura@skiphyperref\expandafter\endcsname
+    \expandafter\let\csname if@scrjura@skiphyperref\expandafter\endcsname
     \csname if@skiphyperref\endcsname
   \fi
-  \if@jura@skiphyperref\else
+  \if@scrjura@skiphyperref\else
     \hyper@refstepcounter{@AbsParagraph}%
     \typeout{absolute Nummer: \the@AbsParagraph^^JLabel: `\@currentHref'}%
   \fi
@@ -1403,7 +1508,7 @@ standard classes created by The LaTeX3 Project 1994-1996.
       \par
     \endgroup
     \nobreak\vskip\contract@postskip
-    \jura@afterheading{contract}%
+    \scrjura@afterheading
   \fi
 }
 %    \end{macrocode}
@@ -1414,21 +1519,23 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % Automatische oder manuelle Absatznummern für alle Umgebungen aktivieren.
 %    \begin{macrocode}
 \newcommand*{\AutoPar}{%
-  \expandafter\let\expandafter\jura@everypar
-  \csname \jura@type @everypar\endcsname
+  \expandafter\let\expandafter\scrjura@everypar
+  \csname \scrjura@env@type @everypar\endcsname
 }
 \newcommand*{\ManualPar}{%
-  \let\jura@everypar\relax
+  \let\scrjura@everypar\relax
 }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}{\jura@afterheading}
+% \begin{macro}{\scrjura@afterheading}
+%   \changes{v0.7b}{2014/11/03}{\cs{jura@afterheading} umbenannt}^^A
+%   \changes{v0.7b}{2014/11/03}{benötigt kein Argument mehr}^^A
 % Entspricht |\afterheading| mit Erweiterungen für automatischen
 % Absatznummern.
 %    \begin{macrocode}
-\newcommand*{\jura@afterheading}[1]{%
+\newcommand*{\scrjura@afterheading}{%
   \@nobreaktrue
   \everypar{%
     \if@nobreak
@@ -1440,20 +1547,20 @@ standard classes created by The LaTeX3 Project 1994-1996.
     \else
       \clubpenalty \@clubpenalty
       \everypar{%
-        \jura@everypar
+        \scrjura@everypar
       }%
     \fi
-    \jura@everypar
+    \scrjura@everypar
   }%
-  \def\jura@type{#1}%
   \AutoPar
 }
 %    \end{macrocode}
-% \begin{macro}{\jura@everypar}
-%   Die Anweisung, die am Anfang von jedem Absatz auszuführen ist, um die
-%   Nummer zu setzen. Außerhalb der Umgebungen ist das nichts.
+% \begin{macro}{\scrjura@everypar}
+%   \changes{v0.7b}{2014/11/03}{\cs{jura@everypar} umbenannt}^^A
+% Die Anweisung, die am Anfang von jedem Absatz auszuführen ist, um die
+% Nummer zu setzen. Außerhalb der Umgebungen ist das nichts.
 %    \begin{macrocode}
-\newcommand*{\jura@everypar}{}
+\newcommand*{\scrjura@everypar}{}
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\@doendpe}
@@ -1461,28 +1568,30 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % kurz-, mittel- und langwirkenden Absatzaktionen zurückzusetzen. Damit hier
 % nicht die automatische Absatznummerierung abgeschaltet wird, wird sie neu
 % eingefügt.
+% \begin{macro}{\scrjura@doendpe}
 %    \begin{macrocode}
 \CheckCommand*\@doendpe{\@endpetrue
   \def\par{\@restorepar\everypar{}\par\@endpefalse}\everypar
   {{\setbox\z@\lastbox}\everypar{}\@endpefalse}}
-\newcommand*{\contract@doendpe}{%
+\newcommand*{\scrjura@doendpe}{%
   \@endpetrue
   \def\par{%
     \@restorepar\everypar{%
-      \csname jura@everypar\endcsname
+      \csname scrjura@everypar\endcsname
     }%
     \par\@endpefalse
   }%
   \everypar{%
     {\setbox\z@\lastbox}\everypar{%
-      \csname jura@everypar\endcsname
+      \csname scrjura@everypar\endcsname
     }%
     \@endpefalse
   }%
 }
 %    \end{macrocode}
-% \end{macro}
-% \end{macro}
+% \end{macro}^^A \scrjura@doendpe
+% \end{macro}^^A \doendpe
+% \end{macro}^^A \scrjura@everypar
 %
 % \begin{macro}{\l@cpar}
 % Verzeichnis-Eintrag für einen Vertrags-Paragraphen.
@@ -1499,31 +1608,34 @@ standard classes created by The LaTeX3 Project 1994-1996.
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\jura@separator}
+% \begin{macro}{\scrjura@separator}
+%   \changes{v0.7b}{2014/11/03}{\cs{jura@separator} umbenannt}^^A
 % Wird verwendet, damit Leerzeichen am Anfang oder Ende entfernt werden können.
 %    \begin{macrocode}
-\DeclareRobustCommand*{\jura@separator}[1]{#1}
+\DeclareRobustCommand*{\scrjura@separator}[1]{#1}
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\jura@usetype}
-%   \changes{v0.5d}{2010/04/28}{neu (intern)}
+% \begin{macro}{\scrjura@usetype}
+%   \changes{v0.5d}{2010/04/28}{neu (intern)}^^A
+%   \changes{v0.7b}{2014/11/03}{\cs{jura@usetype} umbenannt}^^A
 % In der Voreinstellung macht das erst einmal gar nichts, außer dass es robust
 % ist und \cs{jura@@usetype} aufruft.
-% \begin{macro}{\jura@@usetype}
-%   \changes{v0.5d}{2010/04/28}{neu (intern)}
+% \begin{macro}{\scrjura@@usetype}
+%   \changes{v0.5d}{2010/04/28}{neu (intern)}^^A
+%   \changes{v0.7b}{2014/11/03}{\cs{jura@@usetype} umbenannt}^^A
 % Das wiederum ist nicht robust und kann dadurch einfacher umdefiniert
 % werden. In der Voreinstellung macht das dann wirklich nichts, außer das
 % Argument zu fressen.
 %    \begin{macrocode}
-\DeclareRobustCommand*{\jura@usetype}[1]{\jura@@usetype{#1}}
-\newcommand*{\jura@@usetype}[1]{}
+\DeclareRobustCommand*{\scrjura@usetype}[1]{\scrjura@@usetype{#1}}
+\newcommand*{\scrjura@@usetype}[1]{}
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
 %
 % \begin{macro}{\contract@everypar}
-% |\jura@everpar| für Verträge.
+% |\scrjura@everpar| für Verträge.
 % \begin{macro}{\ifparnumber}
 %   \changes{v0.6}{2011/09/29}{Definition des Schalters in die Definition der
 %     Option verschoben}
@@ -1548,7 +1660,7 @@ standard classes created by The LaTeX3 Project 1994-1996.
 \newcommand*{\theHpar}{\theH@AbsParagraph-\Roman{par}}
 \newcommand*{\parformat}{(\thepar)}
 \newkomafont{parnumber}{}
-\renewcommand*\p@par{{\jura@usetype{\jura@env@type}\theSubParagraph\jura@separator{\nobreakspace}}}
+\renewcommand*\p@par{{\scrjura@usetype{\scrjura@env@type}\theSubParagraph\scrjura@separator{\nobreakspace}}}
 \@addtoreset{par}{Paragraph}
 \@addtoreset{par}{SubParagraph}
 %    \end{macrocode}
@@ -1571,6 +1683,8 @@ standard classes created by The LaTeX3 Project 1994-1996.
 %   \changes{v0.7}{2013/05/23}{Absatznummer von \cs{thisparnumber} beachtet}
 %   \changes{v0.7}{2013/06/06}{Im Fall von nicht rein nummerischen
 %     Absatznummern die Absätze auf jeden Fall nummerieren}
+%   \changes{v0.7b}{2014/11/03}{\texttt{contractAbsoluteParagraph}
+%     flexibilisiert}^^A
 %    \begin{macrocode}
 \newcommand*{\contract@everypar}{%
   \ifparnumber
@@ -1590,11 +1704,16 @@ standard classes created by The LaTeX3 Project 1994-1996.
       \setcounter{sentence}{0}\refstepcounter{sentence}%
     \fi
     \begingroup
-      \protected@write\@auxout{\let\contract@Paragraphformat\@firstofone}{%
-        \string\newmaxpar{contract}%
-                         {\thecontractAbsoluteParagraph}%
-                         {\thepar}}%
-      \getmaxpar\@tempa{contract}{\thecontractAbsoluteParagraph}%
+      \protected@write\@auxout{%
+        \expandafter\let\csname \scrjura@env@type @Paragraphformat\endcsname
+        \@firstofone
+      }{%
+        \string\newmaxpar{\scrjura@env@type}%
+                         {\csname the\scrjura@env@type AbsoluteParagraph\endcsname}%
+                         {\thepar}%
+      }%
+      \getmaxpar\@tempa{\scrjura@env@type}%
+                       {\csname the\scrjura@env@type AbsoluteParagraph\endcsname}%
       \typeout{Stored max is \@tempa}%
       \def\reserved@a##1\@nnil{\def\@tempa{##1}}%
       \afterassignment\reserved@a\@tempcnta=0\@tempa\relax\@nnil
@@ -1713,7 +1832,7 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % Den ersten Teil der Referenz in |\@tempa| ablegen.
 %    \begin{macrocode}
       \def\@tempc##1##2\@nil{##1}%
-      \let\jura@separator\@gobble
+      \let\scrjura@separator\@gobble
       \protected@edef\@tempa{\expandafter\expandafter\expandafter\@tempc
         \csname r@#2\endcsname\noexpand\@nil}%
 %    \end{macrocode}
@@ -1780,7 +1899,7 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % Den ersten Teil der Referenz in |\@tempa| ablegen.
 %    \begin{macrocode}
       \def\@tempc##1##2\@nil{##1}%
-      \let\jura@separator\@gobble
+      \let\scrjura@separator\@gobble
       \protected@edef\@tempa{\expandafter\expandafter\expandafter\@tempc
         \csname r@#2\endcsname\noexpand\@nil}%
 %    \end{macrocode}
@@ -1884,7 +2003,7 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % Den ersten Teil der Referenz in |\@tempa| ablegen.
 %    \begin{macrocode}
       \def\@tempc##1##2\@nil{##1}%
-      \let\jura@separator\@gobble
+      \let\scrjura@separator\@gobble
       \protected@edef\@tempa{\expandafter\expandafter\expandafter\@tempc
         \csname r@#2\endcsname\noexpand\@nil}%
 %    \end{macrocode}
@@ -1963,7 +2082,7 @@ standard classes created by The LaTeX3 Project 1994-1996.
 \newcommand*{\theHsentence}{\theHpar-\arabic{sentence}}
 \renewcommand*{\p@sentence}{\expandafter\p@@sentence}
 \newcommand*{\p@@sentence}[1]{\p@par{{\par@cite{\thepar}}%
-    \jura@separator{\nobreakspace}}{\sentence@cite{#1}}}
+    \scrjura@separator{\nobreakspace}}{\sentence@cite{#1}}}
 \newcommand*{\contract@sentence}{%
   \refstepcounter{sentence}%
   \textsuperscript{\thesentence}\nobreak\hskip\z@
