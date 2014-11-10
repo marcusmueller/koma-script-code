@@ -1,4 +1,4 @@
-% \CheckSum{1643}
+% \CheckSum{1666}
 % \iffalse meta-comment
 % ======================================================================
 % scrjura.dtx
@@ -1210,6 +1210,11 @@ standard classes created by The LaTeX3 Project 1994-1996.
       }{%
         \expandafter\let\expandafter\Sentence\csname #2@Sentence\endcsname
       }%
+      \@ifundefined{\scrjura@env@type @everypar}{%
+        \expandafter\let
+        \csname \scrjura@env@type @everypar\endcsname
+        \contract@everypar
+      }{}%
       \@ifundefined{scr@fnt@#2}{%
         \@ifundefined{scr@fnt@instead@#2}{%
           \aliaskomafont{Paragraph}{contract.Paragraph}%
@@ -2236,6 +2241,17 @@ standard classes created by The LaTeX3 Project 1994-1996.
         \edef\noexpand#1{\csname max@#2@\@tempa\endcsname}}%
     \fi
   \@tempa
+}
+%    \end{macocode}
+%   \changes{v0.7b}{2014/11/10}{Notfallcode in die \texttt{aux}-Datei}^^A
+% Da manche Anwender \texttt{scrjura} aus einem Dokument entfernen, ohne die
+% \texttt{aux}-Dateien zu löschen, sehen wir eine Notlösung vor, um
+% Fehlermeldungen wegen nicht definiertem \cs{newmaxpar} zu vermeiden.
+%    \begin{macrocode}
+\AtBeginDocument{%
+  \immediate\write\@mainaux{%
+    \string\providecommand*{\string\newmaxpar}[3]{}
+  }%
 }
 %    \end{macrocode}
 % \end{macro}
