@@ -1,4 +1,4 @@
-% \CheckSum{1659}
+% \CheckSum{1694}
 % \iffalse meta-comment
 % ======================================================================
 % scrjura.dtx
@@ -1145,25 +1145,49 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % \end{macro}
 % \end{environment}
 %
-% \begin{macro}{\newjuraenvironment}
-%   \changes{v1.0}{2014/11/04}{Neue Anweisung}
+% \begin{macro}{\DeclareNewJuraEnvironment}
+%   \changes{v1.0}{2014/11/12}{Neue Anweisung}
+% Verwendet \cs{@defjuraenvironment} um eine neue juristische Umgebung zu
+% definieren.
+%    \begin{macrocode}
+\newcommand*{\DeclareNewJuraEnvironment}[1]{%
+  \@ifundefined{#1}{\expandafter\let\csname #1\expandafter\endcsname
+    \csname end#1\endcsname}{}%
+  \@ifundefined{#1}{\let\reserved@defjuraenvironment\@defjuraenvironment}{%
+    \PackageError{scrjura}{ignorring declaration of `#1'}{%
+      You've tried to declare jura environment `#1', but
+      environment\MessageBreak
+      `#1' or command
+      \expandafter\string\csname #1\endcsname\space or
+      \expandafter\string\csname end#1\endcsname\MessageBreak
+      already exists.\MessageBreak
+      Declaration will be ignored}%
+    \long\def\reserved@defjuraenvironment##1[##2]##3##4{}%
+  }%
+  \@ifnextchar [%]
+    {\reserved@defjuraenvironment{#1}}{\reserved@defjuraenvironment{#1}[]}%
+}
+\@onlypreamble\DeclareNewJuraEnvironment
+%    \end{macrocode}
+% \begin{macro}{\@defjuraenvironment}
+%   \changes{v1.0}{2014/11/04}{Neue (interne) Anweisung}
 % Diese Anweisunge soll irgendwann einmal dazu dienen, weitere
 % Umgebungen einfach definieren zu können. Allerdings wird das vor Version 1.0
 % offiziell nichts werden. Bis dahin funktioniert die Anweisung bzw. die damit
 % definierten Umgebungen nicht korrekt und sollten nicht verwendet werden!
 %    \begin{macrocode}
 \DefineFamily{KOMAarg}
-\DefineFamilyMember[.scrjura.sty]{KOMAarg}
-\DefineFamilyKey[.scrjura.sty]{KOMAarg}{Clause}{%
+\DefineFamilyMember{KOMAarg}
+\DefineFamilyKey{KOMAarg}{Clause}{%
   \expandafter\gdef\csname \scrjura@env@type @Clause\endcsname{#1}%
 }
-\DefineFamilyKey[.scrjura.sty]{KOMAarg}{SubClause}{%
+\DefineFamilyKey{KOMAarg}{SubClause}{%
   \expandafter\gdef\csname \scrjura@env@type @SubClause\endcsname{#1}%
 }
-\DefineFamilyKey[.scrjura.sty]{KOMAarg}{Sentence}{%
+\DefineFamilyKey{KOMAarg}{Sentence}{%
   \expandafter\gdef\csname \scrjura@env@type @Sentence\endcsname{#1}%
 }
-\DefineFamilyKey[.scrjura.sty]{KOMAarg}{ClauseNumberFormat}{%
+\DefineFamilyKey{KOMAarg}{ClauseNumberFormat}{%
   \expandafter\gdef\csname \scrjura@env@type @Clauseformat \endcsname
   ##1{#1{##1}}
   \expandafter\xdef\csname \scrjura@env@type @Clauseformat\endcsname{%
@@ -1171,64 +1195,64 @@ standard classes created by The LaTeX3 Project 1994-1996.
     \csname \scrjura@env@type @Clauseformat \endcsname
   }%
 }
-\DefineFamilyMember[.scrjura.arg]{KOMA}
-\newcommand*{\newjuraenvironment}[4][]{%
+\newcommand{\@defjuraenvironment}{}
+\long\def\@defjuraenvironment#1[#2]#3#4{%
 %    \end{macrocode}
 % Die Zähler definieren:
 %    \begin{macrocode}
-  \newcounter{#2Clause}%
-  \newcounter{#2AbsoluteClause}%
-  \newcounter{#2SubClause}%
+  \newcounter{#1Clause}%
+  \newcounter{#1AbsoluteClause}%
+  \newcounter{#1SubClause}%
   \begingroup
-    \edef\scrjura@env@type{#2}%
-    \FamilyExecuteOptions[.scrjura.sty]{KOMAarg}{#1}%
+    \edef\scrjura@env@type{#1}%
+    \FamilyExecuteOptions[.scrjura.sty]{KOMAarg}{#2}%
   \endgroup
-  \@ifundefined{#2@Clauseformat}{%
+  \@ifundefined{#1@Clauseformat}{%
     \expandafter\DeclareRobustCommand\expandafter*%
-    \csname #2@Clauseformat\endcsname[1]{\Clauseformat{##1}}%
+    \csname #1@Clauseformat\endcsname[1]{\Clauseformat{##1}}%
   }{}%
 %    \end{macrocode}
 % Umgebung:
 %    \begin{macrocode}
-  \newenvironment{#2}{%
+  \newenvironment{#1}{%
     \par
     \ifx\scrjura@env@type\@empty
-      \edef\scrjura@env@type{#2}%
+      \edef\scrjura@env@type{#1}%
       \let\@doendpe\scrjura@doendpe
-      \expandafter\let\expandafter\c@Clause\csname c@#2Clause\endcsname
-      \edef\cl@Clause{\cl@Clause\csname cl@#2Clause\endcsname}%
+      \expandafter\let\expandafter\c@Clause\csname c@#1Clause\endcsname
+      \edef\cl@Clause{\cl@Clause\csname cl@#1Clause\endcsname}%
       \expandafter\let\expandafter\c@SubClause
-        \csname c@#2SubClause\endcsname
+        \csname c@#1SubClause\endcsname
       \edef\cl@SubClause{\cl@SubClause
-        \csname cl@#2SubClause\endcsname}%
-      \expandafter\let\expandafter\Sentence\csname #2@Sentence\endcsname
-      \@ifundefined{#2@Clause}{%
+        \csname cl@#1SubClause\endcsname}%
+      \expandafter\let\expandafter\Sentence\csname #1@Sentence\endcsname
+      \@ifundefined{#1@Clause}{%
         \let\Clause\contract@paragraph
       }{%
         \expandafter\let\expandafter\Clause
-        \csname #2@Clause\endcsname
+        \csname #1@Clause\endcsname
       }%
-      \@ifundefined{#2@SubClause}{%
+      \@ifundefined{#1@SubClause}{%
         \let\SubClause\contract@subparagraph
       }{%
         \expandafter\let\expandafter\SubClause
-        \csname #2@SubClause\endcsname
+        \csname #1@SubClause\endcsname
       }%
-      \@ifundefined{#2@Sentence}{%
+      \@ifundefined{#1@Sentence}{%
         \let\Sentence\contract@sentence
       }{%
-        \expandafter\let\expandafter\Sentence\csname #2@Sentence\endcsname
+        \expandafter\let\expandafter\Sentence\csname #1@Sentence\endcsname
       }%
       \@ifundefined{\scrjura@env@type @everypar}{%
         \expandafter\let
         \csname \scrjura@env@type @everypar\endcsname
         \contract@everypar
       }{}%
-      \@ifundefined{scr@fnt@#2}{%
-        \@ifundefined{scr@fnt@instead@#2}{%
+      \@ifundefined{scr@fnt@#1}{%
+        \@ifundefined{scr@fnt@instead@#1}{%
           \aliaskomafont{Clause}{contract.Clause}%
         }{%
-          \aliaskomafont{Clause}{\csname scr@fnt@instead@#2\endcsname}%
+          \aliaskomafont{Clause}{\csname scr@fnt@instead@#1\endcsname}%
         }%
       }{%
         \aliaskomafont{Clause}{contract.Clause}%
@@ -1236,7 +1260,7 @@ standard classes created by The LaTeX3 Project 1994-1996.
       #3%
     \else
       \PackageError{scrjura}{nested scrjura environments detected}{%
-        You must not use a `#2' environment inside\MessageBreak
+        You must not use a `#1' environment inside\MessageBreak
         a `\scrjura@env@type' environment or after loading\MessageBreak
         package `scrjura' with option `\scrjura@env@type'!}%
     \fi
@@ -1245,9 +1269,9 @@ standard classes created by The LaTeX3 Project 1994-1996.
     \par
   }%
 }
-\@onlypreamble\newjuraenvironment
 %    \end{macrocode}
-% \end{macro}^^A \newjuraenvironment
+% \end{macro}^^A \@dewjuraenvironment
+% \end{macro}^^A \DeclareNewJuraEnvironment
 %
 % \begin{macro}{\contract@paragraph}
 %   Das ist das Macro, das in Verträgen |\Clause| zur Verfügung stellt.
