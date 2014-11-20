@@ -1,4 +1,4 @@
-% \CheckSum{2443}
+% \CheckSum{2474}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -429,6 +429,8 @@
 % \begin{macro}{\chapterheadendvskip}
 %   \changes{v3.11c}{2013/02/13}{\cs{chapterheadstartvskip} und
 %     \cs{chapterheadendvskip} haben in \textsf{scrartcl} nichts verloren}
+% \begin{macro}{\chapterheadmidvskip}
+%   \changes{v3.15}{2014/11/20}{neue Anweisung}
 % Mit diesen Anweisungen wird üblicherweise der Abstand zwischen
 % oberem Rand des Textbereichs und der Überschrift bzw. der Abstand
 % zwischen der Überschrift und dem Text des Kapitels gesetzt. Man kann
@@ -436,13 +438,16 @@
 % missbrauchen. Das ist der Grund warum diese Makros keine Längen,
 % sondern komplette Anweisungen enthalten. In der Voreinstellung
 % enthalten sie jedoch gar nichts. Die tatsächlichen Werte werden
-% durch die Optionen festgelegt.
+% durch die Optionen festgelegt. Dabei wird \cs{chapterheadmidvskip} nur
+% verwendet, wenn Option \texttt{chapterprefix} aktiv ist.
 %    \begin{macrocode}
 %<*book|report>
 \newcommand*{\chapterheadstartvskip}{}
 \newcommand*{\chapterheadendvskip}{}
+\newcommand*{\chapterheadmidvskip}{\par\nobreak\vskip.5\baselineskip}
 %</book|report>
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 %
@@ -2065,6 +2070,15 @@
       \fi
 %<*book>
     \else
+%    \end{macrocode}
+% \changes{v3.15}{2014/11/20}{Resetliste des Kapitelzählers ausführen}
+%    \begin{macrocode}
+      \ifnum\scr@compatibility<\@nameuse{scr@v@3.15}\relax\else
+        \begingroup
+          \let\@elt\@stpelt
+          \csname cl@chapter\endcsname
+        \endgroup
+      \fi
       \ifx\scr@ds@tocentry\@empty\else
         \addchaptertocentry{}{\scr@ds@tocentry}%
       \fi
@@ -2105,35 +2119,46 @@
 }
 %    \end{macrocode}
 %   \changes{v2.96a}{2006/12/02}{Abstand nach der Präfixzeile nur, wenn eines
-%     Präfixzeile ausgegeben wurde}
-%   \changes{v2.97b}{2007/03/09}{\cs{endgraf} korrigiert}
+%     Präfixzeile ausgegeben wurde}^^A
+%   \changes{v2.97b}{2007/03/09}{\cs{endgraf} korrigiert}^^A
+%   \changes{v3.15}{2014/11/20}{Generalumbau}^^A
 %    \begin{macrocode}
-\newcommand*{\@@makechapterhead}[1]{\chapterheadstartvskip
+\newcommand*{\@@makechapterhead}[1]{%
+  \chapterheadstartvskip
   {%
     \setlength{\parindent}{\z@}\setlength{\parfillskip}{\fill}%
-    \normalfont\sectfont\nobreak\size@chapter{}%
+    \normalfont\sectfont\nobreak\nobreak\usekomafont{chapter}{}%
+%<book>    \if@mainmatter
+     \def\IfUseNumber{\ifnumbered{chapter}}%
+%<book>    \else\let\IfUseNumber\@secondoftwo\fi
     \if@chapterprefix
-      \let\@tempa\raggedsection
+      \raggedsection
+      \let\IfUsePrefixLine\@firstoftwo
+      \let\@tempa\@firstofone
     \else
+      \let\IfUsePrefixLine\@secondoftwo
       \let\@tempa\@hangfrom
     \fi
     \@tempa{%
-      \ifnumbered{chapter}{%
-%<book>        \if@mainmatter 
-          \if@chapterprefix
-            \expandafter\size@chapterprefix
-          \else
-            \expandafter\size@chapter
-          \fi
-          {\chapterformat}%
-          \if@chapterprefix
-            \size@chapterprefix{}\endgraf\nobreak\vskip.5\baselineskip
-          \fi
-%<book>        \fi
+      \IfUseNumber{%
+        \usekomafont{chapter}{%
+          \IfUsePrefixLine{%
+            {\usekomafont{chapterprefix}{%
+                \chapterformat\chapterheadmidvskip
+            }}%
+          }{%
+            \chapterformat
+          }%
+        }%
       }{}%
     }%
-    {\raggedsection \interlinepenalty \@M \size@chapter{#1}\par}}%
-  \nobreak\chapterheadendvskip
+    {%
+      \IfUsePrefixLine{}{\raggedsection}%
+      \interlinepenalty \@M 
+      \usekomafont{chapter}{#1}\par
+    }%
+  }%
+  \nobreak\par\nobreak\chapterheadendvskip
 }
 %    \end{macrocode}
 % \end{macro}
@@ -2190,10 +2215,12 @@
 }
 \newcommand*{\@@makeschapterhead}[1]{%
   \chapterheadstartvskip%
-  {\normalfont\sectfont\nobreak\size@chapter{}%
+  {%
     \setlength{\parindent}{\z@}\setlength{\parfillskip}{\fill}%
-    \raggedsection \interlinepenalty \@M \size@chapter{#1}\par}%
-  \nobreak\chapterheadendvskip%
+    \normalfont\sectfont\nobreak\nobreak\usekomafont{chapter}{}%
+    \raggedsection \interlinepenalty \@M \usekomafont{chapter}{#1}\par
+  }%
+  \nobreak\par\nobreak\chapterheadendvskip%
 }
 \newcommand*{\@makeschapterhead}[1]{%
   \use@chapter@o@preamble
