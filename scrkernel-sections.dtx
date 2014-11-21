@@ -1,4 +1,4 @@
-% \CheckSum{2701}
+% \CheckSum{2705}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -2654,14 +2654,20 @@
     }%
 %    \end{macrocode}
 % Zu jedem Gliederungsbefehl gehört auch ein Befehl für den Kolumnentitel, der
-% bei \KOMAScript{} außerdem eine Formatierung des Zählers benötigt:
+% bei \KOMAScript{} außerdem eine Formatierung des Zählers benötigt. Falls
+% \textsf{scrlayer} geladen ist, wird das über dessen Befehl
+% |\DeclareSectionNumberDepth| erledigt, sonst direkt:
 %    \begin{macrocode}
-    \@ifundefined{#2markformat}{%
-      \@namedef{#2markformat}{\csname the#2\endcsname\autodot\endskip}%
-    }{}%
-    \@ifundefined{#2mark}{%
-      \expandafter\let\csname #2mark\endcsname\@gobble
-    }{}%
+    \@ifundefined{DeclareSectionNumberDepth}{%
+      \@ifundefined{#2markformat}{%
+        \@namedef{#2markformat}{\csname the#2\endcsname\autodot\endskip}%
+      }{}%
+      \@ifundefined{#2mark}{%
+        \expandafter\let\csname #2mark\endcsname\@gobble
+      }{}%
+    }{%
+      \DeclareSectionNumberDepth{#2}{\csname #2numdepth\endcsname}%
+    }%
 %    \end{macrocode}
 % Und es gehören Befehle dazu, um einen Eintrag ins Inhaltsverzeichnis zu
 % schreiben und den Eintrag auch darzustellen:
