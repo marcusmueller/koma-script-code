@@ -1,4 +1,4 @@
-% \CheckSum{2474}
+% \CheckSum{2701}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -2489,6 +2489,222 @@
 }
 %    \end{macrocode}
 % \end{macro}
+%
+% \begin{macro}{\DeclareSectionCommand}
+%   \changes{v3.15}{2014/11/21}{neue Anweisung}
+% Definition neuer oder Umdefinition existierender Gliederungsbefehle, die auf
+% \cs{scr@startsection} basieren. Ebenso wird ein Verzeichniseintrag erzeugt,
+% falls ein solcher noch nicht existiert. Die Deklaration geschieht über
+% diverse Optionen:
+%    \begin{macrocode}
+\DefineFamily{KOMAarg}
+\DefineFamilyMember[.dsc]{KOMAarg}
+\newcommand*{\DeclareSectionCommand}[2][]{%
+%    \end{macrocode}
+% \begin{description}\item[\texttt{level}] nummerische
+% Gliederungsebene\end{description}
+%    \begin{macrocode}
+  \edef\reserved@a{%
+    \noexpand\FamilyCounterMacroKey[.dsc]{KOMAarg}{level}{%
+      \expandafter\noexpand\csname #2numdepth\endcsname}%
+  }\reserved@a
+%    \end{macrocode}
+% \begin{description}\item[\texttt{indent}] Linker Einzug der
+% Überschrift\end{description}
+%    \begin{macrocode}
+  \edef\reserved@a{%
+    \noexpand\FamilyLengthMacroKey[.dsc]{KOMAarg}{indent}{%
+      \expandafter\noexpand\csname scr@#2@sectionindent\endcsname}%
+  }\reserved@a
+%    \end{macrocode}
+% \begin{description}\item[\texttt{beforeskip}] Der Absolutwert gibt den
+% vertikalen Abstand vor der Überschrift an. Negative Werte bedeuten, dass
+% der Absatzeinzug nach der Überschrift unterdrückt werden
+% soll.\end{description}
+%    \begin{macrocode}
+  \edef\reserved@a{%
+    \noexpand\FamilyLengthMacroKey[.dsc]{KOMAarg}{beforeskip}{%
+      \expandafter\noexpand\csname scr@#2@sectionbeforeskip\endcsname}%
+  }\reserved@a
+%    \end{macrocode}
+% \begin{description}\item[\texttt{afterskip}] Wenn der Wert positiv ist,
+% dann ist es der verikale Abstand nach der Überschrift. Ein negativer Wert
+% signalisiert hingegen eine Spitzmarke. Der Absolutwert ist dann der
+% horizontale Abstand nach der Spitzmarke.\end{description}
+%    \begin{macrocode}
+  \edef\reserved@a{%
+    \noexpand\FamilyLengthMacroKey[.dsc]{KOMAarg}{afterskip}{%
+      \expandafter\noexpand\csname scr@#2@sectionafterskip\endcsname}%
+  }\reserved@a
+%    \end{macrocode}
+% \begin{description}\item[\texttt{font}] Schrifteinstellungen für das
+% Element.\end{description}
+%    \begin{macrocode}
+  \edef\reserved@a{%
+    \noexpand\DefineFamilyKey[.dsc]{KOMAarg}{font}{%
+      \noexpand\IfExistskomafont{#2}{%
+        \noexpand\setkomafont
+      }{%
+        \noexpand\newkomafont
+      }{#2}{####1}%
+      \noexpand\FamilyKeyStateProcessed
+    }%
+  }\reserved@a
+%    \end{macrocode}
+% \begin{description}\item[\texttt{counterwithin}] Der Zähler dieser Ebene
+% soll abhängen vom angegebenen Zähler.
+% \end{description}
+%    \begin{macrocode}
+  \FamilyStringKey[.dsc]{KOMAarg}{counterwithin}{\scr@local@counterwithin}%
+  \let\scr@local@counterwithin\relax
+%    \end{macrocode}
+% \begin{description}\item[\texttt{toclevel}] Ebene im Inhaltsverzeichnis
+% (Voreinstellung ist derselbe Wert wie für level)\end{description}
+%    \begin{macrocode}
+  \edef\reserved@a{%
+    \noexpand\FamilyCounterMacroKey[.dsc]{KOMAarg}{toclevel}{%
+      \expandafter\noexpand\csname #2tocdepth\endcsname}%
+  }\reserved@a
+%    \end{macrocode}
+% \begin{description}\item[\texttt{tocindent}] Einzug des
+% Inhaltsverzeichniseintrags\end{description}
+%    \begin{macrocode}
+  \edef\reserved@a{%
+    \noexpand\FamilyLengthMacroKey[.dsc]{KOMAarg}{tocindent}{%
+      \expandafter\noexpand\csname scr@#2@tocindent\endcsname}%
+  }\reserved@a
+%    \end{macrocode}
+% \begin{description}\item[\texttt{tocnumwidth}] Breite der Nummer des
+% Inhaltsverzeichniseintrags\end{description}
+%    \begin{macrocode}
+  \edef\reserved@a{%
+    \noexpand\FamilyLengthMacroKey[.dsc]{KOMAarg}{tocnumwidth}{%
+      \expandafter\noexpand\csname scr@#2@tocnumwidth\endcsname}%
+  }\reserved@a
+%    \end{macrocode}
+% Optionen ausführen:
+%    \begin{macrocode}
+  \FamilyExecuteOptions[.dsc]{KOMAarg}{#1}%
+%    \end{macrocode}
+% Testen, ob alle benötigten Optionen für die (Um-)Definierung des
+% Gliederungsbefehls gesetzt sind:
+%    \begin{macrocode}
+  \begingroup
+    \scr@ifundefinedorrelax{#2numdepth}{%
+      \scr@declaresectioncommanderror{#2}{section level}{level}%
+    }{}%
+    \scr@ifundefinedorrelax{scr@#2@sectionindent}{%
+      \scr@declaresectioncommanderror{#2}{section indent}{indent}%
+    }{}%
+    \scr@ifundefinedorrelax{scr@#2@sectionbeforeskip}{%
+      \scr@declaresectioncommanderror{#2}{before section skip}{beforeskip}%
+    }{}%
+    \scr@ifundefinedorrelax{scr@#2@sectionafterskip}{%
+      \scr@declaresectioncommanderror{#2}{after section skip}{afterskip}%
+    }{}%
+    \IfExistskomafont{#2}{}{%
+      \scr@declaresectioncommanderror{#2}{font}{font}%
+    }{}%
+    \scr@ifundefinedorrelax{scr@#2@tocindent}{%
+      \scr@declaresectioncommanderror{#2}{toc entry indent}{tocindent}%
+    }{}%
+    \scr@ifundefinedorrelax{scr@#2@tocnumwidth}{%
+      \scr@declaresectioncommanderror{#2}{toc entry number
+        width}{tocnumwidth}%
+    }{}%
+  \endgroup
+%    \end{macrocode}
+% Wenn alle Informationen für die (Um-)Definierung des Gliederungsbefehls
+% zusammen sind \dots
+%    \begin{macrocode}
+  \@firstofone{%
+%    \end{macrocode}
+% Zunächst sicherstellen, dass der Zähler existiert und ggf. dessen
+% Ausgabe anpassen:
+%    \begin{macrocode}
+    \@ifundefined{c@#2}{\newcounter{#2}}{}%
+    \ifx\scr@local@counterwithin\relax
+    \else\ifx\scr@local@counterwithin\@empty
+        \@namedef{the#2}{\arabic{#2}}%
+      \else
+        \@addtoreset{#2}{\scr@local@counterwithin}%
+        \expandafter\def\csname the#2\expandafter\endcsname{%
+          \csname the\scr@local@counterwithin\endcsname.\arabic{#2}}%
+      \fi
+    \fi
+    \@ifundefined{#2format}{%
+      \@namedef{#2format}{\csname the#2\endcsname\autodot\enskip}%
+    }{}%
+%    \end{macrocode}
+% Dann den eigentlichen Gliederungsbefehl definieren:
+%    \begin{macrocode}
+    \expandafter\edef\csname #2\endcsname{%
+      \noexpand\scr@startsection{#2}%
+      \expandafter\noexpand\csname #2numdepth\endcsname
+      \expandafter\noexpand\csname scr@#2@sectionindent\endcsname
+      \expandafter\noexpand\csname scr@#2@sectionbeforeskip\endcsname
+      \expandafter\noexpand\csname scr@#2@sectionafterskip\endcsname{%
+        \unexpanded{%
+          \ifnum \scr@compatibility>\@nameuse{scr@v@2.96}\relax
+            \setlength{\parfillskip}{\z@ plus 1fil}%
+          \fi
+          \raggedsection\normalfont\sectfont\nobreak\usekomafont{#2}%
+        }%
+      }%
+    }%
+%    \end{macrocode}
+% Zu jedem Gliederungsbefehl gehört auch ein Befehl für den Kolumnentitel, der
+% bei \KOMAScript{} außerdem eine Formatierung des Zählers benötigt:
+%    \begin{macrocode}
+    \@ifundefined{#2markformat}{%
+      \@namedef{#2markformat}{\csname the#2\endcsname\autodot\endskip}%
+    }{}%
+    \@ifundefined{#2mark}{%
+      \expandafter\let\csname #2mark\endcsname\@gobble
+    }{}%
+%    \end{macrocode}
+% Und es gehören Befehle dazu, um einen Eintrag ins Inhaltsverzeichnis zu
+% schreiben und den Eintrag auch darzustellen:
+%    \begin{macrocode}
+    \scr@ifundefinedorrelax{scr@#2@tocdepth}{%
+      \expandafter\let\csname scr@#2@tocdepth\expandafter\endcsname
+      \csname #2numdepth\endcsname
+    }{}%
+    \expandafter\providecommand\expandafter*%
+    \csname add#2tocentry\endcsname[2]{%
+      \addtocentrydefault{#2}{##1}{##2}%
+    }%
+    \scr@ifundefinedorrelax{l@#2}{%
+      \expandafter\edef\csname l@#2\endcsname{%
+        \noexpand\bprot@dottedtocline
+        \expandafter\noexpand\csname scr@#2@tocdepth\endcsname
+        \expandafter\noexpand\csname scr@#2@tocindent\endcsname
+        \expandafter\noexpand\csname scr@#2@tocnumwidth\endcsname
+      }%
+    }{}%
+  }%
+}
+%    \end{macrocode}
+% \begin{macro}{\scr@declaresectioncommanderror}
+%   \changes{v3.15}{2014/11/21}{neue (interne) Anweisung}
+% Gibt einen Fehler aus, falls \cs{DeclareSectionCommand} zu wenige Optionen
+% übergeben wurde. Das erste Argument ist der Name des zu deklarierenden
+% Befehls, das zweite ist eine textuelle Beschreibung der fehlenden Option und
+% das dritte ist der Name der fehlenden Option. Als Seiteneffekt sorgt der
+% Befehl dafür, dass die Deklaration nicht stattfindet.
+%    \begin{macrocode}
+\newcommand*{\scr@declaresectioncommanderror}[3]{%
+  \ClassError{\KOMAClassName}{%
+    #2 of \expandafter\string\csname #1\endcsname\space unknown%
+  }{%
+    Please use option `#3' to declare the #2.\MessageBreak
+    If you'll continue, declaration will be ignored%
+  }%
+  \aftergroup\@gobbletwo
+}
+%    \end{macrocode}
+% \end{macro}^^A \scr@declaresectioncommanderror
+% \end{macro}^^A \DeclareSectionCommand
 %
 % \begin{macro}{\section}
 %   \changes{v2.8p}{2001/09/22}{\cs{sectfont} wird nun vor
