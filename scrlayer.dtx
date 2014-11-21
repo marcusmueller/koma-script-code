@@ -1,4 +1,4 @@
-% \CheckSum{3314}
+% \CheckSum{3321}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlayer.dtx
@@ -744,7 +744,7 @@
       \if@tempswa
         \@mkright{%
           \MakeMarkcase{%
-            \ifnum \c@secnumdepth<\numexpr \csname #1level\endcsname +0\relax
+            \ifnum \c@secnumdepth<\numexpr \csname #1numdepth\endcsname +0\relax
             \else\if@mainmatter \csname #1markformat\endcsname\fi\fi
             ##1%
           }%
@@ -779,7 +779,7 @@
       \fi
       {%
         \MakeMarkcase{%
-          \ifnum \c@secnumdepth<\numexpr \csname #1level\endcsname +0\relax
+          \ifnum \c@secnumdepth<\numexpr \csname #1numdepth\endcsname +0\relax
           \else\if@mainmatter \csname #1markformat\endcsname\fi\fi
           ##1%
         }%
@@ -796,16 +796,16 @@
 \newcommand*{\automark@both}[2]{%
   \ifscrlayer@level@prepared{#1}{%
     \ifscrlayer@level@prepared{#2}{%
-      \ifnum \numexpr \csname #1level\endcsname +0\relax
-           > \numexpr \csname #2level\endcsname +0\relax
+      \ifnum \numexpr \csname #1numdepth\endcsname +0\relax
+           > \numexpr \csname #2numdepth\endcsname +0\relax
 %    \end{macrocode}
 % Level of left mark is greater than level of right mark. e.g., section >
 % chapter. This is unusual. Nevertheless we'll handle it.
 %    \begin{macrocode}
           \automark@leftlow{#2}%
           \automark@righthigh{#1}%
-      \else \ifnum \numexpr \csname #1level\endcsname +0\relax
-                 = \numexpr \csname #2level\endcsname +0\relax
+      \else \ifnum \numexpr \csname #1numdepth\endcsname +0\relax
+                 = \numexpr \csname #2numdepth\endcsname +0\relax
 %    \end{macrocode}
 % Level of left mark is equal to level of right mark. This is
 % nice and very easy to handle.
@@ -814,7 +814,7 @@
             \@mkdouble{%
               \MakeMarkcase{%
                 \ifnum \c@secnumdepth<\numexpr 
-                  \csname #2level\endcsname +0\relax
+                  \csname #2numdepth\endcsname +0\relax
                 \else
                   \if@mainmatter \csname #2markformat\endcsname\fi
                 \fi
@@ -837,7 +837,7 @@
               \@mkleft{%
                 \MakeMarkcase{%
                   \ifnum \c@secnumdepth
-                       < \numexpr\csname #1level\endcsname +0\relax
+                       < \numexpr\csname #1numdepth\endcsname +0\relax
                   \else
                     \if@mainmatter \csname #1markformat\endcsname\fi
                   \fi
@@ -850,7 +850,7 @@
             \@mkboth{}{%
               \MakeMarkcase{%
                 \ifnum \c@secnumdepth
-                     < \numexpr \csname #2level\endcsname +0\relax
+                     < \numexpr \csname #2numdepth\endcsname +0\relax
                 \else\if@mainmatter \csname #2markformat\endcsname\fi\fi
                 ##1%
               }%
@@ -867,7 +867,7 @@
 %    \begin{macrocode}
 \newcommand*{\ifscrlayer@level@prepared}[1]{%
   \typeout{1: \detokenize{#1}}%
-  \scr@ifundefinedorrelax{#1level}{%
+  \scr@ifundefinedorrelax{#1numdepth}{%
     \PackageError{scrlayer}{numbering depth of `#1' unknown}{%
       Someone told me to use a section mark for level `#1',\MessageBreak
       but the numbering depth hasn't been declared before. You may solve this
@@ -902,7 +902,7 @@
 %    \begin{macrocode}
 %<*package&body>
 \newcommand*{\DeclareSectionNumberDepth}[2]{%
-  \expandafter\edef\csname #1level\endcsname{\the\numexpr #2\relax}%
+  \expandafter\edef\csname #1numdepth\endcsname{\the\numexpr #2\relax}%
   \@ifundefined{#1mark}{%
     \expandafter\let\csname #1mark\endcsname\@gobble
   }{}%
@@ -950,10 +950,13 @@
       \scr@ifundefinedorrelax{\reserved@a}{%
         \@tempswafalse
       }{%
-        \@ifundefined{\reserved@a level}{%
+        \@ifundefined{\reserved@a numdepth}{%
           \expandafter\DeclareSectionNumberDepth
           \expandafter{\reserved@a}{\@tempcnta}%
-        }{}%
+        }{%
+          \expandafter\DeclareSectionNumberDepth
+          \expandafter{\reserved@a}{\csname \reserved@a numdepth\endcsname}%
+        }%
         \advance \@tempcnta by \@ne
         \edef\reserved@a{sub\reserved@a}%
       }%
