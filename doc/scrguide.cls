@@ -969,7 +969,7 @@
       \advance\count@\month
       \advance\count@-##2\relax
     }\reserved@a#1\@nil
-    \ifnum\count@>12
+    \ifnum\count@<13
       \marginnote{\footnotesize Beta-Feature}%
     \else
       \marginnote{\footnotesize\fbox{\strut #2}}%
