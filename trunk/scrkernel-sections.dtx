@@ -1,4 +1,4 @@
-% \CheckSum{2763}
+% \CheckSum{2885}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -426,9 +426,13 @@
 %  \end{macro}
 %
 % \begin{macro}{\chapterheadstartvskip}
+%   \changes{v3.15}{2014/11/24}{\cs{scr@chapter@sectionbeforeskip} wird
+%     definiert und verwendet}^^A
 % \begin{macro}{\chapterheadendvskip}
 %   \changes{v3.11c}{2013/02/13}{\cs{chapterheadstartvskip} und
-%     \cs{chapterheadendvskip} haben in \textsf{scrartcl} nichts verloren}
+%     \cs{chapterheadendvskip} haben in \textsf{scrartcl} nichts verloren}^^A
+%   \changes{v3.15}{2014/11/24}{\cs{scr@chapter@sectionafterskip} wird
+%     definiert und verwendet}^^A
 % \begin{macro}{\chapterheadmidvskip}
 %   \changes{v3.15}{2014/11/20}{neue Anweisung}
 % Mit diesen Anweisungen wird üblicherweise der Abstand zwischen
@@ -442,8 +446,18 @@
 % verwendet, wenn Option \texttt{chapterprefix} aktiv ist.
 %    \begin{macrocode}
 %<*book|report>
-\newcommand*{\chapterheadstartvskip}{}
-\newcommand*{\chapterheadendvskip}{}
+\newcommand*{\scr@chapter@sectionbeforeskip}{0pt}%
+\newcommand*{\scr@chapter@sectionafterskip}{0pt}%
+\newcommand*{\chapterheadstartvskip}{%
+  \@tempskipa=\glueexpr \scr@chapter@sectionbeforeskip\relax
+  \ifdim\@tempskipa<\z@\vspace*{-\@tempskipa}%
+  \else\ifdim\@tempskipa>\z@\vspace*{\@tempskipa}\fi\fi
+}
+\newcommand*{\chapterheadendvskip}{%
+  \@tempskipa=\glueexpr \scr@chapter@sectionafterskip\relax
+  \ifdim\@tempskipa<\z@\vspace{-\@tempskipa}%
+  \else\ifdim\@tempskipa>\z@\vspace{\@tempskipa}\fi\fi
+}
 \newcommand*{\chapterheadmidvskip}{\par\nobreak\vskip.5\baselineskip}
 %</book|report>
 %    \end{macrocode}
@@ -468,6 +482,8 @@
 %   \changes{v3.12}{2013/08/26}{\cs{KOMA@options} durch \cs{KOMAoptions}
 %     ersetzt}^^A
 %   \changes{v3.12}{2013/11/11}{neuer Wert \texttt{standardclasses}}^^A
+%   \changes{v3.15}{2014/11/24}{\cs{scr@chapter@sectionbeforeskip} und
+%     \cs{scr@chapter@sectionafterskip} werden verwendet}^^A
 % Dies ist eine neue zentrale Option für Überschriften. Dabei ergibt sich
 % nun auch das Problem, dass die Gesamtmenge der Überschriften mal
 % \emph{headings} (Überschriften), mal \emph{sectioning}
@@ -509,13 +525,21 @@
 %   Font-Elementen für die einzelnen Überschriften aufhebt macht!
 %    \begin{macrocode}
 %<*book|report>
+      \renewcommand*{\scr@chapter@sectionbeforeskip}{2.3\baselineskip}%
+      \renewcommand*{\scr@chapter@sectionafterskip}{%
+        1.725\baselineskip \@plus .115\baselineskip \@minus .192\baselineskip
+      }%
       \renewcommand*{\chapterheadstartvskip}{%
-        \vspace*{2.3\baselineskip}%
+        \@tempdima=\glueexpr \scr@chapter@sectionbeforeskip\relax
+        \ifdim\@tempskipa<\z@\vspace*{-\@tempskipa}%
+        \else\ifdim\@tempskipa>\z@\vspace*{\@tempskipa}\fi\fi
       }%
       \renewcommand*{\chapterheadendvskip}{%
-        \vspace{1.725\baselineskip
-          \@plus .115\baselineskip \@minus .192\baselineskip}%
+        \@tempdima=\glueexpr \scr@chapter@sectionafterskip\relax
+        \ifdim\@tempskipa<\z@\vspace{-\@tempskipa}%
+        \else\ifdim\@tempskipa>\z@\vspace{\@tempskipa}\fi\fi
       }%
+      \renewcommand*{\chapterheadmidvskip}{\par\nobreak\vskip.5\baselineskip}%
 %</book|report>
       \renewcommand*{\size@part}{\Huge}%
       \renewcommand*{\size@partnumber}{\huge}%
@@ -528,13 +552,21 @@
       \renewcommand*{\size@subparagraph}{\normalsize}%
     \or
 %<*book|report>
+      \renewcommand*{\scr@chapter@sectionbeforeskip}{2\baselineskip}%
+      \renewcommand*{\scr@chapter@sectionafterskip}{%
+        1.5\baselineskip \@plus .1\baselineskip \@minus .167\baselineskip
+      }%
       \renewcommand*{\chapterheadstartvskip}{%
-        \vspace*{2\baselineskip}%
+        \@tempskipa=\glueexpr \scr@chapter@sectionbeforeskip\relax
+        \ifdim\@tempskipa<\z@\vspace*{-\@tempskipa}%
+        \else\ifdim\@tempskipa>\z@\vspace*{\@tempskipa}\fi\fi
       }%
       \renewcommand*{\chapterheadendvskip}{%
-        \vspace{1.5\baselineskip
-          \@plus .1\baselineskip \@minus .167\baselineskip}%
+        \@tempskipa=\glueexpr \scr@chapter@sectionafterskip\relax
+        \ifdim\@tempskipa<\z@\vspace{-\@tempskipa}%
+        \else\ifdim\@tempskipa>\z@\vspace{\@tempskipa}\fi\fi
       }%
+      \renewcommand*{\chapterheadmidvskip}{\par\nobreak\vskip.5\baselineskip}%
 %</book|report>
       \renewcommand*{\size@part}{\huge}%
       \renewcommand*{\size@partnumber}{\huge}%
@@ -553,13 +585,21 @@
       \renewcommand*{\size@subparagraph}{\normalsize}%
     \or
 %<*book|report>
+      \renewcommand*{\scr@chapter@sectionbeforeskip}{1.8\baselineskip}%
+      \renewcommand*{\scr@chapter@sectionafterskip}{%
+        1.35\baselineskip \@plus 0.09\baselineskip \@minus .15\baselineskip
+      }%
       \renewcommand*{\chapterheadstartvskip}{%
-        \vspace*{1.8\baselineskip}%
+        \@tempskipa=\glueexpr \scr@chapter@sectionbeforeskip\relax
+        \ifdim\@tempskipa<\z@\vspace*{-\@tempskipa}%
+        \else\ifdim\@tempskipa>\z@\vspace*{\@tempskipa}\fi\fi
       }%
       \renewcommand*{\chapterheadendvskip}{%
-        \vspace{1.35\baselineskip
-          \@plus 0.09\baselineskip \@minus .15\baselineskip}%
+        \@tempskipa=\glueexpr \scr@chapter@sectionafterskip\relax
+        \ifdim\@tempskipa<\z@\vspace{-\@tempskipa}%
+        \else\ifdim\@tempskipa>\z@\vspace{\@tempskipa}\fi\fi
       }%
+      \renewcommand*{\chapterheadmidvskip}{\par\nobreak\vskip.5\baselineskip}%
 %</book|report>
       \renewcommand*{\size@part}{\LARGE}%
       \renewcommand*{\size@partnumber}{\LARGE}%
@@ -1599,6 +1639,154 @@
 %</book|report>
 % \fi
 %
+% \subsection{Schrift und Formatierung}
+%
+%  \begin{macro}{\raggedsection}
+%    \changes{v2.3h}{1996/01/20}{Überschriften werden
+%      \cs{raggedsection} gesetzt}
+%    \changes{v2.3h}{1996/01/20}{\cs{raggedsection} ist als
+%      \cs{raggedright} voreingestellt}
+% Dieses Makro gibt an, wie die Überschriften formatiert
+% werden. Voreingestellt ist linksbündig.
+%    \begin{macrocode}
+\newcommand*{\raggedsection}{}
+\let\raggedsection\raggedright
+%    \end{macrocode}
+%  \end{macro}
+%
+%  \begin{macro}{\raggedpart}
+%    \changes{v2.95a}{2006/07/10}{neue Konfigurationsmöglichkeit}
+% Die Ausrichtung der Überschrift von \cs{part} kann davon abweichend über
+% \cs{raggedpart} konfiguriert werden. Die Voreinstellung ist von der
+% Klasse abhängig.
+%    \begin{macrocode}
+\newcommand*{\raggedpart}{}
+%<article>\let\raggedpart\raggedsection
+%<report|book>\let\raggedpart\centering
+%    \end{macrocode}
+%  \end{macro}
+%
+%  \begin{KOMAfont}{partentry}
+%    \changes{v2.97c}{2007/06/21}{neues Font-Element}
+%    \changes{v3.06}{2010/06/09}{Verwendung von \texttt{sectioning} durch
+%      \texttt{disposition} ersetzt}
+%    Schrift für den \cs{part}-Eintrag im Inhaltsverzeichnis.
+%    \begin{macrocode}
+\newkomafont{partentry}{\usekomafont{disposition}\large}
+%    \end{macrocode}
+%  \end{KOMAfont}
+%
+%  \begin{KOMAfont}{partentrypagenumber}
+%    \changes{v2.97c}{2007/06/21}{neues Font-Element}
+%    Schrift für die Seitenzahl des \cs{part}-Eintrags im Inhaltsverzeichnis
+%    abweichend von \texttt{partentry}.
+%    \begin{macrocode}
+\newkomafont{partentrypagenumber}{}
+%    \end{macrocode}
+%  \end{KOMAfont}
+%
+%  \begin{KOMAfont}{chapterentry}
+%    \changes{v2.97c}{2007/06/21}{neues Font-Element}
+%    Schrift für den \cs{chapter}-Eintrag im Inhaltsverzeichnis.
+%    \changes{v3.06}{2010/06/09}{Verwendung von \texttt{sectioning} durch
+%      \texttt{disposition} ersetzt}
+%    \begin{macrocode}
+%<*book|report>
+\newkomafont{chapterentry}{\usekomafont{disposition}}
+%    \end{macrocode}
+%  \end{KOMAfont}
+%
+%  \begin{KOMAfont}{chapterentrypagenumber}
+%    \changes{v2.97c}{2007/06/21}{neues Font-Element}
+%    Schrift für die Seitenzahl des \cs{chapter}-Eintrags im Inhaltsverzeichnis
+%    abweichend von \texttt{chapterentry}.
+%    \begin{macrocode}
+\newkomafont{chapterentrypagenumber}{}
+%</book|report>
+%    \end{macrocode}
+%  \end{KOMAfont}
+%
+%  \begin{KOMAfont}{sectionentry}
+%    \changes{v2.97c}{2007/06/21}{neues Font-Element}
+%    \changes{v3.06}{2010/06/09}{Verwendung von \texttt{sectioning} durch
+%      \texttt{disposition} ersetzt}
+%    Schrift für den \cs{section}-Eintrag im Inhaltsverzeichnis.
+%    \begin{macrocode}
+%<*article>
+\newkomafont{sectionentry}{\usekomafont{disposition}}
+%    \end{macrocode}
+%  \end{KOMAfont}
+%
+%  \begin{KOMAfont}{sectionentrypagenumber}
+%    \changes{v2.97c}{2007/06/21}{neues Font-Element}
+%    Schrift für die Seitenzahl des \cs{section}-Eintrags im Inhaltsverzeichnis
+%    abweichend von \texttt{sectionentry}.
+%    \begin{macrocode}
+\newkomafont{sectionentrypagenumber}{}
+%</article>
+%    \end{macrocode}
+%  \end{KOMAfont}
+%
+%  \begin{macro}{\scr@fnt@disposition}
+%    \changes{v2.95b}{2006/07/30}{neues Element \texttt{disposition}}
+%  \begin{macro}{\scr@fnt@sectioning}
+%    \changes{v2.8o}{2001/09/14}{neues Element \texttt{sectioning}}
+%    \changes{v2.95b}{2006/07/30}{\texttt{sectioning} ist nun ein Alias für
+%      \texttt{disposition}}
+%  \begin{macro}{\scr@fnt@part}
+%    \changes{v2.8p}{2001/09/23}{neues Element \texttt{part}}
+%  \begin{macro}{\scr@fnt@partnumber}
+%    \changes{v2.8p}{2001/09/23}{neues Element \texttt{partnumber}}
+%  \begin{macro}{\scr@fnt@chapter}
+%    \changes{v2.8o}{2001/09/14}{neues Element \texttt{chapter}}
+%  \begin{macro}{\scr@fnt@chapterprefix}
+%    \changes{v2.96a}{2006/12/02}{neues Element \texttt{chapterprefix}}
+%  \begin{macro}{\scr@fnt@section}
+%    \changes{v2.8o}{2001/09/14}{neues Element \texttt{section}}
+%  \begin{macro}{\scr@fnt@subsection}
+%    \changes{v2.8o}{2001/09/14}{neues Element \texttt{subsection}}
+%  \begin{macro}{\scr@fnt@subsubsection}
+%    \changes{v2.8o}{2001/09/14}{neues Element \texttt{subsubsection}}
+%  \begin{macro}{\scr@fnt@paragraph}
+%    \changes{v2.8o}{2001/09/14}{neues Element \texttt{paragraph}}
+%  \begin{macro}{\scr@fnt@subparagraph}
+%    \changes{v2.8o}{2001/09/14}{neues Element \texttt{subparagraph}}
+%  \begin{KOMAfont}{minisec}
+%    \changes{v2.8o}{2001/09/14}{neuer Ersatz für das Element
+%      \texttt{minisec}}
+%    \changes{v2.96a}{2007/01/08}{Alias für das Element \texttt{minisec}
+%      entfernt, da es nun ein eigenes Element ist}
+% Definition der Elemente der Gliederung, deren Schrift geändert
+% werden kann:
+%    \begin{macrocode}
+%</class>
+\newcommand*{\scr@fnt@disposition}{\sectfont}
+\aliaskomafont{sectioning}{disposition}
+%<*class>
+\newcommand*{\scr@fnt@part}{\size@part}
+\newcommand*{\scr@fnt@partnumber}{\size@partnumber}
+%<book|report>\newcommand*{\scr@fnt@chapter}{\size@chapter}
+%<book|report>\newcommand*{\scr@fnt@chapterprefix}{\size@chapterprefix}
+\newcommand*{\scr@fnt@section}{\size@section}
+\newcommand*{\scr@fnt@subsection}{\size@subsection}
+\newcommand*{\scr@fnt@subsubsection}{\size@subsubsection}
+\newcommand*{\scr@fnt@paragraph}{\size@paragraph}
+\newcommand*{\scr@fnt@subparagraph}{\size@subparagraph}
+%    \end{macrocode}
+%  \end{KOMAfont}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%  \end{macro}
+%
+%
 % \subsection{Die Gliederungsbefehle}
 %
 % \changes{v2.3h}{1996/01/20}{Größenbefehle in den Überschriften
@@ -1671,27 +1859,39 @@
 % \cs{part}-Überschrift kann ohne Warnung über den oberen Rand
 % hinaus reichen!}
 % \begin{macro}{\partheadstartvskip}
-%   \changes{v2.95a}{2006/07/10}{neue Konfiguratonsmöglichkeit}
+%   \changes{v2.95a}{2006/07/10}{neue Konfiguratonsmöglichkeit}^^A
+%   \changes{v3.15}{2014/11/24}{\textsf{scrartcl} definiert und verwendet
+%     \cs{scr@part@sectionbeforeskip}}^^A
 % \begin{macro}{\partheadmidvskip}
 %   \changes{v2.95a}{2006/07/10}{neue Konfiguratonsmöglichkeit}
 % \begin{macro}{\partheadendvskip}
 %   \changes{v2.95a}{2006/07/10}{neue Konfiguratonsmöglichkeit}
+%   \changes{v3.15}{2014/11/24}{\textsf{scrartcl} definiert und verwendet
+%     \cs{scr@part@sectionafterskip}}^^A
 % \begin{macro}{\parheademptypage}
 %   \changes{v3.02}{2009/01/01}{neue Konfigurationsmöglichkeit}
 % Diese vier Makros werden verwendet, um den Abstand über in und unter der
 % Überschrift eines Teils und die leere Rückseite zu definieren. Prinzipiell
 % kann damit auch der Umbruch zwischen Nummer und Text entfernt werden.
 %    \begin{macrocode}
+%<article>\newcommand*{\scr@part@sectionbeforeskip}{4ex}
 \newcommand*{\partheadstartvskip}{%
-%<article> \addvspace{4ex}%
+%<*article> 
+  \@tempskipa=\glueexpr\scr@part@sectionbeforeskip\relax
+  \ifdim\@tempskipa<\z@\addvspace{-\@tempskipa}\else\addvspace{\@tempskipa}\fi
+%</article>
 %<report|book>  \null\vfil
 }
 \newcommand*{\partheadmidvskip}{%
   \par\nobreak
 %<book|report>  \vskip 20\p@
 }
+%<article>\newcommand*{\scr@part@sectionafterskip}{3ex}
 \newcommand*{\partheadendvskip}{%
-%<article>    \vskip 3ex
+%<*article> 
+  \@tempskipa=\glueexpr\scr@part@sectionafterskip\relax
+  \ifdim\@tempskipa<\z@\vskip-\@tempskipa\else\vskip\@tempskipa\fi
+%</article>
 %<report|book>  \vfil\newpage
 }
 %<*report|book>
@@ -1988,8 +2188,9 @@
   \@at@twocolumntrue\scr@topnewpage[{#1}]\@at@twocolumnfalse
 }
 %    \end{macrocode}
-% \end{macro}
-% \end{macro}
+% \end{macro}^^A \@topnewpage
+% \end{macro}^^A \scr@topnewpage
+% \end{macro}^^A \if@at@twocolumn
 % \begin{macro}{\use@chapter@o@preamble}
 % Das Makro wird benötigt, weil das Setzen der oberen Präambel etwas
 % mehr Aufwand bedeutet. Die Anweisung spart Platz, da sie zweimal
@@ -2026,7 +2227,7 @@
     }
 }
 %    \end{macrocode}
-% \end{macro}
+% \end{macro}^^A \use@chapter@o@preamble
 % Zurück zur Kapiteldefinition:
 %    \begin{macrocode}
 \newcommand\chapter{\if@openright\cleardoublepage\else\clearpage\fi
@@ -2161,9 +2362,9 @@
   \nobreak\par\nobreak\chapterheadendvskip
 }
 %    \end{macrocode}
-% \end{macro}
-% \end{macro}
-% \end{macro}
+% \end{macro}^^A \@@makechapterhead
+% \end{macro}^^A \@makechapterhead
+% \end{macro}^^A \@chapter
 % \begin{macro}{\addchaptertocentry}
 %   \changes{v3.08}{2010/11/01}{Neu}%^^A
 %   \changes{v3.12}{2013/09/24}{Behandlung von \cs{if@chaptertolists} hier}%^^A
@@ -2188,7 +2389,7 @@
   \fi
 }
 %    \end{macrocode}
-% \end{macro}
+% \end{macro}^^A \addchaptertocentry
 %
 % \begin{macro}{\@schapter}
 % \begin{macro}{\@makeschapterhead}
@@ -2228,10 +2429,10 @@
   \use@preamble{chapter@u}\nobreak
 }
 %    \end{macrocode}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-% \end{macro}
+% \end{macro}^^A \@@makeschapterhead
+% \end{macro}^^A \@makeschapterhead
+% \end{macro}^^A \@schapter
+% \end{macro}^^A \chapter
 %
 %
 % \begin{macro}{\addchap}
@@ -2645,10 +2846,16 @@
       \expandafter\noexpand\csname scr@#2@sectionindent\endcsname
       \expandafter\noexpand\csname scr@#2@sectionbeforeskip\endcsname
       \expandafter\noexpand\csname scr@#2@sectionafterskip\endcsname{%
+        \noexpand\ifdim\noexpand\glueexpr
+        \expandafter\noexpand\csname scr@#2@sectionbeforeskip\endcsname
+        <\noexpand\z@
+          \unexpanded{%
+            \ifnum \scr@compatibility>\@nameuse{scr@v@2.96}\relax
+              \setlength{\parfillskip}{\z@ plus 1fil}%
+            \fi
+          }%
+        \noexpand\fi
         \unexpanded{%
-          \ifnum \scr@compatibility>\@nameuse{scr@v@2.96}\relax
-            \setlength{\parfillskip}{\z@ plus 1fil}%
-          \fi
           \raggedsection\normalfont\sectfont\nobreak\usekomafont{#2}%
         }%
       }%
@@ -2740,13 +2947,13 @@
 %    \end{macrocode}
 % \end{macro}^^A \DeclareNewSectionCommand
 %
-% \begin{macro}{\ReDeclareSectionCommand}
+% \begin{macro}{\RedeclareSectionCommand}
 %   \changes{v3.15}{2014/11/21}{neue Anweisung}^^A
 % Basierend auf |\DeclareSectionCommand| wird eine Gliederungsanweisung
 % umdefiniert, die zuvor bereits existierte. Wichtig zu bemerken ist, dass
 % die ganzen Hilfsanweisungen nicht zu exisieren brauchen.
 %    \begin{macrocode}
-\newcommand*{\ReDeclareSectionCommand}[2][]{%
+\newcommand*{\RedeclareSectionCommand}[2][]{%
   \@ifundefined{#2}{%
     \ClassError{\KOMAClassName}{%
       command `\expandafter\string\csname #1\endcsname` not defined
@@ -2764,7 +2971,7 @@
   }%
 }
 %    \end{macrocode}
-% \end{macro}^^A \ReDeclareSectionCommand
+% \end{macro}^^A \RedeclareSectionCommand
 %
 % \begin{macro}{\ProvideSectionCommand}
 %   \changes{v3.15}{2014/11/21}{neue Anweisung}^^A
@@ -2786,92 +2993,103 @@
 %
 % \begin{macro}{\section}
 %   \changes{v2.8p}{2001/09/22}{\cs{sectfont} wird nun vor
-%     \cs{size@section} aufgerufen}
+%     \cs{size@section} aufgerufen}^^A
 %   \changes{v2.8q}{2002/02/28}{\cs{nobreak} nach \cs{sectfont}
-%     behebt einen Bug im color Paket}
+%     behebt einen Bug im color Paket}^^A
 %   \changes{v2.96a}{2006/11/30}{Standardwert für \cs{parfillskip} (abhängig
-%     von Option \texttt{version})}
-%   \changes{v2.96a}{2006/12/03}{alle nicht benötigten \cs{nobreak} entfernt}
-%   \changes{v3.13a}{2014/09/11}{Verwendung von \cs{scr@startsection}}
+%     von Option \texttt{version})}^^A
+%   \changes{v2.96a}{2006/12/03}{alle nicht benötigten \cs{nobreak} entfernt}^^A
+%   \changes{v3.13a}{2014/09/11}{Verwendung von \cs{scr@startsection}}^^A
+%   \changes{v3.15}{2014/11/24}{Verwendung von \cs{DeclareSectionCommand}}^^A
 % \begin{macro}{\subsection}
 %   \changes{v2.8p}{2001/09/22}{\cs{sectfont} wird nun vor
-%     \cs{size@subsection} aufgerufen}
+%     \cs{size@subsection} aufgerufen}^^A
 %   \changes{v2.8q}{2002/02/28}{\cs{nobreak} nach \cs{sectfont}
-%     behebt einen Bug im color Paket}
+%     behebt einen Bug im color Paket}^^A
 %   \changes{v2.96a}{2006/11/30}{Standardwert für \cs{parfillskip} (abhängig
-%     von Option \texttt{version})}
-%   \changes{v2.96a}{2006/12/03}{alle nicht benötigten \cs{nobreak} entfernt}
-%   \changes{v3.13a}{2014/09/11}{Verwendung von \cs{scr@startsection}}
+%     von Option \texttt{version})}^^A
+%   \changes{v2.96a}{2006/12/03}{alle nicht benötigten \cs{nobreak} entfernt}^^A
+%   \changes{v3.13a}{2014/09/11}{Verwendung von \cs{scr@startsection}}^^A
+%   \changes{v3.15}{2014/11/24}{Verwendung von \cs{DeclareSectionCommand}}^^A
 % \begin{macro}{\subsubsection}
 %   \changes{v2.3d}{1995/08/19}{wird bei \texttt{scrartcl} nun
-%     ebenfalls numeriert und ins Inhaltsverzeichnis geschrieben}
+%     ebenfalls numeriert und ins Inhaltsverzeichnis geschrieben}^^A
 %   \changes{v2.8p}{2001/09/22}{\cs{sectfont} wird nun vor
-%     \cs{size@subsubsection} aufgerufen}
+%     \cs{size@subsubsection} aufgerufen}^^A
 %   \changes{v2.8q}{2002/02/28}{\cs{nobreak} nach \cs{sectfont}
-%     behebt einen Bug im color Paket}
+%     behebt einen Bug im color Paket}^^A
 %   \changes{v2.96a}{2006/11/30}{Standardwert für \cs{parfillskip} (abhängig
-%     von Option \texttt{version})}
-%   \changes{v2.96a}{2006/12/03}{alle nicht benötigten \cs{nobreak} entfernt}
-%   \changes{v3.13a}{2014/09/11}{Verwendung von \cs{scr@startsection}}
+%     von Option \texttt{version})}^^A
+%   \changes{v2.96a}{2006/12/03}{alle nicht benötigten \cs{nobreak} entfernt}^^A
+%   \changes{v3.13a}{2014/09/11}{Verwendung von \cs{scr@startsection}}^^A
+%   \changes{v3.15}{2014/11/24}{Verwendung von \cs{DeclareSectionCommand}}^^A
 % \begin{macro}{\paragraph}
 %   \changes{v2.8p}{2001/09/22}{\cs{sectfont} wird nun vor
-%     \cs{size@paragraph} aufgerufen}
+%     \cs{size@paragraph} aufgerufen}^^A
 %   \changes{v2.8q}{2002/02/28}{\cs{nobreak} nach \cs{sectfont}
-%     behebt einen Bug im color Paket}
-%   \changes{v2.96a}{2006/12/03}{alle nicht benötigten \cs{nobreak} entfernt}
+%     behebt einen Bug im color Paket}^^A
+%   \changes{v2.96a}{2006/12/03}{alle nicht benötigten \cs{nobreak} entfernt}^^A
+%   \changes{v3.15}{2014/11/24}{Verwendung von \cs{DeclareSectionCommand}}^^A
 % \begin{macro}{\subparagraph}
 %   \changes{v2.8p}{2001/09/22}{\cs{sectfont} wird nun vor
-%     \cs{size@subparagraph} aufgerufen}
+%     \cs{size@subparagraph} aufgerufen}^^A
 %   \changes{v2.8q}{2002/02/28}{\cs{nobreak} nach \cs{sectfont}
-%     behebt einen Bug im color Paket}
-%   \changes{v2.96a}{2006/12/03}{alle nicht benötigten \cs{nobreak} entfernt}
-%   \changes{v3.13a}{2014/09/11}{Verwendung von \cs{scr@startsection}}
+%     behebt einen Bug im color Paket}^^A
+%   \changes{v2.96a}{2006/12/03}{alle nicht benötigten \cs{nobreak} entfernt}^^A
+%   \changes{v3.13a}{2014/09/11}{Verwendung von \cs{scr@startsection}}^^A
+%   \changes{v3.15}{2014/11/24}{Verwendung von \cs{DeclareSectionCommand}}^^A
+%   \changes{v3.15}{2014/11/24}{\cs{parindent} durch \cs{scr@parindent}
+%     ersetzt}^^A
 % Die Standardgliederungsbefehle \cs{section} bis \cs{subparagraph}
-% sind mit der im Kernel dafür vorgesehenen Schnittstelle
-% definiert. Im Unterschied zu den Standardklassen erfolgt die
-% Formatierung jedoch in \cs{raggedsection} und die Ausgabe in der
-% Schriftart \cs{sectfont}. Außerdem sind die Größen veränderbar. In
-% letzter Konsequenz sollten hier eigentlich auch die Abstände
-% variabilisiert werden. Vielleicht in einer späteren Version.
+% sind seit \KOMAScript{} v3.15 über die von \KOMAScript{} bereitgestellte
+% Schnittstelle \cs{DeclareSectionCommand} definiert.
 %    \begin{macrocode}
-\newcommand\section{%
-  \scr@startsection{section}{\sectionnumdepth}{\z@}%
-  {-3.5ex \@plus -1ex \@minus -.2ex}%
-  {2.3ex \@plus.2ex}%
-  {\ifnum \scr@compatibility>\@nameuse{scr@v@2.96}\relax
-    \setlength{\parfillskip}{\z@ plus 1fil}\fi
-    \raggedsection\normalfont\sectfont\nobreak\size@section}%
-}
-\newcommand\subsection{%
-  \scr@startsection{subsection}{\subsectionnumdepth}{\z@}%
-  {-3.25ex\@plus -1ex \@minus -.2ex}%
-  {1.5ex \@plus .2ex}%
-  {\ifnum \scr@compatibility>\@nameuse{scr@v@2.96}\relax
-    \setlength{\parfillskip}{\z@ plus 1fil}\fi
-    \raggedsection\normalfont\sectfont\nobreak\size@subsection
-  }%
-}
-\newcommand\subsubsection{%
-  \scr@startsection{subsubsection}{\subsubsectionnumdepth}{\z@}%
-  {-3.25ex\@plus -1ex \@minus -.2ex}%
-  {1.5ex \@plus .2ex}%
-  {\ifnum \scr@compatibility>\@nameuse{scr@v@2.96}\relax
-    \setlength{\parfillskip}{\z@ plus 1fil}\fi
-    \raggedsection\normalfont\sectfont\nobreak\size@subsubsection
-  }%
-}
-\newcommand\paragraph{%
-  \scr@startsection{paragraph}{\paragraphnumdepth}{\z@}%
-  {3.25ex \@plus1ex \@minus.2ex}%
-  {-1em}%
-  {\raggedsection\normalfont\sectfont\nobreak\size@paragraph}%
-}
-\newcommand\subparagraph{%
-  \scr@startsection{subparagraph}{\subparagraphnumdepth}{\parindent}%
-  {3.25ex \@plus1ex \@minus .2ex}%
-  {-1em}%
-  {\raggedsection\normalfont\sectfont\nobreak\size@subparagraph}%
-}
+\DeclareSectionCommand[%
+  indent=\z@,%
+  beforeskip=-3.5ex \@plus -1ex \@minus -.2ex,%
+  afterskip=2.3ex \@plus.2ex,%
+%<article>  tocindent=0pt,%
+%<book|report>  tocindent=1.5em,%
+%<article>  tocnumwidth=1.5em%
+%<book|report>  tocnumwidth=2.3em%
+]{section}
+\DeclareSectionCommand[%
+  indent=\z@,%
+  beforeskip=-3.25ex\@plus -1ex \@minus -.2ex,%
+  afterskip=1.5ex \@plus .2ex,%
+%<article>  tocindent=1.5em,%
+%<book|report>  tocindent=3.8em,%
+%<article>  tocnumwidth=2.3em%
+%<book|report>  tocnumwidth=3.2em%
+]{subsection}
+\DeclareSectionCommand[%
+  indent=\z@,%
+  beforeskip=-3.25ex\@plus -1ex \@minus -.2ex,%
+  afterskip=1.5ex \@plus .2ex,%
+%<article>  tocindent=3.8em,%
+%<book|report>  tocindent=7.0em,%
+%<article>  tocnumwidth=3.2em%
+%<book|report>  tocnumwidth=4.1em%
+]{subsubsection}
+\DeclareSectionCommand[%
+  indent=\z@,%
+  beforeskip=3.25ex \@plus1ex \@minus.2ex,%
+  afterskip=-1em,%
+%<article>  tocindent=7.0em,%
+%<book|report>  tocindent=10em,%
+%<article>  tocnumwidth=4.1em%
+%<book|report>  tocnumwidth=5em%
+]{paragraph}
+\DeclareSectionCommand[%
+  indent=\ifnum \scr@compatibility<\@nameuse{scr@v@3.15} \parindent
+         \else \scr@parindent\fi,%
+  beforeskip=3.25ex \@plus1ex \@minus .2ex,%
+  afterskip=-1em,%
+%<article>  tocindent=10em,%
+%<book|report>  tocindent=12em,%
+%<article>  tocnumwidth=5em%
+%<book|report>  tocnumwidth=6em%
+]{subparagraph}
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -2919,154 +3137,6 @@
 %    \end{macrocode}
 % \end{KOMAfont}
 % \end{macro}
-%
-%
-% \subsection{Schrift und Formatierung}
-%
-%  \begin{macro}{\raggedsection}
-%    \changes{v2.3h}{1996/01/20}{Überschriften werden
-%      \cs{raggedsection} gesetzt}
-%    \changes{v2.3h}{1996/01/20}{\cs{raggedsection} ist als
-%      \cs{raggedright} voreingestellt}
-% Dieses Makro gibt an, wie die Überschriften formatiert
-% werden. Voreingestellt ist linksbündig.
-%    \begin{macrocode}
-\newcommand*{\raggedsection}{}
-\let\raggedsection\raggedright
-%    \end{macrocode}
-%  \end{macro}
-%
-%  \begin{macro}{\raggedpart}
-%    \changes{v2.95a}{2006/07/10}{neue Konfigurationsmöglichkeit}
-% Die Ausrichtung der Überschrift von \cs{part} kann davon abweichend über
-% \cs{raggedpart} konfiguriert werden. Die Voreinstellung ist von der
-% Klasse abhängig.
-%    \begin{macrocode}
-\newcommand*{\raggedpart}{}
-%<article>\let\raggedpart\raggedsection
-%<report|book>\let\raggedpart\centering
-%    \end{macrocode}
-%  \end{macro}
-%
-%  \begin{KOMAfont}{partentry}
-%    \changes{v2.97c}{2007/06/21}{neues Font-Element}
-%    \changes{v3.06}{2010/06/09}{Verwendung von \texttt{sectioning} durch
-%      \texttt{disposition} ersetzt}
-%    Schrift für den \cs{part}-Eintrag im Inhaltsverzeichnis.
-%    \begin{macrocode}
-\newkomafont{partentry}{\usekomafont{disposition}\large}
-%    \end{macrocode}
-%  \end{KOMAfont}
-%
-%  \begin{KOMAfont}{partentrypagenumber}
-%    \changes{v2.97c}{2007/06/21}{neues Font-Element}
-%    Schrift für die Seitenzahl des \cs{part}-Eintrags im Inhaltsverzeichnis
-%    abweichend von \texttt{partentry}.
-%    \begin{macrocode}
-\newkomafont{partentrypagenumber}{}
-%    \end{macrocode}
-%  \end{KOMAfont}
-%
-%  \begin{KOMAfont}{chapterentry}
-%    \changes{v2.97c}{2007/06/21}{neues Font-Element}
-%    Schrift für den \cs{chapter}-Eintrag im Inhaltsverzeichnis.
-%    \changes{v3.06}{2010/06/09}{Verwendung von \texttt{sectioning} durch
-%      \texttt{disposition} ersetzt}
-%    \begin{macrocode}
-%<*book|report>
-\newkomafont{chapterentry}{\usekomafont{disposition}}
-%    \end{macrocode}
-%  \end{KOMAfont}
-%
-%  \begin{KOMAfont}{chapterentrypagenumber}
-%    \changes{v2.97c}{2007/06/21}{neues Font-Element}
-%    Schrift für die Seitenzahl des \cs{chapter}-Eintrags im Inhaltsverzeichnis
-%    abweichend von \texttt{chapterentry}.
-%    \begin{macrocode}
-\newkomafont{chapterentrypagenumber}{}
-%</book|report>
-%    \end{macrocode}
-%  \end{KOMAfont}
-%
-%  \begin{KOMAfont}{sectionentry}
-%    \changes{v2.97c}{2007/06/21}{neues Font-Element}
-%    \changes{v3.06}{2010/06/09}{Verwendung von \texttt{sectioning} durch
-%      \texttt{disposition} ersetzt}
-%    Schrift für den \cs{section}-Eintrag im Inhaltsverzeichnis.
-%    \begin{macrocode}
-%<*article>
-\newkomafont{sectionentry}{\usekomafont{disposition}}
-%    \end{macrocode}
-%  \end{KOMAfont}
-%
-%  \begin{KOMAfont}{sectionentrypagenumber}
-%    \changes{v2.97c}{2007/06/21}{neues Font-Element}
-%    Schrift für die Seitenzahl des \cs{section}-Eintrags im Inhaltsverzeichnis
-%    abweichend von \texttt{sectionentry}.
-%    \begin{macrocode}
-\newkomafont{sectionentrypagenumber}{}
-%</article>
-%    \end{macrocode}
-%  \end{KOMAfont}
-%
-%  \begin{macro}{\scr@fnt@disposition}
-%    \changes{v2.95b}{2006/07/30}{neues Element \texttt{disposition}}
-%  \begin{macro}{\scr@fnt@sectioning}
-%    \changes{v2.8o}{2001/09/14}{neues Element \texttt{sectioning}}
-%    \changes{v2.95b}{2006/07/30}{\texttt{sectioning} ist nun ein Alias für
-%      \texttt{disposition}}
-%  \begin{macro}{\scr@fnt@part}
-%    \changes{v2.8p}{2001/09/23}{neues Element \texttt{part}}
-%  \begin{macro}{\scr@fnt@partnumber}
-%    \changes{v2.8p}{2001/09/23}{neues Element \texttt{partnumber}}
-%  \begin{macro}{\scr@fnt@chapter}
-%    \changes{v2.8o}{2001/09/14}{neues Element \texttt{chapter}}
-%  \begin{macro}{\scr@fnt@chapterprefix}
-%    \changes{v2.96a}{2006/12/02}{neues Element \texttt{chapterprefix}}
-%  \begin{macro}{\scr@fnt@section}
-%    \changes{v2.8o}{2001/09/14}{neues Element \texttt{section}}
-%  \begin{macro}{\scr@fnt@subsection}
-%    \changes{v2.8o}{2001/09/14}{neues Element \texttt{subsection}}
-%  \begin{macro}{\scr@fnt@subsubsection}
-%    \changes{v2.8o}{2001/09/14}{neues Element \texttt{subsubsection}}
-%  \begin{macro}{\scr@fnt@paragraph}
-%    \changes{v2.8o}{2001/09/14}{neues Element \texttt{paragraph}}
-%  \begin{macro}{\scr@fnt@subparagraph}
-%    \changes{v2.8o}{2001/09/14}{neues Element \texttt{subparagraph}}
-%  \begin{KOMAfont}{minisec}
-%    \changes{v2.8o}{2001/09/14}{neuer Ersatz für das Element
-%      \texttt{minisec}}
-%    \changes{v2.96a}{2007/01/08}{Alias für das Element \texttt{minisec}
-%      entfernt, da es nun ein eigenes Element ist}
-% Definition der Elemente der Gliederung, deren Schrift geändert
-% werden kann:
-%    \begin{macrocode}
-%</class>
-\newcommand*{\scr@fnt@disposition}{\sectfont}
-\aliaskomafont{sectioning}{disposition}
-%<*class>
-\newcommand*{\scr@fnt@part}{\size@part}
-\newcommand*{\scr@fnt@partnumber}{\size@partnumber}
-%<book|report>\newcommand*{\scr@fnt@chapter}{\size@chapter}
-%<book|report>\newcommand*{\scr@fnt@chapterprefix}{\size@chapterprefix}
-\newcommand*{\scr@fnt@section}{\size@section}
-\newcommand*{\scr@fnt@subsection}{\size@subsection}
-\newcommand*{\scr@fnt@subsubsection}{\size@subsubsection}
-\newcommand*{\scr@fnt@paragraph}{\size@paragraph}
-\newcommand*{\scr@fnt@subparagraph}{\size@subparagraph}
-%    \end{macrocode}
-%  \end{KOMAfont}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
 %
 %
 % \subsection{Definitionen für Präambeln}
@@ -3488,32 +3558,35 @@
 % \iffalse
 %</report|book>
 % \fi
-%  \end{macro}
-%  \begin{macro}{\l@section}
-%    \changes{v2.9k}{2003/01/02}{Anpassung an Option \texttt{tocleft}}
-%    \changes{v2.96b}{2006/11/30}{Umbruch zwischen \cs{section}-Eintrag im
-%      Inhaltsverzeichnis und übergeordneten Einträgen verhindern}
-%    \changes{v2.96b}{2006/11/30}{Umbruch zwischen \cs{section}-Eintrag im
-%      Inhaltsverzeichnis und untergeordneten Einträgen verhindern}
-%    \changes{v2.97c}{2007/06/21}{\cs{sectfont} durch Verwendung von
-%      Element \texttt{sectionentry} ersetzt}
-%    \changes{v2.97c}{2007/06/21}{Element \texttt{sectionentrypagenumber} wird
-%      verwendet}
-%    \changes{v2.97c}{2007/06/21}{weitgehend umgeschrieben, um linksbündige
-%      Einträge zu ermöglichen}
+% \end{macro}
+% \begin{macro}{\l@section}
+%   \changes{v2.9k}{2003/01/02}{Anpassung an Option \texttt{tocleft}}^^A
+%   \changes{v2.96b}{2006/11/30}{Umbruch zwischen \cs{section}-Eintrag im
+%     Inhaltsverzeichnis und übergeordneten Einträgen verhindern}^^A
+%   \changes{v2.96b}{2006/11/30}{Umbruch zwischen \cs{section}-Eintrag im
+%     Inhaltsverzeichnis und untergeordneten Einträgen verhindern}^^A
+%   \changes{v2.97c}{2007/06/21}{\cs{sectfont} durch Verwendung von
+%     Element \texttt{sectionentry} ersetzt}^^A
+%   \changes{v2.97c}{2007/06/21}{Element \texttt{sectionentrypagenumber} wird
+%     verwendet}^^A
+%   \changes{v2.97c}{2007/06/21}{weitgehend umgeschrieben, um linksbündige
+%     Einträge zu ermöglichen}^^A
+%   \changes{v3.15}{2014/11/24}{\cs{sectiontocdepth},
+%     \cs{scr@section@tocindent} und \cs{scr@section@tocnumwidth} werden
+%     verwendet}^^A
 % Bei der Artikel-Klasse folgt die Formatierung für
 % \cs{section}-Einträge, an Stelle der Einträge für \cs{chapter}
 % der Buch- oder der Bericht-Klasse. Bei diesen handelt es sich hier
 % stattdessen um eine normale Ebene.
 %    \begin{macrocode}
 %<*article>
-\newcommand*\l@section[2]{%
+\renewcommand*\l@section[2]{%
   \ifnum \c@tocdepth >\z@
     \ifnum \lastpenalty<20009
       \addpenalty{\@secpenalty}%
     \fi
     \addvspace{1.0em \@plus\p@}%
-    \setlength\@tempdima{1.5em}%
+    \setlength\@tempdima{\dimexpr\scr@section@tocnumwidth}%
      \if@tocleft
       \ifx\toc@l@number\@empty\else
         \setlength\@tempdima{0\toc@l@number}%
@@ -3552,56 +3625,10 @@
 %   Ausrichtung des Textes der Abschnittseinträge im Inhaltsverzeichnis.
 %    \begin{macrocode}
 \newcommand*{\raggedsectionentry}{}
+%</article>
 %    \end{macrocode}   
 % \end{macro}
-%
-%    \begin{macrocode}
-%</article>
-%<*report|book>
-\newcommand*\l@section{\bprot@dottedtocline{1}{1.5em}{2.3em}}
-%</report|book>
-%    \end{macrocode}
-%  \end{macro}
-%  \begin{macro}{\l@subsection}
-%    \changes{v2.96b}{2006/11/30}{Umbruch zwischen \cs{subsection}-Eintrag im
-%      Inhaltsverzeichnis und übergeordneten Einträgen verhindern}
-%    \changes{v2.96b}{2006/11/30}{Umbruch zwischen \cs{subsection}-Eintrag im
-%      Inhaltsverzeichnis und untergeordneten Einträgen verhindern}
-%  \begin{macro}{\l@subsubsection}
-%    \changes{v2.96b}{2006/11/30}{Umbruch zwischen \cs{subsubsection}-Eintrag
-%      im Inhaltsverzeichnis und übergeordneten Einträgen verhindern}
-%    \changes{v2.96b}{2006/11/30}{Umbruch zwischen \cs{subsubsection}-Eintrag
-%      im Inhaltsverzeichnis und untergeordneten Einträgen verhindern}
-%  \begin{macro}{\l@paragraph}
-%    \changes{v2.96b}{2006/11/30}{Umbruch zwischen \cs{paragraph}-Eintrag im
-%      Inhaltsverzeichnis und übergeordneten Einträgen verhindern}
-%    \changes{v2.96b}{2006/11/30}{Umbruch zwischen \cs{paragraph}-Eintrag im
-%      Inhaltsverzeichnis und untergeordneten Einträgen verhindern}
-%  \begin{macro}{\l@subparagraph}
-%    \changes{v2.96b}{2006/11/30}{Umbruch zwischen \cs{subparagraph}-Eintrag
-%      im Inhaltsverzeichnis und übergeordneten Einträgen verhindern}
-%    \changes{v2.96b}{2006/11/30}{Umbruch zwischen \cs{subparagraph}-Eintrag
-%      im Inhaltsverzeichnis und untergeordneten Einträgen verhindern}
-% Die übrigen Ebenen werden normal behandelt.
-%    \begin{macrocode}
-%<*article>
-\newcommand*\l@subsection{\bprot@dottedtocline{2}{1.5em}{2.3em}}
-\newcommand*\l@subsubsection{\bprot@dottedtocline{3}{3.8em}{3.2em}}
-\newcommand*\l@paragraph{\bprot@dottedtocline{4}{7.0em}{4.1em}}
-\newcommand*\l@subparagraph{\bprot@dottedtocline{5}{10em}{5em}}
-%</article>
-%<*report|book>
-\newcommand*\l@subsection{\bprot@dottedtocline{2}{3.8em}{3.2em}}
-\newcommand*\l@subsubsection{\bprot@dottedtocline{3}{7.0em}{4.1em}}
-\newcommand*\l@paragraph{\bprot@dottedtocline{4}{10em}{5em}}
-\newcommand*\l@subparagraph{\bprot@dottedtocline{5}{12em}{6em}}
-%</report|book>
-%    \end{macrocode}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
+% \end{macro}
 %
 %  \begin{macro}{\bprot@dottedtocline}
 %    \changes{v2.96a}{2006/11/30}{neu (intern)}
