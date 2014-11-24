@@ -958,24 +958,39 @@
 %   Set the margin note and write an entry to the change log.\footnote{TODO:
 %     Don't use the glossary, use a file by my own.}
 %    \begin{macrocode}
-\providecommand*{\ChangedAt}[2]{%
-  \marginnote{\footnotesize\fbox{\strut#1}}%
+\providecommand*{\ChangedAt}[3][]{%
+  \ifstr{#1}{}{%
+    \marginnote{\footnotesize\fbox{\strut#2}}%
+  }{%
+    \def\reserved@a##1/##2\@nil{%
+      \count@\year
+      \advance\count@-##1\relax
+      \multiply\count@ by 12\relax
+      \advance\count@\month
+      \advance\count@-##2\relax
+    }\reserved@a#1\@nil
+    \ifnum\count@>12
+      \marginnote{\footnotesize Beta-Feature}%
+    \else
+      \marginnote{\footnotesize\fbox{\strut #2}}%
+    \fi
+  }%
   \begingroup
     \let\@tempa\@empty
-    \ifstr{#1}{v2.9i}{\def\@tempa{v2.90i=}}{}%
-    \ifstr{#1}{v2.9t}{\def\@tempa{v2.90t=}}{}%
+    \ifstr{#2}{v2.9i}{\def\@tempa{v2.90i=}}{}%
+    \ifstr{#2}{v2.9t}{\def\@tempa{v2.90t=}}{}%
     \let\and\ignorespaces
     \def\Package##1{%
-      \glossary{##1=\string\Package{##1}>\@tempa#1|indexrm}%
-      \glossary{\@tempa#1>##1=\string\Package{##1}|indexrm}%
+      \glossary{##1=\string\Package{##1}>\@tempa#2|indexrm}%
+      \glossary{\@tempa#2>##1=\string\Package{##1}|indexrm}%
       \ignorespaces
     }%
     \def\Class##1{%
-      \glossary{##1=\string\Class{##1}>\@tempa#1|indexrm}%
-      \glossary{\@tempa#1>##1=\string\Class{##1}|indexrm}%
+      \glossary{##1=\string\Class{##1}>\@tempa#2|indexrm}%
+      \glossary{\@tempa#2>##1=\string\Class{##1}|indexrm}%
       \ignorespaces
     }%
-    \ignorespaces #2%
+    \ignorespaces #3%
   \endgroup
 }
 %    \end{macrocode}
