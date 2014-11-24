@@ -534,6 +534,232 @@ unter der Kapitelüberschrift gesetzt werden.%
 
 
 \begin{Declaration}
+  \Macro{DeclareSectionCommand}\OParameter{Einstellungen}\Parameter{Name}\\
+  \Macro{DeclareNewSectionCommand}\OParameter{Einstellungen}\Parameter{Name}\\
+  \Macro{RedeclareSectionCommand}\OParameter{Einstellungen}\Parameter{Name}\\
+  \Macro{ProvideSectionCommand}\OParameter{Einstellungen}\Parameter{Name}
+\end{Declaration}
+\BeginIndex{Cmd}{DeclareSectionCommand}%
+\BeginIndex{Cmd}{DeclareNewSectionCommand}%
+\BeginIndex{Cmd}{RedeclareSectionCommand}%
+\BeginIndex{Cmd}{ProvideSectionCommand}%
+Mit\ChangedAt[2014/11]{v3.15}{\Class{scrbook}\and \Class{scrreprt}\and
+  \Class{scrartcl}} diesen Anweisungen kann eine neuer Gliederungsbefehl
+\Macro{\PName{Name}} definiert oder der vorhandene Gliederungsbefehl
+\Macro{\PName{Name}} verändert werden. Dazu werden über das optionale Argument
+\PName{Einstellungen} vorgenommen. Die \PName{Einstellungen} sind dabei eine
+durch Komma separierte Liste von
+\PName{Schlüssel}=\PName{Wert}-Zuweisungen. Die möglichen \PName{Schlüssel}
+sind \autoref{tab:maincls-experts.declaresection.keys} zu entnehmen.
+
+\begin{longtable}[l]{llp{\dimexpr\linewidth-6\tabcolsep-17em}}
+  \caption[Eigenschaften bei der Deklaration von Gliederungsbefehlen]{Mögliche
+    \PName{Schlüssel} und \PName{Werte} für die \PName{Eigenschaften} bei der
+    Deklaration von Gliederungsbefehlen%
+    \label{tab:maincls-experts.declaresection.keys}}\\
+  \toprule
+  \PName{Schlüssel} & \PName{Wert} & Bedeutung \\
+  \midrule
+  \endfirsthead
+  \caption[]{Eigenschaften bei der Deklaration von Gliederungsbefehlen
+    (\emph{Fortsetzung})}\\
+  \toprule
+  \PName{Schlüssel} & \PName{Wert} & Bedeutung \\
+  \midrule
+  \endhead
+  \midrule
+  \multicolumn3r{\dots}\\
+  \endfoot
+  \bottomrule
+  \endlastfoot
+    \PValue{afterskip} & \PName{Länge}  & Ein negativer Wert bedeutet, dass
+                                          die Überschrift als Spitzmarke
+                                          formatiert werden soll. Der
+                                          Absolutwert gibt dabei dann den
+                                          horizontalen Abstand nach der
+                                          Überschrift an. Ein positiver Wert
+                                          führt hingegen zu einem vertikalen
+                                          Abstand nach der Überschrift.\\
+    \PValue{beforeskip} & \PName{Länge} & Der Absolutwert gibt den vertikalen
+                                          Abstand vor der Überschrift an. Ist
+                                          der Wert negativ, so wird also
+                                          trotzdem ein positiver Abstand
+                                          eingefügt. Negative Werte bedeuten,
+                                          dass der Absatz nach der Überschrift
+                                          ohne horizontalen Einzug gesetzt
+                                          werden soll.\\
+    \PValue{counterwithin} & \PName{Zählername} & 
+                                          Der zur Gliederungsebene gehörende
+                                          Zähler soll vom als Wert angegebenen
+                                          Zähler abhängig sein. Wird
+                                          \PName{Zählername} über
+                                          \Macro{stepcounter} oder
+                                          \Macro{refstepsounter} erhöht, so
+                                          wird der zur Gliederungsebene
+                                          gehörende Zähler auf 0
+                                          zurückgesetzt. Darüber hinaus wird
+                                          \Macro{the\PName{Zählername}}
+                                          gefolgt von einem Punkt in
+                                          der Ausgabe des zur Gliederungsebene
+                                          gehörenden Zählers vorangestellt.\\
+    \PValue{font} & \PName{Schrifteinstellung}  & 
+                                          Die Fonteinstellungen, die
+                                          zusätzlich zum Element
+                                          \FontElement{disposition} bei der
+                                          Ausgabe der Überschrift verwendet
+                                          werden sollen. Hier sind alle
+                                          Einstellungen erlaubt, die auch über
+                                          \Macro{setkomafont} und
+                                          \Macro{addtokomafont} für das
+                                          Element des Gliederungsbefehls
+                                          erlaubt sind.\\
+    \PValue{indent} & \PName{Länge}     & Einzug vom linken Rand vor der
+                                          Ausgabe der Nummer und des Textes
+                                          der Überschrift.\\
+    \PValue{level} & \PName{Ganzzahl}   & Nummerischer Wert der
+                                          Gliederungsebene (siehe Zähler
+                                          \Counter{secnumdepth};
+                                          \autoref{desc:maincls.counter.secnumdepth});
+                                          der Wert sollte eindeutig sein. \\
+    \PValue{tocindent} & \PName{Länge}  & Der horizontale Einzug des zum
+                                          Gliederungsbefehls gehörenden
+                                          Eintrags ins Inhaltsverzeichnis,
+                                          falls ein solcher abhängig von
+                                          \Counter{tocdepth} (siehe
+                                          \autoref{sec:maincls.toc},
+                                          \autopageref{desc:maincls.counter.tocdepth})
+                                          erzeugt wird.\\ 
+    \PValue{tocnumlevel} & \PName{Ganzzahl} & 
+                                          Die Ebene des zum Gliederungsbefehl
+                                          gehörenden Eintrags ins
+                                          Inhaltsverzeichnis, falls diese von
+                                          \PValue{numwidth} abweichen soll
+                                          (siehe auch \Counter{tocdepth} in
+                                          \autoref{sec:maincls.toc},
+                                          \autopageref{desc:maincls.counter.tocdepth}). \\
+    \PValue{tocnumwidth} & \PName{Länge}& Die Breite, die für die
+                                          Gliederungsnummer im zum 
+                                          Gliederungsbefehl gehörenden Eintrag
+                                          ins Inhaltsverzeichnis reserviert wird.\\
+\end{longtable}
+
+Es ist zu beachten, dass bei der Neudefinition eines Gliederungsbefehls die
+\PName{Schlüssel} \PValue{afterskip}, \PValue{beforeskip}, \PValue{font},
+\PValue{indent}, \PValue{level}, \PValue{tocindent} und \PValue{tocnumwidth}
+zwingend sind. Das gilt auch, falls ein Befehl, der bisher kein
+Gliederungsbefehl war, mit \Macro{RedeclareSectionCommand} zu einem
+Gliederungsbefehl umdefiniert wird.
+
+\Macro{DeclareNewSectionCommand} dient der Definition eines neuen
+Gliederungsbefehls. Ist derselbe \PName{Name} von \TeX{} bereits anderweitig
+belegt, so wird ein Fehler ausgegeben und es findet keine Umdefinierung
+statt.
+
+\Macro{ProvideSectionSommand} verhält sich ähnlich, gibt aber keine
+Fehlermeldung aus.
+
+\Macro{RedeclareSectionCommand} kann hingegen nur verwendet werden, um eine
+existierende Anweisung zu einem Gliederungsbefehl mit den angegebenen
+\PName{Eigenschaften} zu ändern. Dabei wird nicht überprüft, ob
+\Macro{\PName{Name}} bereits zuvor ein Gliederungsbefehl war. Es muss nur ein
+von \TeX{} bereits belegter \PName{Name} sein.
+
+Bei \Macro{DeclareSectionCommand} findet keinerlei Überprüfung statt, ob
+\PName{Name} von \TeX{} bereits anderweitig belegt ist. Stattdessen wird der
+Gliederungsbefehl \Macro{\PName{Name}} unbedingt mit den angegebenen
+\PName{Eigenschaften} definiert.
+
+Zu jeder Gliederungsanweisung gehört außerdem ein Zähler mit demselben
+\PName{Name}, der bei Bedarf von allen vier Befehlen mit \Macro{newcounter}
+neu angelegt wird. Dasselbe gilt für die Ausgabe des Zählers,
+\Macro{the\PName{Name}}, die Formatierung des Zählers,
+\Macro{\PName{Name}format}, die Anweisung zur Erstellung eines Kolumnentitels
+\Macro{\PName{Name}mark}, die dabei verwendete Formatierung des Zählers
+\Macro{\PName{Name}markformat}, das Element \FontElement{\PName{Name}}, und
+die Gliederungsebene, \Macro{\PName{Name}numdepth}. Die Anweisung zur
+Erstellung eines Kolumnentitels, \Macro{\PName{Name}mark} wird dabei
+gegebenenfalls so vordefiniert, dass kein Kolumnentitel erzeugt wird. Die
+Ausgabe des Zählers, \Macro{the\PName{Name}} wird als arabische Zahl
+vordefiniert. Wird über den \PName{Schlüssel} \PValue{counterwithin} der
+Zähler als von einem anderen Zähler abhängig definiert, so wird in der Ausgabe
+dieser andere Zähler mit einem Punkt getrennt vorangestellt.
+
+Es ist zu beachten\textnote{Achtung!}, dass derzeit ausschließlich
+Überschriften in der Standardformatierung von \Macro{scr@startsection}
+definiert werden können. Das ist der Stil, der von \KOMAScript{} für die
+Überschriften von \Macro{section} bis \Macro{subparagraph} verwendet
+wird. Überschriften im Stil von \Macro{part} und \Macro{chapter} können
+darüber nicht definiert werden. Die Spezialüberschriften \Macro{addchap} und
+\Macro{addsec} werden hingegen automatisch und mittelbar zusammen mit
+\Macro{chapter} und \Macro{section} verändert. Sie sollten daher ebenfalls
+nicht unmittelbar über die hier erklärten Anweisungen verändert werden.
+
+\begin{Example}
+  Aus unerfindlichen Gründen sollen die Überschriften von \Macro{paragraph}
+  nicht mehr als Spitzmarken, sondern als Überschriften ähnlich
+  \Macro{subsubsection} umdefiniert werden. Dabei soll über der Überschrift
+  ein kleiner Abstand von 10\,pt und unter der Überschrift kein zusätzlicher
+  Abstand eingefügt werden. Das wäre bereits mit
+\begin{lstcode}
+  \RedeclareSectionCommand[%
+    beforeskip=-10pt,%
+    afterskip=1sp%
+  ]{paragraph}
+\end{lstcode}
+  möglich. Durch den negativen Wert bei \PValue{beforeskip} wird der vertikale
+  Abstand über der Überschrift erzeugt und gleichzeitig der Einzug des ersten
+  Abschnitts nach der Überschrift abgeschaltet. Obwohl eigentlich nach der
+  Überschrift kein vertikaler Abstand gewünscht wird, wurde als Wert hier
+  1\,sp angegeben. Der Grund ist einfach: Einen Wert von 0\,pt betrachtet
+  \LaTeX{} an dieser Stelle nicht als positiven Wert und erzeugt damit eine
+  Überschrift in der Form einer Spitzmarke. Der kleinste positive Wert ist
+  1\,sp.
+
+  In der Regel ist es für den vertikalen Ausgleich (siehe \Macro{flushbottom},
+  \autoref{sec:maincls.typearea}, \autopageref{desc:maincls.cmd.flushbottom})
+  besser, wenn man die Abstände mit etwas Spielraum, dem sogenannten Leim,
+  versieht:
+\begin{lstcode}
+  \RedeclareSectionCommand[%
+    beforeskip=-10pt plus -2pt minus -1pt,%
+    afterskip=1sp plus -1sp minus 1sp%
+  ]{paragraph}
+\end{lstcode}
+  Dabei ist zu beachten, dass natürlich auch der Leim bei der Anwendung als
+  vertikaler Abstand das Vorzeichen wechselt, also bei \PValue{beforeskip} im
+  Beispiel negativ angegeben wird. Gleichzeitig wurde die Gelegenheit genutzt,
+  über den Leim bei \PValue{afterskip} dafür zu sorgen, dass der Abstand dort
+  gegebenenfalls tatsächlich bis auf 0 schrumpft.
+\end{Example}
+
+Dass im Beispiel tatsächlich nur die Schlüssel \PValue{beforeskip} und
+\PValue{afterskip} verwendet werden mussten, liegt daran, dass seit
+\KOMAScript{} v3.15 \Macro{paragraph} intern bereits mit
+\Macro{DeclareSectionCommand} definiert wird und daher die übrigen
+Einstellungen unverändert übernommen werden können. Die Originaldefinition von
+\Macro{paragraph} entspricht bei \Class{scrartcl}:
+\begin{lstcode}[belowskip=\dp\strutbox]
+  \DeclareSectionCommand[%
+    level=4,
+    indent=0pt,
+    beforeskip=3.25ex plus 1ex minus .2ex,
+    afterskip=-1em,
+    font={},
+    tocindent=7em,
+    tocnumwidth=4.1em,
+    counterwithin=subsubsection
+  ]{paragraph}
+\end{lstcode}
+Bei \Class{scrreprt} und \Class{scrbook} werden teilweise abweichende Werte
+verwendet.
+%
+\EndIndex{Cmd}{ProvideSectionCommand}%
+\EndIndex{Cmd}{RedeclareSectionCommand}%
+\EndIndex{Cmd}{DeclareNewSectionCommand}%
+\EndIndex{Cmd}{DeclareSectionCommand}%
+
+
+\begin{Declaration}
   \Macro{appendixmore}
 \end{Declaration}%
 \BeginIndex{Cmd}{appendixmore}%
