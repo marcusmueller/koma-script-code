@@ -331,6 +331,7 @@ also the limitation note in \autoref{sec:maincls-experts.coexistence},
 \LoadNonFree{scrbookreportarticle-experts}{3}
 \begin{Declaration}
   \Macro{chapterheadstartvskip}\\
+  \Macro{chapterheadmidvskip}\\
   \Macro{chapterheadendvskip}\\
   \Macro{partheadstartvskip}\\
   \Macro{partheadmidvskip}\\
@@ -338,6 +339,7 @@ also the limitation note in \autoref{sec:maincls-experts.coexistence},
   \Macro{partheademptypage}
 \end{Declaration}
 \BeginIndex{Cmd}{chapterheadstartvskip}%
+\BeginIndex{Cmd}{chapterheadmidvskip}%
 \BeginIndex{Cmd}{chapterheadendvskip}%
 \BeginIndex{Cmd}{partheadstartvskip}%
 \BeginIndex{Cmd}{partheadmidvskip}%
@@ -369,7 +371,7 @@ already part of the default of \Macro{partheadendvskip} in
 page of \Class{scrbook} and \Class{scrreprt}.
 
 The \Class{scrbook}\OnlyAt{\Class{scrbook}\and \Class{scrreprt}} and
-\Class{scrreprt} default of the six commands are listed in
+\Class{scrreprt} default of the seven commands are listed in
 \autoref{tab:maincls-experts.headvskip} and
 \autoref{tab:maincls-experts.headvskip2}. The
 \Class{scrartcl}\OnlyAt{\Class{scrartcl}} defaults of the three at this class
@@ -490,7 +492,209 @@ print extra rules above and below the chapter heading, may be found at
 \EndIndex{Cmd}{partheadmidvskip}%
 \EndIndex{Cmd}{partheadstartvskip}%
 \EndIndex{Cmd}{chapterheadendvskip}%
+\EndIndex{Cmd}{chapterheadmidvskip}%
 \EndIndex{Cmd}{chapterheadstartvskip}%
+
+\iffree{\clearpage}{}% Umbruchkorrektur
+
+\begin{Declaration}
+  \Macro{DeclareSectionCommand}\OParameter{attributes}\Parameter{name}\\
+  \Macro{DeclareNewSectionCommand}\OParameter{attributes}\Parameter{name}\\
+  \Macro{RedeclareSectionCommand}\OParameter{attributes}\Parameter{name}\\
+  \Macro{ProvideSectionCommand}\OParameter{attributes}\Parameter{name}
+\end{Declaration}
+\BeginIndex{Cmd}{DeclareSectionCommand}%
+\BeginIndex{Cmd}{DeclareNewSectionCommand}%
+\BeginIndex{Cmd}{RedeclareSectionCommand}%
+\BeginIndex{Cmd}{ProvideSectionCommand}%
+With\ChangedAt[2014/11]{v3.15}{\Class{scrbook}\and \Class{scrreprt}\and
+  \Class{scrartcl}} these command you can either define a new section-like
+command \Macro{\PName{Name}} or change a already defines sectioning command
+\Macro{\PName{Name}}. To do so you use the optional argument to setup several
+\PName{attributes}. The \PName{attributes} are a comma-separated list of
+\PName{key}=\PName{value} assignments.
+\hyperref[tab:maincls-experts.declaresection.keys]{Table~\ref*{tab:maincls-experts.declaresection.keys}}
+describes the available \PName{key}s.
+
+\begin{longtable}[l]{llp{\dimexpr\linewidth-6\tabcolsep-14em}}
+  \caption[Attributes at the declaration of section-like commands]{Available
+    \PName{key}s and \PName{value}s for the \PName{attributes} declaring a
+    section-like command%
+    \label{tab:maincls-experts.declaresection.keys}}\\
+  \toprule
+  \PName{key} & \PName{value} & Description \\
+  \midrule
+  \endfirsthead
+  \caption[]{Attributes at the declaration of section-like commands
+    (\emph{Fortsetzung})}\\
+  \toprule
+  \PName{key} & \PName{value} & description \\
+  \midrule
+  \endhead
+  \midrule
+  \multicolumn3r{\dots}\\
+  \endfoot
+  \bottomrule
+  \endlastfoot
+    \PValue{afterskip} & \PName{length} & A negative value activates a run-in
+                                          heading. The absolute value is the
+                                          skip to leave to right of the run-in
+                                          heading. A positive value is the
+                                          vertical skip below the heading.\\
+    \PValue{beforeskip} & \PName{length}& The absolute value of the vertical
+                                          skip before the heading. If the
+                                          value is negative, then the
+                                          paragraph indent of the text
+                                          following heading is suppressed.\\
+    \PValue{counterwithin} & \PName{counter name} & 
+                                          The value of the counter of the
+                                          heading should depend on
+                                          \PName{counter name}. Whenever
+                                          \Macro{stepcounter} or
+                                          \Macro{refstepcounter} increases the
+                                          value of \PName{counter name}, the
+                                          value of the counter of this heading
+                                          should be set to 0. Also the output
+                                          of the value of this heading should
+                                          be prefixed by 
+                                          \Macro{the\PName{counter name}}
+                                          followed by a dot.\\
+    \PValue{font} & \PName{font commands}  & 
+                                          The initial font setting, that
+                                          should be used beside 
+                                          \FontElement{disposition} for the
+                                          heading. You can use all settings,
+                                          that are allowed for
+                                          \Macro{setkomafont} and
+                                          \Macro{addtokomafont} for the
+                                          element of the heading.\\
+    \PValue{indent} & \PName{length}    & Indentation of heading from the left
+                                          margin.\\
+    \PValue{level} & \PName{integer}    & A number, denoting depth of section
+                                          (see counter \Counter{secnumdepth};
+                                          \autoref{desc:maincls.counter.secnumdepth});
+                                          the value should be unique.\\
+    \PValue{tocindent} & \PName{length} & Total indentation from the left
+                                          margin of the entry in the table of
+                                          contents corresponding with this
+                                          heading, if and only if such an
+                                          entry will be made (see
+                                          \Counter{tocdepth} (siehe
+                                          \autoref{sec:maincls.toc},
+                                          \autopageref{desc:maincls.counter.tocdepth}).\\ 
+    \PValue{tocnumlevel} & \PName{integer} & 
+                                          A number, denoting the depth of the
+                                          entry in the table of contents
+                                          corresponding with this heading, if
+                                          this should differ from
+                                          \PValue{numwidth} (see
+                                          \Counter{tocdepth} in
+                                          \autoref{sec:maincls.toc},
+                                          \autopageref{desc:maincls.counter.tocdepth}). \\
+    \PValue{tocnumwidth} & \PName{length} &
+                                          Width of the box for the number of
+                                          the entry in the table of contents.\\
+\end{longtable}
+
+The \PName{key}s \PValue{afterskip}, \PValue{beforeskip}, \PValue{font},
+\PValue{indent}, \PValue{level}, \PValue{tocindent}, and \PValue{tocnumwidth}
+are mandatory when declaring a new section-like command. This is also true if
+a command, that was not a section-like command before, will be redefined into a
+section-like command using \Macro{RedeclareSectionCommand}.
+
+\Macro{DeclareNewSectionCommand} defines a new section-like command. If the
+same \PName{name} is already used by \TeX{} for something else, the command
+will result in an error message and will not define anything.
+
+\Macro{ProvideSectionSommand} is similar but doesn't show any error message.
+
+\Macro{RedeclareSectionCommand} can only change an existing command into a
+section-like command with given \PName{attributes}. There is no pre-validation
+to make sure, that \Macro{\PName{name}} was a section-like command before. It
+only has to be an already used command sequence \PName{name}.
+
+\Macro{DeclareSectionCommand} does not check, whether or not \PName{name} is
+an already used \TeX{} command sequence. It just defines a section-like
+command \Macro{\PName{name}} with the given \PName{attributes}.
+
+Every section-like command has also a corresponding counter with the same
+\PName{name}, that will be allocated using \Macro{newcounter} if
+necessary. Similar for the corresponding output of the counter
+\Macro{the\PName{name}}, the output format \Macro{\PName{name}format}, the
+command to generate a running head, \Macro{\PName{name}mark}, the counter
+format of the running head, \Macro{\PName{name}markformat}, die font element
+\FontElement{\PName{name}}, and the section depth number,
+\Macro{\PName{name}numdepth}. The command for the running head
+\Macro{\PName{name}mark} will be defined to not generate any running head. The
+output of the counter, \Macro{the\PName{name}} will show an Arabic number. If
+the \PName{key} \PValue{counterwithin} defines a counter, the heading number
+depends on, the output of the counter will be prefixed by the output of that
+counter followed by a dot.
+
+Please note\textnote{Attention!}: Currently you can define only headings for
+section-like commands depending on \Macro{scr@startsection}. This is the
+style, that \KOMAScript{} uses for headings from \Macro{section} down to
+\Macro{subparagraph}. Headings with the style of \Macro{part} or
+\Macro{chapter} are supported not yet. The special headings \Macro{addpart},
+\Macro{addchap} and \Macro{addsec} on the other hand depend indirectly on
+\Macro{part}, \Macro{chapter}, and \Macro{section}. Therefore they also
+shouldn't be redefined directly using the commands described here.
+
+\begin{Example}
+  Because of incomprehensible reasons, the headings of \Macro{paragraph}
+  shouldn't be run-in headings any longer but headings similar to
+  \Macro{subsubsection}. The vertical skip above the heading should be 10\,pt
+  and the following text should be set without any vertical distance. To do
+  so, you can simply use:
+\begin{lstcode}
+  \RedeclareSectionCommand[%
+    beforeskip=-10pt,%
+    afterskip=1sp%
+  ]{paragraph}
+\end{lstcode}
+  The negative value of \PValue{beforeskip} does not only result in a
+  positive vertical skip before the heading, but also deactivates the paragraph
+  indentation of the following text. Despite the specification of no vertical
+  skip after the heading a value of 1\,sp has been given to
+  \PValue{afterskip}. This is because \LaTeX{} here doesn't accept 0\,pt as
+  positive value. So 1\,sp is the lowest possible positive value.
+
+  Generally, for the vertical adjustment it is better to have some
+  tolerance\,---\,the so called \emph{glue}\,---\,in the declaration of gaps:
+\begin{lstcode}
+  \RedeclareSectionCommand[%
+    beforeskip=-10pt plus -2pt minus -1pt,%
+    afterskip=1sp plus -1sp minus 1sp%
+  ]{paragraph}
+\end{lstcode}
+  Doing so you have to know, that the glue also switches the algebraic sign
+  before becoming a skip, if the value is negative. That is the reason for the
+  negative glue values in the example. Additionally we used the occasion to
+  minimize the vertical skip after the heading using glue too.
+\end{Example}
+
+In the example above only \PValue{beforeskip} and \PValue{afterskip} were
+needed, because since v3.15 \KOMAScript{} defines \Macro{paragraph} itself
+using \Macro{DeclareSectionCommand}. So all other values are just reused
+unchanged from that initial definition. By the way, the original definition of
+\Macro{paragraph} in \Class{scrartcl} comes up to:
+\begin{lstcode}[belowskip=\dp\strutbox]
+  \DeclareSectionCommand[%
+    level=4,
+    indent=0pt,
+    beforeskip=3.25ex plus 1ex minus .2ex,
+    afterskip=-1em,
+    font={},
+    tocindent=7em,
+    tocnumwidth=4.1em,
+    counterwithin=subsubsection
+  ]{paragraph}
+\end{lstcode}
+\Class{scrreprt} and \Class{scrbook} use slightly different values.%
+\EndIndex{Cmd}{ProvideSectionCommand}%
+\EndIndex{Cmd}{RedeclareSectionCommand}%
+\EndIndex{Cmd}{DeclareNewSectionCommand}%
+\EndIndex{Cmd}{DeclareSectionCommand}%
 
 
 \begin{Declaration}
