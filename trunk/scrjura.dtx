@@ -1,4 +1,4 @@
-% \CheckSum{1772}
+% \CheckSum{1766}
 % \iffalse meta-comment
 % ======================================================================
 % scrjura.dtx
@@ -677,7 +677,74 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % zeigen sich die Nachteile dieses Vorgehens erst, wenn man einen Unterunterabschnitt benötigt.
 % 
 % 
-% 
+% \subsection{Zusätzliche Vertragsumgebungen}
+% \label{sec:newenv}
+%
+% Einer der Anwender setzt mit \textsf{scrjura} keine Verträge oder Kommentare
+% zu einzelnen Gesetzen, sondern Werke, in denen unterschiedliche Arten von
+% Gesetzen behandelt werden. Es ist daher erforderliche, dass ein Paragraph
+% nicht immer mit demselben Präfix »\S« versehen wird, sondern beispielsweise
+% als »Art.« oder »GG« oder was auch immer bezeichnet wird. Darüber hinaus
+% wird eine unabhängige Zählung der unterschiedlichen Paragraphen benötigt.
+%
+% \DescribeMacro{\DeclareNewJuraEnvironment}
+% Die für unabhängige Vertrags- oder Gesetzestexte notwendigen Umgebungen
+% werden über die Anweisung:
+%
+% \csname @hangfrom\endcsname{\cs{DeclareNewJuraEnvironment}}\marg{Name}\oarg{Optionen}\\
+% \marg{Start-Anweisungen}\\
+% \marg{End-Anweisungen}
+%
+% deklariert. Das Argument \meta{Name} ist dabei der Name der neuen
+% Umgebung. \meta{Start-Anweisungen} sind Anweisungen, die immer am Anfang der
+% Umgebung ausgeführt werden, ganz als ob man sie jedes Mal unmittelbar hinter
+% \cs{begin}\marg{Name} einfügen würde. Entsprechend werden
+% \meta{End-Anwesiungen} immer am Ende der Umgebung ausgeführt, ganz als ob
+% man sie jedes Mal unmittelbar vor \cs{end}\marg{Name} einfügen würde. Ohne
+% \meta{Optionen} entspricht die neue Umgebung \meta{Name} einer
+% \texttt{contract}-Umgebung mit eigenen Zählern. Es besteht jedoch die
+% Möglichkeit über eine mit Komma separierte Liste an \oarg{Optionen} darauf
+% Einfluss zu nehmen. Derzeit werden folgende \oarg{Optionen} unterstützt:
+% \begin{description}
+% \item[\texttt{Clause=}\meta{Anweisung}:] Legt fest, auf welche
+% \meta{Anweisung} innerhalb der Umgebung die Anweisung \cs{Clause} abgebildet
+% werden soll. Die \meta{Anweisung} sollte wie die für \texttt{contract}
+% dokumentierte Anweisung genau ein Argument erwarten. Für eine korrekte
+% Anwendung dieser Option sind erweiterte Kenntnisse über die interne Funktion
+% von \textsf{scrjura} notwendig. Außerdem können sich die Anforderungen an
+% die \meta{Anweisung} von Version zu Version noch ändern. Daher wird derzeit
+% empfohlen, die Option nicht zu verwenden!
+% \item[\texttt{SubClause=}\meta{Anweisung}:] Siehe Option \texttt{Clause},
+% allerdings für \cs{SubClause} statt \cs{Clause}.
+% \item[\texttt{Sentence=}\meta{Anweisung}:] Legt fest, auf welche
+% \meta{Anweisung} innerhalb der Umgebung die Anweisung \cs{Sentence}
+% abgebildet werden soll. Die \meta{Anweisung} sollte kein Argument
+% besitzen. Normalerweise sollte sie den Zähler \texttt{sentence} mit
+% \cs{refstepcounter} erhöhen und dann in geeigneter Form ausgeben. Dabei ist
+% besonders darauf zu achten, dass keine unerwünschten Leerzeichen eingebaut
+% werden!
+% \item[\texttt{ClauseNumberFormat=}\meta{Anweisung}:] Legt fest, auf welche
+% Weise die Paragraphen"=Nummern dieser Umgebung bei der Ausgabe formatiert
+% werden. Es wird eine Anweisung mit genau einem Argument erwartet, der Nummer
+% des Paragraphen. Falls diese Nummer das letzte Argument einer Kette von
+% Anweisungen ist, so kann diese Kette an Anweisungen auch direkt angegeben
+% werden.
+% \end{description}
+%
+% Um beispielsweise die in der Einleitung zu diesem Abschnitt erwähnte
+% Umgebung für Artikel zu definieren, genügt:
+% \begin{verbatim}
+% \DeclareNewJuraEnvironment{Artikel}[ClauseNumberFormat=Art.]{}{}
+% \end{verbatim}
+% Sollen die Artikel unter Verwendung einer \KOMAScript-Klasse mit
+% Absatzabstand statt Absatzeinzug gesetzt werden, kann
+% \begin{verbatim}
+% \DeclareNewJuraEnvironment{Artikel}[ClauseNumberFormat=Art.~]
+%                           {\KOMAoptions{parskip}}{}
+% \end{verbatim}
+% verwendet werden. Natürlich wird dann auch bei der Referenzierung
+% automatisch »Art.« an Stelle von »\S« vorangestellt.
+%
 % 
 % \subsection{Sonstiges}
 %\label{sec:else}
@@ -1298,7 +1365,6 @@ standard classes created by The LaTeX3 Project 1994-1996.
         \csname c@#1SubClause\endcsname
       \edef\cl@SubClause{\cl@SubClause
         \csname cl@#1SubClause\endcsname}%
-      \expandafter\let\expandafter\Sentence\csname #1@Sentence\endcsname
       \@ifundefined{#1@Clause}{%
         \let\Clause\contract@paragraph
       }{%
