@@ -508,8 +508,8 @@ print extra rules above and below the chapter heading, may be found at
 \BeginIndex{Cmd}{RedeclareSectionCommand}%
 \BeginIndex{Cmd}{ProvideSectionCommand}%
 With\ChangedAt[2014/11]{v3.15}{\Class{scrbook}\and \Class{scrreprt}\and
-  \Class{scrartcl}} these command you can either define a new section-like
-command \Macro{\PName{Name}} or change a already defines sectioning command
+  \Class{scrartcl}} these commands you can either define a new section-like
+command \Macro{\PName{Name}} or change an already defined sectioning command
 \Macro{\PName{Name}}. To do so you use the optional argument to setup several
 \PName{attributes}. The \PName{attributes} are a comma-separated list of
 \PName{key}=\PName{value} assignments.
@@ -574,20 +574,23 @@ describes the available \PName{key}s.
                                           (see counter \Counter{secnumdepth};
                                           \autoref{desc:maincls.counter.secnumdepth});
                                           the value should be unique.\\
+    \PValue{style} & \PName{name}       & Defines the style of the
+                                          heading. Currently only style
+                                          \PValue{section} is provided.\\
     \PValue{tocindent} & \PName{length} & Total indentation from the left
                                           margin of the entry in the table of
-                                          contents corresponding with this
+                                          contents corresponding to this
                                           heading, if and only if such an
                                           entry will be made (see
                                           \Counter{tocdepth} (siehe
                                           \autoref{sec:maincls.toc},
                                           \autopageref{desc:maincls.counter.tocdepth}).\\ 
-    \PValue{tocnumlevel} & \PName{integer} & 
-                                          A number, denoting the depth of the
+    \PValue{toclevel} & \PName{integer} & 
+                                          A number denoting the depth of the
                                           entry in the table of contents
-                                          corresponding with this heading, if
+                                          corresponding to this heading, if
                                           this should differ from
-                                          \PValue{numwidth} (see
+                                          \PValue{level} (see
                                           \Counter{tocdepth} in
                                           \autoref{sec:maincls.toc},
                                           \autopageref{desc:maincls.counter.tocdepth}). \\
@@ -599,7 +602,7 @@ describes the available \PName{key}s.
 The \PName{key}s \PValue{afterskip}, \PValue{beforeskip}, \PValue{font},
 \PValue{indent}, \PValue{level}, \PValue{tocindent}, and \PValue{tocnumwidth}
 are mandatory when declaring a new section-like command. This is also true if
-a command, that was not a section-like command before, will be redefined into a
+a command that was not a section-like command before will be redefined as a
 section-like command using \Macro{RedeclareSectionCommand}.
 
 \Macro{DeclareNewSectionCommand} defines a new section-like command. If the
@@ -608,21 +611,21 @@ will result in an error message and will not define anything.
 
 \Macro{ProvideSectionSommand} is similar but doesn't show any error message.
 
-\Macro{RedeclareSectionCommand} can only change an existing command into a
+\Macro{RedeclareSectionCommand} can only change an existing command to a
 section-like command with given \PName{attributes}. There is no pre-validation
-to make sure, that \Macro{\PName{name}} was a section-like command before. It
-only has to be an already used command sequence \PName{name}.
+to make sure that \Macro{\PName{name}} was a section-like command
+before. However, it has to be an already used command sequence \PName{name}.
 
-\Macro{DeclareSectionCommand} does not check, whether or not \PName{name} is
+\Macro{DeclareSectionCommand} does not check whether or not \PName{name} is
 an already used \TeX{} command sequence. It just defines a section-like
 command \Macro{\PName{name}} with the given \PName{attributes}.
 
 Every section-like command has also a corresponding counter with the same
 \PName{name}, that will be allocated using \Macro{newcounter} if
-necessary. Similar for the corresponding output of the counter
+necessary. The same rule applies to the corresponding output of the counter
 \Macro{the\PName{name}}, the output format \Macro{\PName{name}format}, the
 command to generate a running head, \Macro{\PName{name}mark}, the counter
-format of the running head, \Macro{\PName{name}markformat}, die font element
+format of the running head, \Macro{\PName{name}markformat}, the font element
 \FontElement{\PName{name}}, and the section depth number,
 \Macro{\PName{name}numdepth}. The command for the running head
 \Macro{\PName{name}mark} will be defined to not generate any running head. The
@@ -632,12 +635,12 @@ depends on, the output of the counter will be prefixed by the output of that
 counter followed by a dot.
 
 Please note\textnote{Attention!}: Currently you can define only headings for
-section-like commands depending on \Macro{scr@startsection}. This is the
-style, that \KOMAScript{} uses for headings from \Macro{section} down to
-\Macro{subparagraph}. Headings with the style of \Macro{part} or
-\Macro{chapter} are supported not yet. The special headings \Macro{addpart},
+section-like commands depending on \Macro{scr@startsection}. This is the style
+\PValue{section}, that \KOMAScript{} uses for headings from \Macro{section}
+down to \Macro{subparagraph}. Headings with the style of \Macro{part} or
+\Macro{chapter} are not yet supported. The special headings \Macro{addpart},
 \Macro{addchap} and \Macro{addsec} on the other hand depend indirectly on
-\Macro{part}, \Macro{chapter}, and \Macro{section}. Therefore they also
+\Macro{part}, \Macro{chapter}, and \Macro{section}. Therefore they
 shouldn't be redefined directly using the commands described here.
 
 \begin{Example}
@@ -660,7 +663,7 @@ shouldn't be redefined directly using the commands described here.
   positive value. So 1\,sp is the lowest possible positive value.
 
   Generally, for the vertical adjustment it is better to have some
-  tolerance\,---\,the so called \emph{glue}\,---\,in the declaration of gaps:
+  tolerance in the declaration of gaps\,---\,the so called \emph{glue}:
 \begin{lstcode}
   \RedeclareSectionCommand[%
     beforeskip=-10pt plus -2pt minus -1pt,%
@@ -675,9 +678,9 @@ shouldn't be redefined directly using the commands described here.
 
 In the example above only \PValue{beforeskip} and \PValue{afterskip} were
 needed, because since v3.15 \KOMAScript{} defines \Macro{paragraph} itself
-using \Macro{DeclareSectionCommand}. So all other values are just reused
-unchanged from that initial definition. By the way, the original definition of
-\Macro{paragraph} in \Class{scrartcl} comes up to:
+using \Macro{DeclareSectionCommand}. All other values are just reused
+with their initial definition. Furthermore, the original definition of
+\Macro{paragraph} in \Class{scrartcl} reads:
 \begin{lstcode}[belowskip=\dp\strutbox]
   \DeclareSectionCommand[%
     level=4,
