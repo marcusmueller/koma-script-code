@@ -1,4 +1,4 @@
-% \CheckSum{2885}
+% \CheckSum{2989}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -444,10 +444,32 @@
 % enthalten sie jedoch gar nichts. Die tatsächlichen Werte werden
 % durch die Optionen festgelegt. Dabei wird \cs{chapterheadmidvskip} nur
 % verwendet, wenn Option \texttt{chapterprefix} aktiv ist.
+%
+% Zur Erhöhrung der Kompatibilität mit \cs{DeclareSectionCommand} werden
+% zunächst einige Hilfsanweisung definiert und verwendet. Das bedeutet jedoch
+% nicht, dass \cs{chapter} mit \cs{DeclareSectionCommand} den Stil von normalen
+% Gliederungsbefehlen erhalten kann!
+% \begin{macro}{\scr@chapter@sectionbeforeskip}
+%   \changes{v3.15}{2014/11/24}{neue (interne) Anweisung}^^A
+% \begin{macro}{\scr@chapter@sectionafterskip}
+%   \changes{v3.15}{2014/11/24}{neue (interne) Anweisung}^^A
+% \begin{macro}{\scr@chapter@sectionindent}
+%   \changes{v3.15}{2014/11/24}{neue (interne) Anweisung (unbenutzt)}^^A
+% \begin{macro}{\scr@chapter@style}
+%   \changes{v3.15}{2014/11/24}{neue (interne) Anweisung}^^A
+% Es wird der leere Stil verwendet, mit dem Neudefinitionen von \cs{part}
+% über \cs{DeclareSectionCommand} verhindert werden.
 %    \begin{macrocode}
 %<*book|report>
-\newcommand*{\scr@chapter@sectionbeforeskip}{0pt}%
-\newcommand*{\scr@chapter@sectionafterskip}{0pt}%
+\newcommand*{\scr@chapter@sectionbeforeskip}{\z@}
+\newcommand*{\scr@chapter@sectionafterskip}{\z@}
+\newcommand*{\scr@chapter@sectionindent}{\z@}
+\let\scr@chapter@sectionindent\z@
+%    \end{macrocode}
+% \end{macro}^^A \scr@chapter@sectionindent
+% \end{macro}^^A \scr@chapter@sectionbeforeskip
+% \end{macro}^^A \scr@chapter@sectionafterskip
+%    \begin{macrocode}
 \newcommand*{\chapterheadstartvskip}{%
   \@tempskipa=\glueexpr \scr@chapter@sectionbeforeskip\relax
   \ifdim\@tempskipa<\z@\vspace*{-\@tempskipa}%
@@ -459,8 +481,10 @@
   \else\ifdim\@tempskipa>\z@\vspace{\@tempskipa}\fi\fi
 }
 \newcommand*{\chapterheadmidvskip}{\par\nobreak\vskip.5\baselineskip}
+\newcommand*{\scr@chapter@style}{}
 %</book|report>
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -1873,28 +1897,42 @@
 % Diese vier Makros werden verwendet, um den Abstand über in und unter der
 % Überschrift eines Teils und die leere Rückseite zu definieren. Prinzipiell
 % kann damit auch der Umbruch zwischen Nummer und Text entfernt werden.
+% \begin{macro}{\scr@part@sectionbeforeskip}
+%   \changes{v3.15}{2014/11/24}{neue (interne) Anweisung}^^A
+% \begin{macro}{\scr@part@sectionafterskip}
+%   \changes{v3.15}{2014/11/24}{neue (interne) Anweisung}^^A
+% \begin{macro}{\scr@part@sectionindent}
+%   \changes{v3.15}{2014/11/24}{neue (interne) Anweisung (unbenutzt)}^^A
+% \begin{macro}{\scr@part@style}
+%   \changes{v3.15}{2014/11/24}{neue (interne) Anweisung}^^A
+% Es wird der leere Stil verwendet, mit dem Neudefinitionen von \cs{part}
+% über \cs{DeclareSectionCommand} verhindert werden.
 %    \begin{macrocode}
 %<article>\newcommand*{\scr@part@sectionbeforeskip}{4ex}
+%<report|book>\newcommand*{\scr@part@sectionbeforeskip}{\z@ \@plus 1fil}
 \newcommand*{\partheadstartvskip}{%
 %<*article> 
   \@tempskipa=\glueexpr\scr@part@sectionbeforeskip\relax
   \ifdim\@tempskipa<\z@\addvspace{-\@tempskipa}\else\addvspace{\@tempskipa}\fi
 %</article>
-%<report|book>  \null\vfil
+%<report|book>  \null\vskip\scr@part@sectionbeforeskip
 }
 \newcommand*{\partheadmidvskip}{%
   \par\nobreak
 %<book|report>  \vskip 20\p@
 }
 %<article>\newcommand*{\scr@part@sectionafterskip}{3ex}
+%<report|book>\newcommand*{\scr@part@sectionafterskip}{\z@ \@plus 1fil}
 \newcommand*{\partheadendvskip}{%
 %<*article> 
   \@tempskipa=\glueexpr\scr@part@sectionafterskip\relax
   \ifdim\@tempskipa<\z@\vskip-\@tempskipa\else\vskip\@tempskipa\fi
 %</article>
-%<report|book>  \vfil\newpage
+%<report|book>  \vskip\scr@part@sectionafterskip\newpage
 }
 %<*report|book>
+\newcommand*{\scr@part@sectionindent}{\z@}
+\newcommand*{\scr@part@style}{}
 \newcommand*{\partheademptypage}{%
   \if@twoside\if@openright
       \null%
@@ -1904,6 +1942,10 @@
 }
 %</report|book>
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -2702,6 +2744,15 @@
 \DefineFamilyMember[.dsc]{KOMAarg}
 \newcommand*{\DeclareSectionCommand}[2][]{%
 %    \end{macrocode}
+% \begin{description}\item[\texttt{style}] Stil der
+% Gliederungsebene\end{description}
+%    \begin{macrocode}
+  \edef\reserved@a{%
+    \noexpand\FamilyStringKey[.dsc]{KOMAarg}{style}{%
+      \expandafter\noexpand\csname scr@#2@style\endcsname
+    }%
+  }\reserved@a
+%    \end{macrocode}
 % \begin{description}\item[\texttt{level}] nummerische
 % Gliederungsebene\end{description}
 %    \begin{macrocode}
@@ -2840,23 +2891,51 @@
 %    \end{macrocode}
 % Dann den eigentlichen Gliederungsbefehl definieren:
 %    \begin{macrocode}
-    \expandafter\edef\csname #2\endcsname{%
-      \noexpand\scr@startsection{#2}%
-      \expandafter\noexpand\csname #2numdepth\endcsname
-      \expandafter\noexpand\csname scr@#2@sectionindent\endcsname
-      \expandafter\noexpand\csname scr@#2@sectionbeforeskip\endcsname
-      \expandafter\noexpand\csname scr@#2@sectionafterskip\endcsname{%
-        \noexpand\ifdim\noexpand\glueexpr
-        \expandafter\noexpand\csname scr@#2@sectionbeforeskip\endcsname
-        <\noexpand\z@
-          \unexpanded{%
-            \ifnum \scr@compatibility>\@nameuse{scr@v@2.96}\relax
-              \setlength{\parfillskip}{\z@ plus 1fil}%
-            \fi
+    \ifstr{\csname scr@#2@style\endcsname}{}{%
+      \ClassInfo{\KOMAClassName}{%
+        not defining `\string\csname #2\endcsname' due to\MessageBreak
+        empty section style%
+      }%
+    }{%
+      \scr@ifundefinedorrelax{scr@#2@style}{%
+        \ClassWarning{\KOMAClassName}{using default section style}%
+        \@namedef{scr@#2@style}{section}%
+      }{}%
+      \expandafter\edef\csname #2\endcsname{%
+        \noexpand\scr@ifundefinedorrelax{%
+          scr@start\csname scr@#2@style\endcsname}{%
+          \noexpand\ClassError{\noexpand\KOMAClassName}{%
+            section style `\csname scr@#2@style\endcsname' not defined}{%
+            A not yet defined section style `\csname scr@#2@style\endcsname'
+            has been setup for\MessageBreak
+            `\expandafter\string\csname #2\endcsname'. You should either setup
+            another style\MessageBreak
+            or define the style.\MessageBreak
+            If you'll continue, style `section' will be used as an emergency
+            fallback.%
           }%
-        \noexpand\fi
-        \unexpanded{%
-          \raggedsection\normalfont\sectfont\nobreak\usekomafont{#2}%
+          \noexpand\scr@startsection
+        }{%
+          \expandafter\noexpand
+          \csname scr@start\csname scr@#2@style\endcsname\endcsname
+        }%
+        {#2}%
+        \expandafter\noexpand\csname #2numdepth\endcsname
+        \expandafter\noexpand\csname scr@#2@sectionindent\endcsname
+        \expandafter\noexpand\csname scr@#2@sectionbeforeskip\endcsname
+        \expandafter\noexpand\csname scr@#2@sectionafterskip\endcsname{%
+          \noexpand\ifdim\noexpand\glueexpr
+          \expandafter\noexpand\csname scr@#2@sectionbeforeskip\endcsname
+          <\noexpand\z@
+            \unexpanded{%
+              \ifnum \scr@compatibility>\@nameuse{scr@v@2.96}\relax
+                \setlength{\parfillskip}{\z@ plus 1fil}%
+              \fi
+            }%
+          \noexpand\fi
+          \unexpanded{%
+            \raggedsection\normalfont\sectfont\nobreak\usekomafont{#2}%
+          }%
         }%
       }%
     }%
@@ -3045,6 +3124,7 @@
 % Schnittstelle \cs{DeclareSectionCommand} definiert.
 %    \begin{macrocode}
 \DeclareSectionCommand[%
+  style=section,%
   indent=\z@,%
   beforeskip=-3.5ex \@plus -1ex \@minus -.2ex,%
   afterskip=2.3ex \@plus.2ex,%
@@ -3054,6 +3134,7 @@
 %<book|report>  tocnumwidth=2.3em%
 ]{section}
 \DeclareSectionCommand[%
+  style=section,%
   indent=\z@,%
   beforeskip=-3.25ex\@plus -1ex \@minus -.2ex,%
   afterskip=1.5ex \@plus .2ex,%
@@ -3063,6 +3144,7 @@
 %<book|report>  tocnumwidth=3.2em%
 ]{subsection}
 \DeclareSectionCommand[%
+  style=section,%
   indent=\z@,%
   beforeskip=-3.25ex\@plus -1ex \@minus -.2ex,%
   afterskip=1.5ex \@plus .2ex,%
@@ -3072,6 +3154,7 @@
 %<book|report>  tocnumwidth=4.1em%
 ]{subsubsection}
 \DeclareSectionCommand[%
+  style=section,%
   indent=\z@,%
   beforeskip=3.25ex \@plus1ex \@minus.2ex,%
   afterskip=-1em,%
@@ -3081,6 +3164,7 @@
 %<book|report>  tocnumwidth=5em%
 ]{paragraph}
 \DeclareSectionCommand[%
+  style=section,%
   indent=\ifnum \scr@compatibility<\@nameuse{scr@v@3.15} \parindent
          \else \scr@parindent\fi,%
   beforeskip=3.25ex \@plus1ex \@minus .2ex,%
@@ -3415,10 +3499,39 @@
 %     verwendet}
 %   \changes{v3.05}{2009/11/11}{Da auch \textsf{article} die Ebene -2
 %     verwendet, wird das nun für scrartcl übernommen.}
-% Der Eintrag für \cs{part}:
+%   \changes{v3.15}{2014/12/02}{Verwendung von \cs{parttoclevel} und
+%     \cs{scr@part@numwidth}}
+% Der Eintrag für \cs{part}. Es werden einige Hilfsmakros passend zu
+% \cs{DeclareSectionCommand} definiert. Dadurch können diverse Einstellungen
+% darüber geändert werden. Es kann jedoch derzeit kein neuer Stil zugewiesen
+% werden.
+% \begin{macro}{\parttoclevel}
+%   \changes{v3.15}{2014/12/02}{neue Anweisung}
+% Die Ebene des Verzeichniseintrags wird tatsächlich verwendet.
+%    \begin{macrocode}
+\newcommand*{\parttoclevel}{\m@ne}
+\let\parttoclevel\m@ne
+%    \end{macrocode}
+% \end{macro}^^A \parttoclevel
+% \begin{macro}{\scr@part@tocindent}
+%   \changes{v3.15}{2014/12/02}{neue (interne) Anweisung}
+% Wird nicht verwendet aber zwecks besserer Kompatibilität mit
+% \cs{DeclareSectionCommand} definiert.
+%    \begin{macrocode}
+\newcommand*{\scr@part@tocindent}{\z@}
+\let\scr@part@tocindent\z@
+%    \end{macrocode}
+% \end{macro}^^A \scr@part@tocindent
+% \begin{macro}{\scr@part@tocnumwidth}
+%   \changes{v3.15}{2014/12/02}{neue (interne) Anweisung}
+% Die definierte Breite der Nummer für den Eintrag ins Inhaltsverzeichnis.
+%    \begin{macrocode}
+\newcommand*{\scr@part@tocnumwidth}{2em}
+%    \end{macrocode}
+% \end{macro}
 %    \begin{macrocode}
 \newcommand*\l@part[2]{%
-  \ifnum \c@tocdepth >-2\relax
+  \ifnum \c@tocdepth <\parttoclevel \else
 %<article>    \addpenalty{\@secpenalty}%
 %<book|report>    \addpenalty{-\@highpenalty}%
     \addvspace{2.25em \@plus\p@}%
@@ -3427,7 +3540,7 @@
 %      den linken Rand}
 %    \changes{v2.9k}{2003/01/02}{Anpassung an Option \texttt{tocleft}}
 %    \begin{macrocode}
-    \setlength{\@tempdima}{2em}%
+    \setlength{\@tempdima}{\scr@part@tocnumwidth}%
     \if@tocleft
       \ifx\toc@l@number\@empty\else
         \setlength\@tempdima{0\toc@l@number}%
@@ -3477,30 +3590,60 @@
 }
 %    \end{macrocode}
 %  \end{macro}
-%  \begin{macro}{\l@chapter}
-%    \changes{v2.9k}{2003/01/02}{Anpassung an Option \texttt{tocleft}}
-%    \changes{v2.96b}{2006/11/30}{Umbruch zwischen \cs{chapter}-Eintrag im
-%      Inhaltsverzeichnis und übergeordneten Einträgen verhindern}
-%    \changes{v2.96b}{2006/11/30}{Umbruch zwischen \cs{chapter}-Eintrag im
-%      Inhaltsverzeichnis und untergeordneten Einträgen verhindern}
-%    \changes{v2.97c}{2007/06/21}{\cs{sectfont} durch Verwendung von
-%      Element \texttt{chapterentry} ersetzt}
-%    \changes{v2.97c}{2007/06/21}{Element \texttt{chapterentrypagenumber} wird
-%      verwendet}
-%    \changes{v2.97c}{2007/06/21}{weitgehend umgeschrieben, um linksbündige
-%      Einträge zu ermöglichen}
+% \begin{macro}{\l@chapter}
+%   \changes{v2.9k}{2003/01/02}{Anpassung an Option \texttt{tocleft}}^^A
+%   \changes{v2.96b}{2006/11/30}{Umbruch zwischen \cs{chapter}-Eintrag im
+%     Inhaltsverzeichnis und übergeordneten Einträgen verhindern}^^A
+%   \changes{v2.96b}{2006/11/30}{Umbruch zwischen \cs{chapter}-Eintrag im
+%     Inhaltsverzeichnis und untergeordneten Einträgen verhindern}^^A
+%   \changes{v2.97c}{2007/06/21}{\cs{sectfont} durch Verwendung von
+%     Element \texttt{chapterentry} ersetzt}^^A
+%   \changes{v2.97c}{2007/06/21}{Element \texttt{chapterentrypagenumber} wird
+%     verwendet}^^A
+%   \changes{v2.97c}{2007/06/21}{weitgehend umgeschrieben, um linksbündige
+%     Einträge zu ermöglichen}^^A
+%   \changes{v3.15}{2014/12/02}{Verwendung von \cs{chaptertoclevel} und
+%     \cs{scr@chapter@tocnumwidth}}^^A 
+% Für die Definition des Kapiteleintrags ins Inhaltsverzeichnis werden einige
+% Parameter von \cs{DeclareSectionCommand} definiert und teilweise
+% verwendet. Damit kann man dann zumindest einige Änderungen mit
+% \cs{DeclareSectionCommand} vornehmen, allerdings noch keine komplette
+% Neugestaltung des Eintrags erreichen.
+% \begin{macro}{\chaptertoclevel}
+%   \changes{v3.15}{2014/12/02}{neue Anweisung}^^A
+% Die Ebene des Verzeichniseintrags wird tatsächlich verwendet.
 % \iffalse
 %<*report|book>
 % \fi
 % Kapiteleinträge gibt es natürlich nicht bei \textsf{scrartcl}.
 %    \begin{macrocode}
+\newcommand*{\chaptertoclevel}{\z@}
+\let\chaptertoclevel\z@
+%    \end{macrocode}
+% \end{macro}^^A \chaptertoclevel
+% \begin{macro}{\scr@chapter@tocindent}
+%   \changes{v3.15}{2014/12/02}{neue (interne) Anweisung}^^A
+% Der Einzug des Eintrags wird nicht verwendet.
+%    \begin{macrocode}
+\newcommand*{\scr@chapter@tocindent}{\z@}
+\let\scr@chapter@tocindent\z@
+%    \end{macrocode}
+% \end{macro}^^A \scr@chapter@tocindent
+% \begin{macro}{\scr@chapter@tocnumwidth}
+%   \changes{v3.15}{2014/12/02}{neue (interne) Anweisung}^^A
+% Die Breite der Nummer des Eintrags wird tatsächlich verwendet.
+%    \begin{macrocode}
+\newcommand*{\scr@chapter@tocnumwidth}{1.5em}
+%    \end{macrocode}
+% \end{macro}
+%    \begin{macrocode}
 \newcommand*\l@chapter[2]{%
-  \ifnum \c@tocdepth >\m@ne
+  \ifnum \c@tocdepth <\chaptertoclevel \else
     \ifnum \lastpenalty<20010
       \addpenalty{-\@highpenalty}%
     \fi
     \vskip 1.0em \@plus\p@
-    \setlength\@tempdima{1.5em}%
+    \setlength\@tempdima{\scr@chapter@tocnumwidth}%
     \if@tocleft
       \ifx\toc@l@number\@empty\else
         \setlength\@tempdima{0\toc@l@number}%
