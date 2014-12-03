@@ -1,4 +1,4 @@
-% \CheckSum{2989}
+% \CheckSum{3246}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -2738,7 +2738,8 @@
 % Definition neuer oder Umdefinition existierender Gliederungsbefehle, die auf
 % \cs{scr@startsection} basieren. Ebenso wird ein Verzeichniseintrag erzeugt,
 % falls ein solcher noch nicht existiert. Die Deklaration geschieht über
-% diverse Optionen:
+% diverse Optionen (Achtung: Unbedingt daran denken, diese in
+% \cs{ProvideSectionCommands} ebenfalls zu definieren!!!):
 %    \begin{macrocode}
 \DefineFamily{KOMAarg}
 \DefineFamilyMember[.dsc]{KOMAarg}
@@ -2753,13 +2754,41 @@
     }%
   }\reserved@a
 %    \end{macrocode}
+% \begin{description}\item[\texttt{increaselevel}] Automatische Erhöhung des
+% Wertes von Option \texttt{level} mit Säumniswert 1. Diese Option wird nur
+% definiert, wenn \cs{DeclareSectionCommands} verwendet wurde, was an
+% \cs{scr@local@levelincrease} erkannt wird.\end{description}
+%    \begin{macrocode}
+  \scr@ifundefinedorrelax{scr@local@levelincrease}{%
+    \RelaxFamilyKey[.dsc]{KOMAarg}{increaselevel}%
+  }{%
+    \FamilyCounterMacroKey[.dsc]{KOMAarg}{increaselevel}[1]%
+                          {\scr@local@levelincrease}%
+  }%
+%    \end{macrocode}
 % \begin{description}\item[\texttt{level}] nummerische
 % Gliederungsebene\end{description}
 %    \begin{macrocode}
-  \edef\reserved@a{%
-    \noexpand\FamilyCounterMacroKey[.dsc]{KOMAarg}{level}{%
-      \expandafter\noexpand\csname #2numdepth\endcsname}%
-  }\reserved@a
+  \scr@ifundefinedorrelax{scr@local@leveloffset}{%
+    \edef\reserved@a{%
+      \noexpand\FamilyCounterMacroKey[.dsc]{KOMAarg}{level}{%
+        \expandafter\noexpand\csname #2numdepth\endcsname}%
+    }\reserved@a
+  }{%
+    \edef\reserved@a{%
+      \noexpand\DefineFamilyKey[.dsc]{KOMAarg}{level}{%
+        \noexpand\FamilySetCounterMacro{KOMAarg}{level}{%
+          \expandafter\noexpand\csname #2numdepth\endcsname
+        }%
+        \unexpanded{%
+          {\numexpr ##1+\scr@local@leveloffset\relax}%
+          \edef\scr@local@leveloffset{%
+            \the\numexpr\scr@local@leveloffset+\scr@local@levelincrease\relax
+          }%
+        }%
+      }%
+    }\reserved@a
+  }%
 %    \end{macrocode}
 % \begin{description}\item[\texttt{indent}] Linker Einzug der
 % Überschrift\end{description}
@@ -2813,10 +2842,26 @@
 % \begin{description}\item[\texttt{toclevel}] Ebene im Inhaltsverzeichnis
 % (Voreinstellung ist derselbe Wert wie für level)\end{description}
 %    \begin{macrocode}
-  \edef\reserved@a{%
-    \noexpand\FamilyCounterMacroKey[.dsc]{KOMAarg}{toclevel}{%
-      \expandafter\noexpand\csname #2tocdepth\endcsname}%
-  }\reserved@a
+  \scr@ifundefinedorrelax{scr@local@tocleveloffset}{%
+    \edef\reserved@a{%
+      \noexpand\FamilyCounterMacroKey[.dsc]{KOMAarg}{toclevel}{%
+        \expandafter\noexpand\csname #2tocdepth\endcsname}%
+    }\reserved@a
+  }{%
+    \edef\reserved@a{%
+      \noexpand\DefineFamilyKey[.dsc]{KOMAarg}{toclevel}{%
+        \noexpand\FamilySetCounterMacro{KOMAarg}{toclevel}{%
+          \expandafter\noexpand\csname #2tocdepth\endcsname
+        }%
+        \unexpanded{%
+          {\numexpr ##1+\scr@local@tocleveloffset\relax}%
+          \edef\scr@local@tocleveloffset{%
+            \the\numexpr\scr@local@tocleveloffset+\scr@local@levelincrease\relax
+          }%
+        }%
+      }%
+    }\reserved@a
+  }%
 %    \end{macrocode}
 % \begin{description}\item[\texttt{tocindent}] Einzug des
 % Inhaltsverzeichniseintrags\end{description}
@@ -3010,7 +3055,7 @@
     \DeclareSectionCommand[{#1}]{#2}%
   }{%
     \ClassError{\KOMAClassName}{%
-      command `\expandafter\string\csname #1\endcsname` already defined
+      command `\expandafter\string\csname #1\endcsname` already defined%
     }{%
       You've tried to define the section command `\expandafter\string\csname
       #1\endcsname` newly,\MessageBreak
@@ -3019,7 +3064,7 @@
       Maybe you should use one of \string\DeclareSectionCommand,
       \string\RedeclareSectionCommand,\MessageBreak
       or \string\ProvideSectionCommand.\MessageBreak
-      If you'll continue, the command will be irgnored%
+      If you'll continue, the command will be irgnored.%
     }%
   }%
 }
@@ -3035,7 +3080,7 @@
 \newcommand*{\RedeclareSectionCommand}[2][]{%
   \@ifundefined{#2}{%
     \ClassError{\KOMAClassName}{%
-      command `\expandafter\string\csname #1\endcsname` not defined
+      command `\expandafter\string\csname #1\endcsname` not defined%
     }{%
       You've tried to re-define the section command `\expandafter\string\csname
       #1\endcsname`,\MessageBreak
@@ -3043,7 +3088,7 @@
       Maybe you should use one of \string\DeclareSectionCommand,
       \string\DeclareNewSectionCommand,\MessageBreak
       or \string\ProvideSectionCommand.\MessageBreak
-      If you'll continue, the command will be irgnored%
+      If you'll continue, the command will be irgnored.%
     }%
   }{%
     \DeclareSectionCommand[{#1}]{#2}%
@@ -3069,6 +3114,167 @@
 }
 %    \end{macrocode}
 % \end{macro}^^A \ProvideSectionCommand
+%
+% \begin{macro}{\DeclareSectionCommands}
+%   \changes{v3.15}{2014/12/03}{neue Anweisung}
+% Basierend auf \cs{DeclareSectionCommand} können gleich mehrere
+% Gliederungsanweisungen definiert werden. Dabei sorgt Option
+% \texttt{increaselevel} dafür, dass die Werte von \texttt{level} und
+% \texttt{toclevel} automatisch von Befehl zu Befehl um den angegebenen Wert
+% (Default ist 1) erhöht werden.
+%    \begin{macrocode}
+\newcommand*{\DeclareSectionCommands}[2][]{%
+  \edef\reserved@a{#2}%
+  \let\scr@local@levelincrease\z@
+  \let\scr@local@leveloffset\z@
+  \let\scr@local@tocleveloffset\z@
+  \@for\reserved@a:=\reserved@a\do{%
+    \edef\reserved@a{%
+      \unexpanded{\DeclareSectionCommand[{#1}]}{\reserved@a}%
+    }%
+    \reserved@a
+  }%
+  \let\scr@local@levelincrease\relax
+  \let\scr@local@leveloffset\relax
+  \let\scr@local@tocleveloffset\relax
+}
+%    \end{macrocode}
+% \end{macro}^^A \DeclareSectionCommands
+%
+% \begin{macro}{\DeclareNewSectionCommands}
+%   \changes{v3.15}{2014/12/03}{neue Anweisung}
+% Im Unterschied zu \cs{DeclareNewSectionCommand} führt diese Anweisung die
+% Änderung auch dann aus, wenn die Anweisung bereits deklariert war. Eine
+% Fehlermeldung wird aber natürlich trotzdem ausgegeben. Dieser Unterschied
+% ist jedoch notwendig, weil sonst Option \texttt{increaselevel} für
+% nachfolgende Befehle nicht mehr korrekt arbeiten würde.
+%    \begin{macrocode}
+\newcommand*{\DeclareNewSectionCommands}[2][]{%
+  \edef\reserved@a{#2}%
+  \let\scr@local@levelincrease\z@
+  \let\scr@local@leveloffset\z@
+  \let\scr@local@tocleveloffset\z@
+  \@for\reserved@a:=\reserved@a\do{%
+    \@ifundefined{\reserved@a}{}{%
+      \ClassError{\KOMAClassName}{%
+        command `\expandafter\string\csname\reserved@a\endcsname` already
+        defined%
+      }{%
+        You've tried to define the section command 
+        `\expandafter\string\csname\reserved@a\endcsname` newly,\MessageBreak
+        but a command, token, box or length with this name already
+        exists.\MessageBreak
+        Maybe you should use one of \string\DeclareSectionCommand,
+        \string\RedeclareSectionCommand,\MessageBreak
+        or \string\ProvideSectionCommand.\MessageBreak
+        Nevertheless, if you'll continue, the command will be defined.%
+      }%
+    }%
+    \edef\reserved@a{%
+      \unexpanded{\DeclareSectionCommand[{#1}]}{\reserved@a}%
+    }%
+    \reserved@a
+  }%
+  \let\scr@local@levelincrease\relax
+  \let\scr@local@leveloffset\relax
+  \let\scr@local@tocleveloffset\relax
+}
+%    \end{macrocode}
+% \end{macro}^^A \DeclareNewSectionCommands
+%
+% \begin{macro}{\RedeclareSectionCommands}
+%   \changes{v3.15}{2014/12/03}{neue Anweisung}
+% Im Unterschied zu \cs{RedeclareNewSectionCommands} führt diese Anweisung die
+% Änderung auch dann aus, wenn die Anweisung noch nicht deklariert war. Eine
+% Fehlermeldung wird aber natürlich trotzdem ausgegeben. Dieser Unterschied
+% ist jedoch notwendig, weil sonst Option \texttt{increaselevel} für
+% nachfolgende Befehle nicht mehr korrekt arbeiten würde.
+%    \begin{macrocode}
+\newcommand*{\RedeclareSectionCommands}[2][]{%
+  \edef\reserved@a{#2}%
+  \let\scr@local@levelincrease\z@
+  \let\scr@local@leveloffset\z@
+  \let\scr@local@tocleveloffset\z@
+  \@for\reserved@a:=\reserved@a\do{%
+    \@ifundefined{\reserved@a}{%
+      \ClassError{\KOMAClassName}{%
+        command `\expandafter\string\csname\reserved@a\endcsname` not defined%
+      }{%
+        You've tried to re-define the section command 
+        `\expandafter\string\csname\reserved@a\endcsname`,\MessageBreak
+        but a command with this name does not exists.\MessageBreak
+        Maybe you should use one of \string\DeclareSectionCommand,
+        \string\DeclareNewSectionCommand,\MessageBreak
+        or \string\ProvideSectionCommand.\MessageBreak
+        Nevertheless, if you'll continue, the command will be defined.%
+      }%
+    }{}%
+    \edef\reserved@a{%
+      \unexpanded{\DeclareSectionCommand[{#1}]}{\reserved@a}%
+    }%
+    \reserved@a
+  }%
+  \let\scr@local@levelincrease\relax
+  \let\scr@local@leveloffset\relax
+  \let\scr@local@tocleveloffset\relax
+}
+%    \end{macrocode}
+% \end{macro}^^A \RedeclareSectionCommands
+%
+% \begin{macro}{\ProvideSectionCommands}
+%   \changes{v3.15}{2014/12/03}{neue Anweisung}
+% Hier wird es nun wirklich schwierig, weil wir irgendwie dafür sorgen müssen,
+% dass Option \texttt{increaselevel} funktioniert, auch wenn gar nichts
+% definiert werden darf. Das macht die Geschichte ein wenig auswändig.
+%    \begin{macrocode}
+\newcommand*{\ProvideSectionCommands}[2][]{%
+  \edef\reserved@a{#2}%
+  \let\scr@local@levelincrease\z@
+  \let\scr@local@leveloffset\z@
+  \let\scr@local@tocleveloffset\z@
+  \@for\reserved@a:=\reserved@a\do{%
+    \@ifundefined{\reserved@a}{%
+      \edef\reserved@a{%
+        \unexpanded{\DeclareSectionCommand[{#1}]}{\reserved@a}%
+      }%
+      \reserved@a
+    }{%
+%    \end{macrocode}
+% Wenn die Anweisung bereits definiert ist, dann müssen wir trotzdem die
+% Optionen auswerten, wobei allerdings nur die Option \texttt{level} und
+% \texttt{increaselevel} eine Wirkung haben dürfen. Der Rest wird per
+% dummy-Optionen erledigt.
+%    \begin{macrocode}
+      \DefineFamilyKey[.dsc]{KOMAarg}{style}{}%
+      \FamilyCounterMacroKey[.dsc]{KOMAarg}{increaselevel}[1]%
+        {\scr@local@levelincrease}%
+      \DefineFamilyKey[.dsc]{KOMAarg}{level}{%
+        \FamilySetCounterMacro{KOMAarg}{level}{\reserved@b}{##1}%
+        \edef\scr@local@leveloffset{%
+          \the\numexpr\scr@local@leveloffset+\scr@local@levelincrease\relax
+        }%
+        \edef\scr@local@tocleveloffset{%
+          \the\numexpr\scr@local@tocleveloffset+\scr@local@levelincrease\relax
+        }%
+      }%
+      \DefineFamilyKey[.dsc]{KOMAarg}{indent}{}%
+      \DefineFamilyKey[.dsc]{KOMAarg}{beforeskip}{}%
+      \DefineFamilyKey[.dsc]{KOMAarg}{afterskip}{}%
+      \DefineFamilyKey[.dsc]{KOMAarg}{font}{}%
+      \DefineFamilyKey[.dsc]{KOMAarg}{counterwidthin}{}%
+      \DefineFamilyKey[.dsc]{KOMAarg}{toclevel}{}%
+      \DefineFamilyKey[.dsc]{KOMAarg}{tocindent}{}%
+      \DefineFamilyKey[.dsc]{KOMAarg}{tocnumwidth}{}%
+      \FamilyExecuteOptions[.dsc]{KOMAarg}{#1}%
+    }%
+  }%
+  \let\scr@local@levelincrease\relax
+  \let\scr@local@leveloffset\relax
+  \let\scr@local@tocleveloffset\relax
+}
+%    \end{macrocode}
+% \end{macro}^^A \ProvideSectionCommands
+%
 %
 % \begin{macro}{\section}
 %   \changes{v2.8p}{2001/09/22}{\cs{sectfont} wird nun vor
