@@ -1,4 +1,4 @@
-% \CheckSum{2485}
+% \CheckSum{2561}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -375,6 +375,26 @@
 % \end{macro}^^A \DefineFamilyKey
 % \end{macro}^^A \DefineFamilyMember
 % \end{macro}^^A \DefineFamily
+%
+% \begin{macro}{\RelaxFamilyKey}
+%   \changes{v3.15}{2014/12/03}{neue Anweisung}
+% Undefiniert einen Schlüssel. Irgendwelche Hilfsmakros werden dabei nicht
+% angetastet. Stattdessen wird nur der Schlüssel selbst und ggf. ein
+% Defaultwert als \cs{relax} definiert, so dass er nicht mehr verwendet werden
+% kann.
+%    \begin{macrocode}
+%<*base>
+\newcommand*{\RelaxFamilyKey}[3][.\@currname.\@currext]{%
+  \scr@ifundefinedorrelax{KV@#2#1@#3}{}{%
+    \expandafter\let\csname KV@#2#1@#3\endcsname\relax
+  }%
+  \scr@ifundefinedorrelax{KV@#2#1@#3@default}{}{%
+    \expandafter\let\csname KV@#2#1@#3@default\endcsname\relax
+  }%
+}
+%</base>
+%    \end{macrocode}
+% \end{macro}
 %
 % \begin{macro}{\FamilyKeyState}
 %   \changes{v3.12}{2013/03/04}{Neue Anweisung}
@@ -2387,14 +2407,30 @@
 %
 % \begin{macro}{\FamilyCounterKey}
 %   \changes{v3.12}{2013/11/05}{neu}%^^A
-%   Dieses Makro definiert einen Schlüssel, der einen \LaTeX-Zähler an Hand
-%   des Wertes setzt. Das erste, optionale Argument ist das Familienmitglied,
-%   das zweite, obligatorische Argument ist die Familie, das dritte der Name
-%   des Schlüssels, das vierte der name des \LaTeX-Zählers. Erlaubt sind alle
-%   Integer-Werte.
+%   \changes{v3.15}{2014/12/03}{er wird ein (optionaler) Säumniswert
+%     unterstützt}^^A
+% Dieses Makro definiert einen Schlüssel, der einen \LaTeX-Zähler an Hand
+% des Wertes setzt. Das erste, optionale Argument ist das Familienmitglied,
+% das zweite, obligatorische Argument ist die Familie, das dritte der Name
+% des Schlüssels, das vierte, optionale ist der Säumniswert, das fünfte der
+% Name des \LaTeX-Zählers. Erlaubt sind alle Integer-Werte.
+% \begin{macro}{\Family@@Counter@@Key}
+%   \changes{v3.15}{2014/12/03}{neu (intern)}^^A
+% \begin{macro}{\Family@Counter@Key}
+%   \changes{v3.15}{2014/12/03}{neu (intern)}^^A
 %    \begin{macrocode}
 %<*base>
-\newcommand*{\FamilyCounterKey}[4][.\@currname.\@currext]{%
+\newcommand*{\FamilyCounterKey}[3][.\@currname.\@currext]{%
+  \@ifnextchar [%]
+    {\Family@@Counter@@Key{#1}{#2}{#3}}%
+    {\Family@Counter@Key{#1}{#2}{#3}}%
+}
+\newcommand*{\Family@@Counter@@Key}{}
+\def\Family@@Counter@@Key#1#2#3[#4]#5{%
+  \@ifundefined{c@#5}{\newcounter{#5}}{}%
+  \DefineFamilyKey[{#1}]{#2}{#3}[{#4}]{\FamilySetCounter{#2}{#3}{#5}{##1}}%
+}
+\newcommand*{\Family@Counter@Key}[4]{%
   \@ifundefined{c@#4}{\newcounter{#4}}{}%
   \DefineFamilyKey[{#1}]{#2}{#3}{\FamilySetCounter{#2}{#3}{#4}{##1}}%
 }
@@ -2428,18 +2464,40 @@
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
+% \end{macro}
+% \end{macro}
 % \begin{macro}{\FamilyCounterMacroKey}
-%   \changes{v3.12}{2013/11/05}{neu}%^^A
+%   \changes{v3.12}{2013/11/05}{neu}^^A
+%   \changes{v3.15}{2014/12/03}{er wird ein (optionaler) Säumniswert
+%     unterstützt}^^A
+% Diese Anweisung arbeitet fast wie \cs{FamilyCounterKey}, allerdings wird
+% dabei nicht ein Zähler, sondern ein Marko auf einen Wert definiert. Dabei
+% ist das erste (optionale) Argument das Mitglied, das zweite die Familie, das
+% dritte der Schlüssel, das vierte (optionale) der Säumniswert, das fünfte das
+% Makro.
 % \begin{macro}{\FamilySetCounterMacro}
 %   \changes{v3.12}{2013/11/05}{neu}%^^A
-%   Diese Anweisungen arbeitet fast wie \cs{FamilyCounterKey} und
-%   \cs{FamilySetCounter}, allerdings wird nicht ein Zähler gesetzt, sondern
-%   ein Makro auf einen Wert definiert. Dabei ist das erste Argument die
-%   Familie, das zweite der Name des Schlüssels, das dritte das Makro, das
-%   vierte schließlich der gewünschte Wert.
+% Diese Anweisung arbeitet fast wie \cs{FamilySetCounter}, allerdings wird
+% nicht ein Zähler gesetzt, sondern ein Makro auf einen Wert definiert. Dabei
+% ist das erste Argument die Familie, das zweite der Name des Schlüssels, das
+% dritte das Makro, das vierte schließlich der gewünschte Wert.
+% \begin{macro}{\Family@@Counter@@Macro@@Key}
+%   \changes{v3.15}{2014/12/03}{neu (intern)}^^A
+% \begin{macro}{\Family@Counter@Macro@Key}
+%   \changes{v3.15}{2014/12/03}{neu (intern)}^^A
 %    \begin{macrocode}
 %<*base>
-\newcommand*{\FamilyCounterMacroKey}[4][.\@currname.\@currext]{%
+\newcommand*{\FamilyCounterMacroKey}[3][.\@currname.\@currext]{%
+  \@ifnextchar [%]
+    {\Family@@Counter@@Macro@@Key{#1}{#2}{#3}}%
+    {\Family@Counter@Macro@Key{#1}{#2}{#3}}%
+}
+\newcommand*{\Family@@Counter@@Macro@@Key}{}
+\def\Family@@Counter@@Macro@@Key#1#2#3[#4]#5{%
+  \ifdefined#4\else\let#4\z@\fi
+  \DefineFamilyKey[{#1}]{#2}{#3}[{#4}]{\FamilySetCounterMacro{#2}{#3}{#5}{##1}}%
+}
+\newcommand*{\Family@Counter@Macro@Key}[4]{%
   \ifdefined#4\else\let#4\z@\fi
   \DefineFamilyKey[{#1}]{#2}{#3}{\FamilySetCounterMacro{#2}{#3}{#4}{##1}}%
 }
@@ -2470,25 +2528,43 @@
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
+% \end{macro}
+% \end{macro}
 %
 % \begin{macro}{\FamilyLengthKey}
 %   \changes{v3.12}{2013/11/05}{neu}%^^A
-%   Dieses Makro definiert einen Schlüssel, der eine \LaTeX-Länge an Hand
-%   des Wertes setzt. Das erste, optionale Argument ist das Familienmitglied,
-%   das zweite, obligatorische Argument ist die Familie, das dritte der Name
-%   des Schlüssels, das vierte der name der \LaTeX-Länge.
+%   \changes{v3.15}{2014/12/03}{er wird ein (optionaler) Säumniswert
+%     unterstützt}^^A
+% Dieses Makro definiert einen Schlüssel, der eine \LaTeX-Länge an Hand
+% des Wertes setzt. Das erste, optionale Argument ist das Familienmitglied,
+% das zweite, obligatorische Argument ist die Familie, das dritte der Name
+% des Schlüssels, das vierte der name der \LaTeX-Länge.
+% \begin{macro}{\Family@@Length@@Key}
+%   \changes{v3.15}{2014/12/03}{neu (intern)}^^A
+% \begin{macro}{\Family@Length@Key}
+%   \changes{v3.15}{2014/12/03}{neu (intern)}^^A
 %    \begin{macrocode}
 %<*base>
-\newcommand*{\FamilyLengthKey}[4][.\@currname.\@currext]{%
+\newcommand*{\FamilyLengthKey}[3][.\@currname.\@currext]{%
+  \@ifnextchar [%]
+    {\Family@@Length@@Key{#1}{#2}{#3}}%
+    {\Family@Length@Key{#1}{#2}{#3}}%
+}
+\newcommand*{\Family@@Length@@Key}{}
+\def\Family@@Length@@Key#1#2#3[#4]#5{%
+  \ifdefined#5\else\newlength{#5}\fi
+  \DefineFamilyKey[{#1}]{#2}{#3}[{#4}]{\FamilySetLength{#2}{#3}{#5}{##1}}%
+}
+\newcommand*{\Family@Length@Key}[4]{%
   \ifdefined#4\else\newlength{#4}\fi
   \DefineFamilyKey[{#1}]{#2}{#3}{\FamilySetLength{#2}{#3}{#4}{##1}}%
 }
 %    \end{macrocode}
 % \begin{macro}{\FamilySetLength}
 %   \changes{v3.12}{2013/11/05}{neu}%^^A
-%   Über diese Anwesiung wird der Wert dann gesetzt. Dabei ist das erste
-%   Argument die Familie, das zweite der Name des Schlüssels, das dritte der
-%   Name der \LaTeX-Länge, das vierte schließlich der gewünschte Wert.
+% Über diese Anwesiung wird der Wert dann gesetzt. Dabei ist das erste
+% Argument die Familie, das zweite der Name des Schlüssels, das dritte der
+% Name der \LaTeX-Länge, das vierte schließlich der gewünschte Wert.
 %    \begin{macrocode}
 \newcommand*{\FamilySetLength}[4]{%
   \ifiscount{#4}{#3=#4\FamilyKeyStateProcessed}{%
@@ -2511,19 +2587,37 @@
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
+% \end{macro}
+% \end{macro}
 % \begin{macro}{\FamilyLengthMacroKey}
 %   \changes{v3.12}{2013/11/05}{neu}%^^A
+%   \changes{v3.15}{2014/12/03}{er wird ein (optionaler) Säumniswert
+%     unterstützt}^^A
 % \begin{macro}{\FamilySetLengthMacro}
 %   \changes{v3.12}{2013/11/05}{neu}%^^A
 %   \changes{v3.14a}{2014/11/24}{fix: \cs{@tempskipa} statt \cs{@temskipa}}^^A
-%   Diese Anweisungen arbeitet fast wie \cs{FamilyCounterKey} und
-%   \cs{FamilySetCounter}, allerdings wird nicht ein Zähler gesetzt, sondern
-%   ein Makro auf einen Wert definiert. Dabei ist das erste Argument die
-%   Familie, das zweite der Name des Schlüssels, das dritte das Makro, das
-%   vierte schließlich der gewünschte Wert.
+% Diese Anweisungen arbeitet fast wie \cs{FamilyCounterKey} und
+% \cs{FamilySetCounter}, allerdings wird nicht ein Zähler gesetzt, sondern
+% ein Makro auf einen Wert definiert. Dabei ist das erste Argument die
+% Familie, das zweite der Name des Schlüssels, das dritte das Makro, das
+% vierte schließlich der gewünschte Wert.
+% \begin{macro}{\Family@@Length@@Macro@@Key}
+%   \changes{v3.15}{2014/12/03}{neu (intern)}^^A
+% \begin{macro}{\Family@Length@Macro@Key}
+%   \changes{v3.15}{2014/12/03}{neu (intern)}^^A
 %    \begin{macrocode}
 %<*base>
-\newcommand*{\FamilyLengthMacroKey}[4][.\@currname.\@currext]{%
+\newcommand*{\FamilyLengthMacroKey}[3][.\@currname.\@currext]{%
+  \@ifnextchar [%]
+    {\Family@@Length@@Macro@@Key{#1}{#2}{#3}}%
+    {\Family@Length@Macro@Key{#1}{#2}{#3}}%
+}
+\newcommand*{\Family@@Length@@Macro@@Key}{}
+\def\Family@@Length@@Macro@@Key#1#2#3[#4]#5{%
+  \ifdefined#5\else\let#5\z@\fi
+  \DefineFamilyKey[{#1}]{#2}{#3}[{#4}]{\FamilySetLengthMacro{#2}{#3}{#5}{##1}}%
+}
+\newcommand*{\Family@Length@Macro@Key}[4]{%
   \ifdefined#4\else\let#4\z@\fi
   \DefineFamilyKey[{#1}]{#2}{#3}{\FamilySetLengthMacro{#2}{#3}{#4}{##1}}%
 }
@@ -2549,6 +2643,8 @@
 }    
 %</base>
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 %
