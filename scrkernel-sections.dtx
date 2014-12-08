@@ -1,4 +1,4 @@
-% \CheckSum{3288}
+% \CheckSum{3316}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -1915,31 +1915,32 @@
 % Es wird der leere Stil verwendet, mit dem Neudefinitionen von \cs{part}
 % über \cs{DeclareSectionCommand} verhindert werden.
 %    \begin{macrocode}
-%<article>\newcommand*{\scr@part@sectionbeforeskip}{4ex}
-%<report|book>\newcommand*{\scr@part@sectionbeforeskip}{\z@ \@plus 1fil}
+\newcommand*{\scr@part@sectionbeforeskip}{%
+%<article>  4ex
+%    \end{macrocode}
+% Note: The |+\baselineskip| is used to avoid compatibility issues.
+%    \begin{macrocode}
+%<report|book>  \z@ \@plus 1fil + \baselineskip
+}
 \newcommand*{\partheadstartvskip}{%
-%<*article> 
-  \@tempskipa=\glueexpr\scr@part@sectionbeforeskip\relax
-  \ifdim\@tempskipa<\z@\addvspace{-\@tempskipa}\else\addvspace{\@tempskipa}\fi
-%</article>
-%<report|book>  \null\vskip\scr@part@sectionbeforeskip
+%<article>  \addvspace{\@tempskipa}%
+%<report|book>  \null\vskip-\baselineskip\vskip\@tempskipa
 }
 \newcommand*{\partheadmidvskip}{%
   \par\nobreak
 %<book|report>  \vskip 20\p@
 }
-%<article>\newcommand*{\scr@part@sectionafterskip}{3ex}
-%<report|book>\newcommand*{\scr@part@sectionafterskip}{\z@ \@plus 1fil}
-\newcommand*{\partheadendvskip}{%
-%<*article> 
-  \@tempskipa=\glueexpr\scr@part@sectionafterskip\relax
-  \ifdim\@tempskipa<\z@\vskip-\@tempskipa\else\vskip\@tempskipa\fi
-%</article>
-%<report|book>  \vskip\scr@part@sectionafterskip\newpage
+\newcommand*{\scr@part@sectionafterskip}{%
+%<article>  3ex
+%<report|book>  \z@ \@plus 1fil
 }
-%<*report|book>
+\newcommand*{\partheadendvskip}{%
+%<article>  \vskip\@tempskipa
+%<report|book>  \vskip\@tempskipa\newpage
+}
 \newcommand*{\scr@part@sectionindent}{\z@}
 \newcommand*{\scr@part@style}{}
+%<*report|book>
 \newcommand*{\partheademptypage}{%
   \if@twoside\if@openright
       \null%
@@ -1960,6 +1961,8 @@
 %    \begin{macrocode}
 %<*article>
 \newcommand\part{\par
+  \@tempskipa=\glueexpr\scr@part@sectionbeforeskip\relax
+  \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
   \partheadstartvskip%
   \@afterindentfalse
   \SecDef\@part\@spart
@@ -1974,6 +1977,8 @@
   \else
     \@tempswafalse
   \fi
+  \@tempskipa=\glueexpr\scr@part@sectionbeforeskip\relax
+  \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
   \partheadstartvskip
   \vbox to\z@{\vss\use@preamble{part@o}\strut\par}%
   \vskip-\baselineskip\nobreak%
@@ -2029,6 +2034,8 @@
   \endgroup
 %<*article>
   \nobreak
+  \@tempskipa=\glueexpr\scr@part@sectionafterskip\relax
+  \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
   \partheadendvskip
   \@afterheading
 %</article>
@@ -2044,6 +2051,8 @@
   \endgroup
 %<*article>
   \nobreak
+  \@tempskipa=\glueexpr\scr@part@sectionafterskip\relax
+  \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
   \partheadendvskip
   \@afterheading
 %</article>
@@ -2051,6 +2060,8 @@
 }
 %<*book|report>
 \newcommand*{\@endpart}{\vbox to\z@{\use@preamble{part@u}\vss}%
+  \@tempskipa=\glueexpr\scr@part@sectionafterskip\relax
+  \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
   \partheadendvskip
   \partheademptypage
   \if@tempswa
