@@ -1,4 +1,4 @@
-% \CheckSum{1340}
+% \CheckSum{1368}
 % \iffalse meta-comment
 % ======================================================================
 % tocbasic.dtx
@@ -2460,6 +2460,9 @@ may be found in \autoref{tab:tocbasic.DeclareNewTOC-options}.
 %   \changes{v3.09a}{2011/04/12}{again no explicite marks if ``numbered''}%
 %   \changes{v3.12}{2013/09/24}{usage of new
 %     \cs{tocbasic@addxcontentsline}}%
+%   \changes{v3.15}{2014/12/10}{moved \cs{@mkboth} inside \cs{chapter*}}^^A
+%   \changes{v3.15}{2014/12/10}{usage of \cs{addsec} if available}^^A
+%   \changes{v3.15}{2014/12/10}{usage of \cs{@mkright} if available}^^A
 %   Setting the headings of a list of something. The heading is the only
 %   argument.
 %    \begin{macrocode}
@@ -2473,20 +2476,26 @@ may be found in \autoref{tab:tocbasic.DeclareNewTOC-options}.
             \subsection[##1]{##1}%
           }{%
             \subsection*{##1}%
-            \ifx\@mkboth\@gobbletwo\else\markright{\MakeMarkcase{##1}}\fi
             \iftocfeature{\@currext}{totoc}{%
               \addxcontentsline{toc}{subsection}{##1}%
             }{}%
+            \begingroup
+              \@ifundefined{@mkright}{%
+                \ifx\@mkboth\@gobbletwo\else\markright{\MakeMarkcase{##1}}\fi
+              }{%
+                \@mkright{\MakeMarkcase{##1}}%
+              }%
+            \endgroup
           }%
         }{%
           \iftocfeature{\@currext}{numbered}{%
             \section[##1]{##1}%
           }{%
             \section*{##1}%
-            \@mkboth{\MakeMarkcase{##1}}{\MakeMarkcase{##1}}%
             \iftocfeature{\@currext}{totoc}{%
               \addxcontentsline{toc}{section}{##1}%
             }{}%
+            \@mkboth{\MakeMarkcase{##1}}{\MakeMarkcase{##1}}%
           }%
         }%
       }%
@@ -2496,18 +2505,41 @@ may be found in \autoref{tab:tocbasic.DeclareNewTOC-options}.
           \iftocfeature{\@currext}{numbered}{%
             \section{##1}%
           }{%
-            \section*{##1}%
             \iftocfeature{\@currext}{totoc}{%
-              \addxcontentsline{toc}{section}{##1}%
-            }{}%
-            \ifx\@mkboth\@gobbletwo\else\markright{\MakeMarkcase{##1}}\fi
+              \begingroup
+                \@ifundefined{addsec}{%
+                  \section*{##1}%
+                  \begingroup
+                    \@ifundefined{@mkright}{%
+                      \ifx\@mkboth\@gobbletwo
+                      \else\markright{\MakeMarkcase{##1}}\fi
+                    }{%
+                      \@mkright{\MakeMarkcase{##1}}%
+                    }%
+                  \endgroup
+                  \addxcontentsline{toc}{section}{##1}%
+                }{%
+                  \addsec{##1}%
+                }%
+              \endgroup
+            }{%
+              \section*{##1}%
+              \begingroup
+                \@ifundefined{@mkright}{%
+                  \ifx\@mkboth\@gobbletwo
+                  \else\markright{\MakeMarkcase{##1}}\fi
+                }{%
+                  \@mkright{\MakeMarkcase{##1}}%
+                }%
+              \endgroup
+            }%
           }%
         }{%
           \iftocfeature{\@currext}{numbered}{%
             \chapter[##1]{##1}%
           }{%
-            \chapter*{##1}%
-            \@mkboth{\MakeMarkcase{##1}}{\MakeMarkcase{##1}}%
+            \chapter*{##1\unskip
+            \@mkboth{\MakeMarkcase{##1}}{\MakeMarkcase{##1}}}%
             \iftocfeature{\@currext}{totoc}{%
               \addxcontentsline{toc}{chapter}{##1}%
             }{}%
