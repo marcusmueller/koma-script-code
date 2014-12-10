@@ -1,4 +1,4 @@
-% \CheckSum{3254}
+% \CheckSum{3302}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -3052,7 +3052,9 @@
 %   \changes{v2.97c}{2007/06/21}{weitgehend umgeschrieben, um linksbündige
 %     Einträge zu ermöglichen}^^A
 %   \changes{v3.15}{2014/12/02}{Verwendung von \cs{chaptertoclevel} und
-%     \cs{scr@chapter@tocnumwidth}}^^A 
+%     \cs{scr@chapter@tocnumwidth}}^^A
+%   \changes{v3.15}{2014/12/10}{Verwendung von \cs{addvspace} statt \cs{vskip}
+%     für den Abstand am Anfang}^^A
 % Für die Definition des Kapiteleintrags ins Inhaltsverzeichnis werden einige
 % Parameter von \cs{DeclareSectionCommand} definiert und teilweise
 % verwendet. Damit kann man dann zumindest einige Änderungen mit
@@ -3081,13 +3083,29 @@
 \newcommand*{\scr@chapter@tocnumwidth}{1.5em}
 %    \end{macrocode}
 % \end{macro}
+% \begin{option}{chapterentrydots}
+%   \changes{v3.15}{2014/12/10}{Neu}
+% Seit Version~3.15 kann man mit dieser Option Pünktchen zwischen Text und
+% Seitenzahl in den Kapiteleinträgen einschalten.
+%    \begin{macrocode}
+%</body>
+%<*option>
+\KOMA@ifkey{chapterentrydots}{@chapterentrywithdots}
+%</option>
+%<*body>
+%    \end{macrocode}
+% \end{option}^^A chapterentrydots
 %    \begin{macrocode}
 \newcommand*\l@chapter[2]{%
   \ifnum \c@tocdepth <\chaptertoclevel \else
     \ifnum \lastpenalty<20010
       \addpenalty{-\@highpenalty}%
     \fi
-    \vskip 1.0em \@plus\p@
+    \ifnum \scr@compatibility<\@nameuse{scr@v@3.15}%
+      \vskip 1.0em \@plus\p@
+    \else
+      \addvspace{1.0em \@plus\p@}%
+    \fi
     \setlength\@tempdima{\scr@chapter@tocnumwidth}%
     \if@tocleft
       \ifx\toc@l@number\@empty\else
@@ -3101,19 +3119,19 @@
       \interlinepenalty\@M
       \leavevmode
       \advance\leftskip \@tempdima \null\nobreak\hskip -\leftskip
+      \edef\@pnumwidth{\the\dimexpr\@pnumwidth\relax}%
       \usekomafont{chapterentry}{#1\nobreak
         \usekomafont{chapterentrypagenumber}{%
 %    \end{macrocode}
-% Und dann könnte man noch folgendes machen:
-%    \begin{verbatim}
-%          \if@chapterentrywithdots
-%            \leaders\hbox{$\m@th
-%              \mkern \@dotsep mu\hbox{.}\mkern \@dotsep
-%              mu$}%
-%          \fi
-%    \end{verbatim}
+%   \changes{v3.15}{2014/10/12}{optionale Pünktchen im Eintrag}
 %    \begin{macrocode}
-          \hfill\nobreak
+          {\usekomafont{chapterentrydots}{%
+              \if@chapterentrywithdots
+                \leaders\hbox{$\m@th
+                  \mkern \@dotsep mu\hbox{.}\mkern \@dotsep
+                  mu$}%
+              \fi
+              \hfill}}\nobreak
           \hb@xt@\@pnumwidth{\hss#2}}}\par
       \ifnum \scr@compatibility>\@nameuse{scr@v@2.96}\relax
       \endgroup
@@ -3322,6 +3340,15 @@
 % abweichend von \texttt{chapterentry}.
 %    \begin{macrocode}
 \newkomafont{chapterentrypagenumber}{}
+%    \end{macrocode}
+% \end{KOMAfont}
+%
+% \begin{KOMAfont}{chapterentrydots}
+%   \changes{v3.15}{2014/12/10}{neues Font-Element}^^A
+% Schrift für die optionalen Pünktchen des \cs{chapter}-Eintrags im
+% Inhaltsverzeichnis abweichend von \texttt{chapterentrypagenumber}.
+%    \begin{macrocode}
+\newkomafont{chapterentrydots}{\normalfont}
 %</body>
 %</book|report>
 %</class>
@@ -3383,8 +3410,18 @@
 % \cs{section}-Einträge, an Stelle der Einträge für \cs{chapter}
 % der Buch- oder der Bericht-Klasse. Bei diesen handelt es sich hier
 % stattdessen um eine normale Ebene.
+% \begin{option}{chapterentrydots}
+%   \changes{v3.15}{2014/12/10}{Neu}
+% Seit Version~3.15 kann man mit dieser Option Pünktchen zwischen Text und
+% Seitenzahl in den Kapiteleinträgen einschalten.
 %    \begin{macrocode}
 %<*article>
+%<*option>
+\KOMA@ifkey{sectionentrydots}{@sectionentrywithdots}
+%</option>
+%    \end{macrocode}
+% \end{option}^^A chapterentrydots
+%    \begin{macrocode}
 %<*body>
 \newcommand*\l@section[2]{%
   \ifnum \c@tocdepth >\z@
@@ -3405,19 +3442,19 @@
       \interlinepenalty\@M
       \leavevmode
       \advance\leftskip \@tempdima \null\nobreak\hskip -\leftskip
+      \edef\@pnumwidth{\the\dimexpr\@pnumwidth\relax}%
       \usekomafont{sectionentry}{#1\nobreak
         \usekomafont{sectionentrypagenumber}{%
 %    \end{macrocode}
-% Und dann könnte man noch folgendes machen:
-%    \begin{verbatim}
-%          \if@sectionentrywithdots
-%            \leaders\hbox{$\m@th
-%              \mkern \@dotsep mu\hbox{.}\mkern \@dotsep
-%              mu$}%
-%          \fi
-%    \end{verbatim}
+%   \changes{v3.15}{2014/10/12}{optionale Pünktchen im Eintrag}
 %    \begin{macrocode}
-          \hfill\nobreak
+          {\usekomafont{sectionentrydots}{%
+              \if@sectionentrywithdots
+                \leaders\hbox{$\m@th
+                  \mkern \@dotsep mu\hbox{.}\mkern \@dotsep
+                  mu$}%
+              \fi
+              \hfill}}\nobreak
           \hb@xt@\@pnumwidth{\hss#2}}}\par
     \endgroup
     \ifnum \scr@compatibility>\@nameuse{scr@v@2.96}\relax
@@ -3776,6 +3813,15 @@
 % abweichend von \texttt{sectionentry}.
 %    \begin{macrocode}
 \newkomafont{sectionentrypagenumber}{}
+%    \end{macrocode}
+% \end{KOMAfont}
+%
+% \begin{KOMAfont}{sectionentrydots}
+%   \changes{v3.15}{2014/12/10}{neues Font-Element}^^A
+% Schrift für die optionalen Pünktchen des \cs{section}-Eintrags im
+% Inhaltsverzeichnis abweichend von \texttt{sectionentrypagenumber}.
+%    \begin{macrocode}
+\newkomafont{sectionentrydots}{\normalfont}
 %</article>
 %    \end{macrocode}
 % \end{KOMAfont}
