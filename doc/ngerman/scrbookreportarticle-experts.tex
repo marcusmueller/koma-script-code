@@ -809,6 +809,85 @@ ohne Wertzuweisung verwendet, so wird der Wert 1 angenommen.
 \EndIndex{Cmd}{DeclareSectionCommands}%
 
 
+\begin{Declaration}
+  \Macro{SecDef}\Parameter{Sternanweisung}\Parameter{Normalanweisung}\\
+  \Macro{scr@startsection}\Parameter{Name}\Parameter{Ebene}%
+  \Parameter{Einzug}\Parameter{Abstand davor}\Parameter{Abstand danach}\\
+  \hphantom{\XMacro{scr@startsection}}\Parameter{Stilanweisungen}%
+  \OParameter{Kurzform}\Parameter{Überschrift}\\
+  \Macro{scr@startsection}\Parameter{Name}\Parameter{Ebene}%
+  \Parameter{Einzug}\Parameter{Abstand davor}\Parameter{Abstand danach}\\
+  \hphantom{\XMacro{scr@startsection}}\Parameter{Stilanweisungen}%
+  \texttt{*}\Parameter{Überschrift}\\
+  \Macro{At@startsection}\Parameter{Code}\\
+  \Macro{Before@ssect}\Parameter{Code}\\
+  \Macro{Before@sect}\Parameter{Code}
+\end{Declaration}
+\BeginIndex{Cmd}{At@startsection}%
+\BeginIndex{Cmd}{Before@ssect}%
+\BeginIndex{Cmd}{Before@sect}%
+\BeginIndex{Cmd}{scr@startsection}%
+Wie\ChangedAt[2014/09]{v3.15}{\Class{scrbook}\and \Class{scrreprt}\and
+  \Class{scrartcl}} bereits in \autoref{sec:maincls.structure} bei der
+Beschreibung zu den Gliederungsbefehlen ab
+\autopageref{desc:maincls.cmd.chapter} erklärt, verfügt \KOMAScript{}
+bezüglich des optionalen Arguments der Gliederungsbefehle über erweiterte
+Möglichkeiten. Um dies möglich zu machen, war es notwendig, einige Anweisungen
+des \LaTeX-Kerns zu ersetzen. Dazu gehören auch die Anweisungen
+\Macro{secdef}\IndexCmd{secdef}\important{\Macro{secdef}} und
+\Macro{@startsection}\IndexCmd{@startsection}%
+\important{\Macro{@startsection}}. Die Bedeutung der Parameter dieser
+Anweisungen ist der Anleitung zum \LaTeX-Kern \cite{latex:source2e} zu
+entnehmen.
+
+Da diese Anweisungen jedoch auch häufig von Paketen komplett neu definiert
+werden und dadurch die Funktion von \KOMAScript{} teilweise stark
+beeinträchtigt werden kann, wurden die genannten \LaTeX-Kern-Anweisungen nicht
+einfach nur umdefiniert, sondern es wurden zusätzliche die alternativen
+Anweisungen \Macro{SecDef} und \Macro{scr@startsection} definiert. Diese
+können von Paketautoren genau wie die \LaTeX-Kern-Anweisungen verwendet
+werden, bieten dann aber automatisch die erweiterte Funktionalität von
+\KOMAScript{}. Die beiden Anweisungen sollten jedoch nicht umdefiniert werden,
+da sie sich jederzeit ändern können und dann die Funktionalität von
+\KOMAScript{} durch diese Umdefinierung erneut beeinträchtigt werden
+könnte.
+
+\KOMAScript{} selbst verwendet intern \Macro{SecDef} und
+\Macro{scr@startsection} an Stelle von \Macro{secdef} und
+\Macro{@startsection} beispielsweise bei den Gliederungsbefehlen, die mit
+\Macro{DeclareSectionCommand} definiert werden. Eine nachträgliche
+Umdefinierung von \Macro{secdef} und \Macro{@startsection} hat daher keine
+Auswirkungen auf diese Gliederungsbefehle.
+
+Als Ersatz für die Umdefinierung der Anweisungen bietet \KOMAScript{} die
+Möglichkeit, zusätzlichen \PName{Code} in die Ausführung der
+\KOMAScript-eigenen Erweiterungen einzufügen. Der \PName{Code} aller Aufrufe
+der Anweisungen \Macro{At@startsection}, \Macro{Before@sect} und
+\Macro{Before@@sect} wird für die einzelnen Anweisungen getrennt aufgesammelt.
+Es ist nicht vorgesehen, einmal eingefügten Code wieder zu entfernen.
+
+Der \PName{Code} von \Macro{At@startsection} wird dabei in
+\Macro{scr@startsection} unmittelbar nach der Auswertung von Parameter
+\PName{Abstand davor} und der zugehörigen Berechnung des resultierenden
+\Length{@tempskipa} aber noch vor Einfügen des Abstandes angewendet. Es damit
+also noch möglichen, den Abstand über Änderung von \Length{@tempskipa} zu
+verändert.
+
+Der \PName{Code} von \Macro{Before@sect} beziehungsweise
+\Macro{Before@ssect} wird unmittelbar vor dem Aufruf von \Macro{@sect}
+beziehungsweise \Macro{@ssect} innerhalb von \Macro{scr@startsection}
+ausgeführt. Zu diesem Zeitpunkt ist gegebenenfalls der vertikale Abstand vor
+der Überschrift bereits über \Macro{addvspace} eingefügt.
+
+Die Anweisungen \Macro{At@startsection}, \Macro{Before@sect},
+\Macro{Before@ssect} sind als Anweisungen für Paketautoren entworfen und für
+diese zur Verwendung freigegeben.%
+%
+\EndIndex{Cmd}{scr@startsection}%
+\EndIndex{Cmd}{Before@sect}%
+\EndIndex{Cmd}{Before@ssect}%
+\EndIndex{Cmd}{At@startsection}%
+
 
 \begin{Declaration}
   \Macro{appendixmore}
@@ -1008,5 +1087,5 @@ Option \Option{bibliography}.
 %%% TeX-master: "guide.tex"
 %%% End:
 
-% LocalWords:  Sternvarianten Kapitelüberschrift Standardklassen
-% LocalWords:  Klassenoptionen
+% LocalWords:  Sternvarianten Kapitelüberschrift Standardklassen Paketautoren
+% LocalWords:  Klassenoptionen Gliederungsbefehlen
