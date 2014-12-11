@@ -54,7 +54,7 @@
 
 \translator{Gernot Hassenpflug\and Markus Kohm}
 
-% Date of the translated German file: 2012/02/28
+% Date of the translated German file: 2014/12/11
 
 
 \chapter{Additional Information about the Main Classes \Class{scrbook},
@@ -738,6 +738,78 @@ will be increased by the value of \PValue{increaselevel}. If attribute
 \EndIndex{Cmd}{RedeclareSectionCommands}%
 \EndIndex{Cmd}{DeclareNewSectionCommands}%
 \EndIndex{Cmd}{DeclareSectionCommands}%
+
+
+\begin{Declaration}
+  \Macro{SecDef}\Parameter{star command}\Parameter{command}\\
+  \Macro{scr@startsection}\Parameter{name}\Parameter{level}%
+  \Parameter{indent}\Parameter{beforeskip}\Parameter{afterskip}\\
+  \hphantom{\XMacro{scr@startsection}}\Parameter{style commands}%
+  \OParameter{short version}\Parameter{heading}\\
+  \Macro{scr@startsection}\Parameter{name}\Parameter{level}%
+  \Parameter{indent}\Parameter{beforeskip}\Parameter{afterskip}\\
+  \hphantom{\XMacro{scr@startsection}}\Parameter{style commands}%
+  \texttt{*}\Parameter{heading}\\
+  \Macro{At@startsection}\Parameter{code}\\
+  \Macro{Before@ssect}\Parameter{code}\\
+  \Macro{Before@sect}\Parameter{code}
+\end{Declaration}
+\BeginIndex{Cmd}{At@startsection}%
+\BeginIndex{Cmd}{Before@ssect}%
+\BeginIndex{Cmd}{Before@sect}%
+\BeginIndex{Cmd}{scr@startsection}%
+As\ChangedAt[2014/09]{v3.15}{\Class{scrbook}\and \Class{scrreprt}\and
+  \Class{scrartcl}} already explained in \autoref{sec:maincls.structure} in
+the description of the sectioning commands beginning with
+\autopageref{desc:maincls.cmd.chapter}, \KOMAScript{} provides additional
+features for the optional argument of those commands. Therefore, it was
+necessary to replace some \LaTeX{} kernel commands, especially 
+\Macro{secdef}\IndexCmd{secdef}\important{\Macro{secdef}} and
+\Macro{@startsection}\IndexCmd{@startsection}%
+\important{\Macro{@startsection}}. The meaning of the parameters of these
+commands can be found in the \LaTeX{} kernel manual \cite{latex:source2e}.
+
+Unfortunately these commands are often redefined by other packages in a way,
+that collides with the functionality of \KOMAScript. So \KOMAScript{} not only
+changes the definition of these commands but also defines the additional,
+alternative commands \Macro{SecDef} and \Macro{scr@startsection}. Package
+authors are permitted to use these commands like they would use the
+corresponding \LaTeX{} kernel commands and therefore participate in the
+additional features of \KOMAScript. Nevertheless these commands should be
+redefined, because they could be changed in future and so the redefinition would
+impair \KOMAScript{} again.
+
+\KOMAScript{} itself internally uses \Macro{SecDef} and
+\Macro{scr@startsection} instead of \Macro{secdef} and \Macro{@startsection},
+e.\,g., defining section-like commands by \Macro{DeclareSectionCommand}. So
+later redefinition of \Macro{secdef} or \Macro{@startsection} will not
+influence the sectioning commands of \KOMAScript.
+
+As an alternative to the redefinition of such commands, \KOMAScript{} provides
+the execution of additional \PName{code} at several states of the
+\KOMAScript{} replacements. The \PName{code} of each usage of
+\Macro{At@startsection}, \Macro{Before@sect}, or \Macro{Before@ssect} will be
+cumulated independently. Later removing of added \PName{code} is not
+provided.
+
+The \PName{code} of \Macro{At@startsection} is executed immediately after
+the evaluation of \PName{beforeskip} and calculation of the resulting
+\Length{@tempskipa}, before adding the vertical gap itself. So you still may
+change the value of \Length{@tempskipa}.
+
+The \PName{code} of \Macro{Before@sect} respective 
+\Macro{Before@ssect} is executed just before \Macro{@sect}
+respectively \Macro{@ssect} inside of \Macro{scr@startsection}. At this state
+the vertical gap of \Length{@tempskipa} has already been added using
+\Macro{addvspace}.
+
+The commands \Macro{At@startsection}, \Macro{Before@sect}, and
+\Macro{Before@ssect} are suggested for package authors.%
+%
+\EndIndex{Cmd}{scr@startsection}%
+\EndIndex{Cmd}{Before@sect}%
+\EndIndex{Cmd}{Before@ssect}%
+\EndIndex{Cmd}{At@startsection}%
 
 
 \begin{Declaration}
