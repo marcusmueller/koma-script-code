@@ -193,7 +193,7 @@ uninstall_local:
 	$(make_recursive)
 
 clean_local:
-	$(SRM) *.aux *.glo *.idx *.lof *.log *.lot *.synctex.gz *.toc
+	$(SRM) *.aux *.glo *.idx *.lof *.log *.lot *.synctex.gz *.toc *.slnc
 	$(make_recursive)
 
 dist_local: $(DIST_FILES)
@@ -218,7 +218,8 @@ distclean_local:
 	$(make_recursive)
 
 maintainclean_local:
-	$(SRM) ChangeLog.svn ChangeLog.bak $(STATIC_DOC_LINKS) $(DOC_FILES)
+	$(SRM) ChangeLog.svn ChangeLog.bak $(STATIC_DOC_LINKS) $(DOC_FILES) \
+	       scrpage2-ngerman.tex scrpage2-english.tex
 	$(make_recursive)
 
 edit:
