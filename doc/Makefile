@@ -97,6 +97,7 @@ STATIC_DOC_SRC  = koma-script.html
 
 STATIC_DOC_LINKS= komascript.html komascr.html \
 		  scrbook.html scrreprt.html scrartcl.html scrlttr2.html \
+		  scrletter.html \
 		  scrextend.html \
 		  typearea.html scraddr.html scrlfile.html \
 		  scrwfile.html \
