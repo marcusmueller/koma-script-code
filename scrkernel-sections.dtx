@@ -1,4 +1,4 @@
-% \CheckSum{3308}
+% \CheckSum{3309}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -1103,8 +1103,8 @@
 % Und es gehören Befehle dazu, um einen Eintrag ins Inhaltsverzeichnis zu
 % schreiben und den Eintrag auch darzustellen:
 %    \begin{macrocode}
-    \scr@ifundefinedorrelax{scr@#2@tocdepth}{%
-      \expandafter\let\csname scr@#2@tocdepth\expandafter\endcsname
+    \scr@ifundefinedorrelax{#2tocdepth}{%
+      \expandafter\let\csname #2tocdepth\expandafter\endcsname
       \csname #2numdepth\endcsname
     }{}%
     \expandafter\providecommand\expandafter*%
@@ -1114,7 +1114,7 @@
     \scr@ifundefinedorrelax{l@#2}{%
       \expandafter\edef\csname l@#2\endcsname{%
         \noexpand\bprot@dottedtocline
-        \expandafter\noexpand\csname scr@#2@tocdepth\endcsname
+        \expandafter\noexpand\csname #2tocdepth\endcsname
         \expandafter\noexpand\csname scr@#2@tocindent\endcsname
         \expandafter\noexpand\csname scr@#2@tocnumwidth\endcsname
       }%
@@ -2191,20 +2191,20 @@
 %     Element \texttt{partentry} ersetzt}^^A
 %   \changes{v2.97c}{2007/06/21}{Element \texttt{partentrypagenumber} wird
 %     verwendet}^^A
-%   \changes{v3.15}{2014/12/02}{Verwendung von \cs{parttoclevel} und
+%   \changes{v3.15}{2014/12/23}{Verwendung von \cs{parttocdepth} und
 %     \cs{scr@part@numwidth}}^^A
 % Der Eintrag für \cs{part}. Es werden einige Hilfsmakros passend zu
 % \cs{DeclareSectionCommand} definiert. Dadurch können diverse Einstellungen
 % darüber geändert werden. Es kann jedoch derzeit kein neuer Stil zugewiesen
 % werden.
-% \begin{macro}{\parttoclevel}
-%   \changes{v3.15}{2014/12/02}{neue Anweisung}^^A
+% \begin{macro}{\parttocdepth}
+%   \changes{v3.15}{2014/12/22}{neue Anweisung}^^A
 % Die Ebene des Verzeichniseintrags wird tatsächlich verwendet.
 %    \begin{macrocode}
-\newcommand*{\parttoclevel}{\m@ne}
-\let\parttoclevel\m@ne
+\newcommand*{\parttocdepth}{\m@ne}
+\let\parttocdepth\m@ne
 %    \end{macrocode}
-% \end{macro}^^A \parttoclevel
+% \end{macro}^^A \parttocdepth
 % \begin{macro}{\scr@part@tocindent}
 %   \changes{v3.15}{2014/12/02}{neue (interne) Anweisung}^^A
 % Wird nicht verwendet aber zwecks besserer Kompatibilität mit
@@ -2223,7 +2223,7 @@
 % \end{macro}
 %    \begin{macrocode}
 \newcommand*\l@part[2]{%
-  \ifnum \c@tocdepth <\parttoclevel \else
+  \ifnum \c@tocdepth <\parttocdepth \else
 %<article>    \addpenalty{\@secpenalty}%
 %<book|report>    \addpenalty{-\@highpenalty}%
     \addvspace{2.25em \@plus\p@}%
@@ -3051,7 +3051,7 @@
 %     verwendet}^^A
 %   \changes{v2.97c}{2007/06/21}{weitgehend umgeschrieben, um linksbündige
 %     Einträge zu ermöglichen}^^A
-%   \changes{v3.15}{2014/12/02}{Verwendung von \cs{chaptertoclevel} und
+%   \changes{v3.15}{2014/12/22}{Verwendung von \cs{chaptertocdepth} und
 %     \cs{scr@chapter@tocnumwidth}}^^A
 %   \changes{v3.15}{2014/12/10}{Verwendung von \cs{addvspace} statt \cs{vskip}
 %     für den Abstand am Anfang}^^A
@@ -3060,14 +3060,14 @@
 % verwendet. Damit kann man dann zumindest einige Änderungen mit
 % \cs{DeclareSectionCommand} vornehmen, allerdings noch keine komplette
 % Neugestaltung des Eintrags erreichen.
-% \begin{macro}{\chaptertoclevel}
-%   \changes{v3.15}{2014/12/02}{neue Anweisung}^^A
+% \begin{macro}{\chaptertocdepth}
+%   \changes{v3.15}{2014/12/22}{neue Anweisung}^^A
 % Die Ebene des Verzeichniseintrags wird tatsächlich verwendet.
 %    \begin{macrocode}
-\newcommand*{\chaptertoclevel}{\z@}
-\let\chaptertoclevel\z@
+\newcommand*{\chaptertocdepth}{\z@}
+\let\chaptertocdepth\z@
 %    \end{macrocode}
-% \end{macro}^^A \chaptertoclevel
+% \end{macro}^^A \chaptertocdepth
 % \begin{macro}{\scr@chapter@tocindent}
 %   \changes{v3.15}{2014/12/02}{neue (interne) Anweisung}^^A
 % Der Einzug des Eintrags wird nicht verwendet.
@@ -3097,7 +3097,7 @@
 % \end{option}^^A chapterentrydots
 %    \begin{macrocode}
 \newcommand*\l@chapter[2]{%
-  \ifnum \c@tocdepth <\chaptertoclevel \else
+  \ifnum \c@tocdepth <\chaptertocdepth \else
     \ifnum \lastpenalty<20010
       \addpenalty{-\@highpenalty}%
     \fi
@@ -3424,7 +3424,7 @@
 %    \begin{macrocode}
 %<*body>
 \newcommand*\l@section[2]{%
-  \ifnum \c@tocdepth >\z@
+  \ifnum \c@tocdepth <\sectiontocdepth\else
     \ifnum \lastpenalty<20009
       \addpenalty{\@secpenalty}%
     \fi
@@ -3977,11 +3977,11 @@
 % \end{macro}^^A \subsubsection
 % \end{macro}^^A \subsection
 % \end{macro}^^A \section
-% \end{macro}^^A \subparargraphtoclevel
-% \end{macro}^^A \paragraphtoclevel
-% \end{macro}^^A \subsubsectiontoclevel
-% \end{macro}^^A \subsectiontoclevel
-% \end{macro}^^A \sectiontoclevel
+% \end{macro}^^A \subparargraphtocdepth
+% \end{macro}^^A \paragraphtocdepth
+% \end{macro}^^A \subsubsectiontocdepth
+% \end{macro}^^A \subsectiontocdepth
+% \end{macro}^^A \sectiontocdepth
 % \end{macro}^^A \subparargraphnumdepth
 % \end{macro}^^A \paragraphnumdepth
 % \end{macro}^^A \subsubsectionnumdepth
