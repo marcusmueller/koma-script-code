@@ -1,8 +1,8 @@
-% \CheckSum{2573}
+% \CheckSum{2579}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
-% Copyright (c) Markus Kohm, 2002-2014
+% Copyright (c) Markus Kohm, 2002-2015
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrkernel-basics.dtx
-% Copyright (c) Markus Kohm, 2002-2014
+% Copyright (c) Markus Kohm, 2002-2015
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -2565,7 +2565,8 @@
 }
 %    \end{macrocode}
 % \begin{macro}{\FamilySetLength}
-%   \changes{v3.12}{2013/11/05}{neu}%^^A
+%   \changes{v3.12}{2013/11/05}{neu}^^A
+%   \changes{v3.15}{2015/01/02}{\cs{ifglueexpr} hinzugefügt}^^A
 % Über diese Anwesiung wird der Wert dann gesetzt. Dabei ist das erste
 % Argument die Familie, das zweite der Name des Schlüssels, das dritte der
 % Name der \LaTeX-Länge, das vierte schließlich der gewünschte Wert.
@@ -2576,9 +2577,11 @@
       \ifisskip{#4}{#3=#4\FamilyKeyState\Processed}{%
         \ifisnumexpr{#4}{#3=#4\FamilyKeyStateProcessed}{%
           \ifisdimexpr{#4}{#3=#4\FamilyKeyStateProcessed}{%
-            \ifisglue{#4}{#3=#4\FamilyKeyStateProcessed}{%
-              \FamilyUnknownKeyValue{#1}{#2}{#4}{%
-                length values, counters, lengths, skips, dimens
+            \ifisglueexpr{#4}{#3=#4\FamilyKeyStateProcessed}{%
+              \ifisglue{#4}{#3=#4\FamilyKeyStateProcessed}{%
+                \FamilyUnknownKeyValue{#1}{#2}{#4}{%
+                  length values, counters, lengths, skips, dimens
+                }%
               }%
             }%
           }%
@@ -2602,6 +2605,7 @@
 %   \changes{v3.14a}{2014/11/24}{fix: \cs{@tempskipa} statt \cs{@temskipa}}^^A
 %   \changes{v3.15}{2014/12/17}{\cs{aftergroup} vor
 %     \cs{FamilyKeyStateProcessed}}^^A
+%   \changes{v3.15}{2015/01/02}{\cs{ifglueexpr} hinzugefügt}^^A
 % Diese Anweisungen arbeitet fast wie \cs{FamilyCounterKey} und
 % \cs{FamilySetCounter}, allerdings wird nicht ein Zähler gesetzt, sondern
 % ein Makro auf einen Wert definiert. Dabei ist das erste Argument die
@@ -2636,9 +2640,15 @@
             \ifisdimexpr{#4}{%
               \@tempskipa=#4\aftergroup\FamilyKeyStateProcessed
             }{%
-              \ifisglue{#4}{\@tempskipa=#4\aftergroup\FamilyKeyStateProcessed}{%
-                \FamilyUnknownKeyValue{#1}{#2}{#4}{%
-                  length values, counters, lengths, skips, dimens
+              \ifisglueexpr{#4}{%
+                \@tempskipa=#4\aftergroup\FamilyKeyStateProcessed
+              }{%
+                \ifisglue{#4}{%
+                  \@tempskipa=#4\aftergroup\FamilyKeyStateProcessed
+                }{%
+                  \FamilyUnknownKeyValue{#1}{#2}{#4}{%
+                    length values, counters, lengths, skips, dimens
+                  }%
                 }%
               }%
             }%
