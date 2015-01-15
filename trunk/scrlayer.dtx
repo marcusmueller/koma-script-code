@@ -1,4 +1,4 @@
-% \CheckSum{3363}
+% \CheckSum{3372}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlayer.dtx
@@ -3304,7 +3304,10 @@
 %<*package&body>
 \newcommand*{\currentpagestyle}{}
 \PackageInfo{scrlayer}{patching LaTeX kernel macro \string\pagestyle}
-\def\reserved@a{\scrlayer@exec@before@pagestyle@hook{##1}}
+\def\reserved@a{%
+  \iftoplevelpagestyle\edef\toplevelpagestyle{##1}\toplevelpagestylefalse\fi
+  \scrlayer@exec@before@pagestyle@hook{##1}%
+}
 \expandafter\expandafter\expandafter\renewcommand
 \expandafter\expandafter\expandafter*%
 \expandafter\expandafter\expandafter\pagestyle
@@ -3316,7 +3319,9 @@
   \pagestyle{#1}%
   \edef\currentpagestyle{\GetRealPageStyle{#1}}%
   \scrlayer@exec@after@pagestyle@hook{#1}%
+  \toplevelpagestyletrue
 }
+\newif\iftoplevelpagestyle\toplevelpagestyletrue
 \AtBeginDocument{%
   \begingroup
     \let\scrlayer@exec@before@pagestyle@hook\@gobble
