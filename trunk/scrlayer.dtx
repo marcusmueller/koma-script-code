@@ -1,4 +1,4 @@
-% \CheckSum{3372}
+% \CheckSum{3474}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlayer.dtx
@@ -1055,8 +1055,8 @@
 %    \end{macrocode}
 % \end{macro}^^A \def@scr@l@pos
 %
-% There are basic attributes and compounding attributes. The basic attributes
-% are:
+% There are basic, primitive attributes and compounding attributes. The basic
+% attributes are:
 % \begin{description}
 % \item[\texttt{hoffset=\meta{dimension expression}}:] offset from the left
 %   edge of the paper.
@@ -1206,6 +1206,81 @@
   \scrlayer@testunexpectedarg{twoside}{#1}%
   \csname @scr@l@\scr@current@layer @twosidetrue\endcsname
   \csname @scr@l@\scr@current@layer @onesidefalse\endcsname
+}
+%    \end{macrocode}
+% \end{description}
+%
+% Attribute modifications are attributes, that modify existing basic
+% attributes:
+% There are basic, primitive attributes and compounding attributes. The basic
+% attributes are:
+% \begin{description}
+%   \changes{v3.16}{2015/01/26}{new layer attribute \texttt{addhoffset}}^^A
+% \item[\texttt{addhoffset=\meta{dimension expression}}:] add to offset from
+%   the left edge of the paper.
+%    \begin{macrocode}
+\DefineFamilyKey[.definelayer]{KOMAarg}{addhoffset}{%
+  \expandafter\edef\csname scr@l@\scr@current@layer @x\endcsname{%
+    \noexpand\dimexpr \unexpanded\expandafter\expandafter\expandafter{%
+      \csname scr@l@\scr@current@layer @x\endcsname + (#1)\relax}}%
+  \FamilyKeyStateProcessed
+}
+%    \end{macrocode}
+%   \changes{v3.16}{2015/01/26}{new layer attribute \texttt{addvoffset}}^^A
+% \item[\texttt{addvoffset=\meta{dimension expression}}:] add to offset from
+%   the top edge of the paper.
+%    \begin{macrocode}
+\DefineFamilyKey[.definelayer]{KOMAarg}{addvoffset}{%
+  \expandafter\edef\csname scr@l@\scr@current@layer @y\endcsname{%
+    \noexpand\dimexpr \unexpanded\expandafter\expandafter\expandafter{%
+      \csname scr@l@\scr@current@layer @y\endcsname + (#1)\relax}}%
+  \FamilyKeyStateProcessed
+}
+%    \end{macrocode}
+%   \changes{v3.16}{2015/01/26}{new layer attribute \texttt{addwidth}}^^A
+% \item[\texttt{addwidth=\meta{dimension expression}}:] add to width of the
+%   layer.
+%    \begin{macrocode}
+\DefineFamilyKey[.definelayer]{KOMAarg}{addwidth}{%
+  \expandafter\edef\csname scr@l@\scr@current@layer @w\endcsname{%
+    \noexpand\dimexpr \unexpanded\expandafter\expandafter\expandafter{%
+      \csname scr@l@\scr@current@layer @w\endcsname + (#1)\relax}}%
+  \FamilyKeyStateProcessed
+}
+%    \end{macrocode}
+%   \changes{v3.16}{2015/01/26}{new layer attribute \texttt{addheight}}^^A
+% \item[\texttt{addheight=\meta{dimension expression}}:] add to height of the
+%   layer.
+%    \begin{macrocode}
+\DefineFamilyKey[.definelayer]{KOMAarg}{addheight}{%
+  \expandafter\edef\csname scr@l@\scr@current@layer @h\endcsname{%
+    \noexpand\dimexpr \unexpanded\expandafter\expandafter\expandafter{%
+      \csname scr@l@\scr@current@layer @h\endcsname + (#1)\relax}}%
+  \FamilyKeyStateProcessed
+}
+%    \end{macrocode}
+%   \changes{v3.16}{2015/01/26}{new layer attribute \texttt{addcontents}}^^A
+% \item[\texttt{addcontents=\meta{output}}:] append to whatever should be
+%   printed by the layer.
+% \changes{v3.14}{2014/10/20}{\texttt{contents} is \cs{long}}^^A
+%    \begin{macrocode}
+\DefineFamilyKey[.definelayer]{KOMAarg}{addcontents}{%
+  \expandafter\edef\csname scr@l@\scr@current@layer @contents\endcsname{%
+    \unexpanded\expandafter\expandafter\expandafter{%
+      \csname scr@l@\scr@current@layer @contents\endcsname #1}}%
+  \FamilyKeyStateProcessed
+}
+%    \end{macrocode}
+%   \changes{v3.16}{2015/01/26}{new layer attribute \texttt{pretocontents}}^^A
+% \item[\texttt{pretocontents=\meta{output}}:] prefix whatever should be
+%   printed by the layer.
+% \changes{v3.14}{2014/10/20}{\texttt{contents} is \cs{long}}^^A
+%    \begin{macrocode}
+\DefineFamilyKey[.definelayer]{KOMAarg}{pretocontents}{%
+  \expandafter\edef\csname scr@l@\scr@current@layer @contents\endcsname{%
+    \unexpanded{#1}\unexpanded\expandafter\expandafter\expandafter{%
+      \csname scr@l@\scr@current@layer @contents\endcsname}}%
+  \FamilyKeyStateProcessed
 }
 %    \end{macrocode}
 % \end{description}
@@ -1632,6 +1707,25 @@
 % \end{macro}^^A \RedeclareLayer
 % \end{macro}^^A \ProvideLayer
 % \end{macro}^^A \DeclareNewLayer
+%
+%
+% \begin{macro}{\GetLayerContents}
+%   \changes{v3.16}{2015/01/26}{new}
+%   \begin{description}
+%   \item[\Parameter{string}:] the name of the layer
+%   \end{description}
+% Get the contents of the given layer.
+%    \begin{macrocode}
+%<*package&body>
+\newcommand*{\GetLayerContents}[1]{%
+  \IfLayerExists{#1}{\@nameuse{scr@l@#1@contents}}{%
+    \PackageError{scrlayer}{unknown layer `#1'}{%
+      You can ask only for the contents of an existing layer.}%
+  }%
+}
+%</package&body>
+%    \end{macrocode}
+% \end{macro}
 %
 %
 % \begin{macro}{\DestroyLayer}
