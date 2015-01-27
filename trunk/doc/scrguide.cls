@@ -1,6 +1,6 @@
 % ======================================================================
 % scrguide.cls
-% Copyright (c) Markus Kohm, 2005-2014
+% Copyright (c) Markus Kohm, 2005-2015
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -18,7 +18,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrguide.cls
-% Copyright (c) Markus Kohm, 2005-2014
+% Copyright (c) Markus Kohm, 2005-2015
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -152,6 +152,15 @@
 \RequirePackage{mparhack}
 %    \end{macrocode}
 %
+% \section{Dependence from \KOMAScript{} Version}
+%
+% \begin{macro}{currentversionlt}
+\newcommand*{\currentversionlt}[1]{%
+  \expandafter\ifx\csname scr@v@#1\endcsname\relax \maxdimen
+  \else\csname scr@v@#1\endcsname\fi >\scr@compatibility\relax
+}
+%    \end{macrocode}
+% \end{macro}
 %
 % \section{Free or Non-Free Version}
 %
@@ -181,8 +190,8 @@
       includehead,includemp,reversemp,marginparwidth=4em,%
       vmargin={1.5mm,3mm},hmargin=1.75mm}%
     \RequirePackage{xcolor}%
-    \RequirePackage{scrpage2}%
-    \clearscrheadfoot
+    \RequirePackage{scrlayer-scrpage}%
+    \clearpairofpagestyles
     \ohead{\smash{%
         \rule[-\dp\strutbox]{0pt}{\headheight}\headmark\hspace{2mm}}%
     }%
@@ -194,7 +203,7 @@
           \makebox[\dimexpr\linewidth-2\fboxsep\relax][l]{%
             \rule[-\dp\strutbox]{0pt}{\headheight}%
             \makebox[2em][r]\pagemark}}}}%
-    \renewcommand*{\headfont}{\normalfont\sffamily}%
+    \setkomafont{pageheadfoot}{\normalfont\sffamily}%
     \setkomafont{pagenumber}{}%
     \renewcommand*{\chaptermark}[1]{%
       \markboth\chaptermarkformat\chaptermarkformat}%
@@ -204,7 +213,6 @@
     \setlength{\@tempdimc}{\oddsidemargin}%
     \addtolength{\@tempdimc}{1in}%
     \setheadwidth[-\@tempdimc]{paper}%
-    \pagestyle{scrheadings}%
     % Entweder:
     \hypersetup{colorlinks}% 
     % oder:
