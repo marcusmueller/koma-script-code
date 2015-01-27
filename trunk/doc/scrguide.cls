@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2014/03/18 v1.7e internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2015/01/27 v1.8 internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
