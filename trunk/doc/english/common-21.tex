@@ -1,6 +1,6 @@
 % ======================================================================
 % common-21.tex
-% Copyright (c) Markus Kohm, 2013
+% Copyright (c) Markus Kohm, 2013-2015
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -18,7 +18,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % common-21.tex
-% Copyright (c) Markus Kohm, 2013
+% Copyright (c) Markus Kohm, 2013-2015
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -51,11 +51,12 @@
                                      Manipulation of defined page styles)]
 \translator{Markus Kohm\and Jana Schubert}
 
-% Date version of the translated file: 2013-10-23
+% Date version of the translated file: 2015-01-28
 
 \makeatletter
 \@ifundefined{ifCommonscrlayer}{\newif\ifCommonscrlayer}{}%
-\@ifundefined{ifCommoonscrlayer-scrpage}{\expandafter\newif\csname ifCommonscrlayer-scrpage\endcsname}{}%
+\@ifundefined{ifCommonscrlayerscrpage}{\newif\ifCommonscrlayerscrpage}{}%
+\@ifundefined{ifCommonscrlayerscrpageexperts}{\newif\ifCommonscrlayerscrpageexperts}{}
 \@ifundefined{ifIgnoreThis}{\newif\ifIgnoreThis}{}%
 \makeatother
 
@@ -84,9 +85,15 @@
   \Package{scrlayer-scrpage}.%
 }
 
+\IfCommon{scrlayer-scrpage-expert}{%
+  This section is an add-on to \autoref{sec:scrlayer.pagestyle.content}. It
+  describes features that may be to complicated for beginners.%
+}
+
+\ifCommonscrlayerscrpageexperts\else % ------- nicht scrlayer-scrpage-experts -
 \ifshortversion\IgnoreThistrue\IfCommon{scrlayer-scrpage}{\IgnoreThisfalse}\fi
-\ifIgnoreThis %++++++++++++++++++++++++++++++++++++++++ not scrlayer-scrpage +
-\else %----------------------------------------------- only scrlayer-scrpage -
+\ifIgnoreThis %++++++++++++++++++++++++++++++++++++++ nicht scrlayer-scrpage +
+\else %------------------------------------------------ nur scrlayer-scrpage -
 
 \begin{Declaration}
   \Macro{automark}\OParameter{section level of the right mark}%
@@ -103,44 +110,54 @@
 \BeginIndex{Option}{automark}%
 \BeginIndex{Option}{manualmark}%
 \BeginIndex{Option}{autooneside~=\PName{simple switch}}%
-With the \LaTeX{} standard classes or the \KOMAScript{} classes the decision
-whether using automatic running heads\Index{running heads>automatic}, or
-static or manual running heads\Index{running heads>static}\Index{running
-  heads>manual} would be done using either page style \Pagestyle{headings} or
-\Pagestyle{myheadings}. Automatic running heads are replications of a
-significant, characterizing text snippet of the page mostly inside the page
-head, sometimes in the page footer.
+\IfCommon{scrlayer-scrpage}{%
+  \begin{Explain}
+    With the \LaTeX{} standard classes or the \KOMAScript{} classes the
+    decision whether using automatic running heads\Index{running
+      heads>automatic}, or static or manual running heads\Index{running
+      heads>static}\Index{running heads>manual} would be done using either
+    page style \Pagestyle{headings} or \Pagestyle{myheadings}. Automatic
+    running heads are replications of a significant, characterizing text
+    snippet of the page mostly inside the page head, sometimes in the page
+    footer.
 
-The article classes\OnlyAt{\Class{article}\and \Class{scrartcl}}
-\Class{article} or \Class{scrartcl} with page style
-\Pagestyle{headings}\IndexPagestyle{headings} use the section heading, which
-is either the mandatory or the optional argument of \Macro{section}, for the
-automatic running head of single side documents. Double side documents use
-this section heading as the \emph{left mark} and at once use the subsection
-heading as the \emph{right mark}. The left mark will be printed on left pages,
-which founds the name \emph{left mark}. The right mark will be printed on
-right\,---\,in single side mode this means every\,---\,page. The classes by
-default also remove the right mark whenever they put the section heading into
-the left mark.
+    The article classes\OnlyAt{\Class{article}\and \Class{scrartcl}}
+    \Class{article} or \Class{scrartcl} with page style
+    \Pagestyle{headings}\IndexPagestyle{headings} use the section heading,
+    which is either the mandatory or the optional argument of \Macro{section},
+    for the automatic running head of single side documents. Double side
+    documents use this section heading as the \emph{left mark} and at once use
+    the subsection heading as the \emph{right mark}. The left mark will be
+    printed on left pages, which founds the name \emph{left mark}. The right
+    mark will be printed on right\,---\,in single side mode this means
+    every\,---\,page. The classes by default also remove the right mark
+    whenever they put the section heading into the left mark.
 
-The report and book classes \OnlyAt{\Class{report}\and
-  \Class{scrreprt}\and \Class{book}\and \Class{scrbook}} start one level
-higher. So they use the chapter heading to be the right mark in single side
-layout. In double side layout they use the chapter heading to be the left mark
-and the section heading to be the right mark.
+    The report and book classes \OnlyAt{\Class{report}\and
+      \Class{scrreprt}\and \Class{book}\and \Class{scrbook}} start one level
+    higher. So they use the chapter heading to be the right mark in single
+    side layout. In double side layout they use the chapter heading to be the
+    left mark and the section heading to be the right mark.
 
-If you are using \Pagestyle{myheadings} instead of
-\Pagestyle{headings}\IndexPagestyle{myheadings}, the marks in the page header
-still exists and would be printed same like using \Pagestyle{headings}. But
-section commands will not automatically set the marks any longer. So you can
-fill them only using the commands \Macro{markright}, \Macro{markleft}, and
-\Macro{markboth}, which will be described later in this section.
-
-This difference between two page styles has been abolished by
+    If you are using \Pagestyle{myheadings} instead of
+    \Pagestyle{headings}\IndexPagestyle{myheadings}, the marks in the page
+    header still exists and would be printed same like using
+    \Pagestyle{headings}. But section commands will not automatically set the
+    marks any longer. So you can fill them only using the commands
+    \Macro{markright}, \Macro{markleft}, and \Macro{markboth}, which will be
+    described later in this section.
+  \end{Explain}\par
+}
+\IfNotCommon{scrlayer-scrpage}{In common classes the decision for a page
+  style\,---\,generally \Pagestyle{headings} and
+  \Pagestyle{myheading}\,---\,is also a decision to use either automatic or
+  manual running heads.}
+This difference between those two page styles has been abolished by
 \Package{scrpage2} and also by \Package{scrlayer}. Instead of distinguishing
 between automatic and manual running head by the selection of a page style,
-two new commands, \Macro{automark} and \Macro{manualmark}, are provided. The
-command \Macro{manualmark} switches to manual marks and deactivates the
+two new commands, \Macro{automark} and \Macro{manualmark}, are provided. 
+
+The command \Macro{manualmark} switches to manual marks and deactivates the
 automatic filling of the marks. In contrast to this \Macro{automark} and
 \Macro{automark*} can be used to define, which section levels should be used
 for the automatic mark filling. The optional argument is the \PName{section
@@ -158,6 +175,7 @@ The difference in \Macro{automark} and \Macro{automark*} is, that
 \Macro{automark*}, while \Macro{automark*} changes only the behaviour of the
 section levels of its arguments. So you can even build more complex cases.
 
+\ifCommonscrlayerscrpage% +++++++++++++++++++++++++++ nur scrlayer-scrpage +
 \begin{Example}
   Assume you want the chapter heading to be the running head of even pages
   and the section heading to be the running head of odd pages like this is
@@ -206,6 +224,7 @@ section levels of its arguments. So you can even build more complex cases.
   this page to the end the running head alternates between chapter and section
   heading from page to page.
 \end{Example}
+\fi % ******************************************** Ende nur scrlayer-scrpage *
 
 Instead of the commands you may also use the options \Option{manualmark} and
 \Option{automark} to switch between manual and automatic running
@@ -228,7 +247,7 @@ found in  \autoref{tab:truefalseswitch} on
 \autopageref{tab:truefalseswitch}. If you'd deactivate the option, in single
 side layout the optional and the obligatory arguments of \Macro{automark} and
 \Macro{automark*} will influence the running head again.%
-%
+\ifCommonscrlayerscrpage% +++++++++++++++++++++++++++++ nur scrlayer-scrpage +
 \begin{Example}
   Assume you have a single sided report but want similar running heads as in
   the book example before. The chapter headings should be used as a running
@@ -253,6 +272,7 @@ side layout the optional and the obligatory arguments of \Macro{automark} and
   \PValue{true} or remove the option and its value. You should find a
   difference at the running head in the pages' head from page~4 on.
 \end{Example}
+\fi% ********************************************* Ende nur scrlayer-scrpage *
 
 Please note\textnote{Attention!}, only loading the package does not have
 any effect on the fact whether automatic or manual running heads are used or
@@ -334,8 +354,9 @@ used. This will also deactivate \Macro{MakeUppercase} and \Macro{uppercase}
 inside the running heads.
 
 You can find all valid values for \Option{markcase} in
-\autoref{tab:scrlayer-scrpage.markcase}.%
-%
+\autoref{tab:scrlayer-scrpage.markcase}\IfNotCommon{scrlayer-scrpage}{,
+  \autopageref{tab:scrlayer-scrpage.markcase}}.%
+\ifCommonscrlayerscrpage
 \begin{table}
   \centering
   \caption[Possible values for option \Option{markcase}]{Possible values for
@@ -366,7 +387,7 @@ You can find all valid values for \Option{markcase} in
     }%
   \end{desctabular}
 \end{table}
-%
+\fi
 \EndIndex{Option}{markcase~=\PName{Wert}}%
 
 \begin{Declaration}
@@ -401,9 +422,10 @@ the output. This can be changed using command \Macro{setkomafont} or
 \Macro{addtokomafont} (see also \autoref{sec:maincls.textmarkup},
 \autopageref{desc:maincls.cmd.setkomafont}).%
 \EndIndex{FontElement}{pagenumber}%
-%
+\ifCommonscrlayerscrpage% +++++++++++++++++++++++++++++ nur scrlayer-scrpage +
 \begin{Example}
-  Assume you want to use a left aligned running head and right aligned page
+  Assume\label{example.scrlayer-scrpage.headmark} you want to use a left
+  aligned running head and right aligned page
   number in the head of the pages of a document in single side layout. The
   following minimal but working examples would do so:
 \begin{lstcode}
@@ -440,7 +462,24 @@ Please note\textnote{Attention!}, that the empty optional argument of
 \Macro{cfoot} in the example above is not the same like omitting the optional
 argument. Please try it out and have a look at the difference in the footer of
 the first page.%
-%
+\else % --------------------------------------------- nicht scrlayer-scrpage -
+  \par %
+  If you are interested in an example about usage of commands \Macro{headmark}
+  and \Macro{pagemark}, have a look into
+  \autoref{sec:scrlayer-scrpage.pagestyle.content},
+  \autopageref{example.scrlayer-scrpage.headmark}. The package
+  \Package{scrlayer-scrpage} internally uses a lot of such features of
+  \Package{scrlayer}.%
+\fi% ******************************************* Ende nicht scrlayer-scrpage *
+\ifnum\currentversionlt{3.16}\else\par
+  If all the mark features described above are not sufficient, experienced
+  users can find more of them on \IfCommon{scrlayer-scrpage}{%
+    \autopageref{desc:scrlayer-scrpage-experts.cmd.righttopmark}}%
+  \IfNotCommon{scrlayer-scrpage}{%
+    \autopageref{desc:scrlayer.cmd.righttopmark}}. For example, you can find
+  there \Macro{leftfirstmark} and \Macro{rightbotmark}, which seem to be
+  useful for lexicon like documents.%
+\fi
 \EndIndex{Cmd}{pagemark}%
 \EndIndex{Cmd}{headmark}%
 \EndIndex{Cmd}{rightmark}%
@@ -467,7 +506,7 @@ commands internally to bring the section numbers into wanted form and
 additionally they support the \Macro{autodot} mechanism of the \KOMAScript{}
 classes. If wanted these commands may be redefined to get another form of
 section numbers.%
-%
+\ifCommonscrlayerscrpage% ++++++++++++++++++++++++++++ nur scrlayer-scrpage +
 \begin{Example}
   Assume you do not want section numbers but section heading text only in the
   running head. So:
@@ -476,6 +515,12 @@ section numbers.%
 \end{lstcode}
   would be a simple solution for this.
 \end{Example}
+\else % -------------------------------------------- nicht scrlayer-scrpage -
+  \ See the example in
+  \autoref{sec:scrlayer-scrpage.pagestyle.content},
+  \autopageref{example:scrlayer-scrpage.sectionmarkformat} for more
+  information.%
+\fi % ***************************************** Ende nicht scrlayer-scrpage *
 %
 \EndIndex{Cmd}{subparagraphmarkformat}%
 \EndIndex{Cmd}{paragraphmarkformat}%
@@ -550,7 +595,7 @@ depending on the configuration of the automatism.
 
 You may also use these commands together with the star versions of the section
 commands.%
-%
+\ifCommonscrlayerscrpage % +++++++++++++++++++++++++++++ nur scrlayer-scrpage +
 \begin{Example}
   Assume you are using a preface with several pages just before the table of
   contents, that should not have an entry at the table of contents
@@ -609,18 +654,26 @@ commands.%
   \end{document}
 \end{lstcode}
 \end{Example}
+\else % -------------------------------------------- nicht scrlayer-scrpage -
+  \ You can find a detailed example about usage of \Macro{markboth} with
+  \Package{scrlayer-scrpage} in
+  \autoref{sec:scrlayer-scrpage.pagestyle.content},
+  \autopageref{example:scrlayer-scrpage.markboth}. Package
+  \Package{scrlayer-scrpage} is a kind of extension of \Package{scrlayer}.%
+\fi % ***************************************** Ende nicht scrlayer-scrpage *
 %
 \EndIndex{Cmd}{markboth}%
 \EndIndex{Cmd}{markright}%
 \EndIndex{Cmd}{markleft}%
 
 \fi %********************************************* End only scrlayer-scrpage *
+\fi %*********************************** Ende nicht scrlayer-scrpage-experts *
 
 
-\ifshortversion\IgnoreThistrue\IfCommon{scrlayer}{\IgnoreThisfalse}\fi
-\ifIgnoreThis %++++++++++++++++++++++++++++++++++++++++++++++++ not scrlayer +
-\else %------------------------------------------------------- only scrlayer -
-
+\ifshortversion\IgnoreThisfalse\IfCommon{scrlayer-scrpage}{\IgnoreThistrue}\fi
+\ifIgnoreThis %+++++++++++++++++++++++++++++++++++++++ auch scrlayer-scrpage +
+\else %---------------------------------------------- nicht scrlayer-scrpage -
+\ifCommonscrlayerscrpage\else %---------------------- nicht scrlayer-scrpage -
 \begin{Declaration}
   \Macro{GenericMarkFormat}\Parameter{name of the section level}
 \end{Declaration}
@@ -639,7 +692,7 @@ kernel. The expected, mandatory argument of the command is the \PName{name of
 You can change the default formatting of the numbers, that use this command,
 by redefining only this single command. Classes can change the default
 formatting also by defining this command.%
-%
+\ifCommonscrlayerscrpageexperts % ++++++++++++ nur scrlayer-scrpage-experts +
 \begin{Example}
   Assume you want the section numbers of all levels at the running head of
   an article to be printed in white colour inside a black coloured box. Using
@@ -700,8 +753,97 @@ formatting also by defining this command.%
   \end{document}
 \end{lstcode}
 \end{Example}
+\else % ------------------------------------- nicht scrlayer-scrpage-experts -
+  \par %
+  A detailed example about cooperation of command \Macro{GenericMarkFormat}
+  and the commands \Macro{sectionmarkformat} and \Macro{subsectionmarkformat}
+  that are described at \autopageref{desc:\csname
+    label@base\endcsname.cmd.chaptermark} is shown in
+  \autoref{sec:scrlayer-scrpage-experts.pagestyle.content},
+  \autopageref{example:scrlayer-scrpage-experts.GenericMarkFormat}.%
+\fi % ********************************** Ende nicht scrlayer-scrpage-experts *
 %
 \EndIndex{Cmd}{GenericMarkFormat}%
+
+\ifnum\currentversionlt{3.16}\else
+\begin{Declaration}
+  \Macro{righttopmark}\\
+  \Macro{rightbotmark}\\
+  \Macro{rightfirstmark}\\
+  \Macro{lefttopmark}\\
+  \Macro{leftbotmark}\\
+  \Macro{leftfirstmark}
+\end{Declaration}
+\BeginIndex{Cmd}{righttopmark}%
+\BeginIndex{Cmd}{rightbotmark}%
+\BeginIndex{Cmd}{rightfirstmark}%
+\BeginIndex{Cmd}{lefttopmark}%
+\BeginIndex{Cmd}{leftbotmark}%
+\BeginIndex{Cmd}{leftfirstmark}%
+For page styles \LaTeX\ChangedAt{v3.16}{\Package{scrlayer}} uses a bipartite
+\TeX{} mark. Running heads can use the left part of that mark by
+\Macro{leftmark}\important{\Macro{leftmark}}\IndexCmd{leftmark} and the right
+part by
+\Macro{rightmark}\important{\Macro{rightmark}}\IndexCmd{rightmark}. Indeed, it
+seems that it was suggested to use \Macro{leftmark} for the running head of
+left, even pages and \Macro{rightmark} for the running head of right, odd
+pages of double-sided documents. Within single-sided layouts the standard
+classes even do not set the left part of the mark.
+
+\TeX{} itself knows three alternatives to make usage of a mark. The
+\Macro{botmark} is the last valid mark of the page that has been build
+last. If there has not been set any mark on the page, it is the last mark of the
+already shipped out pages. \LaTeX{} command \Macro{leftmark} uses exactly this
+mark. So it shows the left part of the last mark of the page. This is the same
+like \Macro{leftbotmark}. In opposite to this \Macro{rightbotmark} shows the
+right part of that mark.
+
+\Macro{firstmark} is the first mark of the page that has been build last. This
+means the first mark, that has been set on the page. If there has not been set
+any mark on the page, this is the last mark of the already shipped out
+pages. \LaTeX{} command \Macro{rightmark} uses exaclty this mark. So it shows
+the right part of the first mark of the page. This is the same like
+\Macro{rightfirstmark}. In opposite to this \Macro{leftfirstmark} shows the
+left part of that mark.
+
+\Macro{topmark} is the content of \Macro{botmark} before building the current
+page. \LaTeX{} itself does not use it. Nevertheless, \Package{scrlayer}
+provides \Macro{lefttopmark} to show the left part of it and
+\Macro{righttopmark} to show the right part of it.
+
+Note\textnote{Attention!} that the left part and the right part of the mark
+can be made all together only. Even if you use
+\Macro{markright}\IndexCmd{markright} to change only the right part, the left
+part will be made again (unchanged). Accordingly in double-side mode using
+page style
+\Pagestyle{headings\important{\Pagestyle{headings}}\IndexPagestyle{headings}}
+the higher section levels always make both parts. For example
+\Macro{chaptermark} uses \Macro{markboth} with an empty right argument in this
+case. This is the reason why \Macro{rightmark} or \Macro{rightfirstmark}
+always shows an empty value on pages with chapter beginnings, even if there
+was a \Macro{sectionmark} or \Macro{section} on the same page to make the
+right part of the mark.
+
+Please note\textnote{Attention!} that using any of these commands to show the
+left or right part of the mark as part of the page content could have
+unexpected results. They are recommended to be used in the head or foot of a
+page style only. So with \Package{scrlayer} they should be part of the
+contents of a layer. But it does not matter whether or not a layer is
+restricted to the background or the foreground. Both kind of layers are
+shipped out after building the current page.
+
+If you need more information about the mark mechanism of \TeX, please have a
+look at \cite[chapter~23]{knuth:texbook}. You will find, that marks are an
+issue for real experts. So if the explanation above was at least more
+confusing than illuminative: Please don't worry.
+%
+\EndIndex{Cmd}{leftfirstmark}%
+\EndIndex{Cmd}{leftbotmark}%
+\EndIndex{Cmd}{lefttopmark}%
+\EndIndex{Cmd}{rightfirstmark}%
+\EndIndex{Cmd}{righttopmark}%
+\EndIndex{Cmd}{rightbotmark}%
+\fi
 
 \begin{Declaration}
   \Macro{@mkleft}\Parameter{left mark}\\
@@ -743,9 +885,8 @@ to the commands \Macro{markleft}, \Macro{markright}, and \Macro{markboth}.%
 \EndIndex{Cmd}{@mkright}%
 \EndIndex{Cmd}{@mkleft}%
 
-
 \fi %***************************************************** End only scrlayer *
-
+\fi %***************************************************** End only scrlayer *
 
 \ifshortversion%
 \IfCommon{scrlayer}{%
@@ -760,6 +901,6 @@ to the commands \Macro{markleft}, \Macro{markright}, and \Macro{markboth}.%
 %%% mode: flyspell
 %%% coding: iso-latin-1
 %%% ispell-local-dictionary: "en_GB"
-%%% TeX-master: "scrlayer-de.tex"
+%%% TeX-master: "../guide.tex"
 %%% TeX-PDF-mode: t
 %%% End: 
