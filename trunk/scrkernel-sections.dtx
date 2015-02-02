@@ -1,4 +1,4 @@
-% \CheckSum{3319}
+% \CheckSum{3337}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -1033,7 +1033,8 @@
 %    \begin{macrocode}
     \ifstr{\csname scr@#2@style\endcsname}{}{%
       \ClassInfo{\KOMAClassName}{%
-        not defining `\string\csname #2\endcsname' due to\MessageBreak
+        not defining `\expandafter\string\csname #2\endcsname' due
+        to\MessageBreak
         empty section style%
       }%
     }{%
@@ -2603,6 +2604,8 @@
 % \end{macro}^^A \if@at@twocolumn
 % \begin{macro}{\use@chapter@o@preamble}
 %   \changes{v3.15}{2014/12/08}{Anpassung an geänderte Abstandsbehandlung}^^A
+%   \changes{v3.15a}{2015/02/02}{Korrektur, zur Verhinderung falscher
+%     \texttt{overfull \cs{vbox}} Meldungen}^^A
 % Das Makro wird benötigt, weil das Setzen der oberen Präambel etwas
 % mehr Aufwand bedeutet. Die Anweisung spart Platz, da sie zweimal
 % verwendet wird.
@@ -2621,21 +2624,28 @@
     }%
     \addtolength{\@tempdima}{\@tempdimb}%
     \setbox0\vbox{%
-      \vskip-\ht\strutbox
       \use@preamble{chapter@o}%
-      \vskip\baselineskip
     }%
     \setlength{\@tempdimb}{\ht0}%
     \addtolength{\@tempdimb}{\dp0}%
     \vbox to \z@{%
+      \vskip-\baselineskip
       \vbox to \@tempdima{%
         \vfill
-        \unvbox0
+        \box0
       }%
       \vss
     }\vskip-\parskip\vskip-\baselineskip
     \ifdim \@tempdimb>\@tempdima%
       \addtolength{\@tempdimb}{-\@tempdima}%
+      \ifdim\@tempdimb<\vfuzz
+        \ClassInfo{\KOMAClassName}{%
+          preamble before chapter is \the\@tempdimb\space too
+          high.\MessageBreak
+          Tolerated without warning because of\MessageBreak
+          \string\vfuzz\space = \the\vfuzz\space >= \the\@tempdimb
+        }%
+      \else
       \ClassWarning{\KOMAClassName}{%
         preamble before chapter is \the\@tempdimb\space too
         high.\MessageBreak
@@ -2648,9 +2658,10 @@
         before the command, which generates the message
         about\MessageBreak
         an overfull \string\vbox
-        }%
+      }%
+      \fi
     \fi%
-    }
+  }%
 }
 %    \end{macrocode}
 % \end{macro}^^A \use@chapter@o@preamble
