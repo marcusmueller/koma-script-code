@@ -1,6 +1,6 @@
 % ======================================================================
 % scrlayer.tex
-% Copyright (c) Markus Kohm, 2013
+% Copyright (c) Markus Kohm, 2013-2015
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -18,7 +18,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrlayer.tex
-% Copyright (c) Markus Kohm, 2013
+% Copyright (c) Markus Kohm, 2013-2015
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -51,15 +51,15 @@
 
 \translator{Markus Kohm}
 
-% Date of the translated file: 2013-10-31
+% Date of the translated file: 2015-02-03
 
 \chapter[{Defining Layers and Page Styles Using \Package{scrlayer}}]%
 {Defining Layers and Page Styles Using \Package{scrlayer}%
 }
 \labelbase{scrlayer}
 
-\BeginIndex{Package}{scrlayer}
-
+\BeginIndex{Package}{scrlayer}%
+\BeginIndex{}{layer}%
 Most users of graphics software already know layer models for pages or working
 sheets. \LaTeX{} itself does not know layers, but there are already packages
 like \Package{eso-pic} or \Package{textpos}, that provide a kind of
@@ -295,6 +295,45 @@ there has not been a layer with \PName{layer name} defined before.
   }{%
     Options for the definition of layers (\emph{Continuation})%
   }%
+  \ifnum\currentversionlt{3.16}\else
+  \nentry{%
+    \ChangedAt{v3.16}{\Package{scrlayer}}%
+    \KOption{addcontents}\PName{Code}}{%
+    Value \PName{code} will be added (or appended) at the very end of the
+    current value of attribute \Option{contents}. So the new content will be
+    generated behind the end of the already existing content. For more
+    information about the handling of \PName{code} see option
+    \Option{contents}.%
+  }%
+  \nentry{%
+    \ChangedAt{v3.16}{\Package{scrlayer}}%
+    \KOption{addheight}\PName{additional height}}{%
+    The current value of attribute \Option{height} will be increased by the
+    value of this option. You can use the same kind of values as for
+    \Option{height}.%
+  }%
+  \nentry{%
+    \ChangedAt{v3.16}{\Package{scrlayer}}%
+    \KOption{addhoffset}\PName{additional horizontal offset}}{%
+    The current value of attribute \Option{hoffset} will be increased by the
+    value of this option. You can use the same kind of values as for
+    \Option{hoffset}.%
+  }%
+  \nentry{%
+    \ChangedAt{v3.16}{\Package{scrlayer}}%
+    \KOption{addvoffset}\PName{additional vertical offset}}{%
+    The current value of attribute \Option{voffset} will be increased by the
+    value of this option. You can use the same kind of values as for
+    \Option{voffset}.%
+  }%
+  \nentry{%
+    \ChangedAt{v3.16}{\Package{scrlayer}}%
+    \KOption{addwidth}\PName{additional width}}{%
+    The current value of attribute \Option{width} will be increased by the
+    value of this option. You can use the same kind of values as for
+    \Option{width}.%
+  }%
+  \fi
   \nentry{\KOption{align}{\PName{alignment characters}}}{%
     The \PName{alignment characters} define the desired alignment of the
     layer. Each \PName{alignment character} influences either, how argument
@@ -454,6 +493,16 @@ there has not been a layer with \PName{layer name} defined before.
     vertically span the whole paper from the left edge to the right edge and
     the top edge to the bottom edge.%
   }%
+  \ifnum\currentversionlt{3.16}\else
+  \nentry{%
+    \ChangedAt{v3.16}{\Package{scrlayer}}%
+    \KOption{pretocontents}\PName{code}}{%
+    Value \PName{code} will be added at the very beginning of the current
+    value of attribute \Option{contents}. So the new content will be generated
+    in front of the already existing content. For more information about the
+    handling of \PName{code} see option \Option{contents}.%
+  }%
+  \fi
   \entry{\Option{rightmargin}}{%
     The composed option sets \Option{hoffset}, \Option{voffset},
     \Option{width}, \Option{height}, and \Option{align} to horizontally span
@@ -518,6 +567,20 @@ result in unpredictable issues.%
 \EndIndex{Cmd}{layerwidth}%
 \EndIndex{Cmd}{layeryoffset}%
 \EndIndex{Cmd}{layerxoffset}%
+
+\ifnum\currentversionlt{3.16}\else
+\begin{Declaration}
+  \Macro{GetLayerContents}\Parameter{layer name}
+\end{Declaration}
+\BeginIndex{Cmd}{GetLayerContents}%
+This\ChangedAt{v3.16}{\Package{scrlayer}} command results in the whole content
+of a layer. You have to note\textnote{Attention!} that using this
+command inside the \PName{code} of the layer attributes \Option{contents},
+\Option{addcontents}, or \Option{pretocontents} can result in
+an infinite recursion, if the content of the current layer is referenced. You
+yourself should avoid such situations!%
+\EndIndex{Cmd}{GetLayerContents}%
+\fi
 
 \begin{Declaration}
   \Macro{IfLayerExists}%
@@ -1229,6 +1292,7 @@ used, e.g., to automatically destroy layers or page styles (see
 \Macro{DestroyRealLayerPageStyle}).%
 \EndIndex{Cmd}{scrlayerOnAutoRemoveInterface}%
 %
+\EndIndex{}{layer}
 \EndIndex{Package}{scrlayer}
 
 %%% Local Variables:
