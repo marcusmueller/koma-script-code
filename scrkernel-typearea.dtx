@@ -1,8 +1,8 @@
-% \CheckSum{2330}
+% \CheckSum{2411}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-typearea.dtx
-% Copyright (c) Markus Kohm, 2002-2014
+% Copyright (c) Markus Kohm, 2002-2015
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrkernel-typearea.dtx
-% Copyright (c) Markus Kohm, 2002-2014
+% Copyright (c) Markus Kohm, 2002-2015
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -1391,6 +1391,17 @@
 % \end{macro}
 % \end{option}
 %
+% \subsubsection{\textsf{geometry} Berücksichtigung]}
+%
+% \begin{option}{usegeometry}
+%   \changes{v3.17}{2015/02/07}{neue Option}
+% Mit dieser Option kann eingestellt werden, dass \cs{activateareas} die
+% Einstellungen außerdem an das Paket \textsf{geometry} übergeben soll.
+%    \begin{macrocode}
+\KOMA@ifkey{usegeometry}{@ta@usegeometry}
+%    \end{macrocode}
+% \end{option}
+%
 %    \begin{macrocode}
 %</package>
 %    \end{macrocode}
@@ -1892,8 +1903,9 @@
 %  \end{macro}
 %  \end{macro}
 %
-%  \begin{macro}{\activateareas}
-%    \changes{v2.96a}{Neuer Name für alte Anweisung}
+% \begin{macro}{\activateareas}
+%   \changes{v2.96a}{2006/11/29}{Neuer Name für alte Anweisung}^^A
+%   \changes{v3.17}{2015/02/07}{Beachte Option \texttt{usegeometry}}^^A
 % Dieses Makro wird verwendet, um mit einem gewaltigen Hack die Änderung des
 % Satzspiegels innerhalb eines Dokuments zu ermöglichen. Es stellt selbst
 % sicher, dass es nur innerhalb des Dokuments ausgeführt wird.
@@ -1935,9 +1947,70 @@
       \KOMAoptions{pagesize=\@pagesizelast}%
     }%
   \fi
+%    \end{macrocode}
+% \changes{v3.17}{2015/02/07}{neuer Code für Option \texttt{usegeometry}}
+%    \begin{macrocode}
+  \edef\scr@geometryargs{%
+    bindingoffset=\the\ta@bcor,
+    lmargin=\the\dimexpr 1in+\oddsidemargin-\ta@bcor\relax,
+    textwidth=\the\textwidth,
+    \if@hincl
+      includehead,%
+      top=\the\dimexpr 1in+\topmargin\relax,
+    \else
+      includehead=false,%
+      top=\the\dimexpr 1in+\topmargin+\headheight+\headsep\relax,
+    \fi
+    headheight=\the\headheight,
+    headsep=\the\headsep,
+    textheight=\the\textheight,
+    \if@fincl
+      includefoot,
+    \else
+      includefoot=false,
+    \fi
+    footskip=\the\footskip,
+    \if@mincl
+      includemp,
+    \else
+      includemp=false,
+    \fi
+    marginparwidth=\the\marginparwidth,
+    marginparsep=\the\marginparsep
+  }%
+  \if@ta@usegeometry
+    \@ifundefined{Gm@save}{%
+      \if@atdocument\else
+        \edef\scr@geometryargs{%
+          paperwidth=\the\paperwidth,paperheight=\the\paperheight,%
+          \scr@geometryargs
+        }%
+        \PassOptionsToPackage{\scr@geometryargs}{geometry}%
+      \fi
+    }{%
+      \edef\Gm@restore@org{\Gm@restore}%
+      \if@atdocument
+        \expandafter\newgeometry\expandafter{\scr@geometryargs}%
+      \else
+        \edef\scr@geometryargs{%
+          paperwidth=\the\paperwidth,paperheight=\the\paperheight,%
+          \scr@geometryargs
+        }%
+        \expandafter\geometry\expandafter{\scr@geometryargs}%
+      \fi
+    }%
+  \fi
 }
 %    \end{macrocode}
-%  \end{macro}
+% \begin{macro}{scr@geometryargs}
+%   \changes{v3.16}{2015/02/07}{neu (intern)}
+% Dieses Makro nimmt innerhalb von \cs{activateareas} die Optionen für
+% \textsf{geometry} auf. Initialisiert wird es einfach leer.
+%    \begin{macrocode}
+\newcommand*{\scr@geometryargs}{}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
 %
 % \begin{macro}{\storeareas}
 %   \changes{v3.10}{2011/09/13}{neue Anweisung}%
