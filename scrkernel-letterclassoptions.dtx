@@ -1,8 +1,8 @@
-% \CheckSum{1498}
+% \CheckSum{1655}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-letterclassoptions.dtx
-% Copyright (c) Markus Kohm, 2006-2014
+% Copyright (c) Markus Kohm, 2006-2015
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrkernel-letterclassoptions.dtx
-% Copyright (c) Markus Kohm, 2006-2014
+% Copyright (c) Markus Kohm, 2006-2015
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -62,11 +62,11 @@
 \begingroup
   \def\filedate$#1: #2-#3-#4 #5${\gdef\filedate{#2/#3/#4}}
   \filedate$Date$
-  \def\filerevision$#1: #2 ${\gdef\filerevision{#2}}
+  \def\filerevision$#1: #2 ${\gdef\filerevision{r#2}}
   \filerevision$Revision$
 \endgroup
 \ProvidesFile{scrkernel-letterclassoptions.dtx}
-             [\filedate\space v3.14.\filerevision\space
+             [\filedate\space \filerevision\space
               KOMA-Script (letter class options)]
 % \iffalse
 \documentclass{scrdoc}
@@ -351,21 +351,27 @@
 %
 % Im Kopf ist natürlich die Datei zu deklarieren:
 % \changes{v3.04}{2009/04/21}{neue LCO \texttt{NF} von Jean-Marie Pacquet
-%   übernommen und ergänzt}
+%   übernommen und ergänzt}^^A
 % \changes{v3.04}{2009/06/26}{neue LCO \texttt{USletter2w} in Zusammenarbeit
-%   mit Engelbert Buxbaum und Richard Ar\`es geschaffen}
+%   mit Engelbert Buxbaum und Richard Ar\`es geschaffen}^^A
 % \changes{v3.04}{2009/06/29}{neue LCO \texttt{UScommercial9DW} für Papier im
 %   Format letter oder legal in Umschlägen im Format commercial No.\,9 mit
-%   zwei Fenstern}
+%   zwei Fenstern}^^A
 % \changes{v3.04}{2009/06/30}{neue LCO \texttt{UScommercial9} für Papier im
 %   Format letter oder legal in Umschlägen im Format commercial No.\,9 mit
-%   einem Fenster auf Basis von \texttt{http://www.envelopesuperstore.com/}}
+%   einem Fenster auf Basis von
+%   \texttt{http://www.envelopesuperstore.com/}}^^A
 % \changes{v3.04}{2009/06/26}{seit langem existierende LCO \texttt{visualize}
-%   zur Visualisierung einiger Pseudolängen aufgenommen}
+%   zur Visualisierung einiger Pseudolängen aufgenommen}^^A
+% \changes{v3.17}{2015/02/17}{neue LCOs \texttt{DIN5008A} und
+%   \texttt{DIN5008B}}^^A
 %    \begin{macrocode}
 \ProvidesFile{%
 %<visualize>  visualize%
 %<DIN>  DIN%
+%<5008> 5008%
+%<A>    A%
+%<B>    B%
 %<DINmoretext> DINmtext%
 %<SN>  SN%
 %<SNold>  SNold%
@@ -378,12 +384,23 @@
   .lco}[\KOMAScriptVersion\space letter-class-option]
 %    \end{macrocode}
 %
+% Manche \texttt{LCO}-Dateien bauen auf anderen auf:
+%    \begin{macrocode}
+%<*5008>
+\LoadLetterOption{%
+%<A>  DINmtext%
+%<B>  DIN%
+}
+%</5008>
+%    \end{macrocode}
+%
 % \begin{macro}{\LCOWarningNoLine}
 %   \changes{v2.95}{2006/03/24}{Neu}
 % \begin{macro}{\LCOWarning}
 %   \changes{v2.95}{2006/03/24}{Neu}
 % Außerdem wird ein Makro benötigt, das analog zu |\ClassWarningNoLine| oder
 % |\PackageWarningNoLine| funktioniert.
+%<*!5008>
 \providecommand*\LCOWarningNoLine[2]{%
   \LCOWarning{#1}{#2\@gobble}%
 }
@@ -394,6 +411,7 @@
     Letter class option  #1 Warning: #2%
   }%
 }
+%</!5008>
 % \end{macro}
 % \end{macro}
 %
@@ -411,6 +429,8 @@
 %   \texttt{lco}-Datei & Recherchiert von \\\hline\\[-1.6ex]
 %   DIN                & mir \\
 %   DINmtext           & mir \\
+%   DIN5008A           & mir \\
+%   DIN5008B           & mir \\
 %   KOMAold            & mir \\
 %   SNleft             & Roger Luethi \\
 %   SN                 & Roger Luethi \\
@@ -423,6 +443,7 @@
 %
 % Zunächst wird geprüft, ob überhaupt die richtige Klasse geladen ist.
 %    \begin{macrocode}
+%<*!5008>
 \@ifundefined{scr@fromname@var}{%
   \LCOWarningNoLine{%
 %<DIN>    DIN%
@@ -532,8 +553,15 @@
 %<DIN|DINmoretext|SN|SwissLeft|KOMAold|NF>  45mm}
 %<USletter2w>  1.17in}
 %<UScommercial9|UScommercial9DW>  1.125in}
+%</!5008>
 \@setplength{toaddrindent}{%
 %<DIN|DINmoretext|SN|SwissLeft|KOMAold|USletter2w|UScommercial9|UScommercial9DW>  \z@}
+%<*5008>
+  5mm}
+\@setplength{locvpos}{%
+  \dimexpr\useplength{toaddrvpos}+\useplength{backaddrheight}}
+%</5008>
+%<*!5008>
 %<NF>  10mm}
 \@setplength{backaddrheight}{%
 %<DIN|DINmoretext|SN|SwissLeft|KOMAold|NF>  5mm}
@@ -541,11 +569,19 @@
 %<USletter2w|UScommercial9|UScommercial9DW>\KOMAoptions{backaddress=false}
 \@setplength{specialmailindent}{\fill}
 \@setplength{specialmailrightindent}{1em}
+%</!5008>
+%<*5008>
+\@setplength{specialmailindent}{\useplength{toaddrindent}}
+\@setplength{specialmailrightindent}{\z@}
+%</5008>
 %    \end{macrocode}
 % \item[Absenderergänzung]
 %    \begin{macrocode}
 \@setplength{locwidth}{%
 %<DIN|DINmoretext|SN|SwissLeft|KOMAold|NF|USletter2w|UScommercial9|UScommercial9DW>  \z@}
+%<5008>  75mm}
+%<5008>\@setplength{lochpos}{10mm}
+%<*!5008>
 %    \end{macrocode}
 % \item[Kopf]
 %    \begin{macrocode}
@@ -555,6 +591,11 @@
 %<NF>  15mm}
 %<USletter2w>  .36in}
 %<UScommercial9|UScommercial9DW>  .4375in}
+%</!5008>
+%<*5008>
+\@setplength{firstheadhpos}{%
+  \dimexpr \useplength{toaddrhpos}+\useplength{toaddrindent}}
+%</5008>
 \@setplength{firstheadwidth}{%
 %<KOMAold>  \textwidth}
 %<NF>  170mm}
@@ -566,6 +607,7 @@
   \@addtoplength[2]{firstheadwidth}{\useplength{toaddrhpos}}
 \fi
 %</DIN|DINmoretext|SN|SwissLeft|UScommercial9>
+%<5008>  \dimexpr 125mm-\useplength{firstheadhpos}}
 %<*USletter2w>
   \paperwidth}
 \@addtoplength[-]{firstheadwidth}{.68in}
@@ -579,7 +621,13 @@
 % \changes{v2.9u}{2005/03/05}{Der Fuß hat optional eine feste Position 16\,mm
 %   über der unteren Papierkante.}
 %    \begin{macrocode}
-\@setplength{firstfootwidth}{\useplength{firstheadwidth}}
+%<!5008>\@setplength{firstfootwidth}{\useplength{firstheadwidth}}
+%<*5008>
+\@setplength{firstfoothpos}{%
+  \dimexpr\useplength{toaddrhpos}+\useplength{toaddrindent}}%
+\@setplength{firstfootwidth}{%
+  \dimexpr \paperwidth-\useplength{toaddrhpos}-\useplength{firstfoothpos}}%
+%</5008>
 %<KOMAold>\@setplength{firstfootvpos}{\paperheight}
 %<KOMAold>\@addtoplength{firstfootvpos}{-2cm}
 %<!KOMAold&!NF>\ifnum \scr@compatibility >\@nameuse{scr@v@2.9t}\relax
@@ -597,17 +645,20 @@
 %    \end{macrocode}
 % \item[Geschäftszeile]
 %    \begin{macrocode}
-\@setplength{refvpos}{%
+%<!(5008&B)>\@setplength{refvpos}{%
 %<DIN|SN>  98.5mm}
 %<DINmoretext>  80.5mm}
+%<5008&A>  79.4mm}
 %<SwissLeft>  89mm}
 %<KOMAold>  89.5mm}
 %<NF>  \useplength{tfoldmarkvpos}}
 %<USletter2w>  3.1in}
 %<UScommercial9|UScommercial9DW>  3.4375in}
 \@setplength{refaftervskip}{%
-%<!KOMAold>  \baselineskip}
+%<!KOMAold&!5008>  \baselineskip}
 %<KOMAold>  2\baselineskip}
+%<5008>  8.46mm}
+%<*!5008>
 %    \end{macrocode}
 % Bei der Breite der Geschäftszeile brauchen wir wieder eine Sonderlösung,
 % damit die Option "`wide"' auch später noch gesetzt werden kann. Also
@@ -710,6 +761,79 @@
 \def\subjectafteroff{%
   \@ObsoleteCommand{\subjectafteroff}{subject=beforeopening}}
 %</KOMAold>
+%    \end{macrocode}
+%
+% Und für \texttt{DIN5008} braucht es dann noch einige zusätzliche
+% Einstellungen:
+%    \begin{macrocode}
+%</!5008>
+%<*5008>
+\@newplength{specialmailheight}
+\@setplength{specialmailheight}{12.7mm}
+\areaset[5mm]{165mm}{233mm}
+\KOMAoptions{%
+  fromalign=locationleft,
+  addrfield=topaligned,
+  refline=narrow,
+  parskip=full
+}
+\l@addto@macro\@PapersizeWarning{%
+  \begingroup
+    \@tempswafalse
+    \ifdim\oddsidemargin<\dimexpr 25mm-1in-1pt\relax\@tempswatrue\else
+      \ifdim\oddsidemargin>\dimexpr 25mm-1in+1pt\relax\@tempswatrue\fi\fi
+    \ifdim\textwidth<\dimexpr \paperwidth-45mm-1pt\relax\@tempswatrue\else
+      \ifdim\textwidth>\dimexpr \paperwidth-45mm+1pt\relax\@tempswatrue\fi\fi
+    \if@tempswa
+      \LCOWarning{DIN5008%
+%<A>        A%
+%<B>        B%
+      }{%
+        DIN5008 orders exact margins and text\MessageBreak
+        width. Without following these values,\MessageBreak
+        your document does not conform DIN5008.\MessageBreak
+        You should use, e.g.,\MessageBreak
+        \space\string\areaset[5mm]{%
+          \the\dimexpr \paperwidth-45mm\relax}{%
+          \the\dimexpr 1.414\dimexpr \paperwidth-45mm\relax\relax}\MessageBreak
+        to follow the norm
+      }%
+    \fi
+    \ifdim \dimexpr\parskip\relax=\dimexpr\baselineskip\relax\else
+      \LCOWarning{DIN5008%
+%<A>        A%
+%<B>        B%
+      }{%
+        DIN5008 orders paragraph separation by\MessageBreak
+        exactly one line. Without this, your\MessageBreak
+        document does not conform DIN5008.\MessageBreak
+        You shoud use, e.g.,\MessageBreak
+        \space\string\KOMAoption{parskip}{full}\MessageBreak
+        to follow the norm
+      }%
+    \fi
+  \endgroup
+}
+\renewcommand{\backaddr@format}[1]{\hspace*{\useplength{toaddrindent}}%
+  \parbox[t][\useplength{backaddrheight}][t]%
+         {\dimexpr\useplength{toaddrwidth}-\useplength{toaddrindent}}%
+         {\strut\ignorespaces #1\ifhmode\unskip\strut\fi}%
+}
+\renewcommand{\specialmail@format}[1]{%
+  \parbox[t][\useplength{specialmailheight}][t]%
+         {\dimexpr\useplength{toaddrwidth}
+                 -\useplength{specialmailindent}
+                 -\useplength{specialmailrightindent}}%
+         {\strut\ignorespaces #1\ifhmode\unskip\strut\fi}%
+}
+\setkomafont{specialmail}{\sffamily\fontsize{10pt}{12pt}\selectfont}
+\setkomafont{backaddress}{\sffamily\fontsize{8pt}{10pt}\selectfont}
+\setkomafont{addressee}{\sffamily\fontsize{10pt}{12pt}\selectfont}
+\setkomafont{fromname}{\sffamily\fontsize{10pt}{12pt}\selectfont}
+\setkomafont{fromaddress}{\sffamily\fontsize{10pt}{12pt}\selectfont}
+\setkomafont{refvalue}{\sffamily\fontsize{10pt}{12pt}\selectfont}
+\let\raggedsignature\raggedright
+%</5008>
 %    \end{macrocode}
 %
 % \iffalse
