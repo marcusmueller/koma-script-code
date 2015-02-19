@@ -1,4 +1,4 @@
-% \CheckSum{3178}
+% \CheckSum{3121}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-notepaper.dtx
@@ -3265,60 +3265,42 @@
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\@xtrimtempa}
-%   \changes{v2.8q}{2002/02/05}{Neu (intern)}
+%   \changes{v2.8q}{2002/02/05}{Neu (intern)}^^A
+%   \changes{v3.17}{2014/02/19}{entfernt}^^A
 % \begin{macro}{\@@xtrimtempa}
-%   \changes{v2.8q}{2002/02/05}{Neu (intern)}
-% Die beiden internen Macros werden benötigt, um beim Zerlegen eines mit
-% \texttt{\cmd{\\}[\cs{dots}]} zusammengesetzten Arguments das optionale
-% Argument in eckigen Klammern abzutrennen. Das Ergebnis steht anschließend in
-% \cs{@tempa}.
-%    \begin{macrocode}
-\newcommand*{\@xtrimtempa}{%
-  \@ifnextchar [{\@@xtrimtempa}{\@@xtrimtempa[]}}
-\newcommand*{\@@xtrimtempa}{}
-\def\@@xtrimtempa[#1]#2\@nil{\def\@tempa{#2}}
-%    \end{macrocode}
+%   \changes{v2.8q}{2002/02/05}{Neu (intern)}^^A
+%   \changes{v3.17}{2014/02/19}{entfernt}^^A
 % \end{macro}
 % \end{macro}
 % \begin{macro}{\@tempdimaismaxwidthof}
-%   \changes{v2.8q}{2002/02/05}{Neu (intern)}
-% Das Makro zerlegt ein mit \texttt{\cmd{\\}[\cs{dots}]} zusammengesetzten
-% Arguments und merkt in \cs{@tempdima} die Länge des längsten
-% Elements. \cs{@tempdima} enthält beim Aufruf die minimale Länge.
-%    \begin{macrocode}
-\newcommand*{\@tempdimaismaxwidthof}{}
-\def\@tempdimaismaxwidthof#1\\#2\@nil{%
-  \settowidth{\@tempdimb}{\strut\ignorespaces#1}%
-  \ifdim\@tempdima<\@tempdimb\setlength{\@tempdima}{\@tempdimb}\fi
-  \def\@tempa{#2}\ifx\@tempa\@empty
-    \let\@tempb\relax
-  \else
-    \expandafter\@xtrimtempa\@tempa\@nil
-    \def\@tempb{\expandafter\@tempdimaismaxwidthof\@tempa\@nil}%
-  \fi
-  \@tempb
-}
-%    \end{macrocode}
-%  \end{macro}
-% Jetzt endlich zum eigentichen Befehl.
-%   \changes{v2.9r}{2004/01/28}{Längenbegrenzung auf \cs{hsize}}
-%   \changes{v2.9r}{2004/01/28}{das Argument darf leer sein}
+%   \changes{v2.8q}{2002/02/05}{Neu (intern)}^^A
+%   \changes{v3.17}{2014/02/19}{entfernt}^^A
+% \end{macro}
+% Jetzt endlich zum eigentlichen Befehl.
+%   \changes{v2.9r}{2004/01/28}{Längenbegrenzung auf \cs{hsize}}^^A
+%   \changes{v2.9r}{2004/01/28}{das Argument darf leer sein}^^A
+%   \changes{v3.17}{2015/02/19}{aus Rücksicht auf Leute, die ohne Rücksicht
+%     auf die Anleitung einfach machen, was ihnen gerade einfällt, neu
+%     implementiert}^^A
 %    \begin{macrocode}
 \newcommand*{\closing}[1]{{%
-    \setparsizes{\z@}{\z@}{\z@ plus 1fil}\par@updaterelative\nobreak\par%
-    \nobreak\vskip\baselineskip%
-    \stopbreaks\noindent%
-    \setlength{\@tempdima}{0pt}%
-    \expandafter\@tempdimaismaxwidthof\scr@signature@var\\\@nil
-    \expandafter\@tempdimaismaxwidthof\strut\ignorespaces#1\\\@nil
+    \setparsizes{\z@}{\z@}{\z@ plus 1fil}\par@updaterelative\nobreak\par
+    \nobreak\vskip\baselineskip
+    \stopbreaks\noindent
+    \settowidth{\@tempdima}{%
+      \begin{tabular}{@{}l@{}}
+        #1\\
+        \usekomavar{signature}\\
+      \end{tabular}
+    }%
     \setlength{\@tempdimb}{\hsize}%
     \addtolength{\@tempdimb}{-\useplength{sigindent}}%
-    \ifdim\@tempdima>\@tempdimb\setlength{\@tempdima}{\@tempdimb}\fi%
+    \ifdim\@tempdima>\@tempdimb\setlength{\@tempdima}{\@tempdimb}\fi
     \hspace{\useplength{sigindent}}%
-    \parbox{\@tempdima}{\raggedsignature\strut\ignorespaces%
+    \parbox{\@tempdima}{\raggedsignature\strut\ignorespaces
       #1\strut\\[\useplength{sigbeforevskip}]
       \strut\usekomavar{signature}\strut}}\par
-  \nobreak\vskip\baselineskip%
+  \nobreak\vskip\baselineskip
 }
 %    \end{macrocode}
 % \end{macro}
