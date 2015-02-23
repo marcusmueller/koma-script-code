@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2015/01/27 v1.8 internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2015/02/23 v1.8a internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -1320,7 +1320,8 @@
     chapter,chapterformat,chaptermarkformat,chapterpagestyle,chead,
     cleardoubleevenemptypage,clearscrheadfoot,closing,cofoot,Comment,
     DeclareLayer,DeclareNewNoteColumn,DeclareNewPageStyleAlias,
-    DeclareNewTOC,
+    DeclareNewTOC,DeclareSectionCommand,DeclareNewSectionCommand,
+    RedeclareSectionCommand,ProvideSectionCommand,
     dedication,defcaptionname,deffootnote,deffootnotemark,
     DefineFamily,DefineFamilyKey,
     DefineFamilyMember,DestroyLayer,defpagestyle,deftripstyle,
@@ -1347,7 +1348,8 @@
     multfootsep,multiplefootnoteseparator,
     Name,nameday,newbibstyle,newcaptionname,newkomavar,nexthead,
     ofoot,ohead,opening,othersectionlevelsformat,
-    p@section,pagemark,Paragraph,parellipsis,parformat,parname,parshortname,
+    p@section,pagemark,paragraphformat,subparagraphformat,
+    Paragraph,parellipsis,parformat,parname,parshortname,
     part,partformat,partname,partpagestyle,pnumfont,
     PreventPackageFromLoading,providecaptionname,publishers,ps,
     raggedsection,raggedpart,raggedsignature,recalctypearea,
@@ -1357,7 +1359,8 @@
     removereffields,renewcaptionname,
     RedeclarePageStyleAlias,
     ReplaceInput,ReplacePackage,ResetPreventPackageFromLoading,
-    rohead, sectionmarkformat,Sentence,sentencename,sentenceshortname,
+    rohead,sectionformat,subsectionformat,subsubsectionformat,
+    sectionmarkformat,Sentence,sentencename,sentenceshortname,
     setbibpreamble,setcapindent,setcapwidth,
     setchapterpreamble,setfootbotline,setfootsepline,setfootwidth,
     setheadsepline,setheadtopline,setheadwidth,setindexpreamble,setkomafont,
