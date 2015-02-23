@@ -2306,11 +2306,21 @@ umdefiniert werden.
 \begin{Declaration}
   \Macro{partformat}\\
   \Macro{chapterformat}\\
+  \Macro{sectionformat}\\
+  \Macro{subsectionformat}\\
+  \Macro{subsubsectionformat}\\
+  \Macro{paragraphformat}\\
+  \Macro{subparagraphformat}\\
   \Macro{othersectionlevelsformat}\Parameter{Gliederungsname}\Parameter{}\Parameter{Zählerausgabe}\\
   \Macro{autodot}
 \end{Declaration}%
 \BeginIndex{Cmd}{partformat}\Index{Teil>Nummer}%
 \BeginIndex{Cmd}{chapterformat}\Index{Kapitel>Nummer}%
+\BeginIndex{Cmd}{sectionformat}%
+\BeginIndex{Cmd}{subsectionformat}%
+\BeginIndex{Cmd}{subsubsectionformat}%
+\BeginIndex{Cmd}{paragraphformat}%
+\BeginIndex{Cmd}{subparagraphformat}%
 \BeginIndex{Cmd}{othersectionlevelsformat}\Index{Abschnitt>Nummer}%
 \BeginIndex{Cmd}{autodot}%
 \KOMAScript{} fügt der Ausgabe der Gliederungsnummern oberhalb von
@@ -2318,8 +2328,9 @@ umdefiniert werden.
 \autopageref{desc:maincls-experts.cmd.the}) eine weitere logische Ebene
 hinzu. Die Zähler werden für die jeweilige Überschrift nicht einfach nur
 ausgegeben. Sie werden mit Hilfe der parameterlosen Anweisungen
-\Macro{partformat}, \Macro{chapterformat} und der Anweisung
-\Macro{othersectionlevelsformat}, die drei Parameter erwartet, formatiert.
+\Macro{partformat}, \Macro{chapterformat} bis
+\Macro{subparagraphformat}\ChangedAt{v3.17}{\Class{scrbook}\and
+  \Class{scrreprt}\and \Class{scrartcl}} formatiert.
 \OnlyAt{\Class{scrbook}\and \Class{scrreprt}}Die Anweisung
 \Macro{chapterformat} existiert wie bereits \Macro{thechapter}
 selbstverständlich nicht in der Klasse \Class{scrartcl}, sondern nur in den
@@ -2334,14 +2345,19 @@ Regel verantwortlich. Auf den Punkt folgt bei allen Gliederungsebenen außer
 \Macro{part} noch ein \Macro{enskip}.  Dies entspricht einem Leerraum von
 0,5\Unit{em}, also einem Halbgeviert.
 
-Die Anweisung \Macro{othersectionlevelsformat}
-%\important{\Macro{othersectionlevelsformat}} 
-erwartet als ersten Parameter den Namen der Gliederungsebene, also
-\PValue{section}, \PValue{subsection}, \PValue{subsubsection},
-\PValue{paragraph} oder \PValue{subparagraph}.  Als drittes Argument wird die
-Ausgabe des Zählers dieser Gliederungsebene, also \Macro{thesection},
-\Macro{thesubsection}, \Macro{thesubsubsection}, \Macro{theparagraph} oder
-\Macro{thesubparagraph}, erwartet.
+Die Anweisung
+\Macro{othersectionlevelsformat}\ChangedAt{v3.17}{\Class{scrbook}\and
+  \Class{scrreprt}\and \Class{scrartcl}} wird seit \KOMAScript~3.17 nur noch
+in Ausnahmefällen verwendet, wenn für eine Gliederungsebene keine
+Format-Anweisung definiert oder diese \Macro{relax} ist, was jedoch in der
+Voreinstellung für die Gliederungsebenen von KOMA-Script nicht zutrifft. Daher
+wird sie auch nicht mehr offiziell dokumentiert. Bei einer
+Kompatibilitätseinstellung zu Versionen vor 3.17 (siehe Option
+\Option{version}, \autoref{sec:maincls.compatibilityOptions},
+\autopageref{desc:maincls.option.version}) haben hingegen die Anweisungen
+\Macro{sectionformat} bis \Macro{subparagraphformat} keine interne
+Funktion. Stattdessen wird für diese Ebenen dann weiterhin
+\Macro{othersectionlevelsformat} verwendet.
 
 In %\important[i]{\Macro{partformat}\\\Macro{chapterformat}} 
 der Voreinstellung gibt es nur für die beiden Ebenen \Macro{part} und
@@ -2353,20 +2369,24 @@ von {\KOMAScript} angeregt hat, wurde nur diese Unterscheidung
 benötigt. Anwender sollten bei der Umdefinierung der Anweisung das zweite
 Argument komplett ignorieren.
 
-Mit Hilfe von \Macro{renewcommand} kann jede der drei
+Mit Hilfe von \Macro{renewcommand} kann jede der 
 Formatierungsanweisungen umdefiniert werden, um sie eigenen Anforderungen
-anzupassen.  Nachfolgend finden Sie die Originaldefinitionen aus den
+anzupassen.  Nachfolgend finden Sie einige Originaldefinitionen aus den
 {\KOMAScript}-Klassen:
 \begin{lstcode}
   \newcommand*{\partformat}{\partname~\thepart\autodot}
   \newcommand*{\chapterformat}{%
     \mbox{\chapappifchapterprefix{\nobreakspace}\thechapter
       \autodot\enskip}}
+  \newcommand*{\sectionformat}{%
+    \csname thesection\endcsname\autodot\endskip
+  }%
   \newcommand*{\othersectionlevelsformat}[3]{%
     #3\autodot\enskip}
 \end{lstcode}
-Bitte\textnote{Achtung!} beachten Sie, dass bei der Umdefinierung
-\Macro{newcommand} durch \Macro{renewcommand} zu ersetzen ist.
+Die Definitionen der tieferen Ebenen entsprechen der von
+\Macro{sectionformat}. Bitte\textnote{Achtung!} beachten Sie, dass bei der
+Umdefinierung \Macro{newcommand} durch \Macro{renewcommand} zu ersetzen ist.
 
 \begin{Example}
   Angenommen, Sie wollen, dass bei \Macro{part} das Wort »Teil« vor
@@ -2388,25 +2408,30 @@ Bitte\textnote{Achtung!} beachten Sie, dass bei der Umdefinierung
   links mit dem umgebenden Text abschließt. Dies erreicht man
   mit:
 \begin{lstcode}
-  \renewcommand*{\othersectionlevelsformat}[3]{%
-    \llap{#3\autodot\enskip}}
-\end{lstcode}
-  Die wenig bekannte \TeX-Anweisung \Macro{llap}\IndexCmd{llap} sorgt
-  dabei dafür, dass das Argument links von der aktuellen Position
-  ausgegeben wird, ohne dass dabei die Position verändert wird. Eine
-  bessere \LaTeX-Lösung für dieses Problem wäre:
-\begin{lstcode}
-  \renewcommand*{\othersectionlevelsformat}[3]{%
-    \makebox[0pt][r]{#3\autodot\enskip}}
+  \renewcommand*{\sectionformat}{%
+    \makebox[0pt][r]{\thesection\autodot\enskip}}
+  \renewcommand*{\subsectionformat}{%
+    \makebox[0pt][r]{\thesubsection\autodot\enskip}}
+  \renewcommand*{\subsubsectionformat}{%
+    \makebox[0pt][r]{\thesubsubsection\autodot\enskip}}
+  \renewcommand*{\paragraphformat}{%
+    \makebox[0pt][r]{\theparagraph\autodot\enskip}}
+  \renewcommand*{\paragraphformat}{%
+    \makebox[0pt][r]{\thesubparagraph\autodot\enskip}}
 \end{lstcode}
   Näheres zu den optionalen Argumenten von \Macro{makebox} ist
   \cite{latex:usrguide} zu entnehmen.
 \end{Example}
 %
-\EndIndex{Cmd}{partformat}%
-\EndIndex{Cmd}{chapterformat}%
-\EndIndex{Cmd}{othersectionlevelsformat}%
 \EndIndex{Cmd}{autodot}%
+\EndIndex{Cmd}{othersectionlevelsformat}%
+\EndIndex{Cmd}{paragraphformat}%
+\EndIndex{Cmd}{subparagraphformat}%
+\EndIndex{Cmd}{subsubsectionformat}%
+\EndIndex{Cmd}{subsectionformat}%
+\EndIndex{Cmd}{sectionformat}%
+\EndIndex{Cmd}{chapterformat}%
+\EndIndex{Cmd}{partformat}%
 
 
 \begin{Declaration}
