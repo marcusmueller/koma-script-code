@@ -1,4 +1,4 @@
-% \CheckSum{3227}
+% \CheckSum{3238}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-fonts.dtx
@@ -620,9 +620,12 @@
 % \fi
 %
 % \begin{macro}{\changefontsizes}
-%   \changes{v2.96}{2006/08/11}{neue Anweisung (benötigt \eTeX)}
+%   \changes{v2.96}{2006/08/11}{neue Anweisung (benötigt \eTeX)}^^A
 %   \changes{v3.08b}{2011/02/22}{drei falsche \cs{def} durch \cs{edef}
-%     ersetzt}
+%     ersetzt}^^A
+%   \changes{v3.17}{2015/02/23}{wird nur definiert, wenn nicht vorhanden}^^A
+% \begin{macro}{\simple@changefontsizes}
+%   \changes{v3.17}{2015/02/23}{auf speziellen Wunsch von Falk}^^A
 % Diese Anweisung bietet berechnete Schriftgrößen als Fallbacklösung an. Das
 % optionale erste Argument ist dabei der Grundlinienabstand. Das zweite
 % Argument ist die gewünschte Grundschriftgröße.
@@ -669,7 +672,7 @@
 %    \end{macrocode}
 % \end{macro}
 %    \begin{macrocode}
-\newcommand*{\changefontsizes}[2][1.2\@tempdima]{%
+\providecommand*{\simple@changefontsizes}[2][1.2\@tempdima]{%
 %<!extend>  \ClassWarning{\KOMAClassName}{%
 %<extend>  \PackageWarning{scrextend}{%
     Using fallback calculation to setup font sizes\MessageBreak
@@ -1076,8 +1079,18 @@
     \fi
   }%
 }
+\scr@ifundefinedorrelax{changefontsizes}{%
+  \let\changefontsizes\simple@changefontsizes
+}{%
+  \ClassWarning{\KOMAClassName}{%
+    \string\changefontsizes\space already defined.\MessageBreak
+    I hope, the definition is compatible,\MessageBreak
+    because I do not change it%
+  }%
+}
 %    \end{macrocode}
-% \end{macro}
+% \end{macro}^^A \simple@changefontsizes
+% \end{macro}^^A \changefontsizes
 % \iffalse
 %</class|extend>
 %<*generator>
