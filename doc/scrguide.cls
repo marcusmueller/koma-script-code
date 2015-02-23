@@ -1370,6 +1370,7 @@
     subject,SubParagraph,subsectionmarkformat,subtitle,syncwithnotecolumn,
     tableformat,tablename,tableofcontents,textsubscript,thechapter,thefigure,
     thefootnotemark,thepar,thepart,thesection,thesentence,thesubsection,
+    thesubsubsection,theparagraph,thesubparagraph,
     thetable,thistime,
     titlehead,tocbasic@extend@babel,TOCclone,todaysname,typearea,%
     UnPreventPackageFromLoading,unitfactor,
