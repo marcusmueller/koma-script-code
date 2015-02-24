@@ -1,4 +1,4 @@
-% \CheckSum{2579}
+% \CheckSum{2764}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -62,7 +62,7 @@
 \begingroup
   \def\filedate$#1: #2-#3-#4 #5${\gdef\filedate{#2/#3/#4}}
   \filedate$Date$
-  \def\filerevision$#1: #2 ${\gdef\filerevision{#2}}
+  \def\filerevision$#1: #2 ${\gdef\filerevision{r#2}}
   \filerevision$Revision: 1638 $
 \endgroup
 \ProvidesFile{scrkernel-basics.dtx}[\filedate\space\filerevision\space
@@ -457,6 +457,8 @@
 %
 % \begin{macro}{\KOMA@key}
 %   \changes{v2.97c}{2007/04/19}{neues optionales Argument}
+%   \changes{v3.17}{2015/02/24}{rudimentäre Funktionalität zur Speicherung von
+%     Optionen}
 % \begin{macro}{\KOMA@key@familylist}
 % \textsf{keyval}-Schlüssel für \KOMAScript{} werden mit \cs{KOMAkey}
 % definiert, damit auch die Familie korrekt gesetzt und ggf. der Liste der
@@ -464,12 +466,168 @@
 %    \begin{macrocode}
 %<*koma>
 \newcommand*{\KOMA@key}[1][.\@currname.\@currext]{%
-  \DefineFamilyMember{KOMA}%
-  \DefineFamilyKey[#1]{KOMA}%
+  \DefineFamilyMember[{#1}]{KOMA}%
+  \@ifundefined{scr@kav@KOMA#1}{\@namedef{scr@kav@KOMA#1}{}}{}%
+  \DefineFamilyKey[{#1}]{KOMA}%
 }
 %</koma>
 %    \end{macrocode}
 % \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\KOMA@kav@add}
+%   \changes{v3.17}{2015/02/24}{neu (\KOMAScript intern)}
+% Dieses Makro speichert ein \texttt{key=value}-Paar in der internen Liste.
+% Es ist ausschließlich für den \KOMAScript-internen Gebrauch bestimmt.
+%    \begin{macrocode}
+%<*koma>
+\newcommand*{\KOMA@kav@add}[3]{%
+  \@ifundefined{scr@kav@KOMA#1}{%
+    \KOMA@internal@error\KOMA@kav@add{#1}%
+  }{%
+    \expandafter\l@addto@macro\csname scr@kav@KOMA#1\endcsname{\do{{#2}{#3}}}%
+  }%
+}
+%    \end{macrocode}
+%</koma>
+% \end{macro}
+%
+% \begin{macro}{\KOMA@kav@xadd}
+%   \changes{v3.17}{2015/02/24}{neu (\KOMAScript intern)}
+% Dieses Makro speichert ein zuvor expandiertes \texttt{key=value}-Paar in der
+% internen Liste.
+% Es ist ausschließlich für den \KOMAScript-internen Gebrauch bestimmt.
+%    \begin{macrocode}
+%<*koma>
+\newcommand*{\KOMA@kav@xadd}[3]{%
+  \@ifundefined{scr@kav@KOMA#1}{%
+    \KOMA@internal@error\KOMA@kav@xadd{#1}%
+  }{%
+    \edef\reserved@a{{#2}{#3}}%
+    \expandafter\l@addto@macro\csname scr@kav@KOMA#1\expandafter\endcsname
+    \expandafter{\expandafter\do\expandafter{\reserved@a}}%
+  }%
+}
+%    \end{macrocode}
+%</koma>
+% \end{macro}
+%
+% \begin{macro}{\KOMA@kav@remove}
+%   \changes{v3.17}{2015/02/24}{neu (\KOMAScript intern)}
+% Dieses Makro entfernt ein ganz bestimmtes \texttt{key=value}-Paar aus der
+% internen Liste.
+% Es ist ausschließlich für den \KOMAScript-internen Gebrauch bestimmt.
+%    \begin{macrocode}
+%<*koma>
+\newcommand*{\KOMA@kav@remove}[3]{%
+  \@ifundefined{scr@kav@KOMA#1}{%
+    \KOMA@internal@error\KOMA@kav@remove{#1}%
+  }{%
+    \begingroup
+      \def\reserved@a{\endgroup\@namedef{scr@kav@KOMA#1}{}}%
+      \edef\reserved@b{\detokenize{{#2}{#3}}}%
+      \def\do##1{%
+        \edef\reserved@c{\detokenize{##1}}%
+        \ifx\reserved@b\reserved@c\else
+          \l@addto@macro\reserved@a{%
+            \expandafter\l@addto@macro\csname scr@kav@KOMA#1\endcsname{%
+              \do{##1}%
+            }%
+          }%
+        \fi
+      }%
+      \@nameuse{scr@kav@KOMA#1}%
+    \reserved@a
+  }%
+}
+%</koma>
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\KOMA@kav@removekey}
+%   \changes{v3.17}{2015/02/24}{neu (\KOMAScript intern)}
+% Dieses Makro entfernt alle \texttt{key=value}-Paar mit einem gegebenen
+% \texttt{key} aus der internen Liste.
+% Es ist ausschließlich für den \KOMAScript-internen Gebrauch bestimmt.
+%    \begin{macrocode}
+%<*koma>
+\newcommand*{\KOMA@kav@removekey}[2]{%
+  \@ifundefined{scr@kav@KOMA#1}{%
+    \KOMA@internal@error\KOMA@kav@removekey{#1}%
+  }{%
+    \begingroup
+      \def\reserved@a{\endgroup\@namedef{scr@kav@KOMA#1}{}}%
+      \edef\reserved@b{\detokenize{#2}}%
+      \def\reserved@d##1##2{\edef\reserved@c{\detokenize{##1}}}%
+      \def\do##1{%
+        \reserved@d##1\relax
+        \ifx\reserved@b\reserved@c\else
+          \l@addto@macro\reserved@a{%
+            \expandafter\l@addto@macro\csname scr@kav@KOMA#1\endcsname{%
+              \do{##1}%
+            }%
+          }%
+        \fi
+      }%
+      \@nameuse{scr@kav@KOMA#1}%
+    \reserved@a
+  }%
+}
+%</koma>
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\KOMA@kav@defall}
+%   \changes{v3.17}{2015/02/24}{neu (\KOMAScript intern)}
+% Dieses Makro liefert eine \texttt{key=value}-Liste aller gespeicherten Paare.
+% Es ist ausschließlich für den \KOMAScript-internen Gebrauch bestimmt.
+%    \begin{macrocode}
+%<*koma>
+\newcommand*{\KOMA@kav@defall}[2]{%
+  \@ifundefined{scr@kav@KOMA#2}{%
+    \KOMA@internal@error\KOMA@kav@defall{#1}%
+  }{%
+    \begingroup
+      \let\reserved@a\@empty
+      \def\reserved@b##1##2{\l@addto@macro\reserved@a{,{##1=##2}}}%
+      \def\do##1{\reserved@b##1}%
+      \@nameuse{scr@kav@KOMA#2}%
+      \ifx\reserved@a\@empty
+        \def\reserved@b{\endgroup\let#1\@empty}%
+      \else
+        \edef\reserved@b{%
+          \unexpanded{\endgroup\def#1}{%
+            \unexpanded
+            \expandafter\expandafter\expandafter{%
+              \expandafter\@gobble\reserved@a}}}%
+      \fi
+    \reserved@b
+  }%
+}
+%</koma>
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\KOMA@internal@error}
+%   \changes{v3.17}{2015/02/24}{neu (\KOMAScript intern)}
+% Einfach nur eine Meldung über einen internen Fehler mit der Bitte um einen
+% entsprechenden Bug-Report.
+%    \begin{macrocode}
+%<*koma>
+\newcommand*{\KOMA@internal@error}[2]{%
+  \PackageError{scrkbase}{internal error using \string#1{#2}}{%
+    You've found an internal error either in KOMA-Script or a third
+    party\MessageBreak
+    definition, that uses KOMA-Script internal macros.\MessageBreak
+    Please send a bug report with a minimal but complete example,
+    that\MessageBreak
+    shows this error, to komascript at gmx dot info or report it
+    at\MessageBreak 
+    <http://www.komascript.de/forum/20> (you need an account to do so).%
+  }%
+}
+%</koma>
+%    \end{macrocode}
 % \end{macro}
 %
 % \subsection{Optionen}
@@ -2386,13 +2544,49 @@
 % der Name des Schlüssels, der zweite ist der Name des Schalters. 
 %    \begin{macrocode}
 %<*koma>
-\newcommand*{\KOMA@ifkey}{%
-  \DefineFamilyMember{KOMA}%
-  \FamilyBoolKey{KOMA}%
+\newcommand*{\KOMA@ifkey}[1][.\@currname.\@currext]{%
+  \begingroup\edef\reserved@a{\noexpand\KOMA@@ifkey{#1}}%
+  \expandafter\endgroup\reserved@a
+}
+\newcommand*{\KOMA@@ifkey}[3]{%
+  \@ifundefined{if#3}{%
+    \expandafter\newif\csname if#3\endcsname
+  }{}%
+  \KOMA@key[{#1}]{#2}[true]{%
+    \KOMA@set@ifkey{#2}{#3}{##1}%
+    \KOMA@kav@replacebool{#1}{#2}{#3}%
+  }%
 }
 %</koma>
 %    \end{macrocode}
-%  \begin{macro}{\KOMA@set@ifkey}
+% \begin{macro}{\KOMA@kav@replacebool}
+%   \changes{v3.17}{2015/02/24}{neu (\KOMAScript intern)}
+% Dieses Makro dient dazu, den Wert eines if-Schlüssels in der internen Liste
+% auszutauschen. Das erste (optionale) Argument ist das Mitglied, das zweite
+% ist der Name des Schlüssels, das dritte der Name des Schalters.
+% Es ist ausschließlich für den \KOMAScript-internen Gebrauch bestimmt.
+%    \begin{macrocode}
+%<*koma>
+\newcommand*{\KOMA@kav@replacebool}[3]{%
+  \ifx\FamilyKeyState\FamilyKeyStateProcessed
+    \@ifundefined{scr@kav@KOMA#1}{%
+      \KOMA@internal@error\KOMA@kav@replacebool{#1}%
+    }{%
+      \KOMA@kav@remove{#1}{#2}{false}%
+      \KOMA@kav@remove{#1}{#2}{true}%
+      \expandafter\ifx\csname if#3\expandafter\endcsname
+                      \csname iftrue\endcsname
+        \KOMA@kav@xadd{#1}{#2}{true}%
+      \else
+        \KOMA@kav@xadd{#1}{#2}{false}%
+      \fi
+    }%
+  \fi
+}
+%</koma>
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\KOMA@set@ifkey}
 % Die eigentliche Arbeit bei der ganzen Sache wird von diesem internen
 % Makro erledigt. Dabei wird der Name des Schlüssels zu Argument 1, der
 % Name des Schalters zu Argument 2 und der Wert des Schlüssels wird
