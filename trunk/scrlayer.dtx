@@ -376,15 +376,23 @@
       \aftergroup\FamilyKeyStateUnknownValue
     \fi
   \endgroup
+  \ifx\FamilyKeyState\FamilyKeyStateProcessed
+    \KOMA@kav@removekey{.scrlayer.sty}{markcase}%
+    \KOMA@kav@xadd{.scrlayer.sty}{markcase}{#1}%
+  \fi
 %<interface&scrpage>}%
 }
-%<interface>\scrlayer@AddCsToInterface{KV@KOMA.\@currname.\@currext @markcase}
+%</options>
+%<*interface&body>
+\expandafter\let
+  \csname KV@KOMA.\@currname.\@currext @markcase\endcsname\relax
+%</interface&body>
 %    \end{macrocode}
 % \begin{macro}{\MakeMarkcase}
 % We use this instead of, e.g., \Macro{MakeUppercase} for every layer! So the
 % name seams to be wrong, but it is common, so we use it here.
 %    \begin{macrocode}
-%<*package>
+%<*package&options>
 \providecommand*{\MakeMarkcase}[1]{#1}
 %    \end{macrocode}
 % \begin{macro}{\scrlayer@ignoreuppercase}
@@ -406,8 +414,7 @@
 % \begin{macro}{\ifscrlayer@forceignoreuppercase}
 %    \begin{macrocode}
 \newif\ifscrlayer@forceignoreuppercase
-%</package>
-%</options>
+%</package&options>
 %    \end{macrocode}
 % \end{macro}^^A \ifscrlayer@forceignoreuppercase
 % \end{macro}^^A \scrlayer@ignoreuppercase
@@ -634,9 +641,20 @@
 % single-side layout.
 %    \begin{macrocode}
 %<*options>
+%<*package>
 \KOMA@ifkey{autooneside}{scrlayer@autooneside}\scrlayer@autoonesidetrue
-%<interface>\scrlayer@AddCsToInterface{KV@KOMA.\@currname.\@currext @autooneside}
+%</package>
+%<*interface>
+\KOMA@key{autooneside}[true]{%
+  \KOMA@set@ifkey{autooneside}{scrlayer@autooneside}{#1}%
+  \KOMA@kav@replacebool{.scrlayer.sty}{autooneside}{scrlayer@autooneside}%
+}
+%</interface>
 %</options>
+%<*interface&body>
+\expandafter\let
+  \csname KV@KOMA.\@currname.\@currext @autooneside\endcsname\relax
+%</interface&body>
 %    \end{macrocode}
 % \end{macro}^^A \ifscrlayer@autooneside
 % \end{option}^^A autooneside
@@ -663,21 +681,31 @@
     \fi
   }%
   \FamilyKeyStateProcessed
+  \KOMA@kav@removekey{.scrlayer.sty}{automark}%
+  \KOMA@kav@removekey{.scrlayer.sty}{manualmark}%
+  \KOMA@kav@add{.scrlayer.sty}{automark}{}%
 }
-%<*interface>
-\scrlayer@AddCsToInterface{KV@KOMA.\@currname.\@currext @automark}
-\scrlayer@AddCsToInterface{KV@KOMA.\@currname.\@currext @automark@default}
-%</interface>
+%</options>
+%<*interface&body>
+\expandafter\let\csname KV@KOMA.\@currname.\@currext @automark\endcsname\relax
+\expandafter\let
+  \csname KV@KOMA.\@currname.\@currext @automark@default\endcsname\relax
+%</interface&body>
+%<*options>
 \KOMA@key{manualmark}[]{%
   \scrlayer@testunexpectedarg{manualmark}{#1}%
   \scrlayer@AtEndOfPackage{\manualmark}%
   \FamilyKeyStateProcessed
+  \KOMA@kav@removekey{.scrlayer.sty}{automark}%
+  \KOMA@kav@removekey{.scrlayer.sty}{manualmark}%
+  \KOMA@kav@add{.scrlayer.sty}{manualmark}{}%
 }
-%<*interface>
-\scrlayer@AddCsToInterface{KV@KOMA.\@currname.\@currext @manualmark}
-\scrlayer@AddCsToInterface{KV@KOMA.\@currname.\@currext @manualmark@default}
-%</interface>
 %</options>
+%<*interface&body>
+\expandafter\let\csname KV@KOMA.\@currname.\@currext @manualmark\endcsname\relax
+\expandafter\let
+  \csname KV@KOMA.\@currname.\@currext @manualmark@default\endcsname\relax
+%</interface&body>
 %    \end{macrocode}
 % \end{option}^^A manualmark
 % \end{option}^^A automark
@@ -2004,13 +2032,16 @@
 \KOMA@key{onpsselect}{%
   \l@addto@macro{\@ps@initialhook}{#1}%
   \FamilyKeyStateProcessed
+  \KOMA@kav@add{.scrlayer.sty}{onpsselect}{#1}%
 }
-%<*interface>
-\scrlayer@AddCsToInterface{KV@KOMA.\@currname.\@currext @onpsselect}
-\scrlayer@AddCsToInterface{KV@KOMA.\@currname.\@currext @onpsselect@default}
-%</interface>
 %<package>\newcommand*{\@ps@initialhook}{}
 %</options>
+%<*interface&body>
+\expandafter\let
+  \csname KV@KOMA.\@currname.\@currext @onpsselect\endcsname\relax
+\expandafter\let
+  \csname KV@KOMA.\@currname.\@currext @onpsselect@default\endcsname\relax
+%</interface&body>
 %<*package&body>
 \DefineFamilyKey[.definelayerpagestyle]{KOMAarg}{onselect}{%
   \expandafter\l@addto@macro
@@ -2035,13 +2066,16 @@
 \KOMA@key{onpsinit}{%
   \l@addto@macro{\@ps@hook}{#1}%
   \FamilyKeyStateProcessed
+  \KOMA@kav@add{.scrlayer.sty}{onpsinit}{#1}%
 }
-%<*interface>
-\scrlayer@AddCsToInterface{KV@KOMA.\@currname.\@currext @onpsinit}
-\scrlayer@AddCsToInterface{KV@KOMA.\@currname.\@currext @onpsinit@default}
-%</interface>
 %<package>\newcommand*{\@ps@hook}{}
 %</options>
+%<*interface&body>
+\expandafter\let
+  \csname KV@KOMA.\@currname.\@currext @onpsinit\endcsname\relax
+\expandafter\let
+  \csname KV@KOMA.\@currname.\@currext @onpsinit@default\endcsname\relax
+%</interface&body>
 %<*package&body>
 \DefineFamilyKey[.definelayerpagestyle]{KOMAarg}{oninit}{%
   \expandafter\l@addto@macro
@@ -2067,13 +2101,16 @@
 \KOMA@key{onpsoneside}{%
   \l@addto@macro{\@ps@onesidehook}{#1}%
   \FamilyKeyStateProcessed
+  \KOMA@kav@add{.scrlayer.sty}{onpsoneside}{#1}%
 }
-%<*interface>
-\scrlayer@AddCsToInterface{KV@KOMA.\@currname.\@currext @onpsoneside}
-\scrlayer@AddCsToInterface{KV@KOMA.\@currname.\@currext @onpsoneside@default}
-%</interface>
 %<package>\newcommand*{\@ps@onesidehook}{}
 %</options>
+%<*interface&body>
+\expandafter\let
+  \csname KV@KOMA.\@currname.\@currext @onpsoneside\endcsname\relax
+\expandafter\let
+  \csname KV@KOMA.\@currname.\@currext @onpsoneside@default\endcsname\relax
+%</interface&body>
 %<*package&body>
 \DefineFamilyKey[.definelayerpagestyle]{KOMAarg}{ononeside}{%
   \expandafter\l@addto@macro
@@ -2099,13 +2136,16 @@
 \KOMA@key{onpstwoside}{%
   \l@addto@macro{\@ps@twosidehook}{#1}%
   \FamilyKeyStateProcessed
+  \KOMA@kav@add{.scrlayer.sty}{onpstwoside}{#1}%
 }
-%<*interface>
-\scrlayer@AddCsToInterface{KV@KOMA.\@currname.\@currext @onpstwoside}
-\scrlayer@AddCsToInterface{KV@KOMA.\@currname.\@currext @onpstwoside@default}
-%</interface>
 %<package>\newcommand*{\@ps@twosidehook}{}
 %</options>
+%<*interface&body>
+\expandafter\let
+  \csname KV@KOMA.\@currname.\@currext @onpstwoside\endcsname\relax
+\expandafter\let
+  \csname KV@KOMA.\@currname.\@currext @onpstwoside@default\endcsname\relax
+%</interface&body>
 %<*package&body>
 \DefineFamilyKey[.definelayerpagestyle]{KOMAarg}{ontwoside}{%
   \expandafter\l@addto@macro
@@ -2131,13 +2171,16 @@
 \KOMA@key{onpsoddpage}{%
   \l@addto@macro{\@ps@oddpagehook}{#1}%
   \FamilyKeyStateProcessed
+  \KOMA@kav@add{.scrlayer.sty}{onpsoddpage}{#1}%
 }
-%<*interface>
-\scrlayer@AddCsToInterface{KV@KOMA.\@currname.\@currext @onpsoddpage}
-\scrlayer@AddCsToInterface{KV@KOMA.\@currname.\@currext @onpsoddpage@default}
-%</interface>
 %<package>\newcommand*{\@ps@oddpagehook}{}
 %</options>
+%<*interface&body>
+\expandafter\let
+  \csname KV@KOMA.\@currname.\@currext @onpsoddpage\endcsname\relax
+\expandafter\let
+  \csname KV@KOMA.\@currname.\@currext @onpsoddpage@default\endcsname\relax
+%</interface&body>
 %<*package&body>
 \DefineFamilyKey[.definelayerpagestyle]{KOMAarg}{onoddpage}{%
   \expandafter\l@addto@macro
@@ -2163,13 +2206,16 @@
 \KOMA@key{onpsevenpage}{%
   \l@addto@macro{\@ps@evenpagehook}{#1}%
   \FamilyKeyStateProcessed
+  \KOMA@kav@add{.scrlayer.sty}{onpsevenpage}{#1}%
 }
-%<*interface>
-\scrlayer@AddCsToInterface{KV@KOMA.\@currname.\@currext @onpsevenpage}
-\scrlayer@AddCsToInterface{KV@KOMA.\@currname.\@currext @onpsevenpage@default}
-%</interface>
 %<package>\newcommand*{\@ps@evenpagehook}{}
 %</options>
+%<*interface&body>
+\expandafter\let
+  \csname KV@KOMA.\@currname.\@currext @onpsevenpage\endcsname\relax
+\expandafter\let
+  \csname KV@KOMA.\@currname.\@currext @onpsevenpage@default\endcsname\relax
+%</interface&body>
 %<*package&body>
 \DefineFamilyKey[.definelayerpagestyle]{KOMAarg}{onevenpage}{%
   \expandafter\l@addto@macro
@@ -2193,13 +2239,16 @@
 \KOMA@key{onpsfloatpage}{%
   \l@addto@macro{\@ps@floatpagehook}{#1}%
   \FamilyKeyStateProcessed
+  \KOMA@kav@add{.scrlayer.sty}{onpsfloatpage}{#1}%
 }
-%<*interface>
-\scrlayer@AddCsToInterface{KV@KOMA.\@currname.\@currext @onpsfloatpage}
-\scrlayer@AddCsToInterface{KV@KOMA.\@currname.\@currext @onpsfloatpage@default}
-%</interface>
 %<package>\newcommand*{\@ps@floatpagehook}{}
 %</options>
+%<*interface&body>
+\expandafter\let
+  \csname KV@KOMA.\@currname.\@currext @onpsfloatpage\endcsname\relax
+\expandafter\let
+  \csname KV@KOMA.\@currname.\@currext @onpsfloatpage@default\endcsname\relax
+%</interface&body>
 %<*package&body>
 \DefineFamilyKey[.definelayerpagestyle]{KOMAarg}{onfloatpage}{%
   \expandafter\l@addto@macro
@@ -2223,14 +2272,16 @@
 \KOMA@key{onpsnonfloatpage}{%
   \l@addto@macro{\@ps@nonfloatpagehook}{#1}%
   \FamilyKeyStateProcessed
+  \KOMA@kav@add{.scrlayer.sty}{onpsnonfloatpage}{#1}%
 }
-%<*interface>
-\scrlayer@AddCsToInterface{KV@KOMA.\@currname.\@currext @onpsnonfloatpage}
-\scrlayer@AddCsToInterface{%
-  KV@KOMA.\@currname.\@currext @onpsnonfloatpage@default}
-%</interface>
 %<package>\newcommand*{\@ps@nonfloatpagehook}{}
 %</options>
+%<*interface&body>
+\expandafter\let
+  \csname KV@KOMA.\@currname.\@currext @onpsnonfloatpage\endcsname\relax
+\expandafter\let
+  \csname KV@KOMA.\@currname.\@currext @onpsnonfloatpage@default\endcsname\relax
+%</interface&body>
 %<*package&body>
 \DefineFamilyKey[.definelayerpagestyle]{KOMAarg}{onnonfloatpage}{%
   \expandafter\l@addto@macro
@@ -2256,14 +2307,16 @@
 \KOMA@key{onpsbackground}{%
   \l@addto@macro{\@ps@backgroundhook}{#1}%
   \FamilyKeyStateProcessed
+  \KOMA@kav@add{.scrlayer.sty}{onpsbackground}{#1}%
 }
-%<*interface>
-\scrlayer@AddCsToInterface{KV@KOMA.\@currname.\@currext @onpsbackground}
-\scrlayer@AddCsToInterface{%
-  KV@KOMA.\@currname.\@currext @onpsbackground@default}
-%</interface>
 %<package>\newcommand*{\@ps@backgroundhook}{}
 %</options>
+%<*interface&body>
+\expandafter\let
+  \csname KV@KOMA.\@currname.\@currext @onpsbackground\endcsname\relax
+\expandafter\let
+  \csname KV@KOMA.\@currname.\@currext @onpsbackground@default\endcsname\relax
+%</interface&body>
 %<*package&body>
 \DefineFamilyKey[.definelayerpagestyle]{KOMAarg}{onbackground}{%
   \expandafter\l@addto@macro
@@ -2289,14 +2342,16 @@
 \KOMA@key{onpsforeground}{%
   \l@addto@macro{\@ps@foregroundhook}{#1}%
   \FamilyKeyStateProcessed
+  \KOMA@kav@add{.scrlayer.sty}{onpsforeground}{#1}%
 }
-%<*interface>
-\scrlayer@AddCsToInterface{KV@KOMA.\@currname.\@currext @onpsforeground}
-\scrlayer@AddCsToInterface{%
-  KV@KOMA.\@currname.\@currext @onpsforeground@default}
-%</interface>
 %<package>\newcommand*{\@ps@foregroundhook}{}
 %</options>
+%<*interface&body>
+\expandafter\let
+  \csname KV@KOMA.\@currname.\@currext @onpsforeground\endcsname\relax
+\expandafter\let
+  \csname KV@KOMA.\@currname.\@currext @onpsforeground@default\endcsname\relax
+%</interface&body>
 %<*package&body>
 \DefineFamilyKey[.definelayerpagestyle]{KOMAarg}{onforeground}{%
   \expandafter\l@addto@macro
@@ -2519,14 +2574,25 @@
 % option too.
 %    \begin{macrocode}
 %<*options>
+%<*package>
 \KOMA@ifkey{deactivatepagestylelayers}{scrlayer@deactivate@layers}
+%</package>
 %<*interface>
-\scrlayer@AddCsToInterface{%
-  KV@KOMA.\@currname.\@currext @deactivatepagestylelayers}
-\scrlayer@AddCsToInterface{%
-  KV@KOMA.\@currname.\@currext @deactivatepagestylelayers@default}
+\KOMA@key{deactivatepagestylelayers}[true]{%
+  \KOMA@set@ifkey{deactivatepagestylelayers}{scrlayer@deactivate@layers}{#1}%
+  \KOMA@kav@replacebool{.scrlayer.sty}{deactivatepagestylelayers}
+                       {scrlayer@deactivate@layers}%
+}
 %</interface>
 %</options>
+%<*interface&body>
+\expandafter\let
+  \csname KV@KOMA.\@currname.\@currext @deactivatepagestylelayers\endcsname
+  \relax
+\expandafter\let
+  \csname KV@KOMA.\@currname.\@currext @deactivatepagestylelayers@default\endcsname
+  \relax
+%</interface&body>
 %    \end{macrocode}
 % \end{macro}^^A \ifscrlayer@deactivate@layers
 % \end{option}^^A deactivatepagestylelayers
@@ -2659,12 +2725,22 @@
 % contents and one time with contents \Macro{layercontentsmeasure}.
 %    \begin{macrocode}
 %<*options>
+%<*package>
 \KOMA@ifkey{draft}{scrlayer@draft}
+%</package>
 %<*interface>
-\scrlayer@AddCsToInterface{KV@KOMA.\@currname.\@currext @draft}
-\scrlayer@AddCsToInterface{KV@KOMA.\@currname.\@currext @draft@default}
+\KOMA@key{draft}[true]{%
+  \KOMA@set@ifkey{draft}{scrlayer@draft}{#1}%
+  \KOMA@kav@replacebool{.scrlayer.sty}{draft}{scrlayer@draft}%
+}
 %</interface>
 %</options>
+%<*interface&body>
+\expandafter\let
+  \csname KV@KOMA.\@currname.\@currext @draft\endcsname\relax
+\expandafter\let
+  \csname KV@KOMA.\@currname.\@currext @draft@default\endcsname\relax
+%</interface&body>
 %    \end{macrocode}
 % \end{macro}^^A \ifscrlayer@draft
 % \end{option}^^A draft
@@ -3615,12 +3691,22 @@
 %   \end{description}
 %    \begin{macrocode}
 %<*options>
+%<*package>
 \KOMA@ifkey{forceoverwrite}{scrlayer@forceoverwrite}
+%</package>
 %<*interface>
-\scrlayer@AddCsToInterface{KV@KOMA.\@currname.\@currext @forceoverwrite}
-\scrlayer@AddCsToInterface{KV@KOMA.\@currname.\@currext @forceoverwrite@default}
+\KOMA@key{forceoverwrite}[true]{%
+  \KOMA@set@ifkey{forceoverwrite}{scrlayer@forceoverwrite}{#1}%
+  \KOMA@kav@replacebool{.scrlayer.sty}{forceoverwrite}{scrlayer@forceoverwrite}%
+}
 %</interface>
 %</options>
+%<*interface&body>
+\expandafter\let
+  \csname KV@KOMA.\@currname.\@currext @forceoverwrite\endcsname\relax
+\expandafter\let
+  \csname KV@KOMA.\@currname.\@currext @forceoverwrite@default\endcsname\relax
+%</interface&body>
 %    \end{macrocode}
 % \end{macro}^^A \ifscrlayer@forceoverwrite
 % \end{option}^^A forceoverwrite
@@ -3633,13 +3719,24 @@
 %   \end{description}
 %    \begin{macrocode}
 %<*options>
+%<*package>
 \KOMA@ifkey{autoremoveinterfaces}{scrlayer@autoremoveinterfaces}
+%</package>
 %<*interface>
-\scrlayer@AddCsToInterface{KV@KOMA.\@currname.\@currext @autoremoveinterfaces}
-\scrlayer@AddCsToInterface{%
-  KV@KOMA.\@currname.\@currext @autoremoveinterfaces@default}
+\KOMA@key{autoremoveinterfaces}[true]{%
+  \KOMA@set@ifkey{autoremoveinterfaces}{scrlayer@autoremoveinterfaces}{#1}%
+  \KOMA@kav@replacebool{.scrlayer.sty}{autoremoveinterfaces}
+                       {scrlayer@autoremoveinterfaces}%
+}
 %</interface>
 %</options>
+%<*interface&body>
+\expandafter\let
+  \csname KV@KOMA.\@currname.\@currext @autoremoveinterfaces\endcsname\relax
+\expandafter\let
+  \csname KV@KOMA.\@currname.\@currext @autoremoveinterfaces@default\endcsname
+  \relax
+%</interface&body>
 %    \end{macrocode}
 % \end{macro}^^A \ifscrlayer@autoremoveinterfaces
 % \end{option}^^A autoremoveinterfaces
