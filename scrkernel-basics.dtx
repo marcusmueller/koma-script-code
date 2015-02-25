@@ -1,4 +1,4 @@
-% \CheckSum{2764}
+% \CheckSum{2827}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -577,9 +577,46 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}{\KOMA@kav@replacevalue}
+% \begin{macro}{\KOMA@kav@xreplacevalue}
+%   \changes{v3.17}{2015/02/25}{neu (\KOMAScript intern)}
+% Diese Makros dienen dazu, den Wert Schlüssels in der internen Liste
+% auszutauschen. Das erste (optionale) Argument ist das Mitglied, das zweite
+% ist der Name des Schlüssels, das dritte der neue Wert. Es setzt den Status
+% \cs{FamilyKeyStateProcessed} voraus. Anderenfalls tut es nichts!
+% Es ist ausschließlich für den \KOMAScript-internen Gebrauch bestimmt.
+%    \begin{macrocode}
+%<*koma>
+\newcommand*{\KOMA@kav@replacevalue}[3]{%
+  \ifx\FamilyKeyState\FamilyKeyStateProcessed
+    \@ifundefined{scr@kav@KOMA#1}{%
+      \KOMA@internal@error\KOMA@kav@replacevalue{#1}%
+    }{%
+      \KOMA@kav@removekey{#1}{#2}%
+      \KOMA@kav@add{#1}{#2}{#3}%
+    }%
+  \fi
+}
+\newcommand*{\KOMA@kav@xreplacevalue}[3]{%
+  \ifx\FamilyKeyState\FamilyKeyStateProcessed
+    \@ifundefined{scr@kav@KOMA#1}{%
+      \KOMA@internal@error\KOMA@kav@replacevalue{#1}%
+    }{%
+      \KOMA@kav@removekey{#1}{#2}%
+      \KOMA@kav@xadd{#1}{#2}{#3}%
+    }%
+  \fi
+}
+%</koma>
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
 % \begin{macro}{\KOMA@kav@defall}
 %   \changes{v3.17}{2015/02/24}{neu (\KOMAScript intern)}
 % Dieses Makro liefert eine \texttt{key=value}-Liste aller gespeicherten Paare.
+% Das erste Argument ist die zu definierende Anweisung, das zweite ist das
+% Mitglied.
 % Es ist ausschließlich für den \KOMAScript-internen Gebrauch bestimmt.
 %    \begin{macrocode}
 %<*koma>
@@ -590,6 +627,43 @@
     \begingroup
       \let\reserved@a\@empty
       \def\reserved@b##1##2{\l@addto@macro\reserved@a{,{##1=##2}}}%
+      \def\do##1{\reserved@b##1}%
+      \@nameuse{scr@kav@KOMA#2}%
+      \ifx\reserved@a\@empty
+        \def\reserved@b{\endgroup\let#1\@empty}%
+      \else
+        \edef\reserved@b{%
+          \unexpanded{\endgroup\def#1}{%
+            \unexpanded
+            \expandafter\expandafter\expandafter{%
+              \expandafter\@gobble\reserved@a}}}%
+      \fi
+    \reserved@b
+  }%
+}
+%</koma>
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\KOMA@kav@defone}
+%   \changes{v3.17}{2015/02/25}{neu (\KOMAScript intern)}
+% Dieses Makro liefert alle aktuellen Werte eine Schlüssels aus der
+% \texttt{key=value}-Liste aller gespeicherten Paare. Falls es mehr als einen
+% Wert gibt, so werden diese \cs{KOMAoption}-tauglich verknüpft. Das erste
+% Argument ist die zu definierende Anweisung, das zweite ist das Mitglied
+% und das dritte der Schlüssel.
+% Es ist ausschließlich für den \KOMAScript-internen Gebrauch bestimmt.
+%    \begin{macrocode}
+%<*koma>
+\newcommand*{\KOMA@kav@defone}[3]{%
+  \@ifundefined{scr@kav@KOMA#2}{%
+    \KOMA@internal@error\KOMA@kav@defall{#1}%
+  }{%
+    \begingroup
+      \let\reserved@a\@empty
+      \def\reserved@b##1##2{%
+        \ifstr{##1}{#3}{\l@addto@macro\reserved@a{,{##2}}}{}%
+      }%
       \def\do##1{\reserved@b##1}%
       \@nameuse{scr@kav@KOMA#2}%
       \ifx\reserved@a\@empty
