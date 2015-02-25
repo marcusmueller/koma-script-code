@@ -1,4 +1,4 @@
-% \CheckSum{2827}
+% \CheckSum{2892}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -468,6 +468,7 @@
 \newcommand*{\KOMA@key}[1][.\@currname.\@currext]{%
   \DefineFamilyMember[{#1}]{KOMA}%
   \@ifundefined{scr@kav@KOMA#1}{\@namedef{scr@kav@KOMA#1}{}}{}%
+  \@ifundefined{scr@kav@list@KOMA#1}{\@namedef{scr@kav@list@KOMA#1}{}}{}%
   \DefineFamilyKey[{#1}]{KOMA}%
 }
 %</koma>
@@ -486,6 +487,15 @@
     \KOMA@internal@error\KOMA@kav@add{#1}%
   }{%
     \expandafter\l@addto@macro\csname scr@kav@KOMA#1\endcsname{\do{{#2}{#3}}}%
+    \expandafter\ifx\csname scr@kav@list@KOMA#1\endcsname\@empty
+      \expandafter\l@addto@macro\csname scr@kav@list@KOMA#1\endcsname{%
+        {#2=#3}%
+      }%
+    \else
+      \expandafter\l@addto@macro\csname scr@kav@list@KOMA#1\endcsname{%
+        ,{#2=#3}%
+      }%
+    \fi
   }%
 }
 %    \end{macrocode}
@@ -506,6 +516,13 @@
     \edef\reserved@a{{#2}{#3}}%
     \expandafter\l@addto@macro\csname scr@kav@KOMA#1\expandafter\endcsname
     \expandafter{\expandafter\do\expandafter{\reserved@a}}%
+    \expandafter\ifx\csname scr@kav@list@KOMA#1\endcsname\@empty
+      \edef\reserved@a{{#2=#3}}%
+    \else
+      \edef\reserved@a{,{#2=#3}}%
+    \fi
+    \expandafter\l@addto@macro\csname scr@kav@list@KOMA#1\expandafter\endcsname
+    \expandafter{\reserved@a}%
   }%
 }
 %    \end{macrocode}
@@ -538,6 +555,7 @@
       }%
       \@nameuse{scr@kav@KOMA#1}%
     \reserved@a
+    \expandafter\KOMA@kav@defall\csname scr@kav@list@KOMA#1\endcsname{#1}%
   }%
 }
 %</koma>
@@ -571,6 +589,7 @@
       }%
       \@nameuse{scr@kav@KOMA#1}%
     \reserved@a
+    \expandafter\KOMA@kav@defall\csname scr@kav@list@KOMA#1\endcsname{#1}%
   }%
 }
 %</koma>
@@ -2441,6 +2460,30 @@
 %   \changes{v3.12}{2013/03/04}{entfernt}
 % \end{macro}^^A \KOMA@options
 % \end{macro}^^A \KOMAoptions
+%
+% \begin{macro}{\KOMAoptionsOf}
+%   \changes{v3.17}{2015/02/25}{neue Anweisung}
+% Mit dieser Anweisung können die aktuell gesetzten \KOMAScript-Optionen
+% eines Pakets oder einer Klasse abgefragt werden, sobald ein Paket oder eine
+% Klasse das unterstützt.
+%    \begin{macrocode}
+%<*koma>
+\newcommand*{\KOMAoptionsOf}[2][\@firstofone]{%
+  \scr@ifundefinedorrelax{scr@kav@list@KOMA.#2}{%
+    \PackageError{scrkbase}{\string\KOMAoptionsOf\space not supported}{%
+      #2 is not the name of a KOMA-Script package or\MessageBreak
+      KOMA-Script class, that supports \string\KOMAoptionsOf.}%
+  }{%
+    \def\reserved@a{#1}%
+    \expandafter\expandafter\expandafter\reserved@a
+    \expandafter\expandafter\expandafter{%
+      \csname scr@kav@list@KOMA.#2\endcsname
+    }%
+  }%
+}
+%</koma>
+%    \end{macrocode}
+% \end{macro}^^A \KOMAoptionsOf
 %
 % \begin{macro}{\post@kopt@hook}
 %   \changes{v3.12}{2013/03/04}{entfernt}
