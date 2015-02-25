@@ -1,4 +1,4 @@
-% \CheckSum{2398}
+% \CheckSum{2425}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlayer-scrpage.dtx
@@ -263,10 +263,12 @@
 %
 % \begin{option}{headwidth}
 %   \changes{v0.9.1757}{2014/04/09}{new: two offsets available}^^A
+%   \changes{v3.17}{2015/02/25}{new: store the values}^^A
 % \begin{option}{footwidth}
 %   \changes{v0.9.1757}{2014/04/09}{new: two offsets available}^^A
 %   \changes{v3.15}{2014/12/28}{fix: missing colon in call of
-%     \cs{sls@split@at@iicolons}}^^A 
+%     \cs{sls@split@at@iicolons}}^^A
+%   \changes{v3.17}{2015/02/25}{new: store the values}^^A
 %   \begin{description}
 %   \item[\texttt{=\meta{special dimensional expression}:\meta{special
 %     dimensional expression}}:] see \Macro{sls@settowidthof} for information
@@ -290,9 +292,12 @@
     \edef\reserved@a{%
       \noexpand\endgroup
       \noexpand\sls@set@hf@width{head}{\reserved@b}{\reserved@c}{\reserved@a}%
+      \noexpand\FamilyKeyStateProcessed
+      \noexpand\KOMA@kav@replacevalue{.scrlayer-scrpage.sty}{headwidth}{%
+        \reserved@a:\reserved@b:\reserved@c
+      }%
     }%
   \reserved@a
-  \FamilyKeyStateProcessed
 }
 \scrlayer@AddCsToInterface{KV@KOMA.scrlayer-scrpage.sty@headwidth}
 \scrlayer@AddCsToInterface{KV@KOMA.scrlayer-scrpage.sty@headwidth@default}
@@ -303,9 +308,12 @@
     \edef\reserved@a{%
       \noexpand\endgroup
       \noexpand\sls@set@hf@width{foot}{\reserved@b}{\reserved@c}{\reserved@a}%
+      \noexpand\FamilyKeyStateProcessed
+      \noexpand\KOMA@kav@replacevalue{.scrlayer-scrpage.sty}{footwidth}{%
+        \reserved@a:\reserved@b:\reserved@c
+      }%
     }%
   \reserved@a
-  \FamilyKeyStateProcessed
 }
 \scrlayer@AddCsToInterface{KV@KOMA.scrlayer-scrpage.sty@footwidth}
 \scrlayer@AddCsToInterface{KV@KOMA.scrlayer-scrpage.sty@footwidth@default}
@@ -427,8 +435,8 @@
     \newcommand*{\sls@headwidth}{\@headwidth}%
   }%
 }
-\scrlayerAddToInterface\sls@oddheadshift{\newcommand*{\sls@oddheadshift}{\z@}}
-\scrlayerAddToInterface\sls@evenheadshift{\newcommand*{\sls@evenheadshift}{\z@}}
+\scrlayerAddToInterface\sls@oddheadshift{\newcommand*{\sls@oddheadshift}{0pt}}
+\scrlayerAddToInterface\sls@evenheadshift{\newcommand*{\sls@evenheadshift}{0pt}}
 \scrlayerAddToInterface\sls@footwidth{%
   \scr@ifundefinedorrelax{@footwidth}{%
     \newcommand*{\sls@footwidth}{\textwidth}%
@@ -436,8 +444,8 @@
     \newcommand*{\sls@footwidth}{\@footwidth}%
   }%
 }
-\scrlayerAddToInterface\sls@oddfootshift{\newcommand*{\sls@oddfootshift}{\z@}}
-\scrlayerAddToInterface\sls@evenfootshift{\newcommand*{\sls@evenfootshift}{\z@}}
+\scrlayerAddToInterface\sls@oddfootshift{\newcommand*{\sls@oddfootshift}{0pt}}
+\scrlayerAddToInterface\sls@evenfootshift{\newcommand*{\sls@evenfootshift}{0pt}}
 %    \end{macrocode}
 % \end{macro}^^A \sls@headwidth
 % \end{macro}^^A \sls@oddheadshift
@@ -567,9 +575,13 @@
 % values.
 %
 % \begin{option}{headtopline}
+%   \changes{v3.17}{2015/02/25}{new: store the values}^^A
 % \begin{option}{headsepline}
+%   \changes{v3.17}{2015/02/25}{new: store the values}^^A
 % \begin{option}{footsepline}
+%   \changes{v3.17}{2015/02/25}{new: store the values}^^A
 % \begin{option}{footbotline}
+%   \changes{v3.17}{2015/02/25}{new: store the values}^^A
 % \begin{description}
 % \item[{\texttt{=\meta{dimensional expression}:\meta{dimensional
 %   expression}}:}]
@@ -586,16 +598,36 @@
 % argument, the length, has been omitted the \texttt{:} may also be omitted.
 %    \begin{macrocode}
 %<*options>
-\KOMA@key{headtopline}[:]{\sls@set@values{head}{above}{#1}}
+\KOMA@key{headtopline}[:]{%
+  \sls@set@values{head}{above}{#1}%
+  \KOMA@kav@xreplacevalue{.scrlayer-scrpage.sty}{headtopline}{%
+    \sls@headabove@linethickness:\sls@headabove@linelength%
+  }%
+}
 \scrlayer@AddCsToInterface{KV@KOMA.scrlayer-scrpage.sty@headtopline}
 \scrlayer@AddCsToInterface{KV@KOMA.scrlayer-scrpage.sty@headtopline@default}
-\KOMA@key{headsepline}[:]{\sls@set@values{head}{below}{#1}}
+\KOMA@key{headsepline}[:]{%
+  \sls@set@values{head}{below}{#1}%
+  \KOMA@kav@xreplacevalue{.scrlayer-scrpage.sty}{headsepline}{%
+    \sls@headbelow@linethickness:\sls@headbelow@linelength%
+  }%
+}
 \scrlayer@AddCsToInterface{KV@KOMA.scrlayer-scrpage.sty@headsepline}
 \scrlayer@AddCsToInterface{KV@KOMA.scrlayer-scrpage.sty@headsepline@default}
-\KOMA@key{footsepline}[:]{\sls@set@values{foot}{above}{#1}}
+\KOMA@key{footsepline}[:]{%
+  \sls@set@values{foot}{above}{#1}%
+  \KOMA@kav@xreplacevalue{.scrlayer-scrpage.sty}{footsepline}{%
+    \sls@footabove@linethickness:\sls@footabove@linelength%
+  }%
+}
 \scrlayer@AddCsToInterface{KV@KOMA.scrlayer-scrpage.sty@footsepline}
 \scrlayer@AddCsToInterface{KV@KOMA.scrlayer-scrpage.sty@footsepline@default}
-\KOMA@key{footbotline}[:]{\sls@set@values{foot}{below}{#1}}
+\KOMA@key{footbotline}[:]{%
+  \sls@set@values{foot}{below}{#1}%
+  \KOMA@kav@xreplacevalue{.scrlayer-scrpage.sty}{footbotline}{%
+    \sls@footbelow@linethickness:\sls@footbelow@linelength%
+  }%
+}
 \scrlayer@AddCsToInterface{KV@KOMA.scrlayer-scrpage.sty@footbotline}
 \scrlayer@AddCsToInterface{KV@KOMA.scrlayer-scrpage.sty@footbotline@default}
 %    \end{macrocode}
@@ -617,9 +649,9 @@
       \ifstr{#3}{true}{\def\reserved@a{.4pt}\def\reserved@b{sls@#1width}}{%
         \ifstr{#3}{yes}{\def\reserved@a{.4pt}\def\reserved@b{sls@#1width}}{%
           \ifstr{#3}{on}{\def\reserved@a{.4pt}\def\reserved@b{sls@#1width}}{%
-            \ifstr{#3}{false}{\def\reserved@a{\z@}\def\reserved@b{z@}}{%
-              \ifstr{#3}{no}{\def\reserved@a{\z@}\def\reserved@b{z@}}{%
-                \ifstr{#3}{off}{\def\reserved@a{\z@}\def\reserved@b{z@}}{%
+            \ifstr{#3}{false}{\def\reserved@a{0pt}\def\reserved@b{0pt}}{%
+              \ifstr{#3}{no}{\def\reserved@a{0pt}\def\reserved@b{0pt}}{%
+                \ifstr{#3}{off}{\def\reserved@a{0pt}\def\reserved@b{0pt}}{%
                 }%
               }%
             }%
@@ -658,6 +690,7 @@
         }%
       \fi
     \reserved@b
+    \FamilyKeyStateProcessed
   }%
 }
 %    \end{macrocode}
@@ -706,25 +739,25 @@
   \newcommand*{\sls@headabove@linelength}{\sls@headwidth}%
 }
 \scrlayerAddToInterface\sls@headabove{%
-  \newcommand*{\sls@headabove@linethickness}{\z@}%
+  \newcommand*{\sls@headabove@linethickness}{0pt}%
 }
 \scrlayerAddToInterface\sls@headbelow@linelength{%
   \newcommand*{\sls@headbelow@linelength}{\sls@headwidth}%
 }
 \scrlayerAddToInterface\sls@headbelow@linethickness{%
-  \newcommand*{\sls@headbelow@linethickness}{\z@}%
+  \newcommand*{\sls@headbelow@linethickness}{0pt}%
 }
 \scrlayerAddToInterface\sls@footabove@linelength{%
   \newcommand*{\sls@footabove@linelength}{\sls@footwidth}%
 }
 \scrlayerAddToInterface\sls@footabove@linethickness{%
-  \newcommand*{\sls@footabove@linethickness}{\z@}%
+  \newcommand*{\sls@footabove@linethickness}{0pt}%
 }
 \scrlayerAddToInterface\sls@footbelow@linelength{%
   \newcommand*{\sls@footbelow@linelength}{\sls@footwidth}%
 }
 \scrlayerAddToInterface\sls@footbelow@linethickness{%
-  \newcommand*{\sls@footbelow@linethickness}{\z@}%
+  \newcommand*{\sls@footbelow@linethickness}{0pt}%
 }
 %</options>
 %    \end{macrocode}
@@ -799,8 +832,11 @@
 % \end{option}^^A plainheadtopline
 %
 % \begin{option}{ilines}
+%   \changes{v3.17}{2015/02/25}{new: store the values}^^A
 % \begin{option}{clines}
+%   \changes{v3.17}{2015/02/25}{new: store the values}^^A
 % \begin{option}{olines}
+%   \changes{v3.17}{2015/02/25}{new: store the values}^^A
 % \begin{macro}{\sls@hfline@adjust}
 % Maybe it would be more useful to be able to adjust each line on its own or
 % at most to define an offset. But \Package{scrpage2} supports only these
@@ -815,6 +851,10 @@
   \ifx\relax#1\relax
     \renewcommand*{\sls@hfline@adjust}{0}%
     \FamilyKeyStateProcessed
+    \KOMA@kav@removekey{.scrlayer-scrpage.sty}{ilines}%
+    \KOMA@kav@removekey{.scrlayer-scrpage.sty}{clines}%
+    \KOMA@kav@removekey{.scrlayer-scrpage.sty}{olines}%
+    \KOMA@kav@add{.scrlayer-scrpage.sty}{ilines}{}%
   \else
     \def\FamilyKeyStateProcessed{unexpected value}%
   \fi
@@ -825,6 +865,10 @@
   \ifx\relax#1\relax
     \renewcommand*{\sls@hfline@adjust}{1}%
     \FamilyKeyStateProcessed
+    \KOMA@kav@removekey{.scrlayer-scrpage.sty}{ilines}%
+    \KOMA@kav@removekey{.scrlayer-scrpage.sty}{clines}%
+    \KOMA@kav@removekey{.scrlayer-scrpage.sty}{olines}%
+    \KOMA@kav@add{.scrlayer-scrpage.sty}{clines}{}%
   \else
     \def\FamilyKeyStateProcessed{unexpected value}%
   \fi
@@ -835,6 +879,10 @@
   \ifx\relax#1\relax
     \renewcommand*{\sls@hfline@adjust}{2}%
     \FamilyKeyStateProcessed
+    \KOMA@kav@removekey{.scrlayer-scrpage.sty}{ilines}%
+    \KOMA@kav@removekey{.scrlayer-scrpage.sty}{clines}%
+    \KOMA@kav@removekey{.scrlayer-scrpage.sty}{olines}%
+    \KOMA@kav@add{.scrlayer-scrpage.sty}{olines}{}%
   \else
     \def\FamilyKeyStateProcessed{unexpected value}%
   \fi
@@ -1065,6 +1113,7 @@
 %</init>
 %    \end{macrocode}
 % \end{macro}%^^A \sls@auto@pagestyleset
+%   \changes{v3.17}{2015/02/25}{new: store the values}^^A
 %    \begin{macrocode}
 %<*options>
 \KOMA@key{pagestyleset}{%
@@ -1074,6 +1123,7 @@
     \let\sls@auto@pagestyleset\relax
     \@nameuse{sls@ps@style@#1}%
     \FamilyKeyStateProcessed
+    \KOMA@kav@replacevalue{.scrlayer-scrpage.sty}{pagestyleset}{#1}%
   }%
 }
 \scrlayer@AddCsToInterface{KV@KOMA.scrlayer-scrpage.sty@pagestyleset}
