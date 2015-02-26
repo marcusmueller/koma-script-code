@@ -1,4 +1,4 @@
-% \CheckSum{2892}
+% \CheckSum{2886}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -468,7 +468,6 @@
 \newcommand*{\KOMA@key}[1][.\@currname.\@currext]{%
   \DefineFamilyMember[{#1}]{KOMA}%
   \@ifundefined{scr@kav@KOMA#1}{\@namedef{scr@kav@KOMA#1}{}}{}%
-  \@ifundefined{scr@kav@list@KOMA#1}{\@namedef{scr@kav@list@KOMA#1}{}}{}%
   \DefineFamilyKey[{#1}]{KOMA}%
 }
 %</koma>
@@ -487,15 +486,6 @@
     \KOMA@internal@error\KOMA@kav@add{#1}%
   }{%
     \expandafter\l@addto@macro\csname scr@kav@KOMA#1\endcsname{\do{{#2}{#3}}}%
-    \expandafter\ifx\csname scr@kav@list@KOMA#1\endcsname\@empty
-      \expandafter\l@addto@macro\csname scr@kav@list@KOMA#1\endcsname{%
-        {#2=#3}%
-      }%
-    \else
-      \expandafter\l@addto@macro\csname scr@kav@list@KOMA#1\endcsname{%
-        ,{#2=#3}%
-      }%
-    \fi
   }%
 }
 %    \end{macrocode}
@@ -516,13 +506,6 @@
     \edef\reserved@a{{#2}{#3}}%
     \expandafter\l@addto@macro\csname scr@kav@KOMA#1\expandafter\endcsname
     \expandafter{\expandafter\do\expandafter{\reserved@a}}%
-    \expandafter\ifx\csname scr@kav@list@KOMA#1\endcsname\@empty
-      \edef\reserved@a{{#2=#3}}%
-    \else
-      \edef\reserved@a{,{#2=#3}}%
-    \fi
-    \expandafter\l@addto@macro\csname scr@kav@list@KOMA#1\expandafter\endcsname
-    \expandafter{\reserved@a}%
   }%
 }
 %    \end{macrocode}
@@ -555,7 +538,6 @@
       }%
       \@nameuse{scr@kav@KOMA#1}%
     \reserved@a
-    \expandafter\KOMA@kav@defall\csname scr@kav@list@KOMA#1\endcsname{#1}%
   }%
 }
 %</koma>
@@ -589,7 +571,6 @@
       }%
       \@nameuse{scr@kav@KOMA#1}%
     \reserved@a
-    \expandafter\KOMA@kav@defall\csname scr@kav@list@KOMA#1\endcsname{#1}%
   }%
 }
 %</koma>
@@ -629,6 +610,35 @@
 %</koma>
 %    \end{macrocode}
 % \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\KOMA@kav@replacebool}
+%   \changes{v3.17}{2015/02/24}{neu (\KOMAScript intern)}
+% Dieses Makro dient dazu, den Wert eines if-Schlüssels in der internen Liste
+% auszutauschen. Das erste (optionale) Argument ist das Mitglied, das zweite
+% ist der Name des Schlüssels, das dritte der Name des Schalters. Es setzt den
+% Status \cs{FamilyKeyStateProcessed} voraus. Anderenfalls tut es nichts!
+% Es ist ausschließlich für den \KOMAScript-internen Gebrauch bestimmt.
+%    \begin{macrocode}
+%<*koma>
+\newcommand*{\KOMA@kav@replacebool}[3]{%
+  \ifx\FamilyKeyState\FamilyKeyStateProcessed
+    \@ifundefined{scr@kav@KOMA#1}{%
+      \KOMA@internal@error\KOMA@kav@replacebool{#1}%
+    }{%
+      \KOMA@kav@remove{#1}{#2}{false}%
+      \KOMA@kav@remove{#1}{#2}{true}%
+      \expandafter\ifx\csname if#3\expandafter\endcsname
+                      \csname iftrue\endcsname
+        \KOMA@kav@xadd{#1}{#2}{true}%
+      \else
+        \KOMA@kav@xadd{#1}{#2}{false}%
+      \fi
+    }%
+  \fi
+}
+%</koma>
+%    \end{macrocode}
 % \end{macro}
 %
 % \begin{macro}{\KOMA@kav@defall}
@@ -2465,25 +2475,61 @@
 %   \changes{v3.17}{2015/02/25}{neue Anweisung}
 % Mit dieser Anweisung können die aktuell gesetzten \KOMAScript-Optionen
 % eines Pakets oder einer Klasse abgefragt werden, sobald ein Paket oder eine
-% Klasse das unterstützt.
+% Klasse das unterstützt. Das erste (optionale) Argument gibt dabei eine
+% Anweisung an, die für die Optionenliste ausgeführt werden soll. Das zweite
+% (nicht optionale Argument) ist der Name eines KOMA-Script-Pakets oder einer
+% KOMA-Script-Klasse einschließlich Dateiendung.
 %    \begin{macrocode}
 %<*koma>
 \newcommand*{\KOMAoptionsOf}[2][\@firstofone]{%
-  \scr@ifundefinedorrelax{scr@kav@list@KOMA.#2}{%
+  \scr@ifundefinedorrelax{scr@kav@KOMA.#2}{%
     \PackageError{scrkbase}{\string\KOMAoptionsOf\space not supported}{%
       #2 is not the name of a KOMA-Script package or\MessageBreak
       KOMA-Script class, that supports \string\KOMAoptionsOf.}%
   }{%
-    \def\reserved@a{#1}%
-    \expandafter\expandafter\expandafter\reserved@a
-    \expandafter\expandafter\expandafter{%
-      \csname scr@kav@list@KOMA.#2\endcsname
-    }%
+    \begingroup
+      \def\reserved@a{#1}%
+      \KOMA@kav@defall\reserved@b{.#2}%
+    \expandafter\expandafter\expandafter\endgroup
+    \expandafter\reserved@a\expandafter{\reserved@b}%
   }%
 }
 %</koma>
 %    \end{macrocode}
 % \end{macro}^^A \KOMAoptionsOf
+%
+% \begin{macro}{\KOMAoptionOf}
+%   \changes{v3.17}{2015/02/26}{neue Anweisung}
+% Mit dieser Anweisung kann eine aktuell gesetzte \KOMAScript-Option
+% eines Pakets oder einer Klasse abgefragt werden, sobald ein Paket oder eine
+% Klasse das unterstützt. Das erste (optionale) Argument gibt dabei eine
+% Anweisung an, die für die Optionenliste ausgeführt werden soll. Das zweite
+% (nicht optionale Argument) ist der Name eines KOMA-Script-Pakets oder einer
+% KOMA-Script-Klasse einschließlich Dateiendung, das dritte (nicht optionale
+% Argument) ist der Name der Option, die abgefragt werden soll.
+%    \begin{macrocode}
+%<*koma>
+\newcommand*{\KOMAoptionOf}[3][\@firstofone]{%
+  \scr@ifundefinedorrelax{scr@kav@KOMA.#2}{%
+    \PackageError{scrkbase}{\string\KOMAoptionOf\space not supported}{%
+      #2 is not the name of a KOMA-Script package or\MessageBreak
+      KOMA-Script class, that supports \string\KOMAoptionOf.}%
+  }{%
+    \begingroup
+      \def\reserved@a{#1}%
+      \KOMA@kav@defone\reserved@b{.#2}{#3}%
+      \ifx\reserved@b\@empty
+        \PackageWarning{scrkbase}{option `#3' for `#2' unset}%
+        \endgroup
+      \else
+      \expandafter\expandafter\expandafter\endgroup
+      \expandafter\reserved@a\expandafter{\reserved@b}%
+    \fi
+  }%
+}
+%</koma>
+%    \end{macrocode}
+% \end{macro}
 %
 % \begin{macro}{\post@kopt@hook}
 %   \changes{v3.12}{2013/03/04}{entfernt}
@@ -2661,48 +2707,27 @@
 % der Name des Schlüssels, der zweite ist der Name des Schalters. 
 %    \begin{macrocode}
 %<*koma>
-\newcommand*{\KOMA@ifkey}[1][.\@currname.\@currext]{%
-  \begingroup\edef\reserved@a{\noexpand\KOMA@@ifkey{#1}}%
+\newcommand*{\KOMA@ifkey}[2][.\@currname.\@currext]{%
+  \begingroup\edef\reserved@a{\noexpand\KOMA@@ifkey{#1}{#2}}%
   \expandafter\endgroup\reserved@a
 }
 \newcommand*{\KOMA@@ifkey}[3]{%
   \@ifundefined{if#3}{%
     \expandafter\newif\csname if#3\endcsname
-  }{}%
-  \KOMA@key[{#1}]{#2}[true]{%
-    \KOMA@set@ifkey{#2}{#3}{##1}%
-    \KOMA@kav@replacebool{#1}{#2}{#3}%
+    \KOMA@key[{#1}]{#2}[true]{%
+      \KOMA@set@ifkey{#2}{#3}{##1}%
+      \KOMA@kav@replacebool{#1}{#2}{#3}%
+    }%
+    \KOMA@kav@replacebool{#1}{#2}{false}%
+  }{%
+    \KOMA@key[{#1}]{#2}[true]{%
+      \KOMA@set@ifkey{#2}{#3}{##1}%
+      \KOMA@kav@replacebool{#1}{#2}{#3}%
+    }%
   }%
 }
 %</koma>
 %    \end{macrocode}
-% \begin{macro}{\KOMA@kav@replacebool}
-%   \changes{v3.17}{2015/02/24}{neu (\KOMAScript intern)}
-% Dieses Makro dient dazu, den Wert eines if-Schlüssels in der internen Liste
-% auszutauschen. Das erste (optionale) Argument ist das Mitglied, das zweite
-% ist der Name des Schlüssels, das dritte der Name des Schalters.
-% Es ist ausschließlich für den \KOMAScript-internen Gebrauch bestimmt.
-%    \begin{macrocode}
-%<*koma>
-\newcommand*{\KOMA@kav@replacebool}[3]{%
-  \ifx\FamilyKeyState\FamilyKeyStateProcessed
-    \@ifundefined{scr@kav@KOMA#1}{%
-      \KOMA@internal@error\KOMA@kav@replacebool{#1}%
-    }{%
-      \KOMA@kav@remove{#1}{#2}{false}%
-      \KOMA@kav@remove{#1}{#2}{true}%
-      \expandafter\ifx\csname if#3\expandafter\endcsname
-                      \csname iftrue\endcsname
-        \KOMA@kav@xadd{#1}{#2}{true}%
-      \else
-        \KOMA@kav@xadd{#1}{#2}{false}%
-      \fi
-    }%
-  \fi
-}
-%</koma>
-%    \end{macrocode}
-% \end{macro}
 % \begin{macro}{\KOMA@set@ifkey}
 % Die eigentliche Arbeit bei der ganzen Sache wird von diesem internen
 % Makro erledigt. Dabei wird der Name des Schlüssels zu Argument 1, der
