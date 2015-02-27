@@ -1,8 +1,8 @@
-% \CheckSum{2425}
+% \CheckSum{2467}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlayer-scrpage.dtx
-% Copyright (c) Markus Kohm, 2012-2014
+% Copyright (c) Markus Kohm, 2012-2015
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % Dieses Werk besteht aus den in manifest.txt aufgefuehrten Dateien.
 % ----------------------------------------------------------------------
 % scrlayer-scrpage.dtx
-% Copyright (c) Markus Kohm, 2012-2014
+% Copyright (c) Markus Kohm, 2012-2015
 %
 % Diese Datei ist Teil der LaTeX2e KOMA-Script-Sammlung.
 %
@@ -431,8 +431,10 @@
 \scrlayerAddToInterface\sls@headwidth{%
   \scr@ifundefinedorrelax{@headwidth}{%
     \newcommand*{\sls@headwidth}{\textwidth}%
+    \KOMA@kav@add{.scrlayer-scrpage.sty}{headwidth}{\textwidth:0pt:0pt}%
   }{%
     \newcommand*{\sls@headwidth}{\@headwidth}%
+    \KOMA@kav@xadd{.scrlayer-scrpage.sty}{headwidth}{\@headwidth:0pt:0pt}%
   }%
 }
 \scrlayerAddToInterface\sls@oddheadshift{\newcommand*{\sls@oddheadshift}{0pt}}
@@ -440,8 +442,10 @@
 \scrlayerAddToInterface\sls@footwidth{%
   \scr@ifundefinedorrelax{@footwidth}{%
     \newcommand*{\sls@footwidth}{\textwidth}%
+    \KOMA@kav@add{.scrlayer-scrpage.sty}{footwidth}{\textwidth:0pt:0pt}
   }{%
     \newcommand*{\sls@footwidth}{\@footwidth}%
+    \KOMA@kav@xadd{.scrlayer-scrpage.sty}{footwidth}{\@footwidth:0pt:0pt}
   }%
 }
 \scrlayerAddToInterface\sls@oddfootshift{\newcommand*{\sls@oddfootshift}{0pt}}
@@ -741,24 +745,36 @@
 \scrlayerAddToInterface\sls@headabove{%
   \newcommand*{\sls@headabove@linethickness}{0pt}%
 }
+\KOMA@kav@xadd{.scrlayer-scrpage.sty}{headtopline}{%
+  \expandafter\noexpand\sls@headabove@linethickness:%
+  \expandafter\noexpand\sls@headabove@linelength}
 \scrlayerAddToInterface\sls@headbelow@linelength{%
   \newcommand*{\sls@headbelow@linelength}{\sls@headwidth}%
 }
 \scrlayerAddToInterface\sls@headbelow@linethickness{%
   \newcommand*{\sls@headbelow@linethickness}{0pt}%
 }
+\KOMA@kav@xadd{.scrlayer-scrpage.sty}{headsepline}{%
+  \expandafter\noexpand\sls@headbelow@linethickness:%
+  \expandafter\noexpand\sls@headbelow@linelength}
 \scrlayerAddToInterface\sls@footabove@linelength{%
   \newcommand*{\sls@footabove@linelength}{\sls@footwidth}%
 }
 \scrlayerAddToInterface\sls@footabove@linethickness{%
   \newcommand*{\sls@footabove@linethickness}{0pt}%
 }
+\KOMA@kav@xadd{.scrlayer-scrpage.sty}{footsepline}{%
+  \expandafter\noexpand\sls@footabove@linethickness:%
+  \expandafter\noexpand\sls@footabove@linelength}
 \scrlayerAddToInterface\sls@footbelow@linelength{%
   \newcommand*{\sls@footbelow@linelength}{\sls@footwidth}%
 }
 \scrlayerAddToInterface\sls@footbelow@linethickness{%
   \newcommand*{\sls@footbelow@linethickness}{0pt}%
 }
+\KOMA@kav@xadd{.scrlayer-scrpage.sty}{footbotline}{%
+  \expandafter\noexpand\sls@footbelow@linethickness:%
+  \expandafter\noexpand\sls@footbelow@linelength}
 %</options>
 %    \end{macrocode}
 % \end{macro}^^A \sls@footbelow@linethickness
@@ -847,6 +863,7 @@
 \scrlayerAddToInterface\sls@hfline@adjust{%
   \newcommand*{\sls@hfline@adjust}{0}%
 }
+\KOMA@kav@add{.scrlayer-scrpage.sty}{ilines}{}
 \KOMA@key{ilines}[]{%
   \ifx\relax#1\relax
     \renewcommand*{\sls@hfline@adjust}{0}%
@@ -927,6 +944,7 @@
 % \begin{macro}{\sls@setline}
 % \begin{macro}{\sls@@setline}
 % \begin{macro}{\sls@@@setline}
+%   \changes{v3.17}[2015/02/27]{internal use of the corresponding options}^^A
 % \begin{macro}{\sls@@@@setline}
 % Helper to set up the line attributes processing the parameters of the
 % commands above.
@@ -949,12 +967,24 @@
 }
 \scrlayerAddToInterface\sls@@@setline{%
   \def\sls@@@setline#1#2{%
-    \edef\@tempa{#2}\edef\@tempb{current}
+    \edef\@tempa{#2}\edef\@tempb{current}%
     \ifstr{#2}{}{}{%
       \ifstr{#2}{current}{}{%
         \setlength{\@tempdima}{#2}%
-        \expandafter\edef\csname sls@#1@linethickness\endcsname%
-        {\the\@tempdima}%
+        \ifstr{#1}{headabove}{%
+          \KOMAExecuteOptions[.scrlayer-scrpage.sty]{headtopline=\@tempdima}%
+        }{\ifstr{#1}{headbelow}{%
+            \KOMAExecuteOptions[.scrlayer-scrpage.sty]{headsepline=\@tempdima}%
+          }{%
+            \ifstr{#1}{footabove}{%
+              \KOMAExecuteOptions[.scrlayer-scrpage.sty]%
+                                 {footsepline=\@tempdima}%
+            }{%
+              \KOMAExecuteOptions[.scrlayer-scrpage.sty]%
+                                 {footbotline=\@tempdima}%
+            }%
+          }%
+        }%
       }%
     }%
     \PackageWarning{scrlayer-scrpage}{%
