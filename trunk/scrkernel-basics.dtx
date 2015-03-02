@@ -1,4 +1,4 @@
-% \CheckSum{2886}
+% \CheckSum{2888}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -2698,6 +2698,7 @@
 %
 % \begin{macro}{\KOMA@ifkey}
 %   \changes{v3.02c}{2009/02/04}{definiert ebenfalls das Familienmitglied}
+%   \changes{v3.17}{2015/03/02}{ersetzt den gespeicherten Wert}
 % Dieses Makro definiert einen Schlüssel, der einen Schalter an Hand des
 % Wertes setzt. Als Werte sind "`\texttt{true}"', "`\texttt{false}"',
 % "`\texttt{on}"', "`\texttt{off}"', "`\texttt{yes}"' und
@@ -2714,17 +2715,16 @@
 \newcommand*{\KOMA@@ifkey}[3]{%
   \@ifundefined{if#3}{%
     \expandafter\newif\csname if#3\endcsname
-    \KOMA@key[{#1}]{#2}[true]{%
-      \KOMA@set@ifkey{#2}{#3}{##1}%
-      \KOMA@kav@replacebool{#1}{#2}{#3}%
-    }%
-    \KOMA@kav@replacebool{#1}{#2}{false}%
-  }{%
-    \KOMA@key[{#1}]{#2}[true]{%
-      \KOMA@set@ifkey{#2}{#3}{##1}%
-      \KOMA@kav@replacebool{#1}{#2}{#3}%
-    }%
+  }{}%
+  \KOMA@key[{#1}]{#2}[true]{%
+    \KOMA@set@ifkey{#2}{#3}{##1}%
+    \KOMA@kav@replacebool{#1}{#2}{#3}%
   }%
+  \csname if#3\endcsname
+    \KOMA@kav@replacebool{#1}{#2}{true}%
+  \else
+    \KOMA@kav@replacebool{#1}{#2}{false}%
+  \fi
 }
 %</koma>
 %    \end{macrocode}
