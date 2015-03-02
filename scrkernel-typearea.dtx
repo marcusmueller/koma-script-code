@@ -1,4 +1,4 @@
-% \CheckSum{2412}
+% \CheckSum{2480}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-typearea.dtx
@@ -532,6 +532,8 @@
   \endgroup
   \def\ta@hh{#1\baselineskip}%
   \FamilyKeyStateProcessed
+  \KOMA@kav@replacevalue{.typearea.sty}{headlines}{#1}%
+  \KOMA@kav@replacevalue{.typearea.sty}{headheight}{#1\baselineskip}%
 }
 \KOMA@key{footlines}{%
   \begingroup
@@ -539,6 +541,8 @@
   \endgroup
   \def\ta@fh{#1\baselineskip}%
   \FamilyKeyStateProcessed
+  \KOMA@kav@replacevalue{.typearea.sty}{footlines}{#1}%
+  \KOMA@kav@replacevalue{.typearea.sty}{footheight}{#1\baselineskip}%
 }
 %    \end{macrocode}
 % \end{option}
@@ -560,6 +564,8 @@
   \endgroup
   \def\ta@hh{#1}%
   \FamilyKeyStateProcessed
+  \KOMA@kav@replacevalue{.typearea.sty}{headheight}{#1}%
+  \KOMA@kav@removekey{.typearea.sty}{headlines}%
 }
 \KOMA@key{footheight}{%
   \begingroup
@@ -567,6 +573,8 @@
   \endgroup
   \def\ta@fh{#1}%
   \FamilyKeyStateProcessed
+  \KOMA@kav@replacevalue{.typearea.sty}{footheight}{#1}%
+  \KOMA@kav@removekey{.typearea.sty}{footlines}%
 }
 %    \end{macrocode}
 % \end{option}
@@ -667,10 +675,11 @@
 % Laden des Pakets absolut keinen Sinn ergeben!
 %    \begin{macrocode}
 \KOMA@key{BCOR}{%
-  \edef\@tempa{#1}\edef\@tempb{current}\ifx\@tempa\@tempb\else
+  \ifstr{#1}{current}{}{%
     \setlength{\ta@bcor}{#1}%
-  \fi
+  }%
   \FamilyKeyStateProcessed
+  \KOMA@kav@xreplacevalue{.typearea.sty}{BCOR}{#1}%
 }
 %    \end{macrocode}
 % Wenn allerdings der Satzspiegel bereits berechnet ist, dann muss er
@@ -708,6 +717,7 @@
     \fi
   \fi
   \FamilyKeyStateProcessed
+  \KOMA@kav@xreplacevalue{.typearea.sty}{DIV}{#1}%
 }
 %    \end{macrocode}
 % Wenn allerdings der Satzspiegel bereits berechnet ist, dann muss er
@@ -800,16 +810,19 @@
     \def\FamilyElseValue{, `semi'}%
     \KOMA@set@ifkey{twoside}{@twoside}{#1}%
   }%
-  \if@twoside
-    \if@semitwoside
-      \@mparswitchfalse
+  \ifx\FamilyKeyState\FamilyKeyStateProcessed
+    \KOMA@kav@xreplacevalue{.typearea.sty}{twoside}{#1}%
+    \if@twoside
+      \if@semitwoside
+        \@mparswitchfalse
+      \else
+        \@mparswitchtrue
+      \fi
     \else
-      \@mparswitchtrue
-    \fi
-  \else
-    \@mparswitchfalse
-  \fi%
-  \csname recalctypearea\endcsname
+      \@mparswitchfalse
+    \fi%
+    \csname recalctypearea\endcsname
+  \fi
 %</package>
 }
 \KOMA@DeclareStandardOption%
@@ -850,10 +863,12 @@
 %</package>
   \FamilyKeyStateProcessed
 %<*package>
+    \KOMA@kav@replacebool{.typearea.sty}{twocolumn}{@twocolumn}%
     \csname recalctypearea\endcsname
   \fi
 %</package>
 }
+%<package>\KOMA@kav@add{.typearea.sty}{twocolumn}{false}
 \KOMA@DeclareStandardOption%
 %<package>  [typearea]%
   {onecolumn}{twocolumn=false}
@@ -922,6 +937,7 @@
         \endgroup
         \set@dvipdfmxpagesize
     \fi
+    \KOMA@kav@xreplacevalue{.typearea.sty}{pagesize}{#1}%
     \edef\@pagesizelast{#1}%
   \else
     \endgroup
@@ -1288,6 +1304,8 @@
             \setlength\paperwidth {8.5in}%
           \fi
           \FamilyKeyStateProcessed
+          \KOMA@kav@removekey{.typearea.sty}{paper}%
+          \KOMA@kav@add{.typearea.sty}{paper}{letter}%
         }{%
           \ifstr{#1}{legal}{%
             \if@landscape
@@ -1298,6 +1316,8 @@
               \setlength\paperwidth {8.5in}%
             \fi
             \FamilyKeyStateProcessed
+            \KOMA@kav@removekey{.typearea.sty}{paper}%
+            \KOMA@kav@add{.typearea.sty}{paper}{legal}%
           }{%
             \ifstr{#1}{executive}{%
               \if@landscape
@@ -1308,10 +1328,14 @@
                 \setlength\paperwidth {7.25in}%
              \fi
              \FamilyKeyStateProcessed
+             \KOMA@kav@removekey{.typearea.sty}{paper}%
+             \KOMA@kav@add{.typearea.sty}{paper}{executive}%
             }{%
               \iso@paper{#1}%
               \if@tempswa
                 \FamilyKeyStateProcessed
+                \KOMA@kav@removekey{.typearea.sty}{paper}%
+                \KOMA@kav@xadd{.typearea.sty}{paper}{#1}%
               \else
                 \expandafter\maybe@pair#1::\@nil
                 \if@tempswa
@@ -1330,7 +1354,13 @@
                     \setlength\paperheight{\@tempb}%
                   \fi
                   \FamilyKeyStateProcessed
-                \else
+                  \KOMA@kav@removekey{.typearea.sty}{paper}%
+                  \if@landscape
+                    \KOMA@kav@xadd{.typearea.sty}{paper}{\@tempa:\@tempb}%
+                  \else
+                    \KOMA@kav@xadd{.typearea.sty}{paper}{\@tempb:\@tempa}%
+                  \fi
+               \else
                   \KOMA@unknown@keyval{paper}{#1}{%
                     `letter', `legal', `executive', `a'<nr>, `b'<nr>,
                     `c'<nr>, `d'<nr>,\MessageBreak
@@ -1341,6 +1371,17 @@
             }%
           }%
         }%
+        \ifx\FamilyKeyState\FamilyKeyStateProcessed
+          \if@landscape
+            \if@seascape
+              \KOMA@kav@add{.typearea.sty}{paper}{seascape}%
+            \else
+              \KOMA@kav@add{.typearea.sty}{paper}{landscape}%
+            \fi
+          \else
+            \KOMA@kav@add{.typearea.sty}{paper}{portrait}%
+          \fi
+        \fi
       }%
     }%
   }%
@@ -1454,18 +1495,19 @@
 % eingestellt. Diese Optionen können selbstverständlich durch
 % explizite Angaben überladen werden.
 % \changes{v2.3h}{1995/01/19}{\cs{relax} nach \cs{ProcessOptions}
-%   ergänzt.}
+%   ergänzt.}^^A
 % \changes{v2.96}{2006/08/18}{Optionen werden in Reihenfolge der Angabe statt
-%   in Reihenfolge der Deklaration abgearbeitet.}
+%   in Reihenfolge der Deklaration abgearbeitet.}^^A
 % \changes{v2.97c}{2007/04/19}{Verwendung von \cs{KOMAExecuteOptions} an
 %   Stelle von \cs{KOMAoptions} und \cs{KOMAProcessOptions} an Stelle von
-%   \cs{ProcessOptions}}
+%   \cs{ProcessOptions}}^^A
 % \changes{v2.97c}{2007/04/19}{Optionen, die der Voreinstellung ohnehin
-%   entsprechen, werden nicht explizit gesetzt}
+%   entsprechen, werden nicht explizit gesetzt}^^A
 % \changes{v2.97c}{2007/07/18}{Option \texttt{twoside} wird explizit passend
-%   gesetzt}
+%   gesetzt}^^A
 % \changes{v3.12}{2013/11/11}{die voreingestellte Papiergröße kann via
-%   \cs{defaultpagesize} auch in \texttt{typearea.cfg} verändert werden}
+%   \cs{defaultpagesize} auch in \texttt{typearea.cfg} verändert werden}^^A
+% \changes{v3.17}{2015/03/02}{Defaulteinstellung \texttt{pagesize}}^^A
 % \begin{macro}{\defaultpapersize}
 %   \changes{v3.12}{2013/11/11}{Neue Anweisung}
 %    \begin{macrocode}
@@ -1473,7 +1515,7 @@
 %    \end{macrocode}
 % \end{macro}
 %    \begin{macrocode}
-\KOMAExecuteOptions{paper=\defaultpapersize}
+\KOMAExecuteOptions{paper=\defaultpapersize,pagesize}
 \if@twoside
   \if@semitwoside
     \KOMAExecuteOptions{twoside=semi}
@@ -2065,6 +2107,11 @@
       \noexpand\def\noexpand\@lastdiv{\@lastdiv}%
       \noexpand\marginparsep=\the\marginparsep\space
       \noexpand\marginparwidth=\the\marginparwidth\space
+      \noexpand\def
+      \expandafter\noexpand\csname scr@kav@KOMA.typearea.sty\endcsname{%
+        \unexpanded\expandafter\expandafter\expandafter{%
+          \csname scr@kav@KOMA.typearea.sty\endcsname}%
+      }%
     }%
   }%
   \reserved@a
@@ -2514,6 +2561,10 @@
       }
     \fi
     \ta@layoutinfo{\number\ta@div}{\the\@tempcnta}%
+    \KOMA@kav@removekey{.typearea.sty}{DIV}%
+    \KOMA@kav@xadd{.typearea.sty}{DIV}{\@lastdiv}%
+    \KOMA@kav@removekey{.typearea.sty}{BCOR}%
+    \KOMA@kav@xadd{.typearea.sty}{BCOR}{\the\ta@bcor}%
     \@typearea@end
     \activateareas
     \ifdim \dimexpr 1in+\topmargin
@@ -2620,6 +2671,10 @@
   \setlength{\textwidth}{#2}%
   \setlength{\textheight}{#3}%
   \def\@lastdiv{areaset}%
+  \KOMA@kav@removekey{.typearea.sty}{DIV}%
+  \KOMA@kav@addkey{.typearea.sty}{DIV}{areaset}%
+  \KOMA@kav@removekey{.typearea.sty}{BCOR}%
+  \KOMA@kav@add{.typearea.sty}{BCOR}{\the\ta@bcor}%
   \ta@hblk=\paperwidth
   \advance\ta@hblk by-\ta@bcor
   \advance\ta@hblk by-\textwidth
