@@ -1,8 +1,8 @@
-% \CheckSum{1368}
+% \CheckSum{1377}
 % \iffalse meta-comment
 % ======================================================================
 % tocbasic.dtx
-% Copyright (c) Markus Kohm, 2008-2014
+% Copyright (c) Markus Kohm, 2008-2015
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -22,7 +22,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % tocbasic.dtx
-% Copyright (c) Markus Kohm, 2008-2014
+% Copyright (c) Markus Kohm, 2008-2015
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -60,7 +60,13 @@
 %%% From File: $Id$
 %<*dtx>
 \ifx\ProvidesFile\undefined\def\ProvidesFile#1[#2]{}\fi
-\ProvidesFile{tocbasic.dtx}[%
+\begingroup
+  \def\filedate$#1: #2-#3-#4 #5${\gdef\filedate{#2/#3/#4}}
+  \filedate$Date$
+  \def\filerevision$#1: #2 ${\gdef\filerevision{r#2}}
+  \filerevision$Revision: 1962 $
+\endgroup
+\ProvidesFile{tocbasic.dtx}[\filedate\space\filerevision\space
 %</dtx>
 %<package>\NeedsTeXFormat{LaTeX2e}[1995/12/01]
 %<doc>\ProvidesFile{tocbasic.tex}[%
@@ -2463,6 +2469,8 @@ may be found in \autoref{tab:tocbasic.DeclareNewTOC-options}.
 %   \changes{v3.15}{2014/12/10}{moved \cs{@mkboth} inside \cs{chapter*}}^^A
 %   \changes{v3.15}{2014/12/10}{usage of \cs{addsec} if available}^^A
 %   \changes{v3.15}{2014/12/10}{usage of \cs{@mkright} if available}^^A
+%   \changes{v3.17}{2015/03/08}{moved \cs{@mkboth} outside \cs{chapter*}}^^A
+%   \changes{v3.17}{2015/03/08}{usage of \cs{@mkdouble} if available}^^A
 %   Setting the headings of a list of something. The heading is the only
 %   argument.
 %    \begin{macrocode}
@@ -2495,7 +2503,13 @@ may be found in \autoref{tab:tocbasic.DeclareNewTOC-options}.
             \iftocfeature{\@currext}{totoc}{%
               \addxcontentsline{toc}{section}{##1}%
             }{}%
-            \@mkboth{\MakeMarkcase{##1}}{\MakeMarkcase{##1}}%
+            \begingroup
+              \@ifundefined{@mkdouble}{%
+                \@mkboth{\MakeMarkcase{##1}}{\MakeMarkcase{##1}}%
+              }{%
+                \@mkdouble{\MakeMarkcase{##1}}%
+              }%
+            \endgroup
           }%
         }%
       }%
@@ -2538,8 +2552,14 @@ may be found in \autoref{tab:tocbasic.DeclareNewTOC-options}.
           \iftocfeature{\@currext}{numbered}{%
             \chapter[##1]{##1}%
           }{%
-            \chapter*{##1\unskip
-            \@mkboth{\MakeMarkcase{##1}}{\MakeMarkcase{##1}}}%
+            \chapter*{##1}%
+            \begingroup
+              \@ifundefined{@mkdouble}{%
+                \@mkboth{\MakeMarkcase{##1}}{\MakeMarkcase{##1}}%
+              }{%
+                \@mkdouble{\MakeMarkcase{##1}}%
+              }%
+            \endgroup
             \iftocfeature{\@currext}{totoc}{%
               \addxcontentsline{toc}{chapter}{##1}%
             }{}%
