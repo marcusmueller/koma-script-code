@@ -1,8 +1,8 @@
-% \CheckSum{70}
+% \CheckSum{75}
 % \iffalse meta-comment
 % ======================================================================
 % scrextend.dtx
-% Copyright (c) Markus Kohm, 2002-2013
+% Copyright (c) Markus Kohm, 2002-2015
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrextend.dtx
-% Copyright (c) Markus Kohm, 2002-2013
+% Copyright (c) Markus Kohm, 2002-2015
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -58,8 +58,15 @@
 %%% From File: $Id$
 %<*driver>
 % \fi
-\ProvidesFile{scrextend.dtx}[2013/03/05 v3.12 KOMA-Script 
-                                   (extend other classes)]
+\ifx\ProvidesFile\undefined\def\ProvidesFile#1[#2]{}\fi
+\begingroup
+  \def\filedate$#1: #2-#3-#4 #5${\gdef\filedate{#2/#3/#4}}
+  \filedate$Date$
+  \def\filerevision$#1: #2 ${\gdef\filerevision{r#2}}
+  \filerevision$Revision: 1962 $
+\endgroup
+\ProvidesFile{scrextend.dtx}[\filedate\space\filerevision\space
+                             KOMA-Script package (extend other classes)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -192,22 +199,26 @@
 %
 % \begin{option}{extendedfeature}
 %   \changes{v3.12}{2013/03/05}{Verwendung der Status-Signalisierung mit
-%     \cs{FamilyKeyState}}
+%     \cs{FamilyKeyState}}^^A
+%   \changes{v3.17}{2015/03/09}{Speicherung des Werts in der internen
+%     Liste}^^A
 %    \begin{macrocode}
 \KOMA@key{extendedfeature}{%
   \scr@ext@activate{#1}%
   \AtEndOfPackage{%
     \scr@ifundefinedorrelax{scr@ext@immediate@#1}{}{%
-      \PackageErrorNoLine{unkown extended feature `#1'}{%
-        You have used option `extendedfeature' to activate an extended feature
-        named\MessageBreak
-        `#1', but there is no such extended feature.\MessageBreak
-        See the KOMA-Script manual for more infromation about known
-        activatable\MessageBreak
+      \PackageWarningNoLine{unkown extended feature `#1'\MessageBreak
+        You have used option `extendedfeature' to\MessageBreak
+        activate an extended feature `#1',\MessageBreak
+        but there is no such extended feature.\MessageBreak
+        See the KOMA-Script manual for more\MessageBreak
+        information about known activatable\MessageBreak
         extended features%
       }%
     }%
   }%
+  \FamilyKeyStateProcessed
+  \KOMA@kav@xadd{.scrextend.sty}{extendedfeature}{#1}%
 }
 \AtEndOfPackage{%
   \KOMA@key{extendedfeature}{%
