@@ -128,8 +128,7 @@ CLS_MAIN	= scrbook.cls \
 		  scrlayer-scrpage.sty \
 		  scrlayer-notecolumn.sty
 
-CLS_MAIN_DTX    = scrbeta.dtx \
-		  scrkernel-basics.dtx \
+CLS_MAIN_DTX    = scrkernel-basics.dtx \
 		  scrkernel-bibliography.dtx \
 		  scrkernel-circularletters.dtx \
 		  scrkernel-compatibility.dtx \
