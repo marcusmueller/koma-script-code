@@ -1,8 +1,8 @@
-% \CheckSum{785}
+% \CheckSum{793}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-title.dtx
-% Copyright (c) Markus Kohm, 2002-2014
+% Copyright (c) Markus Kohm, 2002-2015
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrkernel-title.dtx
-% Copyright (c) Markus Kohm, 2002-2014
+% Copyright (c) Markus Kohm, 2002-2015
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -62,10 +62,10 @@
 \begingroup
   \def\filedate$#1: #2-#3-#4 #5${\gdef\filedate{#2/#3/#4}}
   \filedate$Date$
-  \def\filerevision$#1: #2 ${\gdef\filerevision{#2}}
+  \def\filerevision$#1: #2 ${\gdef\filerevision{r#2}}
   \filerevision$Revision: 1638 $
 \endgroup
-\ProvidesFile{scrkernel-title.dtx}[\filedate r\filerevision 
+\ProvidesFile{scrkernel-title.dtx}[\filedate\space\filerevision\space
                                    KOMA-Script (title pages)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
@@ -115,7 +115,8 @@
 %
 % \begin{option}{titlepage}
 %   \changes{v2.95c}{2006/08/21}{als \textsf{keyval}-Option}^^A
-%   \changes{v3.12}{2013/11/21}{neuer Wert \texttt{firstiscover}}
+%   \changes{v3.12}{2013/11/21}{neuer Wert \texttt{firstiscover}}^^A
+%   \changes{v3.17}{2015/03/10}{interne Speicherung des Werts}^^A
 % \begin{option}{notitlepage}
 %   \changes{v2.95c}{2006/08/21}{Option ist obsolet}
 %   \changes{v3.01a}{2008/11/21}{standard statt obsolet}
@@ -162,15 +163,31 @@
     \@titlepagetrue
     \@titlepageiscoverpagetrue
     \FamilyKeyStateProcessed
+    \KOMA@kav@replacevalue{.%
+%<class>      \KOMAClassName.cls%
+%<package&extend>      scrextend.sty%
+    }{titlepage}{firstiscover}%
   }{%
     \def\FamilyElseValue{, `firstiscover'}%
 %<!(package&extend)>     \KOMA@set@ifkey{titlepage}{@titlepage}{#1}%
 %<package&extend>     \KOMA@set@ifkey{titlepage}{@titlepage}{##1}%
     \ifx\FamilyKeyState\FamilyKeyStateProcessed
+      \KOMA@kav@remove{.%
+%<class>      \KOMAClassName.cls%
+%<package&extend>      scrextend.sty%
+      }{titlepage}{firstiscover}%
+      \KOMA@kav@replacebool{.%
+%<class>      \KOMAClassName.cls%
+%<package&extend>      scrextend.sty%
+      }{titlepage}{@titlepage}%
       \@titlepageiscoverpagefalse
     \fi
   }%
 }
+\KOMA@kav@xadd{.%
+%<class>  \KOMAClassName.cls%
+%<package&extend>  scrextend.sty%
+}{titlepage}{\if@titlepage true\else false\fi}
 %<*extend>
 %    \end{macrocode}
 % Diese Erweiterung soll dann auch tatsächlich sofort aktiviert werden:
@@ -189,46 +206,41 @@
 %  \end{option}
 %  \end{option}
 %
-%  \begin{option}{abstract}
-%    \changes{v2.95c}{2006/08/21}{neue \textsf{keyval}-Option}
-%  \begin{option}{abstracton}
-%    \changes{v2.95c}{2006/08/21}{Option ist obsolet}
-%    \changes{v3.01a}{2008/11/21}{standard statt obsolet}
-%  \begin{option}{abstractoff}
-%    \changes{v2.95c}{2006/08/21}{Option ist obsolet}
-%    \changes{v3.01a}{2008/11/21}{standard statt obsolet}
+% \begin{option}{abstract}
+%   \changes{v2.95c}{2006/08/21}{neue \textsf{keyval}-Option}^^A
+% \begin{option}{abstracton}
+%   \changes{v2.95c}{2006/08/21}{Option ist obsolet}^^A
+%   \changes{v3.01a}{2008/11/21}{standard statt obsolet}^^A
+% \begin{option}{abstractoff}
+%   \changes{v2.95c}{2006/08/21}{Option ist obsolet}^^A
+%   \changes{v3.01a}{2008/11/21}{standard statt obsolet}^^A
 % Obwohl die Zusammenfassung nicht unbedingt auf einer Titelseite steht,
 % gehört sie doch zur Titelei und wird daher hier mit behandelt. Die
 % Zusammenfassung kann mit einem standardmäßigen Titel versehen werden. Der
 % Titel kann aber auch unterdrückt werden.
-%
 % \iffalse
 %<*class>
 %<*article|report>
 % \fi
 % Bei Büchern gibt es keine Zusammenfassung als gesonderte Umgebung. Als
 % Ersatz kann bei Büchern auf \cs{addchap*} zurückgegriffen werden.
-%
-%  \begin{macro}{\if@abstrt}
-%  \begin{macro}{\@abstrttrue}
-%  \begin{macro}{\@abstrtfalse}
+% \begin{macro}{\if@abstrt}
+%   \changes{v3.17}{2015/03/10}{wird von \cs{KOMA@ifkey} definiert}^^A
+% \begin{macro}{\@abstrttrue}
+% \begin{macro}{\@abstrtfalse}
 % Die Enscheidung, ob der Titel der Zusammenfassung gesetzt werden soll, wird
 % in einem Schalter gespeichert.
-%    \begin{macrocode}
-\newif\if@abstrt\@abstrtfalse
-%    \end{macrocode}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
-%
 %    \begin{macrocode}
 \KOMA@ifkey{abstract}{@abstrt}
 \KOMA@DeclareStandardOption{abstracton}{abstract=true}
 \KOMA@DeclareStandardOption{abstractoff}{abstract=false}
 %    \end{macrocode}
-%  \end{option}
-%  \end{option}
-%  \end{option}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{option}
+% \end{option}
+% \end{option}
 % \iffalse
 %</article|report>
 %</class>
