@@ -1,8 +1,8 @@
-% \CheckSum{678}
+% \CheckSum{712}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-pagestyles.dtx
-% Copyright (c) Markus Kohm, 2002-2014
+% Copyright (c) Markus Kohm, 2002-2015
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrkernel-pagestyles.dtx
-% Copyright (c) Markus Kohm, 2002-2014
+% Copyright (c) Markus Kohm, 2002-2015
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -62,12 +62,11 @@
 \begingroup
   \def\filedate$#1: #2-#3-#4 #5${\gdef\filedate{#2/#3/#4}}
   \filedate$Date$
-  \def\filerevision$#1: #2 ${\gdef\filerevision{#2}}
+  \def\filerevision$#1: #2 ${\gdef\filerevision{r#2}}
   \filerevision$Revision$
 \endgroup
-\ProvidesFile{scrkernel-pagestyles.dtx}[\filedate\space 
-                                           v3.13.\filerevision\space
-                                           KOMA-Script (page styles)]
+\ProvidesFile{scrkernel-pagestyles.dtx}[\filedate\space\filerevision\space
+                                        KOMA-Script (page styles)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -115,19 +114,20 @@
 %
 % \begin{option}{headsepline}
 %   \changes{v2.95c}{2006/08/11}{BugFix: Argument bei
-%     \cs{PassOptionsToPackage} vertauscht}%
+%     \cs{PassOptionsToPackage} vertauscht}^^A
 %   \changes{v2.97c}{2007/04/19}{Option \texttt{headinclude} wird nicht
-%     mehr an \textsf{typearea} geschickt}%
+%     mehr an \textsf{typearea} geschickt}^^A
 %   \changes{v2.98c}{2008/03/26}{Option \texttt{headinclude} wird gesetzt,
-%     wobei kein Fehler ausgegeben wird, wenn sie nicht existiert.}%
+%     wobei kein Fehler ausgegeben wird, wenn sie nicht existiert.}^^A
 %   \changes{v3.12}{2013/03/05}{Nutzung der Status-Signalisierung mit
-%     \cs{FamilyKeyStateProcessed}}%
+%     \cs{FamilyKeyStateProcessed}}^^A
 %   \changes{v3.12}{2013/03/05}{wenn \textsf{typearea} noch gar nicht geladen
-%     ist, Option an dieses Paket schicken}
+%     ist, Option an dieses Paket schicken}^^A
+%   \changes{v3.17}{2015/03/10}{Wert wird gespeichert}^^A
 % \begin{option}{headnosepline}
 %   \changes{v2.97d}{2007/10/03}{\cs{PackageInfo} durch \cs{PackageInfoNoLine}
-%     ersetzt}
-%   \changes{v3.01a}{2008/11/20}{deprecated}
+%     ersetzt}^^A
+%   \changes{v3.01a}{2008/11/20}{deprecated}^^A
 % Der Kopfteil kann mit einer Linie vom Textbereich getrennt werden.
 % \begin{macro}{\if@hsl}
 % \begin{macro}{\@hsltrue}
@@ -146,6 +146,7 @@
 \KOMA@key{headsepline}[true]{%
   \KOMA@set@ifkey{headsepline}{@hsl}{#1}%
   \ifx\FamilyKeyState\FamilyKeyStateProcessed
+    \KOMA@kav@replacebool{.\KOMAClassName.cls}{headsepline}{@hsl}%
     \@ifundefined{typearea}{%
       \PassOptionsToPackage{typearea}{headinclude=#1}%
     }{%
@@ -153,6 +154,7 @@
     }%
   \fi
 }
+\KOMA@kav@add{.\KOMAClassName.cls}{headsepline}{false}
 \KOMA@DeclareDeprecatedOption{headnosepline}{headsepline=false}
 %    \end{macrocode}
 % \end{option}
@@ -177,6 +179,7 @@
 %   \changes{v3.12}{2013/08/26}{ggf. Satzspiegel neu berechnen}^^A
 %   \changes{v3.13}{2014/07/07}{Satzspiegel wird nicht neu berechnet}^^A
 %   \changes{v3.13}{2014/07/07}{\texttt{headinclude}-Fehler beseitigt}^^A
+%   \changes{v3.17}{2015/03/10}{Wert wird gespeichert}^^A
 % \begin{option}{footnosepline}
 %   \changes{v2.97d}{2007/10/03}{\cs{PackageInfo} durch \cs{PackageInfoNoLine}
 %     ersetzt}
@@ -198,6 +201,7 @@
 \KOMA@key{footsepline}[true]{%
   \KOMA@set@ifkey{footsepline}{@fsl}{#1}%
   \ifx\FamilyKeyState\FamilyKeyStateProcessed
+    \KOMA@kav@replacebool{.\KOMAClassName.cls}{footsepline}{@fsl}%
     \@ifundefined{typearea}{%
       \PassOptionsToPackage{typearea}{footinclude=#1}%
     }{%
@@ -205,6 +209,7 @@
     }%
   \fi
 }
+\KOMA@kav@add{.\KOMAClassName.cls}{footsepline}{false}
 \KOMA@DeclareDeprecatedOption{footnosepline}{footsepline=false}
 %    \end{macrocode}
 % \end{option}
@@ -235,13 +240,14 @@
 % \fi
 %
 % \begin{option}{cleardoublepage}
-%   \changes{v2.95}{2004/08/24}{neuer Schalter}
+%   \changes{v2.95}{2004/08/24}{neuer Schalter}^^A
 %   \changes{v2.96a}{2007/01/03}{Wert \texttt{current} sollte nun
-%     funktionieren}
+%     funktionieren}^^A
 %   \changes{v2.98c}{2008/03/06}{verwendet \cs{def} statt \cs{let}, damit die
-%     Option \texttt{open} funktioniert}
+%     Option \texttt{open} funktioniert}^^A
 %   \changes{v3.12}{2013/03/05}{Nutzung der Status-Signalisierung mit
-%     \cs{FamilyKeyStateProcessed}}%
+%     \cs{FamilyKeyStateProcessed}}^^A
+%   \changes{v3.17}{2015/03/10}{Wert wird gespeichert}^^A
 % \begin{option}{cleardoubleempty}
 %   \changes{v2.8a}{2001/06/18}{neue Option}
 %   \changes{v2.97d}{2007/10/03}{\cs{PackageInfo} durch \cs{PackageInfoNoLine}
@@ -320,6 +326,7 @@
         \def\cleardoubleoddpage{\cleardoubleoddstandardpage}%
         \def\cleardoubleevenpage{\cleardoubleevenstandardpage}%
         \FamilyKeyStateProcessed
+        \KOMA@kav@replacevalue{.\KOMAClassName.cls}{cleardoublepage}{current}%
       }%
     }{%
       \ifnotundefined{ps@#1}{%
@@ -328,6 +335,7 @@
           \def\cleardoubleoddpage{\cleardoubleoddpageusingstyle{#1}}%
           \def\cleardoubleevenpage{\cleardoubleevenpageusingstyle{#1}}%
           \FamilyKeyStateProcessed
+          \KOMA@kav@xreplacevalue{.\KOMAClassName.cls}{cleardoublepage}{#1}%
         }%
       }{%
 %    \end{macrocode}
@@ -344,6 +352,8 @@
                 \def\cleardoubleoddpage{\cleardoubleoddpageusingstyle{#1}}%
                 \def\cleardoubleevenpage{\cleardoubleevenpageusingstyle{#1}}%
                 \FamilyKeyStateProcessed
+                \KOMA@kav@xreplacevalue{.\KOMAClassName.cls}%
+                                       {cleardoublepage}{#1}%
               }%
             }{}%
           \fi
@@ -375,6 +385,21 @@
   \else
     \cleardoublestandardpage
   \fi
+}
+\KOMA@kav@add{.\KOMAClassName.cls}{cleardoublepage}{%
+  \expandafter\ifnum \scr@v@is@gt{2.98c}empty\else current\fi
+}
+%    \end{macrocode}
+% Es ist zwar nicht unbedingt notwendig aber eventuell schöner, wenn der zuvor
+% hinzugefügte, bedingte Wert am Ende noch expandiert wird. Der Umstand ist
+% notwendig, weil während der Definition der Optionen die Kompatibilität noch
+% nicht bekannt ist. Diese ergibt sich erst während \cs{KOMAProcessOptions}.
+%    \begin{macrocode}
+\AtEndOfClass{%
+  \KOMAoptionOf[\expandafter\edef\expandafter\@tempa\@firstofone]%
+               {\KOMAClassName.cls}{cleardoublepage}%
+  \KOMA@kav@removekey{.\KOMAClassName.cls}{cleardoublepage}%
+  \KOMA@kav@xadd{.\KOMAClassName.cls}{cleardoublepage}{\@tempa}%
 }
 \newcommand*{\cleardoubleoddpage}{\cleardoubleoddemptypage}
 \newcommand*{\cleardoubleevenpage}{\cleardoubleevenemptypage}
