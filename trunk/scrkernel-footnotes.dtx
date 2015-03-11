@@ -1,8 +1,8 @@
-% \CheckSum{401}
+% \CheckSum{423}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-footnotes.dtx
-% Copyright (c) Markus Kohm, 2002-2013
+% Copyright (c) Markus Kohm, 2002-2015
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrkernel-footnotes.dtx
-% Copyright (c) Markus Kohm, 2002-2013
+% Copyright (c) Markus Kohm, 2002-2015
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -58,8 +58,15 @@
 %%% From File: $Id$
 %<*driver>
 % \fi
-\ProvidesFile{scrkernel-footnotes.dtx}[2013/03/05 v3.12 KOMA-Script
-                                                        (footnotes)]
+\ifx\ProvidesFile\undefined\def\ProvidesFile#1[#2]{}\fi
+\begingroup
+  \def\filedate$#1: #2-#3-#4 #5${\gdef\filedate{#2/#3/#4}}
+  \filedate$Date$
+  \def\filerevision$#1: #2 ${\gdef\filerevision{r#2}}
+  \filerevision$Revision: 1962 $
+\endgroup
+\ProvidesFile{scrkernel-footnotes.dtx}[\filedate\space\filerevision\space
+                                       KOMA-Script (footnotes)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -100,11 +107,12 @@
 % \subsection{Option}
 %
 % \begin{option}{footnotes}
-%   \changes{v2.98c}{2008/02/01}{Neue Option f¸r Mehrfachfuﬂnoten}%
+%   \changes{v2.98c}{2008/02/01}{Neue Option f¸r Mehrfachfuﬂnoten}^^A
 %   \changes{v3.10}{2011/09/13}{\cs{let} durch \cs{def} ersetzt, damit die
-%     Option auch als Klassenoption funktioniert}%
+%     Option auch als Klassenoption funktioniert}^^A
 %   \changes{v3.12}{2013/03/05}{Status-Signalisierung mit
-%     \cs{FamilyKeyStateProcessed}}%
+%     \cs{FamilyKeyStateProcessed}}^^A
+%   \changes{v3.17}{2015/03/11}{interne Wert-Speicherung}^^A
 % Mehrfachfuﬂnoten gibt es dann, wenn zu einer Textstelle mehrere Fuﬂnoten
 % hintereinander gesetzt werden. Normalerweise werden die einfach ohne
 % Abstand hintereinander geklatscht. Man kann dann aber die beiden Fuﬂnoten
@@ -132,16 +140,45 @@
     \def\FN@mf@prepare{\scr@mf@prepare}%
     \def\scr@footmisc@options{multiple}%
     \FamilyKeyStateProcessed
+    \KOMA@kav@replacevalue{.%
+%<class>      \KOMAClassName.cls%
+%<package&extend>      scrextend.sty%
+    }{footnotes}{multiple}%
   }{%
     \ifstr{#1}{nomultiple}{%
       \let\@footnotemark\scr@saved@footnotemark
       \let\FN@mf@prepare\relax
       \let\scr@footmisc@options\@empty
       \FamilyKeyStateProcessed
+      \KOMA@kav@replacevalue{.%
+%<class>      \KOMAClassName.cls%
+%<package&extend>      scrextend.sty%
+      }{footnotes}{nomultiple}%
     }{%
       \KOMA@unknown@keyval{footnotes}{#1}{`multiple' and `nomultiple'}%
     }%
   }%
+}
+\AtBeginDocument{%
+  \ifx\@footnotemark\scr@saved@footnotemark
+    \KOMA@kav@removekey{.%
+%<class>      \KOMAClassName.cls%
+%<package&extend>      scrextend.sty%
+    }{footnotes}%
+    \KOMA@kav@add{.%
+%<class>    \KOMAClassName.cls%
+%<package&extend>    scrextend.sty%
+    }{footnotes}{nomultiple}%
+  \else\ifx\@footnotemark\scr@footnotemark
+    \KOMA@kav@removekey{.%
+%<class>      \KOMAClassName.cls%
+%<package&extend>      scrextend.sty%
+    }{footnotes}%
+    \KOMA@kav@add{.%
+%<class>      \KOMAClassName.cls%
+%<package&extend>      scrextend.sty%
+    }{footnotes}{multiple}%
+  \fi\fi
 }
 %    \end{macrocode}
 % \begin{macro}{\scr@footmisc@options}
