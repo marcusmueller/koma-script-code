@@ -1,4 +1,4 @@
-% \CheckSum{1198}
+% \CheckSum{1326}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-floats.dtx
@@ -58,8 +58,15 @@
 %%% From File: $Id$
 %<*driver>
 % \fi
-\ProvidesFile{scrkernel-floats.dtx}[2013/06/12 v3.12 KOMA-Script 
-                                                         (floats)]
+\ifx\ProvidesFile\undefined\def\ProvidesFile#1[#2]{}\fi
+\begingroup
+  \def\filedate$#1: #2-#3-#4 #5${\gdef\filedate{#2/#3/#4}}
+  \filedate$Date$
+  \def\filerevision$#1: #2 ${\gdef\filerevision{r#2}}
+  \filerevision$Revision: 1962 $
+\endgroup
+\ProvidesFile{scrkernel-floats.dtx}[\filedate\space\filerevision\space
+                                    KOMA-Script (floats)]
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -202,9 +209,13 @@
 % \subsection{Optionen für Titel von Gleitumgebungen}
 %
 % \begin{option}{captions}
-%   \changes{v2.98c}{2008/02/18}{Neuer Zentralschalter für caption}
+%   \changes{v2.98c}{2008/02/18}{Neuer Zentralschalter für caption}^^A
 %   \changes{v3.09}{2011/04/02}{Neue Werte (\texttt{heading},
-%   \texttt{signature}, \texttt{figureheading}, \texttt{figuresignature})}
+%     \texttt{signature}, \texttt{figureheading},
+%     \texttt{figuresignature})}^^A
+%   \changes{v3.17}{2015/03/11}{Beachtung der Signalisierung mit
+%     \cs{FamilyKeyState}}^^A
+%   \changes{v3.17}{2015/03/11}{Verwendung der internen Werteliste}^^A
 % Dies ist nun die zentrale Option für Einstellungen zu \cs{caption}. Als
 % besondere Schwierigkeit ergibt sich dabei jedoch, dass das Paket
 % \textsf{caption} einige Sonderbehandlungen für \KOMAScript{} enthält, die
@@ -236,42 +247,106 @@
     {middlebeside}{13},{besidemiddle}{13},%
     {bottombeside}{14},{besidebottom}{14}%
   }{#1}%
-  \ifcase \@tempa\relax
-    \@tablecaptionabovetrue
-    \@figurecaptionabovetrue
-    \@captionabovetrue
-  \or
-    \@tablecaptionabovefalse
-    \@figurecaptionabovefalse
-    \@captionabovefalse
-  \or
-    \@tablecaptionabovetrue
-  \or
-    \@tablecaptionabovefalse
-  \or
-    \@figurecaptionabovetrue
-  \or
-    \@figurecaptionabovefalse
-  \or
-    \onelinecaptionstrue
-  \or
-    \onelinecaptionsfalse
-  \or
-    \renewcommand*{\scap@pos}{r}%
-  \or
-    \renewcommand*{\scap@pos}{l}%
-  \or
-    \renewcommand*{\scap@pos}{i}%
-  \or
-    \renewcommand*{\scap@pos}{o}%
-  \or
-    \renewcommand*{\scap@valign}{t}%
-  \or
-    \renewcommand*{\scap@valign}{c}%
-  \or
-    \renewcommand*{\scap@valign}{b}%
+  \ifx\FamilyKeyState\FamilyKeyStateProcessed
+    \ifcase \@tempa\relax % heading
+      \@tablecaptionabovetrue
+      \@figurecaptionabovetrue
+      \@captionabovetrue
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{heading}%
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{signature}%
+      \KOMA@kav@add{.\KOMAClassName.cls}{captions}{heading}%
+   \or % signature
+      \@tablecaptionabovefalse
+      \@figurecaptionabovefalse
+      \@captionabovefalse
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{heading}%
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{signature}%
+      \KOMA@kav@add{.\KOMAClassName.cls}{captions}{signature}%
+    \or % tableheading
+      \@tablecaptionabovetrue
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{tableheading}%
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{tablesignature}%
+      \KOMA@kav@add{.\KOMAClassName.cls}{captions}{tableheading}%
+    \or % tablesignature
+      \@tablecaptionabovefalse
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{tableheading}%
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{tablesignature}%
+      \KOMA@kav@add{.\KOMAClassName.cls}{captions}{tablesignature}%
+    \or % figureheading
+      \@figurecaptionabovetrue
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{figureheading}%
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{figuresignature}%
+      \KOMA@kav@add{.\KOMAClassName.cls}{captions}{figureheading}%
+    \or % figuresignature
+      \@figurecaptionabovefalse
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{figureheading}%
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{figuresignature}%
+      \KOMA@kav@add{.\KOMAClassName.cls}{captions}{figuresignature}%
+    \or % oneline
+      \onelinecaptionstrue
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{oneline}%
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{nooneline}%
+      \KOMA@kav@add{.\KOMAClassName.cls}{captions}{oneline}%
+    \or % nooneline
+      \onelinecaptionsfalse
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{oneline}%
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{nooneline}%
+      \KOMA@kav@add{.\KOMAClassName.cls}{captions}{nooneline}%
+    \or % rightbeside
+      \renewcommand*{\scap@pos}{r}%
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{rightbeside}%
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{leftbeside}%
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{innerbeside}%
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{outerbeside}%
+      \KOMA@kav@add{.\KOMAClassName.cls}{captions}{rightbeside}%
+    \or % leftbeside
+      \renewcommand*{\scap@pos}{l}%
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{rightbeside}%
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{leftbeside}%
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{innerbeside}%
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{outerbeside}%
+      \KOMA@kav@add{.\KOMAClassName.cls}{captions}{leftbeside}%
+    \or % innerbeside
+      \renewcommand*{\scap@pos}{i}%
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{rightbeside}%
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{leftbeside}%
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{innerbeside}%
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{outerbeside}%
+      \KOMA@kav@add{.\KOMAClassName.cls}{captions}{innerbeside}%
+    \or % outerbeside
+      \renewcommand*{\scap@pos}{o}%
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{rightbeside}%
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{leftbeside}%
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{innerbeside}%
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{outerbeside}%
+      \KOMA@kav@add{.\KOMAClassName.cls}{captions}{outerbeside}%
+    \or % topbeside
+      \renewcommand*{\scap@valign}{t}%
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{topbeside}%
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{centeredbeside}%
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{bottombeside}%
+      \KOMA@kav@add{.\KOMAClassName.cls}{captions}{topbeside}%
+    \or % centeredbeside
+      \renewcommand*{\scap@valign}{c}%
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{topbeside}%
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{centeredbeside}%
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{bottombeside}%
+      \KOMA@kav@add{.\KOMAClassName.cls}{captions}{centeredbeside}%
+    \or % bottombeside
+      \renewcommand*{\scap@valign}{b}%
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{topbeside}%
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{centeredbeside}%
+      \KOMA@kav@remove{.\KOMAClassName.cls}{captions}{bottombeside}%
+      \KOMA@kav@add{.\KOMAClassName.cls}{captions}{bottombeside}%
+    \fi
   \fi
 }
+\KOMA@kav@add{.\KOMAClassName.cls}{captions}{signature}
+\KOMA@kav@add{.\KOMAClassName.cls}{captions}{tablesignature}
+\KOMA@kav@add{.\KOMAClassName.cls}{captions}{figuresignature}
+\KOMA@kav@add{.\KOMAClassName.cls}{captions}{oneline}
+\KOMA@kav@add{.\KOMAClassName.cls}{captions}{rightbeside}
+\KOMA@kav@add{.\KOMAClassName.cls}{captions}{bottombeside}
 %    \end{macrocode}
 % \end{option}
 %
