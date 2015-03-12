@@ -1,4 +1,4 @@
-% \CheckSum{3485}
+% \CheckSum{3480}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -64,9 +64,13 @@
   \filedate$Date$
   \def\filerevision$#1: #2 ${\gdef\filerevision{#2}}
   \filerevision$Revision$
-\endgroup
-\ProvidesFile{scrkernel-sections.dtx}[\filedate\space\filerevision\space
-                                      KOMA-Script (disposition)]
+  \edef\reserved@a{%
+    \noexpand\endgroup
+    \noexpand\ProvidesFile{scrkernel-sections.dtx}%
+                          [\filedate\space\filerevision\space
+                           KOMA-Script (disposition)]
+  }%
+\reserved@a
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -157,21 +161,29 @@
     {left}{2}%
   }{#1}%
   \ifx\FamilyKeyState\FamilyKeyStateProcessed
-    \KOMA@kav@xreplacevalue{.\KOMAClassName.cls}{open}{#1}%
+    \KOMA@kav@xreplacevalue{.\KOMAClassFileName}{open}{#1}%
+    \KOMA@kav@remove{.\KOMAClassFileName}{headings}{openany}%
+    \KOMA@kav@remove{.\KOMAClassFileName}{headings}{openright}%
+    \KOMA@kav@remove{.\KOMAClassFileName}{headings}{openleft}%
     \ifcase \@tempa\relax
+      \KOMA@kav@add{.\KOMAClassFileName}{headings}{openany}%
       \@openrightfalse
       \renewcommand*{\cleardoublestandardpage}{\cleardoubleoddstandardpage}%
     \or
+      \KOMA@kav@add{.\KOMAClassFileName}{headings}{openright}%
       \@openrighttrue
       \renewcommand*{\cleardoublestandardpage}{\cleardoubleoddstandardpage}%
     \or
+      \KOMA@kav@add{.\KOMAClassFileName}{headings}{openleft}%
       \@openrighttrue
       \renewcommand*{\cleardoublestandardpage}{\cleardoubleevenstandardpage}%
     \fi
   \fi
 }
-%<book>\KOMA@kav@add{.scrbook.cls}{open}{right}
-%<report>\KOMA@kav@add{.scrreprt.cls}{open}{any}
+%<book>\KOMA@kav@add{.scrbook.\@clsextension}{open}{right}
+%<report>\KOMA@kav@add{.scrreprt.\@clsextension}{open}{any}
+%<book>\KOMA@kav@add{.\KOMAClassFileName}{headings}{openright}
+%<report>\KOMA@kav@add{.\KOMAClassFileName}{headings}{openany}
 %    \end{macrocode}
 % \end{option}
 % \begin{option}{openright}
@@ -244,7 +256,7 @@
     {noenddot}{2},{nodotatend}{2}%
   }{#1}%
   \ifx\FamilyKeyState\FamilyKeyStateProcessed
-    \KOMA@kav@xreplacevalue{.\KOMAClassName.cls}{numbers}{#1}%
+    \KOMA@kav@xreplacevalue{.\KOMAClassFileName}{numbers}{#1}%
     \ifcase \@tempa\relax
       \if@atdocument\scr@dotchangeatdocument{#1}\else
         \let\scr@altsecnumhook\@empty
@@ -260,7 +272,7 @@
     \fi
   \fi
 }
-\KOMA@kav@add{.\KOMAClassName.cls}{numbers}{autoendperiod}
+\KOMA@kav@add{.\KOMAClassFileName}{numbers}{autoendperiod}
 %</option>
 %    \end{macrocode}
 % \end{option}
@@ -2404,8 +2416,24 @@
 %<*class>
 %<*book|report>
 %<*option>
-\KOMA@ifkey{chapterprefix}{@chapterprefix}
+\newif\if@chapterprefix
+\KOMA@key{chapterprefix}[true]{%
+  \KOMA@set@ifkey{chapterprefix}{@chapterprefix}{#1}%
+  \ifx\FamilyKeyState\FamilyKeyStateProcessed
+    \KOMA@kav@replacebook{.\KOMAClassFileName}%
+                         {chapterprefix}{@chapterprefix}%
+    \KOMA@kav@remove{.\KOMAClassFileName}%
+                    {headings}{twolinechapter}%
+    \KOMA@kav@remove{.\KOMAClassFileName}%
+                    {headings}{onelinechapter}%
+    \KOMA@kav@xadd{.\KOMAClassName.\@clsextenstion}%
+                  {headings}{%
+                    \if@chapterprefix twolinechapter\else onelinechapter\fi
+                  }%
+  \fi
+}
 \KOMA@DeclareDeprecatedOption{nochapterprefix}{chapterprefix=false}
+\KOMA@kav@add{.\KOMAClassFileName}{headings}{onelinechapter}%
 %</option>
 %    \end{macrocode}
 % \end{option}
@@ -2432,14 +2460,18 @@
 \KOMA@key{appendixprefix}[true]{%
   \KOMA@set@ifkey{appendixprefix}{@tempswa}{#1}%
   \ifx\FamilyKeyState\FamilyKeyStateProcessed
-    \KOMA@kav@xreplacevalue{.\KOMAClassName.cls}{appendixprefix}{#1}%
+    \KOMA@kav@xreplacevalue{.\KOMAClassFileName}{appendixprefix}{#1}%
+    \KOMA@kav@remove{.\KOMAClassFileName}{headings}{twolineappendix}%
+    \KOMA@kav@remove{.\KOMAClassFileName}{headings}{onelineappendix}%
     \if@tempswa
+      \KOMA@kav@add{.\KOMAClassFileName}{headings}{twolineappendix}%
       \@ifundefined{appendixmore}{%
         \def\appendixmore{\@chapterprefixtrue}%
       }{%
         \l@addto@macro\appendixmore{\@chapterprefixtrue}%
       }%
     \else
+      \KOMA@kav@add{.\KOMAClassFileName}{headings}{onelineappendix}%
       \@ifundefined{appendixmore}{%
         \def\appendixmore{\@chapterprefixfalse}%
       }{%
@@ -4111,11 +4143,11 @@
   }{#1}%
   \ifx\FamilyKeyState\FamilyKeyStateProcessed
     \ifcase \@tempa\relax% big
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{big}%
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{normal}%
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{small}%
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{standardclasses}%
-      \KOMA@kav@add{.\KOMAClassName.cls}{headings}{big}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{headings}{big}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{headings}{normal}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{headings}{small}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{headings}{standardclasses}%
+      \KOMA@kav@add{.\KOMAClassFileName}{headings}{big}%
 %    \end{macrocode}
 % Als erstes kümmern wir uns um die drei Größenabstufungen für die
 % Überschriften, die \KOMAScript{} bietet, und zwar in der Reihenfolge
@@ -4151,11 +4183,11 @@
       \renewcommand*{\size@paragraph}{\normalsize}%
       \renewcommand*{\size@subparagraph}{\normalsize}%
     \or % normal
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{big}%
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{normal}%
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{small}%
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{standardclasses}%
-      \KOMA@kav@add{.\KOMAClassName.cls}{headings}{normal}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{headings}{big}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{headings}{normal}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{headings}{small}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{headings}{standardclasses}%
+      \KOMA@kav@add{.\KOMAClassFileName}{headings}{normal}%
 %<*book|report>
       \renewcommand*{\scr@chapter@sectionbeforeskip}{3\baselineskip+\parskip}%
       \renewcommand*{\scr@chapter@sectionafterskip}{%
@@ -4184,11 +4216,11 @@
       \renewcommand*{\size@paragraph}{\normalsize}%
       \renewcommand*{\size@subparagraph}{\normalsize}%
     \or % small
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{big}%
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{normal}%
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{small}%
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{standardclasses}%
-      \KOMA@kav@add{.\KOMAClassName.cls}{headings}{small}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{headings}{big}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{headings}{normal}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{headings}{small}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{headings}{standardclasses}%
+      \KOMA@kav@add{.\KOMAClassFileName}{headings}{small}%
 %<*book|report>
       \renewcommand*{\scr@chapter@sectionbeforeskip}{2.8\baselineskip+\parskip}%
       \renewcommand*{\scr@chapter@sectionafterskip}{%
@@ -4222,26 +4254,14 @@
 %    \begin{macrocode}
     \or % openany
 %<*book|report>
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{openany}%
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{openright}%
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{openleft}%
-      \KOMA@kav@add{.\KOMAClassName.cls}{headings}{openany}%
       \KOMAoptions{open=any}%
 %</book|report>
     \or % openright
 %<*book|report>
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{openany}%
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{openright}%
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{openleft}%
-      \KOMA@kav@add{.\KOMAClassName.cls}{headings}{openright}%
       \KOMAoptions{open=right}%
 %</book|report>
     \or % openleft
 %<*book|report>
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{openany}%
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{openright}%
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{openleft}%
-      \KOMA@kav@add{.\KOMAClassName.cls}{headings}{openleft}%
       \KOMAoptions{open=left}%
 %</book|report>
 %    \end{macrocode}
@@ -4251,30 +4271,18 @@
 %    \begin{macrocode}
     \or % twolinechapter
 %<*book|report>
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{twolinechapter}%
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{onelinechapter}%
-      \KOMA@kav@add{.\KOMAClassName.cls}{headings}{twolinechapter}%
       \KOMAoptions{chapterprefix=true}%
 %</book|report>
     \or % onelinechapter
 %<*book|report>
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{twolinechapter}%
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{onelinechapter}%
-      \KOMA@kav@add{.\KOMAClassName.cls}{headings}{onelinechapter}%
       \KOMAoptions{chapterprefix=false}%
 %</book|report>
     \or % twolineappendix
 %<*book|report>
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{twolineappendix}%
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{onelineappendix}%
-      \KOMA@kav@add{.\KOMAClassName.cls}{headings}{twolineappendix}%
       \KOMAoptions{appendixprefix=true}%
 %</book|report>
     \or % onelineappend
 %<*book|report>
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{twolineappendix}%
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{onelineappendix}%
-      \KOMA@kav@add{.\KOMAClassName.cls}{headings}{onelineappendix}%
       \KOMAoptions{appendixprefix=false}%
 %</book|report>
 %    \end{macrocode}
@@ -4282,33 +4290,33 @@
 % optionale Argument der Gliederungsüberschriften aktiviert und gesteuert.
 %    \begin{macrocode}
     \or % optiontotocandhead
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{optiontotocandhead}%
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{optiontotoc}%
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{optiontohead}%
-      \KOMA@kav@add{.\KOMAClassName.cls}{headings}{optiontotocandhead}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{headings}{optiontotocandhead}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{headings}{optiontotoc}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{headings}{optiontohead}%
+      \KOMA@kav@add{.\KOMAClassFileName}{headings}{optiontotocandhead}%
       \scr@activate@xsection{3}%
     \or % optiontotoc
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{optiontotocandhead}%
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{optiontotoc}%
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{optiontohead}%
-      \KOMA@kav@add{.\KOMAClassName.cls}{headings}{optiontotoc}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{headings}{optiontotocandhead}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{headings}{optiontotoc}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{headings}{optiontohead}%
+      \KOMA@kav@add{.\KOMAClassFileName}{headings}{optiontotoc}%
       \scr@activate@xsection{2}%
     \or % optiontohead
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{optiontotocandhead}%
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{optiontotoc}%
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{optiontohead}%
-      \KOMA@kav@add{.\KOMAClassName.cls}{headings}{optiontohead}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{headings}{optiontotocandhead}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{headings}{optiontotoc}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{headings}{optiontohead}%
+      \KOMA@kav@add{.\KOMAClassFileName}{headings}{optiontohead}%
       \scr@activate@xsection{1}%
 %    \end{macrocode}
 % Ab Version~3.12 gibt es noch die Möglichkeit, die Überschriftengrößen der
 % Standardklassen zu emulieren.
 %    \begin{macrocode}
     \or % standardclasses
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{big}%
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{normal}%
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{small}%
-      \KOMA@kav@remove{.\KOMAClassName.cls}{headings}{standardclasses}%
-      \KOMA@kav@add{.\KOMAClassName.cls}{headings}{standardclasses}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{headings}{big}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{headings}{normal}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{headings}{small}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{headings}{standardclasses}%
+      \KOMA@kav@add{.\KOMAClassFileName}{headings}{standardclasses}%
 %<*book|report>
       \renewcommand*{\scr@chapter@sectionbeforeskip}{50\p@}%
       \renewcommand*{\scr@chapter@sectionafterskip}{40\p@}%
@@ -4334,10 +4342,8 @@
     \fi
   \fi
 }
-\KOMA@kav@add{.\KOMAClassName.cls}{headings}{big}
-%<book>\KOMA@kav@add{.\KOMAClassName.cls}{headings}{openright}
-%<report>\KOMA@kav@add{.\KOMAClassName.cls}{headings}{openany}
-%<book|report>\KOMA@kav@add{.\KOMAClassName.cls}{headings}{onelinechapter}
+\KOMA@kav@add{.\KOMAClassFileName}{headings}{big}
+%<book|report>\KOMA@kav@add{.\KOMAClassFileName}{headings}{onelinechapter}
 %    \end{macrocode}
 % \end{option}^^A headings
 %
