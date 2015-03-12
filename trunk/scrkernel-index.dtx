@@ -1,8 +1,8 @@
-% \CheckSum{114}
+% \CheckSum{134}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-index.dtx
-% Copyright (c) Markus Kohm, 2002-2013
+% Copyright (c) Markus Kohm, 2002-2015
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrkernel-index.dtx
-% Copyright (c) Markus Kohm, 2002-2013
+% Copyright (c) Markus Kohm, 2002-2015
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -58,8 +58,20 @@
 %%% From File: $Id$
 %<*driver>
 % \fi
-\ProvidesFile{scrkernel-index.dtx}[2013/09/24 v3.12 KOMA-Script 
-                                                        (index)]
+\ifx\ProvidesFile\undefined\def\ProvidesFile#1[#2]{}\fi
+\begingroup
+  \def\filedate$#1: #2-#3-#4 #5${\gdef\filedate{#2/#3/#4}}
+  \filedate$Date$
+  \def\filerevision$#1: #2 ${\gdef\filerevision{r#2}}
+  \filerevision$Revision: 1872 $
+  \edef\reserved@a{%
+    \noexpand\endgroup
+    \noexpand\ProvidesFile{scrkernel-index.dtx}%
+                          [\filedate\space\filerevision\space
+                           KOMA-Script source
+                           (index)]%
+  }%
+\reserved@a
 % \iffalse
 \documentclass[halfparskip-]{scrdoc}
 \usepackage[english,ngerman]{babel}
@@ -126,6 +138,7 @@
 %
 % \begin{option}{index}
 %   \changes{v2.98c}{2008/03/04}{Neue Option}
+%   \changes{v3.17}{2015/03/12}{interne Speicherung der Werte}
 % \begin{macro}{\idx@@heading}
 % Die Option sorgt dafür, dass der Index auch im Inhaltsverzeichnis
 % erscheint. Dazu wird das interne Makro \cs{idx@@heading} umdefiniert, über
@@ -157,12 +170,20 @@
     {totoc}{1},{toc}{1},{notnumbered}{1}%
   }{#1}%
   \ifx\FamilyKeyState\FamilyKeyStateProcessed
+    \KOMA@kav@remove{.\KOMAClassFileName}{toc}{noindex}%
+    \KOMA@kav@remove{.\KOMAClassFileName}{toc}{index}%
+    \KOMA@kav@remove{.\KOMAClassFileName}{index}{notoc}%
+    \KOMA@kav@remove{.\KOMAClassFileName}{index}{toc}%
     \ifcase \@tempa\relax
+      \KOMA@kav@add{.\KOMAClassFileName}{toc}{noindex}%
+      \KOMA@kav@add{.\KOMAClassFileName}{index}{notoc}%
       \renewcommand*{\idx@@heading}{%
 %<article>      \section*
 %<book|report>      \chapter*
       }%
     \or
+      \KOMA@kav@add{.\KOMAClassFileName}{toc}{index}%
+      \KOMA@kav@add{.\KOMAClassFileName}{index}{toc}%
       \renewcommand*{\idx@@heading}{%
 %<article>      \addsec
 %<book|report>      \addchap
@@ -170,6 +191,8 @@
     \fi
   \fi
 }
+\KOMA@kav@add{.\KOMAClassFileName}{toc}{noindex}
+\KOMA@kav@add{.\KOMAClassFileName}{index}{notoc}
 %    \end{macrocode}
 % \end{macro}
 % \end{option}
