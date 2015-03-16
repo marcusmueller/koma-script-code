@@ -1,4 +1,4 @@
-% \CheckSum{3157}
+% \CheckSum{3357}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-notepaper.dtx
@@ -137,7 +137,8 @@
 % Gespeichert wird die Information in einem einfachen Schalter.
 % Voreingestellt ist die Verwendung des Briefkopfes.
 %    \begin{macrocode}
-\KOMA@ifkey{firsthead}{@firsthead}\@firstheadtrue
+\KOMA@ifkey{firsthead}{@firsthead}
+\KOMAExecuteOptions{firsthead=true}
 %    \end{macrocode}
 % \end{macro}
 % \end{option}
@@ -145,7 +146,8 @@
 % \begin{option}{fromalign}
 %   \changes{v2.8q}{2002/01/25}{Neu}^^A
 %   \changes{v3.12}{2013/03/05}{Verwendung der Status-Signalisierung mit
-%     \cs{FamilyKeyState}}
+%     \cs{FamilyKeyState}}^^A
+%   \changes{v3.17}{2015/03/16}{interne Speicherung der Werte}^^A
 % Diese Option legt fest, ob der Absender linksbündig, mittig oder
 % rechtsbündig gesetzt werden soll.
 % \begin{macro}{\@alignfrom}
@@ -178,16 +180,25 @@
     {no}{10000},{false}{10000},{off}{10000}%
   }{#1}%
   \ifx\FamilyKeyState\FamilyKeyStateProcessed
+    \KOMA@kav@xreplacevalue{.%
+%<class>      \KOMAClassFileName
+%<package>      scrletter.\@pkgextension
+    }{fromalign}{#1}%
     \ifcase\@alignfrom\or\or\or\@firstheadfalse\or\@firstheadfalse\fi
   \fi
 }
+\KOMA@kav@add{.%
+%<class>  \KOMAClassFileName
+%<package>  scrletter.\@pkgextension
+}{fromalign}{left}
 %    \end{macrocode}
 % \end{macro}
 % \end{option}
 %
 % \begin{option}{fromrule}
 %   \changes{v2.8q}{2002/01/25}{Neu}^^A
-%   Es kann gewählt werden, ob im Absender nach dem Namen oder nach dem
+%   \changes{v3.17}{2015/03/16}{interne Speicherung der Werte}^^A
+% Es kann gewählt werden, ob im Absender nach dem Namen oder nach dem
 % gesamten Absender eine Linie gesetzt werden soll.
 % \begin{macro}{\@rulefrom}
 %   \changes{v2.8q}{2002/01/25}{Neu}^^A
@@ -203,11 +214,14 @@
 % \end{center}
 % Voreingestellt ist keine Linie.
 %    \begin{macrocode}
-\newcommand*{\@rulefrom}{0}
 \KOMA@ncmdkey{fromrule}[below]{@rulefrom}{%
   {false}{0},{no}{0},{off}{0},{aftername}{1},%
   {below}{2},{afteraddress}{2},{true}{2},{yes}{2},{on}{2}%
 }
+\KOMA@kav@add{.%
+%<class>  \KOMAClassFileName
+%<package>  scrletter.\@pkgextension
+}{fromrule}{false}
 %    \end{macrocode}
 % \end{macro}
 % \end{option}
@@ -338,6 +352,7 @@
 % \begin{option}{addrfield}
 %   \changes{v2.8q}{2001/10/09}{Neu}^^A
 %   \changes{v3.03}{2009/03/04}{neue Werte}^^A
+%   \changes{v3.17}{2015/03/16}{interne Speicherung der Werte}^^A
 % Das Adressfeld für Fensterumschläge kann mit \texttt{addrfield} ein- und
 % ausgeschaltet werden. Darüber hinaus kann die Art des Adressfeldes gewählt
 % werden.
@@ -369,7 +384,7 @@
     KOMA-Script version 3.03.  I'll replace the usage of\MessageBreak
     \string\@afieldtrue\space by
     \string\KOMAoptions{addrfield=true}.\MessageBreak
-    This may result in erros.  A better solution would be\MessageBreak
+    This may result in errors.  A better solution would be\MessageBreak
     to change the code}%
   \KOMAoptions{addrfield=true}}
 \newcommand*{\@afieldfalse}{%
@@ -379,7 +394,7 @@
     KOMA-Script version 3.03.  I'll replace the usage of\MessageBreak
     \string\@afieldfalse\space by
     \string\KOMAoptions{addrfield=false}.\MessageBreak
-    This may result in erros.  A better solution would be\MessageBreak
+    This may result in errors.  A better solution would be\MessageBreak
     to change the code}%
   \KOMAoptions{addrfield=false}}
 %</class>
@@ -398,6 +413,10 @@
   {ppimage}{4},{ppImage}{4},%
   {topaligned}{5},{alignedtop}{5}%
 }
+\KOMA@kav@add{.%
+%<class>  \KOMAClassFileName
+%<package>  scrletter.\@pkgextension
+}{addrfield}{true}
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -407,13 +426,13 @@
 %
 % \begin{option}{priority}
 %   \changes{v3.03}{2009/03/04}{neu}^^A
+%   \changes{3.17}{2015/03/16}{interne Speicherung der Werte}^^A
 % Im internationalen Briefverkehr sind zwei Prioritätseinstellungen
 % bekannt. Dafür gibt es dann so etwas wie eine Versandart nicht mehr.
 % \begin{macro}{\ltr@priority}
 %   \changes{v3.03}{2009/03/04}{neu (intern)}^^A
 % Abgelegt wird die Art der Priorität in einem Macro.
 %    \begin{macrocode}
-\newcommand*{\ltr@priority}{0}%
 \KOMA@ncmdkey{priority}[A]{ltr@priority}{%
   {no}{0},{off}{0},{false}{0},{manual}{1},%
   {B}{1},{b}{1},%
@@ -423,6 +442,10 @@
   {priority}{2},{Priority}{2},{PRIORITY}{2},%
   {A-PRIORITY}{2},{A-Priority}{2},{a-priority}{2}%
 }%
+\KOMA@kav@add{.%
+%<class>  \KOMAClassFileName
+%<package>  scrletter.\@pkgextension
+}{priority}{false}
 %    \end{macrocode}
 % \end{macro}
 % \end{option}
@@ -430,7 +453,8 @@
 % \begin{option}{backaddress}
 %   \changes{v2.8q}{2002/01/22}{Neu}^^A
 %   \changes{v3.12}{2013/03/05}{Verwendung der Status-Signalisierung mit
-%     \cs{FamilyKeyState}}
+%     \cs{FamilyKeyState}}^^A
+%   \changes{v3.17}{3015/03/16}{interne Speicherung der Werte}^^A
 % Im Adressfeld kann die Rücksendeadresse gesetzt werden. Dies geschieht nun
 % nicht mehr allein durch Definition einer Rücksendeadresse, sondern auch
 % durch eine Option.
@@ -477,6 +501,31 @@
       \else
         \endgroup
       \fi
+      \if@baddr
+        \ifx\backaddr@format\underline
+          \KOMA@kav@replacevalue{.%
+%<class>            \KOMAClassFileName
+%<package>            scrletter.\@pkgextension
+          }{backaddress}{underlined}%
+        \else
+          \ifx\backaddr@format\@firstofone
+            \KOMA@kav@replacevalue{.%
+%<class>              \KOMAClassFileName
+%<package>              scrletter.\@pkgextension
+            }{backaddress}{plain}%
+          \else
+            \KOMA@kav@replacevalue{.%
+%<class>              \KOMAClassFileName
+%<package>              scrletter.\@pkgextension
+            }{backaddress}{true}%
+          \fi
+        \fi
+      \else
+        \KOMA@kav@replacevalue{.%
+%<class>          \KOMAClassFileName
+%<package>          scrletter.\@pkgextension
+        }{backaddress}{false}%
+      \fi
   \else
       \endgroup
       \FamilyKeyStateUnknownValue
@@ -492,7 +541,8 @@
 %   \changes{v2.8q}{2001/10/09}{Neu}^^A
 %   \changes{v2.97c}{2007/03/30}{vertauschte Bedeutung korrigiert}^^A
 %   \changes{v3.12}{2013/03/05}{Verwendung der Status-Signalisierung mit
-%     \cs{FamilyKeyState}}
+%     \cs{FamilyKeyState}}^^A
+%   \changes{v3.17}{2015/03/16}{interne Speicherung der Werte}^^A
 % Mit Hilfe der Optione \texttt{locfield} kann der Platz neben dem Adressfeld
 % groß oder klein gewählt werden.
 % \begin{macro}{\if@bigloc}
@@ -513,15 +563,27 @@
       \ifcase\@tempa
         \endgroup
         \@bigloctrue
+        \KOMA@kav@replacevalue{.%
+%<class>          \KOMAClassFileName
+%<package>          scrletter.\@pkgextension
+        }{locfield}{wide}%
       \else
         \endgroup
         \@biglocfalse
+        \KOMA@kav@replacevalue{.%
+%<class>          \KOMAClassFileName
+%<package>          scrletter.\@pkgextension
+        }{locfield}{narrow}%
       \fi
     \else
       \endgroup
       \FamilyKeyStateUnknownValue
   \fi
 }
+\KOMA@kav@add{.%
+%<class>  \KOMAClassFileName
+%<package>  scrletter.\@pkgextension
+}{locfield}{narrow}
 %    \end{macrocode}
 % \begin{option}{wlocfield}
 %   \changes{v3.01a}{2008/11/20}{deprecated}^^A
@@ -541,9 +603,10 @@
 % \begin{option}{foldmarks}
 %   \changes{v2.8q}{2001/09/10}{Neu}^^A
 %   \changes{v3.00}{2008/06/06}{es muss \cs{FamilyUnkownKeyVal} statt
-%     \cs{KOMA@unkown@keyval} lokal umdefiniert werden}
+%     \cs{KOMA@unkown@keyval} lokal umdefiniert werden}^^A
 %   \changes{v3.12}{2013/03/05}{Verwendung der Status-Signalisierung mit
-%     \cs{FamilyKeyState}}
+%     \cs{FamilyKeyState}}^^A
+%   \changes{v3.17}{2015/03/16}{interne Speicherung der Werte}^^A
 % Die Faltmarken können mit \texttt{foldmarks} aktiviert und deaktiviert
 % werden.
 % \begin{macro}{\if@fold}
@@ -610,7 +673,25 @@
       \expandafter\sc@nf@ldch@rs#1\@nil
     \fi
   \endgroup
+  \ifx\FamilyKeyState\FamilyKeyStateProcessed
+    \KOMA@kav@xreplacevalue{.%
+%<class>      \KOMAClassFileName
+%<package>      scrletter.\@pkgextension
+    }{foldmarks}{\@usefolds}%
+    \KOMA@kav@xadd{.%
+%<class>      \KOMAClassFileName
+%<package>      scrletter.\@pkgextension
+    }{foldmarks}{\if@fold true\else false\fi}%
+  \fi
 }
+\KOMA@kav@xadd{.%
+%<class>  \KOMAClassFileName
+%<package>  scrletter.\@pkgextension
+}{foldmarks}{\@usefolds}%
+\KOMA@kav@add{.%
+%<class>  \KOMAClassFileName
+%<package>  scrletter.\@pkgextension
+}{foldmarks}{true}%
 %    \end{macrocode}
 % \begin{macro}{\scr@removechar}
 %   \changes{v2.97e}{2007/11/08}{Neu (intern)}^^A
@@ -638,7 +719,8 @@
 %   \changes{v2.8n}{2001/09/08}{Neue Option}^^A
 %   \changes{v2.96a}{2006/12/07}{vertauschte Bedeutung korrigiert}^^A
 %   \changes{v3.12}{2013/03/05}{Verwendung der Status-Signalisierung mit
-%     \cs{FamilyKeyState}}
+%     \cs{FamilyKeyState}}^^A
+%   \changes{v3.17}{2015/03/16}{interne Speicherung der Werte}^^A
 % Kopf und Fuß der ersten Seite sind normalweise so breit, dass sie
 % zur Adresse des Empfängers passen. Für die Geschäftszeile gibt es
 % zwei Alternativen, eine breite und eine, deren Breite der Textbreite
@@ -670,24 +752,104 @@
       \ifcase\@tempa
         \endgroup
         \@refwidetrue
+        \KOMA@kav@remove{.%
+%<class>          \KOMAClassFileName
+%<package>          scrletter.\@pkgextension
+        }{refline}{wide}%
+        \KOMA@kav@remove{.%
+%<class>          \KOMAClassFileName
+%<package>          scrletter.\@pkgextension
+        }{refline}{narrow}%
+        \KOMA@kav@add{.%
+%<class>          \KOMAClassFileName
+%<package>          scrletter.\@pkgextension
+        }{refline}{wide}%
       \or
         \endgroup
         \@refwidefalse
+        \KOMA@kav@remove{.%
+%<class>          \KOMAClassFileName
+%<package>          scrletter.\@pkgextension
+        }{refline}{wide}%
+        \KOMA@kav@remove{.%
+%<class>          \KOMAClassFileName
+%<package>          scrletter.\@pkgextension
+        }{refline}{narrow}%
+        \KOMA@kav@add{.%
+%<class>          \KOMAClassFileName
+%<package>          scrletter.\@pkgextension
+        }{refline}{narrow}%
       \or
         \endgroup
         \def\@datepos{2}%
+        \KOMA@kav@remove{.%
+%<class>          \KOMAClassFileName
+%<package>          scrletter.\@pkgextension
+        }{refline}{dateleft}%
+        \KOMA@kav@remove{.%
+%<class>          \KOMAClassFileName
+%<package>          scrletter.\@pkgextension
+        }{refline}{dateright}%
+        \KOMA@kav@remove{.%
+%<class>          \KOMAClassFileName
+%<package>          scrletter.\@pkgextension
+        }{refline}{nodate}%
+        \KOMA@kav@add{.%
+%<class>          \KOMAClassFileName
+%<package>          scrletter.\@pkgextension
+        }{refline}{dateleft}%
       \or
         \endgroup
         \def\@datepos{1}%
+        \KOMA@kav@remove{.%
+%<class>          \KOMAClassFileName
+%<package>          scrletter.\@pkgextension
+        }{refline}{dateleft}%
+        \KOMA@kav@remove{.%
+%<class>          \KOMAClassFileName
+%<package>          scrletter.\@pkgextension
+        }{refline}{dateright}%
+        \KOMA@kav@remove{.%
+%<class>          \KOMAClassFileName
+%<package>          scrletter.\@pkgextension
+        }{refline}{nodate}%
+        \KOMA@kav@add{.%
+%<class>          \KOMAClassFileName
+%<package>          scrletter.\@pkgextension
+        }{refline}{dateright}%
       \or
         \endgroup
         \def\@datepos{0}%
+        \KOMA@kav@remove{.%
+%<class>          \KOMAClassFileName
+%<package>          scrletter.\@pkgextension
+        }{refline}{dateleft}%
+        \KOMA@kav@remove{.%
+%<class>          \KOMAClassFileName
+%<package>          scrletter.\@pkgextension
+        }{refline}{dateright}%
+        \KOMA@kav@remove{.%
+%<class>          \KOMAClassFileName
+%<package>          scrletter.\@pkgextension
+        }{refline}{nodate}%
+        \KOMA@kav@add{.%
+%<class>          \KOMAClassFileName
+%<package>          scrletter.\@pkgextension
+        }{refline}{nodate}%
       \fi
     \else
       \endgroup
       \FamilyKeyStateUnknownValue
   \fi
 }
+\KOMA@kav@add{.%
+%<class>  \KOMAClassFileName
+%<package>  scrletter.\@pkgextension
+}{refline}{dateright}%
+\KOMA@kav@add{.%
+%<class>  \KOMAClassFileName
+%<package>  scrletter.\@pkgextension
+}{refline}{narrow}%
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -701,7 +863,8 @@
 % \begin{option}{subject}
 %   \changes{v2.8q}{2001/10/09}{Neu}^^A
 %   \changes{v3.12}{2013/03/05}{Verwendung der Status-Signalisierung mit
-%     \cs{FamilyKeyState}}
+%     \cs{FamilyKeyState}}^^A
+%  \changes{v3.17}{2015/03/16}{interne Speicherung der Werte}^^A
 % Ein Betreff-Titel kann mit \texttt{subject} ein- und abgeschaltet
 % werden. In England und Frankreich scheint es teilweise üblich zu
 % sein, den Betreff erst nach der Anrede und dafür zentriert zu
@@ -767,7 +930,51 @@
       \aftergroup\FamilyKeyStateUnknownValue
     \fi
   \endgroup
+  \ifx\FamilyKeyState\FamilyKeyStateProcessed
+    \KOMA@kav@xreplacevalue{.%
+%<class>      \KOMAClassFileName
+%<package>      scrletter.\@pkgextension
+    }{subject}{\if@subj titled\else untitled\fi}%
+    \KOMA@kav@xadd{.%
+%<class>      \KOMAClassFileName
+%<package>      scrletter.\@pkgextension
+    }{subject}{\if@subjafter after\else before\fi opening}%
+    \ifx\subject@format\undeline
+      \KOMA@kav@add{.%
+%<class>        \KOMAClassFileName
+%<package>        scrletter.\@pkgextension
+      }{subject}{underlined}%
+    \fi
+    \ifx\raggedsubject\raggedright
+      \KOMA@kav@add{.%
+%<class>        \KOMAClassFileName
+%<package>        scrletter.\@pkgextension
+      }{subject}{left}%
+    \else
+      \ifx\raggedsubject\raggedleft
+        \KOMA@kav@add{.%
+%<class>          \KOMAClassFileName
+%<package>          scrletter.\@pkgextension
+        }{subject}{right}%
+      \else
+        \ifx\raggedsubject\centering
+          \KOMA@kav@add{.%
+%<class>            \KOMAClassFileName
+%<package>            scrletter.\@pkgextension
+          }{subject}{centered}%
+        \fi
+      \fi
+    \fi
+  \fi
 }
+\KOMA@kav@add{.%
+%<class>  \KOMAClassFileName
+%<package>  scrletter.\@pkgextension
+}{subject}{untitled}%
+\KOMA@kav@add{.%
+%<class>  \KOMAClassFileName
+%<package>  scrletter.\@pkgextension
+}{subject}{beforeopening}%
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -892,7 +1099,31 @@
       \def\@tempa{\endgroup\FamilyKeyStateUnknownValue}%
     \fi
   \@tempa
+  \KOMA@kav@xreplacevalue{.%
+%<class>    \KOMAClassFileName
+%<package>    scrletter.\@pkgextension
+  }{pagenumber}{%
+    \ifcase \@pageat
+      topleft%
+    \or
+      topmiddle%
+    \or
+      topright%
+    \or
+      botleft%
+    \or
+      botmiddle%
+    \or
+      botright%
+    \else
+      false%
+    \fi
+  }%
 }
+\KOMA@kav@add{.%
+%<class>  \KOMAClassFileName
+%<package>  scrletter.\@pkgextension
+}{pagenumber}{botmiddle}
 %    \end{macrocode}
 % \end{macro}
 % \end{option}
@@ -965,12 +1196,17 @@
 % \end{KOMAvar}
 % \begin{macro}{\scr@firsthead@postsetvar}
 %   \changes{v3.08}{2010/10/28}{Neu (intern)}^^A
+%   \changes{v3.17}{2015/03/16}{internes Setzen von Option
+%     \texttt{fromalign!=no}}^^A
 % Über dieses Makro wird jeweils nach dem Setzen der Variable die Ausrichtung
 % auf manuell umgeschaltet. Das darf deshalb auch erst nach dem erstmaligen
 % Setzen definiert werden!
 %    \begin{macrocode}
 \newcommand*{\scr@firsthead@postsetvar}{%
-  \renewcommand*{\@alignfrom}{10000}%
+  \KOMAExecuteOptions[.%
+%<class>    \KOMAClassFileName
+%<package>    scrletter.\@pkgextension
+  ]{fromalign=no}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -3468,13 +3704,14 @@
 % \end{KOMAvar}
 %
 % \begin{option}{symbolicnames}
-%   \changes{v3.12}{2013/05/2013}{neue Option}^^A
+%   \changes{v3.12}{2013/05/13}{neue Option}^^A
+%   \changes{v3.17}{2015/03/16}{interne Speicherung der Werte}^^A
 % \begin{macro}{\if@scrsymbols}
-%   \changes{v3.12}{2013/05/2013}{neu (intern)}^^A
+%   \changes{v3.12}{2013/05/13}{neu (intern)}^^A
 % \begin{macro}{\@scrsymbolstrue}
-%   \changes{v3.12}{2013/05/2013}{neu (intern)}^^A
+%   \changes{v3.12}{2013/05/13}{neu (intern)}^^A
 % \begin{macro}{\@scrsymbolsfalse}
-%   \changes{v3.12}{2013/05/2013}{neu (intern)}^^A
+%   \changes{v3.12}{2013/05/13}{neu (intern)}^^A
 % Über diese Option kann eingestellt werden, dass an Stelle von
 % sprachabhängigen Bezeichnern für einige Variablen Symbole verwendet
 % werden. Daztu wird das Paket \textsf{macrosym} benötigt.
@@ -3485,6 +3722,10 @@
 \newif\if@scrsymbols
 \KOMA@key{symbolicnames}[true]{%
   \KOMA@set@ifkey{symbolicnames}{@scrsymbols}{#1}%
+  \KOMA@kav@replacebool{.%
+%<class>    \KOMAClassFileName
+%<package>    scrletter.\@pkgextension
+  }{symbolicnames}{@scrsymbols}%
   \if@scrsymbols
     \if@atdocument
       \begingroup
@@ -3529,6 +3770,10 @@
     \fi
   \fi
 }
+\KOMA@kav@add{.%
+%<class>  \KOMAClassFileName
+%<package>  scrletter.\@pkgextension
+}{symbolicnames}{false}%
 %</option&letter>
 %<*body>
 %<*letter>
