@@ -1,4 +1,4 @@
-% \CheckSum{2889}
+% \CheckSum{2919}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -3090,21 +3090,41 @@
 %
 % \begin{macro}{\KOMA@ncmdkey}
 %   \changes{v3.02c}{2009/02/04}{definiert ebenfalls das Familienmitglied}^^A
-% Ein ähnliches Makro definiert einen Schlüssel, der ein nummerisches
-% Makro auf einen bestimmten Wert setzt. Dabei können auch
-% verschiedene symbolische Werte auf denselben nummerischen Wert
-% abgebildet werden. Das erste Argument ist obligatorisch und der Name
-% des Schlüssels. Das zweite Argument ist optional und der Defaultwert
-% für den Schlüssel. Das dritte Argument ist obligatorisch und der
-% Name des Makros, das definiert werden soll. Der Defaultwert dafür
-% ist 0. Das vierte Argument ist obligatorisch und die Liste der
-% symbolischen und nummerischen Wert. Die Liste hat die Form: 
-% \{\emph{Symbol}\}\{\emph{Wert}\},\{\emph{Symbol}\}\{\emph{Wert}\}\dots
+%   \changes{v3.17}{2015/03/16}{neu implementiert mit Speicherung der
+%     Werte und optionalem erstem Argument}^^A
+% Wie \cs{FamilyNumericalKey} mit zwei entscheidenden Unterschieden:
+% \begin{itemize}
+% \item Die Familien ist immer \texttt{KOMA} und entfällt daher als zweites
+%   Argument.
+% \item Der gespeicherte Wert wird ausgetauscht. Daher kann es nicht nur für
+%   Optionen verwendet werden, bei denen die Werte exklusiv sind.
+% \end{itemize}
+% Wichtig: Die Voreinstellung muss anschließend noch in jedem Fall mit
+% \cs{KOMA@kav@add} gesetzt werden!
 %    \begin{macrocode}
 %<*koma>
-\newcommand*{\KOMA@ncmdkey}{%
-  \DefineFamilyMember{KOMA}%
-  \FamilyNumericalKey{KOMA}%
+\newcommand*{\KOMA@ncmdkey}[2][.\@currname.\@currext]{%
+  \begingroup\edef\reserved@a{\noexpand\KOMA@@ncmdkey{#1}{#2}}%
+  \expandafter\endgroup\reserved@a
+}
+\newcommand*{\KOMA@@ncmdkey}[2]{%
+  \@ifnextchar [%]
+    {\KOMA@@@ncmdkey{#1}{#2}}{\KOMA@@@ncmdkey{#1}{#2}[]}
+}
+\newcommand*{\KOMA@@@cmdkey}{}
+\def\KOMA@@@ncmdkey#1#2[#3]#4#5{%
+  \@ifundefined{#4}{\@namedef{#4}{0}}{}%
+  \ifx\relax#3\relax
+    \KOMA@key[{#1}]{#2}{%
+      \KOMA@set@ncmdkey{#2}{#4}{#5}{##1}%
+      \KOMA@kav@replacevalue{#1}{#2}{##1}%
+    }%
+  \else
+    \KOMA@key[{#1}]{#2}[{#3}]{%
+      \KOMA@set@ncmdkey{#2}{#4}{#5}{##1}%
+      \KOMA@kav@replacevalue{#1}{#2}{##1}%
+    }%
+  \fi
 }
 %</koma>
 %    \end{macrocode}
@@ -3112,7 +3132,8 @@
 % Die eigentliche Arbeit dabei wird wahlweise von diesem Makro erledigt. Dabei
 % wird der Name des Schlüssels zu Argument 1, der Name des Makros,
 % das definiert werden soll zu Argument 2, die Liste zu Argument 3 und
-% der Wert, auf den gesetzt werden soll, zu Argument 4.
+% der Wert, auf den gesetzt werden soll, zu Argument 4. Dabei wird allerdings
+% kein gespeicherter Wert ersetzt!
 %    \begin{macrocode}
 %<*koma>
 \newcommand*{\KOMA@set@ncmdkey}{\FamilySetNumerical{KOMA}}
