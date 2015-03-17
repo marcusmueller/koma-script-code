@@ -1,4 +1,4 @@
-% \CheckSum{2519}
+% \CheckSum{2580}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-typearea.dtx
@@ -543,8 +543,8 @@
   \endgroup
   \def\ta@hh{#1\baselineskip}%
   \FamilyKeyStateProcessed
-  \KOMA@kav@replacevalue{.typearea.\@pkgextension}{headlines}{#1}%
-  \KOMA@kav@replacevalue{.typearea.\@pkgextension}{headheight}{#1\baselineskip}%
+  \KOMA@kav@replacevalue{.typearea.\scr@pkgextension}{headlines}{#1}%
+  \KOMA@kav@replacevalue{.typearea.\scr@pkgextension}{headheight}{#1\baselineskip}%
 }
 \KOMA@key{footlines}{%
   \begingroup
@@ -552,8 +552,8 @@
   \endgroup
   \def\ta@fh{#1\baselineskip}%
   \FamilyKeyStateProcessed
-  \KOMA@kav@replacevalue{.typearea.\@pkgextension}{footlines}{#1}%
-  \KOMA@kav@replacevalue{.typearea.\@pkgextension}{footheight}{#1\baselineskip}%
+  \KOMA@kav@replacevalue{.typearea.\scr@pkgextension}{footlines}{#1}%
+  \KOMA@kav@replacevalue{.typearea.\scr@pkgextension}{footheight}{#1\baselineskip}%
 }
 %    \end{macrocode}
 % \end{option}
@@ -575,8 +575,8 @@
   \endgroup
   \def\ta@hh{#1}%
   \FamilyKeyStateProcessed
-  \KOMA@kav@replacevalue{.typearea.\@pkgextension}{headheight}{#1}%
-  \KOMA@kav@removekey{.typearea.\@pkgextension}{headlines}%
+  \KOMA@kav@replacevalue{.typearea.\scr@pkgextension}{headheight}{#1}%
+  \KOMA@kav@removekey{.typearea.\scr@pkgextension}{headlines}%
 }
 \KOMA@key{footheight}{%
   \begingroup
@@ -584,8 +584,8 @@
   \endgroup
   \def\ta@fh{#1}%
   \FamilyKeyStateProcessed
-  \KOMA@kav@replacevalue{.typearea.\@pkgextension}{footheight}{#1}%
-  \KOMA@kav@removekey{.typearea.\@pkgextension}{footlines}%
+  \KOMA@kav@replacevalue{.typearea.\scr@pkgextension}{footheight}{#1}%
+  \KOMA@kav@removekey{.typearea.\scr@pkgextension}{footlines}%
 }
 %    \end{macrocode}
 % \end{option}
@@ -690,7 +690,7 @@
     \setlength{\ta@bcor}{#1}%
   }%
   \FamilyKeyStateProcessed
-  \KOMA@kav@xreplacevalue{.typearea.\@pkgextension}{BCOR}{#1}%
+  \KOMA@kav@xreplacevalue{.typearea.\scr@pkgextension}{BCOR}{#1}%
 }
 %    \end{macrocode}
 % Wenn allerdings der Satzspiegel bereits berechnet ist, dann muss er
@@ -728,7 +728,7 @@
     \fi
   \fi
   \FamilyKeyStateProcessed
-  \KOMA@kav@xreplacevalue{.typearea.\@pkgextension}{DIV}{#1}%
+  \KOMA@kav@xreplacevalue{.typearea.\scr@pkgextension}{DIV}{#1}%
 }
 %    \end{macrocode}
 % Wenn allerdings der Satzspiegel bereits berechnet ist, dann muss er
@@ -793,6 +793,10 @@
 %     \cs{FamilyKeyState}}^^A
 %   \changes{v3.13a}{2014/04/09}{Die Klasse setzt signalisiert ebenfalls
 %     \cs{FamilyKeyStateProcessed}}^^A
+%   \changes{v3.17}{2015/03/17}{ab dieser Version werden \cs{flushbottom} und
+%     \cs{raggedbottom} automatisch gesetzt}^^A
+%   \changes{v3.17}{2015/03/17}{Voreinstellungen werden bereits hier
+%     gesetzt}^^A
 % \begin{macro}{\if@semitwoside}
 %   \changes{v3.00}{2008/07/09}{neuer Schalter (intern)}^^A
 % \begin{macro}{\if@twoside}
@@ -811,18 +815,21 @@
 %<class>  \if@atdocument\else\PassOptionsToPackage{twoside=#1}{typearea}\fi%
 %<*package>
   \if@atdocument\if@twoside\cleardoublepage\else\clearpage\fi\fi
+%</package>
   \ifstr{#1}{semi}{%
     \@twosidetrue
-    \@semitwosidetrue
-%</package>
+%<package>    \@semitwosidetrue
     \FamilyKeyStateProcessed
-%<*package>
   }{%
     \def\FamilyElseValue{, `semi'}%
     \KOMA@set@ifkey{twoside}{@twoside}{#1}%
   }%
   \ifx\FamilyKeyState\FamilyKeyStateProcessed
-    \KOMA@kav@xreplacevalue{.typearea.\@pkgextension}{twoside}{#1}%
+    \KOMA@kav@xreplacevalue{.%
+%<class>      \KOMAClassFileName
+%<package>      typearea.\scr@pkgextension
+    }{twoside}{#1}%
+%<*package>
     \if@twoside
       \if@semitwoside
         \@mparswitchfalse
@@ -833,9 +840,27 @@
       \@mparswitchfalse
     \fi%
     \csname recalctypearea\endcsname
-  \fi
 %</package>
+%<*class>
+    \expandafter\ifnum\scr@v@is@ge{3.17}%
+%<*!letter>
+      \if@twoside\flushbottom
+      \else\if@twocolumn\flushbottom\else\raggedbottom\fi\fi
+%</!letter>
+%<letter>    \raggedbottom
+    \fi
+%</class>
+  \fi
 }
+%<*class>
+%<book>\KOMAExecuteOptions{twoside=true}
+%<!book>\KOMAExecuteOptions{twoside=false}
+%</class>
+%<*package>
+\KOMA@kav@xadd{.typearea.\scr@pkgextension}{twoside}{%
+  \if@twoside true\else false\fi
+}
+%</package>
 \KOMA@DeclareStandardOption%
 %<package>  [typearea]%
   {oneside}{twoside=false}
@@ -869,21 +894,42 @@
 %<class>  \if@atdocument\else\PassOptionsToPackage{twocolumn=#1}{typearea}\fi%
 %<*package>
   \if@atdocument\clearpage\fi
+%</package>
   \KOMA@set@ifkey{twocolumn}{@twocolumn}{#1}%
-  \ifx\FamilyKeyState
-%</package>
-  \FamilyKeyStateProcessed
-%<*package>
-    \KOMA@kav@replacebool{.typearea.\@pkgextension}{twocolumn}{@twocolumn}%
-    \csname recalctypearea\endcsname
+  \ifx\FamilyKeyState\FamilyKeyStateProcessed
+    \KOMA@kav@replacebool{.%
+%<class>      \KOMAClassFileName
+%<package>      typearea.\scr@pkgextension
+    }{twocolumn}{@twocolumn}%
+%<package>    \csname recalctypearea\endcsname
+%<*class>
+    \expandafter\ifnum\scr@v@is@ge{3.17}%
+      \if@twocolumn\twocolumn\sloppy\flushbottom
+      \else\onecolumn\if@twoside\flushbottom\else\raggedbottom\fi\fi
+    \fi
+%</class>
   \fi
-%</package>
 }
-%<package>\KOMA@kav@add{.typearea.\@pkgextension}{twocolumn}{false}
+%<*class>
+\AtEndOfClass{%
+  \expandafter\ifnum\scr@v@is@lt{3.17}%
+%<*!letter>
+    \if@twocolumn\twocolumn\sloppy\flushbottom
+    \else\onecolumn\if@twoside\flushbottom\else\raggedbottom\fi\fi
+%</!letter>
+%<letter>    \raggedbottom
+  \fi
+}
+\KOMAExecuteOptions{twocolumn=false}
+%</class>
+%<*package>
+\KOMA@kav@xadd{.typearea.\scr@pkgextension}{twocolumn}{%
+  \if@twocolumn true\else false\fi
+}
+%</package>
 \KOMA@DeclareStandardOption%
 %<package>  [typearea]%
   {onecolumn}{twocolumn=false}
-%<*package>
 %    \end{macrocode}
 % \end{option}
 % \end{option}
@@ -921,6 +967,7 @@
 %   werden gesetzt, falls sie definiert sind.
 % \end{labeling}
 %    \begin{macrocode} 
+%<*package>
 \KOMA@key{pagesize}[auto]{%
   \begingroup
     \KOMA@set@ncmdkey{pagesize}{@tempa}{%
@@ -948,7 +995,7 @@
         \endgroup
         \set@dvipdfmxpagesize
     \fi
-    \KOMA@kav@xreplacevalue{.typearea.\@pkgextension}{pagesize}{#1}%
+    \KOMA@kav@xreplacevalue{.typearea.\scr@pkgextension}{pagesize}{#1}%
     \edef\@pagesizelast{#1}%
   \else
     \endgroup
@@ -1315,8 +1362,8 @@
             \setlength\paperwidth {8.5in}%
           \fi
           \FamilyKeyStateProcessed
-          \KOMA@kav@removekey{.typearea.\@pkgextension}{paper}%
-          \KOMA@kav@add{.typearea.\@pkgextension}{paper}{letter}%
+          \KOMA@kav@removekey{.typearea.\scr@pkgextension}{paper}%
+          \KOMA@kav@add{.typearea.\scr@pkgextension}{paper}{letter}%
         }{%
           \ifstr{#1}{legal}{%
             \if@landscape
@@ -1327,8 +1374,8 @@
               \setlength\paperwidth {8.5in}%
             \fi
             \FamilyKeyStateProcessed
-            \KOMA@kav@removekey{.typearea.\@pkgextension}{paper}%
-            \KOMA@kav@add{.typearea.\@pkgextension}{paper}{legal}%
+            \KOMA@kav@removekey{.typearea.\scr@pkgextension}{paper}%
+            \KOMA@kav@add{.typearea.\scr@pkgextension}{paper}{legal}%
           }{%
             \ifstr{#1}{executive}{%
               \if@landscape
@@ -1339,14 +1386,14 @@
                 \setlength\paperwidth {7.25in}%
              \fi
              \FamilyKeyStateProcessed
-             \KOMA@kav@removekey{.typearea.\@pkgextension}{paper}%
-             \KOMA@kav@add{.typearea.\@pkgextension}{paper}{executive}%
+             \KOMA@kav@removekey{.typearea.\scr@pkgextension}{paper}%
+             \KOMA@kav@add{.typearea.\scr@pkgextension}{paper}{executive}%
             }{%
               \iso@paper{#1}%
               \if@tempswa
                 \FamilyKeyStateProcessed
-                \KOMA@kav@removekey{.typearea.\@pkgextension}{paper}%
-                \KOMA@kav@xadd{.typearea.\@pkgextension}{paper}{#1}%
+                \KOMA@kav@removekey{.typearea.\scr@pkgextension}{paper}%
+                \KOMA@kav@xadd{.typearea.\scr@pkgextension}{paper}{#1}%
               \else
                 \expandafter\maybe@pair#1::\@nil
                 \if@tempswa
@@ -1365,11 +1412,11 @@
                     \setlength\paperheight{\@tempb}%
                   \fi
                   \FamilyKeyStateProcessed
-                  \KOMA@kav@removekey{.typearea.\@pkgextension}{paper}%
+                  \KOMA@kav@removekey{.typearea.\scr@pkgextension}{paper}%
                   \if@landscape
-                    \KOMA@kav@xadd{.typearea.\@pkgextension}{paper}{\@tempa:\@tempb}%
+                    \KOMA@kav@xadd{.typearea.\scr@pkgextension}{paper}{\@tempa:\@tempb}%
                   \else
-                    \KOMA@kav@xadd{.typearea.\@pkgextension}{paper}{\@tempb:\@tempa}%
+                    \KOMA@kav@xadd{.typearea.\scr@pkgextension}{paper}{\@tempb:\@tempa}%
                   \fi
                \else
                   \KOMA@unknown@keyval{paper}{#1}{%
@@ -1385,12 +1432,12 @@
         \ifx\FamilyKeyState\FamilyKeyStateProcessed
           \if@landscape
             \if@seascape
-              \KOMA@kav@add{.typearea.\@pkgextension}{paper}{seascape}%
+              \KOMA@kav@add{.typearea.\scr@pkgextension}{paper}{seascape}%
             \else
-              \KOMA@kav@add{.typearea.\@pkgextension}{paper}{landscape}%
+              \KOMA@kav@add{.typearea.\scr@pkgextension}{paper}{landscape}%
             \fi
           \else
-            \KOMA@kav@add{.typearea.\@pkgextension}{paper}{portrait}%
+            \KOMA@kav@add{.typearea.\scr@pkgextension}{paper}{portrait}%
           \fi
         \fi
       }%
@@ -2119,9 +2166,9 @@
       \noexpand\marginparsep=\the\marginparsep\space
       \noexpand\marginparwidth=\the\marginparwidth\space
       \noexpand\def
-      \expandafter\noexpand\csname scr@kav@KOMA.typearea.\@pkgextension\endcsname{%
+      \expandafter\noexpand\csname scr@kav@KOMA.typearea.\scr@pkgextension\endcsname{%
         \unexpanded\expandafter\expandafter\expandafter{%
-          \csname scr@kav@KOMA.typearea.\@pkgextension\endcsname}%
+          \csname scr@kav@KOMA.typearea.\scr@pkgextension\endcsname}%
       }%
     }%
   }%
@@ -2572,10 +2619,10 @@
       }
     \fi
     \ta@layoutinfo{\number\ta@div}{\the\@tempcnta}%
-    \KOMA@kav@removekey{.typearea.\@pkgextension}{DIV}%
-    \KOMA@kav@xadd{.typearea.\@pkgextension}{DIV}{\@lastdiv}%
-    \KOMA@kav@removekey{.typearea.\@pkgextension}{BCOR}%
-    \KOMA@kav@xadd{.typearea.\@pkgextension}{BCOR}{\the\ta@bcor}%
+    \KOMA@kav@removekey{.typearea.\scr@pkgextension}{DIV}%
+    \KOMA@kav@xadd{.typearea.\scr@pkgextension}{DIV}{\@lastdiv}%
+    \KOMA@kav@removekey{.typearea.\scr@pkgextension}{BCOR}%
+    \KOMA@kav@xadd{.typearea.\scr@pkgextension}{BCOR}{\the\ta@bcor}%
     \@typearea@end
     \activateareas
     \ifdim \dimexpr 1in+\topmargin
@@ -2682,10 +2729,10 @@
   \setlength{\textwidth}{#2}%
   \setlength{\textheight}{#3}%
   \def\@lastdiv{areaset}%
-  \KOMA@kav@removekey{.typearea.\@pkgextension}{DIV}%
-  \KOMA@kav@addkey{.typearea.\@pkgextension}{DIV}{areaset}%
-  \KOMA@kav@removekey{.typearea.\@pkgextension}{BCOR}%
-  \KOMA@kav@add{.typearea.\@pkgextension}{BCOR}{\the\ta@bcor}%
+  \KOMA@kav@removekey{.typearea.\scr@pkgextension}{DIV}%
+  \KOMA@kav@addkey{.typearea.\scr@pkgextension}{DIV}{areaset}%
+  \KOMA@kav@removekey{.typearea.\scr@pkgextension}{BCOR}%
+  \KOMA@kav@add{.typearea.\scr@pkgextension}{BCOR}{\the\ta@bcor}%
   \ta@hblk=\paperwidth
   \advance\ta@hblk by-\ta@bcor
   \advance\ta@hblk by-\textwidth
