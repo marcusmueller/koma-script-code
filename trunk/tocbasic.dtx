@@ -1,4 +1,4 @@
-% \CheckSum{1377}
+% \CheckSum{1389}
 % \iffalse meta-comment
 % ======================================================================
 % tocbasic.dtx
@@ -1052,6 +1052,11 @@ features. \Package{tocbasic} does know following features:
   \Package{scrwfile}\important{\Package{scrwfile}}\IndexPackage{scrwfile} uses
   this feature also for clone destinations, because those will get the
   language change from the clone source already.
+\item[\texttt{noparskipfake}] prevents\ChangedAt{v3.17}{\Package{scrwfile}}
+  usage of an extra \Length{parskip} before switching \Length{parskip} off. In
+  general, the consequence of this feature for documents using paragraph
+  distance is less vertical space between heading and first entry than between
+  normal headings and normal text.
 \item[\texttt{noprotrusion}] prevents\ChangedAt{v3.10}{\Package{tocbasic}}
   disabling character protrusion at the lists of something. Character
   protrusion at the lists will be disabled by default if package
@@ -2306,6 +2311,7 @@ may be found in \autoref{tab:tocbasic.DeclareNewTOC-options}.
 % too. Here are basics and high level commands for this.
 %
 % \begin{macro}{\tocbasic@starttoc}
+%   \changes{v3.17}{2015/03/23}{usage of feature \texttt{noparskipfake}}^^A
 %   Some basics are done like setting up \cs{parskip}, \cs{parindent} and
 %   \cs{parfillskip}, a general hook will be called, an individual hook will
 %   be called, the toc will be started, an individual hook will be called, an
@@ -2313,10 +2319,18 @@ may be found in \autoref{tab:tocbasic.DeclareNewTOC-options}.
 %    \begin{macrocode}
 \newcommand*{\tocbasic@starttoc}[1]{%
   \begingroup
+    \edef\@currext{#1}%
+    \iftocfeature{@currext}{noparskipfake}{}{%
+      \ifvmode
+        \@tempskipa\lastskip
+        \vskip-\lastskip
+        \addtolength{\@tempskipa}{\parskip}%
+        \vskip\@tempskipa
+      \fi
+    }%
     \setlength{\parskip}{\z@}%
     \setlength{\parindent}{\z@}%
     \setlength{\parfillskip}{\z@\@plus 1fil}%
-    \edef\@currext{#1}%
     \csname tocbasic@@before@hook\endcsname
     \csname tb@#1@before@hook\endcsname
     \@starttoc{#1}%
