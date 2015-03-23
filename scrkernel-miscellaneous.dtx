@@ -1,4 +1,4 @@
-% \CheckSum{421}
+% \CheckSum{430}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-miscellaneous.dtx
@@ -537,9 +537,12 @@
 %
 % \begin{macro}{\is@thispageodd}
 %   \changes{v2.8q}{2001/11/22}{neu (intern)}^^A
-%   \changes{v2.9l}{2003/01/28}{renamed \cs{if@thispageodd}}
-%   \changes{v2.95b}{2006/07/28}{basiert nun auf \cs{@newl@bel}}
-% Dieses Makro macht die eigentliche Arbeit. Es funktioniert nicht wie
+%   \changes{v2.9l}{2003/01/28}{renamed \cs{if@thispageodd}}^^A
+%   \changes{v2.95b}{2006/07/28}{basiert nun auf \cs{@newl@bel}}^^A
+%   \changes{v3.17}{2015/03/23}{in zwei Anweisungen ausgeteilt}^^A
+% \begin{macro}{\is@thispageodd@setlabel}
+%   \changes{v3.17}{2015/03/23}{neu (intern)}^^A
+% Diese Makros machen die eigentliche Arbeit. Sie funktionieren nicht wie
 % ein normales \cs{iffalse} oder \cs{iftrue}, denn es kann nicht
 % geschachtelt innerhalb anderer \cs{if\dots} \dots \cs{fi}
 % Klammerungen verwendet werden. Es sollte daher niemals auﬂerhalb von
@@ -547,14 +550,12 @@
 % gearbeitet wird, funktioniert das Ganze nur, wenn die Datei auch
 % geschrieben wird und min. zwei \LaTeX-L‰ufe erfolgen.
 %    \begin{macrocode}
-\newcommand*{\is@thispageodd}{%
+\newcommand*{\is@thispageodd}[1][\is@thispageodd@setlabel]{%
   \@bsphack
   \begingroup
     \@tempcnta=\scr@tpo
     \advance\@tempcnta by\@ne
     \xdef\scr@tpo{\the\@tempcnta}%
-    \protected@write\@auxout{\let\arabic\relax}{%
-      \string\new@tpo@label{\scr@tpo}{\arabic{page}}}%
     \expandafter\ifx\csname tpo@\scr@tpo\endcsname\relax
       \protect\G@refundefinedtrue
 %<!extend>      \ClassWarning{\KOMAClassName}{%
@@ -570,9 +571,17 @@
       \aftergroup\thispagewasoddfalse
     \fi
   \endgroup
+  \edef\is@thispageodd@setlabel{%
+    \unexpanded{\protected@write\@auxout{\let\arabic\relax}}{%
+      \noexpand\string
+      \noexpand\new@tpo@label{\scr@tpo}{\noexpand\arabic{page}}}%
+  }%
+  #1%
   \@esphack
 }
+\newcommand*{\is@thispageodd@setlabel}{}
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
 % \begin{macro}{\ifthispagewasodd}
