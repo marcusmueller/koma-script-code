@@ -1,4 +1,4 @@
-% \CheckSum{3479}
+% \CheckSum{3541}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -849,6 +849,8 @@
 %
 % \begin{macro}{\DeclareSectionCommand}
 %   \changes{v3.15}{2014/11/21}{neue Anweisung}^^A
+%   \changes{v3.17}{2015/03/23}{Komplettumbau, um stilabhängige Optionen zu
+%     ermöglichen}^^A
 % Definition neuer oder Umdefinition existierender Gliederungsbefehle, die auf
 % \cs{scr@startsection} basieren. Ebenso wird ein Verzeichniseintrag erzeugt,
 % falls ein solcher noch nicht existiert. Die Deklaration geschieht über
@@ -857,16 +859,172 @@
 %    \begin{macrocode}
 \DefineFamily{KOMAarg}
 \DefineFamilyMember[.dsc]{KOMAarg}
-\newcommand*{\DeclareSectionCommand}[2][]{%
 %    \end{macrocode}
+% \begin{macro}{\DeclareSectionCommandStyleOption}
+%   \changes{v3.17}{2015/03/23}{neue Anweisung}^^A
+% Definiert eine neue Option für einen Stil eines Gliederungsbefehls. Das
+% erste Argument ist der Stil, das zweite der Name der Option, das dritte ist
+% die Definition. Sollte innerhalb der Definition eine Familie benötigt
+% werden, so ist \texttt{KOMAarg} zu verwenden.
+%    \begin{macrocode}
+\newcommand*{\DeclareSectionCommandStyleOption}[3]{%
+  \DeclareSectionCommandDummyOption{#2}%
+  \expandafter\g@addto@macro\csname scr@dsc@style@#1@options\endcsname{%
+    \DefineFamilyKey[.dsc]{KOMAarg}{#2}{#3}%
+  }%
+}
+%    \end{macrocode}
+% \begin{macro}{\DeclareSectionCommandDummyOption}
+%   \changes{v3.17}{2015/03/23}{neue Anweisung (intern)}^^A
+% \begin{macro}{\scr@dsc@dummyoptions}
+%   \changes{v3.17}{2015/03/23}{Neu (intern)}^^A
+% Definiert eine neue Dummy-Option für einen Stil eines
+% Gliederungsbefehls. Das einzige Argument ist der Name der Option. Die
+% Dummy-Optionen werden in \cs{scr@dsc@dummyoptions} gesammelt.
+%    \begin{macrocode}
+\newcommand*{\DeclareSectionCommandDummyOption}[1]{%
+  \g@addto@macro{\scr@dsc@dummyoptions}{%
+    \DefineFamilyKey[.dsc]{KOMAarg}{#1}{\FamilyKeyStateProcessed}%
+  }%
+}
+\newcommand*{\scr@dsc@dummyoptions}{}
+%    \end{macrocode}
+% \end{macro}^^A \scr@dsc@dummyoptions
+% \end{macro}^^A \DeclareSectionCommandDummyOption
+% \end{macro}^^A \DeclareSectionCommandStyleOption
+% \begin{macro}{\DeclareSectionCommandStyleLengthOption}
+%   \changes{v3.17}{2015/03/23}{neue Anweisung}^^A
+% Definiert eine für die aktuelle Ebene \cs{scr@dsc@current} eine neue
+% Längenoption und speichert das Ergebnis in einem Makro, das sich aus
+% Argument 3 gefolgt von der aktuellen Ebene gefolgt von Argument 4 ergibt.
+%    \begin{macrocode}
+\newcommand*{\DeclareSectionCommandStyleLengthOption}[4]{%
+  \DeclareSectionCommandStyleOption{#1}{#2}{%
+    \FamilySetLength{KOMAarg}{#2}{\@tempskipa}{##1}%
+    \ifx\FamilyKeyState\FamilyKeyStateProcessed
+      \ifscr@dsc@expandtopt
+        \expandafter\edef\csname #3\scr@dsc@current#4\endcsname{%
+          \the\@tempskipa}%
+      \else
+        \expandafter\edef\csname #3\scr@dsc@current#4\endcsname{##1}%
+      \fi
+    \fi
+  }%
+}
+%    \end{macrocode}
+% \end{macro}^^A \DeclareSectionCommandStyleLengthOption
+% \begin{macro}{\DeclareSectionCommandStyleNumberOption}
+%   \changes{v3.17}{2015/03/23}{neue Anweisung}^^A
+% Definiert eine für die aktuelle Ebene \cs{scr@dsc@current} eine neue
+% Zahlenoption und speichert das Ergebnis in einem Makro, das sich aus
+% Argument 3 gefolgt von der aktuellen Ebene gefolgt von Argument 4 ergibt.
+%    \begin{macrocode}
+\newcommand*{\DeclareSectionCommandStyleNumberOption}[4]{%
+  \DeclareSectionCommandStyleOption{#1}{#2}{%
+    \FamilySetCounter{KOMAarg}{#2}{\@tempcnta}{##1}%
+    \ifx\FamilyKeyState\FamilyKeyStateProcessed
+      \expandafter\edef\csname #3\scr@dsc@current#4 \endcsname{\the\@tempcnta}%
+    \fi
+  }%
+}
+%    \end{macrocode}
+% \end{macro}^^A \DeclareSectionCommandStyleNumberOption
+% \begin{macro}{\DeclareSectionCommandStyleFontOption}
+%   \changes{v3.17}{2015/03/23}{neue Anweisung}^^A
+% Definiert eine für die aktuelle Ebene \cs{scr@dsc@current} eine neue
+% Schrift und speichert das Ergebnis in einem Element, das sich aus
+% Argument 3 gefolgt von der aktuellen Ebene gefolgt von Argument 4 ergibt.
+%    \begin{macrocode}
+\newcommand*{\DeclareSectionCommandStyleFontOption}[4]{%
+  \DeclareSectionCommandStyleOption{#1}{#2}{%
+    \IfExistskomafont{#3\scr@dsc@current#4}{%
+      \setkomafont
+    }{%
+      \newkomafont
+    }{#3\scr@dsc@current#4}{##1}%
+    \FamilyKeyStateProcessed
+  }%
+}
+%    \end{macrocode}
+% \end{macro}^^A \DeclareSectionCommandStyleFontOption
+% Es folgt die Initialisierung zunächst der Dummys für die Optionen, die es
+% immer gibt. (Erklärung dieser Optionen folgt unten.)
+%    \begin{macrocode}
+\DeclareSectionCommandDummyOption{style}
+\DeclareSectionCommandDummyOption{expandtopt}
+\DeclareSectionCommandDummyOption{increaselevel}
+\DeclareSectionCommandDummyOption{level}
+\DeclareSectionCommandDummyOption{toclevel}
+\DeclareSectionCommandDummyOption{tocindent}
+\DeclareSectionCommandDummyOption{tocnumwidth}
+%    \end{macrocode}
+% \begin{macro}{\scr@dsc@style@section@options}
+% Dann für die Optionen des Stils \texttt{section}:
+%    \begin{macrocode}
+\newcommand*{\scr@dsc@style@section@options}{}
+%    \end{macrocode}
+% \begin{description}\item[\texttt{indent}] Linker Einzug der
+% Überschrift\end{description}
+%    \begin{macrocode}
+\DeclareSectionCommandStyleLengthOption{section}
+                                       {indent}{scr@}{@sectionindent}
+%    \end{macrocode}
+% \begin{description}\item[\texttt{beforeskip}] Der Absolutwert gibt den
+% vertikalen Abstand vor der Überschrift an. Negative Werte bedeuten, dass
+% der Absatzeinzug nach der Überschrift unterdrückt werden
+% soll.\end{description}
+%    \begin{macrocode}
+\DeclareSectionCommandStyleLengthOption{section}
+                                       {beforeskip}{scr@}{@sectionbeforeskip}
+%    \end{macrocode}
+% \begin{description}\item[\texttt{afterskip}] Wenn der Wert positiv ist,
+% dann ist es der verikale Abstand nach der Überschrift. Ein negativer Wert
+% signalisiert hingegen eine Spitzmarke. Der Absolutwert ist dann der
+% horizontale Abstand nach der Spitzmarke.\end{description}
+%    \begin{macrocode}
+\DeclareSectionCommandStyleLengthOption{section}
+                                       {afterskip}{scr@}{@sectionafterskip}
+%    \end{macrocode}
+% \begin{description}\item[\texttt{font}] Schrifteinstellungen für das
+% Element.\end{description}
+%    \begin{macrocode}
+\DeclareSectionCommandStyleFontOption{section}{font}{}{}
+%    \end{macrocode}
+% \end{macro}^^A \scr@dsc@style@section@options
+%    \begin{macrocode}
+\newcommand*{\DeclareSectionCommand}[2][]{%
+  \edef\scr@dsc@current{#2}%
+%    \end{macrocode}
+% Zunächst sind alle für Gliederungsbefehle bekannten Optionen nur
+% dummy-Optionen.
+%    \begin{macrocode}
+  \scr@dsc@dummyoptions
+%    \end{macrocode}
+% Die einzige Optionen, die wir direkt auswerten, ist der Stil:
 % \begin{description}\item[\texttt{style}] Stil der
 % Gliederungsebene\end{description}
 %    \begin{macrocode}
-  \edef\reserved@a{%
-    \noexpand\FamilyStringKey[.dsc]{KOMAarg}{style}{%
-      \expandafter\noexpand\csname scr@#2@style\endcsname
-    }%
-  }\reserved@a
+  \DefineFamilyKey[.dsc]{KOMAarg}{style}{%
+    \@namedef{scr@\scr@dsc@current @style}{##1}%
+    \FamilyKeyStateProcessed
+  }%
+  \FamilyExecuteOptions[.dsc]{KOMAarg}{#1}%
+%    \end{macrocode}
+% Nach nun der Stil für den Gliederungsbefehl bekannt ist, können wir dessen
+% Optionen aktivieren:
+%    \begin{macrocode}
+  \scr@dsc@dummyoptions
+  \typeout{style: \scr@dsc@current}%
+  \@nameuse{scr@dsc@style@\@nameuse{scr@\scr@dsc@current @style}@options}%
+%    \end{macrocode}
+% Dazu kommen einige Optionen, die es schlicht immer gibt:
+% \begin{description}\item[\texttt{expandtopt}] Schalter, um die Längen zur
+% Definitionszeit statt zur Anwendungszeit komplett zu expandieren. Das
+% bedingt dann aber auch, dass die Längen nicht mehr abhängig von der
+% aktuellen Schriftgröße sind.\end{description}
+%    \begin{macrocode}
+   \FamilyBoolKey[.dsc]{KOMAarg}{expandtopt}{scr@dsc@expandtopt}%
+   \scr@dsc@expandtoptfalse
 %    \end{macrocode}
 % \begin{description}\item[\texttt{increaselevel}] Automatische Erhöhung des
 % Wertes von Option \texttt{level} mit Säumniswert 1. Diese Option wird nur
@@ -886,13 +1044,13 @@
   \scr@ifundefinedorrelax{scr@local@leveloffset}{%
     \edef\reserved@a{%
       \noexpand\FamilyCounterMacroKey[.dsc]{KOMAarg}{level}{%
-        \expandafter\noexpand\csname #2numdepth\endcsname}%
+        \expandafter\noexpand\csname \scr@dsc@current numdepth\endcsname}%
     }\reserved@a
   }{%
     \edef\reserved@a{%
       \noexpand\DefineFamilyKey[.dsc]{KOMAarg}{level}{%
         \noexpand\FamilySetCounterMacro{KOMAarg}{level}{%
-          \expandafter\noexpand\csname #2numdepth\endcsname
+          \expandafter\noexpand\csname \scr@dsc@current numdepth\endcsname
         }%
         \unexpanded{%
           {\numexpr ##1+\scr@local@leveloffset\relax}%
@@ -903,49 +1061,6 @@
       }%
     }\reserved@a
   }%
-%    \end{macrocode}
-% \begin{description}\item[\texttt{indent}] Linker Einzug der
-% Überschrift\end{description}
-%    \begin{macrocode}
-  \edef\reserved@a{%
-    \noexpand\FamilyLengthMacroKey[.dsc]{KOMAarg}{indent}{%
-      \expandafter\noexpand\csname scr@#2@sectionindent\endcsname}%
-  }\reserved@a
-%    \end{macrocode}
-% \begin{description}\item[\texttt{beforeskip}] Der Absolutwert gibt den
-% vertikalen Abstand vor der Überschrift an. Negative Werte bedeuten, dass
-% der Absatzeinzug nach der Überschrift unterdrückt werden
-% soll.\end{description}
-%    \begin{macrocode}
-  \edef\reserved@a{%
-    \noexpand\FamilyLengthMacroKey[.dsc]{KOMAarg}{beforeskip}{%
-      \expandafter\noexpand\csname scr@#2@sectionbeforeskip\endcsname}%
-  }\reserved@a
-%    \end{macrocode}
-% \begin{description}\item[\texttt{afterskip}] Wenn der Wert positiv ist,
-% dann ist es der verikale Abstand nach der Überschrift. Ein negativer Wert
-% signalisiert hingegen eine Spitzmarke. Der Absolutwert ist dann der
-% horizontale Abstand nach der Spitzmarke.\end{description}
-%    \begin{macrocode}
-  \edef\reserved@a{%
-    \noexpand\FamilyLengthMacroKey[.dsc]{KOMAarg}{afterskip}{%
-      \expandafter\noexpand\csname scr@#2@sectionafterskip\endcsname}%
-  }\reserved@a
-%    \end{macrocode}
-% \begin{description}\item[\texttt{font}] Schrifteinstellungen für das
-% Element.\end{description}
-%    \begin{macrocode}
-  \edef\reserved@a{%
-    \noexpand\DefineFamilyKey[.dsc]{KOMAarg}{font}{%
-      \noexpand\IfExistskomafont{#2}{%
-        \noexpand\setkomafont
-      }{%
-        \noexpand\newkomafont
-      }{#2}{####1}%
-      \noexpand\FamilyKeyStateProcessed
-    }%
-  }\reserved@a
-%    \end{macrocode}
 % \begin{description}\item[\texttt{counterwithin}] Der Zähler dieser Ebene
 % soll abhängen vom angegebenen Zähler.
 % \end{description}
@@ -959,13 +1074,13 @@
   \scr@ifundefinedorrelax{scr@local@tocleveloffset}{%
     \edef\reserved@a{%
       \noexpand\FamilyCounterMacroKey[.dsc]{KOMAarg}{toclevel}{%
-        \expandafter\noexpand\csname #2tocdepth\endcsname}%
+        \expandafter\noexpand\csname \scr@dsc@current tocdepth\endcsname}%
     }\reserved@a
   }{%
     \edef\reserved@a{%
       \noexpand\DefineFamilyKey[.dsc]{KOMAarg}{toclevel}{%
         \noexpand\FamilySetCounterMacro{KOMAarg}{toclevel}{%
-          \expandafter\noexpand\csname #2tocdepth\endcsname
+          \expandafter\noexpand\csname \scr@dsc@curernt tocdepth\endcsname
         }%
         \unexpanded{%
           {\numexpr ##1+\scr@local@tocleveloffset\relax}%
@@ -982,7 +1097,7 @@
 %    \begin{macrocode}
   \edef\reserved@a{%
     \noexpand\FamilyLengthMacroKey[.dsc]{KOMAarg}{tocindent}{%
-      \expandafter\noexpand\csname scr@#2@tocindent\endcsname}%
+      \expandafter\noexpand\csname scr@\scr@dsc@current @tocindent\endcsname}%
   }\reserved@a
 %    \end{macrocode}
 % \begin{description}\item[\texttt{tocnumwidth}] Breite der Nummer des
@@ -990,7 +1105,7 @@
 %    \begin{macrocode}
   \edef\reserved@a{%
     \noexpand\FamilyLengthMacroKey[.dsc]{KOMAarg}{tocnumwidth}{%
-      \expandafter\noexpand\csname scr@#2@tocnumwidth\endcsname}%
+      \expandafter\noexpand\csname scr@\scr@dsc@current @tocnumwidth\endcsname}%
   }\reserved@a
 %    \end{macrocode}
 % Optionen ausführen:
@@ -1001,26 +1116,29 @@
 % Gliederungsbefehls gesetzt sind:
 %    \begin{macrocode}
   \begingroup
-    \scr@ifundefinedorrelax{#2numdepth}{%
-      \scr@declaresectioncommanderror{#2}{section level}{level}%
+    \scr@ifundefinedorrelax{\scr@dsc@current numdepth}{%
+      \scr@declaresectioncommanderror{\scr@dsc@current}{section level}{level}%
     }{}%
-    \scr@ifundefinedorrelax{scr@#2@sectionindent}{%
-      \scr@declaresectioncommanderror{#2}{section indent}{indent}%
+    \scr@ifundefinedorrelax{scr@\scr@dsc@current @sectionindent}{%
+      \scr@declaresectioncommanderror{\scr@dsc@current}{section indent}{indent}%
     }{}%
-    \scr@ifundefinedorrelax{scr@#2@sectionbeforeskip}{%
-      \scr@declaresectioncommanderror{#2}{before section skip}{beforeskip}%
+    \scr@ifundefinedorrelax{scr@\scr@dsc@current @sectionbeforeskip}{%
+      \scr@declaresectioncommanderror{\scr@dsc@current}{before section skip}
+      {beforeskip}%
     }{}%
-    \scr@ifundefinedorrelax{scr@#2@sectionafterskip}{%
-      \scr@declaresectioncommanderror{#2}{after section skip}{afterskip}%
+    \scr@ifundefinedorrelax{scr@\scr@dsc@current @sectionafterskip}{%
+      \scr@declaresectioncommanderror{\scr@dsc@current}{after section skip}
+      {afterskip}%
     }{}%
-    \IfExistskomafont{#2}{}{%
-      \scr@declaresectioncommanderror{#2}{font}{font}%
+    \IfExistskomafont{\scr@dsc@current}{}{%
+      \scr@declaresectioncommanderror{\scr@dsc@current}{font}{font}%
     }{}%
-    \scr@ifundefinedorrelax{scr@#2@tocindent}{%
-      \scr@declaresectioncommanderror{#2}{toc entry indent}{tocindent}%
+    \scr@ifundefinedorrelax{scr@\scr@dsc@current @tocindent}{%
+      \scr@declaresectioncommanderror{\scr@dsc@current}{toc entry indent}
+      {tocindent}%
     }{}%
-    \scr@ifundefinedorrelax{scr@#2@tocnumwidth}{%
-      \scr@declaresectioncommanderror{#2}{toc entry number
+    \scr@ifundefinedorrelax{scr@\scr@dsc@current @tocnumwidth}{%
+      \scr@declaresectioncommanderror{\scr@dsc@current}{toc entry number
         width}{tocnumwidth}%
     }{}%
   \endgroup
@@ -1343,6 +1461,8 @@
 %
 % \begin{macro}{\ProvideSectionCommands}
 %   \changes{v3.15}{2014/12/03}{neue Anweisung}^^A
+%   \changes{v3.17}{2015/03/23}{Umbau, um stilabhängige Optionen zu
+%     ermöglichen}^^A
 % Hier wird es nun wirklich schwierig, weil wir irgendwie dafür sorgen müssen,
 % dass Option \texttt{increaselevel} funktioniert, auch wenn gar nichts
 % definiert werden darf. Das macht die Geschichte ein wenig auswändig.
@@ -1365,7 +1485,7 @@
 % \texttt{increaselevel} eine Wirkung haben dürfen. Der Rest wird per
 % dummy-Optionen erledigt.
 %    \begin{macrocode}
-      \DefineFamilyKey[.dsc]{KOMAarg}{style}{}%
+      \scr@dsc@dummyoptions
       \FamilyCounterMacroKey[.dsc]{KOMAarg}{increaselevel}[1]%
         {\scr@local@levelincrease}%
       \DefineFamilyKey[.dsc]{KOMAarg}{level}{%
@@ -1377,14 +1497,6 @@
           \the\numexpr\scr@local@tocleveloffset+\scr@local@levelincrease\relax
         }%
       }%
-      \DefineFamilyKey[.dsc]{KOMAarg}{indent}{}%
-      \DefineFamilyKey[.dsc]{KOMAarg}{beforeskip}{}%
-      \DefineFamilyKey[.dsc]{KOMAarg}{afterskip}{}%
-      \DefineFamilyKey[.dsc]{KOMAarg}{font}{}%
-      \DefineFamilyKey[.dsc]{KOMAarg}{counterwidthin}{}%
-      \DefineFamilyKey[.dsc]{KOMAarg}{toclevel}{}%
-      \DefineFamilyKey[.dsc]{KOMAarg}{tocindent}{}%
-      \DefineFamilyKey[.dsc]{KOMAarg}{tocnumwidth}{}%
       \FamilyExecuteOptions[.dsc]{KOMAarg}{#1}%
     }%
   }%
