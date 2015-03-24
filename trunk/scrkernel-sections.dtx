@@ -1,4 +1,4 @@
-% \CheckSum{3565}
+% \CheckSum{3578}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -991,6 +991,31 @@
 \DeclareSectionCommandStyleFontOption{section}{font}{}{}
 %    \end{macrocode}
 % \end{macro}^^A \scr@dsc@style@section@options
+% \begin{macro}{\scr@dsc@style@section@neededoptionstest}
+%   \changes{v3.17}{2015/03/24}{Neu (intern)}
+% Dieses Anweisung überprüft, ob alle notwendigen Eigenschaften für die
+% Definition der spezifischen Gliederungsebene im section-Stil bekannt
+% sind. Sollte das nicht der Fall sein, meldet sie einen Fehler und sorgt sie
+% mit \cs{aftergroup}\cs{@gobbletwo} dafür, dass die Definition unterbleibt.
+%    \begin{macrocode}
+\newcommand*{\scr@dsc@style@section@neededoptionstest}{%
+  \scr@ifundefinedorrelax{scr@\scr@dsc@current @sectionindent}{%
+    \scr@declaresectioncommanderror{\scr@dsc@current}{section indent}{indent}%
+  }{}%
+  \scr@ifundefinedorrelax{scr@\scr@dsc@current @sectionbeforeskip}{%
+    \scr@declaresectioncommanderror{\scr@dsc@current}{before section skip}
+    {beforeskip}%
+  }{}%
+  \scr@ifundefinedorrelax{scr@\scr@dsc@current @sectionafterskip}{%
+    \scr@declaresectioncommanderror{\scr@dsc@current}{after section skip}
+    {afterskip}%
+  }{}%
+  \IfExistskomafont{\scr@dsc@current}{}{%
+    \scr@declaresectioncommanderror{\scr@dsc@current}{font}{font}%
+  }{}%
+}
+%    \end{macrocode}
+% \end{macro}^^A \scr@dsc@style@section@neededoptionstest
 %    \begin{macrocode}
 \newcommand*{\DeclareSectionCommand}[2][]{%
   \edef\scr@dsc@current{#2}%
@@ -1009,13 +1034,20 @@
     \FamilyKeyStateProcessed
   }%
   \FamilyExecuteOptions[.dsc]{KOMAarg}{#1}%
+  \begingroup
+    \scr@ifundefinedorrelax{scr@\scr@dsc@current @style}{%
+      \scr@declaresectioncommanderror{\scr@dsc@current}
+                                     {section command style}{style}%
+    }{}%
+  \endgroup
+  \@firstofone{%
 %    \end{macrocode}
 % Nach nun der Stil für den Gliederungsbefehl bekannt ist, können wir dessen
 % Optionen aktivieren:
 %    \begin{macrocode}
-  \scr@dsc@dummyoptions
-  \typeout{style: \scr@dsc@current}%
-  \@nameuse{scr@dsc@style@\@nameuse{scr@\scr@dsc@current @style}@options}%
+    \scr@dsc@dummyoptions
+%<trace>    \typeout{TRACE: style=\@nameuse{scr@\scr@dsc@current @style}}%
+    \@nameuse{scr@dsc@style@\@nameuse{scr@\scr@dsc@current @style}@options}%
 %    \end{macrocode}
 % Dazu kommen einige Optionen, die es schlicht immer gibt:
 % \begin{description}\item[\texttt{expandtopt}] Schalter, um die Längen zur
@@ -1023,220 +1055,210 @@
 % bedingt dann aber auch, dass die Längen nicht mehr abhängig von der
 % aktuellen Schriftgröße sind.\end{description}
 %    \begin{macrocode}
-   \FamilyBoolKey[.dsc]{KOMAarg}{expandtopt}{scr@dsc@expandtopt}%
-   \scr@dsc@expandtoptfalse
+    \FamilyBoolKey[.dsc]{KOMAarg}{expandtopt}{scr@dsc@expandtopt}%
+    \scr@dsc@expandtoptfalse
 %    \end{macrocode}
 % \begin{description}\item[\texttt{increaselevel}] Automatische Erhöhung des
 % Wertes von Option \texttt{level} mit Säumniswert 1. Diese Option wird nur
 % definiert, wenn \cs{DeclareSectionCommands} verwendet wurde, was an
 % \cs{scr@local@levelincrease} erkannt wird.\end{description}
 %    \begin{macrocode}
-  \scr@ifundefinedorrelax{scr@local@levelincrease}{%
-    \RelaxFamilyKey[.dsc]{KOMAarg}{increaselevel}%
-  }{%
-    \FamilyCounterMacroKey[.dsc]{KOMAarg}{increaselevel}[1]%
-                          {\scr@local@levelincrease}%
-  }%
+    \scr@ifundefinedorrelax{scr@local@levelincrease}{%
+      \RelaxFamilyKey[.dsc]{KOMAarg}{increaselevel}%
+    }{%
+      \FamilyCounterMacroKey[.dsc]{KOMAarg}{increaselevel}[1]%
+                            {\scr@local@levelincrease}%
+    }%
 %    \end{macrocode}
 % \begin{description}\item[\texttt{level}] nummerische
 % Gliederungsebene\end{description}
 %    \begin{macrocode}
-  \scr@ifundefinedorrelax{scr@local@leveloffset}{%
-    \edef\reserved@a{%
-      \noexpand\FamilyCounterMacroKey[.dsc]{KOMAarg}{level}{%
-        \expandafter\noexpand\csname \scr@dsc@current numdepth\endcsname}%
-    }\reserved@a
-  }{%
-    \edef\reserved@a{%
-      \noexpand\DefineFamilyKey[.dsc]{KOMAarg}{level}{%
-        \noexpand\FamilySetCounterMacro{KOMAarg}{level}{%
-          \expandafter\noexpand\csname \scr@dsc@current numdepth\endcsname
-        }%
-        \unexpanded{%
-          {\numexpr ##1+\scr@local@leveloffset\relax}%
-          \edef\scr@local@leveloffset{%
-            \the\numexpr\scr@local@leveloffset+\scr@local@levelincrease\relax
+    \scr@ifundefinedorrelax{scr@local@leveloffset}{%
+      \edef\reserved@a{%
+        \noexpand\FamilyCounterMacroKey[.dsc]{KOMAarg}{level}{%
+          \expandafter\noexpand\csname \scr@dsc@current numdepth\endcsname}%
+      }\reserved@a
+    }{%
+      \edef\reserved@a{%
+        \noexpand\DefineFamilyKey[.dsc]{KOMAarg}{level}{%
+          \noexpand\FamilySetCounterMacro{KOMAarg}{level}{%
+            \expandafter\noexpand\csname \scr@dsc@current numdepth\endcsname
+          }%
+          \unexpanded{%
+            {\numexpr ##1+\scr@local@leveloffset\relax}%
+            \edef\scr@local@leveloffset{%
+              \the\numexpr\scr@local@leveloffset+\scr@local@levelincrease\relax
+            }%
           }%
         }%
-      }%
-    }\reserved@a
-  }%
+      }\reserved@a
+    }%
 % \begin{description}\item[\texttt{counterwithin}] Der Zähler dieser Ebene
 % soll abhängen vom angegebenen Zähler.
 % \end{description}
 %    \begin{macrocode}
-  \FamilyStringKey[.dsc]{KOMAarg}{counterwithin}{\scr@local@counterwithin}%
-  \let\scr@local@counterwithin\relax
+    \FamilyStringKey[.dsc]{KOMAarg}{counterwithin}{\scr@local@counterwithin}%
+    \let\scr@local@counterwithin\relax
 %    \end{macrocode}
 % \begin{description}\item[\texttt{toclevel}] Ebene im Inhaltsverzeichnis
 % (Voreinstellung ist derselbe Wert wie für level)\end{description}
 %    \begin{macrocode}
-  \scr@ifundefinedorrelax{scr@local@tocleveloffset}{%
-    \edef\reserved@a{%
-      \noexpand\FamilyCounterMacroKey[.dsc]{KOMAarg}{toclevel}{%
-        \expandafter\noexpand\csname \scr@dsc@current tocdepth\endcsname}%
-    }\reserved@a
-  }{%
-    \edef\reserved@a{%
-      \noexpand\DefineFamilyKey[.dsc]{KOMAarg}{toclevel}{%
-        \noexpand\FamilySetCounterMacro{KOMAarg}{toclevel}{%
-          \expandafter\noexpand\csname \scr@dsc@current tocdepth\endcsname
-        }%
-        \unexpanded{%
-          {\numexpr ##1+\scr@local@tocleveloffset\relax}%
-          \edef\scr@local@tocleveloffset{%
-            \the\numexpr\scr@local@tocleveloffset+\scr@local@levelincrease\relax
+    \scr@ifundefinedorrelax{scr@local@tocleveloffset}{%
+      \edef\reserved@a{%
+        \noexpand\FamilyCounterMacroKey[.dsc]{KOMAarg}{toclevel}{%
+          \expandafter\noexpand\csname \scr@dsc@current tocdepth\endcsname}%
+      }\reserved@a
+    }{%
+      \edef\reserved@a{%
+        \noexpand\DefineFamilyKey[.dsc]{KOMAarg}{toclevel}{%
+          \noexpand\FamilySetCounterMacro{KOMAarg}{toclevel}{%
+            \expandafter\noexpand\csname \scr@dsc@current tocdepth\endcsname
+          }%
+          \unexpanded{%
+            {\numexpr ##1+\scr@local@tocleveloffset\relax}%
+            \edef\scr@local@tocleveloffset{%
+              \the\numexpr\scr@local@tocleveloffset
+              +\scr@local@levelincrease\relax
+            }%
           }%
         }%
-      }%
-    }\reserved@a
-  }%
+      }\reserved@a
+    }%
 %    \end{macrocode}
 % \begin{description}\item[\texttt{tocindent}] Einzug des
 % Inhaltsverzeichniseintrags\end{description}
 %    \begin{macrocode}
-  \DefineFamilyKey[.dsc]{KOMAarg}{tocindent}{%
-    \FamilySetLength{KOMAarg}{#2}{\@tempskipa}{##1}%
-    \ifx\FamilyKeyState\FamilyKeyStateProcessed
-      \ifscr@dsc@expandtopt
-        \expandafter\edef\csname scr@\scr@dsc@current @tocindent\endcsname{%
-          \the\@tempskipa}%
-      \else
-        \expandafter\edef\csname scr@\scr@dsc@current @tocindent\endcsname{
-          ##1}%
+    \DefineFamilyKey[.dsc]{KOMAarg}{tocindent}{%
+      \FamilySetLength{KOMAarg}{#2}{\@tempskipa}{##1}%
+      \ifx\FamilyKeyState\FamilyKeyStateProcessed
+        \ifscr@dsc@expandtopt
+          \expandafter\edef\csname scr@\scr@dsc@current @tocindent\endcsname{%
+            \the\@tempskipa}%
+        \else
+          \expandafter\edef\csname scr@\scr@dsc@current @tocindent\endcsname{
+            ##1}%
+        \fi
       \fi
-    \fi
-  }%
+    }%
 %    \end{macrocode}
 % \begin{description}\item[\texttt{tocnumwidth}] Breite der Nummer des
 % Inhaltsverzeichniseintrags\end{description}
 %    \begin{macrocode}
-  \DefineFamilyKey[.dsc]{KOMAarg}{tocnumwidth}{%
-    \FamilySetLength{KOMAarg}{#2}{\@tempskipa}{##1}%
-    \ifx\FamilyKeyState\FamilyKeyStateProcessed
-      \ifscr@dsc@expandtopt
-        \expandafter\edef\csname scr@\scr@dsc@current @tocnumwidth\endcsname{%
-          \the\@tempskipa}%
-      \else
-        \expandafter\edef\csname scr@\scr@dsc@current @tocnumwidth\endcsname{%
-          ##1}%
+    \DefineFamilyKey[.dsc]{KOMAarg}{tocnumwidth}{%
+      \FamilySetLength{KOMAarg}{#2}{\@tempskipa}{##1}%
+      \ifx\FamilyKeyState\FamilyKeyStateProcessed
+        \ifscr@dsc@expandtopt
+          \expandafter\edef\csname scr@\scr@dsc@current @tocnumwidth\endcsname{%
+            \the\@tempskipa}%
+        \else
+          \expandafter\edef\csname scr@\scr@dsc@current @tocnumwidth\endcsname{%
+            ##1}%
+        \fi
       \fi
-    \fi
-  }%
+    }%
 %    \end{macrocode}
 % Optionen ausführen:
 %    \begin{macrocode}
-  \FamilyExecuteOptions[.dsc]{KOMAarg}{#1}%
+    \FamilyExecuteOptions[.dsc]{KOMAarg}{#1}%
 %    \end{macrocode}
 % Testen, ob alle benötigten Optionen für die (Um-)Definierung des
 % Gliederungsbefehls gesetzt sind:
 %    \begin{macrocode}
-  \begingroup
-    \scr@ifundefinedorrelax{\scr@dsc@current numdepth}{%
-      \scr@declaresectioncommanderror{\scr@dsc@current}{section level}{level}%
-    }{}%
-    \scr@ifundefinedorrelax{scr@\scr@dsc@current @sectionindent}{%
-      \scr@declaresectioncommanderror{\scr@dsc@current}{section indent}{indent}%
-    }{}%
-    \scr@ifundefinedorrelax{scr@\scr@dsc@current @sectionbeforeskip}{%
-      \scr@declaresectioncommanderror{\scr@dsc@current}{before section skip}
-      {beforeskip}%
-    }{}%
-    \scr@ifundefinedorrelax{scr@\scr@dsc@current @sectionafterskip}{%
-      \scr@declaresectioncommanderror{\scr@dsc@current}{after section skip}
-      {afterskip}%
-    }{}%
-    \IfExistskomafont{\scr@dsc@current}{}{%
-      \scr@declaresectioncommanderror{\scr@dsc@current}{font}{font}%
-    }{}%
-    \scr@ifundefinedorrelax{scr@\scr@dsc@current @tocindent}{%
-      \scr@declaresectioncommanderror{\scr@dsc@current}{toc entry indent}
-      {tocindent}%
-    }{}%
-    \scr@ifundefinedorrelax{scr@\scr@dsc@current @tocnumwidth}{%
-      \scr@declaresectioncommanderror{\scr@dsc@current}{toc entry number
-        width}{tocnumwidth}%
-    }{}%
-  \endgroup
+    \begingroup
+      \scr@ifundefinedorrelax{\scr@dsc@current numdepth}{%
+        \scr@declaresectioncommanderror{\scr@dsc@current}{section level}{level}%
+      }{}%
+      \scr@ifundefinedorrelax{scr@\scr@dsc@current @tocindent}{%
+        \scr@declaresectioncommanderror{\scr@dsc@current}{toc entry indent}
+        {tocindent}%
+      }{}%
+      \scr@ifundefinedorrelax{scr@\scr@dsc@current @tocnumwidth}{%
+        \scr@declaresectioncommanderror{\scr@dsc@current}{toc entry number
+          width}{tocnumwidth}%
+      }{}%
+      \@nameuse{scr@dsc@style@%
+        \@nameuse{scr@\scr@dsc@current @style}%
+        @neededoptionstest}%
+    \endgroup
 %    \end{macrocode}
 % Wenn alle Informationen für die (Um-)Definierung des Gliederungsbefehls
 % zusammen sind \dots
 %    \begin{macrocode}
-  \@firstofone{%
+    \@firstofone{%
 %    \end{macrocode}
 % Zunächst sicherstellen, dass der Zähler existiert und ggf. dessen
 % Ausgabe anpassen:
 %    \begin{macrocode}
-    \@ifundefined{c@#2}{\newcounter{#2}}{}%
-    \ifx\scr@local@counterwithin\relax
-    \else\ifx\scr@local@counterwithin\@empty
-        \@namedef{the#2}{\arabic{#2}}%
-      \else
-        \@removefromreset{#2}{\scr@local@counterwithin}%
-        \@addtoreset{#2}{\scr@local@counterwithin}%
-        \expandafter\def\csname the#2\expandafter\endcsname{%
-          \csname the\scr@local@counterwithin\endcsname.\arabic{#2}}%
+      \@ifundefined{c@#2}{\newcounter{#2}}{}%
+      \ifx\scr@local@counterwithin\relax
+      \else\ifx\scr@local@counterwithin\@empty
+          \@namedef{the#2}{\arabic{#2}}%
+        \else
+          \@removefromreset{#2}{\scr@local@counterwithin}%
+          \@addtoreset{#2}{\scr@local@counterwithin}%
+          \expandafter\def\csname the#2\expandafter\endcsname{%
+            \csname the\scr@local@counterwithin\endcsname.\arabic{#2}}%
+        \fi
       \fi
-    \fi
-    \@ifundefined{#2format}{%
-      \@namedef{#2format}{\csname the#2\endcsname\autodot\enskip}%
-    }{}%
+      \@ifundefined{#2format}{%
+        \@namedef{#2format}{\csname the#2\endcsname\autodot\enskip}%
+      }{}%
 %    \end{macrocode}
 % Dann den eigentlichen Gliederungsbefehl definieren:
 %    \begin{macrocode}
-    \ifstr{\csname scr@#2@style\endcsname}{}{%
-      \ClassInfo{\KOMAClassName}{%
-        not defining `\expandafter\string\csname #2\endcsname' due
-        to\MessageBreak
-        empty section style%
-      }%
-    }{%
-      \scr@ifundefinedorrelax{scr@#2@style}{%
-        \ClassWarning{\KOMAClassName}{using default section style}%
-        \@namedef{scr@#2@style}{section}%
-      }{}%
-      \expandafter\edef\csname #2\endcsname{%
-        \noexpand\scr@ifundefinedorrelax{%
-          scr@start\csname scr@#2@style\endcsname}{%
-          \noexpand\ClassError{\noexpand\KOMAClassName}{%
-            section style `\csname scr@#2@style\endcsname' not defined}{%
-            A not yet defined section style `\csname scr@#2@style\endcsname'
-            has been setup for\MessageBreak
-            `\expandafter\string\csname #2\endcsname'. You should either setup
-            another style\MessageBreak
-            or define the style.\MessageBreak
-            If you'll continue, style `section' will be used as an emergency
-            fallback.%
-          }%
+      \ifstr{\csname scr@#2@style\endcsname}{}{%
+        \ClassInfo{\KOMAClassName}{%
+          not defining `\expandafter\string\csname #2\endcsname' due
+          to\MessageBreak
+          empty section style%
+        }%
+      }{%
+        \scr@ifundefinedorrelax{scr@#2@style}{%
+          \ClassWarning{\KOMAClassName}{using default section style}%
+          \@namedef{scr@#2@style}{section}%
+        }{}%
+        \expandafter\edef\csname #2\endcsname{%
+          \noexpand\scr@ifundefinedorrelax{%
+            scr@start\csname scr@#2@style\endcsname}{%
+            \noexpand\ClassError{\noexpand\KOMAClassName}{%
+              section style `\csname scr@#2@style\endcsname' not defined}{%
+              A not yet defined section style `\csname scr@#2@style\endcsname'
+              has been setup for\MessageBreak
+              `\expandafter\string\csname #2\endcsname'. You should either setup
+              another style\MessageBreak
+              or define the style.\MessageBreak
+              If you'll continue, style `section' will be used as an emergency
+              fallback.%
+            }%
 %    \end{macro}
 % Damit später der \textsf{titlesec}-Workaround funktioniert muss hier
 % ggf. der Befehl für den Stil geändert werden.
 %    \begin{macro}
-          \noexpand\def\expandafter\noexpand\csname scr@#2@style\endcsname
-          {section}%
-        }{}%
-        \expandafter\noexpand
-        \csname scr@start\csname scr@#2@style\endcsname\endcsname
-        {#2}%
-        \expandafter\noexpand\csname #2numdepth\endcsname
-        \expandafter\noexpand\csname scr@#2@sectionindent\endcsname
-        \expandafter\noexpand\csname scr@#2@sectionbeforeskip\endcsname
-        \expandafter\noexpand\csname scr@#2@sectionafterskip\endcsname{%
-          \noexpand\ifdim\noexpand\glueexpr
+            \noexpand\def\expandafter\noexpand\csname scr@#2@style\endcsname
+            {section}%
+          }{}%
+          \expandafter\noexpand
+          \csname scr@start\csname scr@#2@style\endcsname\endcsname
+          {#2}%
+          \expandafter\noexpand\csname #2numdepth\endcsname
+          \expandafter\noexpand\csname scr@#2@sectionindent\endcsname
           \expandafter\noexpand\csname scr@#2@sectionbeforeskip\endcsname
-          <\noexpand\z@
+          \expandafter\noexpand\csname scr@#2@sectionafterskip\endcsname{%
+            \noexpand\ifdim\noexpand\glueexpr
+            \expandafter\noexpand\csname scr@#2@sectionbeforeskip\endcsname
+            <\noexpand\z@
+              \unexpanded{%
+                \expandafter\ifnum\scr@v@is@gt{2.96}\relax
+                  \setlength{\parfillskip}{\z@ plus 1fil}%
+                \fi
+              }%
+            \noexpand\fi
             \unexpanded{%
-              \expandafter\ifnum\scr@v@is@gt{2.96}\relax
-                \setlength{\parfillskip}{\z@ plus 1fil}%
-              \fi
+              \raggedsection\normalfont\sectfont\nobreak\usekomafont{#2}%
             }%
-          \noexpand\fi
-          \unexpanded{%
-            \raggedsection\normalfont\sectfont\nobreak\usekomafont{#2}%
           }%
         }%
       }%
-    }%
 %    \end{macrocode}
 % Zu jedem Gliederungsbefehl gehört auch ein Befehl für den Kolumnentitel, der
 % bei \KOMAScript{} außerdem eine Formatierung des Zählers benötigt. Falls
@@ -1244,36 +1266,37 @@
 % |\DeclareSectionNumberDepth| erledigt, sonst direkt:
 %   \changes{v3.15a}{2015/01/21}{fix: \cs{endskip} statt \cs{enskip}}^^A
 %    \begin{macrocode}
-    \@ifundefined{DeclareSectionNumberDepth}{%
-      \@ifundefined{#2markformat}{%
-        \@namedef{#2markformat}{\csname the#2\endcsname\autodot\enskip}%
-      }{}%
-      \@ifundefined{#2mark}{%
-        \expandafter\let\csname #2mark\endcsname\@gobble
-      }{}%
-    }{%
-      \DeclareSectionNumberDepth{#2}{\csname #2numdepth\endcsname}%
-    }%
+      \@ifundefined{DeclareSectionNumberDepth}{%
+        \@ifundefined{#2markformat}{%
+          \@namedef{#2markformat}{\csname the#2\endcsname\autodot\enskip}%
+        }{}%
+        \@ifundefined{#2mark}{%
+          \expandafter\let\csname #2mark\endcsname\@gobble
+        }{}%
+      }{%
+        \DeclareSectionNumberDepth{#2}{\csname #2numdepth\endcsname}%
+      }%
 %    \end{macrocode}
 % Und es gehören Befehle dazu, um einen Eintrag ins Inhaltsverzeichnis zu
 % schreiben und den Eintrag auch darzustellen:
 %    \begin{macrocode}
-    \scr@ifundefinedorrelax{#2tocdepth}{%
-      \expandafter\let\csname #2tocdepth\expandafter\endcsname
-      \csname #2numdepth\endcsname
-    }{}%
-    \expandafter\providecommand\expandafter*%
-    \csname add#2tocentry\endcsname[2]{%
-      \addtocentrydefault{#2}{##1}{##2}%
-    }%
-    \scr@ifundefinedorrelax{l@#2}{%
-      \expandafter\edef\csname l@#2\endcsname{%
-        \noexpand\bprot@dottedtocline
-        \expandafter\noexpand\csname #2tocdepth\endcsname
-        \expandafter\noexpand\csname scr@#2@tocindent\endcsname
-        \expandafter\noexpand\csname scr@#2@tocnumwidth\endcsname
+      \scr@ifundefinedorrelax{#2tocdepth}{%
+        \expandafter\let\csname #2tocdepth\expandafter\endcsname
+        \csname #2numdepth\endcsname
+      }{}%
+      \expandafter\providecommand\expandafter*%
+      \csname add#2tocentry\endcsname[2]{%
+        \addtocentrydefault{#2}{##1}{##2}%
       }%
-    }{}%
+      \scr@ifundefinedorrelax{l@#2}{%
+        \expandafter\edef\csname l@#2\endcsname{%
+          \noexpand\bprot@dottedtocline
+          \expandafter\noexpand\csname #2tocdepth\endcsname
+          \expandafter\noexpand\csname scr@#2@tocindent\endcsname
+          \expandafter\noexpand\csname scr@#2@tocnumwidth\endcsname
+        }%
+      }{}%
+    }%
   }%
 }
 %    \end{macrocode}
