@@ -1,4 +1,4 @@
-% \CheckSum{3624}
+% \CheckSum{3661}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -997,9 +997,11 @@
 \DeclareSectionCommandStyleFontOption{section}{font}{}{}
 %    \end{macrocode}
 % \end{macro}^^A \scr@dsc@style@section@options
-% \begin{macro}{\scr@dsc@style@section@options}
+%
+% \begin{macro}{\scr@dsc@style@chapter@options}
 % Dann für die Optionen des Stils \texttt{chapter}:
 %    \begin{macrocode}
+%<*book|report>
 \newcommand*{\scr@dsc@style@chapter@options}{}
 %    \end{macrocode}
 % \begin{description}
@@ -1038,8 +1040,55 @@
 % \end{description}
 %    \begin{macrocode}
 \DeclareSectionCommandStyleFontOption{chapter}{prefixfont}{}{prefix}
+%</book|report>
 %    \end{macrocode}
 % \end{macro}^^A \scr@dsc@style@chapter@options
+%
+% \begin{macro}{\scr@dsc@style@part@options}
+% Dann für die Optionen des Stils \texttt{part}:
+%    \begin{macrocode}
+\newcommand*{\scr@dsc@style@part@options}{}
+%    \end{macrocode}
+% \begin{description}
+% \item[\texttt{beforeskip}] Der Absolutwert gibt den vertikalen Abstand vor
+%   der Überschrift an. Negative Werte bedeuten, dass der Absatzeinzug nach
+%   der Überschrift unterdrückt werden soll.
+% \end{description}
+%    \begin{macrocode}
+\DeclareSectionCommandStyleLengthOption{part}
+                                       {beforeskip}{scr@}{@partbeforeskip}
+%    \end{macrocode}
+% \begin{description}
+% \item[\texttt{innerskip}] Der Absolutwert gibt den vertikalen Abstand
+%   innerhalb der Überschrift zwischen Präfix-Zeile und Text an.
+% \end{description}
+%    \begin{macrocode}
+%<*book|report>
+\DeclareSectionCommandStyleLengthOption{part}
+                                       {innerskip}{scr@}{@partinnerskip}
+%</book|report>
+%    \end{macrocode}
+% \begin{description}
+% \item[\texttt{afterskip}] Der Absolutwert gibt den vertikalen Abstand nach
+%   der Überschrift an.
+% \end{description}
+%    \begin{macrocode}
+\DeclareSectionCommandStyleLengthOption{part}
+                                       {afterskip}{scr@}{@partafterskip}
+%    \end{macrocode}
+% \begin{description}
+% \item[\texttt{font}] Schrifteinstellungen für das Element.
+% \end{description}
+%    \begin{macrocode}
+\DeclareSectionCommandStyleFontOption{part}{font}{}{}
+%    \end{macrocode}
+% \begin{description}
+% \item[\texttt{font}] Schrifteinstellungen für die Präfixzeile des Elements.
+% \end{description}
+%    \begin{macrocode}
+\DeclareSectionCommandStyleFontOption{part}{prefixfont}{}{number}
+%    \end{macrocode}
+% \end{macro}^^A \scr@dsc@style@part@options
 %
 % \begin{macro}{\scr@dsc@style@section@neededoptionstest}
 %   \changes{v3.17}{2015/03/24}{Neu (intern)}
@@ -1077,6 +1126,7 @@
 % sind. Sollte das nicht der Fall sein, meldet sie einen Fehler und sorgt sie
 % mit \cs{aftergroup}\cs{@gobbletwo} dafür, dass die Definition unterbleibt.
 %    \begin{macrocode}
+%<*book|report>
 \newcommand*{\scr@dsc@style@chapter@neededoptionstest}{%
 %<trace>  \typeout{TRACE:
 %<trace>    \string\scr@dsc@style@chapter@neededoptionstest\space for
@@ -1101,8 +1151,45 @@
     {prefixfont}%
   }{}%
 }
+%</book|report>
 %    \end{macrocode}
 % \end{macro}^^A \scr@dsc@style@chapter@neededoptionstest
+%
+% \begin{macro}{\scr@dsc@style@part@neededoptionstest}
+%   \changes{v3.17}{2015/03/24}{Neu (intern)}
+% Dieses Anweisung überprüft, ob alle notwendigen Eigenschaften für die
+% Definition der spezifischen Gliederungsebene im chapter-Stil bekannt
+% sind. Sollte das nicht der Fall sein, meldet sie einen Fehler und sorgt sie
+% mit \cs{aftergroup}\cs{@gobbletwo} dafür, dass die Definition unterbleibt.
+%    \begin{macrocode}
+\newcommand*{\scr@dsc@style@part@neededoptionstest}{%
+%<trace>  \typeout{TRACE:
+%<trace>    \string\scr@dsc@style@part@neededoptionstest\space for
+%<trace>    \scr@dsc@current}%
+%<*book|report>
+  \scr@ifundefinedorrelax{scr@\scr@dsc@current @partinnerskip}{%
+    \scr@declaresectioncommanderror{\scr@dsc@current}{inner part skip}
+    {innerskip}%
+  }{}%
+%</book|report>
+  \scr@ifundefinedorrelax{scr@\scr@dsc@current @partbeforeskip}{%
+    \scr@declaresectioncommanderror{\scr@dsc@current}{before part skip}
+    {beforeskip}%
+  }{}%
+  \scr@ifundefinedorrelax{scr@\scr@dsc@current @partafterskip}{%
+    \scr@declaresectioncommanderror{\scr@dsc@current}{after part skip}
+    {afterskip}%
+  }{}%
+  \IfExistskomafont{\scr@dsc@current}{}{%
+    \scr@declaresectioncommanderror{\scr@dsc@current}{font}{font}%
+  }{}%
+  \IfExistskomafont{\scr@dsc@current number}{}{%
+    \scr@declaresectioncommanderror{\scr@dsc@current}{number font}
+    {prefixfont}%
+  }{}%
+}
+%    \end{macrocode}
+% \end{macro}^^A \scr@dsc@style@part@neededoptionstest
 %
 % \begin{macro}{\ifscr@dsc@parametersonly}
 %   \changes{v3.17}{2015/03/24}{neu}
@@ -2132,13 +2219,13 @@
 % \begin{macro}{\partheadstartvskip}
 %   \changes{v2.95a}{2006/07/10}{neue Konfiguratonsmöglichkeit}^^A
 %   \changes{v3.15}{2014/11/24}{\textsf{scrartcl} definiert und verwendet
-%     \cs{scr@part@sectionbeforeskip}}^^A
+%     \cs{scr@part@partbeforeskip}}^^A
 % \begin{macro}{\partheadmidvskip}
 %   \changes{v2.95a}{2006/07/10}{neue Konfiguratonsmöglichkeit}^^A
 % \begin{macro}{\partheadendvskip}
 %   \changes{v2.95a}{2006/07/10}{neue Konfiguratonsmöglichkeit}^^A
 %   \changes{v3.15}{2014/11/24}{\textsf{scrartcl} definiert und verwendet
-%     \cs{scr@part@sectionafterskip}}^^A
+%     \cs{scr@part@partafterskip}}^^A
 % \begin{macro}{\parheademptypage}
 %   \changes{v3.02}{2009/01/01}{neue Konfigurationsmöglichkeit}^^A
 % Diese vier Makros werden verwendet, um den Abstand über in und unter der
@@ -2148,16 +2235,30 @@
 % müssen diese Hilfsmakros nicht bereits vor den Optionen definiert werden.
 % \begin{macro}{\scr@part@sectionbeforeskip}
 %   \changes{v3.15}{2014/11/24}{neue (interne) Anweisung}^^A
+%   \changes{v3.17}{2015/03/24}{umbenannt in \cs{scr@part@partbeforeskip}}^^A
 % \begin{macro}{\scr@part@sectionafterskip}
 %   \changes{v3.15}{2014/11/24}{neue (interne) Anweisung}^^A
+%   \changes{v3.17}{2015/03/24}{umbenannt in \cs{scr@part@partafterskip}}^^A
 % \begin{macro}{\scr@part@sectionindent}
 %   \changes{v3.15}{2014/11/24}{neue (interne) Anweisung (unbenutzt)}^^A
+%   \changes{v3.17}{2015/03/24}{entfernt}^^A
+% \end{macro}^^A \scr@part@sectionindent
+% \end{macro}^^A \scr@part@sectionafterskip
+% \end{macro}^^A \scr@part@sectionbeforeskip
+% \begin{macro}{\scr@part@partbeforeskip}
+%   \changes{v3.17}{2015/03/24}{neu (intern) aus Umdefinierung von
+%     \cs{scr@part@ectionbeforeskip}}^^A
+% \begin{macro}{\scr@part@partinnerskip}
+%   \changes{v3.17}{2015/03/24}{neu (intern)}^^A
+% \begin{macro}{\scr@part@partafterskip}
+%   \changes{v3.17}{2015/03/24}{neu (intern) aus Umdefinierung von
+%     \cs{scr@part@ectionbeforeskip}}^^A
 % \begin{macro}{\scr@part@style}
 %   \changes{v3.15}{2014/11/24}{neue (interne) Anweisung}^^A
 % Es wird der leere Stil verwendet, mit dem Neudefinitionen von \cs{part}
 % über \cs{DeclareSectionCommand} verhindert werden.
 %    \begin{macrocode}
-\newcommand*{\scr@part@sectionbeforeskip}{%
+\newcommand*{\scr@part@partbeforeskip}{%
 %<article>  4ex
 %    \end{macrocode}
 % Hinweis: Das |+\baselineskip| wird benötigt, um Kompatibilitätsprobleme mit
@@ -2169,11 +2270,12 @@
 %<article>  \addvspace{\@tempskipa}%
 %<report|book>  \null\vskip-\baselineskip\vskip\@tempskipa
 }
+%<book|report>\newcommand*{\scr@part@partinnerskip}{20\p@}
 \newcommand*{\partheadmidvskip}{%
   \par\nobreak
-%<book|report>  \vskip 20\p@
+%<book|report>  \vskip\@tempskipa
 }
-\newcommand*{\scr@part@sectionafterskip}{%
+\newcommand*{\scr@part@partafterskip}{%
 %<article>  3ex
 %<report|book>  \z@ \@plus 1fil
 }
@@ -2181,8 +2283,7 @@
 %<article>  \vskip\@tempskipa
 %<report|book>  \vskip\@tempskipa\newpage
 }
-\newcommand*{\scr@part@sectionindent}{\z@}
-\newcommand*{\scr@part@style}{}
+\newcommand*{\scr@part@style}{part}
 %<*report|book>
 \newcommand*{\partheademptypage}{%
   \if@twoside\if@openright
@@ -2204,7 +2305,7 @@
 %    \begin{macrocode}
 %<*article>
 \newcommand\part{\par
-  \@tempskipa=\glueexpr\scr@part@sectionbeforeskip\relax
+  \@tempskipa=\glueexpr\scr@part@partbeforeskip\relax
   \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
   \partheadstartvskip%
   \@afterindentfalse
@@ -2220,7 +2321,7 @@
   \else
     \@tempswafalse
   \fi
-  \@tempskipa=\glueexpr\scr@part@sectionbeforeskip\relax
+  \@tempskipa=\glueexpr\scr@part@partbeforeskip\relax
   \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
   \partheadstartvskip
   \vbox to\z@{\vss\use@preamble{part@o}\strut\par}%
@@ -2266,6 +2367,7 @@
     \normalfont\sectfont\nobreak
     \ifnumbered{part}{%
       \size@partnumber{\partformat}%
+%<book|report>      \setlength{\@tempskipa}{\scr@part@partinnerskip}%
       \partheadmidvskip
     }{}%
     \size@part{#2}\strut
@@ -2277,7 +2379,7 @@
   \endgroup
 %<*article>
   \nobreak
-  \@tempskipa=\glueexpr\scr@part@sectionafterskip\relax
+  \@tempskipa=\glueexpr\scr@part@partafterskip\relax
   \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
   \partheadendvskip
   \@afterheading
@@ -2294,7 +2396,7 @@
   \endgroup
 %<*article>
   \nobreak
-  \@tempskipa=\glueexpr\scr@part@sectionafterskip\relax
+  \@tempskipa=\glueexpr\scr@part@partafterskip\relax
   \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
   \partheadendvskip
   \@afterheading
@@ -2303,7 +2405,7 @@
 }
 %<*book|report>
 \newcommand*{\@endpart}{\vbox to\z@{\use@preamble{part@u}\vss}%
-  \@tempskipa=\glueexpr\scr@part@sectionafterskip\relax
+  \@tempskipa=\glueexpr\scr@part@partafterskip\relax
   \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
   \partheadendvskip
   \partheademptypage
@@ -2397,7 +2499,7 @@
   \else
     \@tempswafalse
   \fi
-  \@tempskipa=\glueexpr\scr@part@sectionbeforeskip\relax
+  \@tempskipa=\glueexpr\scr@part@partbeforeskip\relax
   \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
   \partheadstartvskip
   \vbox to\z@{\vss\use@preamble{part@o}\strut\par}%
