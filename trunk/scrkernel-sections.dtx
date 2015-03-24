@@ -883,8 +883,14 @@
 % Dummy-Optionen werden in \cs{scr@dsc@dummyoptions} gesammelt.
 %    \begin{macrocode}
 \newcommand*{\DeclareSectionCommandDummyOption}[1]{%
-  \g@addto@macro{\scr@dsc@dummyoptions}{%
-    \DefineFamilyKey[.dsc]{KOMAarg}{#1}{\FamilyKeyStateProcessed}%
+  \@ifstar {%
+    \g@addto@macro{\scr@dsc@dummyoptions}{%
+      \DefineFamilyKey[.dsc]{KOMAarg}{#1}[]{\FamilyKeyStateProcessed}%
+    }%
+  }{%
+    \g@addto@macro{\scr@dsc@dummyoptions}{%
+      \DefineFamilyKey[.dsc]{KOMAarg}{#1}{\FamilyKeyStateProcessed}%
+    }%
   }%
 }
 \newcommand*{\scr@dsc@dummyoptions}{}
@@ -951,7 +957,7 @@
 % immer gibt. (Erklärung dieser Optionen folgt unten.)
 %    \begin{macrocode}
 \DeclareSectionCommandDummyOption{style}
-\DeclareSectionCommandDummyOption{expandtopt}
+\DeclareSectionCommandDummyOption{expandtopt}*
 \DeclareSectionCommandDummyOption{increaselevel}
 \DeclareSectionCommandDummyOption{level}
 \DeclareSectionCommandDummyOption{toclevel}
@@ -986,11 +992,55 @@
                                        {afterskip}{scr@}{@sectionafterskip}
 %    \end{macrocode}
 % \begin{description}\item[\texttt{font}] Schrifteinstellungen für das
-% Element.\end{description}
+%   Element.\end{description}
 %    \begin{macrocode}
 \DeclareSectionCommandStyleFontOption{section}{font}{}{}
 %    \end{macrocode}
 % \end{macro}^^A \scr@dsc@style@section@options
+% \begin{macro}{\scr@dsc@style@section@options}
+% Dann für die Optionen des Stils \texttt{chapter}:
+%    \begin{macrocode}
+\newcommand*{\scr@dsc@style@chapter@options}{}
+%    \end{macrocode}
+% \begin{description}
+% \item[\texttt{beforeskip}] Der Absolutwert gibt den vertikalen Abstand vor
+%   der Überschrift an. Negative Werte bedeuten, dass der Absatzeinzug nach
+%   der Überschrift unterdrückt werden soll.
+% \end{description}
+%    \begin{macrocode}
+\DeclareSectionCommandStyleLengthOption{chapter}
+                                       {beforeskip}{scr@}{@chapterbeforeskip}
+%    \end{macrocode}
+% \begin{description}
+% \item[\texttt{innerskip}] Der Absolutwert gibt den vertikalen Abstand
+%   innerhalb der Überschrift zwischen Präfix-Zeile und Text an.
+% \end{description}
+%    \begin{macrocode}
+\DeclareSectionCommandStyleLengthOption{chapter}
+                                       {innerskip}{scr@}{@chapterinnerskip}
+%    \end{macrocode}
+% \begin{description}
+% \item[\texttt{afterskip}] Der Absolutwert gibt den vertikalen Abstand nach
+%   der Überschrift an.
+% \end{description}
+%    \begin{macrocode}
+\DeclareSectionCommandStyleLengthOption{chapter}
+                                       {afterskip}{scr@}{@chapterafterskip}
+%    \end{macrocode}
+% \begin{description}
+% \item[\texttt{font}] Schrifteinstellungen für das Element.
+% \end{description}
+%    \begin{macrocode}
+\DeclareSectionCommandStyleFontOption{chapter}{font}{}{}
+%    \end{macrocode}
+% \begin{description}
+% \item[\texttt{font}] Schrifteinstellungen für die Präfixzeile des Elements.
+% \end{description}
+%    \begin{macrocode}
+\DeclareSectionCommandStyleFontOption{chapter}{prefixfont}{}{prefix}
+%    \end{macrocode}
+% \end{macro}^^A \scr@dsc@style@chapter@options
+%
 % \begin{macro}{\scr@dsc@style@section@neededoptionstest}
 %   \changes{v3.17}{2015/03/24}{Neu (intern)}
 % Dieses Anweisung überprüft, ob alle notwendigen Eigenschaften für die
@@ -999,6 +1049,9 @@
 % mit \cs{aftergroup}\cs{@gobbletwo} dafür, dass die Definition unterbleibt.
 %    \begin{macrocode}
 \newcommand*{\scr@dsc@style@section@neededoptionstest}{%
+%<trace>  \typeout{TRACE:
+%<trace>    \string\scr@dsc@style@section@neededoptionstest\space for
+%<trace>    \scr@dsc@current}%
   \scr@ifundefinedorrelax{scr@\scr@dsc@current @sectionindent}{%
     \scr@declaresectioncommanderror{\scr@dsc@current}{section indent}{indent}%
   }{}%
@@ -1016,6 +1069,52 @@
 }
 %    \end{macrocode}
 % \end{macro}^^A \scr@dsc@style@section@neededoptionstest
+%
+% \begin{macro}{\scr@dsc@style@chapter@neededoptionstest}
+%   \changes{v3.17}{2015/03/24}{Neu (intern)}
+% Dieses Anweisung überprüft, ob alle notwendigen Eigenschaften für die
+% Definition der spezifischen Gliederungsebene im chapter-Stil bekannt
+% sind. Sollte das nicht der Fall sein, meldet sie einen Fehler und sorgt sie
+% mit \cs{aftergroup}\cs{@gobbletwo} dafür, dass die Definition unterbleibt.
+%    \begin{macrocode}
+\newcommand*{\scr@dsc@style@chapter@neededoptionstest}{%
+%<trace>  \typeout{TRACE:
+%<trace>    \string\scr@dsc@style@chapter@neededoptionstest\space for
+%<trace>    \scr@dsc@current}%
+  \scr@ifundefinedorrelax{scr@\scr@dsc@current @chapterinnerskip}{%
+    \scr@declaresectioncommanderror{\scr@dsc@current}{inner chapter skip}
+    {innerskip}%
+  }{}%
+  \scr@ifundefinedorrelax{scr@\scr@dsc@current @chapterbeforeskip}{%
+    \scr@declaresectioncommanderror{\scr@dsc@current}{before chapter skip}
+    {beforeskip}%
+  }{}%
+  \scr@ifundefinedorrelax{scr@\scr@dsc@current @chapterafterskip}{%
+    \scr@declaresectioncommanderror{\scr@dsc@current}{after chaper skip}
+    {afterskip}%
+  }{}%
+  \IfExistskomafont{\scr@dsc@current}{}{%
+    \scr@declaresectioncommanderror{\scr@dsc@current}{font}{font}%
+  }{}%
+  \IfExistskomafont{\scr@dsc@current prefix}{}{%
+    \scr@declaresectioncommanderror{\scr@dsc@current}{prefix line font}
+    {prefixfont}%
+  }{}%
+}
+%    \end{macrocode}
+% \end{macro}^^A \scr@dsc@style@chapter@neededoptionstest
+%
+% \begin{macro}{\ifscr@dsc@parametersonly}
+%   \changes{v3.17}{2015/03/24}{neu}
+% Dieser Schalter wird verwendet, um die Einstellungen entsprechend dem
+% aktuell gültigen Stil zu ändern, die zugehörige Anweisunge selbst aber nicht
+% neu zu definieren. Er wird von einem leeren \texttt{style}-Wert lokal
+% gesetzt.
+%    \begin{macrocode}
+\newif\ifscr@dsc@parametersonly
+%    \end{macrocode}
+% \end{macro}^^A \ifscr@dsc@parametersonly
+%
 %    \begin{macrocode}
 \newcommand*{\DeclareSectionCommand}[2][]{%
   \edef\scr@dsc@current{#2}%
@@ -1029,9 +1128,10 @@
 % \begin{description}\item[\texttt{style}] Stil der
 % Gliederungsebene\end{description}
 %    \begin{macrocode}
+  \scr@dsc@parametersonlyfalse
   \DefineFamilyKey[.dsc]{KOMAarg}{style}{%
     \ifstr{##1}{}{%
-      \@namedef{scr@\scr@dsc@current @style}{##1}%
+      \ifscr@dsc@parametersonlytrue
       \FamilyKeyStateProcessed
     }{%
       \scr@ifundefinedorrelax{scr@start##1}{%
@@ -1215,36 +1315,45 @@
 %    \end{macrocode}
 % Dann den eigentlichen Gliederungsbefehl definieren:
 %    \begin{macrocode}
-      \ifstr{\csname scr@#2@style\endcsname}{}{%
+      \ifscr@dsc@parametersonly
         \ClassInfo{\KOMAClassName}{%
           not defining `\expandafter\string\csname #2\endcsname' due
           to\MessageBreak
-          empty section style%
+          empty section style option%
         }%
-      }{%
-        \expandafter\edef\csname #2\endcsname{%
-          \expandafter\noexpand
-          \csname scr@start\csname scr@#2@style\endcsname\endcsname
-          {#2}%
-          \expandafter\noexpand\csname #2numdepth\endcsname
-          \expandafter\noexpand\csname scr@#2@sectionindent\endcsname
-          \expandafter\noexpand\csname scr@#2@sectionbeforeskip\endcsname
-          \expandafter\noexpand\csname scr@#2@sectionafterskip\endcsname{%
-            \noexpand\ifdim\noexpand\glueexpr
+      \else
+        \scr@ifundefinedorrelax{scr@start\@nameuse{scr@#2@style}}{%
+          \ClassWarning{\KOMAClassName}{%
+            not defining `\expandafter\string\csname #2\endcsname'
+            due\MessageBreak
+            to not yet defined section style\MessageBreak
+            `\@nameuse{scr@#2@style}'%
+          }%
+        }{%
+          \expandafter\edef\csname #2\endcsname{%
+            \expandafter\noexpand
+            \csname scr@start\csname scr@#2@style\endcsname\endcsname
+            {#2}%
+            \expandafter\noexpand\csname #2numdepth\endcsname
+            \expandafter\noexpand\csname scr@#2@sectionindent\endcsname
             \expandafter\noexpand\csname scr@#2@sectionbeforeskip\endcsname
-            <\noexpand\z@
+            \expandafter\noexpand\csname scr@#2@sectionafterskip\endcsname{%
+              \noexpand\ifdim\noexpand\glueexpr
+              \expandafter\noexpand\csname scr@#2@sectionbeforeskip\endcsname
+              <\noexpand\z@
+                \unexpanded{%
+                  \expandafter\ifnum\scr@v@is@gt{2.96}\relax
+                    \setlength{\parfillskip}{\z@ plus 1fil}%
+                  \fi
+                }%
+              \noexpand\fi
               \unexpanded{%
-                \expandafter\ifnum\scr@v@is@gt{2.96}\relax
-                  \setlength{\parfillskip}{\z@ plus 1fil}%
-                \fi
+                \raggedsection\normalfont\sectfont\nobreak\usekomafont{#2}%
               }%
-            \noexpand\fi
-            \unexpanded{%
-              \raggedsection\normalfont\sectfont\nobreak\usekomafont{#2}%
             }%
           }%
         }%
-      }%
+      \fi
 %    \end{macrocode}
 % Zu jedem Gliederungsbefehl gehört auch ein Befehl für den Kolumnentitel, der
 % bei \KOMAScript{} außerdem eine Formatierung des Zählers benötigt. Falls
@@ -2643,17 +2752,19 @@
 %
 %
 % \begin{macro}{\chapterheadstartvskip}
-%   \changes{v3.15}{2014/11/24}{\cs{scr@chapter@sectionbeforeskip} wird
+%   \changes{v3.15}{2014/11/24}{\cs{scr@chapter@chapterbeforeskip} wird
 %     definiert und verwendet}^^A
 % \begin{macro}{\chapterheadendvskip}
 %   \changes{v3.11c}{2013/02/13}{\cs{chapterheadstartvskip} und
 %     \cs{chapterheadendvskip} haben in \textsf{scrartcl} nichts verloren}^^A
-%   \changes{v3.15}{2014/11/24}{\cs{scr@chapter@sectionafterskip} wird
+%   \changes{v3.15}{2014/11/24}{\cs{scr@chapter@chapterafterskip} wird
 %     definiert und verwendet}^^A
 %   \changes{v3.15}{2014/12/10}{\cs{vspace} durch \cs{vskip} ersetzt, damit
 %     \cs{lastskip} korrekt gesetzt ist}
 % \begin{macro}{\chapterheadmidvskip}
 %   \changes{v3.15}{2014/11/20}{neue Anweisung}^^A
+%   \changes{v3.17}{2015/03/24}{\cs{scr@chapter@chapterinnerskip} wird
+%     definiert und verwendet}^^A
 % Mit diesen Anweisungen wird üblicherweise der Abstand zwischen
 % oberem Rand des Textbereichs und der Überschrift bzw. der Abstand
 % zwischen der Überschrift und dem Text des Kapitels gesetzt. Man kann
@@ -2670,10 +2781,26 @@
 % Gliederungsbefehlen erhalten kann!
 % \begin{macro}{\scr@chapter@sectionbeforeskip}
 %   \changes{v3.15}{2014/11/24}{neue (interne) Anweisung}^^A
+%   \changes{v3.17}{2015/03/24}{umbenannt in
+%     \cs{scr@chapter@chapterbeforeskip}}^^A
 % \begin{macro}{\scr@chapter@sectionafterskip}
 %   \changes{v3.15}{2014/11/24}{neue (interne) Anweisung}^^A
+%   \changes{v3.17}{2015/03/24}{umbenannt in
+%     \cs{scr@chapter@chapterafterskip}}^^A
 % \begin{macro}{\scr@chapter@sectionindent}
 %   \changes{v3.15}{2014/11/24}{neue (interne) Anweisung (unbenutzt)}^^A
+%   \changes{v3.17}{2015/04/24}{entfernt}^^A
+% \end{macro}^^A \scr@chapter@sectionindent
+% \end{macro}^^A \scr@chapter@sectionafterskip
+% \end{macro}^^A \scr@chapter@sectionbeforeskip
+% \begin{macro}{\scr@chapter@chapterbeforeskip}
+%   \changes{v3.17}{2015/03/24}{Neu (intern) aus Umdefinierung von
+%     \cs{scr@chapter@sectionbeforeskip}}^^A
+% \begin{macro}{\scr@chapter@chapterinnerskip}
+%   \changes{v3.17}{2015/03/24}{Neu (intern)}^^A
+% \begin{macro}{\scr@chapter@chapterafterskip}
+%   \changes{v3.17}{2015/03/24}{Neu (intern) aus Umdefinierung von
+%     \cs{scr@chapter@sectionafterskip}}^^A
 % \begin{macro}{\scr@chapter@style}
 %   \changes{v3.15}{2014/11/24}{neue (interne) Anweisung}^^A
 % Dabei wird der leere Stil verwendet, mit dem Neudefinitionen von \cs{part}
@@ -2681,32 +2808,31 @@
 % jedoch Einstellungen einiger Werte darüber erfolgen.
 %    \begin{macrocode}
 %<*prepare>
-\newcommand*{\scr@chapter@sectionbeforeskip}{\z@}
-\let\scr@chapter@sectionbeforeskip\z@
-\newcommand*{\scr@chapter@sectionafterskip}{\z@}
-\let\scr@chapter@sectionafterskip\z@
-\newcommand*{\scr@chapter@sectionindent}{\z@}
+\newcommand*{\scr@chapter@chapterbeforeskip}{\z@}
+\let\scr@chapter@chapterbeforeskip\z@
+\newcommand*{\scr@chapter@chapterafterskip}{\z@}
+\let\scr@chapter@chapterafterskip\z@
+\newcommand*{\scr@chapter@chapterinnerskip}{\z@}
 \let\scr@chapter@sectionindent\z@
-\newcommand*{\scr@chapter@style}{}
+\newcommand*{\scr@chapter@style}{chapter}
 %    \end{macrocode}
 % \end{macro}^^A \scr@chapter@style
 % \end{macro}^^A \scr@chapter@sectionindent
-% \end{macro}^^A \scr@chapter@sectionbeforeskip
-% \end{macro}^^A \scr@chapter@sectionafterskip
+% \end{macro}^^A \scr@chapter@chapterbeforeskip
+% \end{macro}^^A \scr@chapter@chapterafterskip
 %    \begin{macrocode}
 \newcommand*{\chapterheadstartvskip}{\vspace{\@tempskipa}}
 \newcommand*{\chapterheadendvskip}{\vskip\@tempskipa}
-\newcommand*{\chapterheadmidvskip}{\par\nobreak\vskip.5\baselineskip}
+\newcommand*{\chapterheadmidvskip}{\par\nobreak\vskip\@tempskipa}
 %</prepare>
 %    \end{macrocode}
 % \end{macro}^^A \chapterheadmidvskip
 % \end{macro}^^A \chapterheadendvskip
 % \end{macro}^^A \chapterheadstartvskip
 %
-%
 % \begin{macro}{\chapternumdepth}
 %   \changes{v3.12}{2013/12/16}{new read only command}^^A
-% Darf nur gelesen, sollten aber nie umdefiniert werden und geben die
+% Darf nur gelesen, sollten aber nie umdefiniert werden und gibt die
 % Nummerierungsebene der Gliederungsanweisungen an (nicht zu verwechseln mit
 % der Verzeichnisebene der Gliederungsanweisungen):
 %    \begin{macrocode}
@@ -2791,12 +2917,12 @@
 \newcommand*{\use@chapter@o@preamble}{%
   {%
     \settoheight{\@tempdima}{%
-      \@tempskipa=\glueexpr \scr@chapter@sectionbeforeskip\relax
+      \@tempskipa=\glueexpr \scr@chapter@chapterbeforeskip\relax
       \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
       \vbox{\chapterheadstartvskip}%
     }%
     \settodepth{\@tempdimb}{%
-      \@tempskipa=\glueexpr \scr@chapter@sectionbeforeskip\relax
+      \@tempskipa=\glueexpr \scr@chapter@chapterbeforeskip\relax
       \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
       \vbox{\chapterheadstartvskip}%
     }%
@@ -2942,7 +3068,7 @@
 %    \cs{raggedsection}}^^A
 %    \begin{macrocode}
 \newcommand*{\@@makechapterhead}[1]{%
-  \@tempskipa=\glueexpr \scr@chapter@sectionbeforeskip\relax
+  \@tempskipa=\glueexpr \scr@chapter@chapterbeforeskip\relax
   \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
   \chapterheadstartvskip
   {%
@@ -2964,7 +3090,9 @@
         \usekomafont{chapter}{%
           \IfUsePrefixLine{%
             {\usekomafont{chapterprefix}{%
-                \chapterformat\chapterheadmidvskip
+                \chapterformat
+                \setlenght{\@tempskipa}{\scr@chapter@chapterinnerskip}%
+                \chapterheadmidvskip
             }}%
           }{%
             \chapterformat
@@ -2979,7 +3107,7 @@
     }%
   }%
   \nobreak\par\nobreak
-  \@tempskipa=\glueexpr \scr@chapter@sectionafterskip\relax
+  \@tempskipa=\glueexpr \scr@chapter@chapterafterskip\relax
   \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
   \chapterheadendvskip
 }
@@ -3059,7 +3187,7 @@
   \fi
 }
 \newcommand*{\@@makeschapterhead}[1]{%
-  \@tempskipa=\glueexpr \scr@chapter@sectionbeforeskip\relax
+  \@tempskipa=\glueexpr \scr@chapter@chapterbeforeskip\relax
   \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
   \chapterheadstartvskip
   {%
@@ -3068,7 +3196,7 @@
     \raggedchapter \interlinepenalty \@M \usekomafont{chapter}{#1}\par
   }%
   \nobreak\par\nobreak
-  \@tempskipa=\glueexpr \scr@chapter@sectionafterskip\relax
+  \@tempskipa=\glueexpr \scr@chapter@chapterafterskip\relax
   \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
   \chapterheadendvskip%
 }
@@ -4243,8 +4371,8 @@
 %   \changes{v3.12}{2013/08/26}{\cs{KOMA@options} durch \cs{KOMAoptions}
 %     ersetzt}^^A
 %   \changes{v3.12}{2013/11/11}{neuer Wert \texttt{standardclasses}}^^A
-%   \changes{v3.15}{2014/11/24}{\cs{scr@chapter@sectionbeforeskip} und
-%     \cs{scr@chapter@sectionafterskip} werden verwendet}^^A
+%   \changes{v3.15}{2014/11/24}{\cs{scr@chapter@chapterbeforeskip} und
+%     \cs{scr@chapter@chapterafterskip} werden verwendet}^^A
 %   \changes{v3.17}{2015/03/09}{interne Speicherung des Wert}^^A
 % Dies ist eine neue zentrale Option für Überschriften. Dabei ergibt sich
 % nun auch das Problem, dass die Gesamtmenge der Überschriften mal
@@ -4299,16 +4427,17 @@
 % |beforeskip=0pt| an den oberen Rand zu bekommen.
 %    \begin{macrocode}
 %<*book|report>
-      \renewcommand*{\scr@chapter@sectionbeforeskip}{3.3\baselineskip+\parskip}%
-      \renewcommand*{\scr@chapter@sectionafterskip}{%
+      \renewcommand*{\scr@chapter@chapterbeforeskip}{3.3\baselineskip+\parskip}%
+      \renewcommand*{\scr@chapter@chapterafterskip}{%
         1.725\baselineskip \@plus .115\baselineskip \@minus .192\baselineskip
       }%
+      \renewcommand*{\scr@chapter@chapterinnerskip}{.5\baselineskip}%
       \renewcommand*{\chapterheadstartvskip}{\vspace{\@tempskipa}}%
       \renewcommand*{\chapterheadendvskip}{%
         \expandafter\ifnum\scr@v@is@lt{3.15}\vspace\@tempskipa
         \else\vskip\@tempskipa\fi
       }%
-      \renewcommand*{\chapterheadmidvskip}{\par\nobreak\vskip.5\baselineskip}%
+      \renewcommand*{\chapterheadmidvskip}{\par\nobreak\vskip\@tempskipa}%
 %</book|report>
       \renewcommand*{\size@part}{\Huge}%
       \renewcommand*{\size@partnumber}{\huge}%
@@ -4326,16 +4455,17 @@
       \KOMA@kav@remove{.\KOMAClassFileName}{headings}{standardclasses}%
       \KOMA@kav@add{.\KOMAClassFileName}{headings}{normal}%
 %<*book|report>
-      \renewcommand*{\scr@chapter@sectionbeforeskip}{3\baselineskip+\parskip}%
-      \renewcommand*{\scr@chapter@sectionafterskip}{%
+      \renewcommand*{\scr@chapter@chapterbeforeskip}{3\baselineskip+\parskip}%
+      \renewcommand*{\scr@chapter@chapterafterskip}{%
         1.5\baselineskip \@plus .1\baselineskip \@minus .167\baselineskip
       }%
+      \renewcommand*{\scr@chapter@chapterinnerskip}{.5\baselineskip}%
       \renewcommand*{\chapterheadstartvskip}{\vspace{\@tempskipa}}%
       \renewcommand*{\chapterheadendvskip}{%
         \expandafter\ifnum\scr@v@is@lt{3.15}\vspace\@tempskipa
         \else\vskip\@tempskipa\fi
       }%
-      \renewcommand*{\chapterheadmidvskip}{\par\nobreak\vskip.5\baselineskip}%
+      \renewcommand*{\chapterheadmidvskip}{\par\nobreak\vskip\@tempskipa}%
 %</book|report>
       \renewcommand*{\size@part}{\huge}%
       \renewcommand*{\size@partnumber}{\huge}%
@@ -4359,16 +4489,17 @@
       \KOMA@kav@remove{.\KOMAClassFileName}{headings}{standardclasses}%
       \KOMA@kav@add{.\KOMAClassFileName}{headings}{small}%
 %<*book|report>
-      \renewcommand*{\scr@chapter@sectionbeforeskip}{2.8\baselineskip+\parskip}%
-      \renewcommand*{\scr@chapter@sectionafterskip}{%
+      \renewcommand*{\scr@chapter@chapterbeforeskip}{2.8\baselineskip+\parskip}%
+      \renewcommand*{\scr@chapter@chapterafterskip}{%
         1.35\baselineskip \@plus 0.09\baselineskip \@minus .15\baselineskip
       }%
+      \renewcommand*{\scr@chapter@chapterinnerskip}{.5\baselineskip}%
       \renewcommand*{\chapterheadstartvskip}{\vspace{\@tempskipa}}%
       \renewcommand*{\chapterheadendvskip}{%
         \expandafter\ifnum\scr@v@is@lt{3.15}\vspace\@tempskipa
         \else\vskip\@tempskipa\fi
       }%
-      \renewcommand*{\chapterheadmidvskip}{\par\nobreak\vskip.5\baselineskip}%
+      \renewcommand*{\chapterheadmidvskip}{\par\nobreak\vskip\@tempskipa}%
 %</book|report>
       \renewcommand*{\size@part}{\LARGE}%
       \renewcommand*{\size@partnumber}{\LARGE}%
@@ -4455,11 +4586,12 @@
       \KOMA@kav@remove{.\KOMAClassFileName}{headings}{standardclasses}%
       \KOMA@kav@add{.\KOMAClassFileName}{headings}{standardclasses}%
 %<*book|report>
-      \renewcommand*{\scr@chapter@sectionbeforeskip}{50\p@}%
-      \renewcommand*{\scr@chapter@sectionafterskip}{40\p@}%
+      \renewcommand*{\scr@chapter@chapterbeforeskip}{50\p@}%
+      \renewcommand*{\scr@chapter@chapterafterskip}{40\p@}%
+      \renewcommand*{\scr@chapter@chapterinnerskip}{20\p@}%
       \renewcommand*{\chapterheadstartvskip}{\vspace{\@tempskipa}}%
       \renewcommand*{\chapterheadendvskip}{\vskip\@tempskipa}%
-      \renewcommand*{\chapterheadmidvskip}{\par\nobreak\vskip 20\p@}%
+      \renewcommand*{\chapterheadmidvskip}{\par\nobreak\vskip\@tempskipa}%
       \renewcommand*{\size@part}{\Huge}%
       \renewcommand*{\size@partnumber}{\huge}%
       \renewcommand*{\size@chapter}{\Huge}%
