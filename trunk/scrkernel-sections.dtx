@@ -1,4 +1,4 @@
-% \CheckSum{3578}
+% \CheckSum{3552}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -1030,8 +1030,17 @@
 % Gliederungsebene\end{description}
 %    \begin{macrocode}
   \DefineFamilyKey[.dsc]{KOMAarg}{style}{%
-    \@namedef{scr@\scr@dsc@current @style}{##1}%
-    \FamilyKeyStateProcessed
+    \ifstr{##1}{}{%
+      \@namedef{scr@\scr@dsc@current @style}{##1}%
+      \FamilyKeyStateProcessed
+    }{%
+      \scr@ifundefinedorrelax{scr@start##1}{%
+        \FamilyKeyStateUnknownValue
+      }{%
+        \@namedef{scr@\scr@dsc@current @style}{##1}%
+        \FamilyKeyStateProcessed
+      }%
+    }%
   }%
   \FamilyExecuteOptions[.dsc]{KOMAarg}{#1}%
   \begingroup
@@ -1213,30 +1222,7 @@
           empty section style%
         }%
       }{%
-        \scr@ifundefinedorrelax{scr@#2@style}{%
-          \ClassWarning{\KOMAClassName}{using default section style}%
-          \@namedef{scr@#2@style}{section}%
-        }{}%
         \expandafter\edef\csname #2\endcsname{%
-          \noexpand\scr@ifundefinedorrelax{%
-            scr@start\csname scr@#2@style\endcsname}{%
-            \noexpand\ClassError{\noexpand\KOMAClassName}{%
-              section style `\csname scr@#2@style\endcsname' not defined}{%
-              A not yet defined section style `\csname scr@#2@style\endcsname'
-              has been setup for\MessageBreak
-              `\expandafter\string\csname #2\endcsname'. You should either setup
-              another style\MessageBreak
-              or define the style.\MessageBreak
-              If you'll continue, style `section' will be used as an emergency
-              fallback.%
-            }%
-%    \end{macro}
-% Damit später der \textsf{titlesec}-Workaround funktioniert muss hier
-% ggf. der Befehl für den Stil geändert werden.
-%    \begin{macro}
-            \noexpand\def\expandafter\noexpand\csname scr@#2@style\endcsname
-            {section}%
-          }{}%
           \expandafter\noexpand
           \csname scr@start\csname scr@#2@style\endcsname\endcsname
           {#2}%
