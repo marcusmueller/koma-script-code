@@ -1,4 +1,4 @@
-% \CheckSum{1389}
+% \CheckSum{1455}
 % \iffalse meta-comment
 % ======================================================================
 % tocbasic.dtx
@@ -2485,6 +2485,8 @@ may be found in \autoref{tab:tocbasic.DeclareNewTOC-options}.
 %   \changes{v3.15}{2014/12/10}{usage of \cs{@mkright} if available}^^A
 %   \changes{v3.17}{2015/03/08}{moved \cs{@mkboth} outside \cs{chapter*}}^^A
 %   \changes{v3.17}{2015/03/08}{usage of \cs{@mkdouble} if available}^^A
+%   \changes{v3.17}{2015/03/25}{penalty and skip reconstruction after
+%     \cs{@mkright}, \cs{@mkboth}, or \cs{@mkdouble}}^^A
 %   Setting the headings of a list of something. The heading is the only
 %   argument.
 %    \begin{macrocode}
@@ -2498,32 +2500,36 @@ may be found in \autoref{tab:tocbasic.DeclareNewTOC-options}.
             \subsection[##1]{##1}%
           }{%
             \subsection*{##1}%
-            \iftocfeature{\@currext}{totoc}{%
-              \addxcontentsline{toc}{subsection}{##1}%
-            }{}%
+            \ifvmode\@tempcnta\lastpenalty\@tempskipa\lastskip\unskip\fi
             \begingroup
+              \iftocfeature{\@currext}{totoc}{%
+                \addxcontentsline{toc}{subsection}{##1}%
+              }{}%
               \@ifundefined{@mkright}{%
                 \ifx\@mkboth\@gobbletwo\else\markright{\MakeMarkcase{##1}}\fi
               }{%
                 \@mkright{\MakeMarkcase{##1}}%
               }%
             \endgroup
+            \ifvmode\penalty\@tempcnta\vskip\@tempskipa\fi
           }%
         }{%
           \iftocfeature{\@currext}{numbered}{%
             \section[##1]{##1}%
           }{%
             \section*{##1}%
-            \iftocfeature{\@currext}{totoc}{%
-              \addxcontentsline{toc}{section}{##1}%
-            }{}%
+            \ifvmode\@tempcnta\lastpenalty\@tempskipa\lastskip\unskip\fi
             \begingroup
+              \iftocfeature{\@currext}{totoc}{%
+                \addxcontentsline{toc}{section}{##1}%
+              }{}%
               \@ifundefined{@mkdouble}{%
                 \@mkboth{\MakeMarkcase{##1}}{\MakeMarkcase{##1}}%
               }{%
                 \@mkdouble{\MakeMarkcase{##1}}%
               }%
             \endgroup
+            \ifvmode\penalty\@tempcnta\vskip\@tempskipa\fi
           }%
         }%
       }%
@@ -2537,6 +2543,7 @@ may be found in \autoref{tab:tocbasic.DeclareNewTOC-options}.
               \begingroup
                 \@ifundefined{addsec}{%
                   \section*{##1}%
+                  \ifvmode\@tempcnta\lastpenalty\@tempskipa\lastskip\unskip\fi
                   \begingroup
                     \@ifundefined{@mkright}{%
                       \ifx\@mkboth\@gobbletwo
@@ -2544,14 +2551,16 @@ may be found in \autoref{tab:tocbasic.DeclareNewTOC-options}.
                     }{%
                       \@mkright{\MakeMarkcase{##1}}%
                     }%
+                    \addxcontentsline{toc}{section}{##1}%
                   \endgroup
-                  \addxcontentsline{toc}{section}{##1}%
+                  \ifvmode\penalty\@tempcnta\vskip\@tempskipa\fi
                 }{%
                   \addsec{##1}%
                 }%
               \endgroup
             }{%
               \section*{##1}%
+              \ifvmode\@tempcnta\lastpenalty\@tempskipa\lastskip\unskip\fi
               \begingroup
                 \@ifundefined{@mkright}{%
                   \ifx\@mkboth\@gobbletwo
@@ -2560,6 +2569,7 @@ may be found in \autoref{tab:tocbasic.DeclareNewTOC-options}.
                   \@mkright{\MakeMarkcase{##1}}%
                 }%
               \endgroup
+              \ifvmode\penalty\@tempcnta\vskip\@tempskipa\fi
             }%
           }%
         }{%
@@ -2567,16 +2577,18 @@ may be found in \autoref{tab:tocbasic.DeclareNewTOC-options}.
             \chapter[##1]{##1}%
           }{%
             \chapter*{##1}%
+            \ifvmode\@tempcnta\lastpenalty\@tempskipa\lastskip\unskip\fi
             \begingroup
               \@ifundefined{@mkdouble}{%
                 \@mkboth{\MakeMarkcase{##1}}{\MakeMarkcase{##1}}%
               }{%
                 \@mkdouble{\MakeMarkcase{##1}}%
               }%
+              \iftocfeature{\@currext}{totoc}{%
+                \addxcontentsline{toc}{chapter}{##1}%
+              }{}%
             \endgroup
-            \iftocfeature{\@currext}{totoc}{%
-              \addxcontentsline{toc}{chapter}{##1}%
-            }{}%
+            \ifvmode\penalty\@tempcnta\vskip\@tempskipa\fi
           }%
         }%
       }%
