@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2015/02/23 v1.8a internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2015/03/31 v1.9 internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -713,6 +713,31 @@
 \newcommand*{\label@base}{unknown}
 %    \end{macrocode}
 % \end{macro}
+% \end{macro}
+% \begin{macro}{\labelofbase}
+% Sets a label depending on \cs{label@base}. First optional argument is the
+% label prefix, second is the the label postfix.
+%    \begin{macrocode}
+\newcommand*{\labelofbase}[2][lab:]{%
+  \label{#1:\label@base.#2}%
+}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\seclabel}
+% Sets a label of type section.
+%    \begin{macrocode}
+\newcommand*{\seclabel}[1]{%
+  \labelofbase[sec]{#1}%
+}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\exlabel}
+% Sets a label of type example.
+%    \begin{macrocode}
+\newcommand*{\exlabel}[1]{%
+  \labelofbase[example]{#1}%
+}
+%    \end{macrocode}
 % \end{macro}
 %
 % \section{Special Environments}
