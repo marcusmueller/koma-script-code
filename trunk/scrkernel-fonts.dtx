@@ -1,4 +1,4 @@
-% \CheckSum{3280}
+% \CheckSum{3224}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-fonts.dtx
@@ -1821,37 +1821,39 @@
 %
 % \begin{macro}{\usesizeofkomafont}
 %   \changes{v3.12}{2013/03/30}{neu}^^A
+%   \changes{v3.17}{2015/04/03}{robustere Neuimplementierung}^^A
 % \begin{macro}{\usefamilyofkomafont}
 %   \changes{v3.12}{2013/03/30}{neu}^^A
+%   \changes{v3.17}{2015/04/03}{basiert auf robusterer Neuimplementierung}^^A
 % \begin{macro}{\useseriesofkomafont}
 %   \changes{v3.12}{2013/03/30}{neu}^^A
+%   \changes{v3.17}{2015/04/03}{basiert auf robusterer Neuimplementierung}^^A
 % \begin{macro}{\useshapeofkomafont}
 %   \changes{v3.12}{2013/03/30}{neu}^^A
 %   \changes{v3.16a}{2015/02/20}{Makroname korrigiert}^^A
+%   \changes{v3.17}{2015/04/03}{basiert auf robusterer Neuimplementierung}^^A
 % \begin{macro}{\useencodingofkomafont}
 %   \changes{v3.12}{2013/03/30}{neu}^^A
+%   \changes{v3.17}{2015/04/03}{basiert auf robusterer Neuimplementierung}^^A
 % \begin{macro}{\usefontofkomafont}
 %   \changes{v3.12}{2013/03/30}{neu}^^A
+%   \changes{v3.17}{2015/04/03}{robustere Neuimplementierung}^^A
 % Manchmal wollen die Leute tatsächlich gar nicht den kompletten Font eines
 % Elements, sondern nur einen Teilaspekt davon. Aber Version~3.12 wird das mit
 % Hilfe neuer Anweisungen unterstützt.
 %    \begin{macrocode}
 \newcommand*{\usesizeofkomafont}[1]{%
   \begingroup
-    \let\color\@gobble\let\normalcolor\relax
-    \@tempcnta=\currentgrouplevel
-    \usekomafont{#1}{%
-      \ifnum \currentgrouplevel>\numexpr\@tempcnta\relax
-        \edef\reserved@a{\noexpand\egroup\noexpand\endgroup
-          \noexpand\fontsize{\f@size}{\f@baselineskip}%
-          \noexpand\bgroup}%
-      \else
-        \edef\reserved@a{\noexpand\endgroup
-          \noexpand\fontsize{\f@size}{\f@baselineskip}}%
-      \fi
-      \reserved@a
+    \scr@prepareforkomafont
+    \sbox\@tempboxa{%
+      \usekomafont{#1}{%
+        \xdef\g@scr@usefont{%
+          \noexpand\fontsize{\f@size}{\f@baselineskip}\noexpand\selectfont
+        }%
+      }%
     }%
-  \selectfont
+  \endgroup
+  \g@scr@usefont
 }
 \newcommand*{\usefamilyofkomafont}{\use@ofkomafont{family}}
 \newcommand*{\useseriesofkomafont}{\use@ofkomafont{series}}
@@ -1859,55 +1861,93 @@
 \newcommand*{\useencodingofkomafont}{\use@ofkomafont{encoding}}
 \newcommand*{\usefontofkomafont}[1]{%
   \begingroup
-    \let\color\@gobble\let\normalcolor\relax
-    \@tempcnta=\currentgrouplevel
-    \usekomafont{#1}{%
-      \ifnum \currentgrouplevel>\numexpr\@tempcnta\relax
-        \edef\reserved@a{\noexpand\egroup\noexpand\endgroup
+    \scr@prepareforkomafont
+    \sbox\@tempboxa{%
+      \usekomafont{#1}{%
+        \xdef\g@scr@usefont{%
           \noexpand\fontsize{\f@size}{\f@baselineskip}%
-          \noexpand\fontfamily{\f@family}%
-          \noexpand\fontseries{\f@series}%
-          \noexpand\fontshape{\f@shape}%
-          \noexpand\fontencoding{\f@encoding}%
-          \noexpand\bgroup}%
-      \else
-        \edef\reserved@a{\noexpand\endgroup
-          \noexpand\fontsize{\f@size}{\f@baselineskip}}%
-          \noexpand\fontfamily{\f@family}%
-          \noexpand\fontseries{\f@series}%
-          \noexpand\fontshape{\f@shape}%
-          \noexpand\fontencoding{\f@encoding}%
-      \fi
-      \reserved@a
+          \noexpand\usefont{\f@encoding}{\f@family}{\f@series}{\f@shape}%
+        }%
+      }%
     }%
-  \selectfont
+  \endgroup
+  \g@scr@usefont
 }
 %    \end{macrocode}
 % \begin{macro}{\use@ofkomafont}
 %   \changes{v3.12}{2013/03/30}{neu (intern)}^^A
+%   \changes{v3.17}{2015/04/03}{robustere Neuimplementierung}^^A
 % Kleines Hilfsmakro für all diese Anweisungen bis auf die erste und die letzte.
 %    \begin{macrocode}
 \newcommand*{\use@ofkomafont}[2]{%
   \begingroup
-    \let\color\@gobble\let\normalcolor\relax
-    \@tempcnta=\currentgrouplevel
-    \usekomafont{#2}{%
-      \ifnum \currentgrouplevel>\numexpr\@tempcnta\relax
-        \edef\reserved@a{\noexpand\egroup\noexpand\endgroup
-          \expandafter\noexpand\csname font#1\endcsname
-          {\csname f@#1\endcsname}%
-          \noexpand\bgroup}%
-      \else
-        \edef\reserved@a{\noexpand\endgroup
-          \expandafter\noexpand\csname font#1\endcsname
-          {\csname f@#1\endcsname}%
+    \scr@prepareforkomafont
+    \sbox\@tempboxa{%
+      \usekomafont{#2}{%
+        \xdef\g@scr@usefont{%
+          \expandafter\noexpand
+          \csname font#1\endcsname{\csname f@#1\endcsname}\noexpand\selectfont
         }%
-      \fi
-      \reserved@a
+      }%
     }%
-  \selectfont
+  \endgroup
+  \g@scr@usefont
 }
 %    \end{macrocode}
+% \begin{macro}{\g@scr@usefont}
+%   \changes{v3.17}{2015/04/03}{neu (intern)}^^A
+% Globale definiertes Hilfsmakro. Dieses Makro sollte niemals für irgend etwas
+% anderes als obige Befehle verwendet werden. Anderenfalls ist die Funktion
+% sowohl dieses anderen als auch obiger Befehle nicht mehr gewährleistet!
+%    \begin{macrocode}
+\newcommand*{\g@scr@usefont}{%
+  \PackageError{scrkbase}{%
+    undefined usage of \string\g@scr@usefont
+  }{%
+    \string\g@scr@usefont\space is an internal macro of KOMA-Script and
+    should\MessageBreak
+    not be used this way.\MessageBreak
+    This may be an internal error of KOMA-Script, a mistake of a package
+    author,\MessageBreak
+    or a mistake of the user.%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}^^A \g@scr@usefont
+% \begin{macro}{\scr@komafontrelaxlist}
+%   \changes{v3.17}{2015/04/03}{neu (intern)}^^A
+% Hilfsmakro mit einer |\do|-Liste aller Makros, die in obigen Font-Makros vor
+% der Anwendung des Fonts |\relax| verwenden sollen.
+%    \begin{macrocode}
+\newcommand*{\scr@komafontrelaxlist}{%
+  \do\color \do\normalcolor 
+  \do\uppercase \do\lowercase \do\MakeUppercase \do\MakeLowercase
+}
+%    \end{macrocode}
+% \end{macro}^^A \scr@komafontrelaxlist
+% \begin{macro}{\scr@prepareforkomafont}
+%   \changes{v3.17}{2015/04/03}{neu (intern)}^^A
+% Hilfsmakro, das die Vorbereitungen für die obigen Font-Makros trifft. In der
+% Voreinstellung ist das lediglich die Anwendung der |\do|-Liste, so dass die
+% dort angegebenen Makros alle |\relax| werden. Da die Anweisung dazu |\do|
+% umdefiniert, sollte die Anweisung immer in einer Gruppe eingeschlossen
+% werden.
+%    \begin{macrocode}
+\newcommand*{\scr@prepareforkomafont}{%
+  \long\def\do##1{\let##1\relax}\scr@komafontrelaxlist
+}
+%    \end{macrocode}
+% \end{macro}^^A \scr@prepareforkomafont
+% \begin{macro}{\addtokomafontrelaxlist}
+%   \changes{v3.17}{2015/04/03}{Neu}
+% Diese Anweisung erlaubt es genau ein Makro der obigen |\do|-Liste
+% hinzuzufügen.
+%    \begin{macrocode}
+\newcommand*{\addtokomafontrelaxlist}[1]{%
+  \l@addto@macro\scr@komafontrelaxlist{\do#1}%
+}
+%    \end{macrocode}
+% \end{macro}^^A \addtokomafontrelaxlist
 % \end{macro}
 % \end{macro}
 % \end{macro}
