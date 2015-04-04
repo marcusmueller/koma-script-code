@@ -54,7 +54,7 @@
 
 \translator{Gernot Hassenpflug\and Markus Kohm}
 
-% Date of the translated German file: 2015-03-31
+% Date of the translated German file: 2015-04-04
 
 
 \chapter{Additional Information about the Main Classes \Class{scrbook},
@@ -291,6 +291,55 @@ itself defines a lot of \PName{alias name}s for several \PName{element}s.
 %
 \EndIndex{Cmd}{aliaskomafont}%
 \EndIndex{Cmd}{newkomafont}%
+
+\begin{Declaration}
+  \Macro{addtokomafontrelaxlist}\Parameter{macro}
+\end{Declaration}
+\BeginIndex{Cmd}{addtokomafontrelaxlist}%
+As already mentioned in \autoref{part:forAuthors} of this manual, font
+settings of elements should consist only in commands to select the size, family,
+coding, series, shape, or colour. At least changing the colour is not always
+transparent in \LaTeX{} and therefore could result in unwanted effects if
+someone uses \Macro{usekomafont} at an inappropriate state.
+
+Users tend to use different, somehow critical things in the font setting of an
+element, e.\,g., \Macro{MakeUppercase} at the very end of the setting. As long
+as possible, the internal usage of font settings has been implemented so that
+such forbidden settings do not matter. Even using a command that expects an
+argument, e.\,g., \Macro{textbf} instead of \Macro{bfseries},  would work
+mostly, if it the last one in the font setting of an element\,---\,but without
+warranty.
+
+Inside \KOMAScript, sometimes, it was necessary to restrict the font change
+to real font settings. This has been done, e.\,g., using
+\Macro{usefontofkomafont}%
+\IndexCmd{usefontofkomafont}%
+\IndexCmd{usesizeofkomafont}\IndexCmd{useencodingofkomafont}%
+\IndexCmd{usefamilyofkomafont}\IndexCmd{useseriesofkomafont}%
+\IndexCmd{useshapeofkomafont} instead of \Macro{usekomafont} (see
+\autoref{sec:maincls.textmarkup},
+\autopageref{desc:maincls.cmd.usefontofkomafont}).
+
+Nevertheless, command \Macro{usefontofkomafont} and it's siblings have some
+limitations. Therefore you must not use a command that always needs a fully
+expandable argument inside the font setting of an element. But this is exactly
+what \Macro{MakeUppercase}
+needs. Therefore\ChangedAt{v3.17}{\Class{scrbook}\and \Class{scrreprt}\and
+  \Class{scrartcl}} \KOMAScript{} holds a list of macros, which should become
+\Macro{relax} inside \Macro{usefontofkomafont} and it's siblings. Amongst
+others, \Macro{color}, \Macro{normalcolor}, \Macro{MakeUppercase}, and
+\Macro{MakeLowercase} are part of that list. More macros can be added one by
+one using \Macro{addtokomafontrelaxlist}.
+
+Note that \PName{macro} will be set simply to \Macro{relax}. So if
+\PName{macro} really has an argument, the argument will be execute
+locally. Therefore you must not add commands like \Macro{setlength} to the
+list. The user himself is responsible for all errors resulting in the usage of
+\Macro{addtokomafontrelaxlist}. Additionally this command should not be
+misunderstood as a legitimation for adding all kind of commands to the font
+setting of an element!%
+\EndIndex{Cmd}{addtokomafontrelaxlist}%
+
 
 \begin{Declaration}
   \Macro{IfExistskomafont}\Parameter{element}\Parameter{then code}%
@@ -1295,3 +1344,5 @@ as usual.%
 %%% coding: us-ascii
 %%% TeX-master: "../guide"
 %%% End: 
+
+%  LocalWords:  Amongst legitimation

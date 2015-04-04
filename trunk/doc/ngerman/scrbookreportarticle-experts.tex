@@ -310,6 +310,60 @@ würden. \KOMAScript{} selbst macht von dieser Möglichkeit reichen Gebrauch.
 
 
 \begin{Declaration}
+  \Macro{addtokomafontrelaxlist}\Parameter{Makro}
+\end{Declaration}
+\BeginIndex{Cmd}{addtokomafontrelaxlist}%
+Wie bereits in \autoref{part:forAuthors} der Anleitung erklärt, dürfen in den
+Schrifteinstellungen der Elemente nur Befehle zur Wahl der Größe, Familie,
+Codierung, Strichstärke, Form und Farbe enthalten sein. Dabei erfolgt schon
+die Änderung der Farbe bei \LaTeX{} nicht transparent und kann damit
+unerwünschte Effekte hervorrufen, wenn man \Macro{usekomafont} an ungünstiger
+Stelle verwendet. 
+
+Nun neigen Anwender dazu, in die Schrifteinstellungen auch ganz andere,
+teilweise sehr kritische Dinge zu packen, beispielsweise ein
+\Macro{MakeUppercase} ganz am Ende der Einstellung. Bei der internen
+Verwendung der Schrifteinstellungen wurde daher möglichst so vorgegangen, dass
+viele dieser eigentlich verbotenen Einstellungen trotzdem keinen Schaden
+anrichten und es meist sogar funktioniert, wenn der letzte Befehl in der
+Schrifteinstellung ein Argument erwartet, also beispielsweise \Macro{textbf}
+an Stelle von \Macro{bfseries} verwendet wird. Eine Garantie gibt es dafür
+jedoch nicht. 
+
+In Einzelfällen war es innerhalb von \KOMAScript{} notwendig, die Umschaltung
+wirklich auf Schrifteinstellungen zu beschränken. Dies erfolgt dann
+beispielsweise mit \Macro{usefontofkomafont}\IndexCmd{usefontofkomafont}%
+\IndexCmd{usesizeofkomafont}\IndexCmd{useencodingofkomafont}%
+\IndexCmd{usefamilyofkomafont}\IndexCmd{useseriesofkomafont}%
+\IndexCmd{useshapeofkomafont} statt \Macro{usekomafont} (siehe
+\autoref{sec:maincls.textmarkup},
+\autopageref{desc:maincls.cmd.usefontofkomafont}).
+
+Die Anweisung \Macro{usefontofkomafont} und ihre Geschwister haben allerdings
+ihre Grenzen. Daher darf die vermeintliche Schrifteinstellung eines Elements
+keinesfalls ein voll expandierbares Argument erwarten. Genau das ist aber
+beispielsweise bei \Macro{MakeUppercase} der
+Fall. Daher\ChangedAt{v3.17}{\Class{scrbook}\and \Class{scrreprt}\and
+  \Class{scrartcl}} verwaltet \KOMAScript{} eine interne Liste von Makros,
+die innerhalb von \Macro{usefontofkomafont} und ihren Geschwistern zu
+\Macro{relax} werden sollen. In der Voreinstellung sind das unter anderem:
+\Macro{color}, \Macro{normalcolor}, \Macro{MakeUppercase} und
+\Macro{MakeLowercase}. Weitere Anweisungen können mit
+\Macro{addtokomafontrelaxlist} einzeln hinzugefügt werden. 
+
+Es ist zu beachten, dass das angegebene \PName{Makro} wirklich stur auf
+\Macro{relax} gesetzt wird. Irgendwelche Argumente innerhalb der
+Schrifteinstellung werden also gegebenenfalls lokal ausgeführt. Daher dürfen
+Anweisungen wie \Macro{setlength} keinesfalls zu dieser Liste hinzugefügt
+werden. Für alle Fehler, die durch die Verwendung von
+\Macro{addtokomafontrelaxlist} entstehen, ist der Anwender selbst
+verantwortlich. Außerdem sollte diese Möglichkeit nicht als Legitimation dafür
+missverstanden werden, den Schrifteinstellungen alle möglichen Anweisungen
+hinzuzufügen!%
+\EndIndex{Cmd}{addtokomafontrelaxlist}%
+
+
+\begin{Declaration}
   \Macro{IfExistskomafont}\Parameter{Element}\Parameter{Dann-Code}%
   \Parameter{Sonst-Code}
 \end{Declaration}
@@ -1400,4 +1454,5 @@ Option \Option{bibliography}.
 %  LocalWords:  Teilüberschriften Benutzerfreundlichkeit Absatzmarkierung
 %  LocalWords:  umkonfiguriert Teileüberschrift Abschnittsüberschrift
 %  LocalWords:  Absolutwert Gliederungsbefehls Präfixzeile Schrifteinstellung
-%  LocalWords:  Zählername Spitzmarke Kolumnentitels
+%  LocalWords:  Zählername Spitzmarke Kolumnentitels Schrifteinstellungen
+%  LocalWords:  Strichstärke expandierbar expandierbaren expandierbares
