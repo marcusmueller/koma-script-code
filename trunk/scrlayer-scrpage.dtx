@@ -1,4 +1,4 @@
-% \CheckSum{2467}
+% \CheckSum{2440}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlayer-scrpage.dtx
@@ -603,98 +603,96 @@
 %    \begin{macrocode}
 %<*options>
 \KOMA@key{headtopline}[:]{%
-  \sls@set@values{head}{above}{#1}%
-  \KOMA@kav@xreplacevalue{.scrlayer-scrpage.sty}{headtopline}{%
-    \sls@headabove@linethickness:\sls@headabove@linelength%
-  }%
+  \sls@set@values[headtopline]{head}{above}{#1}%
 }
 \scrlayer@AddCsToInterface{KV@KOMA.scrlayer-scrpage.sty@headtopline}
 \scrlayer@AddCsToInterface{KV@KOMA.scrlayer-scrpage.sty@headtopline@default}
 \KOMA@key{headsepline}[:]{%
-  \sls@set@values{head}{below}{#1}%
-  \KOMA@kav@xreplacevalue{.scrlayer-scrpage.sty}{headsepline}{%
-    \sls@headbelow@linethickness:\sls@headbelow@linelength%
-  }%
+  \sls@set@values[headsepline]{head}{below}{#1}%
 }
 \scrlayer@AddCsToInterface{KV@KOMA.scrlayer-scrpage.sty@headsepline}
 \scrlayer@AddCsToInterface{KV@KOMA.scrlayer-scrpage.sty@headsepline@default}
 \KOMA@key{footsepline}[:]{%
-  \sls@set@values{foot}{above}{#1}%
-  \KOMA@kav@xreplacevalue{.scrlayer-scrpage.sty}{footsepline}{%
-    \sls@footabove@linethickness:\sls@footabove@linelength%
-  }%
+  \sls@set@values[footsepline]{foot}{above}{#1}%
 }
 \scrlayer@AddCsToInterface{KV@KOMA.scrlayer-scrpage.sty@footsepline}
 \scrlayer@AddCsToInterface{KV@KOMA.scrlayer-scrpage.sty@footsepline@default}
 \KOMA@key{footbotline}[:]{%
-  \sls@set@values{foot}{below}{#1}%
-  \KOMA@kav@xreplacevalue{.scrlayer-scrpage.sty}{footbotline}{%
-    \sls@footbelow@linethickness:\sls@footbelow@linelength%
-  }%
+  \sls@set@values[footbotline]{foot}{below}{#1}%
 }
 \scrlayer@AddCsToInterface{KV@KOMA.scrlayer-scrpage.sty@footbotline}
 \scrlayer@AddCsToInterface{KV@KOMA.scrlayer-scrpage.sty@footbotline@default}
 %    \end{macrocode}
 % \begin{macro}{\sls@set@values}
 %   \begin{description}
-%   \item[\Parameter{head or foot}:] either \texttt{head} or \texttt{foot}
-%   \item[\Parameter{above or below}:] either \texttt{above} or \texttt{below}
+%   \item[\OParameter{option name}:] either empty or the name of the option
+%     that sets the line,
+%   \item[\Parameter{head or foot}:] either \texttt{head} or \texttt{foot},
+%   \item[\Parameter{above or below}:] either \texttt{above} or
+%     \texttt{below},
 %   \item[\Parameter{dimension expression}\texttt{:}\Parameter{dimension
-%     expression}] length an thickness of a line (both are optional)
+%     expression}] length an thickness of a line (both are optional).
 %   \end{description}
 % Helper macros for the options to set two macros by two values of one
 % option. The two values are separated by a colon.
 %    \begin{macrocode}
 \scrlayerAddToInterface\sls@set@values{%
-  \newcommand*{\sls@set@values}[3]{%
+  \newcommand*{\sls@set@values}[4][]{%
     \begingroup
-      \let\reserved@a\@empty
-      \let\reserved@b\@empty
-      \ifstr{#3}{true}{\def\reserved@a{.4pt}\def\reserved@b{sls@#1width}}{%
-        \ifstr{#3}{yes}{\def\reserved@a{.4pt}\def\reserved@b{sls@#1width}}{%
-          \ifstr{#3}{on}{\def\reserved@a{.4pt}\def\reserved@b{sls@#1width}}{%
-            \ifstr{#3}{false}{\def\reserved@a{0pt}\def\reserved@b{0pt}}{%
-              \ifstr{#3}{no}{\def\reserved@a{0pt}\def\reserved@b{0pt}}{%
-                \ifstr{#3}{off}{\def\reserved@a{0pt}\def\reserved@b{0pt}}{%
-                }%
-              }%
+      \ifstr{#1}{}{%
+        \FamilyKeyStateUnknown
+      }{%
+        \KOMA@set@ifkey{#1}{@tempswa}{#4}%
+      }%
+      \ifx\FamilyKeyState\FamilyKeyStateProcessed
+        \if@tempswa
+          \edef\reserved@b{%
+            \noexpand\endgroup
+            \noexpand\@namedef{sls@#2#3@linethickness}{.4pt}%
+            \noexpand\@namedef{sls@#2#3@linelength}{%
+              \expandafter\noexpand\csname sls@#2width\endcsname
             }%
           }%
-        }%
-      }%
-      \ifx\reserved@a\@empty
-        \sls@split@at@colon#3::\@nil
+        \else
+          \def\reserved@b{%
+            \endgroup
+            \@namedef{sls@#2#3@linethickness}{0pt}%
+            \@namedef{sls@#2#3@linelength}{0pt}%
+          }%
+        \fi
+      \else
+        \let\reserved@a\@empty
+        \let\reserved@b\@empty
+        \sls@split@at@colon#4::\@nil
         \ifx\reserved@a\@empty
-          \def\reserved@a{\endgroup\@namedef{sls@#1#2@linethickness}{.4pt}}%
+          \def\reserved@a{\endgroup\@namedef{sls@#2#3@linethickness}{.4pt}}%
         \else
           \setlength{\@tempdima}{\dimexpr\reserved@a\relax}%
           \edef\reserved@a{%
             \noexpand\endgroup
-            \noexpand\@namedef{sls@#1#2@linethickness}{\the\@tempdima}%
+            \noexpand\@namedef{sls@#2#3@linethickness}{\the\@tempdima}%
           }%
         \fi
         \ifx\reserved@b\@empty
           \def\reserved@b{%
             \reserved@a
-            \@namedef{sls@#1#2@linelength}{\@nameuse{sls@#1width}}%
+            \@namedef{sls@#2#3@linelength}{\@nameuse{sls@#2width}}%
           }%
         \else
           \edef\reserved@b{%
             \noexpand\reserved@a
-            \noexpand\sls@deftowidthof{sls@#1#2@linelength}{\reserved@b}%
+            \noexpand\sls@deftowidthof{sls@#2#3@linelength}{\reserved@b}%
           }%
         \fi
-      \else
-        \edef\reserved@b{%
-          \noexpand\endgroup
-          \noexpand\@namedef{sls@#1#2@linethickness}{\reserved@a}%
-          \noexpand\@namedef{sls@#1#2@linelength}{%
-            \expandafter\noexpand\csname \reserved@b\endcsname
-          }%
-        }%
       \fi
     \reserved@b
     \FamilyKeyStateProcessed
+    \ifstr{#1}{}{}{%
+      \KOMA@kav@xreplacevalue{.scrlayer-scrpage.sty}{#1}{%
+        \csname sls@#2#3@linethickness\endcsname
+        :\csname sls@#2#3@linelength\endcsname
+      }%
+    }%
   }%
 }
 %    \end{macrocode}
