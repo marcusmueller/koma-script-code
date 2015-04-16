@@ -1,4 +1,4 @@
-% \CheckSum{680}
+% \CheckSum{760}
 % \iffalse meta-comment
 % ======================================================================
 % scrhack.dtx
@@ -77,6 +77,7 @@
 %<float&identify>\ProvidesFile{float.hak}[%
 %<floatrow&identify>\ProvidesFile{floatrow.hak}[%
 %<listings&identify>\ProvidesFile{listings.hak}[%
+%<setspace&identify>\ProvidesFile{setspace.hak}[%
 %<*driver|manual|identify>
 %!KOMAScriptVersion
   package
@@ -89,6 +90,7 @@
 %<float&identify>    float)%
 %<floatrow&identify>    floatrow)%
 %<listings&identify>    listings)%
+%<setspace&identify>    setspace)%
 %<*driver|manual|identify>
 ]
 %</driver|manual|identify>
@@ -127,6 +129,11 @@
       \from{scrhack.dtx}{trace,hack,listings,identify}%
       \from{scrhack.dtx}{trace,hack,listings,body}%
     }%
+    \file{setspace.hak}{%
+      \from{scrkernel-version.dtx}{trace,file,setspace.hak}%
+      \from{scrhack.dtx}{trace,hack,setspace,identify}%
+      \from{scrhack.dtx}{trace,hack,setspace,body}%
+    }%
   }
   \@@input scrstrop.inc
 \else
@@ -159,6 +166,7 @@
 % \let\Parameter\marg
 % \providecommand*{\PParameter}[1]{\texttt{\{#1\}}}
 % \providecommand*{\Counter}[1]{\texttt{\mbox{#1}}}
+% \providecommand*{\Option}[1]{\texttt{#1}}
 % \providecommand*{\OptionValue}[2]{\texttt{\mbox{#1=}\linebreak[3]\mbox{#2}}}
 % \let\PValue\texttt
 %
@@ -337,6 +345,34 @@ switch off the \Package{listings} hack using
 \Macro{KOMAoption}\PParameter{listings}\PParameter{false} somewhere after
 loading package \Package{scrhack}, but before loading package
 \Package{listings}.
+
+\section{The \Package{setspace} hack}
+\label{sec:scrhack.setspace}
+
+Package \Package{setspace} defines macros \Macro{onehalfspacing} and
+\Macro{doublespacing} using \Macro{@ptsize} as an argument of
+\Macro{ifcase}. But if \Macro{@ptsize} is not an integer but a real number,
+this failes, because the digits from the decimal points are interpreted as
+text of that case. Several solutions for this are thinkable. I've decides to
+redefine \Macro{onehalfspacing} and \Macro{doublespacing}. The new definition
+is more general and somehow more exact.
+
+% \iffalse
+\begin{Declaration}
+  \KOption{setspace}{switch}
+\end{Declaration}
+% \fi
+You can switch of the \Package{setspace} hack loading package
+\Package{scrhack} with option \OptionValue{setspace}{false}. You may also
+switch of the \Package{setspace} hack using
+\Macro{KOMAoptions}\PParameter{setspace=false} or
+\Macro{KOMAOption}\PParameter{setspace}\PParameter{false} somewhere after
+loading package \Package{scrhack}, but before loading package
+\Package{setspace}.
+
+Note: If you want to use \Package{setspace} with package option
+\Option{onehalfspacing} or \Option{doublespacing} you have to load
+\Package{scrhack} before \Package{setspace}.
 
 % \iffalse
 %</manual|dtx>
@@ -988,6 +1024,128 @@ loading package \Package{scrhack}, but before loading package
 % \end{macro}
 % \end{macro}
 %
+% \subsection{Der \textsf{setspace}-Hack}
+%
+% Das \textsf{setspace}-Paket verwendet \cs{@ptsize} auf ungünstige Art, indem
+% es davon ausgeht, dass es immer eine ganze Zahl enthält. Das ist aber bei
+% \KOMAScript{} keineswegs zwingend. Außerdem ist der Wert für \texttt{11pt}
+% falsch, weil \LaTeX{} in diesem Fall tatsächlich eine 10,95\,pt-Schrift mit
+% einem Zeilenabstand von 13,6\,pt einstellt. Damit wäre der korrekte Wert für
+% \cs{onehalfspacing} beispielsweise:
+% \[ 10{,}95\,\mathrm{pt} \dot 1{,5} / 13{,}6\,\mathrm{pt} \equiv 1{,}208 \]
+% Tatsächlich stellt \textsf{setspace} aber einen Wert von 1,213 ein, was
+% einer effektiven Schriftgröße von 11\,pt entsprechen würde. Ebenso stellt es
+% den aktuellen Abstand bei \cs{onehalfspacing} nicht relativ zur aktuellen
+% Schriftgröße ein, sondern zur Grundschriftgröße. Damit erhält man bei
+% \begin{verbatim}
+% \documentclass[10pt]{article}
+% \usepackage{setspace}
+% \begin{document}
+% \large\onehalfspacing\raggedright
+% Fontsize: \csname f@size\endcsname pt\\
+% Normal baselineskip: \csname f@baselineskip\endcsname\\
+% baselineskip: \the\baselineskip
+% \end{document}
+% \end{verbatim}
+% einen anderen Abstand als bei
+% \begin{verbatim}
+% \documentclass[11pt]{article}
+% \usepackage{setspace}
+% \begin{document}
+% \large\onehalfspacing\raggedright
+% Fontsize: \csname f@size\endcsname pt\\
+% Normal baselineskip: \csname f@baselineskip\endcsname\\
+% baselineskip: \the\baselineskip
+% \end{document}
+% \end{verbatim}
+% obwohl beide Male dieselbe Schriftgröße verwendet wird. Streng genommen
+% müsste also bei jeder Änderung der Schriftgröße der Wert Abstand angepasst
+% werden. So weit geht dieser Hack nicht. Stattdessen wird der Wert abhängig
+% von der tatsächlichen Schriftgröße und dem tatsächlichen Basisabstand beim
+% Aufruf der Anweisungen eingestellt. Das ergibt immerhin in den obigen
+% Beispielen gleiche Ergebnisse.
+%
+% \begin{option}{setspace}
+%   \changes{v3.17}{2015/04/16}{Neu}^^A
+%    \begin{macrocode}
+%<*package&option>
+\KOMA@ifkey{setspace}{@scrhack@setspace}
+\KOMAExecuteOptions{setspace=true}
+%</package&option>
+%<*package&body>
+\AfterPackage*{setspace}{%
+  \KOMA@key[.scrhack.sty]{setspace}{%
+    \PackageWarning{scrhack}{option `setspace' ignored}%
+    \FamilyKeyStateProcessed
+  }%
+  \if@scrhack@setspace\scr@hack@load\@pkgextension{setspace}\fi
+}
+%</package&body>
+%    \end{macrocode}
+% \end{option}
+%
+%
+% \begin{macro}{\onehalfspacing}
+%   \changes{v3.17}{2015/04/16}{Neu}^^A
+% Über diese Anweisung wird der eineinhalbzeilige Satz eingestellt. Ein auf
+% drei Nachkommastellen genauer Wert erscheint mir ausreichend genau.
+%    \begin{macrocode}
+%<*setspace&body>
+\scr@ifexpected{\onehalfspacing}{%
+  \long\def\onehalfspacing{%
+    \setstretch{1.25}%  default
+    \ifcase \@ptsize \relax % 10pt
+      \setstretch {1.25}%
+    \or % 11pt
+      \setstretch {1.213}%
+    \or % 12pt
+      \setstretch {1.241}%
+    \fi
+  }%
+}{%
+  \renewcommand*{\onehalfspacing}{%
+    \@tempdima=\dimexpr (\f@size pt)*1500/
+                        (\dimexpr \f@baselineskip\relax)*\p@/1000\relax
+    \expandafter\setstretch\expandafter{\strip@pt\@tempdima}%
+  }%
+}{%
+  \PackageWarning{scrhack}{unknown \string\onehalfspacing\space
+    definition found!\MessageBreak
+    Maybe you are using a unsupported setpace version}%
+}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\doublespacing}
+%   \changes{v3.17}{2015/04/16}{Neu}^^A
+% Über diese Anweisung wird der zweizeilige Satz eingestellt. Ein auf
+% drei Nachkommastellen genauer Wert erscheint mir ausreichend genau.
+%    \begin{macrocode}
+\scr@ifexpected{\doublespacing}{%
+  \long\def\doublespacing{%
+    \setstretch{1.667}%  default
+    \ifcase \@ptsize \relax % 10pt
+      \setstretch {1.667}%
+    \or % 11pt
+      \setstretch {1.618}%
+    \or % 12pt
+      \setstretch {1.655}%
+    \fi
+  }%
+}{%
+  \renewcommand*{\doublespacing}{%
+    \@tempdima=\dimexpr (\f@size pt)*2000/
+                        (\dimexpr \f@baselineskip\relax)*\p@/1000\relax
+    \expandafter\setstretch\expandafter{\strip@pt\@tempdima}%
+  }%
+}{%
+  \PackageWarning{scrhack}{unknown \string\doublespacing\space
+    definition found!\MessageBreak
+    Maybe you are using a unsupported setpace version}%
+}
+%</setspace&body>
+%    \end{macrocode}
+% \end{macro}
+%
 %
 % \subsection{Optionen ausführen}
 %
@@ -1008,6 +1166,10 @@ loading package \Package{scrhack}, but before loading package
 % end of file `scrhack.dtx'
 %%% Local Variables:
 %%% mode: doctex
+%%% mode: flyspell
 %%% coding: iso-latin-1
+%%% ispell-local-dictionary: "en_GB"
 %%% TeX-master:
 %%% End:
+
+%  LocalWords:  eineinhalbzeilige
