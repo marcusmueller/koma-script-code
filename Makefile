@@ -108,6 +108,7 @@ CLS_MAIN	= scrbook.cls \
 		  floatrow.hak \
 		  hyperref.hak \
 		  listings.hak \
+		  setspace.hak \
 		  scrfontsizes.sty \
 		  visualize.lco \
 	          DIN.lco \
