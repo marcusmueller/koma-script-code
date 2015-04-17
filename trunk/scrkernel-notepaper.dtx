@@ -1,4 +1,4 @@
-% \CheckSum{3360}
+% \CheckSum{3365}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-notepaper.dtx
@@ -2010,11 +2010,11 @@
 % Ausserdem wird ein vertikales Äquivalent zu |\rlap| benötigt.
 %    \begin{macrocode}
 \newcommand{\vb@t@z}[1]{{%
-    \setbox0\vbox to\z@{#1\vss}%
+    \setbox\z@\vbox to\z@{#1\vss}%
     \setparsizes{\z@}{\z@}{\z@ plus 1fil}\par@updaterelative
     \setlength{\baselineskip}{\z@}%
     \setlength{\@tempdima}{\ht0}\addtolength{\@tempdima}{\dp0}%
-    \box0\vskip-\@tempdima%
+    \box\z@\vskip-\@tempdima%
   }%
 }
 %    \end{macrocode}
@@ -2166,7 +2166,7 @@
   \begingroup%
     \vbox to #2{#1#3}%
     \if@savevbox@warning\@savevbox@warningfalse%
-      \setbox0\vbox{#3}%
+      \setbox\z@\vbox{#3}%
       \setlength{\@tempdima}{#2}%
       \setlength{\@tempdimb}{\ht0}\addtolength{\@tempdimb}{\dp0}%
       \ifdim \@tempdimb>\@tempdima%
@@ -2494,7 +2494,10 @@
                 \vbox to \dimexpr \useplength{PPheadheight}-2\fboxsep\relax{%
                   \setlength{\parindent}{0pt}%
                   \hsize \dimexpr \useplength{PPheadwidth}-2\fboxsep\relax
-                  \setbox\@tempboxa\hbox{%
+%    \end{macrocode}
+%   \changes{3.17}{2015/04/17}{\cs{setbox} durch \cs{sbox} ersetzt}
+%    \begin{macrocode}
+                  \sbox\@tempboxa{%
                     {\fontsize{20.74pt}{20.74pt}\selectfont
                       \usekomafont{PPlogo}{P.P.}}\hskip 2mm%
                   }%
@@ -2875,6 +2878,7 @@
 \newcommand*{\do@set@reffield}{}
 %    \end{macrocode}
 % \begin{macro}{\@set@reffield}
+%   \changes{v3.17}{2015/04/17}{\cs{setbox} durch \cs{sbox} ersetzt}
 % Einzelne Felder werden mit Hilfe dieses Makros gesetzt. Als Parameter wird
 % der Name des Feldes übergeben. Es wird dann davon ausgegangen, dass der
 % Name des Feldes in der jeweiligen Sprache im Makro
@@ -2884,11 +2888,11 @@
 \newcommand*{\@set@reffield}[1]{%
   \ifkomavarempty{#1}{}{%
     \settowidth{\@tempdima}{\strut\usekomafont{refvalue}\usekomavar{#1}}%
-    \setbox0\hbox{\strut\usekomafont{refname}\usekomavar*{#1}}%
+    \sbox\z@{\strut\usekomafont{refname}\usekomavar*{#1}}%
     \ifdim \@tempdima<\wd0\setlength{\@tempdima}{\wd0}\fi
     \if@tempswa\enskip\hfill\fi
     \parbox[t]{\@tempdima}{\noindent\raggedright
-        \strut\box0\\\usekomafont{refvalue}\strut\usekomavar{#1}}%
+        \strut\box\z@\\\usekomafont{refvalue}\strut\usekomavar{#1}}%
     \@tempswatrue
   }%
 }
@@ -3058,16 +3062,17 @@
 %    \end{macrocode}
 % Seit Version~2.97c wird hier auch noch getestet, ob die Geschäftszeile
 % möglicherweise mit zu großer Schrift gesetzt wird.
+%   \changes{v3.17}{2015/04/17}{\cs{setbox} durch \cs{sbox} ersetzt}
 %    \begin{macrocode}
-            \setbox0\hbox{\usekomafont{refname}\strutbox}%
-            \ifdim\ht0>\ht\strutbox
+            \sbox\z@{\usekomafont{refname}\strutbox}%
+            \ifdim\ht\z@>\ht\strutbox
 %<class>              \ClassWarningNoLine{scrlttr2}{%
 %<package>              \PackageWarningNoLine{scrletter}{%
                 Font element `refname' should not be larger than
                 \string\normalsize!}%
             \fi
-            \setbox0\hbox{\usekomafont{refvalue}\strutbox}%
-            \ifdim\ht0>\ht\strutbox
+            \sbox\z@{\usekomafont{refvalue}\strutbox}%
+            \ifdim\ht\z@>\ht\strutbox
 %<class>              \ClassWarningNoLine{scrlttr2}{%
 %<package>              \PackageWarningNoLine{scrletter}{%
                 Font element `refvalue' should not be larger than
