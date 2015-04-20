@@ -1,4 +1,4 @@
-% \CheckSum{3665}
+% \CheckSum{3673}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -2481,6 +2481,8 @@
 %     Argument der Gliederungsbefehle}^^A
 %   \changes{v3.10}{2011/08/30}{Wenn \cs{partmark} \cs{@gobble} ist, wird
 %     \cs{@mkboth}{}{} aufgerufen.}^^A
+%   \changes{v3.17}{2015/04/20}{Es wird \cs{addpartmark} verwendet und auch
+%     nie \cs{@mkboth}{}{} aufgerufen.}^^A
 % \begin{macro}{\@saddpart}
 %   \changes{v2.8c}{2001/06/29}{neu (intern)}^^A
 %    \begin{macrocode}
@@ -2538,15 +2540,15 @@
       \scr@ds@tocentry}%
   \fi
   \@spart{#2}%
-  \ifx\partmark\@gobble
-    \@mkboth{}{}%
-  \else
-    \expandafter\@mkboth\expandafter{%
-      \expandafter\MakeMarkcase\expandafter{\scr@ds@head}}{}%
-  \fi
+  \expandafter\addpartmark\expandafter{\scr@ds@head}%
 }
+%    \end{macrocode}
+% Da bereits \cs{@spart} den Kolumnentitel mit \cs{@mkboth} löscht, brauchen
+% wir hier im Gegensatz zu \cs{@saddchap} das nicht auch noch zu erledigen.
+%    \begin{macrocode}
 \newcommand*{\@saddpart}{\@spart}
 %    \end{macrocode}
+%
 % \begin{macro}{\partmark}
 %   \changes{v2.9r}{2004/07/20}{neu (für \textsf{scrpage2})}^^A
 %    \begin{macrocode}
@@ -2554,6 +2556,25 @@
 \let\partmark\@gobble
 %    \end{macrocode}
 % \end{macro}^^A \partmark
+
+% \begin{macro}{\addpartmark}
+%   \changes{v3.17}{2015/04/20}{neue Anweisung}^^A
+% Analog zu \cs{addchapmark} für \cs{addpart}. Auch dabei gilt, dass
+% \cs{if@mainmatter} hier auch von \textsf{scrreprt} definiert wird. Das ist
+% Absicht und vereinfacht dem einen oder anderen Paket oder Benutzer
+% vielleicht die Arbeit.
+%    \begin{macrocode}
+\newcommand*\addpartmark[1]{%
+  \begingroup
+    \expandafter\let\csname if@mainmatter\expandafter\endcsname
+    \csname iffalse\endcsname
+    \c@secnumdepth=-2
+    \partmark{#1}%
+  \endgroup
+}
+%    \end{macrocode}
+% \end{macro}^^A \addpartmark
+%
 % \end{macro}^^A \@saddpart
 % \end{macro}^^A \@addpart
 % \end{macro}^^A \addpart
@@ -3384,6 +3405,8 @@
 % wird, dass ein korrekter Link erzeugt wird.
 % \begin{macro}{\@addchap}
 %   \changes{v3.12}{2013/02/26}{Verwendung von \cs{addchapmark}}^^A
+%   \changes{v3.17}{2015/04/20}{\cs{scr@ds@head} in \cs{addchapmark}
+%     expandieren}^^A
 % \begin{macro}{\@saddchap}
 %   \changes{v3.12}{2013/02/26}{Verwendung von \cs{addchapmark}}^^A
 %    \begin{macrocode}
@@ -3431,7 +3454,7 @@
       }%
     \fi
   \fi
-  \addchapmark{\scr@ds@head}%
+  \expandafter\addchapmark\expandafter{\scr@ds@head}%
 }%
 \newcommand*{\@saddchap}[1]{\@schapter{#1}\addchapmark{}}%
 %    \end{macrocode}
@@ -3925,6 +3948,8 @@
 %   \changes{v3.12}{2013/02/26}{Verwendung von \cs{addsecmark}}^^A
 % \begin{macro}{\@saddsec}
 %   \changes{v3.12}{2013/02/26}{Verwendung von \cs{addsecmark}}^^A
+%   \changes{v3.17}{2015/04/20}{\cs{scr@ds@head} in \cs{addsecmark}
+%     expandieren}^^A
 % \KOMAScript{} bietet in allen drei Hauptklassen den zusätzlichen
 % Gliederungsbefehl \cs{addsec}. Es handelt sich dabei um einen mit
 % \cs{section*} vergleichbaren Befehl, bei dem jedoch der
@@ -3956,7 +3981,7 @@
   \ifx\scr@ds@tocentry\@empty\else
     \addsectiontocentry{}{\scr@ds@tocentry}%
   \fi
-  \addsecmark{\scr@ds@head}%
+  \expandafter\addsecmark\expandafter{\scr@ds@head}%
 }
 \newcommand*{\@saddsec}[1]{\section*{#1}\addsecmark{}}
 %    \end{macrocode}
