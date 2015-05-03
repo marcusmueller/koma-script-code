@@ -1,4 +1,4 @@
-% \CheckSum{2588}
+% \CheckSum{2591}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-typearea.dtx
@@ -953,10 +953,12 @@
 % \begin{option}{pagesize}
 %   \changes{v2.7g}{2001/04/17}{neue Option}^^A
 %   \changes{v2.95}{2002/08/27}{neu implementiert}^^A
-%   \changes{v3.02c}{2009/02/14}{neuer Wert \texttt{false}}
-%   \changes{v3.05a}{2010/03/18}{neuer Wert \texttt{dvipdfmx}}
+%   \changes{v3.02c}{2009/02/14}{neuer Wert \texttt{false}}^^A
+%   \changes{v3.05a}{2010/03/18}{neuer Wert \texttt{dvipdfmx}}^^A
 %   \changes{v3.12}{2013/03/05}{Verwendung der Status-Signalisierung mit
-%     \cs{FamilyKeyState}}
+%     \cs{FamilyKeyState}}^^A
+%   \changes{v3.17a}{2015/05/03}{\cs{endgroup} falls \cs{@tempa} kleiner 0
+%     oder größer 4}^^A
 % Diese Option ist nun das zentrale Element für die Übermittlung der
 % Seitengröße an pdf\TeX, \texttt{dvips} oder V\TeX. Sie wird auch von
 % den obsoleten Optionen verwendet. Die Werte und ihre Bedeutung:
@@ -986,26 +988,22 @@
       {auto}{0},{automedia}{1},{dvips}{2},{pdftex}{3},{dvipdfmx}{4}%
     }{#1}%
     \ifx\FamilyKeyState\FamilyKeyStateProcessed
-      \aftergroup\FamilyKeyStateProcessed
       \ifcase\number\@tempa\relax
-        \endgroup
-        \set@pdftexpagesize
-        \set@dvipspagesize
+        \aftergroup\set@pdftexpagesize
+        \aftergroup\set@dvipspagesize
       \or
-        \endgroup
-        \set@pdftexpagesize
-        \set@vtexpagesize
-        \set@dvipspagesize
+        \aftergroup\set@pdftexpagesize
+        \aftergroup\set@vtexpagesize
+        \aftergroup\set@dvipspagesize
       \or
-        \endgroup
-        \set@dvipspagesize
+        \aftergroup\set@dvipspagesize
       \or
-        \endgroup
-        \set@pdftexpagesize
+        \aftergroup\set@pdftexpagesize
       \or
-        \endgroup
-        \set@dvipdfmxpagesize
-    \fi
+        \aftergroup\set@dvipdfmxpagesize
+      \fi
+    \endgroup
+    \FamilyKeyStateProcessed
     \KOMA@kav@xreplacevalue{.typearea.\scr@pkgextension}{pagesize}{#1}%
     \edef\@pagesizelast{#1}%
   \else
