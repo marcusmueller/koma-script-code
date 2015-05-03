@@ -1,4 +1,4 @@
-% \CheckSum{2591}
+% \CheckSum{2578}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-typearea.dtx
@@ -957,8 +957,7 @@
 %   \changes{v3.05a}{2010/03/18}{neuer Wert \texttt{dvipdfmx}}^^A
 %   \changes{v3.12}{2013/03/05}{Verwendung der Status-Signalisierung mit
 %     \cs{FamilyKeyState}}^^A
-%   \changes{v3.17a}{2015/05/03}{\cs{endgroup} falls \cs{@tempa} kleiner 0
-%     oder größer 4}^^A
+%   \changes{v3.17a}{2015/05/03}{Logik komplett neu geschrieben}^^A
 % Diese Option ist nun das zentrale Element für die Übermittlung der
 % Seitengröße an pdf\TeX, \texttt{dvips} oder V\TeX. Sie wird auch von
 % den obsoleten Optionen verwendet. Die Werte und ihre Bedeutung:
@@ -982,36 +981,58 @@
 %    \begin{macrocode} 
 %<*package>
 \KOMA@key{pagesize}[auto]{%
-  \begingroup
-    \KOMA@set@ncmdkey{pagesize}{@tempa}{%
-      {off}{-1},{no}{-1},{false}{-1},%
-      {auto}{0},{automedia}{1},{dvips}{2},{pdftex}{3},{dvipdfmx}{4}%
-    }{#1}%
-    \ifx\FamilyKeyState\FamilyKeyStateProcessed
-      \ifcase\number\@tempa\relax
-        \aftergroup\set@pdftexpagesize
-        \aftergroup\set@dvipspagesize
-      \or
-        \aftergroup\set@pdftexpagesize
-        \aftergroup\set@vtexpagesize
-        \aftergroup\set@dvipspagesize
-      \or
-        \aftergroup\set@dvipspagesize
-      \or
-        \aftergroup\set@pdftexpagesize
-      \or
-        \aftergroup\set@dvipdfmxpagesize
+  \KOMA@set@ncmdkey{pagesize}{@pagesizelast}{%
+    {off}{-1},{no}{-1},{false}{-1},%
+    {auto}{0},{automedia}{1},{dvips}{2},{pdftex}{3},{dvipdfmx}{4}%
+  }{#1}%
+  \ifx\FamilyKeyState\FamilyKeyStateProcessed
+    \ifcase\number\@pagesizelast\relax
+      \edef\@pagesizelast{auto}%
+      \if@atdocument
+        \set@pdftexpagesize
+        \set@dvipspagesize
       \fi
-    \endgroup
-    \FamilyKeyStateProcessed
-    \KOMA@kav@xreplacevalue{.typearea.\scr@pkgextension}{pagesize}{#1}%
-    \edef\@pagesizelast{#1}%
-  \else
-    \endgroup
-    \FamilyKeyStateUnknownValue
+    \or
+      \edef\@pagesizelast{automedia}%
+      \if@atdocument
+        \set@pdftextpagesize
+        \set@vtexpagesize
+        \set@dvipspagesize
+      \fi
+    \or
+      \edef\@pagesizelast{dvips}%
+      \if@atdocument
+        \set@dvipspagesize
+      \fi
+    \or
+      \edef\@pagesizelast{pdftex}%
+      \if@atdocument
+        \set@pdftexpagesize
+      \fi
+    \or
+      \edef\@pagesizelast{dvipdfmx}%
+      \if@atdocument
+        \set@dvipdfmxpagesize
+      \fi
+    \else
+      \edef\@pagesizelast{false}%
+    \fi
+    \KOMA@kav@xreplacevalue{.typearea.\scr@pkgextension}%
+                           {pagesize}{\@pagesizelast}%
   \fi
 }
 %    \end{macrocode}
+% \begin{macro}{\@pagesizelast}
+% Das interne Makro speichert die aktuelle Einstellung von \texttt{pagesize}
+% und wird nicht nur für das neu Setzen derselben in Option \texttt{paper},
+% sondern auch für die Parametereinstellung innerhalb von
+% \texttt{\cs{begin}\{document\}}.
+%    \begin{macrocode}
+\newcommand\@pagesizelast{auto}
+\AtBeginDocument{%
+  \KOMAExecuteOptions[.typearea.\scr@pkgextension]{pagesize=\@pagesizelast}%
+%    \end{macrocode}
+% \end{macro}^^A \@pagesizelast
 %
 % \begin{macro}{\set@pdftexpagesize}
 %   \changes{v2.95}{2002/08/27}{neu (intern)}^^A
@@ -1036,86 +1057,11 @@
 % \begin{description}
 % \item{Achtung:} die Definition dieser Makros ändert sich teilweise
 %   bei ihrem Aufruf und insgesamt bei
-%   \texttt{\cs{begin}\{document\}}. 
+%   \texttt{\cs{begin}\{document\}}.
 % \end{description}
+% Hier zunächst ihre ggf. geänderte Definition nach
+% \texttt{\cs{begin}\{document\}}:
 %    \begin{macrocode}
-\newcommand{\set@pdftexpagesize}{%
-  \AtBeginDocument{%
-    \ifnotundefined{pdfpagewidth}{\pdfpagewidth=\paperwidth}{}%
-    \ifnotundefined{pdfpageheight}{\pdfpageheight=\paperheight}{}%
-  }%
-  \let\set@pdftexpagesize=\@empty
-}
-\newcommand{\set@dvipspagesize}{%
-  \begingroup
-    \@tempswafalse
-    \scr@ifdvioutput{\@tempswatrue}{%
-      \ifnotundefined{if@dvips}{%
-        \expandafter\let\csname if@tempswa\expandafter\endcsname
-        \csname if@dvips\endcsname
-      }{}%
-    }%
-    \if@tempswa
-      \endgroup
-      \AtBeginDocument{\AtBeginDvi{%
-          \special{papersize=\the\paperwidth,\the\paperheight}%
-          \if@seascape\special{! TeXDict begin /landplus90{true}store end }\fi
-        }%
-      }%
-      \expandafter\ifnum\scr@ta@v@is@gt{3.02b}\relax
-        \let\set@dvipspagesize=\@empty
-      \else
-        \let\set@dvipspagesize=\setnot@dvipspagesize
-      \fi
-    \else
-      \endgroup
-  \fi
-}
-\newcommand{\setnot@dvipspagesize}{%
-  \scr@ifdvioutput{%
-    \PackageWarning{%
-      typearea%
-    }{%
-      With dvi output option `pagesize=auto',\MessageBreak
-      `pagesize=automedia' or `pagesize=dvips'\MessageBreak
-      may be used only once at preamble.\MessageBreak
-      Option ignored%
-    }%
-  }{}%
-}
-\newcommand*{\set@dvipdfmxpagesize}{%
-  \scr@ifdvioutput{%
-    \AtBeginDocument{\AtBeginDvi{%
-        \special{papersize=\the\paperwidth,\the\paperheight}%
-      }%
-    }%
-  }{}%
-}
-\newcommand{\set@vtexpagesize}{%
-  \AtBeginDocument{%
-    \ifnotundefined{mediawith}{\mediawidth=\paperwidth}{}%
-    \ifnotundefined{mediaheight}{\mediaheight=\paperheight}{}%
-  }%
-  \let\set@vtexpagesize=\@empty
-}
-\newcommand*{\scr@updatedvipspagesize}{%
-  \scr@ifundefinedorrelax{XeTeXversion}{%
-    \special{ps::\@percentchar\@percentchar 
-      PageBoundingBox: 0 0 \the\numexpr\paperwidth/\dimexpr 1bp\relax\relax
-      \space \the\numexpr\paperheight/\dimexpr 1bp\relax\relax^^J%
-      \@percentchar\@percentchar BeginPageSetup^^J%
-      << /PageSize [\the\numexpr\paperwidth/\dimexpr 1bp\relax\relax\space
-      \the\numexpr\paperheight/\dimexpr 1bp\relax\relax] 
-      >> setpagedevice^^J%<<
-      0 0 bop^^J%
-      \@percentchar\@percentchar EndPageSetup}%
-  }{}%
-}
-\AtBeginDocument{%
-  \renewcommand*{\set@pdftexpagesize}{%
-    \ifnotundefined{pdfpagewidth}{\pdfpagewidth=\paperwidth}{}%
-    \ifnotundefined{pdfpageheight}{\pdfpageheight=\paperheight}{}%
-  }%
   \expandafter\ifnum\scr@ta@v@is@gt{3.02b}\relax
     \renewcommand*{\set@dvipspagesize}{%
 %    \end{macrocode}
@@ -1206,10 +1152,75 @@
       \special{papersize=\the\paperwidth,\the\paperheight}%
     }{}%
   }%
-  \renewcommand*{\set@vtexpagesize}{%
-    \ifnotundefined{mediawith}{\mediawidth=\paperwidth}{}%
-    \ifnotundefined{mediaheight}{\mediaheight=\paperheight}{}%
-  }%
+}
+%    \end{macrocode}
+% Und jetzt die Definitionen bevor \texttt{\cs{begin}\{document\}}, die
+% allerdings erst innerhalb von \texttt{\cs{begin}\{document\}} das erste Mal
+% ausgeführt werden:
+%    \begin{macrocode}
+\newcommand{\set@pdftexpagesize}{%
+  \ifnotundefined{pdfpagewidth}{\pdfpagewidth=\paperwidth}{}%
+  \ifnotundefined{pdfpageheight}{\pdfpageheight=\paperheight}{}%
+}
+\newcommand{\set@dvipspagesize}{%
+  \begingroup
+    \@tempswafalse
+    \scr@ifdvioutput{\@tempswatrue}{%
+      \ifnotundefined{if@dvips}{%
+        \expandafter\let\csname if@tempswa\expandafter\endcsname
+        \csname if@dvips\endcsname
+      }{}%
+    }%
+    \if@tempswa
+      \endgroup
+      \AtBeginDvi{%
+        \special{papersize=\the\paperwidth,\the\paperheight}%
+        \if@seascape\special{! TeXDict begin /landplus90{true}store end }\fi
+      }%
+      \expandafter\ifnum\scr@ta@v@is@gt{3.02b}\relax
+        \let\set@dvipspagesize=\@empty
+      \else
+        \let\set@dvipspagesize=\setnot@dvipspagesize
+      \fi
+    \else
+    \endgroup
+  \fi
+}
+\newcommand{\setnot@dvipspagesize}{%
+  \scr@ifdvioutput{%
+    \PackageWarning{%
+      typearea%
+    }{%
+      With dvi output option `pagesize=auto',\MessageBreak
+      `pagesize=automedia' or `pagesize=dvips'\MessageBreak
+      may be used only once at preamble.\MessageBreak
+      Option ignored%
+    }%
+  }{}%
+}
+\newcommand*{\set@dvipdfmxpagesize}{%
+  \scr@ifdvioutput{%
+    \AtBeginDvi{%
+      \special{papersize=\the\paperwidth,\the\paperheight}%
+    }%
+  }{}%
+}
+\newcommand{\set@vtexpagesize}{%
+  \ifnotundefined{mediawith}{\mediawidth=\paperwidth}{}%
+  \ifnotundefined{mediaheight}{\mediaheight=\paperheight}{}%
+}
+\newcommand*{\scr@updatedvipspagesize}{%
+  \scr@ifundefinedorrelax{XeTeXversion}{%
+    \special{ps::\@percentchar\@percentchar 
+      PageBoundingBox: 0 0 \the\numexpr\paperwidth/\dimexpr 1bp\relax\relax
+      \space \the\numexpr\paperheight/\dimexpr 1bp\relax\relax^^J%
+      \@percentchar\@percentchar BeginPageSetup^^J%
+      << /PageSize [\the\numexpr\paperwidth/\dimexpr 1bp\relax\relax\space
+      \the\numexpr\paperheight/\dimexpr 1bp\relax\relax] 
+      >> setpagedevice^^J%<<
+      0 0 bop^^J%
+      \@percentchar\@percentchar EndPageSetup}%
+  }{}%
 }
 %    \end{macrocode}
 % \end{macro}
