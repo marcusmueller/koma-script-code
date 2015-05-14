@@ -1,4 +1,4 @@
-% \CheckSum{3683}
+% \CheckSum{3707}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlayer.dtx
@@ -2559,6 +2559,7 @@
 % \end{macro}^^A \scrlayer@declare@ps@by@layers
 %
 % \begin{macro}{\ForEachLayerOfPageStyle}
+%   \changes{v3.18}{2015/05/14}{star version of the command}^^A
 %   \begin{description}
 %   \item[\Parameter{string}:] a valid page style (must be fully expandable
 %     and expand to the name of a existing page style); note, that currently
@@ -2568,15 +2569,31 @@
 %   \end{description}
 % Do the given \meta{code} for each layer of the page style
 % \meta{string}. Note, that the expansion of \meta{code} will be done inside
-% a group.
+% a group. There's also a star version of the command, that delays execution
+% of \meta{code} after the end of the group.
 %    \begin{macrocode}
 %<*package&body>
-\newcommand*{\ForEachLayerOfPageStyle}[2]{%
+\newcommand*{\ForEachLayerOfPageStyle}{%
+  \@ifstar {\@s@ForEachLayerOfPageStyle}{\@ForEachLayerOfPageStyle}%
+}
+\newcommand*{\@ForEachLayerOfPageStyle}[2]{%
   \begingroup
     \edef\reserved@a{\GetRealPageStyle{#1}}%
     \def\@elt##1{\ifscrlayer@deactivate@layers\else #2\fi}%
     \@nameuse{@ps@\reserved@a @layers}%
   \endgroup
+}
+\newcommand*{\@s@ForEachLayerOfPageStyle}[2]{%
+  \begingroup
+    \edef\reserved@a{\GetRealPageStyle{#1}}%
+    \def\reserved@b{\endgroup}%
+    \def\@elt##1{%
+      \l@addto@macro\reserved@b{%
+        \ifscrlayer@deactivate@layers\else #2\fi
+      }%
+    }%
+    \@nameuse{@ps@\reserved@a @layers}%
+  \reserved@b
 }
 %</package&body>
 %    \end{macrocode}
