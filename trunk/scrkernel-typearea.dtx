@@ -1,4 +1,4 @@
-% \CheckSum{2578}
+% \CheckSum{2622}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-typearea.dtx
@@ -2142,7 +2142,9 @@
 % \end{macro}
 %
 % \begin{macro}{\storeareas}
-%   \changes{v3.10}{2011/09/13}{neue Anweisung}%
+%   \changes{v3.10}{2011/09/13}{neue Anweisung}^^A
+%   \changes{v3.18}{2015/05/20}{Hooks am Anfang und Ende der erzeugten
+%     Anweisungen}^^A
 %   Die aktuellen Einstellungen können in einem Makro gespeichert
 %   werden. Dieses Makro kann anschließend genutzt werden, um die
 %   Einstellungen wieder her zu stellen.
@@ -2166,6 +2168,9 @@
   \edef\reserved@a{%
     \noexpand\newcommand*{\unexpanded{#1}}{%
       \noexpand\scr@grouplevel@test\unexpanded{#1}%
+      \noexpand\csname scr@storeareas@before@hook\noexpand\endcsname
+      \unexpanded\expandafter\expandafter\expandafter{%
+        \csname scr@storeareas@before@current@hook\endcsname}%
       \noexpand\paperheight=\the\paperheight\space
       \noexpand\paperwidth=\the\paperwidth\space
       \noexpand\topmargin=\the\topmargin\space
@@ -2199,13 +2204,56 @@
         \unexpanded\expandafter\expandafter\expandafter{%
           \csname scr@kav@KOMA.typearea.\scr@pkgextension\endcsname}%
       }%
+      \unexpanded\expandafter\expandafter\expandafter{%
+        \csname scr@storeareas@after@current@hook\endcsname}%
+      \noexpand\csname scr@storeareas@after@hook\noexpand\endcsname
     }%
   }%
   \reserved@a
 }
 %    \end{macrocode}
-% \end{macro}
-% \end{macro}
+% \begin{macro}{\BeforeRestoreareas}
+%   \changes{v3.18}{2015/05/20}{neue Anweisung}^^A
+% \begin{macro}{\AfterRestoreareas}
+%   \changes{v3.18}{2015/05/20}{neue Anweisung}^^A
+% \begin{macro}{\scr@storeareashook}
+%   \changes{v3.18}{2015/05/20}{neue Anweisung (intern)}^^A
+% \begin{macro}{\scr@storeareas@before@hook}
+%   \changes{v3.18}{2015/05/20}{neue Anweisung (intern)}^^A
+% \begin{macro}{\scr@storeareas@before@current@hook}
+%   \changes{v3.18}{2015/05/20}{neue Anweisung (intern)}^^A
+% \begin{macro}{\scr@storeareas@after@hook}
+%   \changes{v3.18}{2015/05/20}{neue Anweisung (intern)}^^A
+% \begin{macro}{\scr@storeareas@after@current@hook}
+%   \changes{v3.18}{2015/05/20}{neue Anweisung (intern)}^^A
+% Fügt Code einem Haken für die per \cs{storeareas} definierten Anweisungen
+% hinzu. Der Code der Sternversion wird dabei nur für noch nicht definierte
+% Anweisungen verwendet, während der Code der Version ohne Stern auch für
+% bereits definierte Anweisungen gilt.
+%    \begin{macrocode}
+\newcommand*{\BeforeRestoreareas}{%
+  \@ifstar{\scr@storeareashook{before@current}}{\scr@storeareashook{before}}%
+}
+\newcommand*{\AfterRestoreareas}{%
+  \@ifstar{\scr@storeareashook{after@current}}{\scr@storeareashook{after}}%
+}
+\newcommand*{\scr@storeareashook}[2]{%
+  \expandafter\l@addto@macro\csname scr@storeareas@#1@hook\endcsname{#2}%
+}
+\newcommand*{\scr@storeareas@before@hook}{}
+\newcommand*{\scr@storeareas@before@current@hook}{}
+\newcommand*{\scr@storeareas@after@hook}{}
+\newcommand*{\scr@storeareas@after@current@hook}{}
+%    \end{macrocode}
+% \end{macro}^^A \scr@storeareas@after@current@hook
+% \end{macro}^^A \scr@storeareas@after@hook
+% \end{macro}^^A \scr@storeareas@before@current@hook
+% \end{macro}^^A \scr@storeareas@before@hook
+% \end{macro}^^A \scr@storeareashook
+% \end{macro}^^A \AfterRestoreareas
+% \end{macro}^^A \BeforeRestoreareas
+% \end{macro}^^A \scr@grouplevel@test
+% \end{macro}^^A \storeareas
 %
 % \begin{macro}{\ta@divfor}
 % Der Standardseitenspiegel ist abhängig von den mit \cs{SetDIVList}
