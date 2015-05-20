@@ -1,4 +1,4 @@
-% \CheckSum{3673}
+% \CheckSum{3776}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -500,6 +500,7 @@
 %     der Erweiterung für das optionale Argument}^^A
 % \begin{macro}{\scr@startsection}
 %   \changes{v3.13a}{2014/09/11}{Neue interne Anweisung}^^A
+%   \changes{v3.18}{2015/05/20}{verwende \cs{dimexpr} für Argument 4}
 % \begin{macro}{\scr@saved@startsection}
 %   \changes{v3.13a}{2014/09/11}{Neue interne Anweisung}^^A
 % \KOMAScript{} benötigt ein eigenes \cs{@startsection}, weil die
@@ -530,7 +531,7 @@
   \newcommand*{\scr@startsection}[6]{%
     \if@noskipsec \leavevmode \fi
     \par
-    \@tempskipa #4\relax
+    \@tempskipa \dimexpr #4\relax
     \@afterindenttrue
     \ifdim \@tempskipa <\z@
       \@tempskipa -\@tempskipa \@afterindentfalse
@@ -542,9 +543,10 @@
       \addpenalty\@secpenalty\addvspace\@tempskipa
     \fi
     \@ifstar
-      {\csname scr@preto@ssect@hook\endcsname\@ssect{#3}{#4}{#5}{#6}}%
+      {\csname scr@preto@ssect@hook\endcsname
+        \@ssect{#3}{\dimexpr #4\relax}{#5}{#6}}%
       {\csname scr@preto@sect@hook\endcsname
-        \scr@section@dblarg{\@sect{#1}{#2}{#3}{#4}{#5}{#6}}}%
+        \scr@section@dblarg{\@sect{#1}{#2}{#3}{\dimexpr #4\relax}{#5}{#6}}}%
   }
 \else
   \ClassWarningNoLine{\KOMAClassName}{`\string\@startsection' has been
@@ -566,8 +568,9 @@
   \let\scr@saved@startsection\@startsection
   \newcommand*{\scr@startsection}[6]{%
     \@ifstar
-      {\scr@saved@startsection{#1}{#2}{#3}{#4}{#5}{#6}*}%
-      {\scr@section@dblarg{\scr@saved@startsection{#1}{#2}{#3}{#4}{#5}{#6}}}%
+      {\scr@saved@startsection{#1}{#2}{#3}{\dimexpr #4\relax}{#5}{#6}*}%
+      {\scr@section@dblarg{%
+          \scr@saved@startsection{#1}{#2}{#3}{\dimexpr #4\relax}{#5}{#6}}}%
   }
 \fi
 %    \end{macrocode}
@@ -663,6 +666,7 @@
 %   \changes{v3.10}{2011/08/30}{Verwendung von
 %     \cs{csname}\texttt{add\#1tocentry}\cs{endcsname}
 %     bzw. \cs{addtocentrydefault}}^^A
+%   \changes{v3.18}{2015/05/20}{definiert \cs{IfUsePrefixLine} intern}^^A
 % Damit auch alle mit \cs{@startsection} definierten Gliederungsebenen
 % bei der Entscheidung berücksichtigt werden, muss ein internes Makro
 % des \LaTeX-Kerns erweitert werden. Für die Ebenen \cs{part} und
@@ -729,6 +733,7 @@
       \setkeys{KOMAarg.section}{tocentry={#7},head={#7}}%
     \fi
   \fi
+  \let\IfUsePrefixLine\@secondoftwo
   \ifnum #2>\c@secnumdepth
     \let\@svsec\@empty
   \else
@@ -765,8 +770,8 @@
       #6{\hskip #3\relax
         \@svsec #8}%
 %<trace>      \ClassInfo{\KOMAClassName}{head=`\scr@ds@head'}%
-      \expandafter\csname #1mark\expandafter\endcsname\expandafter{%
-        \scr@ds@head}%
+       \expandafter\csname #1mark\expandafter\endcsname
+       \expandafter{\scr@ds@head}%
 %<trace>      \ClassInfo{\KOMAClassName}{tocentry=`\scr@ds@tocentry'}%
       \ifx\scr@ds@tocentry\@empty\else
         \scr@ifundefinedorrelax{add#1tocentry}{%
@@ -784,6 +789,7 @@
       \fi
     }%
   \fi
+  \let\IfUsePrefixLine\undefined
   \@xsect{#5}%
 }
 %    \end{macrocode}
@@ -851,6 +857,8 @@
 %   \changes{v3.15}{2014/11/21}{neue Anweisung}^^A
 %   \changes{v3.17}{2015/03/23}{Komplettumbau, um stilabhängige Optionen zu
 %     ermöglichen}^^A
+%   \changes{v3.18}{2015/05/20}{\cs{scr@dsc@style@\dots @callformat} definiert
+%     den Stil abhängigen Aufruf für die zu definierende Anweisung}^^A
 % Definition neuer oder Umdefinition existierender Gliederungsbefehle, die auf
 % \cs{scr@startsection} basieren. Ebenso wird ein Verzeichniseintrag erzeugt,
 % falls ein solcher noch nicht existiert. Die Deklaration geschieht über
@@ -965,6 +973,7 @@
 \DeclareSectionCommandDummyOption{tocnumwidth}
 %    \end{macrocode}
 % \begin{macro}{\scr@dsc@style@section@options}
+%   \changes{v3.17}{2015/03/23}{neue Anweisung (intern)}^^A
 % Dann für die Optionen des Stils \texttt{section}:
 %    \begin{macrocode}
 \newcommand*{\scr@dsc@style@section@options}{}
@@ -997,12 +1006,51 @@
 \DeclareSectionCommandStyleFontOption{section}{font}{}{}
 %    \end{macrocode}
 % \end{macro}^^A \scr@dsc@style@section@options
+% \begin{macro}{\scr@dsc@style@section@callformat}
+%   \changes{v3.18}{2015/05/20}{neue Anweisung (für Paketautoren)}
+% Diese Anweisung legt fest, wie der konkrete Aufruf für Überschriften des
+% Stils \texttt{section} lautet. Einziges Argument ist dabei der Name der
+% Gliederungsebene, beispielsweise \texttt{section}, \texttt{subsection}
+% etc. Alle anderen benötigten Werte ergeben sich aus den Einstellungen für
+% die Gliederungsebene. Beim tatsächlichen Aufruf wird dann daran wie üblich
+% noch optional noch entweder ein Stern oder ein Argument für Kolumnentitel
+% und Inhaltsverzeichniseintrag und der Text der Überschrift angehängt.
+%    \begin{macrocode}
+\newcommand*{\scr@dsc@style@section@callformat}[1]{%
+  \scr@startsection{#1}%
+                   {\csname #1numdepth\endcsname}%
+                   {\csname scr@#1@sectionindent\endcsname}%
+                   {\csname scr@#1@beforeskip\endcsname}%
+                   {\csname scr@#1@afterskip\endcsname}%
+                   {%
+                     \ifdim\glueexpr\csname scr@#1@beforeskip\endcsname <\z@
+                       \expandafter\ifnum\scr@v@is@gt{2.96}\relax
+                         \setlength{\parfillskip}{\z@ plus 1fil}%
+                       \fi
+                     \fi
+                     \raggedsection\normalfont\sectfont\nobreak
+                     \usekomafont{#1}%
+                   }%
+}
+%    \end{macrocode}
+% \end{macro}^^A \scr@dsc@style@section@callformat
 %
 % \begin{macro}{\scr@dsc@style@chapter@options}
+%   \changes{v3.17}{2015/03/23}{neue Anweisung (intern)}^^A
 % Dann für die Optionen des Stils \texttt{chapter}:
 %    \begin{macrocode}
 %<*book|report>
 \newcommand*{\scr@dsc@style@chapter@options}{}
+%    \end{macrocode}
+% \begin{description}
+% \item[\texttt{pagestyle}] Seitenstil für die Anfangsseite der
+%   Gliederungsebene.
+% \end{description}
+%    \begin{macrocode}
+\DeclareSectionCommandStyleOption{chapter}{pagestyle}{%
+  \@namedef{\scr@dsc@current pagestyle}{#1}%
+  \FamilyKeyStateProcessed
+}%
 %    \end{macrocode}
 % \begin{description}
 % \item[\texttt{beforeskip}] Der Absolutwert gibt den vertikalen Abstand vor
@@ -1036,15 +1084,42 @@
 \DeclareSectionCommandStyleFontOption{chapter}{font}{}{}
 %    \end{macrocode}
 % \begin{description}
-% \item[\texttt{font}] Schrifteinstellungen für die Präfixzeile des Elements.
+% \item[\texttt{prefixfont}] Schrifteinstellungen für die Präfixzeile des
+%   Elements.
 % \end{description}
 %    \begin{macrocode}
 \DeclareSectionCommandStyleFontOption{chapter}{prefixfont}{}{prefix}
 %</book|report>
 %    \end{macrocode}
 % \end{macro}^^A \scr@dsc@style@chapter@options
+% \begin{macro}{\scr@dsc@style@chapter@callformat}
+%   \changes{v3.18}{2015/05/20}{neue Anweisung (für Paketautoren)}
+% Diese Anweisung legt fest, wie der konkrete Aufruf für Überschriften des
+% Stils \texttt{chapter} lautet. Einziges Argument ist dabei der Name der
+% Gliederungsebene, beispielsweise \texttt{chapter}. Alle anderen benötigten
+% Werte ergeben sich aus den Einstellungen für die Gliederungsebene. Beim
+% tatsächlichen Aufruf wird dann daran wie üblich noch optional noch entweder
+% ein Stern oder ein Argument für Kolumnentitel und Inhaltsverzeichniseintrag
+% und der Text der Überschrift angehängt.
+%    \begin{macrocode}
+\newcommand*{\scr@dsc@style@chapter@callformat}[1]{%
+%    \end{macrocode}
+% Da es in diesem Fall nicht möglich ist, den Namen der aktuellen Anweisung
+% per Argument an die untergeordneten Anweisungen weiterzugeben, erfolgt das
+% stattdessen per internem Macro \cs{scr@dsc@current}.
+%    \begin{macrocode}
+  \edef\scr@dsc@current{#1}%
+  \if@openright\cleardoublepage\else\clearpage\fi
+  \thispagestyle{\@nameuse{#1pagestyle}}%
+  \global\@topnum\z@
+  \@afterindentfalse
+  \SecDef\@chapter\@schapter
+}
+%    \end{macrocode}
+% \end{macro}^^A \scr@dsc@style@chapter@callformat
 %
 % \begin{macro}{\scr@dsc@style@part@options}
+%   \changes{v3.17}{2015/03/23}{neue Anweisung (intern)}^^A
 % Dann für die Optionen des Stils \texttt{part}:
 %    \begin{macrocode}
 \newcommand*{\scr@dsc@style@part@options}{}
@@ -1131,6 +1206,10 @@
 %<trace>  \typeout{TRACE:
 %<trace>    \string\scr@dsc@style@chapter@neededoptionstest\space for
 %<trace>    \scr@dsc@current}%
+  \scr@ifundefinedorrelax{\scr@dsc@current pagestyle}{%
+    \scr@declaresectioncommanderror{\scr@dsc@current}{initial page style}
+    {pagestyle}%
+  }{}%
   \scr@ifundefinedorrelax{scr@\scr@dsc@current @innerskip}{%
     \scr@declaresectioncommanderror{\scr@dsc@current}{inner chapter skip}
     {innerskip}%
@@ -1221,7 +1300,7 @@
       \ifscr@dsc@parametersonlytrue
       \FamilyKeyStateProcessed
     }{%
-      \scr@ifundefinedorrelax{scr@start##1}{%
+      \scr@ifundefinedorrelax{scr@dsc@style@##1@callformat}{%
         \FamilyKeyStateUnknownValue
       }{%
         \@namedef{scr@\scr@dsc@current @style}{##1}%
@@ -1409,7 +1488,9 @@
           empty section style option%
         }%
       \else
-        \scr@ifundefinedorrelax{scr@start\@nameuse{scr@#2@style}}{%
+        \scr@ifundefinedorrelax{%
+          scr@dsc@style@\@nameuse{scr@#2@style}@callformat%
+        }{%
           \ClassWarning{\KOMAClassName}{%
             not defining `\expandafter\string\csname #2\endcsname'
             due\MessageBreak
@@ -1417,27 +1498,11 @@
             `\@nameuse{scr@#2@style}'%
           }%
         }{%
-          \expandafter\edef\csname #2\endcsname{%
-            \expandafter\noexpand
-            \csname scr@start\csname scr@#2@style\endcsname\endcsname
+          \expandafter\def
+          \csname #2\expandafter\expandafter\expandafter\endcsname
+          \expandafter\expandafter\expandafter{%
+            \csname scr@dsc@style@\@nameuse{scr@#2@style}@callformat\endcsname
             {#2}%
-            \expandafter\noexpand\csname #2numdepth\endcsname
-            \expandafter\noexpand\csname scr@#2@sectionindent\endcsname
-            \expandafter\noexpand\csname scr@#2@beforeskip\endcsname
-            \expandafter\noexpand\csname scr@#2@afterskip\endcsname{%
-              \noexpand\ifdim\noexpand\glueexpr
-              \expandafter\noexpand\csname scr@#2@beforeskip\endcsname
-              <\noexpand\z@
-                \unexpanded{%
-                  \expandafter\ifnum\scr@v@is@gt{2.96}\relax
-                    \setlength{\parfillskip}{\z@ plus 1fil}%
-                  \fi
-                }%
-              \noexpand\fi
-              \unexpanded{%
-                \raggedsection\normalfont\sectfont\nobreak\usekomafont{#2}%
-              }%
-            }%
           }%
         }%
       \fi
@@ -2953,21 +3018,7 @@
 % \end{macro}^^A \chapterheadendvskip
 % \end{macro}^^A \chapterheadstartvskip
 %
-% \begin{macro}{\chapternumdepth}
-%   \changes{v3.12}{2013/12/16}{new read only command}^^A
-% Darf nur gelesen, sollten aber nie umdefiniert werden und gibt die
-% Nummerierungsebene der Gliederungsanweisungen an (nicht zu verwechseln mit
-% der Verzeichnisebene der Gliederungsanweisungen):
-%    \begin{macrocode}
-%<*body>
-\newcommand*{\chapternumdepth}{\z@}
-%    \end{macrocode}
-% \end{macro}^^A \chapternumdepth
 %
-%
-% \begin{macro}{\chapter}
-%   \changes{v2.8d}{2001/07/05}{\cs{chapterpagestyle} statt
-%     \texttt{plain}}^^A
 % \begin{macro}{\@chapter}
 %   \changes{v2.8e}{2001/07/10}{\cs{@maybeautodot} wird aufgerufen}^^A
 %   \changes{v2.8g}{2001/07/18}{per \cs{float@addtolists} wird nun
@@ -3019,6 +3070,7 @@
 % \cs{@chapter} innerhalb des optionalen Arguments von \cs{twocolumn}
 % verwenden. Ein Schalter wird allerdings trotzdem gebraucht.
 %    \begin{macrocode}
+%<*body>
 \newif\if@at@twocolumn
 \newcommand*\scr@topnewpage{}
 \let\scr@topnewpage\@topnewpage
@@ -3033,6 +3085,8 @@
 %   \changes{v3.15}{2014/12/08}{Anpassung an geänderte Abstandsbehandlung}^^A
 %   \changes{v3.15a}{2015/02/02}{Korrektur, zur Verhinderung falscher
 %     \texttt{overfull \cs{vbox}} Meldungen}^^A
+%   \changes{v3.18}{2015/05/20}{Verwendung befehlsabhängiger Abstände und
+%     Warnungen}^^A
 % Das Makro wird benötigt, weil das Setzen der oberen Präambel etwas
 % mehr Aufwand bedeutet. Die Anweisung spart Platz, da sie zweimal
 % verwendet wird.
@@ -3040,12 +3094,14 @@
 \newcommand*{\use@chapter@o@preamble}{%
   {%
     \settoheight{\@tempdima}{%
-      \@tempskipa=\glueexpr \scr@chapter@beforeskip\relax
+      \@tempskipa=\glueexpr \csname scr@\scr@dsc@current @beforeskip\endcsname
+                  \relax
       \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
       \vbox{\chapterheadstartvskip}%
     }%
     \settodepth{\@tempdimb}{%
-      \@tempskipa=\glueexpr \scr@chapter@beforeskip\relax
+      \@tempskipa=\glueexpr \csname scr@\scr@dsc@current @beforeskip\endcsname
+                  \relax
       \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
       \vbox{\chapterheadstartvskip}%
     }%
@@ -3067,21 +3123,21 @@
       \addtolength{\@tempdimb}{-\@tempdima}%
       \ifdim\@tempdimb<\vfuzz
         \ClassInfo{\KOMAClassName}{%
-          preamble before chapter is \the\@tempdimb\space too
+          preamble before \scr@dsc@current\space is \the\@tempdimb\space too
           high.\MessageBreak
           Tolerated without warning because of\MessageBreak
           \string\vfuzz\space = \the\vfuzz\space >= \the\@tempdimb
         }%
       \else
       \ClassWarning{\KOMAClassName}{%
-        preamble before chapter is \the\@tempdimb\space too
+        preamble before \scr@dsc@current\space is \the\@tempdimb\space too
         high.\MessageBreak
         To avoid the overfull \string\vbox\space you may
-        redefine\MessageBreak
-        \string\chapterheadstartvskip\space at the preamble of
-        your\MessageBreak
-        document. You may also change
-        \string\setchapterpreamble\MessageBreak 
+        change\MessageBreak
+        the `beforeskip' value using
+        \string\RedeclareSectionCommand\MessageBreak
+        at the preamble of your document.\MessageBreak
+        You may also change \string\setchapterpreamble\MessageBreak 
         before the command, which generates the message
         about\MessageBreak
         an overfull \string\vbox
@@ -3092,17 +3148,10 @@
 }
 %    \end{macrocode}
 % \end{macro}^^A \use@chapter@o@preamble
-% Zurück zur Kapiteldefinition:
-%    \begin{macrocode}
-\newcommand\chapter{\if@openright\cleardoublepage\else\clearpage\fi
-  \thispagestyle{\chapterpagestyle}%
-  \global\@topnum\z@
-  \@afterindentfalse
-  \SecDef\@chapter\@schapter
-}
-%    \end{macrocode}
 %   \changes{v3.06}{2010/06/02}{einschalten des \texttt{tocbasic}-Features
 %     \texttt{chapteratlist} in die Datei \texttt{scrkliof.dtx} verschoben}^^A
+%   \changes{v3.18}{2015/05/20}{Unterscheidung zwischen Stil und einzelnem
+%     Befehl}^^A
 % Die Variante ohne Stern:
 %    \begin{macrocode}
 \newcommand*{\@chapter}{}
@@ -3125,13 +3174,21 @@
       \setkeys{KOMAarg.section}{tocentry={#1},head={#1}}%
     \fi
   \fi
-  \ifnumbered{chapter}{%
+  \ifnumbered{\scr@dsc@current}{%
 %<book>    \if@mainmatter
-      \refstepcounter{chapter}%
-      \@maybeautodot\thechapter
-      \typeout{\@chapapp\space\thechapter.}%
+      \refstepcounter{\scr@dsc@current}%
+      \expandafter\@maybeautodot\csname the\scr@dsc@current\endcsname
+      \typeout{\@chapapp\space\csname the\scr@dsc@current\endcsname.}%
       \ifx\scr@ds@tocentry\@empty\else
-        \addchaptertocentry{\thechapter}{\scr@ds@tocentry}%
+        \scr@ifundefinedorrelax{add\scr@dsc@current tocentry}{%
+          \addtocentrydefault{\scr@dsc@current}{%
+            \csname the\scr@dsc@current\endcsname
+          }%
+        }{%
+          \@nameuse{add\scr@dsc@current tocentry}%
+        }{%
+          \csname the\scr@dsc@current\endcsname
+        }{\scr@ds@tocentry}%
       \fi
 %<*book>
     \else
@@ -3151,10 +3208,17 @@
 %</book>
   }{%
     \ifx\scr@ds@tocentry\@empty\else
-      \addchaptertocentry{}{\scr@ds@tocentry}%
+      \scr@ifundefinedorrelax{add\scr@dsc@current tocentry}{%
+        \addtocentrydefault{\scr@dsc@current}{%
+          \csname the\scr@dsc@current\endcsname
+        }%
+      }{%
+        \@nameuse{add\scr@dsc@current tocentry}%
+      }{}{\scr@ds@tocentry}%
     \fi
   }%
-  \expandafter\chaptermark\expandafter{\scr@ds@head}%
+  \csname \scr@dsc@current mark\expandafter\endcsname
+  \expandafter{\scr@ds@head}%
   \ifdim \@chapterlistsgap>\z@
     \doforeachtocfile{%
       \iftocfeature{\@currext}{chapteratlist}{%
@@ -3191,16 +3255,20 @@
 %    \cs{raggedsection}}^^A
 %  \changes{v3.17}{2015/04/03}{Verwendung von \cs{usefontofkomafont} für die
 %    initiale Fontumstellung}^^A
+%  \changes{v3.18}{2015/05/20}{Unterscheidung zwischen Stil und einzelnem
+%    Befehl}^^A
 %    \begin{macrocode}
 \newcommand*{\@@makechapterhead}[1]{%
-  \@tempskipa=\glueexpr \scr@chapter@beforeskip\relax
+  \@tempskipa=\glueexpr \csname scr@\scr@dsc@current @beforeskip\endcsname
+              \relax
   \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
   \chapterheadstartvskip
   {%
     \setlength{\parindent}{\z@}\setlength{\parfillskip}{\fill}%
-    \normalfont\sectfont\nobreak\nobreak\usefontofkomafont{chapter}%
+    \normalfont\sectfont\nobreak\nobreak
+    \usefontofkomafont{\@nameuse{scr@dsc@current}}%
 %<book>    \if@mainmatter
-     \def\IfUseNumber{\ifnumbered{chapter}}%
+     \def\IfUseNumber{\ifnumbered{\scr@dsc@current}}%
 %<book>    \else\let\IfUseNumber\@secondoftwo\fi
     \if@chapterprefix
       \raggedchapter
@@ -3212,15 +3280,17 @@
     \fi
     \@tempa{%
       \IfUseNumber{%
-        \usekomafont{chapter}{%
+        \usekomafont{\scr@dsc@current}{%
           \IfUsePrefixLine{%
-            {\usekomafont{chapterprefix}{%
+            {\usekomafont{\scr@dsc@current prefix}{%
                 \chapterformat
-                \setlength{\@tempskipa}{\scr@chapter@innerskip}%
+                \setlength{\@tempskipa}{%
+                  \csname scr@\scr@dsc@current @innerskip\endcsname
+                }%
                 \chapterheadmidvskip
             }}%
           }{%
-            \chapterformat
+            \csname \scr@dsc@current format\endcsname
           }%
         }%
       }{}%
@@ -3228,11 +3298,11 @@
     {%
       \IfUsePrefixLine{}{\raggedchapter}%
       \interlinepenalty \@M 
-      \usekomafont{chapter}{#1}\par
+      \usekomafont{\scr@dsc@current}{#1}\par
     }%
   }%
   \nobreak\par\nobreak
-  \@tempskipa=\glueexpr \scr@chapter@afterskip\relax
+  \@tempskipa=\glueexpr \csname scr@\scr@dsc@current @afterskip\endcsname\relax
   \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
   \chapterheadendvskip
 }
@@ -3297,6 +3367,8 @@
 %     angepasst}^^A
 %  \changes{v3.15}{2014/12/09}{\cs{raggedchapter} ersetzt
 %    \cs{raggedsection}}^^A
+%  \changes{v3.18}{2015/05/20}{Unterscheidung zwischen Stil und einzelnem
+%    Befehl}^^A
 % Die Sternvariante, die um Einiges einfacher ausfällt.
 %    \begin{macrocode}
 \newcommand*{\@schapter}[1]{%
@@ -3312,16 +3384,16 @@
   \fi
 }
 \newcommand*{\@@makeschapterhead}[1]{%
-  \@tempskipa=\glueexpr \scr@chapter@beforeskip\relax
+  \@tempskipa=\glueexpr \csname scr@\scr@dsc@current @beforeskip\endcsname\relax
   \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
   \chapterheadstartvskip
   {%
     \setlength{\parindent}{\z@}\setlength{\parfillskip}{\fill}%
-    \normalfont\sectfont\nobreak\nobreak\usekomafont{chapter}{}%
-    \raggedchapter \interlinepenalty \@M \usekomafont{chapter}{#1}\par
+    \normalfont\sectfont\nobreak\nobreak\usekomafont{\scr@dsc@current}{}%
+    \raggedchapter \interlinepenalty \@M \usekomafont{\scr@dsc@current}{#1}\par
   }%
   \nobreak\par\nobreak
-  \@tempskipa=\glueexpr \scr@chapter@afterskip\relax
+  \@tempskipa=\glueexpr \csname scr@\scr@dsc@current @afterskip\endcsname\relax
   \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
   \chapterheadendvskip%
 }
@@ -3334,7 +3406,6 @@
 % \end{macro}^^A \@@makeschapterhead
 % \end{macro}^^A \@makeschapterhead
 % \end{macro}^^A \@schapter
-% \end{macro}^^A \chapter
 %
 %
 % \begin{macro}{\addchap}
@@ -3403,14 +3474,37 @@
 % Bedeutung ist dabei der Aufruf von \cs{chapter*}, da in
 % \texttt{hpdftex.def} das interne Makro \cs{@schapter} so umdefiniert
 % wird, dass ein korrekter Link erzeugt wird.
+%
+% Seit Version~3.18 wird \cs{addchap} indirekt über die neuen Anweisungen
+% \cs{scr@addchapter}, \cs{scr@addsection} Stil abhängig definiert.
 % \begin{macro}{\@addchap}
 %   \changes{v3.12}{2013/02/26}{Verwendung von \cs{addchapmark}}^^A
 %   \changes{v3.17}{2015/04/20}{\cs{scr@ds@head} in \cs{addchapmark}
 %     expandieren}^^A
+%  \changes{v3.18}{2015/05/20}{Unterscheidung zwischen Stil und einzelnem
+%    Befehl}^^A
 % \begin{macro}{\@saddchap}
 %   \changes{v3.12}{2013/02/26}{Verwendung von \cs{addchapmark}}^^A
 %    \begin{macrocode}
 \newcommand\addchap{%
+  \scr@ifundefinedorrelax{scr@add\scr@chapter@style}{%
+    \ClassWarning{\KOMAClassName}{%
+      \string\addchap\space for style `\scr@chapter@style'
+      undefined.\MessageBreak
+      Using \string\addchap\space of style `chapter'
+    }%
+    \expandafter\addchapter
+  }{%
+    \csname scr@add\scr@chapter@style\expandafter\endcsname
+  }%
+}
+%    \end{macrocode}
+% \begin{macro}{\scr@addchapter}
+%   \changes{v3.18}{2015/05/20}{neue Anweisung (für Paketautoren)}
+% Diese Anweisung nimmt nun die Rolle von \cs{addchap} ein, das dafür
+% indirekt und Stil abhängig definiert wird.
+%    \begin{macrocode}
+\newcommand*{\scr@addchapter}{%
   \if@openright\cleardoublepage\else\clearpage\fi
   \thispagestyle{\chapterpagestyle}%
   \global\@topnum\z@
@@ -3439,7 +3533,13 @@
   \fi
   \@schapter{#2}%
   \ifx\scr@ds@tocentry\@empty\else
-    \addchaptertocentry{}{\scr@ds@tocentry}%
+    \scr@ifundefinedorrelax{add\scr@dsc@current tocentry}{%
+      \addtocentrydefault{\scr@dsc@current}{%
+        \csname the\scr@dsc@current\endcsname
+      }%
+    }{%
+      \@nameuse{add\scr@dsc@current tocentry}%
+    }{}{\scr@ds@tocentry}%
   \fi
   \ifnum \@nameuse{scr@v@2.96}<\scr@compatibility\relax
     \ifdim \@chapterlistsgap>\z@
@@ -3486,6 +3586,7 @@
 % \end{macro}
 % \end{macro}
 % \end{macro}
+% \end{macro}
 %
 %
 % \begin{macro}{\l@chapter}
@@ -3509,28 +3610,15 @@
 % verwendet. Damit kann man dann zumindest einige Änderungen mit
 % \cs{DeclareSectionCommand} vornehmen, allerdings noch keine komplette
 % Neugestaltung des Eintrags erreichen.
-% \begin{macro}{\chaptertocdepth}
-%   \changes{v3.15}{2014/12/22}{neue Anweisung}^^A
-% Die Ebene des Verzeichniseintrags wird tatsächlich verwendet.
-%    \begin{macrocode}
-\newcommand*{\chaptertocdepth}{\z@}
-\let\chaptertocdepth\z@
-%    \end{macrocode}
-% \end{macro}^^A \chaptertocdepth
 % \begin{macro}{\scr@chapter@tocindent}
 %   \changes{v3.15}{2014/12/02}{neue (interne) Anweisung}^^A
+%   \changes{v3.18}{2015/05/20}{indirekt über \cs{DeclareSectionCommand}}^^A
 % Der Einzug des Eintrags wird nicht verwendet.
-%    \begin{macrocode}
-\newcommand*{\scr@chapter@tocindent}{\z@}
-\let\scr@chapter@tocindent\z@
-%    \end{macrocode}
 % \end{macro}^^A \scr@chapter@tocindent
 % \begin{macro}{\scr@chapter@tocnumwidth}
 %   \changes{v3.15}{2014/12/02}{neue (interne) Anweisung}^^A
+%   \changes{v3.18}{2015/05/20}{indirekt über \cs{DeclareSectionCommand}}^^A
 % Die Breite der Nummer des Eintrags wird tatsächlich verwendet.
-%    \begin{macrocode}
-\newcommand*{\scr@chapter@tocnumwidth}{1.5em}
-%    \end{macrocode}
 % \end{macro}
 % \begin{option}{chapterentrydots}
 %   \changes{v3.15}{2014/12/10}{Neu}^^A
@@ -3955,9 +4043,30 @@
 % \cs{section*} vergleichbaren Befehl, bei dem jedoch der
 % Kolumnentitel korrigiert wird und ein Eintrag ins Inhaltsverzeichnis
 % erfolgt (nicht in der Stern-Variante).
+%
+% Seit Version~3.18 wird \cs{addsec} indirekt über die neuen Anweisungen
+% \cs{scr@addchapter}, \cs{scr@addsection} Stil abhängig definiert.
 %    \begin{macrocode}
 %<*body>
-\newcommand*\addsec{\SecDef\@addsec\@saddsec}
+\newcommand\addsec{%
+  \scr@ifundefinedorrelax{scr@add\scr@section@style}{%
+    \ClassWarning{\KOMAClassName}{%
+      \string\addsec\space for style `\scr@section@style'
+      undefined.\MessageBreak
+      Using \string\addsec\space of style `section'
+    }%
+    \expandafter\scr@addsection
+  }{%
+    \csname scr@add\scr@section@style\expandafter\endcsname
+  }%
+}
+%    \end{macrocode}
+% \begin{macro}{\scr@addsection}
+%   \changes{v3.18}{2015/05/20}{neue Anweisung (für Paketautoren)}
+% Diese Anweisung nimmt nun die Rolle von \cs{addchap} ein, das dafür
+% indirekt und Stil abhängig definiert wird.
+%    \begin{macrocode}
+\newcommand*{\scr@addsection}{\SecDef\@addsec\@saddsec}
 \newcommand*{\@addsec}{}
 \def\@addsec[#1]#2{\section*{#2}%
   \ifnum \scr@osectarg=\z@
@@ -3985,6 +4094,7 @@
 }
 \newcommand*{\@saddsec}[1]{\section*{#1}\addsecmark{}}
 %    \end{macrocode}
+% \end{macro}^^A \scr@addsection
 % \end{macro}^^A \@saddsec
 % \end{macro}^^A \@addsec
 % \end{macro}^^A \addsec
@@ -4291,6 +4401,9 @@
 % \end{KOMAfont}
 %
 %
+% \begin{macro}{\chapternumdepth}
+%   \changes{v3.12}{2013/12/16}{new read only command}^^A
+%   \changes{v3.18}{2015/05/20}{indirekt über \cs{DeclareSectionCommand}}^^A
 % \begin{macro}{\sectionnumdepth}
 %   \changes{v3.12}{2013/12/16}{new read only command}^^A
 %   \changes{v3.15}{2014/12/09}{indirekt über \cs{DeclareSectionCommand}}^^A
@@ -4309,6 +4422,9 @@
 % Diese dürfen nur gelesen, sollten aber nie umdefiniert werden und geben die
 % Nummerierungsebene der Gliederungsanweisungen an (nicht zu verwechseln mit
 % der Verzeichnisebene der Gliederungsanweisungen).
+% \begin{macro}{\chaptertocdepth}
+%   \changes{v3.15}{2014/12/22}{neue Anweisung}^^A
+%   \changes{v3.18}{2015/05/20}{indirekt über \cs{DeclareSectionCommand}}^^A
 % \begin{macro}{\sectiontocdepth}
 %   \changes{v3.15}{2014/12/09}{indirekt über \cs{DeclareSectionCommand}}^^A
 % \begin{macro}{\subsectiontocdepth}
@@ -4320,6 +4436,14 @@
 % \begin{macro}{\subparagraphtocdepth}
 %   \changes{v3.15}{2014/12/09}{indirekt über \cs{DeclareSectionCommand}}^^A
 %
+% \begin{macro}{\chapter}
+%   \changes{v2.8d}{2001/07/05}{\cs{chapterpagestyle} statt
+%     \texttt{plain}}^^A
+%   \changes{v3.18}{2015/05/20}{Verwendung von \cs{DeclareSectionCommand}}^^A
+% Als Besonderheit werden für \cs{chapter} nur diejenigen Werte gesetzt, die
+% nicht über Optionen eingestellt werden können und daher vorab deklariert
+% werden  müssen. Bei den Anweisungen der unteren Ebenen werden hingegen alle
+% Einstellungen über \cs{DeclareSectionCommand} vorgenommen.
 % \begin{macro}{\section}
 %   \changes{v2.8p}{2001/09/22}{\cs{sectfont} wird nun vor
 %     \cs{size@section} aufgerufen}^^A
@@ -4373,6 +4497,15 @@
 % sind seit \KOMAScript{} v3.15 über die von \KOMAScript{} bereitgestellte
 % Schnittstelle \cs{DeclareSectionCommand} definiert.
 %    \begin{macrocode}
+%<*book|report>
+\DeclareSectionCommand[%
+  style=chapter,%
+  level=\z@,%
+  pagestyle=plain,%
+  tocindent=\z@,%
+  tocnumwidth=1.5em
+]{chapter}
+%</book|report>
 \DeclareSectionCommand[%
   style=section,%
   level=1,%
@@ -4441,16 +4574,19 @@
 % \end{macro}^^A \subsubsection
 % \end{macro}^^A \subsection
 % \end{macro}^^A \section
+% \end{macro}^^A \chapter
 % \end{macro}^^A \subparargraphtocdepth
 % \end{macro}^^A \paragraphtocdepth
 % \end{macro}^^A \subsubsectiontocdepth
 % \end{macro}^^A \subsectiontocdepth
 % \end{macro}^^A \sectiontocdepth
+% \end{macro}^^A \chaptertocdepth
 % \end{macro}^^A \subparargraphnumdepth
 % \end{macro}^^A \paragraphnumdepth
 % \end{macro}^^A \subsubsectionnumdepth
 % \end{macro}^^A \subsectionnumdepth
 % \end{macro}^^A \sectionnumdepth
+% \end{macro}^^A \chapternumdepth
 %
 %
 % \subsection{Font und Größeneinstellungen}
@@ -4506,6 +4642,8 @@
 %   \changes{v3.15}{2014/11/24}{\cs{scr@chapter@beforeskip} und
 %     \cs{scr@chapter@afterskip} werden verwendet}^^A
 %   \changes{v3.17}{2015/03/09}{interne Speicherung des Wert}^^A
+%   \changes{v3.18}{2015/05/20}{Werte für \cs{scr@chapter@beforeskip}
+%     negiert}^^A
 % Dies ist eine neue zentrale Option für Überschriften. Dabei ergibt sich
 % nun auch das Problem, dass die Gesamtmenge der Überschriften mal
 % \emph{headings} (Überschriften), mal \emph{sectioning}
@@ -4559,7 +4697,7 @@
 % |beforeskip=0pt| an den oberen Rand zu bekommen.
 %    \begin{macrocode}
 %<*book|report>
-      \renewcommand*{\scr@chapter@beforeskip}{3.3\baselineskip+\parskip}%
+      \renewcommand*{\scr@chapter@beforeskip}{-3.3\baselineskip-\parskip}%
       \renewcommand*{\scr@chapter@afterskip}{%
         1.725\baselineskip \@plus .115\baselineskip \@minus .192\baselineskip
       }%
@@ -4587,7 +4725,7 @@
       \KOMA@kav@remove{.\KOMAClassFileName}{headings}{standardclasses}%
       \KOMA@kav@add{.\KOMAClassFileName}{headings}{normal}%
 %<*book|report>
-      \renewcommand*{\scr@chapter@beforeskip}{3\baselineskip+\parskip}%
+      \renewcommand*{\scr@chapter@beforeskip}{-3\baselineskip-\parskip}%
       \renewcommand*{\scr@chapter@afterskip}{%
         1.5\baselineskip \@plus .1\baselineskip \@minus .167\baselineskip
       }%
@@ -4621,7 +4759,7 @@
       \KOMA@kav@remove{.\KOMAClassFileName}{headings}{standardclasses}%
       \KOMA@kav@add{.\KOMAClassFileName}{headings}{small}%
 %<*book|report>
-      \renewcommand*{\scr@chapter@beforeskip}{2.8\baselineskip+\parskip}%
+      \renewcommand*{\scr@chapter@beforeskip}{-2.8\baselineskip-\parskip}%
       \renewcommand*{\scr@chapter@afterskip}{%
         1.35\baselineskip \@plus 0.09\baselineskip \@minus .15\baselineskip
       }%
@@ -4718,7 +4856,7 @@
       \KOMA@kav@remove{.\KOMAClassFileName}{headings}{standardclasses}%
       \KOMA@kav@add{.\KOMAClassFileName}{headings}{standardclasses}%
 %<*book|report>
-      \renewcommand*{\scr@chapter@beforeskip}{50\p@}%
+      \renewcommand*{\scr@chapter@beforeskip}{-50\p@}%
       \renewcommand*{\scr@chapter@afterskip}{40\p@}%
       \renewcommand*{\scr@chapter@innerskip}{20\p@}%
       \renewcommand*{\chapterheadstartvskip}{\vspace{\@tempskipa}}%
