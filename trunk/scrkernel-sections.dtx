@@ -1,4 +1,4 @@
-% \CheckSum{3776}
+% \CheckSum{3817}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -1410,7 +1410,7 @@
           \expandafter\edef\csname scr@\scr@dsc@current @tocindent\endcsname{%
             \the\@tempskipa}%
         \else
-          \expandafter\edef\csname scr@\scr@dsc@current @tocindent\endcsname{
+          \expandafter\edef\csname scr@\scr@dsc@current @tocindent\endcsname{%
             ##1}%
         \fi
       \fi
@@ -1545,6 +1545,7 @@
       }{}%
     }%
   }%
+  \let\scr@dsc@current\relax
 }
 %    \end{macrocode}
 % \begin{macro}{\scr@declaresectioncommanderror}
@@ -3030,11 +3031,17 @@
 %   \changes{v3.10}{2011/08/30}{Integration der Erweiterung für das optionale
 %     Argument der Gliederungsbefehle}^^A
 %   \changes{v3.13a}{2014/09/11}{Verwendung von \cs{SecDef}}^^A
+% \begin{macro}{\@makechapterstylehead}
+%   \changes{v3.18}{2015/05/21}{neu (intern)}^^A
+%   \changes{v3.18}{2015/05/21}{Übernimmt die Rolle von
+%     \cs{\@makechapterhead}}^^A
 % \begin{macro}{\@makechapterhead}
 %   \changes{v2.7b}{2001/01/05}{Kapitel können grundsätzlich mit
 %     einer Präambel versehen werden}^^A
 %   \changes{v2.8p}{2001/09/25}{es gibt verschiedene Arten von Präambeln}^^A
 %   \changes{v3.15}{2014/12/10}{\cs{nobreak} am Ende entfernt}^^A
+%   \changes{v3.18}{2015/05/21}{wird nur noch aus Kompatibilitätsgründen
+%   definiert}^^A
 % \begin{macro}{\@@makechapterhead}
 %   \changes{v2.8p}{2001/09/25}{neu (intern)}^^A
 %   \changes{v2.8q}{2002/04/18}{\cs{raggedsection} wird bei Option
@@ -3232,16 +3239,22 @@
   \fi
   \if@twocolumn
     \if@at@twocolumn
-      \@makechapterhead{#2}%
+      \@makechapterstylehead{#2}%
     \else
-      \@topnewpage[\@makechapterhead{#2}]%
+      \@topnewpage[\@makechapterstylehead{#2}]%
     \fi
   \else
-    \@makechapterhead{#2}%
+    \@makechapterstylehead{#2}%
     \@afterheading
   \fi
+  \let\scr@dsc@current\relax
 }
 \newcommand*{\@makechapterhead}[1]{%
+  \def\scr@dsc@current{chapter}%
+  \@makechapterstylehead{#1}%
+  \let\scr@dsc@current\relax
+}
+\newcommand*{\@makechapterstylehead}[1]{%
   \use@chapter@o@preamble
   \@@makechapterhead{#1}%
   \use@preamble{chapter@u}%
@@ -3309,6 +3322,7 @@
 %    \end{macrocode}
 % \end{macro}^^A \@@makechapterhead
 % \end{macro}^^A \@makechapterhead
+% \end{macro}^^A \@makechapterstylehead
 % \end{macro}^^A \@chapter
 % \begin{macro}{\setchapterpreamble}
 %   \changes{v2.7b}{2001/01/05}{neu}^^A
@@ -3356,10 +3370,16 @@
 %    \end{macrocode}
 % \end{macro}^^A \addchaptertocentry
 % \begin{macro}{\@schapter}
+% \begin{macro}{\@makeschapterstylehead}
+%   \changes{v3.18}{2015/05/21}{neu (intern)}^^A
+%   \changes{v3.18}{2015/05/21}{Übernimmt die Rolle von
+%     \cs{\@makeschapterhead}}^^A
 % \begin{macro}{\@makeschapterhead}
 %   \changes{v2.7b}{2001/01/05}{Kapitel können grundsätzlich mit
 %     einer Präambel versehen werden}^^A
 %   \changes{v3.15}{2014/12/10}{\cs{nobreak} am Ende entfernt}^^A
+%   \changes{v3.18}{2015/05/21}{wird nur noch aus Kompatibilitätsgründen
+%   definiert}^^A
 % \begin{macro}{\@@makeschapterhead}
 %   \changes{v2.8p}{2001/09/25}{neu (intern)}^^A
 %   \changes{v2.9p}{2003/06/28}{\cs{parfillskip} auf \cs{fill} gesetzt}^^A
@@ -3374,14 +3394,15 @@
 \newcommand*{\@schapter}[1]{%
   \if@twocolumn
     \if@at@twocolumn
-      \@makeschapterhead{#1}%
+      \@makeschapterstylehead{#1}%
     \else
-      \@topnewpage[\@makeschapterhead{#1}]%
+      \@topnewpage[\@makeschapterstylehead{#1}]%
     \fi
   \else
-    \@makeschapterhead{#1}%
+    \@makeschapterstylehead{#1}%
     \@afterheading
   \fi
+  \let\scr@dsc@current\relax
 }
 \newcommand*{\@@makeschapterhead}[1]{%
   \@tempskipa=\glueexpr \csname scr@\scr@dsc@current @beforeskip\endcsname\relax
@@ -3395,9 +3416,14 @@
   \nobreak\par\nobreak
   \@tempskipa=\glueexpr \csname scr@\scr@dsc@current @afterskip\endcsname\relax
   \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
-  \chapterheadendvskip%
+  \chapterheadendvskip
 }
 \newcommand*{\@makeschapterhead}[1]{%
+  \def\scr@dsc@current{chapter}%
+  \@makeschapterstylehead{#1}%
+  \let\scr@dsc@current\relax
+}
+\newcommand*{\@makeschapterstylehead}[1]{%
   \use@chapter@o@preamble
   \@@makeschapterhead{#1}%
   \use@preamble{chapter@u}%
@@ -3405,6 +3431,7 @@
 %    \end{macrocode}
 % \end{macro}^^A \@@makeschapterhead
 % \end{macro}^^A \@makeschapterhead
+% \end{macro}^^A \@makeschapterstylehead
 % \end{macro}^^A \@schapter
 %
 %
@@ -3487,6 +3514,7 @@
 %   \changes{v3.12}{2013/02/26}{Verwendung von \cs{addchapmark}}^^A
 %    \begin{macrocode}
 \newcommand\addchap{%
+  \def\scr@dsc@current{chapter}%
   \scr@ifundefinedorrelax{scr@add\scr@chapter@style}{%
     \ClassWarning{\KOMAClassName}{%
       \string\addchap\space for style `\scr@chapter@style'
@@ -3531,7 +3559,9 @@
       \setkeys{KOMAarg.section}{tocentry={#1},head={#1}}%
     \fi
   \fi
-  \@schapter{#2}%
+  \edef\reserved@a{%
+    \unexpanded{\@schapter{#2}\def\scr@dsc@current}{\scr@dsc@current}%
+  }\reserved@a
   \ifx\scr@ds@tocentry\@empty\else
     \scr@ifundefinedorrelax{add\scr@dsc@current tocentry}{%
       \addtocentrydefault{\scr@dsc@current}{%
@@ -3555,8 +3585,12 @@
     \fi
   \fi
   \expandafter\addchapmark\expandafter{\scr@ds@head}%
+  \let\scr@dsc@current\relax
 }%
-\newcommand*{\@saddchap}[1]{\@schapter{#1}\addchapmark{}}%
+\newcommand*{\@saddchap}[1]{%
+  \@schapter{#1}\addchapmark{}%
+  \let\scr@dsc@current\relax
+}%
 %    \end{macrocode}
 % In \texttt{hyperref} bis Version 6.71a ist ein dicker Bug. In
 % verschiedenen \texttt{def}-Dateien wird dort das \emph{interne}
@@ -4049,6 +4083,7 @@
 %    \begin{macrocode}
 %<*body>
 \newcommand\addsec{%
+  \def\scr@dsc@current{section}%
   \scr@ifundefinedorrelax{scr@add\scr@section@style}{%
     \ClassWarning{\KOMAClassName}{%
       \string\addsec\space for style `\scr@section@style'
@@ -4091,8 +4126,12 @@
     \addsectiontocentry{}{\scr@ds@tocentry}%
   \fi
   \expandafter\addsecmark\expandafter{\scr@ds@head}%
+  \let\scr@dsc@current\relax
 }
-\newcommand*{\@saddsec}[1]{\section*{#1}\addsecmark{}}
+\newcommand*{\@saddsec}[1]{%
+  \section*{#1}\addsecmark{}%
+  \let\scr@dsc@current\relax
+}
 %    \end{macrocode}
 % \end{macro}^^A \scr@addsection
 % \end{macro}^^A \@saddsec
