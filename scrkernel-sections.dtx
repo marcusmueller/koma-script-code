@@ -1,4 +1,4 @@
-% \CheckSum{3692}
+% \CheckSum{3940}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -1217,6 +1217,24 @@
 \DeclareSectionCommandStyleFontOption{part}{prefixfont}{}{number}
 %    \end{macrocode}
 % \end{macro}^^A \scr@dsc@style@part@options
+% \begin{macro}{\scr@dsc@def@style@part@command}
+%   \changes{v3.18}{2015/05/23}{neue Anweisung (intern)}
+% Diese Anweisung legt fest, wie ein Gliederungsbefehl für den Stil
+% \texttt{part} zu definieren ist. Das einzige Argument ist dabei der
+% \meta{Name} der Gliederungsebene, normalerweise \texttt{part}.
+% Das ist ganz ähnlich wie bei \cs{scr@dsc@def@style@chapter@command}.
+%    \begin{macrocode}
+%<*deactivatedcode>%^^A <-----------------------------------
+\newcommand*{\scr@dsc@def@style@part@command}[1]{%
+  \@namedef{#1}{\scr@startpart{#1}}%
+  \@namedef{@#1}{\scr@@startpart{#1}}%
+  \@namedef{@s#1}{\scr@@startpart{#1}}%
+%<book|report>  \@namedef{@end#1}{\scr@@endpart{#1}}%
+%<book|report>  \@namedef{set#1preamble}{\set@preamble{#1}}%
+}
+%</deactivatedcode>%^^A <-----------------------------------
+%    \end{macrocode}
+% \end{macro}^^A \scr@dsc@def@style@part@command
 %
 % \begin{macro}{\scr@dsc@style@section@neededoptionstest}
 %   \changes{v3.17}{2015/03/24}{Neu (intern)}
@@ -2265,42 +2283,196 @@
 %    \end{macrocode}
 % \end{macro}^^A \partnumdepth
 %
-%
-% \begin{macro}{\part}
-%   \changes{v2.1c}{1995/01/17}{Zeichenkette "`markboth"' durch Befehl
-%     \cs{markboth} ersetzt}^^A
-%   \changes{v2.2c}{1995/05/25}{Part-Ausgabe auf CJK umgestellt}^^A
-%   \changes{v2.3c}{1995/08/06}{alternative Numerierung bei römischer
-%     Part-Numerierung}^^A
-%   \changes{v2.3d}{1995/08/19}{alternative Numerierung korrigiert}^^A
-%   \changes{v2.3g}{1996/01/14}{\cs{hbox} durch \cs{null} ersetzt}^^A
+% \begin{macro}{\scr@startpart}
+%   \changes{v3.18}{2015/05/23}{neue Anweisung (intern)}^^A
+% Diese Anweisung ist von der ursprünglichen Definition von \cs{part}
+% abgeleitet und erbt deren ChangeLog-Einträge. 
 %   \changes{v2.8d}{2001/07/05}{\cs{partpagestyle} statt \texttt{plain}}^^A
 %   \changes{v2.8p}{2001/09/27}{Präambel über der Überschrift hinzugefügt}^^A
-%   \changes{v2.8q}{2002/02/28}{\cs{nobreak} nach \cs{sectfont} behebt einen
-%     Bug im color Paket}^^A
 %   \changes{v3.13a}{2014/09/11}{Verwendung von \cs{SecDef}}^^A
-% \begin{macro}{\@part}
-%   \changes{v2.4b}{1996/03/29}{\cs{size@partnumer} durch
-%     \cs{size@partnumber} ersetzt}^^A
-%   \changes{v2.4n}{1997/05/28}{für \textsf{scrartcl} \cs{markboth}
-%     zum Löschen der Kolumnentitel durch \cs{sectionmark} ersetzt}^^A
-%   \changes{v2.5e}{1998/07/17}{\cs{numberline} verwendet, damit die
-%     reservierte Part-Nummern-Breite in \cs{l@part} auch wirklich verwendet
-%     wird}^^A
-%   \changes{v2.8e}{2001/07/10}{\cs{@maybeautodot} wird aufgerufen}^^A
-%   \changes{v2.8p}{2001/09/22}{\cs{sectfont} wird nun vor \cs{size@part} und
-%     \cs{size@partnumber} aufgerufen}^^A
+% Die Anweisung definiert den Gliederungsüberschriften-Stil
+% \texttt{part}. Dazu bekommt sie als einziges explizites Argument den
+% \meta{Namen} der Gliederungsüberschrift. Weitere Argumente wie ein
+% optionaler Stern oder ein optionales Argument für Inhaltsverzeichnis und
+% Kolumnentitel sowie ein obligatorisches Argument für den Text der
+% Überschrift sind implizit, das heißt, sie werden erst im weiteren Verlauf
+% von Unter-Macros eingelesen und verarbeitet.
+%    \begin{macrocode}
+\newcommand*{\scr@startpart}[1]{%
+%<article>  \par
+%<*book|report>
+  \if@openright\cleardoublepage\else\clearpage\fi
+  \thispagestyle{\@nameuse{#1pagestyle}}%
+  \if@twocolumn
+    \onecolumn
+    \@tempswatrue
+  \else
+    \@tempswafalse
+  \fi
+%</book|report>
+  \@tempskipa=\glueexpr\csname scr@#1@beforeskip\relax\relax
+  \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
+  \partheadstartvskip
+%<article>  \@afterindentfalse
+%<*book|report>
+  \vbox to\z@{\vss\use@preamble{#1@o}\strut\par}%
+  \vskip-\baselineskip\nobreak
+%</book|report>
+  \expandafter\SecDef\csname @#1\expandafter\endcsname\csname @s#1\endcsname
+}
+%    \end{macrocode}
+%
+% \begin{macro}{\scr@@startpart}
+%   \changes{v3.18}{2015/05/23}{neue Anweisung (intern)}^^A
+% Diese Anweisung ist von der ursprünglichen Definition von \cs{@part}
+% abgeleitet und erbt deren ChangeLog-Einträge. 
 %   \changes{v2.8q}{2001/11/13}{\cs{@parskipfalse}\cs{@parskip@indent}}^^A
 %   \changes{v2.95}{2002/08/13}{\cs{centering} und \cs{@parskipfalse}%
 %     \cs{@parskip@indent} vertauscht}^^A
 %   \changes{v2.95}{2004/11/05}{\cs{@parskipfalse} und \cs{@parskip@indent}
 %     ersetzt}^^A
-%   \changes{v3.08}{2010/11/01}{Verwendung von \cs{addparttocentry}}^^A
+% Die Anweisung macht die eigentliche Arbeit für den Fall einer
+% Gliederungsanweisung ohne Stern. Das erste obligatorische Argument ist der
+% \meta{Name} der Gliederungsanweisung. Das zweite eigentlich optionale
+% Argument, das hier jedoch zwingend ist, ist der \meta{Spezial-Text} für
+% Kolumnentitel und Inhaltsverzeichnis. Das dritte obligatorische Argument
+% ist der \meta{Text} für die Überschrift.
+%    \begin{macrocode}
+\newcommand{\scr@@startpart}{}
+\long\def\scr@@startpart#1[#2]#3{%
+%    \end{macrocode}
 %   \changes{v3.10}{2011/08/30}{Integration der Erweiterung für das optionale
 %     Argument der Gliederungsbefehle}^^A
+% Für das erweitere optionale Argument muss hier eine key-value-Auswertung
+% erfolgen, falls das erweitere optionale Argument aktiviert ist:
+%    \begin{macrocode}
+  \ifnum \scr@osectarg=\z@
+    \@scr@tempswafalse
+  \else
+    \scr@istest#2=\@nil
+  \fi
+  \if@scr@tempswa
+    \setkeys{KOMAarg.section}{tocentry={#3},head={#3},#2}%
+  \else
+    \ifcase \scr@osectarg\relax
+      \setkeys{KOMAarg.section}{tocentry={#2},head={#2}}%
+    \or
+      \setkeys{KOMAarg.section}{tocentry={#3},head={#2}}%
+    \or
+      \setkeys{KOMAarg.section}{tocentry={#2},head={#3}}%
+    \or
+      \setkeys{KOMAarg.section}{tocentry={#2},head={#2}}%
+    \fi
+  \fi
+%    \end{macrocode}
+% Als nächstes muss für nummerierte Überschriften dieser Ebene sowohl der
+% Zähler erhöht also auch ein nummerierter Eintrag ins Inhaltsverzeichnis
+% erstellt werden.
+%   \changes{v2.8e}{2001/07/10}{\cs{@maybeautodot} wird aufgerufen}^^A
+%   \changes{v3.08}{2010/11/01}{Verwendung von \cs{addparttocentry}}^^A
+%   \changes{v3.18}{2015/05/20}{Verwendung von \cs{add\meta{Name}tocentry} in
+%     \cs{typeout}}^^A
+%    \begin{macrocode}
+  \ifnumbered{#1}{%
+    \refstepcounter{#1}%
+    \@maybeautodot\thepart%
+    \expandafter\@maybeautodot\csname the#1\endcsname
+    \typeout{#1 \csname the#1\endcsname.}%
+    \ifx\scr@ds@tocentry\@empty\else
+      \scr@ifundefinedorrelax{add#1tocentry}{%
+        \addtocentrydefault{#1}%
+      }{%
+        \@nameuse{add#1tocentry}%
+      }{\csname the#1\endcsname}{\scr@ds@tocentry}%
+    \fi
+  }{%
+%    \end{macrocode}
+%   \changes{v3.18}{2015/05/23}{Resetliste auch bei nicht nummerierten
+%     Überschriften abarbeiten}^^A
+% Für alle nicht nummerieten Überschriften dieser Ebene trotzdem die
+% Resetliste des Zählers ausführen und ggf. einen Verzeichniseintrag
+% erstellen.
+%    \begin{macrocode}
+    \expandafter\ifnum\scr@v@is@lt{3.18}\relax\else
+      \begingroup
+        \let\@elt\@stpelt
+        \csname cl@#1\endcsname
+      \endgroup
+    \fi
+    \typeout{#1 without number}%
+    \ifx\scr@ds@tocentry\@empty\else
+%    \end{macrocode}
+% An dieser Stelle muss ggf. der \textsf{hyperref}-Hook für nicht nummerierte
+% Inhaltsverzeichniseinträge ausgeführt werden.
+%   \changes{v3.08}{2010/11/01}{Verwendung von \cs{addparttocentry}}^^A
+%   \changes{v3.18}{2015/05/23}{\cs{addparttocentry} verallgemeinert}^^A
+%    \begin{macrocode}
+      \hy@insteadofrefstepcounter{#1}%
+      \scr@ifundefinedorrelax{add#1tocentry}{%
+        \addtocentrydefault{#1}%
+      }{%
+        \@nameuse{add#1tocentry}%
+      }{}{\scr@ds@tocentry}%
+    \fi
+  }%
+%    \end{macrocode}
+% Es folgt das eigentliche Setzen der Überschrift. Übrigens ist der ganze Code
+% oben bei \cs{scr@@startchapter} praktisch identisch. Lediglich das
+% Abarbeiten der Resetliste gibt es dort bereits seit Version~3.15. In
+% \cs{scr@@startchapter} wird an dieser Stelle dann \cs{@make\dots head}
+% ausgeführt. Das könnte man eigentlich irgendwann hier genauso machen.
+%   \changes{v2.2c}{1995/05/25}{Part-Ausgabe auf CJK umgestellt}^^A
+%   \changes{v2.4b}{1996/03/29}{\cs{size@partnumer} durch
+%     \cs{size@partnumber} ersetzt}^^A
+%   \changes{v2.8p}{2001/09/22}{\cs{sectfont} wird nun vor \cs{size@part} und
+%     \cs{size@partnumber} aufgerufen}^^A
+%   \changes{v2.8q}{2002/02/28}{\cs{nobreak} nach \cs{sectfont} behebt einen
+%     Bug im color Paket}^^A
+%   \changes{v3.18}{2015/05/23}{\cs{size@\dots} durch \cs{usekomafont}
+%     ersetzt}^^A
+%    \begin{macrocode}
+  \begingroup
+    \setparsizes{\z@}{\z@}{\z@\@plus 1fil}\par@updaterelative
+    \raggedpart
+    \interlinepenalty \@M
+    \normalfont\sectfont\nobreak
+    \ifnumbered{#1}{%
+      \usekomafont{#1number}{\@nameuse{#1format}}%
+%<book|report>      \setlength{\@tempskipa}{\scr@#1@innerskip}%
+      \partheadmidvskip
+    }{}%
+    \usekomafont{part}{#3}\strut
+%    \end{macrocode}
 %   \changes{v3.10}{2011/08/30}{Wenn \cs{partmark} \cs{@gobble} ist, wird
 %     stattdessen \cs{@mkboth}{}{} aufgerufen.}^^A
-% \begin{macro}{\@spart}
+% Und noch den Kolumnentitel setzen.
+%    \begin{macrocode}
+    \expandafter\ifx\csname #1mark\endcsname\@gobble
+      \@mkboth{}{}%
+    \else
+      \csname #1mark\expandafter\endcsname\expandafter{\scr@ds@head}%
+    \fi
+    \par
+  \endgroup
+%    \end{macrocode}
+% Ganz zum Schluss muss noch einmal ein Abstand eingefügt werden.
+%    \begin{macrocode}
+%<*article>
+  \nobreak
+  \@tempskipa=\glueexpr\csname scr@#1@afterskip\relax\relax
+  \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
+  \partheadendvskip
+  \@afterheading
+%</article>
+%<book|report>  \@nameuse{@end#1}%
+}
+%    \end{macrocode}
+% \end{macro}^^A \scr@@startpart
+%
+% \begin{macro}{\scr@@startspart}
+%   \changes{v3.18}{2015/05/23}{neue Anweisung (intern)}^^A
+% Diese Anweisung ist von der ursprünglichen Definition von \cs{@spart}
+% abgeleitet und erbt deren ChangeLog-Einträge. 
 %   \changes{v2.4n}{1997/05/28}{in der Sternvariante \cs{chaptermark}^^A
 %     bzw. \cs{sectionmark} eingefügt, um die Kolumnentitel zu
 %     löschen}^^A
@@ -2311,111 +2483,99 @@
 %     \cs{@parskipfalse}\cs{@parskip@indent} vertauscht}^^A
 %   \changes{v2.95}{2004/11/05}{\cs{@parskipfalse} und \cs{@parskip@indent}
 %     ersetzt}^^A
-% \begin{macro}{\@endpart}
+% Die Anweisung macht die eigentliche Arbeit für den Fall einer
+% Gliederungsanweisung mit Stern. Das erste obligatorische Argument ist der
+% \meta{Name} der Gliederungsanweisung. Das zweite obligatorische Argument
+% ist der \meta{Text} für die Überschrift.
+%    \begin{macrocode}
+\newcommand{\start@@spart}[2]{%
+%    \end{macrocode}
+% Für Leute, die unbedingt nach der Sternversion noch ein \cs{addcontentsline}
+% anfügen wollen, muss hier ebenfalls der \textsf{hyperref}-Hook ausgeführt
+% werden. Allerdings passiert das hier entsprechend dem Vorgehen von
+% \textsf{hyperref} selbst in einer Gruppe, in der zusätzlich \cs{@mkboth} zu
+% \cs{@gobbletwo} gemacht wird, auch wenn ich absolut nicht versehe, was das
+% soll.
+%    \begin{macrocode}
+  \begingroup
+    \let\@mkboth\@gobbletwo
+    \hy@insteadofrefstepcounter{#1}%
+  \endgroup
+%    \end{macrocode}
+% Erst dann erfolgt die tatsächliche Ausgabe der Überschrift.
+%    \begin{macrocode}
+  \begingroup
+    \setparsizes{\z@}{\z@}{\z@\@plus 1fil}\par@updaterelative
+    \raggedpart
+    \interlinepenalty \@M
+    \normalfont
+    \sectfont\nobreak\usekomafont{#1}{#2}\strut\@mkboth{}{}\par
+  \endgroup
+%<*article>
+  \nobreak
+  \@tempskipa=\glueexpr\csname scr@#1@afterskip\endcsname\relax\relax
+  \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
+  \partheadendvskip
+  \@afterheading
+%</article>
+%<book|report>  \@nameuse{@end#1}%
+}
+%    \end{macrocode}
+% \end{macro}^^A \scr@@startspart
+%
+% \begin{macro}{\scr@@endpart}
+%   \changes{v3.18}{2015/05/23}{neue Anweisung (intern)}^^A
+% Diese Anweisung ist von der ursprünglichen Definition von \cs{@spart}
+% abgeleitet und erbt deren ChangeLog-Einträge. 
 %   \changes{v2.3g}{1996/01/14}{\cs{@endpart} wird für
 %     \textsf{scrartcl} nicht mehr definiert}^^A
 %   \changes{v2.4e}{1996/07/02}{Option \texttt{openany} beachten}^^A
 %   \changes{v2.6c}{2000/06/10}{\cs{@endpart} fügt nur noch in
-%     beidseitigen Dokumenten bei Verwendung von openright eine
+%     beidseitigen Dokumenten bei Verwendung von \texttt{openright} eine
 %     Leerseite ein}^^A
 %   \changes{v2.8p}{2001/09/27}{\cs{vbox} eingefügt}^^A
 %   \changes{v2.8p}{2001/09/27}{\cs{use@preamble} ersetzt
 %     \cs{@part@preamble}}^^A
 %   \changes{v3.02}{2009/01/01}{Verwendung des neuen
 %     \cs{partheademptypage}}^^A
-% Der Gliederungsfehl \cs{part} wird wie in den Standardklassen mit
-% Hilfe mehrere Hilfsmakros definiert. Wesentliche Unterschiede zu den
-% Standardklassen existieren nicht, jedoch sind Schriftgröße,
-% Schriftart u.\,ä. flexibler gehalten. Außerdem gibt es die
-% Möglichkeit von Präambeln. \emph{Achtung: Die Präambel vor der
-% \cs{part}-Überschrift kann ohne Warnung über den oberen Rand
-% hinaus reichen!}
-% \begin{macro}{\partheadstartvskip}
-%   \changes{v2.95a}{2006/07/10}{neue Konfiguratonsmöglichkeit}^^A
-%   \changes{v3.15}{2014/11/24}{\textsf{scrartcl} definiert und verwendet
-%     \cs{scr@part@beforeskip}}^^A
-% \begin{macro}{\partheadmidvskip}
-%   \changes{v2.95a}{2006/07/10}{neue Konfiguratonsmöglichkeit}^^A
-% \begin{macro}{\partheadendvskip}
-%   \changes{v2.95a}{2006/07/10}{neue Konfiguratonsmöglichkeit}^^A
-%   \changes{v3.15}{2014/11/24}{\textsf{scrartcl} definiert und verwendet
-%     \cs{scr@part@afterskip}}^^A
-% \begin{macro}{\parheademptypage}
-%   \changes{v3.02}{2009/01/01}{neue Konfigurationsmöglichkeit}^^A
-% Diese vier Makros werden verwendet, um den Abstand über in und unter der
-% Überschrift eines Teils und die leere Rückseite zu definieren. Prinzipiell
-% kann damit auch der Umbruch zwischen Nummer und Text entfernt werden.
-% Da die Größe nicht über Option \texttt{headings} beeinflusst werden kann,
-% müssen diese Hilfsmakros nicht bereits vor den Optionen definiert werden.
-% \begin{macro}{\scr@part@sectionbeforeskip}
-%   \changes{v3.15}{2014/11/24}{neue (interne) Anweisung}^^A
-%   \changes{v3.17}{2015/03/25}{umbenannt in \cs{scr@part@beforeskip}}^^A
-% \begin{macro}{\scr@part@sectionafterskip}
-%   \changes{v3.15}{2014/11/24}{neue (interne) Anweisung}^^A
-%   \changes{v3.17}{2015/03/25}{umbenannt in \cs{scr@part@afterskip}}^^A
-% \begin{macro}{\scr@part@sectionindent}
-%   \changes{v3.15}{2014/11/24}{neue (interne) Anweisung (unbenutzt)}^^A
-%   \changes{v3.17}{2015/03/24}{entfernt}^^A
-% \end{macro}^^A \scr@part@sectionindent
-% \end{macro}^^A \scr@part@sectionafterskip
-% \end{macro}^^A \scr@part@sectionbeforeskip
-% \begin{macro}{\scr@part@beforeskip}
-%   \changes{v3.17}{2015/03/25}{neu (intern) aus Umdefinierung von
-%     \cs{scr@part@ectionbeforeskip}}^^A
-% \begin{macro}{\scr@part@innerskip}
-%   \changes{v3.17}{2015/03/24}{neu (intern)}^^A
-% \begin{macro}{\scr@part@afterskip}
-%   \changes{v3.17}{2015/03/25}{neu (intern) aus Umdefinierung von
-%     \cs{scr@part@ectionbeforeskip}}^^A
-% \begin{macro}{\scr@part@style}
-%   \changes{v3.15}{2014/11/24}{neue (interne) Anweisung}^^A
-% Es wird der leere Stil verwendet, mit dem Neudefinitionen von \cs{part}
-% über \cs{DeclareSectionCommand} verhindert werden.
+% Die Anweisung wird bei \textsf{scrbook} und \textsf{screprt} verwendet, um
+% die Überschrift abzuschließen. \textsf{scrartcl} hat keine solche Anweisung.
+% Da einzige Argument ist der \meta{Name} der Gliederungsanweisung.
 %    \begin{macrocode}
-\newcommand*{\scr@part@beforeskip}{%
-%<article>  4ex
+%<*book|report>
+\newcommand*{\scr@@endpart}[1]{%
+  \vbox to\z@{\use@preamble{#1@u}\vss}%
+  \@tempskipa=\glueexpr\csname scr@#1@afterskip\endcsname\relax\relax
+  \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
+  \partheadendvskip
+  \partheademptypage
+  \if@tempswa
+    \twocolumn
+  \fi
+}
+%</book|report>
 %    \end{macrocode}
-% Hinweis: Das |+\baselineskip| wird benötigt, um Kompatibilitätsprobleme mit
-% der Umdefinierung von |\chapterheadstartvskip| zu vermeiden.
-%    \begin{macrocode}
-%<report|book>  \z@ \@plus 1fil + \baselineskip
-}
-\newcommand*{\partheadstartvskip}{%
-%<article>  \addvspace{\@tempskipa}%
-%<report|book>  \null\vskip-\baselineskip\vskip\@tempskipa
-}
-%<book|report>\newcommand*{\scr@part@innerskip}{20\p@}
-\newcommand*{\partheadmidvskip}{%
-  \par\nobreak
-%<book|report>  \vskip\@tempskipa
-}
-\newcommand*{\scr@part@afterskip}{%
-%<article>  3ex
-%<report|book>  \z@ \@plus 1fil
-}
-\newcommand*{\partheadendvskip}{%
-%<article>  \vskip\@tempskipa
-%<report|book>  \vskip\@tempskipa\newpage
-}
-\newcommand*{\scr@part@style}{part}
-%<*report|book>
-\newcommand*{\partheademptypage}{%
-  \if@twoside\if@openright
-      \null%
-      \thispagestyle{empty}%
-      \newpage
-  \fi\fi
-}
-%</report|book>
-%    \end{macrocode}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-% \end{macro}
+% \end{macro}^^A \scr@@endpart
+% \end{macro}^^A \scr@startpart
+%
+% \begin{macro}{\part}
+%   \changes{v3.18}{2015/05/23}{siehe \cs{scr@dsc@def@style@part@command} und
+%     \cs{scr@startpart}}^^A
+% \begin{macro}{\@part}
+%   \changes{v3.18}{2015/05/23}{siehe \cs{scr@dsc@def@style@part@command} und
+%     \cs{scr@@startpart}}^^A
+% \begin{macro}{\@spart}
+%   \changes{v3.18}{2015/05/23}{siehe \cs{scr@dsc@def@style@part@command} und
+%     \cs{scr@@startspart}}^^A
+% \begin{macro}{\@endpart}
+%   \changes{v3.18}{2015/05/23}{siehe \cs{scr@dsc@def@style@part@command} und
+%     \cs{scr@@endpart}}^^A
+% Diese Anweisungen werden indirekt über \cs{DeclareSectionCommand} und
+% \cs{scr@dsc@def@style@part@command} definiert.
+%
+% Hinweis: Diese Anweisungen werden nur noch so lange hier definiert, bis bei
+% \cs{scr@dsc@def@style@part@command} das \texttt{deactivatedcode}-Flag
+% entfernt wird.
 %    \begin{macrocode}
 %<*article>
 \newcommand\part{\par
@@ -2529,6 +2689,97 @@
 }
 %</book|report>
 %    \end{macrocode}
+% \end{macro}^^A \@endpart
+% \end{macro}^^A \@spart
+% \end{macro}^^A \@part
+% \end{macro}^^A \part
+%
+% TODO: Alle nachfolgenden Anweisungen mit \cs{part}-Bezug müssen noch wie bei
+% \cs{chapter} verschoben und ggf. angepasst werden.
+%
+% \begin{macro}{\partheadstartvskip}
+%   \changes{v2.95a}{2006/07/10}{neue Konfiguratonsmöglichkeit}^^A
+%   \changes{v3.15}{2014/11/24}{\textsf{scrartcl} definiert und verwendet
+%     \cs{scr@part@beforeskip}}^^A
+% \begin{macro}{\partheadmidvskip}
+%   \changes{v2.95a}{2006/07/10}{neue Konfiguratonsmöglichkeit}^^A
+% \begin{macro}{\partheadendvskip}
+%   \changes{v2.95a}{2006/07/10}{neue Konfiguratonsmöglichkeit}^^A
+%   \changes{v3.15}{2014/11/24}{\textsf{scrartcl} definiert und verwendet
+%     \cs{scr@part@afterskip}}^^A
+% \begin{macro}{\parheademptypage}
+%   \changes{v3.02}{2009/01/01}{neue Konfigurationsmöglichkeit}^^A
+% Diese vier Makros werden verwendet, um den Abstand über in und unter der
+% Überschrift eines Teils und die leere Rückseite zu definieren. Prinzipiell
+% kann damit auch der Umbruch zwischen Nummer und Text entfernt werden.
+% Da die Größe nicht über Option \texttt{headings} beeinflusst werden kann,
+% müssen diese Hilfsmakros nicht bereits vor den Optionen definiert werden.
+% \begin{macro}{\scr@part@sectionbeforeskip}
+%   \changes{v3.15}{2014/11/24}{neue (interne) Anweisung}^^A
+%   \changes{v3.17}{2015/03/25}{umbenannt in \cs{scr@part@beforeskip}}^^A
+% \begin{macro}{\scr@part@sectionafterskip}
+%   \changes{v3.15}{2014/11/24}{neue (interne) Anweisung}^^A
+%   \changes{v3.17}{2015/03/25}{umbenannt in \cs{scr@part@afterskip}}^^A
+% \begin{macro}{\scr@part@sectionindent}
+%   \changes{v3.15}{2014/11/24}{neue (interne) Anweisung (unbenutzt)}^^A
+%   \changes{v3.17}{2015/03/24}{entfernt}^^A
+% \end{macro}^^A \scr@part@sectionindent
+% \end{macro}^^A \scr@part@sectionafterskip
+% \end{macro}^^A \scr@part@sectionbeforeskip
+% \begin{macro}{\scr@part@beforeskip}
+%   \changes{v3.17}{2015/03/25}{neu (intern) aus Umdefinierung von
+%     \cs{scr@part@ectionbeforeskip}}^^A
+% \begin{macro}{\scr@part@innerskip}
+%   \changes{v3.17}{2015/03/24}{neu (intern)}^^A
+% \begin{macro}{\scr@part@afterskip}
+%   \changes{v3.17}{2015/03/25}{neu (intern) aus Umdefinierung von
+%     \cs{scr@part@ectionbeforeskip}}^^A
+% \begin{macro}{\scr@part@style}
+%   \changes{v3.15}{2014/11/24}{neue (interne) Anweisung}^^A
+% Es wird der leere Stil verwendet, mit dem Neudefinitionen von \cs{part}
+% über \cs{DeclareSectionCommand} verhindert werden.
+%    \begin{macrocode}
+\newcommand*{\scr@part@beforeskip}{%
+%<article>  4ex
+%    \end{macrocode}
+% Hinweis: Das |+\baselineskip| wird benötigt, um Kompatibilitätsprobleme mit
+% der Umdefinierung von |\chapterheadstartvskip| zu vermeiden.
+%    \begin{macrocode}
+%<report|book>  \z@ \@plus 1fil + \baselineskip
+}
+\newcommand*{\partheadstartvskip}{%
+%<article>  \addvspace{\@tempskipa}%
+%<report|book>  \null\vskip-\baselineskip\vskip\@tempskipa
+}
+%<book|report>\newcommand*{\scr@part@innerskip}{20\p@}
+\newcommand*{\partheadmidvskip}{%
+  \par\nobreak
+%<book|report>  \vskip\@tempskipa
+}
+\newcommand*{\scr@part@afterskip}{%
+%<article>  3ex
+%<report|book>  \z@ \@plus 1fil
+}
+\newcommand*{\partheadendvskip}{%
+%<article>  \vskip\@tempskipa
+%<report|book>  \vskip\@tempskipa\newpage
+}
+\newcommand*{\scr@part@style}{part}
+%<*report|book>
+\newcommand*{\partheademptypage}{%
+  \if@twoside\if@openright
+      \null%
+      \thispagestyle{empty}%
+      \newpage
+  \fi\fi
+}
+%</report|book>
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -2574,7 +2825,6 @@
 }
 %    \end{macrocode}
 % \end{macro}^^A \addparttocentry
-% \end{macro}^^A \part
 %
 %
 % \begin{macro}{\addpart}
@@ -3168,7 +3418,7 @@
     \expandafter\ifnum\scr@v@is@lt{3.15}\relax\else
       \begingroup
         \let\@elt\@stpelt
-        \csname cl@chapter\endcsname
+        \csname cl@#1\endcsname
       \endgroup
     \fi
     \typeout{#1 without number}%
