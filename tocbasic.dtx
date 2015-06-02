@@ -1,4 +1,4 @@
-% \CheckSum{1455}
+% \CheckSum{1459}
 % \iffalse meta-comment
 % ======================================================================
 % tocbasic.dtx
@@ -2931,7 +2931,11 @@ may be found in \autoref{tab:tocbasic.DeclareNewTOC-options}.
 }
 %    \end{macrocode}
 % \end{macro}
-%  Now the command to define a new list and maybe float or nonfloat.
+% Now the command to define a new list and maybe float or nonfloat.
+%   \changes{v3.18}{2015/06/02}{\cs{expandafter}\cs{protect} added before
+%     \cs{MakeUppercase}}^^A
+%   \changes{v3.18}{2015/06/02}{using \cs{protected@edef} instead of \cs{let}
+%     to define \cs{\dots name} and \cs{\dots listname}}^^A
 %    \begin{macrocode}
 \newcommand*{\DeclareNewTOC}[2][]{%
   \tb@floatfalse
@@ -2943,8 +2947,9 @@ may be found in \autoref{tab:tocbasic.DeclareNewTOC-options}.
   \def\tb@nt@type{#2}%
   \def\tb@nt@types{\tb@nt@type s}%
   \def\tb@nt@owner{float}%
-  \def\tb@nt@name{\expandafter\MakeUppercase\tb@nt@type}%
-  \def\tb@nt@listname{List of \expandafter\MakeUppercase\tb@nt@types}%
+  \def\tb@nt@name{\expandafter\protect\expandafter\MakeUppercase\tb@nt@type}%
+  \def\tb@nt@listname{List of 
+    \expandafter\protect\expandafter\MakeUppercase\tb@nt@types}%
   \def\tb@nt@level{1}%
   \def\tb@nt@indent{1em}%
   \def\tb@nt@hang{1.5em}%
@@ -2963,17 +2968,20 @@ may be found in \autoref{tab:tocbasic.DeclareNewTOC-options}.
 % Then we need the TOC itself with a name:
 %    \begin{macrocode}
   \@ifundefined{\tb@nt@type name}{%
-    \expandafter\let\csname \tb@nt@type name\endcsname\tb@nt@name
+    \expandafter\protected@edef\csname \tb@nt@type name\endcsname{\tb@nt@name}%
   }{%
     \iftb@forcenames
-      \expandafter\let\csname \tb@nt@type name\endcsname\tb@nt@name
+      \expandafter\protected@edef\csname \tb@nt@type name\endcsname
+      {\tb@nt@name}%
     \fi
   }%
   \@ifundefined{list\tb@nt@type name}{%
-    \expandafter\let\csname list\tb@nt@type name\endcsname\tb@nt@listname
+    \expandafter\protected@edef\csname list\tb@nt@type name\endcsname
+    {\tb@nt@listname}%
   }{%
     \iftb@forcenames
-      \expandafter\let\csname list\tb@nt@type name\endcsname\tb@nt@listname
+      \expandafter\protected@edef\csname list\tb@nt@type name\endcsname
+      {\tb@nt@listname}%
     \fi
   }%
   \expandafter\newcommand\csname listof\tb@nt@ext name\expandafter\endcsname
