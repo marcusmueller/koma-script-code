@@ -1,4 +1,4 @@
-% \CheckSum{1655}
+% \CheckSum{1750}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-letterclassoptions.dtx
@@ -187,7 +187,9 @@
   \advance\@tempcnta by \@ne\relax
   \edef\@restore@catcode@level{\the\@tempcnta}%
   \KV@@sp@def\reserved@a{#1}%
-  \edef\reserved@a{\noexpand\InputIfFileExists{\reserved@a.lco}{%
+  \edef\reserved@a{%
+    \noexpand\edef\noexpand\scr@currentlco{\reserved@a}%
+    \noexpand\InputIfFileExists{\reserved@a.lco}{%
 %<class>      \noexpand\ClassInfo{scrlttr2%
 %<package>      \noexpand\PackageInfo{scrletter%
       }{Letter-Class-Option `#1' loaded}%
@@ -201,8 +203,39 @@
         to load\noexpand\MessageBreak
         the file `#1.lco'. But the file isn't available.}%
     }%
+    \scr@ifundefinedorrelax{scr@currentlco}{%
+      \unexpanded{\let\scr@currentlco\relax}%
+    }{%
+      \noexpand\def\noexpand\scr@currentlco{\scr@currentlco}%
+    }%
   }%
-  \reserved@a
+%    \end{macrocode}
+%   \changes{v3.18}{2015/06/03}{manage \cs{RequirePackage} and \cs{usepackage}
+%     inside \texttt{lco}-files after \cs{begin\{document\}}}^^A
+%    \begin{macrocode}
+  \if@atdocument
+    \edef\reserved@a{%
+      \unexpanded\expandafter{\reserved@a}%
+      \ifx\RequirePackage\@notprerr
+        \unexpanded{\let\RequirePackage\@notprerr}%
+      \else
+        \noexpand\def\noexpand\RequirePackage{%
+          \unexpanded\expandafter{\RequirePackage}%
+        }%
+      \fi
+      \ifx\usepackage\@notprerr
+        \unexpanded{\let\usepackage\@notprerr}%
+      \else
+        \noexpand\def\noexpand\Rusepackage{%
+          \unexpanded\expandafter{\usepackage}%
+        }%
+      \fi
+    }%
+    \let\RequirePackage\lco@RequirePackage
+    \let\usepackage\lco@RequirePackage
+    \expandafter\reserved@a
+  \else \expandafter\reserved@a
+  \fi
   \@tempcnta=\@restore@catcode@level\relax
   \advance\@tempcnta by \m@ne\relax
   \edef\@restore@catcode@level{\the\@tempcnta}%
@@ -210,7 +243,41 @@
     \@restore@catcode
   \fi
 }
-%    \end{macrocode} 
+%    \end{macrocode}
+% \begin{macro}{\lco@RequirePackage}
+%   \changes{v3.18}{2015/06/03}{neue Anweisung (intern)}
+% Da \texttt{lco}-Dateien auch noch nach \cs{begin\{document\}} geladen werden
+% können, wird hier sinnvoll auf die Anforderung von Paketen in diesem Fall
+% reagiert. In der ersten Ausbaustufe wird eine sinnvolle Fehlermeldung
+% ausgegeben. Irgend wann einmal später könnte man sich eventuell noch etwas
+% besseres einfallen lassen.
+% Das erste, optionale Argument sind ggf. Optionen. Diese werden jedoch an
+% dieser Stelle einfach ignoriert. Das zweitem, obligatorische Argument ist
+% eine Liste von Paketen. Das dritte, optionale Argument ist die Version der
+% Pakete, die an dieser Stelle ebenfalls ignoriert wird.
+%    \begin{macrocode}
+\newcommand*{\lco@RequirePackage}[2][]{%
+  \begingroup
+    \@for\reserved@a:=#2\do{%
+      \expandafter\KV@@sp@def\expandafter\reserved@a\expandafter{\reserved@a}%
+      \scr@ifundefinedorrelax{ver@\reserved@a.\scr@pkgextension}{%
+%<class>        \ClassError{\KOMAClassName}{%
+%<package>        \PackageError{scrletter}{%
+          lco-file `\scr@currentlco' can be used only in preamble%
+        }{%
+          The lco-file `\scr@currentlco' uses \string\RequirePackage\space or
+          \string\usepackage\space to load\MessageBreak
+          package `\reserved@a'. This means you have to either load
+          `\reserved@a'\MessageBreak
+          or lco-file `\scr@currentlco' in the document preamble.
+        }%
+      }{}%
+    }%
+  \endgroup
+  \scr@gobbleopt
+}
+%    \end{macrocode}
+% \end{macro}^^A \lco@RequirePackage
 % \end{macro}^^A \LoadLetterOption
 % \begin{macro}{\LoadLetterOptions}
 %   \changes{v3.14}{2014/10/04}{Neue Anweisung}^^A
@@ -846,11 +913,10 @@
 % Diese Makros werden nur von \texttt{visualize.lco} verwendet und stellen den
 % Hauptteil dieser LCO dar.
 %
-% Das Paket benötigt \textsf{eso-pic}. Das Paket wird nur dann explizit
-% geladen, wenn dies nicht bereits geschehen ist. Damit ist es möglich das
-% Paket mit Optionen vor der LCO zu laden:
+% Das Paket benötigt \textsf{eso-pic}.
+% \changes{v3.18}{2015/06/03}{lade \textsf{eso-pic} unbedingt}^^A
 %    \begin{macrocode}
-\@ifpackageloaded{eso-pic}{}{\RequirePackage{eso-pic}}
+\RequirePackage{eso-pic}
 %    \end{macrocode}
 %
 % \begin{macro}{\showfields}
@@ -1189,11 +1255,10 @@
 % Es kann auch ein Briefumschlag angezeigt werden. Dazu müssen verschiedene
 % Parameter des Umschlags bekannt sein. Der Umschlag wird immer hochkant auf
 % der aktuellen Seite angezeigt. Hierfür wird das Paket \textsf{graphicx}
-% benötigt. Das Paket wird nur dann explizit geladen, wenn dies nicht bereits
-% geschehen ist. Damit ist es möglich das Paket mit Optionen vor der LCO zu
-% laden.
+% benötigt.
+% \changes{v3.18}{2015/06/03}{lade \textsf{graphicx} unbedingt}^^A
 %    \begin{macrocode}
-\@ifpackageloaded{graphicx}{}{\RequirePackage{graphicx}}
+\RequirePackage{graphicx}
 \newcommand*{\showenvelope}{}
 \newcommand*{\@@showenvelope}{}
 \newcommand*{\@@@showenvelope}{}
