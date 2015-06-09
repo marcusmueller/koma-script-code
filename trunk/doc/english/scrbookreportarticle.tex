@@ -1200,8 +1200,7 @@ You\ChangedAt{v3.18}{\Class{scrbook}\and \Class{scrreprt}} can execute code
 depending on the current setting for the chapter preceding line using
 \Macro{IfChapterUsesPrefixLine}. If \Option{chapterprefix} is currently
 active, the \PName{then code} will be executed, otherwise the \PName{else
-  code}. For example, the command is used at the definition of
-\Macro{chapterformat} (see \autopageref{desc:maincls.cmd.chapterformat}).
+  code}.
 
 The font style of the chapter number line using
 \OptionValue{chapterprefix}{true} or \OptionValue{appendixprefix}{true} may be
@@ -2098,6 +2097,7 @@ You may also redefine this using \Macro{renewcommand} too.
   \Macro{subparagraphformat}\\
   \Macro{othersectionlevelsformat}\Parameter{sectioning
     name}\Parameter{}\Parameter{counter output}\\
+  \Macro{IfUsePrefixLine}\Parameter{then code}\Parameter{else code}\\
   \Macro{autodot}
 \end{Declaration}%
 \BeginIndex{Cmd}{partformat}\Index{part>number}%
@@ -2108,6 +2108,7 @@ You may also redefine this using \Macro{renewcommand} too.
 \BeginIndex{Cmd}{paragraphformat}%
 \BeginIndex{Cmd}{subparagraphformat}%
 \BeginIndex{Cmd}{othersectionlevelsformat}\Index{section>number}%
+\BeginIndex{Cmd}{IfUsePrefixLine}%
 \BeginIndex{Cmd}{autodot}%
 {\KOMAScript} has added a further logical level on top of
 \Macro{the\PName{sectioning name}} to the output of the sectioning
@@ -2147,13 +2148,23 @@ are used by the {\KOMAScript} classes:
   \newcommand*{\partformat}{\partname~\thepart\autodot}
   \newcommand*{\chapterformat}{%
     \mbox{\chapappifchapterprefix{\nobreakspace}\thechapter
-      \autodot\IfChapterUsesPrefixLine{}{\enskip}}}
+      \autodot\IfUsePrefixLine{}{\enskip}}}
   \newcommand*{\sectionformat}{\thesection\autodot\enskip}
   \newcommand*{\othersectionlevelsformat}[3]{%
     #3\autodot\enskip}
 \end{lstcode}
 The definitions of the lower levels correspond to
-\Macro{sectionformat}.
+\Macro{sectionformat}. 
+
+Because\ChangedAt{v3.17}{\Class{scrbook}\and \Class{scrreprt}} of
+\Macro{IfUsePrefixLine} command \Macro{chapterformat} should not be used
+outside of \Macro{chapter}. \Macro{IfUsePrefixLine} is only valid inside
+section commands of \KOMAScript{}. In this case, it executes the \PName{then
+  code} if a prefix line for the number is used, but \PName{else code}
+otherwise.
+
+Do\textnote{Attention!} not forget to change \Macro{newcommand} into
+\Macro{renewcommand} if you like to re-define one of the commands.
 
 \begin{Example}
   Assume that when using \Macro{part} you do not want the word
@@ -2190,6 +2201,7 @@ The definitions of the lower levels correspond to
 \end{Example}
 %
 \EndIndex{Cmd}{autodot}%
+\EndIndex{Cmd}{IfUsePrefixLine}%
 \EndIndex{Cmd}{othersectionlevelsformat}%
 \EndIndex{Cmd}{paragraphformat}%
 \EndIndex{Cmd}{subparagraphformat}%

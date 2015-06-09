@@ -1331,9 +1331,7 @@ Mit der Anweisung
 \Macro{IfChapterUsesPrefixLine}\ChangedAt{v3.18}{\Class{scrbook}\and
   \Class{scrreprt}} kann man Code in Abhängigkeit der aktuellen Einstellung
 für die Präfixzeile ausführen. Ist \Option{chapterprefix} aktiv, so wird der
-\PName{Dann-Teil} ausgeführt, anderenfalls der \PName{Sonst-Teil}. Verwendet
-wird dies beispielsweise in der Definition von \Macro{chapterformat} (siehe
-\autopageref{desc:maincls.cmd.chapterformat}).
+\PName{Dann-Teil} ausgeführt, anderenfalls der \PName{Sonst-Teil}.
 
 Die Schriftart der Kapitelnummernzeile bei
 \OptionValue{chapterprefix}{true} oder \OptionValue{appendixprefix}{true} kann
@@ -2339,6 +2337,7 @@ umdefiniert werden.
   \Macro{paragraphformat}\\
   \Macro{subparagraphformat}\\
   \Macro{othersectionlevelsformat}\Parameter{Gliederungsname}\Parameter{}\Parameter{Zählerausgabe}\\
+  \Macro{IfUsePrefixLine}\Parameter{Dann-Teil}\Parameter{Sonst-Teil}\\
   \Macro{autodot}
 \end{Declaration}%
 \BeginIndex{Cmd}{partformat}\Index{Teil>Nummer}%
@@ -2349,6 +2348,7 @@ umdefiniert werden.
 \BeginIndex{Cmd}{paragraphformat}%
 \BeginIndex{Cmd}{subparagraphformat}%
 \BeginIndex{Cmd}{othersectionlevelsformat}\Index{Abschnitt>Nummer}%
+\BeginIndex{Cmd}{IfUsePrefixLine}%
 \BeginIndex{Cmd}{autodot}%
 \KOMAScript{} fügt der Ausgabe der Gliederungsnummern oberhalb von
 \Macro{the\PName{Gliederungsname}} (siehe \Macro{the\PName{Zähler}},
@@ -2394,13 +2394,23 @@ anzupassen.  Nachfolgend finden Sie einige Definitionen, die denen aus den
   \newcommand*{\partformat}{\partname~\thepart\autodot}
   \newcommand*{\chapterformat}{%
     \mbox{\chapappifchapterprefix{\nobreakspace}\thechapter
-      \autodot\IfChapterUsesPrefixLine{}{\enskip}}}
+      \autodot\IfUsePrefixLine{}{\enskip}}}
   \newcommand*{\sectionformat}{\thesection\autodot\enskip}
   \newcommand*{\othersectionlevelsformat}[3]{%
     #3\autodot\enskip}
 \end{lstcode}
 Die Definitionen der tieferen Ebenen entsprechen der von
-\Macro{sectionformat}. Bitte\textnote{Achtung!} beachten Sie, dass bei der
+\Macro{sectionformat}. 
+
+Wegen\ChangedAt{v3.17}{\Class{scrbook}\and \Class{scrreprt}} der Verwendung
+von \Macro{IfUsePrefixLine} sollte \Macro{chapterformat} nicht außerhalb von
+\Macro{chapter} verwendet werden. Diese Anweisung ist nur innerhalb der
+Gliederungsbefehle von \KOMAScript{} wohldefiniert. In diesem Fall wird im
+Falle der Verwendung einer Präfixzeile für die Nummer der Überschrift der
+\PName{Dann-Teil} ausgeführt, während im anderen Fall der \PName{Sonst-Teil}
+verwendet wird.
+
+Bitte\textnote{Achtung!} beachten Sie außerdem, dass bei der
 Umdefinierung \Macro{newcommand} durch \Macro{renewcommand} zu ersetzen ist.
 
 \begin{Example}
@@ -2439,6 +2449,7 @@ Umdefinierung \Macro{newcommand} durch \Macro{renewcommand} zu ersetzen ist.
 \end{Example}
 %
 \EndIndex{Cmd}{autodot}%
+\EndIndex{Cmd}{IfUsePrefixLine}%
 \EndIndex{Cmd}{othersectionlevelsformat}%
 \EndIndex{Cmd}{paragraphformat}%
 \EndIndex{Cmd}{subparagraphformat}%
