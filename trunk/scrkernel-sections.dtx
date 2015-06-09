@@ -1,4 +1,4 @@
-% \CheckSum{3880}
+% \CheckSum{3915}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -854,7 +854,7 @@
       \fi
     }%
   \fi
-  \let\IfUsePrefixLine\undefined
+  \let\IfUsePrefixLine\scr@IfUsePrefixLineWarning
   \@xsect{\glueexpr #5\relax}%
 }
 %    \end{macrocode}
@@ -888,6 +888,42 @@
 % \end{macro}^^A \scr@ds@tocentry
 % \end{macro}^^A \@sect
 % \end{macro}^^A \scr@sect
+%
+% \begin{macro}{\IfUsePrefixLine}
+%   \changes{v3.18}{2015/06/09}{außerhalb von Gliederungsbefehlsstilen
+%     definiert}^^A
+% Eigentlich ist diese Anweisung nur innerhalb von Gliederungsbefehlen
+% sinnvoll und wurde bis \KOMAScript{} 3.17c auch nur dort definiert. Dann gab
+% es aber Leute, die \cs{chapterformat} missbraucht haben und gleich meldete
+% sich jemand, die nicht verstehen konnte, warum die Anweisung dann einen
+% Fehler produzieren muss. Wenn man den Code nicht verstanden hat, dann ist
+% das nämlich so. Deshalb gebe ich jetzt eine Warnung aus, dass die Verwendung
+% nicht unbedingt zu dem Resultat führt, das erwartet wird.
+% \begin{macro}{\scr@IfUsePrefixLineWarning}
+%   \changes{v3.18}{2015/06/09}{neu (intern)}
+%    \begin{macrocode}
+%<*body>
+\newcommand*{\scr@IfUsePrefixLineWarning}[2]{%
+  \ClassWarning{\KOMAClassName}{%
+    usage of \string\IfUsePrefixLine\space outside
+    section command\MessageBreak
+    style makes no sense, because the behaviour not only\MessageBreak
+    depends on class options but also on the run-time\MessageBreak
+    section command style.\MessageBreak
+    Neither the then-code nor the else-code will be\MessageBreak
+    executed.\MessageBreak
+    You may change this and avoid the warning by LOCALLY\MessageBreak
+    setting \string\IsUsePrefixLine\space to either
+    \string\@firstoftwo\space or\MessageBreak
+    \string\@secondoftwo\space before using it%
+  }%
+}
+\newcommand*{\IfUsePrefixLine}[2]{}
+\let\IfUsePrefixLine\scr@IfUsePrefixLineWarning
+%</body>
+%    \end{macrocode}
+% \end{macro}^^A \scr@IfUsePrefixLineWarning
+% \end{macro}^^A \IfUsePrefixLine
 %
 %
 % \begin{macro}{\raggedsection}
@@ -4083,7 +4119,7 @@
 %    \begin{macrocode}
 \newcommand*{\l@chapteratlist}{\l@chapter}
 %    \end{macrocode}   
-% \end{macro}
+% \end{macro}^^A \l@chapteratlist
 %
 % \begin{Counter}{chapter}
 % \begin{macro}{\thechapter}
@@ -4116,7 +4152,7 @@
 \renewcommand*{\thechapter}{\@arabic\c@chapter}
 \newcommand*{\chapterformat}{%
   \mbox{\chapappifchapterprefix{\nobreakspace}\thechapter\autodot
-    \IfUsePrefixLine{}{\enskip}}%
+    \IfChapterUsesPrefixLine{}{\enskip}}%
 }
 \newcommand*\chaptermarkformat{\chapappifchapterprefix{\ }%
   \thechapter\autodot\enskip}
@@ -4149,6 +4185,9 @@
 % \begin{macro}{\chapappifchapterprefix}
 %   \changes{v2.8o}{2001/09/19}{neu}^^A
 %   \changes{v2.8o}{2001/09/19}{Argument ist nicht optional}^^A
+%   \changes{v3.18}{2015/06/09}{verwendet \cs{IfChapterUsePrefixLine}}^^A
+% \begin{macro}{\IfChapterUsesPrefixLine}
+%   \changes{v3.18}{2015/06/09}{neu (intern)}
 % \begin{macro}{\chapapp}
 %   \changes{v2.8}{2001/06/15}{neu}^^A
 % Das in \cs{chapterformat} verwendete Makro
@@ -4171,10 +4210,13 @@
     obligatory instead of an optional argument. Use that\MessageBreak
     new command%
   }%
-  \if@chapterprefix\chapapp#1\fi
+  \chapappifchapterprefix{#1}%
 }
 \newcommand*{\chapappifchapterprefix}[1]{%
-  \if@chapterprefix\chapapp#1\fi
+  \IfChapterUsesPrefixLine{\chapapp#1}{}%
+}
+\newcommand*{\IfChapterUsesPrefixLine}{%
+  \if@chapterprefix\expandafter\@firstoftwo\else\expandafter\@secondoftwo\fi
 }
 \newcommand*{\chapapp}{\@chapapp}
 %    \end{macrocode}
@@ -4184,8 +4226,9 @@
 %    \begin{macrocode}
 \newcommand*\@chapapp{\chaptername}
 %    \end{macrocode}
-% \end{macro}^^A \@chapp
+% \end{macro}^^A \@chapapp
 % \end{macro}^^A \chapapp
+% \end{macro}^^A \IfChapterUsePrefixLine
 % \end{macro}^^A \chapappifchapterprefix
 % \end{macro}^^A \chapappifprefix
 %
