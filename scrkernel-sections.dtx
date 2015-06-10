@@ -1,4 +1,4 @@
-% \CheckSum{3915}
+% \CheckSum{3698}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -1214,6 +1214,18 @@
 \newcommand*{\scr@dsc@style@part@options}{}
 %    \end{macrocode}
 % \begin{description}
+% \item[\texttt{pagestyle}] Seitenstil für die Anfangsseite der
+%   Gliederungsebene.
+% \end{description}
+%    \begin{macrocode}
+%<*report|book>
+\DeclareSectionCommandStyleOption{part}{pagestyle}{%
+  \@namedef{\scr@dsc@current pagestyle}{#1}%
+  \FamilyKeyStateProcessed
+}%
+%</report|book>
+%    \end{macrocode}
+% \begin{description}
 % \item[\texttt{beforeskip}] Der Absolutwert gibt den vertikalen Abstand vor
 %   der Überschrift an. Negative Werte bedeuten, dass der Absatzeinzug nach
 %   der Überschrift unterdrückt werden soll.
@@ -1250,7 +1262,7 @@
 % \item[\texttt{font}] Schrifteinstellungen für die Präfixzeile des Elements.
 % \end{description}
 %    \begin{macrocode}
-\DeclareSectionCommandStyleFontOption{part}{prefixfont}{}{number}
+\DeclareSectionCommandStyleFontOption{part}{prefixfont}{}{prefix}
 %    \end{macrocode}
 % \end{macro}^^A \scr@dsc@style@part@options
 % \begin{macro}{\scr@dsc@def@style@part@command}
@@ -1260,15 +1272,13 @@
 % \meta{Name} der Gliederungsebene, normalerweise \texttt{part}.
 % Das ist ganz ähnlich wie bei \cs{scr@dsc@def@style@chapter@command}.
 %    \begin{macrocode}
-%<*deactivatedcode>%^^A <-----------------------------------
 \newcommand*{\scr@dsc@def@style@part@command}[1]{%
   \@namedef{#1}{\scr@startpart{#1}}%
   \@namedef{@#1}{\scr@@startpart{#1}}%
-  \@namedef{@s#1}{\scr@@startpart{#1}}%
+  \@namedef{@s#1}{\scr@@startspart{#1}}%
 %<book|report>  \@namedef{@end#1}{\scr@@endpart{#1}}%
 %<book|report>  \@namedef{set#1preamble}{\set@preamble{#1}}%
 }
-%</deactivatedcode>%^^A <-----------------------------------
 %    \end{macrocode}
 % \end{macro}^^A \scr@dsc@def@style@part@command
 %
@@ -1344,7 +1354,7 @@
 % \begin{macro}{\scr@dsc@style@part@neededoptionstest}
 %   \changes{v3.17}{2015/03/24}{Neu (intern)}
 % Dieses Anweisung überprüft, ob alle notwendigen Eigenschaften für die
-% Definition der spezifischen Gliederungsebene im chapter-Stil bekannt
+% Definition der spezifischen Gliederungsebene im part-Stil bekannt
 % sind. Sollte das nicht der Fall sein, meldet sie einen Fehler und sorgt sie
 % mit \cs{aftergroup}\cs{@gobbletwo} dafür, dass die Definition unterbleibt.
 %    \begin{macrocode}
@@ -1353,6 +1363,10 @@
 %<trace>    \string\scr@dsc@style@part@neededoptionstest\space for
 %<trace>    \scr@dsc@current}%
 %<*book|report>
+  \scr@ifundefinedorrelax{\scr@dsc@current pagestyle}{%
+    \scr@declaresectioncommanderror{\scr@dsc@current}{initial page style}
+    {pagestyle}%
+  }{}%
   \scr@ifundefinedorrelax{scr@\scr@dsc@current @innerskip}{%
     \scr@declaresectioncommanderror{\scr@dsc@current}{inner part skip}
     {innerskip}%
@@ -1369,7 +1383,7 @@
   \IfExistskomafont{\scr@dsc@current}{}{%
     \scr@declaresectioncommanderror{\scr@dsc@current}{font}{font}%
   }{}%
-  \IfExistskomafont{\scr@dsc@current number}{}{%
+  \IfExistskomafont{\scr@dsc@current prefix}{}{%
     \scr@declaresectioncommanderror{\scr@dsc@current}{number font}
     {prefixfont}%
   }{}%
@@ -2423,7 +2437,7 @@
     \@tempswafalse
   \fi
 %</book|report>
-  \@tempskipa=\glueexpr\csname scr@#1@beforeskip\relax\relax
+  \@tempskipa=\glueexpr\@nameuse{scr@#1@beforeskip}\relax\relax
   \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
   \partheadstartvskip
 %<article>  \@afterindentfalse
@@ -2453,6 +2467,7 @@
 %    \begin{macrocode}
 \newcommand{\scr@@startpart}{}
 \long\def\scr@@startpart#1[#2]#3{%
+%<trace>  \typeout{TRACE: \string\scr@@startpart{#1}}%
 %    \end{macrocode}
 %   \changes{v3.10}{2011/08/30}{Integration der Erweiterung für das optionale
 %     Argument der Gliederungsbefehle}^^A
@@ -2550,8 +2565,8 @@
     \interlinepenalty \@M
     \normalfont\sectfont\nobreak
     \ifnumbered{#1}{%
-      \usekomafont{#1number}{\@nameuse{#1format}}%
-%<book|report>      \setlength{\@tempskipa}{\scr@#1@innerskip}%
+      \usekomafont{#1prefix}{\@nameuse{#1format}}%
+%<book|report>      \setlength{\@tempskipa}{\@nameuse{scr@#1@innerskip}}%
       \partheadmidvskip
     }{}%
     \usekomafont{part}{#3}\strut
@@ -2572,7 +2587,7 @@
 %    \begin{macrocode}
 %<*article>
   \nobreak
-  \@tempskipa=\glueexpr\csname scr@#1@afterskip\relax\relax
+  \@tempskipa=\glueexpr\@nameuse{scr@#1@afterskip}\relax\relax
   \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
   \partheadendvskip
   \@afterheading
@@ -2601,7 +2616,8 @@
 % \meta{Name} der Gliederungsanweisung. Das zweite obligatorische Argument
 % ist der \meta{Text} für die Überschrift.
 %    \begin{macrocode}
-\newcommand{\start@@spart}[2]{%
+\newcommand{\scr@@startspart}[2]{%
+%<trace>  \typeout{TRACE: \string\scr@@startspart{#1}}%
 %    \end{macrocode}
 % Für Leute, die unbedingt nach der Sternversion noch ein \cs{addcontentsline}
 % anfügen wollen, muss hier ebenfalls der \textsf{hyperref}-Hook ausgeführt
@@ -2671,6 +2687,45 @@
 % \end{macro}^^A \scr@@endpart
 % \end{macro}^^A \scr@startpart
 %
+%
+% \begin{macro}{\hy@insteadofrefstepcounter}
+%   \changes{v3.18}{2015/05/22}{neu (intern und \textsf{hyperref})}
+% Normalerweise führt \textsf{hyperref} via \cs{refstepcounter}
+% Initialisierungen für ein nachfolgendes \cs{addcontentsline} durch. Wenn
+% allerdings eine nicht nummerierte Überschrift ins Inhaltsverzeichnis
+% eingetragen wird, dann fehlt das vorherige \cs{refstepcounter}. Statt
+% \cs{@chapter}, \cs{@schapter}, \cs{@part}, \cs{@spart} etc. direkt zu
+% patchen, erscheint es mir sinnvoller einen Hook dafür zu definieren, der
+% dann von \textsf{hyperref} entsprechend definiert werden kann. Solange
+% \textsf{hyperref} das nicht macht, versuche ich mich selbst daran und kann
+% nur hoffen, dass es funktioniert. Dabei verwende ich im Gegensatz zu
+% \textsf{hyperref} für \cs{Hy@MakeCurrentHrefAuto} kein \cs{Hy@chapapp}, weil
+% ja \cs{autoref} für nicht nummerierte Überschriften ohnehin sinnlos
+% ist. Stattdessen verwende ich den Gliederungsbefehl.
+%    \begin{macrocode}
+\newcommand*{\hy@insteadofrefstepcounter}[1]{}
+\let\hy@insteadofrefstepcounter\@gobble
+\BeforePackage{hyperref}{%
+  \let\scr@orig@chapter\@chapter
+  \let\scr@orig@schapter\@schapter
+  \let\scr@orig@addchap\@addchap
+}
+\AfterPackage!{hyperref}{%
+  \let\@chapter\scr@orig@chapter
+  \let\@schapter\scr@orig@schapter
+  \let\@addchap\scr@orig@addchap
+  \ifx\hy@insteadofrefstepcounter\@gobble
+    \renewcommand*{\hy@insteadofrefstepcounter}[1]{%
+      \Hy@MakeCurrentHrefAuto{#1*}%
+      \Hy@raisedlink{%
+        \hyper@anchorstart{\@currentHref}\hyper@anchorend
+      }%
+    }%
+  \fi
+}
+%    \end{macrocode}
+% \end{macro}^^A \hy@insteadofrefstepcounter
+%
 % \begin{macro}{\addparttocentry}
 %   \changes{v3.08}{2010/11/01}{Neu}^^A
 % Seit Version~3.08 wird der Eintrag nicht direkt innerhalb von \cs{part}
@@ -2688,9 +2743,6 @@
 % \end{macro}^^A \addparttocentry
 %
 %
-% TODO: Alle nachfolgenden Anweisungen entfallen, sobald \cs{part} vollständig
-% auf \cs{DeclareSectionCommand} umgestellt wurde. Siehe die weiteren TODOs.
-%
 % \begin{macro}{\part}
 %   \changes{v3.18}{2015/05/23}{siehe \cs{scr@dsc@def@style@part@command} und
 %     \cs{scr@startpart}}^^A
@@ -2703,149 +2755,26 @@
 % \begin{macro}{\@endpart}
 %   \changes{v3.18}{2015/05/23}{siehe \cs{scr@dsc@def@style@part@command} und
 %     \cs{scr@@endpart}}^^A
-% Diese Anweisungen werden indirekt über \cs{DeclareSectionCommand} und
-% \cs{scr@dsc@def@style@part@command} definiert.
-%
-% Hinweis: Diese Anweisungen werden nur noch so lange hier definiert, bis bei
-% \cs{scr@dsc@def@style@part@command} das \texttt{deactivatedcode}-Flag
-% entfernt wird.
-% TODO: \texttt{macrocode}-Umgebungen löschen.
-%    \begin{macrocode}
-%<*article>
-\newcommand\part{\par
-  \@tempskipa=\glueexpr\scr@part@beforeskip\relax
-  \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
-  \partheadstartvskip%
-  \@afterindentfalse
-  \SecDef\@part\@spart
-}
-%</article>
-%<*report|book>
-\newcommand\part{\if@openright\cleardoublepage\else\clearpage\fi
-  \thispagestyle{\partpagestyle}%
-  \if@twocolumn
-    \onecolumn
-    \@tempswatrue
-  \else
-    \@tempswafalse
-  \fi
-  \@tempskipa=\glueexpr\scr@part@beforeskip\relax
-  \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
-  \partheadstartvskip
-  \vbox to\z@{\vss\use@preamble{part@o}\strut\par}%
-  \vskip-\baselineskip\nobreak%
-  \SecDef\@part\@spart
-}
-%</report|book>
-\newcommand*{\@part}{}
-\def\@part[#1]#2{%
-  \ifnum \scr@osectarg=\z@
-    \@scr@tempswafalse
-  \else
-    \scr@istest#1=\@nil
-  \fi
-  \if@scr@tempswa
-    \setkeys{KOMAarg.section}{tocentry={#2},head={#2},#1}%
-  \else
-    \ifcase \scr@osectarg\relax
-      \setkeys{KOMAarg.section}{tocentry={#1},head={#1}}%
-    \or
-      \setkeys{KOMAarg.section}{tocentry={#2},head={#1}}%
-    \or
-      \setkeys{KOMAarg.section}{tocentry={#1},head={#2}}%
-    \or
-      \setkeys{KOMAarg.section}{tocentry={#1},head={#1}}%
-    \fi
-  \fi
-  \ifnumbered{part}{%
-    \refstepcounter{part}%
-    \@maybeautodot\thepart%
-    \ifx\scr@ds@tocentry\@empty\else
-      \addparttocentry{\thepart}{\scr@ds@tocentry}%
-    \fi
-  }{%
-    \ifx\scr@ds@tocentry\@empty\else
-      \addparttocentry{}{\scr@ds@tocentry}%
-    \fi
-  }%
-  \begingroup
-    \setparsizes{\z@}{\z@}{\z@\@plus 1fil}\par@updaterelative
-    \raggedpart
-    \interlinepenalty \@M
-    \normalfont\sectfont\nobreak
-    \ifnumbered{part}{%
-      \size@partnumber{\partformat}%
-%<book|report>      \setlength{\@tempskipa}{\scr@part@innerskip}%
-      \partheadmidvskip
-    }{}%
-    \size@part{#2}\strut
-    \ifx\partmark\@gobble
-      \@mkboth{}{}\par
-    \else
-      \expandafter\partmark\expandafter{\scr@ds@head}\par
-    \fi
-  \endgroup
-%<*article>
-  \nobreak
-  \@tempskipa=\glueexpr\scr@part@afterskip\relax
-  \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
-  \partheadendvskip
-  \@afterheading
-%</article>
-%<book|report>  \@endpart
-}
-\newcommand*{\@spart}[1]{%
-  \begingroup
-    \setparsizes{\z@}{\z@}{\z@\@plus 1fil}\par@updaterelative
-    \raggedpart
-    \interlinepenalty \@M
-    \normalfont
-    \sectfont\nobreak\size@part{#1}\strut\@mkboth{}{}\par
-  \endgroup
-%<*article>
-  \nobreak
-  \@tempskipa=\glueexpr\scr@part@afterskip\relax
-  \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
-  \partheadendvskip
-  \@afterheading
-%</article>
-%<book|report>  \@endpart
-}
-%<*book|report>
-\newcommand*{\@endpart}{\vbox to\z@{\use@preamble{part@u}\vss}%
-  \@tempskipa=\glueexpr\scr@part@afterskip\relax
-  \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
-  \partheadendvskip
-  \partheademptypage
-  \if@tempswa
-    \twocolumn
-  \fi
-}
-%</book|report>
-%    \end{macrocode}
 % \begin{macro}{\setpartpreamble}
 %   \changes{v2.8f}{2001/07/12}{neu}^^A
 %   \changes{v2.8p}{2001/09/27}{Verwendung von \cs{use@preamble}}^^A
+%   \changes{v3.18}{2015/05/23}{siehe \cs{scr@dsc@def@style@part@command} und
+%     \cs{scr@@endpart}}^^A
 % \begin{macro}{\part@u@preamble}
 %   \changes{v2.8p}{2001/09/27}{neu (intern)}^^A
 %   \changes{v2.8p}{2001/09/27}{Ersatz für \cs{part@preamble}}^^A
 %   \changes{v3.12a}{2014/02/14}{flaschen (\cs{part@preamble@u}) Namen
 %     korrigiert}^^A
+%   \changes{v3.18}{2015/05/23}{siehe \cs{scr@dsc@def@style@part@command} und
+%     \cs{scr@@endpart}}^^A
 % \begin{macro}{\part@o@preamble}
 %   \changes{v2.8p}{2001/09/27}{neu (intern)}^^A
 %   \changes{v3.12a}{2014/02/14}{flaschen Namen (\cs{part@preamble@o})
 %     korrigiert}^^A
-% Analog zu den Kapitel gibt es Befehle für eine Teil-Präambel.
-% TODO: \texttt{macrocode}-Umgebungen entfernen.
-%    \begin{macrocode}
-%<*book|report>
-\newcommand*{\setpartpreamble}{\set@preamble{part}}
-\newcommand*{\part@u@preamble}{}
-\let\part@u@preamble\relax
-\newcommand*{\part@o@preamble}{}
-\let\part@o@preamble\relax
-%</book|report>
-%    \end{macrocode}
+%   \changes{v3.18}{2015/05/23}{siehe \cs{scr@dsc@def@style@part@command} und
+%     \cs{scr@@endpart}}^^A
+% Diese Anweisungen werden indirekt über \cs{DeclareSectionCommand} und
+% \cs{scr@dsc@def@style@part@command} bzw. \cs{setpartpreamble} definiert.
 % \end{macro}^^A \setpartpreamble
 % \end{macro}^^A \part@u@preamble
 % \end{macro}^^A \part@o@preamble
@@ -2853,37 +2782,6 @@
 % \end{macro}^^A \@spart
 % \end{macro}^^A \@part
 % \end{macro}^^A \part
-%
-% TODO: komplette \texttt{macro}-Umgebung entfernen
-% \begin{macro}{\partnumdepth}
-%   \changes{v3.12}{2013/12/16}{new read only command}^^A
-% Darf nur gelesen, sollten aber nie umdefiniert werden und gibt die
-% Nummerierungsebene der Gliederungsanweisungen an (nicht zu verwechseln mit
-% der Verzeichnisebene der Gliederungsanweisungen). Dass sich die Ebene für
-% \texttt{article} unterscheidet ist ein zum Feature erklärten Bug, der aus
-% Kompatibilitätsgründen von den Standardklassen übernommen wurde. Richtig
-% glücklich bin ich damit jedoch nicht!
-%    \begin{macrocode}
-\newcommand*{\partnumdepth}{%
-%<article> \z@
-%<report|book> \m@ne
-}
-%    \end{macrocode}
-% \end{macro}^^A \partnumdepth
-%
-% TODO: komplette \texttt{macro}-Umgebung entfernen
-% \begin{macro}{\parttocdepth}
-%   \changes{v3.15}{2014/12/22}{neue Anweisung}^^A
-% Die Ebene des Verzeichniseintrags wird tatsächlich verwendet.
-%    \begin{macrocode}
-\newcommand*{\parttocdepth}{\m@ne}
-\let\parttocdepth\m@ne
-%    \end{macrocode}
-% \end{macro}^^A \parttocdepth
-%
-% TODO: Alle nachfolgenden Anweisungen mit \cs{part}-Bezug müssen noch wie bei
-% \cs{chapter} verschoben und ggf. angepasst werden.
-%
 %
 % \begin{macro}{\addpart}
 %   \changes{v2.8c}{2001/06/29}{neu}^^A
@@ -2948,19 +2846,14 @@
 % werden.
 % \begin{macro}{\scr@part@tocindent}
 %   \changes{v3.15}{2014/12/02}{neue (interne) Anweisung}^^A
+%   \changes{v3.18}{2015/06/09}{indirekt über \cs{DeclareSectionCommand}}^^A
 % Wird nicht verwendet aber zwecks besserer Kompatibilität mit
 % \cs{DeclareSectionCommand} definiert.
-%    \begin{macrocode}
-\newcommand*{\scr@part@tocindent}{\z@}
-\let\scr@part@tocindent\z@
-%    \end{macrocode}
 % \end{macro}^^A \scr@part@tocindent
 % \begin{macro}{\scr@part@tocnumwidth}
 %   \changes{v3.15}{2014/12/02}{neue (interne) Anweisung}^^A
+%   \changes{v3.18}{2015/06/09}{indirekt über \cs{DeclareSectionCommand}}^^A
 % Die definierte Breite der Nummer für den Eintrag ins Inhaltsverzeichnis.
-%    \begin{macrocode}
-\newcommand*{\scr@part@tocnumwidth}{2em}
-%    \end{macrocode}
 % \end{macro}
 %    \begin{macrocode}
 \newcommand*\l@part[2]{%
@@ -3104,10 +2997,14 @@
 %   \changes{v2.8p}{2001/09/23}{neues Element \texttt{partnumber}}^^A
 % \begin{macro}{\scr@fnt@partnumber}
 %   \changes{v2.8p}{2001/09/23}{neues Element \texttt{partnumber}}^^A
+% \begin{KOMAfont}{partprefix}
+%   \changes{v3.18}{2015/06/10}{neues Alias-Element \texttt{partprefix}}^^A
 %    \begin{macrocode}
 \newcommand*{\scr@fnt@part}{\size@part}
 \newcommand*{\scr@fnt@partnumber}{\size@partnumber}
+\aliaskomafont{partprefix}{partnumber}
 %    \end{macrocode}
+% \end{KOMAfont}
 % \end{macro}
 % \end{KOMAfont}
 % \end{macro}
@@ -3532,45 +3429,7 @@
 %    \end{macrocode}
 % \end{macro}^^A \scr@@startschapter
 %
-% \begin{macro}{\hy@insteadofrefstepcounter}
-%   \changes{v3.18}{2015/05/22}{neu (intern und \textsf{hyperref})}
-% Normalerweise führt \textsf{hyperref} via \cs{refstepcounter}
-% Initialisierungen für ein nachfolgendes \cs{addcontentsline} durch. Wenn
-% allerdings eine nicht nummerierte Überschrift ins Inhaltsverzeichnis
-% eingetragen wird, dann fehlt das vorherige \cs{refstepcounter}. Statt
-% \cs{@chapter}, \cs{@schapter}, \cs{@part}, \cs{@spart} etc. direkt zu
-% patchen, erscheint es mir sinnvoller einen Hook dafür zu definieren, der
-% dann von \textsf{hyperref} entsprechend definiert werden kann. Solange
-% \textsf{hyperref} das nicht macht, versuche ich mich selbst daran und kann
-% nur hoffen, dass es funktioniert. Dabei verwende ich im Gegensatz zu
-% \textsf{hyperref} für \cs{Hy@MakeCurrentHrefAuto} kein \cs{Hy@chapapp}, weil
-% ja \cs{autoref} für nicht nummerierte Überschriften ohnehin sinnlos
-% ist. Stattdessen verwende ich den Gliederungsbefehl.
-%    \begin{macrocode}
-\newcommand*{\hy@insteadofrefstepcounter}[1]{}
-\let\hy@insteadofrefstepcounter\@gobble
-\BeforePackage{hyperref}{%
-  \let\scr@orig@chapter\@chapter
-  \let\scr@orig@schapter\@schapter
-  \let\scr@orig@addchap\@addchap
-}
-\AfterPackage!{hyperref}{%
-  \let\@chapter\scr@orig@chapter
-  \let\@schapter\scr@orig@schapter
-  \let\@addchap\scr@orig@addchap
-  \ifx\hy@insteadofrefstepcounter\@gobble
-    \renewcommand*{\hy@insteadofrefstepcounter}[1]{%
-      \Hy@MakeCurrentHrefAuto{#1*}%
-      \Hy@raisedlink{%
-        \hyper@anchorstart{\@currentHref}\hyper@anchorend
-      }%
-    }%
-  \fi
-}
-%    \end{macrocode}
-% \end{macro}
-%
-% \begin{macro}{\if@at@twocolumn}
+%% \begin{macro}{\if@at@twocolumn}
 %   \changes{v2.7b}{2001/01/05}{neu (intern)}^^A
 % \begin{macro}{\scr@topnewpage}
 %   \changes{v2.7b}{2001/01/05}{neu (intern)}^^A
@@ -4906,6 +4765,15 @@
 % sind seit \KOMAScript{} v3.15 über die von \KOMAScript{} bereitgestellte
 % Schnittstelle \cs{DeclareSectionCommand} definiert.
 %    \begin{macrocode}
+\DeclareSectionCommand[%
+  style=part,%
+%<article>  level=\z@,%
+%<report|book>  level=\m@ne,%
+%<report|book>  pagestyle=plain,%
+  toclevel=\m@ne,%
+  tocindent=\z@,%
+  tocnumwidth=2em
+]{part}
 %<*book|report>
 \DeclareSectionCommand[%
   style=chapter,%
