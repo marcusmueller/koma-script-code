@@ -1,4 +1,4 @@
-% \CheckSum{134}
+% \CheckSum{247}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-index.dtx
@@ -122,13 +122,19 @@
 %
 % \begin{macro}{\idx@@heading}
 %   \changes{v2.98c}{2008/03/04}{neu (intern)}^^A
+%   \changes{v3.18}{2015/06/15}{Beachtung von \texttt{leveldown}}^^A
 % Diese Anweisung wird verwendet, um nur die Überschrift zu setzen (nichts
 % weiter!). Sie hat genau ein Argument, nämlich den Text der Überschrift und
 % wird innerhalb von |\idx@heading| verwendet.
 %    \begin{macrocode}
 \newcommand*{\idx@@heading}{%
-%<article>  \section*
-%<book|report>  \chapter*
+  \ifidx@leveldown
+%<article>    \expandafter\subsection
+%<book|report>    \expandafter\section
+  \else
+%<article>    \expandafter\section
+%<book|report>    \expandafter\chapter
+  \fi*%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -139,6 +145,9 @@
 % \begin{option}{index}
 %   \changes{v2.98c}{2008/03/04}{Neue Option}^^A
 %   \changes{v3.17}{2015/03/12}{interne Speicherung der Werte}^^A
+%   \changes{v3.18}{2015/06/15}{neuer Wert \texttt{numbered}}^^A
+%   \changes{v3.18}{2015/06/15}{neuer Wert \texttt{leveldown}}^^A
+%   \changes{v3.18}{2015/06/15}{neuer Wert \texttt{standardlevel}}^^A
 % \begin{macro}{\idx@@heading}
 % Die Option sorgt dafür, dass der Index auch im Inhaltsverzeichnis
 % erscheint. Dazu wird das interne Makro \cs{idx@@heading} umdefiniert, über
@@ -158,42 +167,99 @@
 %     \cs{if@openright} ersetzt}
 %   \changes{v2.98c}{2008/03/04}{statt \cs{idx@heading} wird nun
 %     \cs{idx@@heading} umdefiniert}
+%   \changes{v3.18}{2015/06/15}{Beachtung von \texttt{leveldown}}^^A
 % An dieser Stelle muss dafür gesorgt werden, dass im Falle von
 % \textsf{scrbook} und \textsf{scrreprt} das Makro \cs{@schapter}
 % verwendet wird. Damit dies hier möglich ist mussten tiefreifendere
 % Änderungen am \LaTeX-Kernel bzw. am Gliederungsbefehl \cs{chapter}
 % vorgenommen werden.
+% \begin{macro}{\ifidx@leveldown}
+%   \changes{v3.18}{2015/06/15}{neuer Schalter (intern)}^^A
+% Für den ab Version~3.18neuen Wert \texttt{leveldown} und dessen
+% Gegenstück \texttt{standardlevel} wird außerdem ein Schalter benötigt.
 %    \begin{macrocode}
+\newif\ifidx@leveldown
 \KOMA@key{index}{%
   \KOMA@set@ncmdkey{index}{@tempa}{%
     {notoc}{0},{nottotoc}{0},{default}{0},{plainheading}{0},%
-    {totoc}{1},{toc}{1},{notnumbered}{1}%
+    {totoc}{1},{toc}{1},{notnumbered}{1},%
+    {numbered}{2},{totocnumbered}{2},%
+    {leveldown}{3},%
+    {standardlevel}{4}%
   }{#1}%
   \ifx\FamilyKeyState\FamilyKeyStateProcessed
-    \KOMA@kav@remove{.\KOMAClassFileName}{toc}{noindex}%
-    \KOMA@kav@remove{.\KOMAClassFileName}{toc}{index}%
-    \KOMA@kav@remove{.\KOMAClassFileName}{index}{notoc}%
-    \KOMA@kav@remove{.\KOMAClassFileName}{index}{toc}%
     \ifcase \@tempa\relax
+      \KOMA@kav@remove{.\KOMAClassFileName}{toc}{noindex}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{toc}{indexnumbered}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{toc}{index}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{index}{notoc}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{index}{numbered}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{index}{toc}%
       \KOMA@kav@add{.\KOMAClassFileName}{toc}{noindex}%
       \KOMA@kav@add{.\KOMAClassFileName}{index}{notoc}%
       \renewcommand*{\idx@@heading}{%
-%<article>      \section*
-%<book|report>      \chapter*
+        \ifidx@leveldown
+%<article>        \expandafter\subsection
+%<book|report>        \expandafter\section
+        \else
+%<article>        \expandafter\section
+%<book|report>        \expandafter\chapter
+        \fi*%
       }%
     \or
+      \KOMA@kav@remove{.\KOMAClassFileName}{toc}{noindex}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{toc}{indexnumbered}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{toc}{index}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{index}{notoc}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{index}{numbered}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{index}{toc}%
       \KOMA@kav@add{.\KOMAClassFileName}{toc}{index}%
       \KOMA@kav@add{.\KOMAClassFileName}{index}{toc}%
       \renewcommand*{\idx@@heading}{%
-%<article>      \addsec
-%<book|report>      \addchap
+        \ifidx@leveldown
+%<article>        \expandafter\subsection\expandafter*
+%<book|report>        \expandafter\addsec
+        \else
+%<article>        \expandafter\addsec
+%<book|report>        \expandafter\addchap
+        \fi
       }%
+    \or
+      \KOMA@kav@remove{.\KOMAClassFileName}{toc}{noindex}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{toc}{indexnumbered}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{toc}{index}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{index}{notoc}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{index}{numbered}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{index}{toc}%
+      \KOMA@kav@add{.\KOMAClassFileName}{toc}{indexnumbered}%
+      \KOMA@kav@add{.\KOMAClassFileName}{index}{numbered}%
+      \renewcommand*{\idx@@heading}{%
+        \ifidx@leveldown
+%<article>        \expandafter\subsection
+%<book|report>        \expandafter\section
+        \else
+%<article>        \expandafter\section
+%<book|report>        \expandafter\chapter
+        \fi
+      }%
+    \or
+      \KOMA@kav@remove{.\KOMAClassFileName}{index}{leveldown}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{index}{standardlevel}%
+      \KOMA@kav@add{.\KOMAClassFileName}{index}{leveldown}%
+      \idx@leveldowntrue
+    \or
+      \KOMA@kav@remove{.\KOMAClassFileName}{index}{leveldown}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{index}{standardlevel}%
+      \KOMA@kav@add{.\KOMAClassFileName}{index}{standardlevel}%
+      \idx@leveldownfalse
     \fi
   \fi
 }
 \KOMA@kav@add{.\KOMAClassFileName}{toc}{noindex}
 \KOMA@kav@add{.\KOMAClassFileName}{index}{notoc}
+\KOMA@kav@add{.\KOMAClassFileName}{index}{standardlevel}
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{option}
 %
@@ -276,7 +342,19 @@
   \twocolumn[%
 %<report|book>    \@chaptertolistsfalse
                   \idx@@heading{\indexname}]%
-  \@mkboth{\MakeMarkcase{\indexname}}{\MakeMarkcase{\indexname}}%
+  \ifidx@leveldown
+    \scr@ifundefinedorrelax{@mkright}{%
+      \ifx\@mkboth\@gobble\else\markright{\MakeMarkcase{\indexname}}\fi
+    }{%
+      \@mkright{\MakeMarkcase{\indexname}}%
+    }%
+  \else
+    \scr@ifundefinedorrelax{@mkdouble}{%
+      \@mkboth{\MakeMarkcase{\indexname}}{\MakeMarkcase{\indexname}}%
+    }{%
+      \@mkdouble{\MakeMarkcase{\indexname}}%
+    }%
+  \fi
 }
 %    \end{macrocode}
 % \end{macro}
