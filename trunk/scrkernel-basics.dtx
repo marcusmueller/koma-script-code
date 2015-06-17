@@ -1,4 +1,4 @@
-% \CheckSum{2919}
+% \CheckSum{2939}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -808,6 +808,21 @@
       This error is fatal. You should not continue.%
     }%
   \fi
+%    \end{macrocode}
+%   \changes{v3.18}{2015/06/17}{new hooks before processing the options}^^A
+% Ab Version~3.18 werden hier außerdem zwei Haken ausgeführt. Der erste gilt
+% dabei für alle Klassen und Pakete einer Familie und löscht sich nicht
+% selbst. Der zweite dagegen gilt nur ein einziges Mal für dieses eine
+% Mitglied.
+%    \begin{macrocode}
+  \scr@ifundefinedorrelax{scr@before@process@options@#2@hook}{}{%
+    \@nameuse{scr@before@process@options@#2@hook}%
+  }%
+  \scr@ifundefinedorrelax{scr@before@process@options@#2#1@hook}{}{%
+    \@nameuse{scr@before@process@options@#2#1@hook}%
+    \expandafter\let\csname scr@before@process@options@#2#1@hook\endcsname
+    \relax
+  }%
   \let\AtEndOfFamilyOptions\scr@AtEndOfFamilyOptions
   \@namedef{scr@after@options@#1@hook}{\@namedef{scr@after@options@#1@hook}{}}%
   \let\ds@\@empty
@@ -818,20 +833,23 @@
 % Optionenliste. Daher dürften Klassen nicht auch noch die globale Optionliste
 % verarbeiten. Paket verarbeiten jedoch auch die globale Optionenliste, geben
 % dazu jedoch keine Fehler oder Warnungen aus.
+%   \changes{v3.18}{2015/06/17}{Behandlung von undefiniertem
+%     \cs{@globaloptionslist}}^^A
 %    \begin{macrocode}
-    \@for\CurrentOption:=\@globaloptionslist\do{%
+    \scr@ifundefinedorrelax{@globaloptionslist}{}{%
+      \@for\CurrentOption:=\@globaloptionslist\do{%
 %    \end{macrocode}
 % Die Optionen werden in der Reihenfolge verarbeitet, in der sie als globale
 % Optionen angegeben wurden. Dabei werden nur Optionen verarbeitet, die nicht
 % leer sind und die im aktuellen Paket bekannt sind. Das sind also keine
 % \textsf{keyval}-Optionen, sondern normale \LaTeX-Optionen.
 %    \begin{macrocode}
-      \ifx\CurrentOption\@empty\else
-        \@expandtwoargs\in@{,\CurrentOption,}{,\@declaredoptions,}%
-        \ifin@
-          \@use@ption
-          \expandafter\let\csname ds@\CurrentOption\endcsname\@empty
-        \else
+        \ifx\CurrentOption\@empty\else
+          \@expandtwoargs\in@{,\CurrentOption,}{,\@declaredoptions,}%
+          \ifin@
+            \@use@ption
+            \expandafter\let\csname ds@\CurrentOption\endcsname\@empty
+          \else
 %    \end{macrocode}
 % Wenn die Option keine \LaTeX-Option ist, kann sie noch immer eine
 % \textsf{keyval}-Option sein. In diesem Fall wird geprüft, ob das
@@ -841,12 +859,13 @@
 % einer unbekannnten Option oder eines unbekannten Wertes, geschieht hier gar
 % nichts.
 %    \begin{macrocode}
-          \scr@ifprocess@curroption{#1}{#2}{%
-            \@expandtwoargs\@removeelement\CurrentOption
-            \@unusedoptionlist\@unusedoptionlist
-          }{}%
+            \scr@ifprocess@curroption{#1}{#2}{%
+              \@expandtwoargs\@removeelement\CurrentOption
+              \@unusedoptionlist\@unusedoptionlist
+            }{}%
+          \fi
         \fi
-      \fi
+      }%
     }%
   \fi
 %    \end{macrocode}
@@ -880,6 +899,25 @@
 }
 \@onlypreamble\FamilyProcessOptions
 %    \end{macrocode}
+% \begin{macro}{\BeforeFamilyProcessOptions}
+%   \changes{v3.18}{2015/06/17}{neu}
+% Über diese Anweisung kann man Code unmittelbar vor Ausführung von
+% \cs{FamilyProcessOptions} ausgeführt werden. Dabei muss zur Verwendung
+% des Hakens weder das Mitglied noch die Familie existieren. Man kann dies
+% also beispielsweise auch verwenden, um unmittelbar vor der Ausführung der
+% Optionen eines Pakets oder einer Klasse einzugreifen noch bevor das Paket
+% oder die Klasse geladen ist.
+%    \begin{macrocode}
+\newcommand*{\BeforeFamilyProcessOptions}[3][.\@currname.\@currext]{%
+  \scr@ifundefinedorrelax{scr@before@process@options@#2#1@hook}{%
+    \@namedef{scr@before@process@options@#2#1@hook}{#3}%
+  }{%
+    \expandafter\g@addto@macro
+    \csname scr@before@process@options@#2#1@hook\endcsname{#3}%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}^^A \BeforeFamilyProcessOptions
 % \begin{macro}{\AtEndOfFamilyOptions}
 %   \changes{v3.12}{2013/03/04}{Neue Anweisung}^^A
 % Mit dieser Option kann innerhalb der Ausführung einer Option Material auf
@@ -983,14 +1021,14 @@
 % \begin{macro}{\KOMAProcessOptions}
 %   \changes{v2.97c}{2007/04/18}{neu}%
 %   \changes{v3.00}{2008/04/30}{kein optionales Argument mehr}%
-%   Diese Anweisung führt alle Optionen, sowohl normal deklarierte als auch
-%   keyval-Optionen eines Pakets bzw. einer Klasse in der Reihenfolge, in der
-%   sie verwendet wurden aus -- zuerst globale Optionen, dann lokale
-%   Optionen. Das entspricht der Verwendung von \cs{ProcessOptions*} mit dem
-%   Unterschied, dass eben auch die keyval-Optionen abgearbeitet
-%   werden. keyval-Optionen, die keiner einzelnen Klasse und keinem einzelnen
-%   Paket zugeordnet werden, werden dabei vor gleichnamigen eigenen
-%   keyval-Optionen ausgeführt.
+% Diese Anweisung führt alle Optionen, sowohl normal deklarierte als auch
+% keyval-Optionen eines Pakets bzw. einer Klasse in der Reihenfolge, in der
+% sie verwendet wurden aus -- zuerst globale Optionen, dann lokale
+% Optionen. Das entspricht der Verwendung von \cs{ProcessOptions*} mit dem
+% Unterschied, dass eben auch die keyval-Optionen abgearbeitet
+% werden. keyval-Optionen, die keiner einzelnen Klasse und keinem einzelnen
+% Paket zugeordnet werden, werden dabei vor gleichnamigen eigenen
+%  keyval-Optionen ausgeführt.
 %    \begin{macrocode}
 %<*koma>
 \newcommand*{\KOMAProcessOptions}{\FamilyProcessOptions{KOMA}}
