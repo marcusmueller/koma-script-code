@@ -50,7 +50,7 @@
                   KOMA-Script package scrbase]
 \translator{Markus Kohm\and Melvin Hendrix}
 
-% Date of the translated German file: 2015-03-31
+% Date of the translated German file: 2015-06-17
 
 \chapter{Basic Functions of Package \Package{scrbase}}
 \labelbase{scrbase}
@@ -345,6 +345,47 @@ of \Package{keyval}. Ultimately, with the help of
 \Macro{FamilyProcessOptions}, \PName{key=value} pairs become options.%
 %
 \EndIndex{Cmd}{FamilyProcessOptions}%
+
+
+\begin{Declaration}
+  \Macro{BeforeFamilyProcessOptions}\OParameter{member}\Parameter{family}%
+                                    \Parameter{code}%
+\end{Declaration}
+\BeginIndex{Cmd}{BeforeFamilyProcessOptions}%
+Especially\ChangedAt{v3.18}{\Package{scrbase}} authors of wrapper classes or
+wrapper packages sometimes need a hook to execute \PName{code} just before
+\Macro{FamilyProcessOptions}. The package \Package{scrbase} provides such a
+hook and you can add \PName{code} to it using
+\Macro{BeforeFamilyProcessOptions}. The parameters \PName{member} and
+\PName{family} are same to \Macro{FamilyProcessOptions}. In difference to
+\Macro{FamilyProcessOptions} you can add \PName{code} also to the hook of not
+yet defined \PName{family} or \PName{member}.
+
+Note, the hook of a family member will be cleaned after execution. But if you
+use an empty \PName{member} the \PName{code} will be executed before the
+\Macro{FamilyProcessOptions} of every member of the \PName{family} and will
+never be deleted.
+
+\begin{Example}
+  Now, you are writing a package that loads \Package{liversausage}. But you do
+  not provide option \Option{coldcut} with this package. So you use
+  \Macro{BeforeFamilyProcessOptions} to deactivate
+  that option before loading the package:
+\begin{lstcode}
+  \RequirePackage{scrbase}
+  \BeforeFamilyProcessOptions[.liversausage.sty]{butcher}{%
+    \RelaxFamilyKey[.liversausage.sty]{butcher}{coldcut}%
+  }
+  \RequirePackageWithOptions{liversausage}
+\end{lstcode}
+  If after this a user tries to load your package with option
+  \Option{coldcut}, package \Package{liversausage} will throw an undefined
+  option error. If \Option{coldcut} is used as a global option, package
+  \Package{liversausage} will ignore it. But default settings inside
+  \Package{liversausage}, e.\,g., using \Macro{FamilyExecuteOptions} before
+  \Macro{FamilyProcessOptions} are not effected.
+\end{Example}
+\EndIndex{Cmd}{BeforeFamilyProcessOptions}%
 
 
 \begin{Declaration}

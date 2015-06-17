@@ -377,6 +377,49 @@ Ausführung von Optionen Pakete zu laden.%, die selbst
 %
 \EndIndex{Cmd}{FamilyProcessOptions}%
 
+\begin{Declaration}
+  \Macro{BeforeFamilyProcessOptions}\OParameter{Mitglied}\Parameter{Familie}%
+                                    \Parameter{Code}%
+\end{Declaration}
+\BeginIndex{Cmd}{BeforeFamilyProcessOptions}%
+Insbesondere\ChangedAt{v3.18}{\Package{scrbase}} Autoren von Wrapper-Klassen
+wünschen manchmal, in ein Paket oder eine Klasse noch vor der Verarbeitung der
+Optionen eines zukünftig geladenen Pakets oder einer zukünftig geladenen
+Klasse mit \Macro{FamilyProcessOptions} eingreifen zu können. Dies ist mit
+\Macro{BeforeFamilyProcessOptions} möglich. Das Paket \Package{scrbase} bietet
+dafür einen sogenannten Haken (engl. \emph{hook}). Diesem kann man mit
+\Macro{BeforeFamilyProcessOptions} neuen \PName{Code} hinzufügen. Die
+Parameter \PName{Mitglied} und \PName{Familie} entsprechen dabei denen von
+\Macro{FammilyProcessOptions}. Allerdings kann man auch den Haken von
+Familien-Mitgliedern \PName{Code} hinzufügen, wenn bisher die \PName{Familie}
+oder das \PName{Mitglied} noch gar nicht definiert ist.
+
+Der Haken eines Familien-Mitglieds wird übrigens nach dessen Ausführung
+automatisch gelöscht. Verwendet man hingegen ein leeres \PName{Mitglied}, so
+wird dieser Haken für alle Mitglieder der \PName{Familie} ausgeführt und
+bleibt auch über die Ausführung hinaus erhalten.
+
+\begin{Example}
+  Sie schreiben ein Paket, das selbst \Package{Mettwurst} lädt. Allerdings
+  wollen Sie nicht, dass für dieses Paket die Option \Option{Aufschnitt}
+  gesetzt werden kann. Daher deaktivieren sie die Option vor dem Laden des
+  Pakets über \Macro{BeforeFamilyProcessOptions}.
+\begin{lstcode}
+  \RequirePackage{scrbase}
+  \BeforeFamilyProcessOptions[.Mettwurst.sty]{Fleischermeister}{%
+    \RelaxFamilyKey[.Mettwurst.sty]{Fleischermeister}{Aufschnitt}%
+  }
+  \RequirePackageWithOptions{Mettwurst}
+\end{lstcode}
+  Versucht nun jemand Ihr Paket mit Option \Option{Aufschnitt} zu laden, so
+  meldet das Paket \Package{Mettwurst}, dass diese Option nicht bekannt
+  ist. Wird die Option \Option{Aufschnitt} als globale Option angegeben, so
+  ignoriert Paket \Package{Mettwurst} diese. Voreinstellungen innerhalb des
+  Pakets beispielsweise mit \Macro{FamilyExecuteOptions} noch vor
+  \Macro{FamilyProcessOptions} sind allerdings davon unabhängig.
+\end{Example}
+\EndIndex{Cmd}{BeforeFamilyProcessOptions}%
+
 
 \begin{Declaration}
   \Macro{FamilyExecuteOptions}\OParameter{Mitglied}\Parameter{Familie}%
