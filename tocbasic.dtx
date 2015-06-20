@@ -1,4 +1,4 @@
-% \CheckSum{1459}
+% \CheckSum{1465}
 % \iffalse meta-comment
 % ======================================================================
 % tocbasic.dtx
@@ -2826,10 +2826,11 @@ may be found in \autoref{tab:tocbasic.DeclareNewTOC-options}.
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\tb@nt@listname}
+%   \changes{v3.18}{2015/06/20}{using \cs{def} instead of \cs{edef}}
 %   The list itself has a heading. A |\list<type>name| will also be defined.
 %    \begin{macrocode}
 \define@key{tocbasic}{listname}{%
-  \tb@ifvalueisnotempty{listname}{#1}{\edef\tb@nt@listname{#1}}%
+  \tb@ifvalueisnotempty{listname}{#1}{\def\tb@nt@listname{#1}}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -2932,10 +2933,8 @@ may be found in \autoref{tab:tocbasic.DeclareNewTOC-options}.
 %    \end{macrocode}
 % \end{macro}
 % Now the command to define a new list and maybe float or nonfloat.
-%   \changes{v3.18}{2015/06/02}{\cs{expandafter}\cs{protect} added before
-%     \cs{MakeUppercase}}^^A
-%   \changes{v3.18}{2015/06/02}{using \cs{protected@edef} instead of \cs{let}
-%     to define \cs{\dots name} and \cs{\dots listname}}^^A
+%   \changes{v3.18}{2015/06/20}{\cs{tb@nt@types} and \cs{tb@nt@listname} are
+%     initialised \cs{relax}}^^A
 %    \begin{macrocode}
 \newcommand*{\DeclareNewTOC}[2][]{%
   \tb@floatfalse
@@ -2945,11 +2944,10 @@ may be found in \autoref{tab:tocbasic.DeclareNewTOC-options}.
   \def\tb@nt@floatpos{tbp}%
   \def\tb@nt@ext{#2}%
   \def\tb@nt@type{#2}%
-  \def\tb@nt@types{\tb@nt@type s}%
+  \let\tb@nt@types\relax
   \def\tb@nt@owner{float}%
   \def\tb@nt@name{\expandafter\protect\expandafter\MakeUppercase\tb@nt@type}%
-  \def\tb@nt@listname{List of 
-    \expandafter\protect\expandafter\MakeUppercase\tb@nt@types}%
+  \let\tb@nt@listname\relax
   \def\tb@nt@level{1}%
   \def\tb@nt@indent{1em}%
   \def\tb@nt@hang{1.5em}%
@@ -2967,6 +2965,12 @@ may be found in \autoref{tab:tocbasic.DeclareNewTOC-options}.
 %    \end{macrocode}
 % Then we need the TOC itself with a name:
 %    \begin{macrocode}
+  \scr@ifundefinedorrelax{tb@nt@types}{%
+    \edef\tb@nt@types{\tb@nt@type s}%
+  }{}%
+  \scr@ifundefinedorrelax{tb@nt@listname}{%
+    \protected@edef\tb@nt@listname{List of \protect\MakeUppercase\tb@nt@types}%
+  }{}%
   \@ifundefined{\tb@nt@type name}{%
     \expandafter\protected@edef\csname \tb@nt@type name\endcsname{\tb@nt@name}%
   }{%
@@ -2976,12 +2980,10 @@ may be found in \autoref{tab:tocbasic.DeclareNewTOC-options}.
     \fi
   }%
   \@ifundefined{list\tb@nt@type name}{%
-    \expandafter\protected@edef\csname list\tb@nt@type name\endcsname
-    {\tb@nt@listname}%
+    \expandafter\let\csname list\tb@nt@type name\endcsname\tb@nt@listname
   }{%
     \iftb@forcenames
-      \expandafter\protected@edef\csname list\tb@nt@type name\endcsname
-      {\tb@nt@listname}%
+      \expandafter\let\csname list\tb@nt@type name\endcsname\tb@nt@listname
     \fi
   }%
   \expandafter\newcommand\csname listof\tb@nt@ext name\expandafter\endcsname
