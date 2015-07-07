@@ -183,7 +183,39 @@ Vorschlag des \KOMAScript-Autors beseitigt. Da die entsprechende Änderung aber
 entsprechender Patch aufgenommen. Zwar kann dieser ebenfalls durch
 \OptionValue{hyperref}{false} deaktiviert werden, empfohlen wird jedoch
 stattdessen die aktuelle Version von \Package{hyperref} zu verwenden. In
-diesem Fall wird die Änderung durch \Package{scrhack} automatisch verhindert.%
+diesem Fall wird die Änderung durch \Package{scrhack} automatisch verhindert.
+
+\section{Inkonsistente Behandlung von \Length{textwidth} und \Length{textheight}}
+\seclabel{lscape}
+
+Das Paket \Package{lscape}\IndexPackage[indexmain]{lscape} definiert eine
+Umgebung \Environment{landscape}\IndexEnv{landscape}, um den Inhalt einer
+Seite aber nicht deren Kopf und Fuß quer zu setzen. Innerhalb dieser Umgebung
+wird \Length{textheight}\IndexLength{textheight} auch den Wert von
+\Length{textwidth} gesetzt. Umgekehrt wird jedoch \Length{textwidth} nicht auf
+den vorherige Wert von \Length{textheight} gesetzt. Das ist
+inkonsistent. Meines Wissens wird \Length{textwidth} nicht geändert, weil
+andere Pakete oder Anwenderanweisungen gestört werden können, wenn man es auf
+\Length{textheight} setzen würde. Jedoch hat auch die Änderung von
+\Length{textwidth} diese Potential und in der Tat beschädigt dies die Funktion
+beispielsweise der Pakete \Package{showframe}\IndexPackage{showframe} und
+\Package{scrlayer}\IndexPackage{scrlayer}. Daher wäre es am besten, wenn
+\Length{textheight} ebenfalls unverändert bliebe. \Package{scrhack} verwendet
+Paket \Package{xpatch} (siehe \cite{package:xpatch}) um die Startanweisung
+\Macro{landscape} der gleichnamigen Umgebung entsprechend zu ändern.
+
+Falls diese Änderung nicht gewünscht wird oder Probleme verursacht, kann sie
+mit Option
+\OptionValue{lscape}{false}\IndexOption[indexmain]{lscape~=\PValue{false}}
+deaktiviert wird. Es ist zu beachten\textnote{Achtung!}, dass eine
+nachträgliche Zuweisung an Option \Option{lscape} mit
+\Macro{KOMAoption}\IndexCmd{KOMAoption} oder
+\Macro{KOMAoption}\IndexCmd{KOMAoptions} nur eine Wirkung hat, wenn sie
+während des Ladens von \Package{lscape} nicht \PValue{false} war.
+
+Im übrigens\textnote{Achtung!} wird \Package{lscape} auch von dem Paket
+\Package{pdflscape}\IndexPackage[indexmain]{pdflscape} verwendet, so dass
+\Package{scrhack} sich auch auf die Funktion dieses Pakets auswirkt.%
 %
 \EndIndex{Package}{scrhack}
 
