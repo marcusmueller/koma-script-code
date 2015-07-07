@@ -1,4 +1,4 @@
-% \CheckSum{768}
+% \CheckSum{801}
 % \iffalse meta-comment
 % ======================================================================
 % scrhack.dtx
@@ -78,6 +78,7 @@
 %<floatrow&identify>\ProvidesFile{floatrow.hak}[%
 %<listings&identify>\ProvidesFile{listings.hak}[%
 %<setspace&identify>\ProvidesFile{setspace.hak}[%
+%<lscape&identify>\ProvidesFile{lscape.hak}[%
 %<*driver|manual|identify>
 %!KOMAScriptVersion
   package
@@ -91,6 +92,7 @@
 %<floatrow&identify>    floatrow)%
 %<listings&identify>    listings)%
 %<setspace&identify>    setspace)%
+%<lscape&identify>    lscape)%
 %<*driver|manual|identify>
 ]
 %</driver|manual|identify>
@@ -134,6 +136,11 @@
       \from{scrhack.dtx}{trace,hack,setspace,identify}%
       \from{scrhack.dtx}{trace,hack,setspace,body}%
     }%
+    \file{lscape.hak}{%
+      \from{scrkernel-version.dtx}{trace,file,lscape.hak}%
+      \from{scrhack.dtx}{trace,hack,lscape,identify}%
+      \from{scrhack.dtx}{trace,hack,lscape,body}%
+    }%
   }
   \@@input scrstrop.inc
 \else
@@ -147,6 +154,7 @@
 \usepackage[english,ngerman]{babel}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
+\newcommand*{\Environment}[1]{\texttt{\mbox{#1}}}
 \CodelineIndex
 \RecordChanges
 \begin{document}
@@ -366,13 +374,46 @@ You can switch of the \Package{setspace} hack loading package
 \Package{scrhack} with option \OptionValue{setspace}{false}. You may also
 switch of the \Package{setspace} hack using
 \Macro{KOMAoptions}\PParameter{setspace=false} or
-\Macro{KOMAOption}\PParameter{setspace}\PParameter{false} somewhere after
+\Macro{KOMAoption}\PParameter{setspace}\PParameter{false} somewhere after
 loading package \Package{scrhack}, but before loading package
 \Package{setspace}.
 
 Note: If you want to use \Package{setspace} with package option
 \Option{onehalfspacing} or \Option{doublespacing} you have to load
 \Package{scrhack} before \Package{setspace}.
+
+
+\section{The \Package{lscape} hack}
+\label{sec:scrhack.lscape}
+
+% \begingroup\let\Length\cs
+Package \Package{lscape} defines an environment \Environment{landscape} to set
+the page contents but not head and foot landscape. Inside this environment it
+changes \Length{textheight} to the value of \Length{textwidth}, but it does
+not change \Length{textwidth} to the former value of \Length{textheight}. 
+This is inconsistent. As far a I know, \Length{textwidth} is unchanged because
+setting it to \Length{textheight} could blame other packages or user
+commands. But changing \Length{textheight} could also blame other packages or
+user commands and indeed it breaks, e.\,g., \Package{showframe} and
+\Package{scrlayer}. So best would be, not to change \Length{textwidth},
+too. \Package{scrhack} uses package \Package{xpatch} to modify the
+environment start macro \Macro{landscape} appropriately.
+% \endgroup
+
+% \iffalse
+\begin{Declaration}
+  \KOption{lscape}{switch}
+\end{Declaration}
+% \fi
+You can switch of the \Package{lscape} hack loading package \Package{scrhack}
+with option \OptionValue{lscape}{false}. You can also change option
+\Option{lscape} afterwards. If the option is \PValue{false} while loading
+\Package{lscape}, \Package{scrhack} will not patch \Macro{landscape} and later
+changes of the option have no effect. But if the option is \PValue{true} while
+loading \Package{lscape} or if \Package{scrhack} is loaded after
+\Package{lscape} without option \OptionValue{lscape}{false}, every later
+change of the option using \Macro{KOMAoption} or \Macro{KOMAoptions} will have
+the expected effect.
 
 % \iffalse
 %</manual|dtx>
@@ -1155,6 +1196,66 @@ Note: If you want to use \Package{setspace} with package option
     Maybe you are using a unsupported setpace version}%
 }
 %</setspace&body>
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \subsection{Der \textsf{lscape}-Hack}
+% \changes{v3.18a}{2015/07/07}{Neuer \textsf{lscape}-Hack}
+%
+% Das \textsf{lscape}-Paket setzt innerhalb der
+% \texttt{landscape}-Umgebung die Länge \cs{textheight} auf den Wert
+% von \cs{textwidth} obwohl es auf der anderen Seite \cs{textwidth}
+% nicht auf den Wert von \cs{textheight} setzt. Das ist inkonsequent. Da
+% David~Carlisle außerdem angibt, dass \cs{textwidth} nicht verändert wird,
+% weil das zu Problemen führen konnte, ist es unverständlich, dass
+% \cs{textheight} verändert wird, obwohl das ebenfalls zu Problemen führen
+% kann, beispielsweise für \textsf{showframe} oder \textsf{scrpage}. Daher
+% verändere ich die Definition so, dass auch \cs{textheight} unverändert
+% bleibt. Dabei muss allerdings auch \textsf{pdflscape} berücksichtigt
+% werden. Das ist am einfachsten mit \textsf{xpatch}.
+%
+% \begin{option}{lscape}
+%   \changes{v3.18a}{2015/07/07}{Neue Option für neuen Hack}^^A
+%    \begin{macrocode}
+%<*package&option>
+\KOMA@ifkey{lscape}{@scrhack@lscape}%
+\KOMAExecuteOptions{lscape=true}%
+%</package&option>
+%<*package&body>
+\AfterPackage*{lscape}{%
+  \if@scrhack@lscape\scr@hack@load\@pkgextension{lscape}\else
+    \KOMA@key[.scrhack.sty]{lscape}{%
+      \PackageWarning{scrhack}{option `lscape' ignored}%
+      \FamilyKeyStateProcessed
+    }%
+  \fi
+}
+%</package&body>
+%    \end{macrocode}
+% \end{option}
+%
+% \begin{macro}{\landscape}
+%   \changes{v3.18a}{2015/07/07}{Neu}^^A
+% Über diese Anweisung wird die \texttt{landscape}-Umgebung von
+% \textsf{lscape} gestartet. Genau diese muss gepatcht werden. Dafür wird das
+% Paket \textsf{xpatch} benötigt. Da der Patch nur geladen wird, wenn die
+% Option dafür gesetzt ist, kann die Option daher nur ein- und ausgeschaltet
+% werden, wenn sie bis zum Laden des Pakets aktiviert wurde.
+%    \begin{macrocode}
+%<*lscape&body>
+\RequirePackage{xpatch}
+\xpatchcmd{\landscape}{\textheight=\vsize}{%
+  \if@scrhack@lscape\else\textheight=\vsize\fi
+}{%
+  \PackageInfo{scrhack}{\string\landscape\space patched to make
+    \string\textheight\space change optional}%
+}{%
+  \PackageWarning{scrhack}{Cannot patch \string\landscape!\MessageBreak
+    Maybe you are using a unsupported lscape version}%
+  \@scrhack@lscapefalse
+}
+%</lscape&body>
 %    \end{macrocode}
 % \end{macro}
 %
