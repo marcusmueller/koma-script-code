@@ -1,4 +1,4 @@
-% \CheckSum{3365}
+% \CheckSum{3382}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-notepaper.dtx
@@ -3351,6 +3351,8 @@
 %   \changes{v2.8q}{2002/01/16}{Fußnotenzähler wird zurückgesetzt}^^A
 %   \changes{v2.9d}{2002/08/12}{Fußnotenzähler wird korrekt zurückgesetzt}^^A
 %   \changes{v3.17}{2015/03/20}{Ersatz von \cs{pagemark}}^^A
+%   \changes{v3.19}{2015/07/15}{\cs{letterpagestyle} wird verwendet}^^A
+%   \changes{v3.19}{2015/07/15}{Briefe werden referenzierbar nummeriert}^^A
 % Diese Umgebung ist etwas anders definiert, als normalerweise von
 % \LaTeX gewohnt. Mit ihr können innerhalb eines Dokuments beliebig
 % viele Briefe erzeugt werden. Eine der Abweichungen von der
@@ -3360,12 +3362,21 @@
 \newenvironment{letter}[2][]{%
 %    \end{macrocode}
 % Als erstes wird eine neue Seite begonnen. Dies kann ggf. auch eine neue
-% rechte Seite sein. Danach werden alle relevanten Zähler und Strafpunkte
+% rechte Seite sein. Dabei wird auch auf den korrekten Seitenstil
+% geachtet. Danach werden alle relevanten Zähler und Strafpunkte
 % zurückgesetzt und der obligatorische Parameter ausgewertet.
+%   \changes{v3.19}{2015/07/15}{wegen des Pakets
+%     \cs{cleardoubleoddemptypage}}^^A
 %    \begin{macrocode}
-  \newpage
-  \if@twoside\ifodd\c@page\else\thispagestyle{empty}\null\newpage\fi\fi
+  \cleardoubleoddemptypage
+  \scr@ifundefinedorrelax{letterpagestyle}{}{%
+    \ifx\letterpagestyle\@empty\else
+      \pagestyle{\letterpagestyle}%
+    \fi
+  }%
 %<package>\let\pagemark\letterpagemark
+  \refstepcounter{letter}%
+  \let\thisletter\@currentlabel
   \setcounter{page}{\@ne}%
   \setcounter{footnote}{0}%
   \interlinepenalty=200\@processto{#2}%
@@ -3375,13 +3386,32 @@
   \KOMAoptions{#1}%
 %    \end{macrocode}
 % Zum Schluss werden die per \cs{AtBeginLetter} angegeben Anweisungen
-% ausgeführt.
+% ausgeführt und noch danach ein Label gesetzt.
+%   \changes{v3.19}{2015/07/15}{ein Label wird gesetzt}^^A
 %    \begin{macrocode}
   \@beginletterhook
 }{%
-  \stopletter\@@par\pagebreak\@@par%
+  \stopletter
+  \let\@currentlabel\thisletter
+  \label{\thisletter.lastpage}%
+  \@@par\pagebreak\@@par%
 }
 %    \end{macrocode}
+% \begin{macro}{\thisletter}
+%   \changes{v3.19}{2015/07/15}{neue Anweisung}^^A
+% Gibt den Wert des aktuellen Labels wieder. Man benötigt dies beispielsweise,
+% um per |\ref{\thisletter.lastpage}| auf die letzte Seite zugreifen zu
+% können.
+%    \begin{macrocode}
+\newcommand*{\thisletter}{outside.letter.undefined}
+%    \end{macrocode}
+% \end{macro}^^A \thisletter
+% \begin{macro}{\letterlastpage}
+%   \changes{v3.19}{2015/07/15}{neue Anweisung}^^A
+%    \begin{macrocode}
+\newcommand*{\letterlastpage}{\pageref{\thisletter.lastpage}}
+%    \end{macrocode}^^A \letterlastpage
+% \end{macro}
 % \begin{macro}{\stopletter}
 % Damit man Material am Ende des Briefes einschleusen kann.
 % \begin{macro}{\@processto}
@@ -3401,9 +3431,9 @@
 \long\def\@xproc#1\\#2\@nil{%
   \setkomavar{toname}{#1}\setkomavar{toaddress}{#2}}
 %    \end{macrocode}
-% \end{macro}
-% \end{macro}
-% \end{macro}
+% \end{macro}^^A \@xproc
+% \end{macro}^^A \@processto
+% \end{macro}^^A \stopletter
 % \begin{macro}{\flushbottom}
 %   \changes{v2.97c}{2007/05/17}{neue Erweiterung}^^A
 % Das Verhalten muss auf der letzten Briefseite wieder \cs{raggedbottom}
@@ -3413,9 +3443,32 @@
   \g@addto@macro\stopletter{\vskip \z@\@plus.0001fil\relax}%
 }
 %    \end{macrocode}
+% \end{macro}^^A \flushbottom
+% \begin{Counter}{letter}
+%   \changes{3.19}{2015/07/15}{neuer Zähler}^^A
+% Die Briefe werden durchnummeriert.
+%    \begin{macrocode}
+\newcounter{letter}
+%    \end{macrocode}
+% \end{Counter}
+% \end{environment}^^A letter
+%
+%
+% \begin{macro}{\letterpagestyle}
+%   \changes{v3.19}{2015/07/15}{neue Anweisung}^^A
+% Analog zu \cs{titlepagestyle}, \cs{indexpagestyle} etc. gibt es jetzt auch
+% ein \cs{letterpagestyle}. In der Voreinstellung ist dieser bei der Klasse
+% leer. Dagegen wird beim Paket \texttt{plain.letter} verwendet. Durch den
+% Unterschied wird faktisch die Kompatibilität mit des Pakets mit der Klasse
+% jedoch verbessert!
+%    \begin{macrocode}
+\newcommand*{\letterpagestyle}{%
+%<package>  plain.letter%
+}
+%    \end{macrocode}
 % \end{macro}
-% \end{environment}
-% 
+%
+%
 % \begin{macro}{\AtBeginLetter}
 %   \changes{v2.8n}{2001/09/08}{Neu}^^A
 % \begin{macro}{\@beginletterhook}
@@ -3494,6 +3547,7 @@
 }
 %    \end{macrocode}
 % \end{macro}
+%
 %
 % \begin{macro}{\closing}
 %   \changes{v2.2b}{1995/02/16}{{\cmd\fromsig} wird nicht mehr auf \cs{empty}
