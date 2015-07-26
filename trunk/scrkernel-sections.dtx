@@ -1,4 +1,4 @@
-% \CheckSum{3697}
+% \CheckSum{3773}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -731,6 +731,8 @@
 %   \changes{v3.18}{2015/05/22}{Verwendung von \cs{numexpr} f¸r Argument 2}^^A
 %   \changes{v3.18}{2015/05/22}{Verwendung von \cs{gluexpr} f¸r Argument
 %     3--5}^^A
+%   \changes{v3.19}{2015/07/17}{Verwendung von \cs{sectionlinesformat} und
+%     \cs{sectioncatchphraseformat}}^^A
 % Damit auch alle mit \cs{@startsection} definierten Gliederungsebenen
 % bei der Entscheidung ber¸cksichtigt werden, muss ein internes Makro
 % des \LaTeX-Kerns erweitert werden. F¸r die Ebenen \cs{part} und
@@ -773,7 +775,7 @@
 \ifx\@sect\@tempa\else
   \ClassWarning{\KOMAClassName}{%
     Unexpected definition of \string\@sect!\MessageBreak
-    Please send an information about this to\MessageBreak
+    Please send information about this to\MessageBreak
     the KOMA-Script maintainer!\MessageBreak
     Maybe LaTeX will be broken by the redefinition\MessageBreak
     of \string\@sect\space}%
@@ -809,9 +811,8 @@
   \@tempskipa \glueexpr #5\relax\relax
   \ifdim \@tempskipa>\z@
     \begingroup
-      #6{%
-        \@hangfrom{\hskip \glueexpr #3\relax\@svsec}%
-        \interlinepenalty \@M #8\@@par}%
+      #6{\interlinepenalty \@M
+        \sectionlinesformat{\glueexpr #3\relax}\@svsec{#8}\@@par}%
     \endgroup
 %<trace>    \ClassInfo{\KOMAClassName}{head=`\scr@ds@head'}%
     \expandafter\csname #1mark\expandafter\endcsname\expandafter{\scr@ds@head}%
@@ -832,8 +833,7 @@
     \fi
   \else
     \def\@svsechd{%
-      #6{\hskip \glueexpr #3\relax
-        \@svsec #8}%
+      #6{\sectioncatchphraseformat{\glueexpr #3\relax}\@svsec{#8}}%
 %<trace>      \ClassInfo{\KOMAClassName}{head=`\scr@ds@head'}%
        \expandafter\csname #1mark\expandafter\endcsname
        \expandafter{\scr@ds@head}%
@@ -880,14 +880,102 @@
   \ifx\relax#2\relax\@scr@tempswafalse\else\@scr@tempswatrue\fi
 }
 \newif\if@scr@tempswa
-%</body>
 %    \end{macrocode}
 % \end{macro}^^A \scr@istest
 % \end{macro}^^A \if@scr@tempswa
 % \end{macro}^^A \scr@ds@head
 % \end{macro}^^A \scr@ds@tocentry
+% \begin{macro}{\sectionlinesformat}
+%   \changes{v3.19}{2015/07/17}{neue Anweisung}^^A
+% Diese Anweisung definiert das Format der eigentlichen ‹berschriften im Stil
+% \texttt{section}, wenn mit ‹berschriftenzeilen gearbeitet
+% wird. Fonteinstellungen sind zu diesem Zeitpunkt bereits erfolgt. Die
+% Argumente sind:
+% \begin{description}
+% \item[\meta{Einzug} --] ein eventuell zu verwendender horizontaler
+% Einzug.
+% \item[\meta{Gliederungsnummer} --] die bereits fertig formatierte
+%   Gliederungsnummer oder leer, falls keine Gliederungsnummer auszugeben ist.
+% \item[\meta{Text} --] der Text der ‹berschrift.
+% \end{description}
+% Der Anwender ist selbst verantwortlich, dass innerhalb der ‹berschrift kein
+% Seitenumbruch erfolgen kann. Nach der ‹berschrift wird jedoch zwangsweise
+% ein \cs{@@par} ausgef¸hrt, so dass sichergestellt ist, dass mit einem
+% internen Absatz abgeschlossen wird.
+%    \begin{macrocode}
+\newcommand{\sectionlinesformat}[3]{%
+  \@hangfrom{\hskip #1#2}\interlinepenalty \@M #3%
+}
+%    \end{macrocode}
+% \end{macro}^^A \sectionlinesformat
+% \begin{macro}{\sectioncatchphraseformat}
+%   \changes{v3.19}{2015/07/17}{neue Anweisung}^^A
+% Diese Anweisung definiert das Format der eigentlichen ‹berschriften im
+% Stil \texttt{section}, wenn mit Spitzmarken gearbeitet
+% wird. Fonteinstellungen sind zu diesem Zeitpunkt bereits erfolgt. Die
+% Argumente sind:
+% \begin{description}
+% \item[\meta{Einzug} --] ein eventuell zu verwendender horizontaler
+% Einzug.
+% \item[\meta{Gliederungsnummer} --] die bereits fertig formatierte
+%   Gliederungsnummer oder leer, falls keine Gliederungsnummer auszugeben
+%   ist.
+% \item[\meta{Text} --] der Text der ‹berschrift.
+% \end{description}
+% Der Anwender ist selbst verantwortlich, dass innerhalb der ‹berschrift kein
+% Seitenumbruch erfolgen kann.
+%    \begin{macrocode}
+\newcommand{\sectioncatchphraseformat}[3]{%
+  \hskip #1#2#3%
+}
+%    \end{macrocode}
+% \end{macro}^^A \sectioncatchphraseformat
 % \end{macro}^^A \@sect
 % \end{macro}^^A \scr@sect
+%
+% \begin{macro}{\@ssect}
+%   \changes{v3.19}{2015/07/17}{Vollst‰ndige Neudefinition zur Realisierung
+%     der Erweiterung f¸r die Formatieurng der ‹berschrift}^^A
+% Das wird f¸r ‹berschriften ohne Nummer verwendet. Im Prinzip machen wir hier
+% dasselbe wie zuvor.
+%    \begin{macrocode}
+\def\@tempa#1#2#3#4#5{%
+  \@tempskipa #3\relax
+  \ifdim \@tempskipa>\z@
+    \begingroup
+      #4{%
+        \@hangfrom{\hskip #1}%
+          \interlinepenalty \@M #5\@@par}%
+    \endgroup
+  \else
+    \def\@svsechd{#4{\hskip #1\relax #5}}%
+  \fi
+  \@xsect{#3}}
+\ifx\@ssect\@tempa\else
+  \ClassWarning{\KOMAClassName}{%
+    Unexpected definition of \string\@ssect!\MessageBreak
+    Please send information about this to\MessageBreak
+    the KOMA-Script maintainer!\MessageBreak
+    Maybe LaTeX will be broken by the redefinition\MessageBreak
+    of \string\@ssect\space}%
+\fi
+%<trace>\ClassInfo{\KOMAClassName}{redefining LaTeX kernel macro
+%<trace>  \string\@ssect}
+\def\@ssect#1#2#3#4#5{%
+  \@tempskipa #3\relax
+  \ifdim \@tempskipa>\z@
+    \begingroup
+      #4{\interlinepenalty \@M
+        \sectionlinesformat{\glueexpr #1\relax}\@empty{#5}\@@par}%
+    \endgroup
+  \else
+    \def\@svsechd{#4{\sectioncatchphraseformat{\glueexpr #1\relax}\@empty{#5}}}%
+  \fi
+  \@xsect{\glueexpr #3\relax}%
+}
+%</body>
+%    \end{macrocode}
+% \end{macro}^^A \@ssect
 %
 % \begin{macro}{\IfUsePrefixLine}
 %   \changes{v3.18}{2015/06/09}{auﬂerhalb von Gliederungsbefehlsstilen
