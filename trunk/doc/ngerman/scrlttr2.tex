@@ -694,6 +694,61 @@ folgende Beispiel zeigt dies.
 
 
 \begin{Declaration}
+  \Counter{letter}\\
+  \Macro{thisletter}\\
+  \Macro{letterlastpage}
+\end{Declaration}
+\BeginIndex{Counter}{letter}%
+\BeginIndex{Cmd}{thisletter}%
+\BeginIndex{Cmd}{letterlastpage}%
+Für\ChangedAt{v3.19}{\Class{scrlttr2}\and \Package{scrletter}} den Fall, dass
+sich mehrere Briefe in einem Dokument befinden, werden die Briefe intern von
+\KOMAScript{} durchnummeriert. Hierfür ist seit Version~3.19 der Zähler
+\Counter{letter} definiert, der mit jedem \Macro{begin}\PParameter{letter}
+referenzierbar um eins erhöht wird.
+\begin{Example}
+  Kommen wir auf das Beispiel zu \Macro{AtBeginLetter} zurück. Statt den
+  Zähler explizit innerhalb von \Macro{begin}\PParameter{letter}
+  zurückzusetzen, kann dies auch implizit erfolgen, indem der Zähler
+  \Counter{Frage} abhängig von \Counter{letter} definiert wird:
+\begin{lstcode}
+  \newcounter{Frage}[letter]
+  \newcommand{\Frage}[1]{%
+    \refstepcounter{Frage}\par
+    \noindent\begin{tabularx}{\textwidth}{l@{}X}
+      \theFrage:~ & #1\\
+    \end{tabularx}%
+  }%
+\end{lstcode}
+  Damit wird der Zähler automatisch zu Beginn jedes Briefs wieder auf Null
+  zurück gesetzt, so dass die erste Frage in jedem Brief wieder mit der Nummer
+  Eins beginnt.
+\end{Example}
+
+Will man sich den aktuellen Wert von \Counter{letter} ausgeben lassen, so ist
+das wie gewohnt mit \Macro{theletter} möglich. Wie bereits erwähnt, ist der
+Zähler aber auch referenzierbar. Das bedeutet, man könnte am Anfang eines
+Briefes mit \Macro{label}\Parameter{Labelname} ein Label setzen und mit
+\Macro{ref}\Parameter{Labelname} dann an beliebiger Stelle im Dokument darauf
+verweisen. Innerhalb des Briefes selbst erhält man dasselbe Ergebnis auch ganz
+ohne Label mit \Macro{thisletter}. 
+
+Für Label innerhalb von Serienbriefen ist es notwendig, diesen einen über alle
+Briefe hinweg eindeutigen Namen zu geben. Auch dafür kann \Macro{thisletter}
+verwendet werden. Intern arbeitet \KOMAScript{} für diesen Zweck ebenfalls mit
+\Macro{thisletter}, um auf der letzten Seite eines jeden Briefes ein Label zu
+setzen. Dadurch ist es möglich, mit \Macro{letterlastpage} jederzeit innerhalb
+des Briefes die Nummer der letzten Seite des Briefes auszugeben. Da
+\Macro{letterlastpage} über \Macro{label} und \Macro{pageref} arbeitet, ist
+die Ausgabe allerdings erst nach mehreren \LaTeX-Läufen -- meist zwei oder drei
+-- gültig. Achten Sie gegebenenfalls auf entsprechende \emph{Rerun}-Meldungen
+in der Terminal-Ausgabe oder der \File{log}-Datei.%
+\EndIndex{Cmd}{letterlastpage}%
+\EndIndex{Cmd}{thisletter}%
+\EndIndex{Counter}{letter}%
+
+
+\begin{Declaration}
   \Macro{opening}\Parameter{Anrede}
 \end{Declaration}
 \BeginIndex{Cmd}{opening}%
@@ -3550,4 +3605,4 @@ Version von \Package{adrconv} bereits mit \Macro{addrentry} und
 
 %  LocalWords:  Paketoption Satzspiegels Briefklasse Seitenkopf Seitenfuß
 
-%  LocalWords:  Versandart Zentrierung Dokumenttitel
+%  LocalWords:  Versandart Zentrierung Dokumenttitel Serienbriefen
