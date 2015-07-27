@@ -1,4 +1,4 @@
-% \CheckSum{3819}
+% \CheckSum{3829}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlayer.dtx
@@ -1373,6 +1373,29 @@
 % There are basic, primitive attributes and compounding attributes. The basic
 % attributes are:
 % \begin{description}
+% \item[\texttt{picturecontents=\meta{picture commands}}:]
+%   \changes{v3.19}{2015/07/27}{new layer attribute
+%     \texttt{picturecontents}}^^A
+%   attribute \texttt{contents} will be used to put the \meta{picture
+%   commands} inside a \texttt{picture} environment with full layer size. The
+%   origin of the picture environment is the lower left corner of the layer.
+%    \begin{macrocode}
+\DefineFamilyKey[.definelayer]{KOMAarg}{picturecontents}{%
+  \long\@namedef{scr@l@\scr@current@layer @contents}{%
+    \begin{picture}(0,0)
+               (0,\LenToUnit{%
+                 \if t\scr@l@valign \dimexpr\layerheight-\ht\strutbox\relax
+                 \else
+                   \if b\scr@l@valign \dp\strutbox
+                   \else .5\dimexpr\layerheight-\ht\strutbox+\dp\strutbox\relax
+                   \fi
+                 \fi})
+      #1%
+    \end{picture}%
+  }%
+  \FamilyKeyStateProcessed
+}
+%    \end{macrocode}
 %   \changes{v3.16}{2015/01/26}{new layer attribute \texttt{addhoffset}}^^A
 % \item[\texttt{addhoffset=\meta{dimension expression}}:] add to offset from
 %   the left edge of the paper.
@@ -1948,6 +1971,7 @@
 %
 %
 % \begin{macro}{\layercontentsmeasure}
+%   \changes{v3.19}{2015/07/27}{\cs{@gobble} eliminated}^^A
 % This may used by used as the only value of the layer option
 % \texttt{contents} to show measure lines around the layer. The left and the
 % top measure line will be in centimeter, the right and the bottom measure
@@ -1957,88 +1981,100 @@
 %<*package&body>
 \newcommand*{\layercontentsmeasure}{%
   \smash{\begin{picture}(0,0)
-               (0,\if t\scr@l@valign -\ht\strutbox
-                  \else
-                    \if b\scr@l@valign -\dimexpr\layerheight-\dp\strutbox\relax
-                    \else -.5\dimexpr \layerheight+\ht\strutbox-\dp\strutbox\relax
-                    \fi
-                  \fi\@gobble)
+               (0,\LenToUnit{%
+                 \if t\scr@l@valign -\ht\strutbox
+                 \else
+                   \if b\scr@l@valign -\dimexpr\layerheight-\dp\strutbox\relax
+                   \else -.5\dimexpr \layerheight+\ht\strutbox-\dp\strutbox\relax
+                   \fi
+                 \fi})
 %    \end{macrocode}
 % 1st horizontal cm
 %    \begin{macrocode}
-    \put(0,0){\line(1,0){\layerwidth\@gobble}}%
+    \setlength{\unitlength}{1mm}%
+    \put(0,0){\line(1,0){\LenToUnit{\layerwidth}}}%
     \@tempcnta=\numexpr \dimexpr\layerwidth + .5mm\relax/\dimexpr 1mm\relax\relax
-    \multiput(0,0)(1mm\@gobble,0){\@tempcnta}{%
-      \line(0,-1){1mm\@gobble}%
+    \multiput(0,0)(1,0){\@tempcnta}{%
+      \line(0,-1){1}%
     }%
     \@tempcnta=\numexpr \dimexpr\layerwidth + 2.5mm\relax/\dimexpr 5mm\relax\relax
-    \multiput(0,0)(5mm\@gobble,0){\@tempcnta}{%
-      \line(0,-1){2mm\@gobble}%
+    \multiput(0,0)(5,0){\@tempcnta}{%
+      \line(0,-1){2}%
     }%
     \@tempcnta=\numexpr \dimexpr\layerwidth + .5cm\relax/\dimexpr 1cm\relax\relax
-    \multiput(0,0)(10mm\@gobble,0){\@tempcnta}{%
-      \put(0,0){\line(0,-1){3mm\@gobble}}%
-      \put(0,-3.5mm\@gobble){%
+    \multiput(0,0)(10,0){\@tempcnta}{%
+      \put(0,0){\line(0,-1){3}}%
+      \put(0,-3.5){%
         \makebox(0,0)[ct]{\the\numexpr\@tempcnta-\@multicnt\relax}}%
     }%
 %    \end{macrocode}
 % 2nd horizontal in:
 %    \begin{macrocode}
-    \put(0,-\layerheight\@gobble){\line(1,0){\layerwidth\@gobble}}%
+    \put(0,\LenToUnit{-\layerheight}){\line(1,0){\LenToUnit{\layerwidth}}}%
     \@tempcnta=\numexpr \dimexpr\layerwidth + .05in\relax/\dimexpr .1in\relax\relax
-    \multiput(0,-\layerheight\@gobble)(.1in\@gobble,0){\@tempcnta}{%
-      \line(0,1){1mm\@gobble}%
+    \multiput(0,\LenToUnit{-\layerheight})(2.54,0){\@tempcnta}{%
+      \line(0,1){1}%
     }%
     \@tempcnta=\numexpr \dimexpr\layerwidth + .25in\relax/\dimexpr .5in\relax\relax
-    \multiput(0,-\layerheight\@gobble)(.5in\@gobble,0){\@tempcnta}{%
-      \line(0,1){2mm\@gobble}%
+    \multiput(0,\LenToUnit{-\layerheight})(12.7,0){\@tempcnta}{%
+      \line(0,1){2}%
     }%
     \@tempcnta=\numexpr \dimexpr\layerwidth + .5in\relax/\dimexpr 1in\relax\relax
-    \multiput(0,-\layerheight\@gobble)(1in\@gobble,0){\@tempcnta}{%
-      \put(0,0){\line(0,1){3mm\@gobble}}%
-      \put(0,3.5mm\@gobble){%
+    \multiput(0,\LenToUnit{-\layerheight})(25.4,0){\@tempcnta}{%
+      \put(0,0){\line(0,1){3}}%
+      \put(0,3.5){%
         \makebox(0,0)[cb]{\the\numexpr\@tempcnta-\@multicnt\relax}}%
     }%
 %    \end{macrocode}
 % 3rd vertical cm:
 %    \begin{macrocode}
-    \put(0,0){\line(0,-1){\layerheight\@gobble}}%
+    \put(0,0){\line(0,-1){\LenToUnit{\layerheight}}}%
     \@tempcnta\numexpr \dimexpr\layerheight + .5mm\relax/\dimexpr 1mm\relax\relax
-    \multiput(0,0)(0,-1mm\@gobble){\@tempcnta}{%
-      \line(1,0){1mm\@gobble}%
+    \multiput(0,0)(0,-1){\@tempcnta}{%
+      \line(1,0){1}%
     }%
     \@tempcnta\numexpr \dimexpr\layerheight + 2.5mm\relax/\dimexpr 5mm\relax\relax
-    \multiput(0,0)(0,-5mm\@gobble){\@tempcnta}{%
-      \line(1,0){2mm\@gobble}%
+    \multiput(0,0)(0,-5){\@tempcnta}{%
+      \line(1,0){2}%
     }%
     \@tempcnta\numexpr \dimexpr\layerheight + .5cm\relax/\dimexpr 1cm\relax\relax
-    \multiput(0,0)(0,-1cm\@gobble){\@tempcnta}{%
-      \put(0,0){\line(1,0){3mm\@gobble}}%
-      \put(3.5mm\@gobble,0){%
+    \multiput(0,0)(0,-10){\@tempcnta}{%
+      \put(0,0){\line(1,0){3}}%
+      \put(3.5,0){%
         \makebox(0,0)[cl]{\the\numexpr\@tempcnta-\@multicnt\relax}}%
     }%
 %    \end{macrocode}
 % 4th vertical in:
 %    \begin{macrocode}
-    \put(\layerwidth\@gobble,0){\line(0,-1){\layerheight\@gobble}}%
+    \put(\LenToUnit{\layerwidth},0){\line(0,-1){\LenToUnit{\layerheight}}}%
     \@tempcnta\numexpr \dimexpr\layerheight + .05in\relax/\dimexpr .1in\relax\relax
-    \multiput(\layerwidth\@gobble,0)(0,-.1in\@gobble){\@tempcnta}{%
-      \line(-1,0){1mm\@gobble}%
+    \multiput(\LenToUnit{\layerwidth},0)(0,-2.54){\@tempcnta}{%
+      \line(-1,0){1}%
     }%
     \@tempcnta\numexpr \dimexpr\layerheight + .25in\relax/\dimexpr .5in\relax\relax
-    \multiput(\layerwidth\@gobble,0)(0,-.5in\@gobble){\@tempcnta}{%
-      \line(-1,0){2mm\@gobble}%
+    \multiput(\LenToUnit{\layerwidth},0)(0,-12.7){\@tempcnta}{%
+      \line(-1,0){2}%
     }%
     \@tempcnta\numexpr \dimexpr\layerheight + .5in\relax/\dimexpr 1in\relax\relax
-    \multiput(\layerwidth\@gobble,0)(0,-1in\@gobble){\@tempcnta}{%
-      \put(0,0){\line(-1,0){3mm\@gobble}}%
-      \put(-3.5mm\@gobble,0){%
+    \multiput(\LenToUnit{\layerwidth},0)(0,-25.4){\@tempcnta}{%
+      \put(0,0){\line(-1,0){3}}%
+      \put(-3.5,0){%
         \makebox(0,0)[cr]{\the\numexpr\@tempcnta-\@multicnt\relax}}%
     }%
   \end{picture}}%
 }
+%    \end{macrocode}
+% \begin{macro}{\LenToUnit}
+%   \changes{v3.19}{2015/07/27}{new}
+% Due to an incompatibility of package \textsf{curve2e} I've eliminated
+% \cs{@gobble} in the definition of \cs{layercontentsmeasure} and replaced it
+% sometimes by \cs{LenToUnit} with the (not long) definition suggested by
+% \textsf{curve2e} itself.
+%    \begin{macrocode}
+\providecommand*{\LenToUnit}[1]{\strip@pt\dimexpr#1*\p@/\unitlength}
 %</package&body>
 %    \end{macrocode}
+% \end{macro}^^A \LenToUnit
 % \end{macro}^^A \layercontentsmeasure
 %
 %
