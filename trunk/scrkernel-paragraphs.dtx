@@ -1,4 +1,4 @@
-% \CheckSum{702}
+% \CheckSum{704}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-paragraphs.dtx
@@ -121,6 +121,8 @@
 %   \changes{v2.95}{2004/11/05}{neues Macro}^^A
 %   \changes{v3.17}{2015/03/10}{löscht diverse \texttt{parskip}-Einstellungen
 %     aus der internen Liste}^^A
+%   \changes{v3.19}{2015/07/29}{\cs{par@update} darf erst nach
+%     \cs{begin{document}} wieder \cs{default@par@update} werden}^^A
 % Über dieses Makro wird die Änderung der Absatzparameter |\parskip|,
 % |\parindent|, |\parfillskip| gesetzt. Das erste Argument ist der Einzug, das
 % zweite der Abstand und das dritte die Füllung. Aktiviert werden die
@@ -135,7 +137,10 @@
   \def\scr@parindent{#1}%
   \def\scr@parskip{#2}%
   \def\scr@parfillskip{#3}%
-  \def\par@update{\let\par@update\default@par@update\par@updaterelative}%
+  \def\par@update{%
+    \if@atdocument\let\par@update\default@par@update\fi
+    \par@updaterelative
+  }%
   \KOMA@kav@remove{.\KOMAClassFileName}{parskip}{false}%
   \KOMA@kav@remove{.\KOMAClassFileName}{parskip}{never}%
   \KOMA@kav@remove{.\KOMAClassFileName}{parskip}{full}%
