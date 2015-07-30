@@ -1,4 +1,4 @@
-% \CheckSum{3829}
+% \CheckSum{3896}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlayer.dtx
@@ -1096,6 +1096,18 @@
 % There are basic, primitive attributes and compounding attributes. The basic
 % attributes are:
 % \begin{description}
+% \item[\texttt{mode=\meta{command sequence}}:] the mode that should be used
+%   to output the \texttt{contents}. A command \cs{layer\meta{command
+%   sequence}mode} with one argument need to be defined.
+%   \changes{v3.19}{2015/07/30}{new layer attribute \texttt{mode}}^^A
+%    \begin{macrocode}
+\DefineFamilyKey[.definelayer]{KOMAarg}{mode}{%
+  \scr@ifundefinedorrelax{layer#1mode}{\FamilyKeyStateUnknownValue}{%
+    \@namedef{scr@l@\scr@current@layer @mode}{#1}%
+    \FamilyKeyStateProcessed
+  }%
+}
+%    \end{macrocode}
 % \item[\texttt{hoffset=\meta{dimension expression}}:] offset from the left
 %   edge of the paper.
 %    \begin{macrocode}
@@ -1370,32 +1382,7 @@
 %
 % Attribute modifications are attributes, that modify existing basic
 % attributes:
-% There are basic, primitive attributes and compounding attributes. The basic
-% attributes are:
 % \begin{description}
-% \item[\texttt{picturecontents=\meta{picture commands}}:]
-%   \changes{v3.19}{2015/07/27}{new layer attribute
-%     \texttt{picturecontents}}^^A
-%   attribute \texttt{contents} will be used to put the \meta{picture
-%   commands} inside a \texttt{picture} environment with full layer size. The
-%   origin of the picture environment is the lower left corner of the layer.
-%    \begin{macrocode}
-\DefineFamilyKey[.definelayer]{KOMAarg}{picturecontents}{%
-  \long\@namedef{scr@l@\scr@current@layer @contents}{%
-    \begin{picture}(0,0)
-               (0,\LenToUnit{%
-                 \if t\scr@l@valign \dimexpr\layerheight-\ht\strutbox\relax
-                 \else
-                   \if b\scr@l@valign \dp\strutbox
-                   \else .5\dimexpr\layerheight-\ht\strutbox+\dp\strutbox\relax
-                   \fi
-                 \fi})
-      #1%
-    \end{picture}%
-  }%
-  \FamilyKeyStateProcessed
-}
-%    \end{macrocode}
 %   \changes{v3.16}{2015/01/26}{new layer attribute \texttt{addhoffset}}^^A
 % \item[\texttt{addhoffset=\meta{dimension expression}}:] add to offset from
 %   the left edge of the paper.
@@ -1721,6 +1708,7 @@
     }%
   }{%
     \FamilyKeyStateProcessed
+    \scrlayer@clone@attribute{\scr@current@layer}{#1}{mode}%
     \scrlayer@clone@attribute{\scr@current@layer}{#1}{x}%
     \scrlayer@clone@attribute{\scr@current@layer}{#1}{y}%
     \scrlayer@clone@attribute{\scr@current@layer}{#1}{w}%
@@ -1740,7 +1728,7 @@
 %    \end{macrocode}
 % \begin{macro}{\scrlayer@clone@attribute}
 % \begin{macro}{\scrlayer@clone@switch}
-% Two helpers used to at option \texttt{clone} to clone either a macro-based
+% Two helpers used at option \texttt{clone} to clone either a macro-based
 % attribute or a if-based attribute.
 %    \begin{macrocode}
 \newcommand*{\scrlayer@clone@attribute}[3]{%
@@ -1762,6 +1750,7 @@
 %    \begin{macrocode}
 \newcommand{\DeclareLayer}[2][]{%
   \def\scr@current@layer{#2}%
+  \@namedef{scr@l@#2@mode}{text}%
   \@namedef{scr@l@#2@x}{\z@}%
   \@namedef{scr@l@#2@y}{\z@}%
   \@namedef{scr@l@#2@w}{\paperwidth}%
@@ -1810,7 +1799,7 @@
 %    \begin{macrocode}
 %<*package&body>
 \newcommand*{\IfLayerExists}[1]{%
-  \scr@ifundefinedorrelax{scr@l@#1@x}{%
+  \scr@ifundefinedorrelax{scr@l@#1@mode}{%
     \expandafter\@secondoftwo
   }{%
     \expandafter\@firstoftwo
@@ -1870,7 +1859,17 @@
 \newcommand{\ModifyLayer}[2][]{%
   \IfLayerExists{#2}{%
     \def\scr@current@layer{#2}%
-    \FamilyExecuteOptions[.definelayer]{KOMAarg}{#1}%
+    \edef\reserved@a{%
+      \unexpanded{%
+        \FamilyExecuteOptions[.definelayer]{KOMAarg}{#1}%
+        \ifstr{\csname scr@l@#2@mode\endcsname}%
+      }{\csname scr@l@#2@mode\endcsname}%
+    }\reserved@a{}{%
+      \PackageWarning{scrlayer}{%
+        change of layer mode could result in unexpected\MessageBreak
+        output and errors%
+      }%
+    }%
     \let\scr@current@layer\@empty
   }{%
     \PackageError{scrlayer}{layer `#2' not yet defined}{%
@@ -1926,6 +1925,7 @@
 %<*package&body>
 \newcommand*{\DestroyLayer}[1]{%
   \IfLayerExists{#1}{%
+    \expandafter\let\csname scr@l@#1@mode\endcsname\relax
     \expandafter\let\csname scr@l@#1@x\endcsname\relax
     \expandafter\let\csname scr@l@#1@y\endcsname\relax
     \expandafter\let\csname scr@l@#1@w\endcsname\relax
@@ -1982,9 +1982,9 @@
 \newcommand*{\layercontentsmeasure}{%
   \smash{\begin{picture}(0,0)
                (0,\LenToUnit{%
-                 \if t\scr@l@valign -\ht\strutbox
+                 \if t\layervalign -\ht\strutbox
                  \else
-                   \if b\scr@l@valign -\dimexpr\layerheight-\dp\strutbox\relax
+                   \if b\layervalign -\dimexpr\layerheight-\dp\strutbox\relax
                    \else -.5\dimexpr \layerheight+\ht\strutbox-\dp\strutbox\relax
                    \fi
                  \fi})
@@ -2824,7 +2824,9 @@
                          (\csname scr@l@#3@w\endcsname,%
                           \csname scr@l@#3@h\endcsname)%
                          [\csname scr@l@#3@align\endcsname]%
-                         {\csname scr@l@#3@contents\endcsname}%
+                         {\csname layer\csname scr@l@#3@mode\endcsname 
+                                  mode\expandafter\endcsname
+                          \csname scr@l@#3@contents\endcsname}%
           \fi
         \fi
       \fi
@@ -2854,26 +2856,26 @@
     \edef\layeryoffset{#2}%
     \edef\layerwidth{#3}%
     \edef\layerheight{#4}%
-    \def\scr@l@valign{t}%
-    \def\scr@l@halign{l}%
+    \def\layervalign{t}%
+    \def\layerhalign{l}%
     \edef\reserved@b{#5}%
     \expandafter\@tfor\expandafter\reserved@a\expandafter:\expandafter=%
     \reserved@b\do{%
       \if t\reserved@a
-        \def\scr@l@valign{t}%
+        \def\layervalign{t}%
       \else
         \if c\reserved@a
-          \def\scr@l@valign{c}%
-          \def\scr@l@halign{c}%
+          \def\layervalign{c}%
+          \def\layerhalign{c}%
         \else
           \if b\reserved@a
-            \def\scr@l@valign{b}%
+            \def\layervalign{b}%
           \else
             \if l\reserved@a
-              \def\scr@l@halign{l}%
+              \def\layerhalign{l}%
             \else
               \if r\reserved@a
-                \def\scr@l@halign{r}%
+                \def\layerhalign{r}%
               \else
                 \PackageWarning{scrlayer}{%
                   Unknown alignment `\reserved@a' ignored}%
@@ -2885,12 +2887,12 @@
     }%
     \parbox[t][\z@][t]{\z@}{%
       \vskip\layeryoffset
-      \if b\scr@l@valign\vskip-\layerheight\fi
-      \if c\scr@l@valign\vskip-.5\dimexpr\layerheight\relax\fi
+      \if b\layervalign\vskip-\layerheight\fi
+      \if c\layervalign\vskip-.5\dimexpr\layerheight\relax\fi
       \makebox[\z@][l]{%
         \hskip\layerxoffset
-        \makebox[\z@][\scr@l@halign]{%
-          \parbox[\scr@l@valign][\layerheight][\scr@l@valign]{\layerwidth}{%
+        \makebox[\z@][\layerhalign]{%
+          \parbox[\layervalign][\layerheight][\layervalign]{\layerwidth}{%
             \vskip\z@\strut{%
               \ifscrlayer@forceignoreuppercase
                 \expandafter\let\csname MakeUppercase \endcsname\@firstofone
@@ -2909,6 +2911,51 @@
 %    \end{macrocode}
 % \end{macro}^^A \scr@@layerbox
 % \end{macro}^^A \scr@layerbox
+%
+% \begin{macro}{\layerrawmode}
+%   \changes{v3.19}{2015/07/30}{new command}^^A
+% \begin{macro}{\layertextmode}
+%   \changes{v3.19}{2015/07/30}{new command}^^A
+% This is the command to output layers in raw mode. This is very simple:
+%    \begin{macrocode}
+%<*package&body>
+\newcommand{\layerrawmode}[1]{#1}
+\newcommand{\layertextmode}[1]{#1}
+%</package&body>
+%    \end{macrocode}
+% \end{macro}^^A \layertextmode
+% \end{macro}^^A \layerrawmode
+%
+% \begin{macro}{\layerpicturemode}
+%   \changes{v3.19}{2015/07/30}{new command}^^A
+% This is a bit more complicated. It is the layer output for \texttt{picture}
+% layers. In this case we use a picture environment and internally define some
+% additional commands.
+%    \begin{macrocode}
+%<*package&body>
+\newcommand{\layerpicturemode}[1]{%
+  \begin{picture}(0,0)
+             (0,\LenToUnit{%
+               \if t\layervalign \dimexpr\layerheight-\ht\strutbox\relax
+               \else
+                 \if b\layervalign \dp\strutbox
+                 \else .5\dimexpr\layerheight-\ht\strutbox+\dp\strutbox\relax
+                 \fi
+               \fi})
+    \long\def\putLL##1{\put(0,0){##1}}%
+    \long\def\putUL##1{\put(0,\LenToUnit{\layerheight}){##1}}%
+    \long\def\putLR##1{\put(\LenToUnit{\layerwidth},0){##1}}%
+    \long\def\putUR##1{\put(\LenToUnit{\layerwidth},%
+                                \LenToUnit{\layerheight}){##1}}%
+    \long\def\putC##1{\put(\LenToUnit{.5\dimexpr\layerwidth\relax},%
+                           \LenToUnit{.5\dimexpr\layerheight\relax}){##1}}%
+    #1%
+  \end{picture}%
+}
+%</package&body>
+%    \end{macrocode}
+% \end{macro}^^A \layerpicturemode
+% 
 % \begin{option}{draft}
 % \begin{macro}{\ifscrlayer@draft}
 %   \begin{description}
