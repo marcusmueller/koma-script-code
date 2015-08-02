@@ -1,4 +1,4 @@
-% \CheckSum{3773}
+% \CheckSum{3811}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -3617,40 +3617,57 @@
 %    \begin{macrocode}
   {%
     \setlength{\parindent}{\z@}\setlength{\parfillskip}{\fill}%
-    \normalfont\sectfont\nobreak\nobreak
-    \usefontofkomafont{#1}%
-%<book>    \if@mainmatter
-     \def\IfUseNumber{\ifnumbered{#1}}%
-%<book>    \else\let\IfUseNumber\@secondoftwo\fi
+%    \end{macrocode}
+%   \changes{v3.19}{2015/08/02}{Verwendung von \cs{chapterlinesformat} und
+%     \cs{chapterlineswithprefixformat}}^^A
+%   \changes{v3.19}{2015/08/02}{Verwendung von Element \texttt{disposition} an
+%     Stelle von Befehl \cs{sectfont}}^^A
+% Ab Version~3.19 wurde der Code weitgehend umgebaut, um die Befehle
+% \cs{chapterlinesformat} für die hängende Version und
+% \cs{chapterlinesandprefixformat} für die Version mit Präfixzeile zu
+% verwenden. Dadurch entfällt dann auch die Verwendung von
+% \cs{usefontofkomafont}. Ich bin mir bewusst, dass dadurch diverse Hacks
+% bezüglich der Kapitelüberschriften nicht mehr funktionieren. Dafür kann man
+% diese Hacks nun durch saubere Lösungen ersetzen.
+%    \begin{macrocode}
+    \def\IfUseNumber{\ifnumbered{#1}}%
+%<book>    \if@mainmatter\else\let\IfUseNumber\@secondoftwo\fi
+    \def\IfUseNumber{\ifnumbered{#1}}%
     \if@chapterprefix
-      \raggedchapter
       \let\IfUsePrefixLine\@firstoftwo
-      \let\@tempa\@firstofone
     \else
       \let\IfUsePrefixLine\@secondoftwo
-      \let\@tempa\@hangfrom
     \fi
-    \@tempa{%
-      \IfUseNumber{%
-        \usekomafont{#1}{%
+    \normalfont\usekomafont{disposition}{%
+      \usekomafont{#1}{%
+        \settoheight{\@tempskipa}{%
+          {\usekomafont{#1prefix}{%
+              \vrule \@width\z@ \@height\csname scr@#1@innerskip\endcsname}}%
+        }%
+        \IfUseNumber{%
           \IfUsePrefixLine{%
-            {\usekomafont{#1prefix}{%
-                \csname #1format\endcsname
-                \setlength{\@tempskipa}{%
-                  \csname scr@#1@innerskip\endcsname
-                }%
-                \chapterheadmidvskip
-            }}%
+            \chapterlineswithprefixformat{#1}%
+            {{\usekomafont{#1prefix}{\csname #1format\endcsname%
+                  \setlength{\@tempskipa}{\csname scr@#1@innerskip\endcsname}%
+                  \chapterheadmidvskip}}}%
+            {\raggedchapter\interlinepenalty \@M#2\@@par}%
           }{%
-            \csname #1format\endcsname
+            \chapterlinesformat{#1}%
+            {\csname #1format\endcsname}%
+            {\raggedchapter\interlinepenalty \@M#2\@@par}%
+          }%
+        }{%
+          \IfUsePrefixLine{%
+            \chapterlineswithprefixformat{#1}%
+            {}%
+            {\raggedchapter\interlinepenalty \@M#2\@@par}%
+          }{%
+            \chapterlinesformat{#1}%
+            {}%
+            {\raggedchapter\interlinepenalty \@M#2\@@par}%
           }%
         }%
-      }{}%
-    }%
-    {%
-      \IfUsePrefixLine{}{\raggedchapter}%
-      \interlinepenalty \@M 
-      \usekomafont{#1}{#2}\par
+      }%
     }%
   }%
   \nobreak\par\nobreak
@@ -3674,6 +3691,8 @@
 %     angepasst}^^A
 %  \changes{v3.15}{2014/12/09}{\cs{raggedchapter} ersetzt
 %    \cs{raggedsection}}^^A
+%  \changes{v3.19}{2015/08/02}{an die Änderungen bei \cs{scr@@makechapterhead}
+%    angepasst}^^A
 %    \begin{macrocode}
 \newcommand*{\scr@@makeschapterhead}[2]{%
   \@tempskipa=\glueexpr \csname scr@#1@beforeskip\endcsname\relax\relax
@@ -3681,16 +3700,65 @@
   \chapterheadstartvskip
   {%
     \setlength{\parindent}{\z@}\setlength{\parfillskip}{\fill}%
-    \normalfont\sectfont\nobreak\nobreak\usekomafont{#1}{}%
-    \raggedchapter \interlinepenalty \@M \usekomafont{#1}{#2}\par
+    \let\IfUseNumber\secondoftwo
+    \if@chapterprefix
+      \let\IfUsePrefixLine\@firstoftwo
+    \else
+      \let\IfUsePrefixLine\@secondoftwo
+    \fi
+    \normalfont\usekomafont{disposition}{%
+      \usekomafont{#1}{%
+        \IfUsePrefixLine{%
+          \chapterlineswithprefixformat{#1}%
+          {}%
+          {\raggedchapter\interlinepenalty \@M#2\@@par}%
+        }{%
+          \chapterlinesformat{#1}%
+          {}%
+          {\raggedchapter\interlinepenalty \@M#2\@@par}%
+        }%
+      }%
+    }%
   }%
   \nobreak\par\nobreak
-  \@tempskipa=\glueexpr \csname scr@#1@afterskip\endcsname\relax
+  \@tempskipa=\glueexpr \csname scr@#1@afterskip\endcsname\relax\relax
   \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
   \chapterheadendvskip
 }
 %    \end{macrocode}
 % \end{macro}^^A \scr@@makeschapterhead
+%
+% \begin{macro}{\chapterlinesformat}
+%   \changes{v3.19}{2015/08/02}{neue Anweisung}
+% \begin{macro}{\chapterlineswithprefixformat}
+%   \changes{v3.19}{2015/08/02}{neue Anweisung}
+% Diese Anweisung definiert das Format der eigentlichen Überschriften im Stil
+% \texttt{section}, wenn mit Überschriftenzeilen gearbeitet
+% wird. Fonteinstellungen sind zu diesem Zeitpunkt bereits erfolgt. Die
+% Argumente sind:
+% \begin{description}
+% \item[\meta{Befehlsname} --] der Name der Gliederungsebene, normalerweise
+%   \texttt{chapter}.
+% \item[\meta{Gliederungsnummer} --] die bereits fertig formatierte
+%   Gliederungsnummer (bei \cs{chapterlineswithprefixformat} einschließlich
+%   des nachfolgenden vertikalen Abstands) oder leer, falls keine
+%   Gliederungsnummer auszugeben ist.
+% \item[\meta{Text} --] der Text der Überschrift.
+% \end{description}
+% Der Anwender ist selbst verantwortlich, dass innerhalb der Überschrift kein
+% Seitenumbruch erfolgen kann. Nach der Überschrift wird jedoch zwangsweise
+% ein \cs{@@par} ausgeführt, so dass sichergestellt ist, dass mit einem
+% internen Absatz abgeschlossen wird.
+%    \begin{macrocode}
+\newcommand{\chapterlinesformat}[3]{%
+  \@hangfrom{#2}#3%
+}
+\newcommand{\chapterlineswithprefixformat}[3]{%
+  #2#3%
+}
+%    \end{macrocode}
+% \end{macro}^^A \chapterlineswithprefixformat
+% \end{macro}^^A \chapterlinesformat
 %
 % \begin{macro}{\use@chapter@o@preamble}
 %   \changes{v3.15}{2014/12/08}{Anpassung an geänderte Abstandsbehandlung}^^A
