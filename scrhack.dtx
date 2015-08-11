@@ -1,4 +1,4 @@
-% \CheckSum{801}
+% \CheckSum{814}
 % \iffalse meta-comment
 % ======================================================================
 % scrhack.dtx
@@ -1246,7 +1246,20 @@ the expected effect.
 %<*lscape&body>
 \RequirePackage{xpatch}
 \xpatchcmd{\landscape}{\textheight=\vsize}{%
-  \if@scrhack@lscape\else\textheight=\vsize\fi
+  \if@scrhack@lscape
+%    \end{macrocode}
+%  \changes{v3.18a}{2015/08/11}{Patchen von \cs{@outputpage}}^^A
+% Es gibt allerdings in der Tat eine Stelle, an der ein verändertet Wert von
+% \cs{textheight} benötigt wird. Das ist wenn innerhalb von \cs{@outputpage}
+% der Wert von \cs{@colht} reinitialisiert wird. Also wird das entsprechend
+% auch noch hinein gepatcht.
+%    \begin{macrocode}
+    \scrh@LT@textheight=\vsize
+    \let\scrh@LT@outputpage\@outputpage
+    \def\@outputpage{\scrh@LT@outputpage\global\@colht\scrh@LT@textheight}% 
+  \else
+    \textheight=\vsize
+  \fi
 }{%
   \PackageInfo{scrhack}{\string\landscape\space patched to make
     \string\textheight\space change optional}%
@@ -1255,9 +1268,15 @@ the expected effect.
     Maybe you are using a unsupported lscape version}%
   \@scrhack@lscapefalse
 }
+%    \end{macrocode}
+% \begin{Length}{\scrh@LT@textheight}
+%    \changes{v3.18a}{2015/08/11}{neue Länge (intern)}
+%    \begin{macrocode}
+\newlength{\scrh@LT@textheight}
 %</lscape&body>
 %    \end{macrocode}
-% \end{macro}
+% \end{Length}^^A \scrh@LT@textheight
+% \end{macro}^^A \landscape
 %
 %
 % \subsection{Optionen ausführen}
