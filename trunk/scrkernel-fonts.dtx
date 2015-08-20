@@ -1,4 +1,4 @@
-% \CheckSum{3224}
+% \CheckSum{3237}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-fonts.dtx
@@ -1920,21 +1920,33 @@
 % der Anwendung des Fonts |\relax| verwenden sollen.
 %    \begin{macrocode}
 \newcommand*{\scr@komafontrelaxlist}{%
-  \do\color \do\normalcolor 
+  \do\normalcolor 
   \do\uppercase \do\lowercase \do\MakeUppercase \do\MakeLowercase
 }
 %    \end{macrocode}
 % \end{macro}^^A \scr@komafontrelaxlist
+% \begin{macro}{scr@komafontgobblelist}
+%   \changes{v3.19}{2015/08/20}{neu (intern)}^^A
+% Wie \cs{scr@komafontrelaxlist} nur dass |\@gobble| statt |\relax| verwendet
+% wird.
+%    \begin{macrocode}
+\newcommand*{\scr@komafontgobblelist}{%
+  \do\color
+}
+%    \end{macrocode}
+% \end{macro}^^A \scr@komafontgobblelist
 % \begin{macro}{\scr@prepareforkomafont}
 %   \changes{v3.17}{2015/04/03}{neu (intern)}^^A
+%   \changes{v3.19}{2015/08/20}{abarbeiten von \cs{scr@komafontgobblelist}}^^A
 % Hilfsmakro, das die Vorbereitungen für die obigen Font-Makros trifft. In der
 % Voreinstellung ist das lediglich die Anwendung der |\do|-Liste, so dass die
-% dort angegebenen Makros alle |\relax| werden. Da die Anweisung dazu |\do|
-% umdefiniert, sollte die Anweisung immer in einer Gruppe eingeschlossen
-% werden.
+% dort angegebenen Makros alle |\relax| bzw. |\@gobble| werden. Da die
+% Anweisung dazu |\do| umdefiniert, sollte die Anweisung immer in einer Gruppe
+% eingeschlossen werden.
 %    \begin{macrocode}
 \newcommand*{\scr@prepareforkomafont}{%
   \long\def\do##1{\let##1\relax}\scr@komafontrelaxlist
+  \long\def\do##1{\let##1\@gobble}\scr@komafontgobblelist
 }
 %    \end{macrocode}
 % \end{macro}^^A \scr@prepareforkomafont
@@ -1948,6 +1960,16 @@
 }
 %    \end{macrocode}
 % \end{macro}^^A \addtokomafontrelaxlist
+% \begin{macro}{\addtokomafontgobblelist}
+%   \changes{v3.19}{2015/08/20}{Neu}
+% Diese Anweisung erlaubt es genau ein Makro der obigen |\do|-Liste
+% hinzuzufügen.
+%    \begin{macrocode}
+\newcommand*{\addtokomafontgobblelist}[1]{%
+  \l@addto@macro\scr@komafontrelaxlist{\do#1}%
+}
+%    \end{macrocode}
+% \end{macro}^^A \addtokomafontgobblelist
 % \end{macro}
 % \end{macro}
 % \end{macro}
