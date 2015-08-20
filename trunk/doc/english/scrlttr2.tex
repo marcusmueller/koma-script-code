@@ -52,7 +52,7 @@
 \translator{Harald Bongartz\and Georg Grandke\and Raimund Kohl\and Jens-Uwe
   Morawski\and Stephan Hennig\and Gernot Hassenpflug\and Markus Kohm}
 
-% Date of translated german file: 2015-03-31
+% Date of translated german file: 2015-08-20
 
 \chapter{The New Letter Class \Class{scrlttr2}}
 \labelbase{scrlttr2}
@@ -708,6 +708,57 @@ following example may illustrate.
 %
 \EndIndex{Cmd}{AtEndLetter}%
 \EndIndex{Cmd}{AtBeginLetter}%
+
+
+\begin{Declaration}
+  \Counter{letter}\\
+  \Macro{thisletter}\\
+  \Macro{letterlastpage}
+\end{Declaration}
+\BeginIndex{Counter}{letter}%
+\BeginIndex{Cmd}{thisletter}%
+\BeginIndex{Cmd}{letterlastpage}%
+If\ChangedAt{v3.19}{\Class{scrlttr2}\and \Package{scrletter}} you have more
+than one letter in one document, it is useful to have a letter number. Since
+version~3.19 \KOMAScript{} provides counter \Counter{letter} and increases it
+at every \Macro{begin}\PParameter{letter}.
+\begin{Example}
+  Have one more look into the \Macro{AtBeginLetter} example. Instead of
+  resetting the counter explicitly at \Macro{begin}\PParameter{letter}, we can
+  do it implicitly by defining counter \Counter{Question} depending on counter
+  \Counter{letter}:
+\begin{lstlisting}
+  \newcounter{Question}[letter]
+  \newcommand{\Question}[1]{%
+    \refstepcounter{Question}\par
+    \noindent\begin{tabularx}{\textwidth}{l@{}X}
+      \theQuestion:~ & #1\\
+    \end{tabularx}%
+  }%
+\end{lstlisting}
+  Now, the new counter will be reset at every start of a new letter and
+  the first question of every letter will be number one.
+\end{Example}
+
+If you want the output of current value of \Counter{letter}, you may usually
+use \Macro{theletter}. Indeed the letter can also be used for
+cross-references. So you can use \Macro{label}\Parameter{name} to generate a
+label immediately after \Macro{begin}\PParameter{letter} and reference it
+somewhere in the document using \Macro{ref}\Parameter{name}. Inside the same
+letter you can simply use \Macro{thisletter} without generating a label to get
+the same result.
+
+\KOMAScript{} itself uses \Macro{thisletter} to put a label onto the last page
+of every letter. You can use
+\Macro{letterlastpage}\IndexCmd{label}\IndexCmd{pageref} to reference the last
+page number of the current letter. Please note, the value of
+\Macro{letterlastpage} is valid after some \LaTeX{} runs, because it uses
+\Macro{label} and \Macro{pageref}. So you need at least two or three \LaTeX{}
+runs, if you use \Macro{letterlastpage}. Please have a look at \emph{Rerun}
+terminal or \File{log}-file messages about labels that have been changed.%
+\EndIndex{Cmd}{letterlastpage}%
+\EndIndex{Cmd}{thisletter}%
+\EndIndex{Counter}{letter}%
 
 
 \begin{Declaration}
