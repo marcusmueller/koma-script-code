@@ -1,4 +1,4 @@
-% \CheckSum{704}
+% \CheckSum{702}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-paragraphs.dtx
@@ -604,10 +604,14 @@
 %
 % \begin{macro}{\scr@defaultunits}
 %   \changes{v2.95}{2004/11/05}{neues internes Macro}^^A
+%   \changes{v3.19}{2015/08/22}{\cs{setlength} wegen \textsf{tikz}
+%     eliminiert}^^A
 % \begin{macro}{\scr@@defaultunits}
 %   \changes{v2.95}{2004/11/05}{neues internes Macro}^^A
 % \begin{macro}{\scr@@@defaultunits}
 %   \changes{v2.95}{2004/11/05}{neues internes Macro}^^A
+%   \changes{v3.19}{2015/08/22}{\cs{setlength} und \cs{addtolength} wegen
+%     \textsf{tikz} eliminiert}^^A
 % Damit |\par@updaterelative| überhaupt funktionieren kann, wird
 % |\scr@defaultunits| benötigt. Dieses Makro arbeitet prinzipiell wie
 % |\@defaultunits| bekommt aber Dimension bzw. Skip als erstes und den Wert
@@ -622,7 +626,7 @@
   \begingroup
     \edef\@tempa{#2}%
     \expandafter\scr@@defaultunits\expandafter#1\@tempa plusplus\@nnil
-    \edef\@tempa{\noexpand\endgroup\noexpand\setlength{\noexpand#1}{\the#1}}%
+    \edef\@tempa{\noexpand\endgroup\noexpand#1\the\glueexpr #1\relax}%
   \@tempa
 }
 \newcommand*{\scr@@defaultunits}{}
@@ -637,16 +641,16 @@
 \def\scr@@@defaultunits#1#2#3minus#4minus#5\@nnil{%
   \ifx\relax#2\relax
     \@defaultunits\@tempskipa#3pt\relax\@nnil
-    \setlength{#1}{\@tempskipa}%
+    #1\@tempskipa
   \else
     \@defaultunits\@tempskipa\z@\@plus#3pt\relax\@nnil
-    \setlength{#1}{\@tempskipa}%
+    #1\@tempskipa
     \@defaultunits\@tempskipa#2pt\relax\@nnil
-    \addtolength{#1}{\@tempskipa}%
+    \advance#1\@tempskipa
   \fi
   \ifx\relax#4\relax\else
     \@defaultunits\@tempskipa\z@\@minus #4pt\relax\@nnil
-    \addtolength{#1}{\@tempskipa}%
+    \advance#1\@tempskipa
   \fi
 }
 %    \end{macrocode}
