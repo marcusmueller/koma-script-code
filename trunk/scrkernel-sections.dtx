@@ -1,4 +1,4 @@
-% \CheckSum{3811}
+% \CheckSum{3815}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -2504,6 +2504,8 @@
 %   \changes{v2.8d}{2001/07/05}{\cs{partpagestyle} statt \texttt{plain}}^^A
 %   \changes{v2.8p}{2001/09/27}{Präambel über der Überschrift hinzugefügt}^^A
 %   \changes{v3.13a}{2014/09/11}{Verwendung von \cs{SecDef}}^^A
+%   \changes{v3.19}{2015/08/25}{Seitenstil nur ändern wenn definiert und nicht
+%     leer}^^A
 % Die Anweisung definiert den Gliederungsüberschriften-Stil
 % \texttt{part}. Dazu bekommt sie als einziges explizites Argument den
 % \meta{Namen} der Gliederungsüberschrift. Weitere Argumente wie ein
@@ -2517,7 +2519,11 @@
 %<article>  \par
 %<*book|report>
   \if@openright\cleardoublepage\else\clearpage\fi
-  \thispagestyle{\@nameuse{#1pagestyle}}%
+  \scr@ifundefinedorrelax{#1pagestyle}{}{%
+    \ifstr{#1pagestyle}{}{}{%
+      \thispagestyle{\@nameuse{#1pagestyle}}%
+    }%
+  }%
   \if@twocolumn
     \onecolumn
     \@tempswatrue
@@ -3327,6 +3333,8 @@
 %
 % \begin{macro}{\scr@startchapter}
 %   \changes{v3.18}{2015/05/22}{neue Anweisung (für Paketautoren)}
+%   \changes{v3.19}{2015/08/25}{Seitenstil nur ändern wenn definiert und nicht
+%     leer}^^A
 % Diese Anweisung legt fest, wie der konkrete Aufruf für Überschriften des
 % Stils \texttt{chapter} lautet. Einziges Argument ist dabei der Name der
 % Gliederungsebene, beispielsweise \texttt{chapter}. Alle anderen benötigten
@@ -3339,7 +3347,11 @@
 %<*body>
 \newcommand*{\scr@startchapter}[1]{%
   \if@openright\cleardoublepage\else\clearpage\fi
-  \thispagestyle{\@nameuse{#1pagestyle}}%
+  \scr@ifundefinedorrelax{#1pagestyle}{}{%
+    \ifstr{#1pagestyle}{}{}{%
+      \thispagestyle{\@nameuse{#1pagestyle}}%
+    }%
+  }%
   \global\@topnum\z@
   \@afterindentfalse
   \expandafter\SecDef\csname @#1\expandafter\endcsname\csname @s#1\endcsname
