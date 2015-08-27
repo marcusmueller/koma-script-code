@@ -1305,7 +1305,8 @@
   columns=fullflexible,keepspaces,%
   aboveskip=.4\baselineskip,%
   belowskip=0pt%
-} \lstdefinestyle{code}{%
+}%
+\lstdefinestyle{code}{%
   style=basics,%
   language=[LaTeX]TeX,%
   moretexcs={%
@@ -1313,7 +1314,7 @@
     @ifundefined,
     @rightmark, @secondoftwo, @tempswafalse,@tempswatrue, @undefined,
     AtBeginDocument,AtEndDocument, appendix, ClassWarningNoLine,CurrentOption,
-    color,
+    color,colorbox,
     DeclareOption,DeclareRobustCommand,dimexpr, end@float, ExecuteOptions,
     if@filesw,if@tempswa,if@twoside, includegraphics, MessageBreak,
     onehalfspacing,
@@ -1322,9 +1323,11 @@
     RequirePackage,RequirePackageWithOptions,setkey,setlength,
     SelectInputMappings,setkeys,
     textsuperscript}%
-} \lstdefinestyle{output}{%
+}%
+\lstdefinestyle{output}{%
   style=basics,breaklines,prebreak=\mbox{$\hookleftarrow$}%
-} \lstdefinestyle{KOMA}{%
+}%
+\lstdefinestyle{KOMA}{%
   style=code,%
   moretexcs={%
     @addtoplength,@setplength,@newplength, activateareas,
@@ -1343,7 +1346,8 @@
     blinddocument,blindtext,Blinddocument,Blindtext,
     cc,captionabove,captionaboveof,captionbelow,captionbelowof,captionformat,
     captionof,cefoot,cfoot,chapapp, chapappifchapterprefix,
-    chapter,chapterformat,chaptermarkformat,chapterpagestyle,chead,
+    chapter,chapterlinesformat,chapterlineswithprefixformat,
+    chapterformat,chaptermarkformat,chapterpagestyle,chead,
     cleardoubleevenemptypage,clearscrheadfoot,closing,cofoot,Comment,
     DeclareLayer,DeclareNewNoteColumn,DeclareNewPageStyleAlias,
     DeclareNewTOC,DeclareSectionCommand,DeclareNewSectionCommand,
@@ -1386,8 +1390,10 @@
     removereffields,renewcaptionname,
     RedeclarePageStyleAlias,
     ReplaceInput,ReplacePackage,ResetPreventPackageFromLoading,
-    rohead,sectionformat,subsectionformat,subsubsectionformat,
-    sectionmarkformat,Sentence,sentencename,sentenceshortname,
+    rohead,
+    sectionformat,subsectionformat,subsubsectionformat,
+    sectionmarkformat,sectioncatchphraseformat,sectionlinesformat,
+    Sentence,sentencename,sentenceshortname,
     setbibpreamble,setcapindent,setcapwidth,
     setchapterpreamble,setfootbotline,setfootsepline,setfootwidth,
     setheadsepline,setheadtopline,setheadwidth,setindexpreamble,setkomafont,
