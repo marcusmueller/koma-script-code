@@ -1,4 +1,4 @@
-% \CheckSum{3811}
+% \CheckSum{3842}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -593,6 +593,7 @@
     \fi
     \@ifstar {%
       \csname scr@preto@ssect@hook\endcsname
+      \def\scr@s@ct@@nn@m@{#1}%
       \@ssect{\glueexpr #3\relax}{\glueexpr #4\relax}{\glueexpr #5\relax}{#6}%
     }{%
       \csname scr@preto@sect@hook\endcsname
@@ -812,7 +813,7 @@
   \ifdim \@tempskipa>\z@
     \begingroup
       #6{\interlinepenalty \@M
-        \sectionlinesformat{\glueexpr #3\relax}\@svsec{#8}\@@par}%
+        \sectionlinesformat{#1}{\glueexpr #3\relax}\@svsec{#8}\@@par}%
     \endgroup
 %<trace>    \ClassInfo{\KOMAClassName}{head=`\scr@ds@head'}%
     \expandafter\csname #1mark\expandafter\endcsname\expandafter{\scr@ds@head}%
@@ -833,7 +834,7 @@
     \fi
   \else
     \def\@svsechd{%
-      #6{\sectioncatchphraseformat{\glueexpr #3\relax}\@svsec{#8}}%
+      #6{\sectioncatchphraseformat{#1}{\glueexpr #3\relax}\@svsec{#8}}%
 %<trace>      \ClassInfo{\KOMAClassName}{head=`\scr@ds@head'}%
        \expandafter\csname #1mark\expandafter\endcsname
        \expandafter{\scr@ds@head}%
@@ -892,6 +893,7 @@
 % wird. Fonteinstellungen sind zu diesem Zeitpunkt bereits erfolgt. Die
 % Argumente sind:
 % \begin{description}
+% \item[\meta{Ebene} --] der Name der Gliederungebene
 % \item[\meta{Einzug} --] ein eventuell zu verwendender horizontaler
 % Einzug.
 % \item[\meta{Gliederungsnummer} --] die bereits fertig formatierte
@@ -903,8 +905,8 @@
 % ein \cs{@@par} ausgeführt, so dass sichergestellt ist, dass mit einem
 % internen Absatz abgeschlossen wird.
 %    \begin{macrocode}
-\newcommand{\sectionlinesformat}[3]{%
-  \@hangfrom{\hskip #1#2}\interlinepenalty \@M #3%
+\newcommand{\sectionlinesformat}[4]{%
+  \@hangfrom{\hskip #2#3}\interlinepenalty \@M #4%
 }
 %    \end{macrocode}
 % \end{macro}^^A \sectionlinesformat
@@ -915,6 +917,7 @@
 % wird. Fonteinstellungen sind zu diesem Zeitpunkt bereits erfolgt. Die
 % Argumente sind:
 % \begin{description}
+% \item[\meta{Ebene} --] der Name der Gliederungebene
 % \item[\meta{Einzug} --] ein eventuell zu verwendender horizontaler
 % Einzug.
 % \item[\meta{Gliederungsnummer} --] die bereits fertig formatierte
@@ -925,8 +928,8 @@
 % Der Anwender ist selbst verantwortlich, dass innerhalb der Überschrift kein
 % Seitenumbruch erfolgen kann.
 %    \begin{macrocode}
-\newcommand{\sectioncatchphraseformat}[3]{%
-  \hskip #1#2#3%
+\newcommand{\sectioncatchphraseformat}[4]{%
+  \hskip #2#3#4%
 }
 %    \end{macrocode}
 % \end{macro}^^A \sectioncatchphraseformat
@@ -962,15 +965,32 @@
 %<trace>\ClassInfo{\KOMAClassName}{redefining LaTeX kernel macro
 %<trace>  \string\@ssect}
 \def\@ssect#1#2#3#4#5{%
+  \scr@ifundefinedorrelax{scr@s@ct@@nn@m@}{%
+    \ClassWarning{\KOMAClassName}{incompatible usage of
+      \string\@ssect\space detected.\MessageBreak
+      You've used the KOMA-Script implementation of
+      \string\@ssect\MessageBreak
+      from within a non compatible caller, that does not\MessageBreak
+      \string\scr@s@ct@@nn@m@\space locally.\MessageBreak
+      This could result in several error messages}%
+    \def\scr@s@ct@@nn@m@{\string\scr@s@ct@@nn@m@}%
+  }{}%
   \@tempskipa #3\relax
   \ifdim \@tempskipa>\z@
     \begingroup
       #4{\interlinepenalty \@M
-        \sectionlinesformat{\glueexpr #1\relax}\@empty{#5}\@@par}%
+        \expandafter\sectionlinesformat\expandafter{\scr@s@ct@@nn@m@}%
+        {\glueexpr #1\relax}\@empty{#5}\@@par}%
     \endgroup
   \else
-    \def\@svsechd{#4{\sectioncatchphraseformat{\glueexpr #1\relax}\@empty{#5}}}%
+    \edef\@svsechd{%
+      \unexpanded{#4}{%
+        \noexpand\sectioncatchphraseformat{\scr@s@ct@@nn@m@}%
+        \unexpanded{{\glueexpr #1\relax}\@empty{#5}}%
+      }%
+    }%
   \fi
+  \let\scr@s@ct@@nn@m@\relax
   \@xsect{\glueexpr #3\relax}%
 }
 %</body>
@@ -3313,11 +3333,11 @@
 \newcommand*{\scr@chapter@afterskip}{\z@}
 \let\scr@chapter@afterskip\z@
 \newcommand*{\scr@chapter@innerskip}{\z@}
-\let\scr@chapter@sectionindent\z@
+\let\scr@chapter@innerskip\z@
 \newcommand*{\scr@chapter@style}{chapter}
 %    \end{macrocode}
 % \end{macro}^^A \scr@chapter@style
-% \end{macro}^^A \scr@chapter@sectionindent
+% \end{macro}^^A \scr@chapter@innerskip
 % \end{macro}^^A \scr@chapter@beforeskip
 % \end{macro}^^A \scr@chapter@afterskip
 %    \begin{macrocode}
