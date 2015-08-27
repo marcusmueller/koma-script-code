@@ -1071,7 +1071,7 @@ Einstellungen sind in \autoref{tab:maincls.chapter.skips} zu finden. Eine
 \BeginIndex{Cmd}{DeclareNewSectionCommands}%
 \BeginIndex{Cmd}{RedeclareSectionCommands}%
 \BeginIndex{Cmd}{ProvideSectionCommands}%
-Mit\ChangedAt[2014/11]{v3.15}{\Class{scrbook}\and \Class{scrreprt}\and
+Mit\ChangedAt{v3.15}{\Class{scrbook}\and \Class{scrreprt}\and
   \Class{scrartcl}} diesen Anweisungen können gleich eine ganze Reihe von
 Gliederungsbefehlen definiert oder geändert werden. Dabei ist
 \PName{Namensliste} eine durch Komma separierte Liste von Namen der
@@ -1208,7 +1208,7 @@ Auch hier wird \Length{@tempskipa}\IndexLength{@tempskipa} vor der Verwendung
 der Befehle innerhalb von \Macro{part} entsprechend der Einstellungen von
 \Macro{DeclareSectionCommand}\IndexCmd{DeclareSectionCommand} gesetzt.
 
-Da\ChangedAt[2015/03]{v3.17}{\Class{scrbook}\and \Class{scrreprt}\and
+Da\ChangedAt{v3.17}{\Class{scrbook}\and \Class{scrreprt}\and
   \Class{scrartcl}} die Abstände über, innerhalb und unter den Überschriften
 wesentlich einfacher mit \Macro{RedeclareSectionCommand} eingestellt werden
 können, wird nicht empfohlen zu diesem Zweck stattdessen die hier
@@ -1225,6 +1225,131 @@ gesetzt werden.%
 \EndIndex{Cmd}{partheadstartvskip}%
 \EndIndex{Cmd}{chapterheadendvskip}%
 \EndIndex{Cmd}{chapterheadstartvskip}%
+
+
+\begin{Declaration}
+  \Macro{chapterlineswithprefixformat}%
+    \PName{Ebene}\PName{Nummer}\PName{Text}\\
+  \Macro{chapterlinesformat}%
+    \PName{Ebene}\PName{Nummer}\PName{Text}
+\end{Declaration}
+\BeginIndex{Cmd}{chapterlineswithprefixformat}%
+\BeginIndex{Cmd}{chapterlinesformat}%
+Diese\ChangedAt{v3.19}{\Class{scrbook}\and \Class{scrreprt}} beiden
+Anweisungen werden von Überschriften des Stils \PValue{chapter} in
+Abhängigkeit von Option \Option{chapterprefix}\IndexOption{chapterprefix}%
+\textnote{\Option{chapterprefix}} (siehe \autoref{sec:maincls.structure},
+\autopageref{desc:maincls.option.chapterprefix}) verwendet. Dabei gibt
+\Macro{chapterlineswithprefixformat} die Ausgabe bei aktivierter Option vor,
+während \Macro{chapterlinesformat} die Ausgabe bei deaktivierter Option
+bestimmt.
+
+Die beiden Argumente \PName{Nummer} und \PName{Text} sind dabei
+einschließlich Einstellung der Fonts für sich bereits fertig
+formatiert. Letztlich regeln die Anweisungen also die Anordnung der beiden
+Teile der Überschrift. Bei nicht nummerierten Überschriften ist \PName{Nummer}
+ein komplett leeres Argument, enthält also auch keine
+Formatierungsanweisungen.
+
+Vordefiniert sind die beiden Anweisungen mit:
+\begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
+  \newcommand{\chapterlinesformat}[3]{%
+    \@hangfrom{#2}{#3}%
+  }
+  \newcommand{\chapterlineswithprefixformat}[3]{%
+    #2#3%
+  }
+\end{lstcode}
+bisher eher spartanisch.
+
+\begin{Example}
+  Sie wollen Überschriften im Kapitelstil gelb hinterlegen. Für
+  Überschriften ohne Präfixzeile definieren Sie daher in der Präambel des
+  Dokument:
+\begin{lstcode}
+  \makeatletter
+  \renewcommand{\chapterlinesformat}[3]{%
+    \colorbox{yellow}{%
+      \parbox{\dimexpr\linewidth-2\fboxrule-2\fboxsep}{%
+        \@hangfrom{#2}#3%
+      }%
+    }%
+  }
+  \makeatother
+\end{lstcode}
+  und für Überschriften mit Präfixzeile:
+\begin{lstcode}
+  \renewcommand{\chapterlineswithprefixformat}[3]{%
+    \colorbox{yellow}{%
+      \parbox{\dimexpr\linewidth-2\fboxrule-2\fboxsep}{%
+        #2#3%
+      }%
+    }%
+  }
+\end{lstcode}
+  Allerdings fällt Ihnen nach einiger Zeit auf, dass mit dieser Umdefinierung
+  die Überschriften wieder im Blocksatz gesetzt werden. Das liegt daran, dass
+  \Macro{parbox} sein Argument so setzt. Um dies zu korrigieren, fügen Sie die
+  Anweisung \Macro{raggedchapter} (siehe \autoref{sec:maincls.structure},
+  \autopageref{desc:maincls.cmd.raggedchapter}), die automatisch bereits vor
+  \Macro{chapterlinesformat} und \Macro{chapterlineswithprefixformat}
+  aufgerufen wird, in die Definitionen ein:
+\begin{lstcode}
+  \makeatletter
+  \renewcommand{\chapterlinesformat}[3]{%
+    \colorbox{yellow}{%
+      \parbox{\dimexpr\linewidth-2\fboxrule-2\fboxsep}{%
+        \raggedchapter
+        \@hangfrom{#2}#3%
+      }%
+    }%
+  }
+  \makeatother
+  \renewcommand{\chapterlineswithprefixformat}[3]{%
+    \colorbox{yellow}{%
+      \parbox{\dimexpr\linewidth-2\fboxrule-2\fboxsep}{%
+        \raggedchapter
+        #2#3%
+      }%
+    }%
+  }
+\end{lstcode}
+  Es sei daran erinnert, dass \Macro{makeatletter} und \Macro{makeatother} nur
+  in der Dokumentpräambel zu verwenden sind. In einer eigenen Wrapper-Klasse
+  oder einem Paket haben sie zu entfallen. Sie werden auch nur wegen
+  \Macro{@hangfrom} in der Definition von \Macro{chapterlinesformat} benötigt.
+\end{Example}
+
+Wie im Beispiel gezeigt, ist der Anwender bei der Umdefinierung der
+Anweisungen für einige Dinge selbst verantwortlich. Dazu gehört neben dem
+Erhalt der voreingestellten Ausrichtung auch, dass innerhalb der Überschrift
+kein Seitenumbruch beispielsweise an zusätzlich eingefügten Absätzen oder
+Abständen erfolgen kann. Das gezeigte Beispiel ist diesbezüglich
+unproblematisch. Nicht nur, dass die beiden Boxen ohnehin keinen Seitenumbruch
+erlauben. \KOMAScript{} verändert außerdem \Macro{interlinepenalty} als Teil
+von \PName{Text} so, dass darin kein Seitenumbruch stattfinden
+darf. Gleichzeitig endet \PName{Text} immer mit einem internen Absatz,
+\Macro{@par}.
+
+Die Anweisung \Macro{raggedchapter} ist übrigens nicht Bestandteil von
+\PName{Text}, weil anderenfalls beispielsweise die Verwendung von
+\Macro{MakeUppercase} innerhalb der Umdefinierung von
+\Macro{chapterlinesformat} oder \Macro{chapterlineswithprefixformat} erheblich
+erschwert wäre. Dennoch sei darauf hingewiesen, dass typografischen Regeln
+zufolge Versalsatz mit gängigen Fonts immer der Sperrung und des Ausgleichs
+bedarf. Die \LaTeX-Anweisung \Macro{MakeUppercase} leistet dies jedoch nicht.
+
+Das erste Argument, \PName{Ebene}, wird von den Anweisungen in der
+Voreinstellung nicht verwendet und ist auch im Beispiel nicht
+erforderlich. Erst, wenn der Anwender mehrere Anweisungen im Stil
+\PValue{chapter} definiert und man innerhalb der Definition nach den
+Anweisungen unterscheiden will, kann dies über \PName{Ebene} erfolgen. Dabei
+ist \PName{Ebene} der vom Namen der Anweisung abgeleitete Name der
+Gliederungsebene. Bei \Macro{chapter}, \Macro{chapter*}, \Macro{addchap} und
+\Macro{addchap*} ist \PName{Ebene} daher einheitlich \PValue{chapter}.%
+\EndIndex{Cmd}{chapterlinesformat}%
+\EndIndex{Cmd}{chapterlineswithprefixformat}%
+
 
 \begin{Declaration}
   \Macro{SecDef}\Parameter{Sternanweisung}\Parameter{Normalanweisung}\\
@@ -1502,3 +1627,4 @@ Option \Option{bibliography}.
 %  LocalWords:  Absolutwert Gliederungsbefehls Präfixzeile Schrifteinstellung
 %  LocalWords:  Zählername Spitzmarke Kolumnentitels Schrifteinstellungen
 %  LocalWords:  Strichstärke expandierbar expandierbaren expandierbares
+%  LocalWords:  spartanisch Kapitelstil

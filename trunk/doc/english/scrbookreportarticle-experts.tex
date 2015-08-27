@@ -54,7 +54,7 @@
 
 \translator{Gernot Hassenpflug\and Markus Kohm}
 
-% Date of the translated German file: 2015-08-20
+% Date of the translated German file: 2015-08-27
 
 
 \chapter{Additional Information about the Main Classes \Class{scrbook},
@@ -1134,6 +1134,119 @@ print extra rules above and below the chapter heading may be found at
 \EndIndex{Cmd}{chapterheadendvskip}%
 \EndIndex{Cmd}{chapterheadmidvskip}%
 \EndIndex{Cmd}{chapterheadstartvskip}%
+
+
+\begin{Declaration}
+  \Macro{chapterlineswithprefixformat}%
+    \PName{level}\PName{number}\PName{text}\\
+  \Macro{chapterlinesformat}%
+    \PName{level}\PName{nummer}\PName{text}
+\end{Declaration}
+\BeginIndex{Cmd}{chapterlineswithprefixformat}%
+\BeginIndex{Cmd}{chapterlinesformat}%
+These\ChangedAt{v3.19}{\Class{scrbook}\and \Class{scrreprt}} commands are used
+by headings with style \PValue{chapter} to output the heading number and
+heading text depending on option
+\Option{chapterprefix}\IndexOption{chapterprefix}%
+\textnote{\Option{chapterprefix}} (see \autoref{sec:maincls.structure},
+\autopageref{desc:maincls.option.chapterprefix}). If the option is
+\PValue{true} \Macro{chapterlineswithprefixformat} is used, otherwise
+\Macro{chapterlinesformat}.
+
+The arguments \PName{number} and \PName{text} are already formatted, i.\,e.,
+they contain font selections. At least the order and layout of both has to be
+done with these commands. If a heading has no number argument \PName{number}
+will be completely empty also without any format or font commands.
+
+The default definitions are very simple:
+\begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
+  \newcommand{\chapterlinesformat}[3]{%
+    \@hangfrom{#2}{#3}%
+  }
+  \newcommand{\chapterlineswithprefixformat}[3]{%
+    #2#3%
+  }
+\end{lstcode}
+
+\begin{Example}
+  You want to have chapter headings with yellow background. For the headings
+  without prefix line you use the follow definition in the document preamble:
+\begin{lstcode}
+  \makeatletter
+  \renewcommand{\chapterlinesformat}[3]{%
+    \colorbox{yellow}{%
+      \parbox{\dimexpr\linewidth-2\fboxrule-2\fboxsep}{%
+        \@hangfrom{#2}#3%
+      }%
+    }%
+  }
+  \makeatother
+\end{lstcode}
+  For chapter headings without prefix line you use:
+\begin{lstcode}
+  \renewcommand{\chapterlineswithprefixformat}[3]{%
+    \colorbox{yellow}{%
+      \parbox{\dimexpr\linewidth-2\fboxrule-2\fboxsep}{%
+        #2#3%
+      }%
+    }%
+  }
+\end{lstcode}
+  Unfortunately you will find, that these re-definitions result in justified
+  text for the headings. The reason is the \Macro{parbox} command. To change
+  this, you can use \Macro{raggedchapter} (see \autoref{sec:maincls.structure},
+  \autopageref{desc:maincls.cmd.raggedchapter}) inside the argument of
+  \Macro{parbox}. Otherwise \Macro{raggedchapter} would be used only before
+  \Macro{chapterlineswithprefixformat} and \Macro{chapterlinesformat}:
+\begin{lstcode}
+  \makeatletter
+  \renewcommand{\chapterlinesformat}[3]{%
+    \colorbox{yellow}{%
+      \parbox{\dimexpr\linewidth-2\fboxrule-2\fboxsep}{%
+        \raggedchapter
+        \@hangfrom{#2}#3%
+      }%
+    }%
+  }
+  \makeatother
+  \renewcommand{\chapterlineswithprefixformat}[3]{%
+    \colorbox{yellow}{%
+      \parbox{\dimexpr\linewidth-2\fboxrule-2\fboxsep}{%
+        \raggedchapter
+        #2#3%
+      }%
+    }%
+  }
+\end{lstcode}
+  Remember to use \Macro{makeatletter} and \Macro{makeatother} only at the
+  document preamble. Do not use it inside your own wrapper-class or
+  package. It is only needed because of \Macro{@hangfrom} in the definition of
+  \Macro{chapterlinesformat}.
+\end{Example}
+
+As the example shows, users, who change the definition of one of the commands,
+should take care of several side effects. The alignment of the text is only
+one thing. They also have to prevent page breaks in the headings, e.\,g., if
+they add extra space into the output. The example above does not have page
+break problems. Not only the boxes prevent page breaks. \KOMAScript{} itself
+also changes \Macro{interlinepenalty} as part of \PName{text} to prevent page
+breaks. It also finishes \PName{text} with an internal paragraph break using
+\Macro{@par}.
+
+Command \Macro{raggedchapter} is not part of \PName{text} but executed before
+\Macro{chapterlineswithprefixformat} or \Macro{chapterlinesformat}. This makes
+it much easier to use, e.\,g., \Macro{MakeUppercase} at a
+re-definition. Please note, typographers use individual letter spacing at
+majuscule text, but \LaTeX{} command \Macro{MakeUppercase} does not.
+
+The first argument, \PName{level}, is not used by the default definition and
+also not needed in the example above. It is of interest only, if a user would
+define several commands with \PValue{chapter} style and need to distinguish
+the different levels. The predefined commands \Macro{chapter},
+\Macro{chapter*}, \Macro{addchap}, and \Macro{addchap*} all share the same
+\PName{level} \PName{chapter}.%
+\EndIndex{Cmd}{chapterlinesformat}%
+\EndIndex{Cmd}{chapterlineswithprefixformat}%
 
 
 \begin{Declaration}
