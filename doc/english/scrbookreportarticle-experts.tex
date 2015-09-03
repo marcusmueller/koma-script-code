@@ -54,7 +54,7 @@
 
 \translator{Gernot Hassenpflug\and Markus Kohm}
 
-% Date of the translated German file: 2015-08-27
+% Date of the translated German file: 2015-09-03
 
 
 \chapter{Additional Information about the Main Classes \Class{scrbook},
@@ -1138,9 +1138,9 @@ print extra rules above and below the chapter heading may be found at
 
 \begin{Declaration}
   \Macro{chapterlineswithprefixformat}%
-    \PName{level}\PName{number}\PName{text}\\
+    \Parameter{level}\Parameter{number}\Parameter{text}\\
   \Macro{chapterlinesformat}%
-    \PName{level}\PName{nummer}\PName{text}
+    \Parameter{level}\Parameter{number}\Parameter{text}
 \end{Declaration}
 \BeginIndex{Cmd}{chapterlineswithprefixformat}%
 \BeginIndex{Cmd}{chapterlinesformat}%
@@ -1247,6 +1247,84 @@ the different levels. The predefined commands \Macro{chapter},
 \PName{level} \PName{chapter}.%
 \EndIndex{Cmd}{chapterlinesformat}%
 \EndIndex{Cmd}{chapterlineswithprefixformat}%
+
+
+\begin{Declaration}
+  \Macro{sectionlinesformat}%
+    \Parameter{level}\Parameter{indent}\Parameter{number}\Parameter{text}\\
+  \Macro{sectioncatchphraseformat}%
+    \Parameter{level}\Parameter{indent}\Parameter{number}\Parameter{text}\\
+\end{Declaration}
+\BeginIndex{Cmd}{sectionlinesformat}%
+\BeginIndex{Cmd}{sectioncatchphraseformat}%
+These\ChangedAt{v3.19}{\Class{scrbook}\and \Class{scrreprt}\and
+  \Class{scrartcl}} commands are used by headings with style \PValue{section}
+to output the heading number and heading text. If the heading is printed as
+catch phrase at the very beginning of the following paragraph text
+\Macro{sectioncatchphraseformat} is used, otherwise
+\Macro{sectionlinesformat}.
+
+In both cases \PName{indent} is the value of the horizontal indention of the
+heading relative to the text area. If the value is negative the heading should
+even move into the left margin.
+
+The arguments \PName{number} and \PName{text} are already formatted, i.\,e.,
+they contain font selections. At least the order and layout of both has to be
+done with these commands. If a heading has no number argument \PName{number}
+will be completely empty also without any format or font commands.
+
+The default definitions are:
+\begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
+\newcommand{\sectionlinesformat}[4]{%
+  \@hangfrom{\hskip #2#3}{#4}%
+}
+\newcommand{\sectioncatchphraseformat}[4]{%
+  \hskip #2#3#4%
+}
+\end{lstcode}
+
+If the user re-defines one of these commands, he has to take care to prevent
+page breaks inside the printing of the heading. \KOMAScript{} itself only
+changes \Macro{interlinepenalty} to impede page breaks.
+
+\begin{Example}
+  Like chapter headings in the previous example, headings of \PName{level}
+  \PValue{section} should be printed with a background colour. The lower
+  levels should be affected:
+\begin{lstcode}
+  \makeatletter
+  \renewcommand{\sectionlinesformat}[4]{%
+    \@tempswafalse
+    \ifstr{#1}{section}{%
+      \hspace*{#2}%
+      \colorbox{yellow}{%
+        \parbox{\dimexpr\linewidth-2\fboxrule-2\fboxsep-#2}{%
+          \raggedsection
+          \@hangfrom{#3}{#4}%
+        }%
+      }%
+    }{%
+      \@hangfrom{\hskip #2#3}{#4}%
+    }%
+  }
+  \makeatother
+\end{lstcode}
+  With this code the indention part of indented headings would not be
+  coloured, but with negative indention the background of the margin part of
+  the headings will also become yellow. You can move the \Macro{hspace*}
+  command into the \Macro{colorbox} to change this.
+
+  Again remember to use \Macro{makeatletter} and \Macro{makeatother} only at the
+  document preamble. Do not use it inside your own wrapper-class or
+  package. It is only needed because of \Macro{@hangfrom} in the definition of
+  \Macro{sectionlinesformat}.
+\end{Example}
+
+The first argument, \PName{level}, is not used by the default definition. The
+example shows how to use it to distinguish different heading levels of the
+same style \PValue{section}.%
+\EndIndex{Cmd}{sectioncatchphraseformat}%
+\EndIndex{Cmd}{sectionlinesformat}%
 
 
 \begin{Declaration}
