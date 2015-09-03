@@ -1233,9 +1233,9 @@ gesetzt werden.%
 
 \begin{Declaration}
   \Macro{chapterlineswithprefixformat}%
-    \PName{Ebene}\PName{Nummer}\PName{Text}\\
+    \Parameter{Ebene}\Parameter{Nummer}\Parameter{Text}\\
   \Macro{chapterlinesformat}%
-    \PName{Ebene}\PName{Nummer}\PName{Text}
+    \Parameter{Ebene}\Parameter{Nummer}\Parameter{Text}
 \end{Declaration}
 \BeginIndex{Cmd}{chapterlineswithprefixformat}%
 \BeginIndex{Cmd}{chapterlinesformat}%
@@ -1355,6 +1355,93 @@ Gliederungsebene. Bei \Macro{chapter}, \Macro{chapter*}, \Macro{addchap} und
 \Macro{addchap*} ist \PName{Ebene} daher einheitlich \PValue{chapter}.%
 \EndIndex{Cmd}{chapterlinesformat}%
 \EndIndex{Cmd}{chapterlineswithprefixformat}%
+
+
+\begin{Declaration}
+  \Macro{sectionlinesformat}%
+    \Parameter{Ebene}\Parameter{Einzug}\Parameter{Nummer}\Parameter{Text}\\
+  \Macro{sectioncatchphraseformat}%
+    \Parameter{Ebene}\Parameter{Einzug}\Parameter{Nummer}\Parameter{Text}
+\end{Declaration}
+\BeginIndex{Cmd}{sectionlinesformat}%
+\BeginIndex{Cmd}{sectioncatchphraseformat}%
+Diese\ChangedAt{v3.19}{\Class{scrbook}\and \Class{scrreprt}\and
+  \Class{scrartcl}} beiden Anweisungen werden von Überschriften des Stils
+\PValue{section}\textnote{Gliederungsstil
+  \PValue{section}}\Index{Gliederung>Stil>~\PValue{section}} in Abhängigkeit
+davon verwendet, ob die jeweilige Überschrift eine Spitzmarke erzeugt oder
+eine frei stehende Überschrift. Frei stehende Überschriften werden dabei per
+\Macro{sectionlinesformat} ausgegeben, während
+\Macro{sectioncatchphraseformat} für Spitzmarken zuständig ist.
+
+In beiden Fällen gibt \PName{Einzug} den Wert eines horizontalen Einzugs
+der Überschrift gegenüber dem Textbereich an. Durch Angabe eines negativen
+Wertes soll es auch möglich sein, die Überschrift in den linken Rand zu
+rücken.
+
+Die beiden Argumente \PName{Nummer} und \PName{Text} sind einschließlich
+Einstellung der Fonts für sich bereits fertig formatiert. Letztlich regeln die
+Anweisungen also die Anordnung der beiden Teile der Überschrift. Bei nicht
+nummerierten Überschriften ist \PName{Nummer} ein komplett leeres Argument,
+enthält also auch keine Formatierungsanweisungen.
+
+Vordefiniert sind die beiden Anweisungen als:
+\begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
+\newcommand{\sectionlinesformat}[4]{%
+  \@hangfrom{\hskip #2#3}{#4}%
+}
+\newcommand{\sectioncatchphraseformat}[4]{%
+  \hskip #2#3#4%
+}
+\end{lstcode}
+
+Bei Umdefinierung einer der beiden Anweisungen ist wiederum der Anwender
+selbst dafür verantwortlich Seitenumbrüche innerhalb der Ausgabe zu
+verhindern. \KOMAScript{} selbst setzt lediglich \Macro{interlinepenalty}
+entsprechend.
+
+\begin{Example}
+  Wie schon im Beispiel der Kapitelüberschriften sollen nun die frei stehenden
+  Überschriften der Ebenen \PValue{section} mit einer Farbe hinterlegt
+  werden. Die frei stehenden Überschriften tieferer Ebenen sollen nicht
+  verändert werden:
+\begin{lstcode}
+  \makeatletter
+  \renewcommand{\sectionlinesformat}[4]{%
+    \@tempswafalse
+    \ifstr{#1}{section}{%
+      \hspace*{#2}%
+      \colorbox{yellow}{%
+        \parbox{\dimexpr\linewidth-2\fboxrule-2\fboxsep-#2}{%
+          \raggedsection
+          \@hangfrom{#3}{#4}%
+        }%
+      }%
+    }{%
+      \@hangfrom{\hskip #2#3}{#4}%
+    }%
+  }
+  \makeatother
+\end{lstcode}
+  Mit dem gezeigten Code wird im Falle eines Einzugs der Überschrift der
+  Bereich des Einzugs nicht mit gefärbt. Wird hingegen die Überschrift in den
+  linken Rand gestellt, so wird dieser Bereich des Randes ebenfalls farbig
+  hinterlegt. Durch Verschiebung der \Macro{hspace*}-Anweisung in die
+  \Macro{colorbox} kann dieses Verhalten verändert werden.
+
+  Erneut sei daran erinnert, dass \Macro{makeatletter} und \Macro{makeatother}
+  nur in der Dokumentpräambel zu verwenden sind. In einer eigenen
+  Wrapper-Klasse oder einem Paket haben sie zu entfallen. Sie werden auch nur
+  wegen \Macro{@hangfrom} in der Definition von \Macro{sectionlinesformat}
+  benötigt.
+\end{Example}
+
+Das erste Argument, \PName{Ebene}, wird von den Anweisungen in der
+Voreinstellung nicht verwendet. Wie das Beispiel zeigt, kann es aber sehr gut
+dazu verwendet werden, nach unterschiedlichen Gliederungsebenen im gemeinsamen
+Stil \PValue{section} zu unterscheiden.%
+\EndIndex{Cmd}{sectioncatchphraseformat}%
+\EndIndex{Cmd}{sectionlinesformat}%
 
 
 \begin{Declaration}
@@ -1633,4 +1720,5 @@ Option \Option{bibliography}.
 %  LocalWords:  Absolutwert Gliederungsbefehls Präfixzeile Schrifteinstellung
 %  LocalWords:  Zählername Spitzmarke Kolumnentitels Schrifteinstellungen
 %  LocalWords:  Strichstärke expandierbar expandierbaren expandierbares
-%  LocalWords:  spartanisch Kapitelstil
+%  LocalWords:  spartanisch Kapitelstil Spitzmarken Formatierungsanweisungen
+%  LocalWords:  Kapitelüberschriften Gliederungsebenen
