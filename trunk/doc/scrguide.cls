@@ -1374,7 +1374,7 @@
     ifattoclist,ifoot,ihead,ifkomavarempty,ifstr,ifthispageodd,InputAddressFile,
     KOMAoption,KOMAoptions,KOMAScript, l@addto@macro,
     LastName,layerwidth,layerheight,lefoot,lehead,LetterOptionNeedsPapersize,
-    LengthToUnit,
+    LenToUnit,
     lipsum,listoffigures,
     listoftables,listoftoc,LoadLetterOption,lofoot,lohead,lowertitleback,
     MakeMarkcase,makenote,maketitle,manualmark,marginline,minisec,
