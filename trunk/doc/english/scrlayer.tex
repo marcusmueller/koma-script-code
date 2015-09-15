@@ -51,7 +51,7 @@
 
 \translator{Markus Kohm}
 
-% Date of the translated file: 2015-05-19
+% Date of the translated file: 2015-09-15
 
 \chapter[{Defining Layers and Page Styles Using \Package{scrlayer}}]%
 {Defining Layers and Page Styles Using \Package{scrlayer}%
@@ -190,55 +190,68 @@ contents, the foreground layer stack is above the normal page contents. So the
 normal contents is a kind of a separating layer between the background layer
 stack and the foreground layer stack.
 
-A layer has several attributes. The first attribute states, whether or not the
-layer is part of the foreground or the background. During page building
-background layers will be printed first, followed by the main contents and the
-foreground layers. Therefore, in the output the background layers show up
-behind the main contents and the foreground layers in front of the main
-contents. By default, a layer is both, a background layer \emph{and} a
-foreground layer and therefore will be printed twice.
+A layer has several attributes, which are the answers to some basic questions:
+\begin{description}
+\item[Is the layer part of the background or the
+  foreground?\textnote{background or foreground}]%
+  During page building background layers will be printed first, followed by
+  the main contents and the foreground layers. Therefore, in the output the
+  background layers show up behind the main contents and the foreground layers
+  in front of the main contents. By default, a layer is both, a background
+  layer \emph{and} a foreground layer and therefore will be printed
+  twice. Normally, it makes sense to restrict the layer in this aspect.
+\item[What is the position of the layer?\textnote{horizontal and vertical
+    position}]%
+  There are some attributes to define the horizontal and the vertical position
+  of a layer.
+\item[What is the size of the layer?\textnote{horizontal and vertical size}]%
+  As for the position there are several attributes to define the width and
+  height of a layer. So a layer can also be smaller or larger than the paper
+  and it can be placed everywhere on the paper.
+\item[How is a layer aligned on the paper?\textnote{alignment}]%
+  This question is answered by the alignment attribute. The horizontal position
+  can be relative from the left edge of the paper either to the left edge of
+  the layer or to the centre of the layer or to the right edge of the
+  layer. Also the vertical position can be relative from the to edge of the
+  paper either to the top edge of the layer or to the centre of the layer or
+  to the bottom edge of the layer.
+\item[Is the layer intended for text or picture output?\textnote{text or
+    picture}]%
+  This question is also related to the position. For picture output users
+  often expect the origin at the bottom left corner of the layer. But this
+  would not be suitable for text output. So the origin of a text layer is the
+  height of a standard text line below the top left corner of the
+  layer. Picture layers on the other hand span a
+  \Environment{picture}\IndexEnv{picture} environment and provide addition
+  positioning commands.
+\item[Should the layer be printed on left or right pages?\textnote{left or
+    right page}]%
+  By default a layer will be printed on both, left and right pages. Note, that
+  \LaTeX{} names left pages as even pages and right pages as odd pages and
+  that there are no left or even pages in single-sided mode.
+\item[Should the layer be printed in single-side mode or two-side
+  mode?\textnote{single-side or two-side}]%
+  By default a layer will be printed in both, single-side mode and two-side
+  mode. Nevertheless, an even page layer will never be printed in single-side
+  mode and therefore is not really a two-side mode layer.
+\item[Should the layer be printed on float pages or non-float
+  pages?\textnote{float page or non-float page}]%
+  \LaTeX{} produces float pages for float environments like tables or figures,
+  if they are allowed to be printed on a page without normal page contents
+  (see option \PValue{p} for \Environment{figure} or \Environment{table}). So
+  from some point of view a float page is a page, that may itself
+  flow. Non-float pages are not pages without floats, but pages, that are not
+  float pages. They may contain floats inside the text, on the top of the
+  page, or on the bottom of the page. Very large floats may seem to be page
+  floats, while in reality they are top floats.
+\item[What are the contents of the layer?\textnote{contents}]%
+  The corresponding attribute are the commands that produce the output.
+\end{description}
+So we have eight questions that immediately result in attributes yet. Below in
+this manual we will describe additional attributes. However, they are just
+defined for convenience and can be expressed by a combination of these primary
+attributes.
 
-The horizontal position of the layer is set by the second attribute, the
-vertical position by the third. The forth and fifth attributes determine the
-horizontal and vertical size of the layer. As you can see, a layer may be
-smaller or larger than the paper.
-
-But having two numerical values of the second and third attribute does not
-directly give us the position of the layer on the page. For each dimension we
-need two reference points, one on the page and one on the layer. The
-numerical value than states the distance between these reference.
-Reference points in layouts are also known as alignment and are set by the
-sixth attribute.
-
-The seventh attribute states, whether or not a layer should be
-printed onto left or right pages. By default a layer will be printed on both,
-left and right pages. Note, that \LaTeX{} names left pages as even pages and
-right pages as odd pages and that there are no left or even pages in
-single-sided mode.
-
-The eighth attribute states, whether or not a layer should be printed in
-single-side mode or in two-side mode. By default a layer will be printed in
-both, single-side mode and two-side mode. Nevertheless, an even page layer will
-never be printed in single-side mode and therefore is not really a two-side
-mode layer.
-
-The ninth attribute is, whether or not a layer should be printed onto float
-pages or non-float pages. \LaTeX{} produces float pages for float environments
-like tables or figures, if they are allowed to be printed on a page without
-normal page contents (see option \PValue{p} for \Environment{figure} or
-\Environment{table}). So from some point of view a float page is a page, that
-may itself flow. Non-float pages are not pages without floats, but pages, that
-are not float pages. They may contain floats inside the text, on the top of
-the page, or on the bottom of the page. Very large floats may seem to be page
-floats, while in reality they are top floats.
-
-The tenth and last attribute is the contents of the layer. This is simply,
-what should be printed, whenever the layer will be printed.
-
-So we have ten attributes yet. Below in this manual we will describe
-additional attributes. However, they are just defined for convenience and can
-be expressed by a combination of the ten attributes stated above. We call
-these ten attributes the primary attributes.
 
 \begin{Declaration}
   \Macro{DeclareLayer}\OParameter{option list}\Parameter{layer name}\\
@@ -258,15 +271,13 @@ are tolerated, but are not recommended.
 
 Command \Macro{DeclareLayer} does not care whether or not a layer with the
 given \PName{layer name} already exists. It will under all circumstances
-define the layer with the attribute defined by the \PName{option list}.
-An
-\PName{option} can be either a key or a key followed by an
-equal sign followed by a value. Several options may be concatenated to
-a \PName{option list} and have to be separated by comma. If you'd like to have
-a comma or a white space inside the value of an option, you should put the
-value inside curly brackets. See \autoref{tab:scrlayer.layerkeys} for
-more information on keys, values, and the corresponding
-attributes.
+define the layer with the attribute defined by the \PName{option list}.  An
+\PName{option} can be either a key or a key followed by an equal sign followed
+by a value. Several options may be concatenated to a \PName{option list} and
+have to be separated by comma. If you'd like to have a comma or a white space
+inside the value of an option, you should put the value inside curly
+brackets. See \autoref{tab:scrlayer.layerkeys} for more information on keys,
+values, and the corresponding attributes.
 
 In contrast to \Macro{DeclareLayer} using \Macro{DeclareNewLayer} results in
 an error, if a layer with the same \PName{layer name} already exists. So you
@@ -485,6 +496,23 @@ there has not been a layer with \PName{layer name} defined before.
     text area and vertically span the whole paper from the top edge to the
     bottom edge.%
   }%
+  \entry{\ChangedAt{v3.19}{\Package{scrlayer}}%
+    \KOption{mode}\PName{mode}}{%
+    The primary option defines the \PName{mode} for the layer output. Default
+    is \OptionValue{mode}{text}. The Baseline of the first text line will be
+    placed the height of one standard text line below the top edge of the
+    layer. Therefore the text output will be top aligned in the layer. In
+    \PValue{picture} \PName{mode} the layer spans a \Environment{picture}
+    environment with the origin in the bottom left corner of the layer. The
+    also available \PValue{raw} \PName{mode} current is the same like
+    \PValue{text} \PName{mode}.
+
+    Changing\textnote{Attention!} the \PName{mode} of a layer generally can
+    move the contents. Additionally, i.\,e., \PValue{picture} \PName{mode}
+    provides additional commands that result in errors with another
+    \PName{mode}. Therefore, generally it makes no sense to change the
+    \PName{mode} of a layer after it's initial declaration!%
+  }%
   \entry{\Option{nonfloatpage}}{%
     Restricts the layer to pages, that are not float pages. The option does
     not expect any value. By the default the attribute is not set and
@@ -576,27 +604,133 @@ there has not been a layer with \PName{layer name} defined before.
 \EndIndex{Cmd}{DeclareLayer}%
 
 \begin{Declaration}
+  \Macro{layerhalign}\\
+  \Macro{layervalign}\\
   \Macro{layerxoffset}\\
   \Macro{layeryoffset}\\
   \Macro{layerwidth}\\
   \Macro{layerheight}%
 \end{Declaration}
+\BeginIndex{Cmd}{layervalign}%
+\BeginIndex{Cmd}{layerhalign}%
 \BeginIndex{Cmd}{layerxoffset}%
 \BeginIndex{Cmd}{layeryoffset}%
 \BeginIndex{Cmd}{layerwidth}%
 \BeginIndex{Cmd}{layerheight}%
 These commands are valid during output of the layer's contents only. So they
 can only be used inside the \PName{code} of option \Option{contents} of the
-previously described commands. In this case they give the effective position
-and dimension of the layer, that will be used for the output. However, the
-effective dimension of the layer's contents may differ, i.\,e., if the
-contents are oversized or do not fill the layer completely. Redefinition of
-the commands to change the stored values is strictly forbidden and would
-result in unpredictable issues.%
+previously described commands. In this case they give the effective alignment,
+position and dimension of the layer, that will be used for the
+output. However, the effective dimension of the layer's contents may differ,
+i.\,e., if the contents are oversized or do not fill the layer
+completely.
+
+The primary layer attribute \PValue{align} is mapped to
+\Macro{layerhalign}\ChangedAt{v3.19}{\Package{scrlayer}} and
+\Macro{layervalign}. The horizontal values \PValue{l} and \PValue{r} are
+copied to \Macro{layerhalign}. The vertical values \PValue{r} and \PValue{b}
+are copied to \Macro{layervalign}. The also horizontal and vertical value
+\PValue{c} is copied to both commands. If \PValue{align} has contradictory
+values, only the last one is copied. Therefore the resulting
+\Macro{layerhalign} is either \PValue{l}, \PValue{c}, or \PValue{r} and the
+resulting \Macro{layervalign} is either \PValue{r}, \PValue{c}, or \PValue{b}.
+
+Redefinition of the commands to change the stored values is strictly forbidden
+and would result in unpredictable issues.%
 \EndIndex{Cmd}{layerheight}%
 \EndIndex{Cmd}{layerwidth}%
 \EndIndex{Cmd}{layeryoffset}%
 \EndIndex{Cmd}{layerxoffset}%
+\EndIndex{Cmd}{layerhalign}%
+\EndIndex{Cmd}{layervalign}%
+
+
+\begin{Declaration}
+  \Macro{LenToUnit}\Parameter{length}
+\end{Declaration}
+\BeginIndex{Cmd}{LenToUnit}%
+This\ChangedAt{v3.19}{\Package{scrlayer}} command has been copied from
+\Package{eso-pic}\IndexPackage{eso-pic} 2.0f. It converts lengths into
+multiples of \Length{unitlength}. It can be used everywhere \LaTeX{}
+expects \Environment{picture} coordinates or \Length{unitlength}-depending
+values. For more information see \cite{package:eso-pic} and the following
+descriptions of \Macro{putUR}, \Macro{putLL}, and \Macro{putLR}. If the
+command is already defined, e.\,g., by loading \Package{eso-pic} before
+\Package{scrlayer}, the package does not define it again.%
+\EndIndex{Cmd}{LenToUnit}%
+
+
+\begin{Declaration}
+  \Macro{putUL}\Parameter{content}\\
+  \Macro{putUR}\Parameter{content}\\
+  \Macro{putLL}\Parameter{content}\\
+  \Macro{putLR}\Parameter{content}\\
+  \Macro{putC}\Parameter{content}
+\end{Declaration}
+\BeginIndex{Cmd}{putUL}%
+\BeginIndex{Cmd}{putUR}%
+\BeginIndex{Cmd}{putLL}%
+\BeginIndex{Cmd}{putLR}%
+\BeginIndex{Cmd}{putC}%
+You\ChangedAt{v3.19}{\Package{scrlayer}} can use these commands inside the
+value of primary layer option \PValue{contents}, if the layer is declared with
+\OptionValue{mode}{picture}. In that case, \Macro{putUL} places the
+\PName{content} relative to the upper left corner of the layer and therefore
+is the same like
+\lstinline[breaklines=false]|\put(0,\LenToUnit{\layerheight})|. \Macro{putUR}
+places the \PName{content} relative to the upper right corner of the layer and
+therefore is the same like
+\lstinline[breaklines=false]|\put(\LenToUnit{\layerwidth},\LenToUnit{\layerheight})|.
+\Macro{putLL} places the \PName{content} relative to the lower left corner of
+the layer and therefore is the same like
+\lstinline[breaklines=false]|\put(0,0)|. \Macro{putLR} places the
+\PName{content} relative to the lower right corner and therefore is the same
+like \lstinline[breaklines=false]|\put(\LenToUnit{\layerwidth},0)|. Last but
+not least \Macro{putC} places the \PName{content} relative to the centre of
+the layer.%
+\begin{Example}
+  You want to investigate, how accurate \OptionValue{DIV}{classic} sets the
+  height of the text area to the width of the page size. So you declare a
+  layer that not only border the text area, but also places a circle with
+  paper width as diameter dimension into the centre of the text area:
+\begin{lstcode}
+\documentclass[DIV=classic]{scrartcl}
+\usepackage{pict2e}
+\usepackage{scrlayer}
+\DeclareNewLayer[%
+  textarea,background,mode=picture,
+  contents={%
+    \putLL{\line(1,0){\LenToUnit{\layerwidth}}}%
+    \putLR{\line(0,1){\LenToUnit{\layerheight}}}%
+    \putUR{\line(-1,0){\LenToUnit{\layerwidth}}}%
+    \putUL{\line(0,-1){\LenToUnit{\layerheight}}}%
+    \putC{\circle{\LenToUnit{\paperwidth}}}%
+  }
+]{showtextarea}
+\DeclareNewPageStyleByLayers{test}{showtextarea}
+\pagestyle{test}
+\begin{document}
+\null
+\end{document}
+\end{lstcode}
+  You will see that \Package{typearea}'s mapping to an integer \PName{DIV}
+  value is very accurate in this example.
+\end{Example}
+For more information about the sketched Middle Age method of generating a text
+area see \autoref{sec:typearea.circleConstruction},
+\autopageref{sec:typearea.circleConstruction}.
+
+For more information about command
+\Macro{DeclareNewPageStyleByLayers}\IndexCmd{DeclareNewPageStyleByLayers} see
+the description later in \autoref{sec:scrlayer.pagestyles},
+\autopageref{desc:scrlayer.cmd.DeclareNewPageStyleByLayers}. In short: It
+defines a new page style using the newly declared layer.%
+\EndIndex{Cmd}{putC}%
+\EndIndex{Cmd}{putLR}%
+\EndIndex{Cmd}{putLL}%
+\EndIndex{Cmd}{putUR}%
+\EndIndex{Cmd}{putUL}%
+
 
 \begin{Declaration}
   \Macro{GetLayerContents}\Parameter{layer name}
