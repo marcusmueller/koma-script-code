@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2015/09/14 v1.9a internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2015/09/30 v1.9b internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -1440,13 +1440,14 @@ KOMAScript \endcsname
 % \end{macro}
 %
 % \begin{macro}{\url@}
+%   \changes{v1.9b}{2015/09/30}{\cs{GuideCTANserver} not needed and removed}^^A
 %   Redefine to make \texttt{CTAN://} be an alias for
-%   \texttt{http://|\GuideCTANserver|/tex-archive/}.
+%   \texttt{http://mirror.ctan.org/}.
 %    \begin{macrocode}
 \def\url@#1{\expandafter\url@@#1\@nil}
 \def\url@@#1://#2\@nil{%
   \def\@tempa{#1}\def\@tempb{CTAN}\ifx\@tempa\@tempb
-    \hyper@linkurl{\Hurl{#1://#2}}{http://\GuideCTANserver/tex-archive/#2}%
+    \hyper@linkurl{\Hurl{#1://#2}}{http://mirror.ctan.org/#2}%
   \else
     \hyper@linkurl{\Hurl{#1://#2}}{#1://#2}%
   \fi
