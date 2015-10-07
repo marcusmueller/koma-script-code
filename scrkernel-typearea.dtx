@@ -1,4 +1,4 @@
-% \CheckSum{2622}
+% \CheckSum{2626}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-typearea.dtx
@@ -958,6 +958,8 @@
 %   \changes{v3.12}{2013/03/05}{Verwendung der Status-Signalisierung mit
 %     \cs{FamilyKeyState}}^^A
 %   \changes{v3.17a}{2015/05/03}{Logik komplett neu geschrieben}^^A
+%   \changes{v3.20}{2015/07/10}{\texttt{luatex} als Synonym für
+%     \texttt{pdftex}}^^A
 % Diese Option ist nun das zentrale Element für die Übermittlung der
 % Seitengröße an pdf\TeX, \texttt{dvips} oder V\TeX. Sie wird auch von
 % den obsoleten Optionen verwendet. Die Werte und ihre Bedeutung:
@@ -983,7 +985,7 @@
 \KOMA@key{pagesize}[auto]{%
   \KOMA@set@ncmdkey{pagesize}{@pagesizelast}{%
     {off}{-1},{no}{-1},{false}{-1},%
-    {auto}{0},{automedia}{1},{dvips}{2},{pdftex}{3},{dvipdfmx}{4}%
+    {auto}{0},{automedia}{1},{dvips}{2},{pdftex}{3},{luatex}{3},{dvipdfmx}{4}%
   }{#1}%
   \ifx\FamilyKeyState\FamilyKeyStateProcessed
     \ifcase\number\@pagesizelast\relax
@@ -1036,6 +1038,8 @@
 %
 % \begin{macro}{\set@pdftexpagesize}
 %   \changes{v2.95}{2002/08/27}{neu (intern)}^^A
+%   \changes{v3.20}{2015/07/10}{falls \cs{pdfpage\dots} nicht existiert wird
+%     \cs{page\dots} probiert (angekündigt für lua\TeX{}~0.80.1)}^^A
 % \begin{macro}{\set@dvipspagesize}
 %   \changes{v2.95}{2002/08/27}{neu (intern)}^^A
 %   \changes{v3.02c}{2009/02/13}{\texttt{seascape} wird beachtet}
@@ -1159,8 +1163,12 @@
 % ausgeführt werden:
 %    \begin{macrocode}
 \newcommand{\set@pdftexpagesize}{%
-  \ifnotundefined{pdfpagewidth}{\pdfpagewidth=\paperwidth}{}%
-  \ifnotundefined{pdfpageheight}{\pdfpageheight=\paperheight}{}%
+  \scr@ifundefinedorrelax{pdfpagewidth}{%
+    \scr@ifundefinedorrelax{pagewidth}{}{pagewidth=\paperwidth}%
+  }{\pdfpagewidth=\paperwidth}%
+  \scr@ifundefinedorrelax{pdfpageheight}{%
+    \scr@ifundefinedorrelax{pageheight}{}{pageheight=\paperheight}%
+  }{\pdfpageheight=\paperheight}%
 }
 \newcommand{\set@dvipspagesize}{%
   \begingroup

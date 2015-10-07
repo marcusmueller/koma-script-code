@@ -1,4 +1,4 @@
-% \CheckSum{1578}
+% \CheckSum{1605}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlayer-notecolumn.dtx
@@ -223,19 +223,33 @@
 % \File{scrlayer.dtx}).
 %
 % Here we test the used pdf\TeX{} primitives.
+% \changes{v0.1}{2015/10/07}{ready for renaming \cs{pdfsavepos} and
+%   \cs{pdflastypos} in luaTeX}^^A
 %    \begin{macrocode}
 \@tempswatrue
 \scr@ifundefinedorrelax{pdfsavepos}{%
-  \expandafter\@tempswafalse
-}{%
-  \scr@ifundefinedorrelax{pdflastypos}{%
+  \scr@ifundefinedorrelax{savepos}{%
     \expandafter\@tempswafalse
-  }{}%
+  }{%
+    \let\scr@savepos\savepos
+  }%
+}{%
+  \let\scr@savepos\pdfsavepos
+  \scr@ifundefinedorrelax{pdflastypos}{%
+    \scr@ifundefinedorrelax{lastypos}{%
+      \expandafter\@tempswafalse
+    }{%
+      \let\scr@lastypos\lastypos
+    }%
+  }{%
+    \let\scr@lastypos\pdflastypos
+  }%
 }
 \if@tempswa\else
-  \PackageError{scrlayer-notecolumn}{missing pdfTeX features}{%
-    This package needs \string\pdfsavepos\space and
-    \string\pdflastypos.\MessageBreak
+  \PackageError{scrlayer-notecolumn}{missing pdfTeX/luaTeX features}{%
+    This package needs \string\pdfsavepos\space or \string\savepos\space
+    and\MessageBreak
+    \string\pdflastypos\space or \string\lastypos.\MessageBreak
     This error is fatal, because usage of the package without these
     features\MessageBreak
     cannot work!\MessageBreak
@@ -753,11 +767,11 @@
 \scrlayerAddToInterface\makenote{%
   \newcommand{\makenote}[2][marginpar]{%
     \@bsphack
-    \pdfsavepos
+    \scr@savepos
     \addtocontents{slnc}{%
       \string\slnc@note{#1}%
                        {\noexpand\number\value{slncpage}}%
-                       {\noexpand\number\pdflastypos}%
+                       {\noexpand\number\scr@lastypos}%
                        {#2}%
     }%
     \@esphack
@@ -848,8 +862,18 @@
                     \kern\dimexpr\topskip-\baselineskip\relax
                   }%
                 \fi
+%    \end{macrocode}
+% \changes{v0.1}{2015/10/07}{ready for renaming \cs{pdfpageheight} in
+%   luaTeX}^^A
+% From lua\TeX~0.80.1 \cs{pdfpageheight} will be renamed into
+% \cs{pageheight}. So we have to do an extra test for the new primitive.
+%    \begin{macrocode}
                 \scr@ifundefinedorrelax{pdfpageheight}{%
-                  \@tempdima=\paperheight
+                  \scr@ifundefinedorrelax{pageheight}{%
+                    \@tempdima=\paperheight
+                  }{%
+                    \@tempdima=\pageheight
+                  }%
                 }{%
                   \@tempdima=\pdfpageheight
                 }%
@@ -910,11 +934,11 @@
           \if@filesw
             \expandafter\setbox\csname slnc@#1@box\endcsname\vbox{%
               \expandafter\unvbox\csname slnc@#1@box\endcsname
-              \pdfsavepos
+              \scr@savepos
               \protected@write\@auxout{}{%
                 \string\newlabel{notecolumn.##1.##3.syncnote.label}{%
                   {%
-                    \noexpand\number\pdflastypos
+                    \noexpand\number\scr@lastypos
                   }{\thepage}%
                 }%
               }%
@@ -1475,12 +1499,12 @@
       \fi
       {%
         \if@filesw
-          \pdfsavepos
+          \scr@savepos
           \protected@write\@auxout{}{%
             \string\newlabel{notecolumn.\theslnc@syncpoint.synctext.label}{%
               {%
                 \noexpand\number
-                \numexpr \pdflastypos\slnc@voffset\relax
+                \numexpr \scr@lastypos\slnc@voffset\relax
               }{\thepage}%
             }%
           }%
@@ -1536,8 +1560,18 @@
                \newpage\null\vskip-\dimexpr \baselineskip+\parskip\relax
                 \edef\slnc@textpage{\the\numexpr\slnc@textpage+1\relax}%
               }%
+%    \end{macrocode}
+% \changes{v0.1}{2015/10/07}{ready for renaming \cs{pdfpageheight} in
+%   luaTeX}^^A
+% From lua\TeX~0.80.1 \cs{pdfpageheight} will be renamed into
+% \cs{pageheight}. So we have to do an extra test for the new primitive.
+%    \begin{macrocode}
               \scr@ifundefinedorrelax{pdfpageheight}{%
-                \@tempdima=\paperheight
+                \scr@ifundefinedorrelax{pageheight}{%
+                  \@tempdima=\paperheight
+                }{%
+                  \@tempdima=\pageheight
+                }%
               }{%
                 \@tempdima=\pdfpageheight
               }%
