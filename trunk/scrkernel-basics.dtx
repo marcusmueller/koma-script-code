@@ -1,4 +1,4 @@
-% \CheckSum{2947}
+% \CheckSum{2994}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -1316,6 +1316,47 @@
 %    \end{macrocode}
 %</base>
 % \end{macro}^^A \IfArgIsEmpty
+%
+%
+% \begin{macro}{\ifislengthprimitive}
+%   \changes{v3.20}{2015/10/19}{neu}^^A
+% Falls das erste Argument ggf. über mehrere Stufen hinweg zu einem Primitiv
+% expandiert, das als Länge verwendet werden kann, wird das erste Argument
+% ausgeführt, sonst das zweite.
+%    \begin{macrocode}
+%<*base>
+\newcommand*{\ifislengthprimitive}[1]{%
+  \IfArgIsEmpty{#1}{\@secondoftwo}{\scr@ifislengthprimitive#1\@nil}%
+}
+%    \end{macrocode}
+% \begin{macro}{\scr@ifislengthprimitive}
+%   \changes{v3.20}{2015/10/19}{neu (intern)}^^A
+% Hilfsmacro, das ggf. rekusiv auf diverse Primitive prüft.
+%    \begin{macrocode}
+\newcommand*{\scr@ifislengthprimitive}[1]{%
+  \begingroup
+    \ifstrstart{\meaning #1}{\detokenize{macro:}}{%
+      \aftergroup\expandafter\aftergroup\scr@ifislengthprimitive
+    }{%
+      \def\reserved@c{\aftergroup\scr@secondoftwoAfterNil}%
+      \@for\reserved@a:=\baselineskip,\dp,\hsize,\ht,\lineskip,%
+                        \parindent,\parskip,\pdfpageheight,\pdfpagewidth,%
+                        \wd,\vsize \do {%
+        \expandafter\ifstr\expandafter{\expandafter\string\reserved@a}{%
+          \meaning #1%
+        }{%
+          \def\reserved@c{\aftergroup\scr@TestDimenAssignTillNil}%
+        }{}%
+      }%
+      \reserved@c
+    }%
+  \endgroup
+  #1%
+}
+%</base>
+%    \end{macrocode}
+% \end{macro}^^A \scr@ifislengthprimitive
+% \end{macro}^^A \ifislengthprimitive
 %
 %
 % \begin{macro}{\ifisdimen}
