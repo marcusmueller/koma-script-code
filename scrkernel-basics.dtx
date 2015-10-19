@@ -1,4 +1,4 @@
-% \CheckSum{2982}
+% \CheckSum{2968}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -1518,37 +1518,54 @@
 % \end{macro}^^A \scr@TestCountAssignTillNil
 % \end{macro}^^A \ifiscount
 %
+%
 % \begin{macro}{\ifisdimexpr}
 %   \changes{v3.12}{2013/11/05}{neu}^^A
-% Falls die Expansion des ersten Arguments eine \cs{dimexpr} ist, wird das
-% zweite Argument ausgeführt, sonst das dritte. Achtung: Falls der Ausdruck
-% ungültig ist, so wird ein Fehler gemeldet!
+%   \changes{v3.20}{2015/10/19}{Reimplementierung}^^A
+% Falls das erste Argument ggf. über mehrere Stufen hinweg zu einer
+% \cs{dimexpr} (und zu nichts weiterem!) expandiert, wird das erste
+% Argument ausgeführt, sonst das zweite. Dies unterscheidet sich in einem
+% wichtigen Punkt von \cs{ifisdimen}: Sollte das ganze zwar als \cs{dimexpr}
+% beginnen, aber syntaktisch nicht korrekt sein, so wird dies nicht erkannt,
+% sondern führt tatsächlich zu einer Fehlermeldung.
 %    \begin{macrocode}
 %<*base>
 \newcommand*{\ifisdimexpr}[1]{%
-  \begingroup
-    \edef\reserved@a{#1}%
-    \expandafter\expandafter\expandafter\def
-    \expandafter\expandafter\expandafter\reserved@a
-    \expandafter\expandafter\expandafter{\expandafter\meaning\reserved@a}%
-    \expandafter\def\expandafter\reserved@b\expandafter{\string\dimexpr}%
-    \ifstrstart{\reserved@a}{\reserved@b}{%
-      \afterassignment\scr@ifemptyorrelax@to@nnil
-      \@tempdima=#1\relax\@nnil{%
-        \aftergroup\@firstoftwo
-      }{%
-        \aftergroup\@secondoftwo
-      }%
-    }{\aftergroup\@secondoftwo}%
-  \endgroup
+  \IfArgIsEmpty{#1}{\@secondoftwo}{\scr@ifisdimexpr#1\@nil}%
 }
 %    \end{macrocode}
+% \begin{macro}{\scr@ifisdimexpr}
+%   \changes{v3.20}{2015/10/19}{neu (intern)}^^A
+% Hilfsmacro, das ggf. rekusiv auf eine \cs{dimexpr} prüft
+%    \begin{macrocode}
+\newcommand*{\scr@ifisdimexpr}{}
+\def\scr@ifisdimexpr#1{%
+  \begingroup
+    \ifstrstart{\meaning #1}{\detokenize{macro:}}{%
+      \aftergroup\expandafter\aftergroup\scr@ifisdimexpr
+    }{%
+      \ifstrstart{\meaning #1}{\string\dimexpr}{%
+        \aftergroup\scr@TestDimenAssignTillNil
+      }{%
+        \aftergroup\scr@secondoftwoAfterNil
+      }%
+    }%
+  \endgroup
+  #1%
+}
+%</base>
+%    \end{macrocode}
+% \end{macro}^^A \scr@ifisdimexpr
+% \end{macro}^^A \ifisdimexpr
+%
+%
 % \begin{macro}{\scr@ifemptyorrelax@to@nnil}
 %   \changes{v3.12}{2013/11/05}{neu (intern)}^^A
 % Hilfsmakro, zur Verwendung beispielsweise nach Zuweissungen. Falls alles bis
 % zum ersten \cs{@nnil} leer ist oder aus genau einem \cs{relax} besteht, wird
 % das erste Argument ausgeführt, sonst das zweite.
 %    \begin{macrocode}
+%<*base>
 \newcommand*{\scr@ifemptyorrelax@to@nnil}{}
 \def\scr@ifemptyorrelax@to@nnil#1\@nnil{%
   \begingroup
@@ -1566,7 +1583,6 @@
 }
 %</base>
 %    \end{macrocode}
-% \end{macro}
 % \end{macro}
 %
 %
