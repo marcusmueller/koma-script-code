@@ -1,4 +1,4 @@
-% \CheckSum{2998}
+% \CheckSum{2985}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -1360,18 +1360,22 @@
 %    \begin{macrocode}
 \newcommand*\scr@TestDimenAssignTillNil{}
 \def\scr@TestDimenAssignTillNil#1\@nil{%
-  \afterassignment\scr@IfArgIsRelaxTillNnil
-  \@tempdima=#1\relax\@nnil
+  \begingroup
+    \afterassignment\scr@AfterEndGroupIfArgIsRelaxTillNnil
+    \@tempdima=#1\relax\@nnil
 }
 %    \end{macrocode}
-% \begin{macro}{\scr@IfArgIsRelaxTillNnil}
+% \begin{macro}{\scr@IfAfterEndgroupArgIsRelaxTillNnil}
 %   \changes{v3.20}{2015/10/19}{neu (intern)}
-% Das Hilfsmakro liest ein durch \cs{@nnil} begrenztes Argument. Falls dieses
-% Argument nur aus \cs{relax} besteht, wird das erste Argument nach \cs{@nnil}
-% ausgeführt, sonst das zweite.
+% \begin{macro}{\scr@IfArgIsRelaxAfterRelaxTillNnil}
+%   \changes{v3.20}{2015/10/19}{neu (intern)}
+% Die Hilfsmakros lesen ein durch \cs{@nnil} begrenztes Argument. Falls dieses
+% Argument nur aus einer Folge von \cs{relax} besteht, wird das erste Argument
+% nach \cs{@nnil} ausgeführt, sonst das zweite.
 %    \begin{macrocode}
-\newcommand*\scr@IfArgIsRelaxTillNnil{}
-\def\scr@IfArgIsRelaxTillNnil#1\@nnil{%
+\newcommand*\scr@AfterEndGroupIfArgIsRelaxTillNnil{}
+\def\scr@AfterEndGroupIfArgIsRelaxTillNnil#1\@nnil{%
+  \endgroup
   \ifstr{\detokenize{#1}}{\detokenize{\relax}}{\@firstoftwo}{%
     \ifstrstart{\detokenize{#1}}{\detokenize{\relax}}{%
       \scr@IfArgIsRelaxAfterRelaxTillNnil #1\@nnil
@@ -1386,6 +1390,7 @@
   }%
 }
 %    \end{macrocode}
+% \end{macro}^^A \scr@IfArgIsRelaxAfterRelaxTillNnil
 % \end{macro}^^A \scr@IfArgIsRelaxTillNnil
 % \end{macro}^^A \scr@TestSkipAssignTillNil
 % \begin{macro}{\scr@secondoftwoAfterNil}
@@ -1406,6 +1411,61 @@
 % \end{macro}^^A \scr@@secondoftwoAfterNil
 % \end{macro}^^A \scr@secondoftwoAfterNil
 % \end{macro}^^A \ifisdimen
+%
+% \begin{macro}{\ifisskip}
+%   \changes{v3.12}{2013/11/05}{neu}^^A
+%   \changes{v3.18a}{2015/07/07}{\cs{baselineskip} und \cs{parskip} werden als
+%     skips akzeptiert}^^A
+%   \changes{v3.20}{2015/10/19}{\cs{baselineskip} und \cs{parskip} sind keine
+%     skips}^^A
+%   \changes{v3.20}{2015/10/19}{Reimplementierung}^^A
+% Falls das erste Argument ggf. über mehrere Stufen hinweg zu einem
+% \cs{skip}-Register (und zu nichts weiterem!) expandiert, wird das erste
+% Argument ausgeführt, sonst das zweite.
+%    \begin{macrocode}
+%<*base>
+\newcommand*{\ifisskip}[1]{%
+  \IfArgIsEmpty{#1}{\@secondoftwo}{\scr@ifisskip#1\@nil}%
+}
+%    \end{macrocode}
+% \begin{macro}{\scr@ifisskip}
+%   \changes{v3.20}{2015/10/19}{neu (intern)}^^A
+% Hilfsmacro, das ggf. rekusiv auf ein \cs{skip}-Register prüft
+%    \begin{macrocode}
+\newcommand*{\scr@ifisskip}{}
+\def\scr@ifisskip#1{%
+  \begingroup
+    \ifstrstart{\meaning #1}{\detokenize{macro:}}{%
+      \aftergroup\expandafter\aftergroup\scr@ifisskip
+    }{%
+      \ifstrstart{\meaning #1}{\string\skip}{%
+        \aftergroup\scr@TestSkipAssignTillNil
+      }{%
+        \aftergroup\scr@secondoftwoAfterNil
+      }%
+    }%
+  \endgroup
+  #1%
+}
+%    \end{macrocode}
+% \end{macro}^^A \scr@ifisskip
+% \begin{macro}{\scr@TestSkipAssignTillNil}
+%   \changes{v3.20}{2015/10/19}{neu (intern)}
+% Das durch \cs{@nil} begrenzte Argument wird einer temporären Länge
+% zugewiesen. Wird dabei das Argument komplett aufgebraucht, so wird das
+% erste Argument nach \cs{@nil} ausgeführt, sonst das zweite. Das begrenzte
+% Argument wird in jedem Fall komplett aufgebraucht.
+%    \begin{macrocode}
+\newcommand*\scr@TestSkipAssignTillNil{}
+\def\scr@TestSkipAssignTillNil#1\@nil{%
+  \begingroup
+    \afterassignment\scr@AfterEndGroupIfArgIsRelaxTillNnil
+    \@tempskipa=#1\relax\@nnil
+}
+%</base>
+%    \end{macrocode}
+% \end{macro}^^A \scr@TestSkipAssignTillNil
+% \end{macro}^^A \ifiskip
 %
 % \begin{macro}{\scr@ifrelax@to@nnil}
 %   \changes{v3.12}{2013/11/05}{neu (intern)}^^A
@@ -1480,44 +1540,6 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}{\ifisskip}
-%   \changes{v3.12}{2013/11/05}{neu}^^A
-%   \changes{v3.18a}{2015/07/07}{\cs{baselineskip} und \cs{parskip} werden als
-%     skips akzeptiert}^^A
-% Falls die Expansion des ersten Arguments ein \cs{skip} ist, wird das
-% zweite Argument ausgeführt, sonst das dritte.
-%    \begin{macrocode}
-%<*base>
-\newcommand*{\ifisskip}[1]{%
-  \begingroup
-    \edef\reserved@a{#1}%
-    \expandafter\expandafter\expandafter\def
-    \expandafter\expandafter\expandafter\reserved@a
-    \expandafter\expandafter\expandafter{\expandafter\meaning\reserved@a}%
-    \expandafter\def\expandafter\reserved@b\expandafter{\string\skip}%
-    \ifstrstart{\reserved@a}{\reserved@b}{%
-      \afterassignment\scr@ifrelax@to@nnil
-      \@tempskipa=#1\relax\@nnil{%
-        \aftergroup\@firstoftwo
-      }{%
-        \aftergroup\@secondoftwo
-      }%
-    }{%
-      \ifstr{\reserved@a}{\string\baselineskip}{%
-        \aftergroup\@firstoftwo
-      }{%
-        \ifstr{\reserved@a}{\string\parskip}{%
-          \aftergroup\@firstoftwo
-        }{%
-          \aftergroup\@secondoftwo
-        }%
-      }%
-    }%
-  \endgroup
-}
-%</base>
-%    \end{macrocode}
-% \end{macro}
 %
 % \begin{macro}{\ifisglueexpr}
 %   \changes{v3.12}{2013/11/05}{neu}^^A
