@@ -1,4 +1,4 @@
-% \CheckSum{2985}
+% \CheckSum{2982}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -1467,27 +1467,56 @@
 % \end{macro}^^A \scr@TestSkipAssignTillNil
 % \end{macro}^^A \ifiskip
 %
-% \begin{macro}{\scr@ifrelax@to@nnil}
-%   \changes{v3.12}{2013/11/05}{neu (intern)}^^A
-% Hilfsmakro, zur Verwendung beispielsweise nach Zuweissungen. Falls alles bis
-% zum ersten \cs{@nnil} aus genau einem \cs{relax} besteht, wird das erste
+% \begin{macro}{\ifiscount}
+%   \changes{v3.12}{2013/11/05}{neu}^^A
+%   \changes{v3.20}{2015/10/19}{Reimplementierung}^^A
+% Falls das erste Argument ggf. über mehrere Stufen hinweg zu einem
+% \cs{count}-Register (und zu nichts weiterem!) expandiert, wird das erste
 % Argument ausgeführt, sonst das zweite.
 %    \begin{macrocode}
 %<*base>
-\newcommand*{\scr@ifrelax@to@nnil}{}
-\def\scr@ifrelax@to@nnil#1\@nnil{%
+\newcommand*{\ifiscount}[1]{%
+  \IfArgIsEmpty{#1}{\@secondoftwo}{\scr@ifiscount#1\@nil}%
+}
+%    \end{macrocode}
+% \begin{macro}{\scr@ifiscount}
+%   \changes{v3.20}{2015/10/19}{neu (intern)}^^A
+% Hilfsmacro, das ggf. rekusiv auf ein \cs{count}-Register prüft
+%    \begin{macrocode}
+\newcommand*{\scr@ifiscount}{}
+\def\scr@ifiscount#1{%
   \begingroup
-    \def\reserved@a{#1}\def\reserved@b{\relax}%
-    \ifx\reserved@a\reserved@b
-      \aftergroup\@firstoftwo
-    \else
-      \aftergroup\@secondoftwo
-    \fi
+    \ifstrstart{\meaning #1}{\detokenize{macro:}}{%
+      \aftergroup\expandafter\aftergroup\scr@ifiscount
+    }{%
+      \ifstrstart{\meaning #1}{\string\count}{%
+        \aftergroup\scr@TestCountAssignTillNil
+      }{%
+        \aftergroup\scr@secondoftwoAfterNil
+      }%
+    }%
   \endgroup
+  #1%
+}
+%    \end{macrocode}
+% \end{macro}^^A \scr@ifiscount
+% \begin{macro}{\scr@TestSkipCountTillNil}
+%   \changes{v3.20}{2015/10/19}{neu (intern)}
+% Das durch \cs{@nil} begrenzte Argument wird einer temporären Länge
+% zugewiesen. Wird dabei das Argument komplett aufgebraucht, so wird das
+% erste Argument nach \cs{@nil} ausgeführt, sonst das zweite. Das begrenzte
+% Argument wird in jedem Fall komplett aufgebraucht.
+%    \begin{macrocode}
+\newcommand*\scr@TestCountAssignTillNil{}
+\def\scr@TestCountAssignTillNil#1\@nil{%
+  \begingroup
+    \afterassignment\scr@AfterEndGroupIfArgIsRelaxTillNnil
+    \@tempcnta=#1\relax\@nnil
 }
 %</base>
 %    \end{macrocode}
-% \end{macro}
+% \end{macro}^^A \scr@TestCountAssignTillNil
+% \end{macro}^^A \ifiscount
 %
 % \begin{macro}{\ifisdimexpr}
 %   \changes{v3.12}{2013/11/05}{neu}^^A
@@ -1569,33 +1598,6 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\ifiscount}
-%   \changes{v3.12}{2013/11/05}{neu}^^A
-% Falls die Expansion des ersten Arguments ein \cs{count} ist, wird das
-% zweite Argument ausgeführt, sonst das dritte. Für \LaTeX-Zähler siehe
-% stattdessen \cs{ifiscounter}.
-%    \begin{macrocode}
-%<*base>
-\newcommand*{\ifiscount}[1]{%
-  \begingroup
-    \edef\reserved@a{#1}%
-    \expandafter\expandafter\expandafter\def
-    \expandafter\expandafter\expandafter\reserved@a
-    \expandafter\expandafter\expandafter{\expandafter\meaning\reserved@a}%
-    \expandafter\def\expandafter\reserved@b\expandafter{\string\count}%
-    \ifstrstart{\reserved@a}{\reserved@b}{%
-      \afterassignment\scr@ifrelax@to@nnil
-      \@tempcnta=#1\relax\@nnil{%
-        \aftergroup\@firstoftwo
-      }{%
-        \aftergroup\@secondoftwo
-      }%
-    }{\aftergroup\@secondoftwo}%
-  \endgroup
-}
-%</base>
-%    \end{macrocode}
-% \end{macro}
 %
 % \begin{macro}{\ifisnumexpr}
 %   \changes{v3.12}{2013/11/05}{neu}^^A
@@ -1679,8 +1681,27 @@
   \fi
   \scr@next
 }
+%    \end{macrocode}
+% \begin{macro}{\scr@ifrelax@to@nnil}
+%   \changes{v3.12}{2013/11/05}{neu (intern)}^^A
+% Hilfsmakro, zur Verwendung beispielsweise nach Zuweissungen. Falls alles bis
+% zum ersten \cs{@nnil} aus genau einem \cs{relax} besteht, wird das erste
+% Argument ausgeführt, sonst das zweite.
+%    \begin{macrocode}
+\newcommand*{\scr@ifrelax@to@nnil}{}
+\def\scr@ifrelax@to@nnil#1\@nnil{%
+  \begingroup
+    \def\reserved@a{#1}\def\reserved@b{\relax}%
+    \ifx\reserved@a\reserved@b
+      \aftergroup\@firstoftwo
+    \else
+      \aftergroup\@secondoftwo
+    \fi
+  \endgroup
+}
 %</base>
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 %
