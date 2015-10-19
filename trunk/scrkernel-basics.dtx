@@ -1,4 +1,4 @@
-% \CheckSum{2915}
+% \CheckSum{2943}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -1639,6 +1639,45 @@
 % \end{macro}^^A \ifisnumexpr
 %
 %
+% \begin{macro}{\ifisdefchar}
+%   \changes{v3.20}{2015/10/19}{neu}^^A
+% Falls das erste Argument ggf. über mehrere Stufen hinweg zu einem mit
+% \cs{chardef} definierten Wert (und zu nichts weiterem!) expandiert, wird das
+% erste Argument ausgeführt, sonst das zweite. Dies unterscheidet sich in einem
+% wichtigen Punkt von \cs{ifiscount}: Sollte das ganze zwar wie ein \cs{char}
+% beginnen, aber syntaktisch nicht korrekt sein, so wird dies nicht erkannt,
+% sondern führt tatsächlich zu einer Fehlermeldung.
+%    \begin{macrocode}
+%<*base>
+\newcommand*{\ifisdefchar}[1]{%
+  \IfArgIsEmpty{#1}{\@secondoftwo}{\scr@ifisdefchar#1\@nil}%
+}
+%    \end{macrocode}
+% \begin{macro}{\scr@ifisdefchar}
+%   \changes{v3.20}{2015/10/19}{neu (intern)}^^A
+% Hilfsmacro, das ggf. rekusiv auf eine \cs{char} prüft
+%    \begin{macrocode}
+\newcommand*{\scr@ifisdefchar}{}
+\def\scr@ifisdefchar#1{%
+  \begingroup
+    \ifstrstart{\meaning #1}{\detokenize{macro:}}{%
+      \aftergroup\expandafter\aftergroup\scr@ifisdefchar
+    }{%
+      \ifstrstart{\meaning #1}{\string\char\string"}{%
+        \aftergroup\scr@TestCountAssignTillNil
+      }{%
+        \aftergroup\scr@secondoftwoAfterNil
+      }%
+    }%
+  \endgroup
+  #1%
+}
+%</base>
+%    \end{macrocode}
+% \end{macro}^^A \scr@ifisdefchar
+% \end{macro}^^A \ifisdefchar
+%
+%
 % \begin{macro}{\ifiscounter}
 %   \changes{v3.12}{2013/11/05}{neu}^^A
 % Falls die Expansion des ersten Arguments ein \LaTeX-Zähler ist, wird das
@@ -1655,6 +1694,7 @@
 %</base>
 %    \end{macrocode}
 % \end{macro}
+%
 %
 % \begin{macro}{\ifisinteger}
 %   \changes{v3.12}{2013/11/05}{neu}^^A
