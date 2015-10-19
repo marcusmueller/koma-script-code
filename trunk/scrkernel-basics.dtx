@@ -1,4 +1,4 @@
-% \CheckSum{2956}
+% \CheckSum{2915}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -1599,60 +1599,45 @@
 % \end{macro}^^A \ifisglueexpr
 %
 %
-% \begin{macro}{\scr@ifemptyorrelax@to@nnil}
-%   \changes{v3.12}{2013/11/05}{neu (intern)}^^A
-% Hilfsmakro, zur Verwendung beispielsweise nach Zuweissungen. Falls alles bis
-% zum ersten \cs{@nnil} leer ist oder aus genau einem \cs{relax} besteht, wird
-% das erste Argument ausgeführt, sonst das zweite.
-%    \begin{macrocode}
-%<*base>
-\newcommand*{\scr@ifemptyorrelax@to@nnil}{}
-\def\scr@ifemptyorrelax@to@nnil#1\@nnil{%
-  \begingroup
-    \def\reserved@a{#1}\def\reserved@b{\relax}%
-    \ifx\reserved@a\reserved@b
-      \aftergroup\@firstoftwo
-    \else
-      \ifx\reserved@a\@empty
-        \aftergroup\@firstoftwo
-      \else
-        \aftergroup\@secondoftwo
-      \fi
-    \fi
-  \endgroup
-}
-%</base>
-%    \end{macrocode}
-% \end{macro}
-%
-%
 % \begin{macro}{\ifisnumexpr}
 %   \changes{v3.12}{2013/11/05}{neu}^^A
-% Falls die Expansion des ersten Arguments eine \cs{numexpr} ist, wird das
-% zweite Argument ausgeführt, sonst das dritte. Achtung: Falls der Ausdruck
-% ungültig ist, so wird ein Fehler gemeldet!
+%   \changes{v3.20}{2015/10/19}{Reimplementierung}^^A
+% Falls das erste Argument ggf. über mehrere Stufen hinweg zu einer
+% \cs{numexpr} (und zu nichts weiterem!) expandiert, wird das erste
+% Argument ausgeführt, sonst das zweite. Dies unterscheidet sich in einem
+% wichtigen Punkt von \cs{ifiscount}: Sollte das ganze zwar als \cs{numexpr}
+% beginnen, aber syntaktisch nicht korrekt sein, so wird dies nicht erkannt,
+% sondern führt tatsächlich zu einer Fehlermeldung.
 %    \begin{macrocode}
 %<*base>
 \newcommand*{\ifisnumexpr}[1]{%
+  \IfArgIsEmpty{#1}{\@secondoftwo}{\scr@ifisnumexpr#1\relax\@nil}%
+}
+%    \end{macrocode}
+% \begin{macro}{\scr@ifisnumexpr}
+%   \changes{v3.20}{2015/10/19}{neu (intern)}^^A
+% Hilfsmacro, das ggf. rekusiv auf eine \cs{numexpr} prüft
+%    \begin{macrocode}
+\newcommand*{\scr@ifisnumexpr}{}
+\def\scr@ifisnumexpr#1{%
   \begingroup
-    \edef\reserved@a{#1}%
-    \expandafter\expandafter\expandafter\def
-    \expandafter\expandafter\expandafter\reserved@a
-    \expandafter\expandafter\expandafter{\expandafter\meaning\reserved@a}%
-    \expandafter\def\expandafter\reserved@b\expandafter{\string\numexpr}%
-    \ifstrstart{\reserved@a}{\reserved@b}{%
-      \afterassignment\scr@ifemptyorrelax@to@nnil
-      \@tempcnta=#1\relax\@nnil{%
-        \aftergroup\@firstoftwo
+    \ifstrstart{\meaning #1}{\detokenize{macro:}}{%
+      \aftergroup\expandafter\aftergroup\scr@ifisnumexpr
+    }{%
+      \ifstrstart{\meaning #1}{\string\numexpr}{%
+        \aftergroup\scr@TestCountAssignTillNil
       }{%
-        \aftergroup\@secondoftwo
+        \aftergroup\scr@secondoftwoAfterNil
       }%
-    }{\aftergroup\@secondoftwo}%
+    }%
   \endgroup
+  #1%
 }
 %</base>
 %    \end{macrocode}
-% \end{macro}
+% \end{macro}^^A \scr@ifisnumexpr
+% \end{macro}^^A \ifisnumexpr
+%
 %
 % \begin{macro}{\ifiscounter}
 %   \changes{v3.12}{2013/11/05}{neu}^^A
