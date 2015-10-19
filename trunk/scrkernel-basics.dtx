@@ -1,4 +1,4 @@
-% \CheckSum{2959}
+% \CheckSum{2998}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -1317,36 +1317,103 @@
 %</base>
 % \end{macro}^^A \IfArgIsEmpty
 %
+%
 % \begin{macro}{\ifisdimen}
 %   \changes{v3.12}{2013/11/05}{neu}^^A
-% Falls die Expansion des ersten Arguments eine \cs{dimen} ist, wird das
-% zweite Argument ausgeführt, sonst das dritte.
+%   \changes{v3.20}{2015/10/19}{Reimplementierung}^^A
+% Falls das erste Argument ggf. über mehrere Stufen hinweg zu einem
+% \cs{dimen}-Register (und zu nichts weiterem!) expandiert, wird das erste
+% Argument ausgeführt, sonst das zweite.
 %    \begin{macrocode}
 %<*base>
 \newcommand*{\ifisdimen}[1]{%
-  \begingroup
-    \edef\reserved@a{#1}%
-    \expandafter\expandafter\expandafter\def
-    \expandafter\expandafter\expandafter\reserved@a
-    \expandafter\expandafter\expandafter{\expandafter\meaning\reserved@a}%
-    \expandafter\def\expandafter\reserved@b\expandafter{\string\dimen}%
-    \ifstrstart{\reserved@a}{\reserved@b}{%
-      \afterassignment\scr@ifrelax@to@nnil
-      \@tempdima=#1\relax\@nnil{%
-        \aftergroup\@firstoftwo
-      }{%
-        \aftergroup\@secondoftwo
-      }%
-    }{\aftergroup\@secondoftwo}%
-  \endgroup
+  \IfArgIsEmpty{#1}{\@secondoftwo}{\scr@ifisdimen#1\@nil}%
 }
 %    \end{macrocode}
+% \begin{macro}{\scr@ifisdimen}
+%   \changes{v3.20}{2015/10/19}{neu (intern)}^^A
+% Hilfsmacro, das ggf. rekusiv auf ein \cs{dimen}-Register prüft
+%    \begin{macrocode}
+\newcommand*{\scr@ifisdimen}{}
+\def\scr@ifisdimen#1{%
+  \begingroup
+    \ifstrstart{\meaning #1}{\detokenize{macro:}}{%
+      \aftergroup\expandafter\aftergroup\scr@ifisdimen
+    }{%
+      \ifstrstart{\meaning #1}{\string\dimen}{%
+        \aftergroup\scr@TestDimenAssignTillNil
+      }{%
+        \aftergroup\scr@secondoftwoAfterNil
+      }%
+    }%
+  \endgroup
+  #1%
+}
+%    \end{macrocode}
+% \end{macro}^^A \scr@ifisdimen
+% \begin{macro}{\scr@TestDimenAssignTillNil}
+%   \changes{v3.20}{2015/10/19}{neu (intern)}
+% Das durch \cs{@nil} begrenzte Argument wird einer temporären Länge
+% zugewiesen. Wird dabei das Argument komplett aufgebraucht, so wird das
+% erste Argument nach \cs{@nil} ausgeführt, sonst das zweite. Das begrenzte
+% Argument wird in jedem Fall komplett aufgebraucht.
+%    \begin{macrocode}
+\newcommand*\scr@TestDimenAssignTillNil{}
+\def\scr@TestDimenAssignTillNil#1\@nil{%
+  \afterassignment\scr@IfArgIsRelaxTillNnil
+  \@tempdima=#1\relax\@nnil
+}
+%    \end{macrocode}
+% \begin{macro}{\scr@IfArgIsRelaxTillNnil}
+%   \changes{v3.20}{2015/10/19}{neu (intern)}
+% Das Hilfsmakro liest ein durch \cs{@nnil} begrenztes Argument. Falls dieses
+% Argument nur aus \cs{relax} besteht, wird das erste Argument nach \cs{@nnil}
+% ausgeführt, sonst das zweite.
+%    \begin{macrocode}
+\newcommand*\scr@IfArgIsRelaxTillNnil{}
+\def\scr@IfArgIsRelaxTillNnil#1\@nnil{%
+  \ifstr{\detokenize{#1}}{\detokenize{\relax}}{\@firstoftwo}{%
+    \ifstrstart{\detokenize{#1}}{\detokenize{\relax}}{%
+      \scr@IfArgIsRelaxAfterRelaxTillNnil #1\@nnil
+    }{\@secondoftwo}%
+  }%
+}
+\def\scr@IfArgIsRelaxAfterRelaxTillNnil \relax#1\@nnil{%
+  \ifstr{\detokenize{#1}}{\detokenize{\relax}}{\@firstoftwo}{%
+    \ifstrstart{\detokenize{#1}}{\detokenize{\relax}}{%
+      \scr@IfArgIsRelaxAfterRelaxTillNnil #1\@nnil
+    }{\@secondoftwo}%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}^^A \scr@IfArgIsRelaxTillNnil
+% \end{macro}^^A \scr@TestSkipAssignTillNil
+% \begin{macro}{\scr@secondoftwoAfterNil}
+%   \changes{v3.20}{2015/10/19}{neu (intern)}
+% Das Hilfsmakro liest ein durch \cs{@nil} begrenztes Argument und führt dann
+% das zweite Argument nach \cs{@nil} aus. Dabei wird auch Sorge dafür getrage,
+% dass das Argument eventuell leer sein könnte, was normalerweise dazu führen
+% würde, dass \cs{@nil} zum Argument selbst wird.
+% \begin{macro}{\scr@@secondoftwoAfterNil}
+%   \changes{v3.20}{2015/10/19}{neu (intern)}
+% Zu diesem Zweck wird ein zweites Hilfsmakro benötigt.
+%    \begin{macrocode}
+\newcommand*{\scr@secondoftwoAfterNil}{\scr@@secondoftwoAfterNil\@empty}
+\newcommand*{\scr@@secondoftwoAfterNil}{}
+\def\scr@@secondoftwoAfterNil#1\@nil{\@secondoftwo}
+%</base>
+%    \end{macrocode}
+% \end{macro}^^A \scr@@secondoftwoAfterNil
+% \end{macro}^^A \scr@secondoftwoAfterNil
+% \end{macro}^^A \ifisdimen
+%
 % \begin{macro}{\scr@ifrelax@to@nnil}
 %   \changes{v3.12}{2013/11/05}{neu (intern)}^^A
 % Hilfsmakro, zur Verwendung beispielsweise nach Zuweissungen. Falls alles bis
 % zum ersten \cs{@nnil} aus genau einem \cs{relax} besteht, wird das erste
 % Argument ausgeführt, sonst das zweite.
 %    \begin{macrocode}
+%<*base>
 \newcommand*{\scr@ifrelax@to@nnil}{}
 \def\scr@ifrelax@to@nnil#1\@nnil{%
   \begingroup
@@ -1360,7 +1427,6 @@
 }
 %</base>
 %    \end{macrocode}
-% \end{macro}
 % \end{macro}
 %
 % \begin{macro}{\ifisdimexpr}
