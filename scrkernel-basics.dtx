@@ -1,4 +1,4 @@
-% \CheckSum{2943}
+% \CheckSum{2947}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -1701,47 +1701,63 @@
 % \begin{macro}{\ifisinteger}
 %   \changes{v3.12}{2013/11/05}{neu}^^A
 %   \changes{v3.12a}{2014/01/24}{Leerzeichenfehler korrigiert}^^A
+%   \changes{v3.20}{2015/10/19}{Reimplementierung}^^A
 % Falls die Expansion des ersten Arguments eine (positive oder negative) ganze
 % Zahl ist, wird das zweite Argument ausgeführt, sonst das dritte.
 %    \begin{macrocode}
 %<*base>
-\newcommand*{\ifisinteger}[1]{%
+\renewcommand*{\ifisinteger}[1]{%
+  \IfArgIsEmpty{#1}{\@secondoftwo}{\scr@ifisinteger#1\@nil}%
+}
+%    \end{macrocode}
+% \begin{macro}{\scr@ifisinteger}
+%   \changes{v3.20}{2015/10/19}{neu (intern)}^^A
+% Hilfsmacro, das ggf. rekusiv auf ein Vorzeichen oder eine positive Zahl
+% prüft.
+%    \begin{macrocode}
+\def\scr@ifisinteger#1{%
   \begingroup
-    \edef\reserved@a{#1}\expandafter
-    \scr@ifintegerplusminus\reserved@a\@nil{\aftergroup\@firstoftwo}%
-                                           {\aftergroup\@secondoftwo}%
+    \ifstrstart{\meaning #1}{\detokenize{macro:}}{%
+      \aftergroup\expandafter\aftergroup\scr@ifisinteger\aftergroup#1%
+    }{%
+      \ifstrstart{\meaning #1}{\detokenize{the character}}{%
+        \if #1-\aftergroup\scr@ifisinteger
+        \else
+          \if #1+\aftergroup\scr@ifisinteger
+          \else
+            \ifnum 0=0\if #10\else\if #11\else\if #12\else\if #13\else
+                      \if #14\else\if #15\else\if #16\else\if #17\else
+                      \if #18\else\if #19\else 1\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi
+                      \relax
+              \aftergroup\scr@TestCountAssignTillNil
+              \aftergroup#1%
+            \else
+              \typeout{Know we have: `\meaning #1'}%
+              \aftergroup\scr@secondoftwoAfterNil
+              \aftergroup#1%
+            \fi
+          \fi
+        \fi
+      }{%
+        \aftergroup\scr@secondoftwoAfterNil
+        \aftergroup#1%
+      }%
+    }%
   \endgroup
 }
+%</base>
 %    \end{macrocode}
-% \begin{macro}{\scr@ifintegerplusminus}
-%   \changes{v3.12}{2013/11/05}{neu (intern)}^^A
-% Hilfsmakro, ausschließlich für \cs{ifisinteger}.
-%    \begin{macrocode}
-\newcommand*{\scr@ifintegerplusminus}{}
-\def\scr@ifintegerplusminus#1#2\@nil{%
-  \def\scr@next{\scr@ifintegerplusminus #2\@nil}%
-  \if #1-\relax
-  \else \if #1+\relax
-    \else
-      \def\scr@next{%
-        \afterassignment\scr@ifrelax@to@nnil
-        \@tempcnta=#1#2\relax\@nnil
-      }%
-      \if #10\else\if #11\else\if #12\else\if #13\else\if #14\else
-      \if #15\else\if #16\else\if #17\else\if #18\else\if #19\else
-        \let\scr@next\@secondoftwo
-      \fi\fi\fi\fi\fi\fi\fi\fi\fi\fi
-    \fi
-  \fi
-  \scr@next
-}
-%    \end{macrocode}
+% \end{macro}^^A \scr@ifisinteger
+% \end{macro}^^A \ifisinteger
+%
+%
 % \begin{macro}{\scr@ifrelax@to@nnil}
 %   \changes{v3.12}{2013/11/05}{neu (intern)}^^A
 % Hilfsmakro, zur Verwendung beispielsweise nach Zuweissungen. Falls alles bis
 % zum ersten \cs{@nnil} aus genau einem \cs{relax} besteht, wird das erste
 % Argument ausgeführt, sonst das zweite.
 %    \begin{macrocode}
+%<*base>
 \newcommand*{\scr@ifrelax@to@nnil}{}
 \def\scr@ifrelax@to@nnil#1\@nnil{%
   \begingroup
@@ -1755,8 +1771,6 @@
 }
 %</base>
 %    \end{macrocode}
-% \end{macro}
-% \end{macro}
 % \end{macro}
 %
 % \begin{macro}{\ifisdimension}
