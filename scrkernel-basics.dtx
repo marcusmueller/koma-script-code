@@ -1,4 +1,4 @@
-% \CheckSum{2994}
+% \CheckSum{3064}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -1346,7 +1346,7 @@
           \meaning #1%
         }{%
           \def\reserved@c{\aftergroup\scr@TestDimenAssignTillNil}%
-        }{}%
+        }%
       }%
       \reserved@c
     }%
@@ -1375,8 +1375,7 @@
 %   \changes{v3.20}{2015/10/19}{neu (intern)}^^A
 % Hilfsmacro, das ggf. rekusiv auf ein \cs{dimen}-Register prüft
 %    \begin{macrocode}
-\newcommand*{\scr@ifisdimen}{}
-\def\scr@ifisdimen#1{%
+\newcommand*{\scr@ifisdimen}[1]{%
   \begingroup
     \ifstrstart{\meaning #1}{\detokenize{macro:}}{%
       \aftergroup\expandafter\aftergroup\scr@ifisdimen
@@ -1473,8 +1472,7 @@
 %   \changes{v3.20}{2015/10/19}{neu (intern)}^^A
 % Hilfsmacro, das ggf. rekusiv auf ein \cs{skip}-Register prüft
 %    \begin{macrocode}
-\newcommand*{\scr@ifisskip}{}
-\def\scr@ifisskip#1{%
+\newcommand*{\scr@ifisskip}[1]{%
   \begingroup
     \ifstrstart{\meaning #1}{\detokenize{macro:}}{%
       \aftergroup\expandafter\aftergroup\scr@ifisskip
@@ -1524,8 +1522,7 @@
 %   \changes{v3.20}{2015/10/19}{neu (intern)}^^A
 % Hilfsmacro, das ggf. rekusiv auf ein \cs{count}-Register prüft
 %    \begin{macrocode}
-\newcommand*{\scr@ifiscount}{}
-\def\scr@ifiscount#1{%
+\newcommand*{\scr@ifiscount}[1]{%
   \begingroup
     \ifstrstart{\meaning #1}{\detokenize{macro:}}{%
       \aftergroup\expandafter\aftergroup\scr@ifiscount
@@ -1579,8 +1576,7 @@
 %   \changes{v3.20}{2015/10/19}{neu (intern)}^^A
 % Hilfsmacro, das ggf. rekusiv auf eine \cs{dimexpr} prüft
 %    \begin{macrocode}
-\newcommand*{\scr@ifisdimexpr}{}
-\def\scr@ifisdimexpr#1{%
+\newcommand*{\scr@ifisdimexpr}[1]{%
   \begingroup
     \ifstrstart{\meaning #1}{\detokenize{macro:}}{%
       \aftergroup\expandafter\aftergroup\scr@ifisdimexpr
@@ -1619,8 +1615,7 @@
 %   \changes{v3.20}{2015/10/19}{neu (intern)}^^A
 % Hilfsmacro, das ggf. rekusiv auf eine \cs{glueexpr} prüft
 %    \begin{macrocode}
-\newcommand*{\scr@ifisglueexpr}{}
-\def\scr@ifisglueexpr#1{%
+\newcommand*{\scr@ifisglueexpr}[1]{%
   \begingroup
     \ifstrstart{\meaning #1}{\detokenize{macro:}}{%
       \aftergroup\expandafter\aftergroup\scr@ifisglueexpr
@@ -1659,8 +1654,7 @@
 %   \changes{v3.20}{2015/10/19}{neu (intern)}^^A
 % Hilfsmacro, das ggf. rekusiv auf eine \cs{numexpr} prüft
 %    \begin{macrocode}
-\newcommand*{\scr@ifisnumexpr}{}
-\def\scr@ifisnumexpr#1{%
+\newcommand*{\scr@ifisnumexpr}[1]{%
   \begingroup
     \ifstrstart{\meaning #1}{\detokenize{macro:}}{%
       \aftergroup\expandafter\aftergroup\scr@ifisnumexpr
@@ -1698,8 +1692,7 @@
 %   \changes{v3.20}{2015/10/19}{neu (intern)}^^A
 % Hilfsmacro, das ggf. rekusiv auf eine \cs{char} prüft
 %    \begin{macrocode}
-\newcommand*{\scr@ifisdefchar}{}
-\def\scr@ifisdefchar#1{%
+\newcommand*{\scr@ifisdefchar}[1]{%
   \begingroup
     \ifstrstart{\meaning #1}{\detokenize{macro:}}{%
       \aftergroup\expandafter\aftergroup\scr@ifisdefchar
@@ -1773,21 +1766,56 @@
               \aftergroup\scr@TestCountAssignTillNil
               \aftergroup#1%
             \else
-              \typeout{Know we have: `\meaning #1'}%
               \aftergroup\scr@secondoftwoAfterNil
               \aftergroup#1%
             \fi
           \fi
         \fi
       }{%
-        \aftergroup\scr@secondoftwoAfterNil
+        \ifstrstart{\meaning #1}{\string\char\string"}{%
+          \aftergroup\scr@TestCountAssignTillNil
+        }{%
+          \def\reserved@c{%
+            \aftergroup\scr@secondoftwoAfterNil
+            \aftergroup\@empty
+          }%
+          \@for\reserved@a:=\abovedisplayskip,\abovedisplayshortskip,%
+                            \adjdemerits,%
+                            \baselineskip,\belowdisplayskip,%
+                            \belowdisplayshortskip,\binoppenalty,\boxmaxdepth,%
+                            \brokenpenalty,%
+                            \clubpenalty,\count,%
+                            \dimen,\dimexpr,\doublehyphendemerits,\dp,%
+                            \emergenystretch,\exhyphenpenalty,%
+                            \finalhyphendemerits,%
+                            \glueexpr,%
+                            \hbadness,\hfuzz,\hsize,\ht,\hyphenpenalty,%
+                            \lastskip,\lastpenalty,\linepenalty,%
+                            \lineskip,\lineskiplimit,%
+                            \maxdepth,\numexpr,%
+                            \overfullrule,%
+                            \parfillskip,\parindent,\parskip,%
+                            \pdfpageheight,\pdfpagewidth,%
+                            \predisplaypenalty,\pretolerance,%
+                            \relpenalty,\widowpenalty,%
+                            \skip,\splitmaxdepth,\splittopskip,%
+                            \tolerance,\topskip,%
+                            \wd,\vbadness,\vfuzz,\vsize 
+          \do {%
+            \expandafter\ifstr\expandafter{\expandafter\string\reserved@a}{%
+              \meaning #1%
+            }{%
+              \def\reserved@c{\aftergroup\scr@TestCountAssignTillNil}%
+            }%
+          }%
+          \reserved@c
+        }%
         \aftergroup#1%
       }%
     }%
   \endgroup
 }
 %</base>
-%    \end{macrocode}
 % \end{macro}^^A \scr@ifisinteger
 % \end{macro}^^A \ifisinteger
 %
