@@ -1,4 +1,4 @@
-% \CheckSum{3064}
+% \CheckSum{3276}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -1422,6 +1422,7 @@
     }{\@secondoftwo}%
   }%
 }
+\newcommand*\scr@IfArgIsRelaxAfterRelaxTillNnil{}
 \def\scr@IfArgIsRelaxAfterRelaxTillNnil \relax#1\@nnil{%
   \ifstr{\detokenize{#1}}{\detokenize{\relax}}{\@firstoftwo}{%
     \ifstrstart{\detokenize{#1}}{\detokenize{\relax}}{%
@@ -1729,7 +1730,7 @@
 }
 %</base>
 %    \end{macrocode}
-% \end{macro}
+% \end{macro}^^A \ifiscounter
 %
 %
 % \begin{macro}{\ifisinteger}
@@ -1777,7 +1778,6 @@
         }{%
           \def\reserved@c{%
             \aftergroup\scr@secondoftwoAfterNil
-            \aftergroup\@empty
           }%
           \@for\reserved@a:=\abovedisplayskip,\abovedisplayshortskip,%
                             \adjdemerits,%
@@ -1816,6 +1816,7 @@
   \endgroup
 }
 %</base>
+%    \end{macrocode}
 % \end{macro}^^A \scr@ifisinteger
 % \end{macro}^^A \ifisinteger
 %
@@ -1845,94 +1846,273 @@
 % \begin{macro}{\ifisdimension}
 %   \changes{v3.12}{2013/11/05}{neu}^^A
 %   \changes{v3.12a}{2014/01/24}{Leerzeichenfehler korrigiert}^^A
-% Falls die Expansion des ersten Arguments eine (positive oder negative)
-% Länge ist, wird das zweite Argument ausgeführt, sonst das dritte. Es sei
-% darauf hingewiesen, dass derzeit ungültige oder fehlende Einheiten eine
-% Fehlermeldung bewirken!
+%   \changes{v3.20}{2015/10/20}{Reimplementierung}^^A
+% Falls die stufenweise Expansion des ersten Arguments eine (positive oder
+% negative) Länge ist, wird das zweite Argument ausgeführt, sonst das
+% dritte.
 %    \begin{macrocode}
 %<*base>
 \newcommand*{\ifisdimension}[1]{%
+  \IfArgIsEmpty{#1}{\@secondoftwo}{\scr@ifisdimension#1\@nil}%
+}
+%    \end{macrocode}
+% \begin{macro}{\scr@ifisdimension}
+%   \changes{v3.20}{2015/10/20}{neu (intern)}
+% Eigentlich wäre dieses Hilfsmakro extrem aufwändig, da eine Dimension recht
+% komplex aufgebaut sein darf. Ich habe aber beschlossen, hier mit einer
+% Heuristik zu Werke zu gehen: Wenn das Argument mit einer beliebigen Anzahl
+% Vorzeichen, gefolgt von max. einem Punkt, Komma oder einer Ziffer oder
+% gefolgt einem der für Längen zulässigen Primitiv beginnt, dann probieren wir
+% eine Zuweisung. Ist diese syntaktisch nicht korrekt, kann ein Fehler die
+% Folge sein. Das mag unschön sein, vereinfacht den Test aber erheblich!
+%    \begin{macrocode}
+\newcommand*{\scr@ifisdimension}[1]{%
   \begingroup
-    \edef\reserved@a{#1\relax}\expandafter
-    \scr@ifdimensionplusminus\reserved@a\@nil{\aftergroup\@firstoftwo}%
-                                             {\aftergroup\@secondoftwo}%
+    \ifstrstart{\meaning #1}{\detokenize{macro:}}{%
+      \aftergroup\expandafter\aftergroup\scr@ifisdimension\aftergroup#1%
+    }{%
+      \ifstrstart{\meaning #1}{\detokenize{the character}}{%
+        \if #1-\aftergroup\scr@ifisdimension
+        \else
+          \if #1-\aftergroup\scr@ifisdimension
+          \else
+            \if #1.%
+              \aftergroup\scr@TestDimensionAssignTillNil
+              \aftergroup#1%
+            \else
+              \if #1,%
+                \aftergroup\scr@TestDimensionAssignTillNil
+                \aftergroup#1%
+              \else
+                \ifnum 0=0\if #10\else\if #11\else\if #12\else\if #13\else
+                          \if #14\else\if #15\else\if #16\else\if #17\else
+                          \if #18\else\if #19\else 1\fi\fi
+                          \fi\fi\fi\fi
+                          \fi\fi\fi\fi
+                          \relax
+                  \aftergroup\scr@TestDimensionAssignTillNil
+                  \aftergroup#1%
+                \else
+                  \aftergroup\scr@secondoftwoAfterNil
+                  \aftergroup#1%
+                \fi
+              \fi
+            \fi
+          \fi
+        \fi
+      }{%
+        \ifstrstart{\meaning #1}{\string\char\string"}{%
+          \aftergroup\scr@TestDimensionAssignTillNil
+        }{%
+          \def\reserved@c{%
+            \aftergroup\scr@secondoftwoAfterNil
+            \aftergroup\@empty
+          }%
+          \@for\reserved@a:=\abovedisplayskip,\abovedisplayshortskip,%
+                            \adjdemerits,%
+                            \baselineskip,\belowdisplayskip,%
+                            \belowdisplayshortskip,\binoppenalty,\boxmaxdepth,%
+                            \brokenpenalty,%
+                            \clubpenalty,\count,%
+                            \dimen,\dimexpr,\doublehyphendemerits,\dp,%
+                            \emergenystretch,\exhyphenpenalty,%
+                            \finalhyphendemerits,%
+                            \glueexpr,%
+                            \hbadness,\hfuzz,\hsize,\ht,\hyphenpenalty,%
+                            \lastskip,\lastpenalty,\linepenalty,%
+                            \lineskip,\lineskiplimit,%
+                            \maxdepth,\numexpr,%
+                            \overfullrule,%
+                            \parfillskip,\parindent,\parskip,%
+                            \pdfpageheight,\pdfpagewidth,%
+                            \predisplaypenalty,\pretolerance,%
+                            \relpenalty,\widowpenalty,%
+                            \skip,\splitmaxdepth,\splittopskip,%
+                            \tolerance,\topskip,%
+                            \wd,\vbadness,\vfuzz,\vsize 
+          \do {%
+            \expandafter\ifstr\expandafter{\expandafter\string\reserved@a}{%
+              \meaning #1%
+            }{%
+              \def\reserved@c{\aftergroup\scr@TestDimensionAssignTillNil}%
+            }%
+          }%
+          \reserved@c
+        }%
+        \aftergroup#1%
+      }%
+    }%
   \endgroup
 }
 %    \end{macrocode}
-% \begin{macro}{\scr@ifdimensionplusminus}
-%   \changes{v3.12}{2013/11/05}{neu (intern)}^^A
-% Hilfsmakro, ausschließlich für \cs{ifisdimension}.
+% \begin{macro}{\scr@TestDimenionAssignTillNil}
+%   \changes{v3.20}{2015/10/19}{neu (intern)}
+% Das durch \cs{@nil} begrenzte Argument wird einer temporären Länge
+% zugewiesen. Wird dabei das Argument komplett aufgebraucht, so wird das
+% erste Argument nach \cs{@nil} ausgeführt, sonst das zweite. Das begrenzte
+% Argument wird in jedem Fall komplett aufgebraucht.
 %    \begin{macrocode}
-\newcommand*{\scr@ifdimensionplusminus}{}
-\def\scr@ifdimensionplusminus#1#2\@nil{%
-  \def\scr@next{\scr@ifdimensionplusminus #2\@nil}%
-  \if #1-\relax
-  \else \if #1+\relax
-    \else
-      \def\scr@next{%
-        \afterassignment\scr@ifrelax@to@nnil
-        \@tempdima=#1#2\@nnil
-      }%
-      \if #1,\else\if #1.\else
-        \if #10\else\if #11\else\if #12\else\if #13\else\if #14\else
-        \if #15\else\if #16\else\if #17\else\if #18\else\if #19\else
-          \let\scr@next\@secondoftwo
-        \fi\fi\fi\fi\fi\fi\fi\fi\fi\fi
-      \fi\fi
-    \fi
-  \fi
-  \scr@next
+\newcommand*\scr@TestDimensionAssignTillNil{}
+\def\scr@TestDimensionAssignTillNil#1\@nil{%
+  \begingroup
+    \afterassignment\scr@AfterEndGroupIfArgIsRelaxTillptNnil
+    \@tempdima=#1pt\@nnil
+}
+%    \end{macrocode}
+% \begin{macro}{\scr@IfAfterEndgroupArgIsRelaxTillptNnil}
+%   \changes{v3.20}{2015/10/19}{neu (intern)}
+% \begin{macro}{\scr@IfArgIsRelaxAfterRelaxTillptNnil}
+%   \changes{v3.20}{2015/10/19}{neu (intern)}
+% Die Hilfsmakros lesen ein durch \cs{@nnil} begrenztes Argument. Falls dieses
+% Argument nur aus einer Folge von \cs{relax} besteht, wird das erste Argument
+% nach \cs{@nnil} ausgeführt, sonst das zweite.
+%    \begin{macrocode}
+\newcommand*\scr@AfterEndGroupIfArgIsRelaxTillptNnil{}
+\def\scr@AfterEndGroupIfArgIsRelaxTillptNnil#1\@nnil{%
+  \endgroup
+  \ifstr{\detokenize{#1}}{\detokenize{pt}}{\@firstoftwo}{%
+    \ifstrstart{\detokenize{#1}}{\detokenize{\relax}}{%
+      \scr@IfArgIsRelaxAfterRelaxTillptNnil #1\@nnil
+    }{\@secondoftwo}%
+  }%
+}
+\newcommand*\scr@IfArgIsRelaxAfterRelaxTillptNnil{}
+\def\scr@IfArgIsRelaxAfterRelaxTillptNnil \relax#1pt\@nnil{%
+  \ifstr{\detokenize{#1}}{\detokenize{pt}}{\@firstoftwo}{%
+    \ifstrstart{\detokenize{#1}}{\detokenize{\relax}}{%
+      \scr@IfArgIsRelaxAfterRelaxTillptNnil #1\@nnil
+    }{\@secondoftwo}%
+  }%
 }
 %</base>
 %    \end{macrocode}
-% \end{macro}
-% \end{macro}
+% \end{macro}^^A \scr@IfArgIsRelaxAfterRelaxTillptNnil
+% \end{macro}^^A \scr@IfArgIsRelaxTillptNnil
+% \end{macro}^^A \scr@DimensionSkipAssignTillNil
+% \end{macro}^^A \scr@ifisdimension
+% \end{macro}^^A \ifisdimension
+%
 %
 % \begin{macro}{\ifisglue}
 %   \changes{v3.12}{2013/11/05}{neu}^^A
 %   \changes{v3.12a}{2014/01/24}{Leerzeichenfehler korrigiert}^^A
-% Falls die Expansion des ersten Arguments eine (positive oder negative)
-% Ausdehnung ist, wird das zweite Argument ausgeführt, sonst das dritte. Es sei
-% darauf hingewiesen, dass derzeit ungültige oder fehlende Einheiten eine
-% Fehlermeldung bewirken!
+%   \changes{v3.20}{2015/10/21}{Reimplementierung}^^A
+% Falls die stufenweise Expansion des ersten Arguments eine (positive oder
+% negative) Länge mit Leim ist, wird das zweite Argument ausgeführt, sonst das
+% dritte.
 %    \begin{macrocode}
 %<*base>
 \newcommand*{\ifisglue}[1]{%
+  \IfArgIsEmpty{#1}{\@secondoftwo}{\scr@ifisglue#1\@nil}%
+}
+%    \end{macrocode}
+% \begin{macro}{\scr@ifisglue}
+%   \changes{v3.20}{2015/10/21}{neu (intern)}
+% Eigentlich wäre dieses Hilfsmakro extrem aufwändig, da Leim recht
+% komplex aufgebaut sein darf. Ich habe aber beschlossen, hier mit einer
+% Heuristik zu Werke zu gehen: Wenn das Argument mit einer beliebigen Anzahl
+% Vorzeichen, gefolgt von max. einem Punkt, Komma oder einer Ziffer oder
+% gefolgt einem der für Leim zulässigen Primitiv beginnt, dann probieren wir
+% eine Zuweisung. Ist diese syntaktisch nicht korrekt, kann ein Fehler die
+% Folge sein. Das mag unschön sein, vereinfacht den Test aber erheblich!
+%    \begin{macrocode}
+\newcommand*{\scr@ifisglue}[1]{%
   \begingroup
-    \edef\reserved@a{#1\relax}\expandafter
-    \scr@ifglueplusminus\reserved@a\@nil{\aftergroup\@firstoftwo}%
-                                        {\aftergroup\@secondoftwo}%
+    \ifstrstart{\meaning #1}{\detokenize{macro:}}{%
+      \aftergroup\expandafter\aftergroup\scr@ifisglue\aftergroup#1%
+    }{%
+      \ifstrstart{\meaning #1}{\detokenize{the character}}{%
+        \if #1-\aftergroup\scr@ifisglue
+        \else
+          \if #1-\aftergroup\scr@ifisdimension
+          \else
+            \if #1.%
+              \aftergroup\scr@TestGlueAssignTillNil
+              \aftergroup#1%
+            \else
+              \if #1,%
+                \aftergroup\scr@TestGlueAssignTillNil
+                \aftergroup#1%
+              \else
+                \ifnum 0=0\if #10\else\if #11\else\if #12\else\if #13\else
+                          \if #14\else\if #15\else\if #16\else\if #17\else
+                          \if #18\else\if #19\else 1\fi\fi
+                          \fi\fi\fi\fi
+                          \fi\fi\fi\fi
+                          \relax
+                  \aftergroup\scr@TestGlueAssignTillNil
+                  \aftergroup#1%
+                \else
+                  \aftergroup\scr@secondoftwoAfterNil
+                  \aftergroup#1%
+                \fi
+              \fi
+            \fi
+          \fi
+        \fi
+      }{%
+        \ifstrstart{\meaning #1}{\string\char\string"}{%
+          \aftergroup\scr@TestGlueAssignTillNil
+        }{%
+          \def\reserved@c{%
+            \aftergroup\scr@secondoftwoAfterNil
+            \aftergroup\@empty
+          }%
+          \@for\reserved@a:=\abovedisplayskip,\abovedisplayshortskip,%
+                            \adjdemerits,%
+                            \baselineskip,\belowdisplayskip,%
+                            \belowdisplayshortskip,\binoppenalty,\boxmaxdepth,%
+                            \brokenpenalty,%
+                            \clubpenalty,\count,%
+                            \dimen,\dimexpr,\doublehyphendemerits,\dp,%
+                            \emergenystretch,\exhyphenpenalty,%
+                            \finalhyphendemerits,%
+                            \glueexpr,%
+                            \hbadness,\hfuzz,\hsize,\ht,\hyphenpenalty,%
+                            \lastskip,\lastpenalty,\linepenalty,%
+                            \lineskip,\lineskiplimit,%
+                            \maxdepth,\numexpr,%
+                            \overfullrule,%
+                            \parfillskip,\parindent,\parskip,%
+                            \pdfpageheight,\pdfpagewidth,%
+                            \predisplaypenalty,\pretolerance,%
+                            \relpenalty,\widowpenalty,%
+                            \skip,\splitmaxdepth,\splittopskip,%
+                            \tolerance,\topskip,%
+                            \wd,\vbadness,\vfuzz,\vsize 
+          \do {%
+            \expandafter\ifstr\expandafter{\expandafter\string\reserved@a}{%
+              \meaning #1%
+            }{%
+              \def\reserved@c{\aftergroup\scr@TestGlueAssignTillNil}%
+            }%
+          }%
+          \reserved@c
+        }%
+        \aftergroup#1%
+      }%
+    }%
   \endgroup
 }
 %    \end{macrocode}
-% \begin{macro}{\scr@ifglueplusminus}
-%   \changes{v3.12}{2013/11/05}{neu (intern)}^^A
-% Hilfsmakro, ausschließlich für \cs{ifisglue}.
+% \begin{macro}{\scr@TestGlueAssignTillNil}
+%   \changes{v3.20}{2015/10/21}{neu (intern)}
+% Das durch \cs{@nil} begrenzte Argument wird einer temporären Länge
+% zugewiesen. Wird dabei das Argument komplett aufgebraucht, so wird das
+% erste Argument nach \cs{@nil} ausgeführt, sonst das zweite. Das begrenzte
+% Argument wird in jedem Fall komplett aufgebraucht.
 %    \begin{macrocode}
-\newcommand*{\scr@ifglueplusminus}{}
-\def\scr@ifglueplusminus#1#2\@nil{%
-  \def\scr@next{\scr@ifglueplusminus #2\@nil}%
-  \if #1-\relax
-  \else \if #1+\relax
-    \else
-      \def\scr@next{%
-        \afterassignment\scr@ifrelax@to@nnil
-        \@tempskipa=#1#2\@nnil
-      }%
-      \if #1,\else\if #1.\else
-        \if #10\else\if #11\else\if #12\else\if #13\else\if #14\else
-        \if #15\else\if #16\else\if #17\else\if #18\else\if #19\else
-          \let\scr@next\@secondoftwo
-        \fi\fi\fi\fi\fi\fi\fi\fi\fi\fi
-      \fi\fi
-    \fi
-  \fi
-  \scr@next
+\newcommand*\scr@TestGlueAssignTillNil{}
+\def\scr@TestGlueAssignTillNil#1\@nil{%
+  \begingroup
+    \afterassignment\scr@AfterEndGroupIfArgIsRelaxTillptNnil
+    \@tempskipa=#1pt\@nnil
 }
 %</base>
 %    \end{macrocode}
-% \end{macro}
-% \end{macro}
+% \end{macro}^^A \scr@TestGlueAssignTillNil
+% \end{macro}^^A \scr@ifisglue
+% \end{macro}^^A \ifisglue
 %
 %
 % \begin{macro}{\ifnumber}
