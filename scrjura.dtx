@@ -1,4 +1,4 @@
-% \CheckSum{1835}
+% \CheckSum{1905}
 % \iffalse meta-comment
 % ======================================================================
 % scrjura.dtx
@@ -70,7 +70,7 @@
 %<driver>\ProvidesFile{scrjura.drv}
 %<package>\ProvidesPackage{scrjura}
 %<*dtx|package|driver>
-                [2015/05/13 v0.9d KOMA-Script for jurists
+                [2015/11/03 v0.9e KOMA-Script for jurists
 %</dtx|package|driver>
 %<driver>                 (driver)%
 %<package>                (package)%
@@ -1816,7 +1816,58 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % nicht die automatische Absatznummerierung abgeschaltet wird, wird sie neu
 % eingefügt.
 % \begin{macro}{\scrjura@doendpe}
+% \begin{macro}{\IncludeInRelease}
+%   \changes{v0.9e}{2015/11/03}{wird temporär benötigt}^^A
+% \begin{macro}{\@gobble@IncludeInRelease}
+%   \changes{v0.9e}{2015/11/03}{wird temporär benötigt}^^A
+% \begin{macro}{\EndIncludeInRelease}
+%   \changes{v0.9e}{2015/11/03}{wird temporär benötigt}^^A
+% Seit \LaTeX{} 2015/01/01 ist \cs{@doendpe} abhängig von
+% \textsf{latexrelease} etwas anders definiert. Das wird hier
+% berücksichtigt. Damit das auch noch mit älteren Versionen von \LaTeX{}
+% funktioniert, ohne dass man extra \textsf{latexrelease} nachinstalliert,
+% wird hier ein wenig getrickst. Die Änderungen werden aber so temporär wie
+% möglich gehalten.
 %    \begin{macrocode}
+\providecommand*{\IncludeInRelease}[3]{%
+  \PackageInfo{scrjura}{temporary definition of \string\IncludeInRelease}%
+  \ifstr{#1}{0000/00/00}{%
+    \let\IncludeInRelease\@undefined
+    \def\EndIncludeInRelease{\let\EndIncludeInRelease\@undefined}%
+  }{%
+    \let\EndIncludeInRelease\relax
+    \long\def\@gobble@IncludeInRelease##1\EndIncludeInRelease{%
+      \let\@gobble@IncludeInRelease\@undefined
+    }%
+    \expandafter\@gobble@IncludeInRelease
+  }%
+}
+\IncludeInRelease{2015/01/01}{\@doendpe}{clubpenalty fix}
+\CheckCommand*\@doendpe{\@endpetrue
+     \def\par{\@restorepar
+              \clubpenalty\@clubpenalty
+              \everypar{}\par\@endpefalse}\everypar
+               {{\setbox\z@\lastbox}%
+                \everypar{}\@endpefalse}}
+\newcommand*{\scrjura@doendpe}{%
+  \@endpetrue
+  \def\par{%
+    \@restorepar
+    \clubpenalty\@clubpenalty
+    \everypar{%
+      \csname scrjura@everypar\endcsname
+    }%
+    \par\@endpefalse
+  }%
+  \everypar{%
+    {\setbox\z@\lastbox}\everypar{%
+      \csname scrjura@everypar\endcsname
+    }%
+    \@endpefalse
+  }%
+}
+\EndIncludeInRelease
+\IncludeInRelease{0000/00/00}{\@doendpe}{clubpenalty fix}
 \CheckCommand*\@doendpe{\@endpetrue
   \def\par{\@restorepar\everypar{}\par\@endpefalse}\everypar
   {{\setbox\z@\lastbox}\everypar{}\@endpefalse}}
@@ -1835,6 +1886,7 @@ standard classes created by The LaTeX3 Project 1994-1996.
     \@endpefalse
   }%
 }
+\EndIncludeInRelease
 %    \end{macrocode}
 % \end{macro}^^A \scrjura@doendpe
 % \end{macro}^^A \doendpe
