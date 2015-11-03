@@ -1,4 +1,4 @@
-% \CheckSum{1905}
+% \CheckSum{1909}
 % \iffalse meta-comment
 % ======================================================================
 % scrjura.dtx
@@ -1888,6 +1888,9 @@ standard classes created by The LaTeX3 Project 1994-1996.
 }
 \EndIncludeInRelease
 %    \end{macrocode}
+% \end{macro}^^A \EndIncludeInRelease
+% \end{macro}^^A \@gobble@IncludeInRelease
+% \end{macro}^^A \IncludeInRelease
 % \end{macro}^^A \scrjura@doendpe
 % \end{macro}^^A \doendpe
 % \end{macro}^^A \scrjura@everypar
@@ -2365,10 +2368,15 @@ standard classes created by The LaTeX3 Project 1994-1996.
 % \end{macro}
 %
 % \begin{macro}{\contract@sentence}
-%   \changes{v0.7a}{2014/01/28}{auf \cs{textsuperscript} umgestellt}
+%   \changes{v0.7a}{2014/01/28}{auf \cs{textsuperscript} umgestellt}^^A
 %   \changes{v0.7a}{2014/01/28}{\cs{nobreak}\cs{hskip}\cs{z@} eingefügt, um
-%     die Trennung des ersten Worts nach der Satzmarkierung zu ermöglichen}
-% Sätze nummerieren.
+%     die Trennung des ersten Worts nach der Satzmarkierung zu ermöglichen}^^A
+%   \changes{v0.9e}{2015/11/03}{erst den Absatz beginnen, dann die Nummer
+%     setzen}^^A 
+% Sätze nummerieren. Dabei ist wichtig, dass am Anfang des Absatzes die
+% Satznummer nicht erhöht wird, weil das der Absatz bereits erledigt. Damit
+% das funktioniert muss aber vor der Ausgabe erst einmal der Absatz begonnen
+% werden.
 % \begin{Counter}{sentence}
 % \begin{macro}{\thesentence}
 % \begin{macro}{\theHsentence}
@@ -2383,7 +2391,11 @@ standard classes created by The LaTeX3 Project 1994-1996.
 \newcommand*{\p@@sentence}[1]{\p@par{{\par@cite{\thepar}}%
     \scrjura@separator{\nobreakspace}}{\sentence@cite{#1}}}
 \newcommand*{\contract@sentence}{%
-  \refstepcounter{sentence}%
+  \ifvmode
+    \leavevmode
+  \else
+    \refstepcounter{sentence}%
+  \fi
   \textsuperscript{\thesentence}\nobreak\hskip\z@
 }
 %    \end{macrocode}
