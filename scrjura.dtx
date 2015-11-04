@@ -1,4 +1,4 @@
-% \CheckSum{1909}
+% \CheckSum{1913}
 % \iffalse meta-comment
 % ======================================================================
 % scrjura.dtx
@@ -70,7 +70,7 @@
 %<driver>\ProvidesFile{scrjura.drv}
 %<package>\ProvidesPackage{scrjura}
 %<*dtx|package|driver>
-                [2015/11/03 v0.9e KOMA-Script for jurists
+                [2015/11/04 v0.9e KOMA-Script for jurists
 %</dtx|package|driver>
 %<driver>                 (driver)%
 %<package>                (package)%
@@ -2371,12 +2371,7 @@ standard classes created by The LaTeX3 Project 1994-1996.
 %   \changes{v0.7a}{2014/01/28}{auf \cs{textsuperscript} umgestellt}^^A
 %   \changes{v0.7a}{2014/01/28}{\cs{nobreak}\cs{hskip}\cs{z@} eingefügt, um
 %     die Trennung des ersten Worts nach der Satzmarkierung zu ermöglichen}^^A
-%   \changes{v0.9e}{2015/11/03}{erst den Absatz beginnen, dann die Nummer
-%     setzen}^^A 
-% Sätze nummerieren. Dabei ist wichtig, dass am Anfang des Absatzes die
-% Satznummer nicht erhöht wird, weil das der Absatz bereits erledigt. Damit
-% das funktioniert muss aber vor der Ausgabe erst einmal der Absatz begonnen
-% werden.
+% Sätze nummerieren.
 % \begin{Counter}{sentence}
 % \begin{macro}{\thesentence}
 % \begin{macro}{\theHsentence}
@@ -2391,8 +2386,22 @@ standard classes created by The LaTeX3 Project 1994-1996.
 \newcommand*{\p@@sentence}[1]{\p@par{{\par@cite{\thepar}}%
     \scrjura@separator{\nobreakspace}}{\sentence@cite{#1}}}
 \newcommand*{\contract@sentence}{%
+%    \end{macrocode}
+%   \changes{v0.9e}{2015/11/04}{erst den Absatz beginnen, dann die Nummer
+%     setzen}^^A 
+% Bei der Nummerierung ist wichtig, dass am Anfang des Absatzes die
+% Satznummer nicht erhöht wird, weil das der Absatz bereits erledigt. Damit
+% das funktioniert muss aber vor der Ausgabe erst einmal der Absatz begonnen
+% werden. Befinden wir uns allerdings unmittelbar hinter einer
+% \texttt{minipage}, einer Liste oder einer \cs{parbox} tun wir so, als wären
+% wir nicht am Anfang des Absatzes.
+%    \begin{macrocode}
   \ifvmode
-    \leavevmode
+    \if@endpe
+      \refstepcounter{sentence}%
+    \else
+      \leavevmode
+    \fi
   \else
     \refstepcounter{sentence}%
   \fi
