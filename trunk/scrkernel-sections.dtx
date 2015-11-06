@@ -1,4 +1,4 @@
-% \CheckSum{3904}
+% \CheckSum{3942}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -3025,8 +3025,8 @@
 % \begin{macro}{\scr@part@tocindent}
 %   \changes{v3.15}{2014/12/02}{neue (interne) Anweisung}^^A
 %   \changes{v3.18}{2015/06/09}{indirekt über \cs{DeclareSectionCommand}}^^A
-% Wird nicht verwendet aber zwecks besserer Kompatibilität mit
-% \cs{DeclareSectionCommand} definiert.
+%   \changes{v3.20}{2015/11/06}{wird nun auch verwendet}^^A
+% Der Einzug des Eintrags noch vor der Nummer.
 % \end{macro}^^A \scr@part@tocindent
 % \begin{macro}{\scr@part@tocnumwidth}
 %   \changes{v3.15}{2014/12/02}{neue (interne) Anweisung}^^A
@@ -3046,7 +3046,9 @@
 %  \changes{v2.9k}{2003/01/02}{Anpassung an Option \texttt{tocleft}}^^A
 %    \begin{macrocode}
       \setlength{\@tempdima}{\@nameuse{scr@#1@tocnumwidth}}%
+      \setlength{\@tempdimb}{\@nameuse{scr@#1@tocindent}}%
       \if@tocleft
+        \setlength{\@tempdimb}{\z@}%
         \ifx\toc@l@number\@empty\else
           \setlength\@tempdima{0\toc@l@number}%
         \fi
@@ -3061,8 +3063,9 @@
 %    Größenangabe, so wird diese überschrieben}^^A
 %    \begin{macrocode}
         \leavevmode
-        \advance\leftskip\@tempdima
-        \hskip -\leftskip
+        \advance\leftskip\dimexpr \@tempdimb+\@tempdima\relax
+        \hskip \dimexpr \@tempdimb-\leftskip\relax
+        \edef\@pnumwidth{\the\dimexpr\@pnumwidth\relax}%
         \usekomafont{partentry}{##1\nobreak
           \usekomafont{partentrypagenumber}{\hfil\nobreak
             \hb@xt@\@pnumwidth{\hss##2}}}\par
@@ -4152,7 +4155,8 @@
 % \begin{macro}{\scr@chapter@tocindent}
 %   \changes{v3.15}{2014/12/02}{neue (interne) Anweisung}^^A
 %   \changes{v3.18}{2015/05/20}{indirekt über \cs{DeclareSectionCommand}}^^A
-% Der Einzug des Eintrags wird nicht verwendet.
+%   \changes{v3.20}{2015/11/06}{wird nun auch verwendet}^^A
+% Der Einzug des Eintrags noch vor der Nummer.
 % \end{macro}^^A \scr@chapter@tocindent
 % \begin{macro}{\scr@chapter@tocnumwidth}
 %   \changes{v3.15}{2014/12/02}{neue (interne) Anweisung}^^A
@@ -4183,7 +4187,9 @@
         \addvspace{1.0em \@plus\p@}%
       \fi
       \setlength\@tempdima{\@nameuse{scr@#1@tocnumwidth}}%
+      \setlength{\@tempdimb}{\@nameuse{scr@#1@tocindent}}%
       \if@tocleft
+        \setlength{\@tempdimb}{\z@}%
         \ifx\toc@l@number\@empty\else
           \setlength\@tempdima{0\toc@l@number}%
         \fi
@@ -4194,7 +4200,8 @@
         \parfillskip -\@pnumwidth
         \interlinepenalty\@M
         \leavevmode
-        \advance\leftskip \@tempdima \null\nobreak\hskip -\leftskip
+        \advance\leftskip\dimexpr \@tempdimb+\@tempdima\relax
+        \hskip \dimexpr \@tempdimb-\leftskip\relax
         \edef\@pnumwidth{\the\dimexpr\@pnumwidth\relax}%
         \usekomafont{chapterentry}{##1\nobreak
           \usekomafont{chapterentrypagenumber}{%
@@ -4524,8 +4531,15 @@
         \addpenalty{\@secpenalty}%
       \fi
       \addvspace{1.0em \@plus\p@}%
+%    \end{macrocode}
+%   \changes{v3.20}{2015/11/06}{Einzug wird nun auch verwendet}^^A
+% Neben der Nummernbreite wird nun auch der Einzug (vor der Nummer)
+% berücksichtigt. Das darf natürlich bei \texttt{toc=left} nicht passieren.
+%    \begin{macrocode}
       \setlength\@tempdima{\dimexpr\@nameuse{scr@#1@tocnumwidth}}%
+      \setlength{\@tempdimb}{\@nameuse{scr@#1@tocindent}}%
       \if@tocleft
+        \setlength{\@tempdimb}{\z@}%
         \ifx\toc@l@number\@empty\else
           \setlength\@tempdima{0\toc@l@number}%
         \fi
@@ -4536,7 +4550,8 @@
         \parfillskip -\@pnumwidth
         \interlinepenalty\@M
         \leavevmode
-        \advance\leftskip \@tempdima \null\nobreak\hskip -\leftskip
+        \advance\leftskip\dimexpr \@tempdimb+\@tempdima\relax
+        \hskip \dimexpr \@tempdimb-\leftskip\relax
         \edef\@pnumwidth{\the\dimexpr\@pnumwidth\relax}%
         \usekomafont{sectionentry}{##1\nobreak
           \usekomafont{sectionentrypagenumber}{%
