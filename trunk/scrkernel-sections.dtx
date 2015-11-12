@@ -1,4 +1,4 @@
-% \CheckSum{3942}
+% \CheckSum{3951}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -1089,10 +1089,15 @@
 % \begin{macro}{\scr@dsc@dummyoptions}
 %   \changes{v3.17}{2015/03/23}{Neu (intern)}^^A
 % Definiert eine neue Dummy-Option für einen Stil eines
+% \begin{macro}{\scr@dsc@relaxdummyoptions}
+%   \changes{v3.20}{2015/11/12}{Neu (intern)}^^A
 % Gliederungsbefehls. Das einzige Argument ist der Name der Option. Die
 % Dummy-Optionen werden in \cs{scr@dsc@dummyoptions} gesammelt.
 %    \begin{macrocode}
 \newcommand*{\DeclareSectionCommandDummyOption}[1]{%
+  \g@addto@macro{\scr@dsc@relaxdummyoptions}{%
+    \RelaxFamilyKey[.dsc]{KOMAarg}{#1}%
+  }%
   \@ifstar {%
     \g@addto@macro{\scr@dsc@dummyoptions}{%
       \DefineFamilyKey[.dsc]{KOMAarg}{#1}[]{\FamilyKeyStateProcessed}%
@@ -1104,7 +1109,9 @@
   }%
 }
 \newcommand*{\scr@dsc@dummyoptions}{}
+\newcommand*{\scr@dsc@relaxdummyoptions}{}
 %    \end{macrocode}
+% \end{macro}^^A \scr@dsc@relaxdummyoptions
 % \end{macro}^^A \scr@dsc@dummyoptions
 % \end{macro}^^A \DeclareSectionCommandDummyOption
 % \end{macro}^^A \DeclareSectionCommandStyleOption
@@ -1168,7 +1175,7 @@
 %    \begin{macrocode}
 \DeclareSectionCommandDummyOption{style}
 \DeclareSectionCommandDummyOption{expandtopt}*
-\DeclareSectionCommandDummyOption{increaselevel}
+\DeclareSectionCommandDummyOption{increaselevel}*
 \DeclareSectionCommandDummyOption{level}
 \DeclareSectionCommandDummyOption{toclevel}
 \DeclareSectionCommandDummyOption{tocindent}
@@ -1541,6 +1548,14 @@
     }%
   }%
   \FamilyExecuteOptions[.dsc]{KOMAarg}{#1}%
+%    \end{macrocode}
+%   \changes{v3.20}{2015/11/12}{Rücknahme der Dummy-Optionen}^^A
+% Außer im Fall, dass mehrere Anweisungen auf einen Schlag konfiguriert
+% werden, werden die Dummy-Optionen wieder freigegeben. Damit werden später
+% Optionen, die für den jeweiligen Stil unbekannt sind, tatsächlich als Fehler
+% gemeldet.
+%    \begin{macrocode}
+  \scr@ifundefinedorrelax{scr@local@leveloffset}{\scr@dsc@relaxdummyoptions}{}%
   \begingroup
     \scr@ifundefinedorrelax{scr@\scr@dsc@current @style}{%
       \scr@declaresectioncommanderror{\scr@dsc@current}
@@ -1549,12 +1564,16 @@
   \endgroup
   \@firstofone{%
 %    \end{macrocode}
+%   \changes{v3.20}{2015/11/12}{keine Dummy-Optionen für den echten Lauf}^^A
 % Nach nun der Stil für den Gliederungsbefehl bekannt ist, können wir dessen
 % Optionen aktivieren:
 %    \begin{macrocode}
-    \scr@dsc@dummyoptions
 %<trace>    \typeout{TRACE: style=\@nameuse{scr@\scr@dsc@current @style}}%
     \@nameuse{scr@dsc@style@\@nameuse{scr@\scr@dsc@current @style}@options}%
+%    \end{macrocode}
+% Außerdem soll im echten Lauf der Stil nicht erneut ausgewertet werden.
+%    \begin{macrocode}
+    \DefineFamilyKey[.dsc]{KOMAarg}{style}{\FamilyKeyStateProcessed}
 %    \end{macrocode}
 % Dazu kommen einige Optionen, die es schlicht immer gibt:
 % \begin{description}\item[\texttt{expandtopt}] Schalter, um die Längen zur
@@ -1692,9 +1711,11 @@
       }%
     }%
 %    \end{macrocode}
-% Optionen ausführen:
+%   \changes{v3.20}{2015/11/12}{Optionen werden nur temporär definiert}^^A
+% Optionen ausführen und anschließend wieder freigeben.
 %    \begin{macrocode}
     \FamilyExecuteOptions[.dsc]{KOMAarg}{#1}%
+    \scr@dsc@relaxdummyoptions
 %    \end{macrocode}
 % Testen, ob alle benötigten Optionen für die (Um-)Definierung des
 % Gliederungsbefehls gesetzt sind:
