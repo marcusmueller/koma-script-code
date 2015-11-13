@@ -1,8 +1,8 @@
-% \CheckSum{118}
+% \CheckSum{182}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-tocstyle.dtx
-% Copyright (c) Markus Kohm, 2002-2015
+% Copyright (c) Markus Kohm, 2015
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrkernel-tocstyle.dtx
-% Copyright (c) Markus Kohm, 2002-2015
+% Copyright (c) Markus Kohm, 2015
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -66,13 +66,15 @@
 %<prepare>%%%            (run: prepare)
 % - everything that is needed to define options
 %<option>%%%            (run: option)
-% - definition of options
+% - definition of options (unused)
 %<execoption>%%%            (run: execoption)
-% - initial option executions up to \KOMAProcessOptions
+% - initial option executions up to \KOMAProcessOptions 
+%   (unused)
 %<body>%%%            (run: body)
 % - everything, that should be done after \KOMAProcessOptions
 %<exit>%%%            (run: exit)
 % - everything, that should be done immediately before leaving the file
+%   (unused) 
 %<*driver>
 % \fi
 \ifx\ProvidesFile\undefined\def\ProvidesFile#1[#2]{}\fi
@@ -137,6 +139,15 @@
 % zugehörigen Optionen. Die Optionen dienen dazu, Einstellungen für die
 % einzelnen Verzeichnisbefehle vorzunehmen.
 %
+% \begin{macro}{\scrkernel@tocstyle@available}
+% Diese Anweisung wird nur solange definiert werden, so lange dieses Modul von
+% \KOMAScript{} optional ist. Andere Module können darüber erkennen, ob sie
+% das Modul bereits verwenden können oder nicht.
+%    \begin{macrocode}
+%<prepare>\newcommand*{\scrkernel@tocstyle@available}{}
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}{\DefineTOCEntryOption}
 %   \changes{v3.20}{2015/11/10}{neu}
 % Die Definition der Optionen geschieht mit einer einheitlichen
@@ -170,7 +181,16 @@
 \newcommand*{\@DefineTOCEntryOptionWithoutDefault}[3]{%
   \DeclareSectionCommandDummyOption{#2}\relax
   \expandafter\l@addto@macro\csname scr@dte@#1@opts\endcsname{%
-    \DefineFamilyKey[.dsc]{KOMAarg}{#2}{#3}%
+    \DefineFamilyKey[.dsc]{KOMAarg}{#2}{%
+      \scr@ifundefinedorrelax{scr@dte@current}{%
+        \let\scr@dte@current\scr@dsc@current
+        #3%
+        \let\scr@dte@current\relax
+      }{#3}%
+    }%
+  }%
+  \expandafter\l@addto@macro\csname scr@dte@#1@relaxopts\endcsname{%
+    \RelaxFamilyKey[.dsc]{KOMAarg}{#2}%
   }%
 }
 \newcommand*{\@DefineTOCEntryOptionWithDefault}{}
@@ -178,6 +198,9 @@
   \DeclareSectionCommandDummyOption{#2}*%
   \expandafter\l@addto@macro\csname scr@dte@#1@opts\endcsname{%
     \DefineFamilyKey[.dsc]{KOMAarg}{#2}[{#3}]{#4}%
+  }%
+  \expandafter\l@addto@macro\csname scr@dte@#1@relaxopts\endcsname{%
+    \RelaxFamilyKey[.dsc]{KOMAarg}{#2}%
   }%
 }
 %</body>
@@ -198,6 +221,8 @@
 % \item[\marg{Postfix}: \meta{String},] Postfix des zu definierenden Makros
 % \item[\marg{Erklärung}: \meta{String},] Erklärung der Option
 % \end{description}
+% Zwischen Prefix und Postfix wird bei der späteren, tatsächlichen Definition
+% automatisch \cs{scr@dte@current} eingefügt.
 % \begin{macro}{\@DefineTOCEntryLengthOptionWithoutDefault}
 %   \changes{v3.20}{2015/11/10}{neu (intern)}^^A
 % \begin{macro}{\@DefineTOCEntryLengthOptionWithDefault}
@@ -230,10 +255,10 @@
   \FamilySetLength{KOMAarg}{#1}{\@tempskipa}{#4}%
   \ifx\FamilyKeyState\FamilyKeyStateProcessed
     \ifscr@dsc@expandtopt
-      \expandafter\edef\csname #2\scr@dsc@current#3\endcsname{%
+      \expandafter\edef\csname #2\scr@dte@current#3\endcsname{%
         \the\@tempskipa}%
     \else
-      \expandafter\edef\csname #2\scr@dsc@current#3\endcsname{#4}%
+      \expandafter\edef\csname #2\scr@dte@current#3\endcsname{#4}%
     \fi
   \fi
 }
@@ -256,6 +281,8 @@
 % \item[\marg{Postfix}: \meta{String},] Postfix des zu definierenden Makros
 % \item[\marg{Erklärung}: \meta{String},] Erklärung der Option
 % \end{description}
+% Zwischen Prefix und Postfix wird bei der späteren, tatsächlichen Definition
+% automatisch \cs{scr@dte@current} eingefügt.
 % \begin{macro}{\@DefineTOCEntryNumberOptionWithoutDefault}
 %   \changes{v3.20}{2015/11/12}{neu (intern)}
 % \begin{macro}{\@DefineTOCEntryNumberOptionWithDefault}
@@ -288,10 +315,10 @@
   \FamilySetCounter{KOMAarg}{#1}{\@tempcnta}{#4}%
   \ifx\FamilyKeyState\FamilyKeyStateProcessed
     \ifscr@dsc@expandtopt
-      \expandafter\edef\csname #2\scr@dsc@current#3\endcsname{%
+      \expandafter\edef\csname #2\scr@dte@current#3\endcsname{%
         \the\@tempcnta}%
     \else
-      \expandafter\edef\csname #2\scr@dsc@current#3\endcsname{#4}%
+      \expandafter\edef\csname #2\scr@dte@current#3\endcsname{#4}%
     \fi
   \fi
 }
@@ -327,8 +354,85 @@
 %    \end{macrocode}
 % \end{macro}^^A \TOCStyleNeedsCommandByOption
 %
-% TODO: Bisher können nur einige Optionen deklariert werden, die jedoch für
-% noch gar nichts verwendet werden.
+% \begin{macro}{\DeclareTOCStyleEntry}
+%   \changes{v3.20}{2015/11/13}{neu}
+% Diese Anweisung definiert einen Verzeichniseintragsbefehl. Dabei wird auch
+% geprüft, ob all benötigten Befehle definiert sind. Falls das nicht der Fall
+% ist, wird der Verzeichniseintragsbefehl nicht definiert, sondern ein Fehler
+% gemeldet. Für die Definition werden folgende Argumente verwendet.
+% \begin{description}
+% \item[\oarg{Optionen}:] Komma separierte Liste von Optionen für die
+%   Definition des Eintrags.
+% \item[\marg{Stil}:] Der Stil \meta{string}, in dem der Verzeichniseintrag
+%   sein soll.
+% \item[\marg{Gliederungsebene}:] Der Name \meta{string} der Gliederungsebene
+%   für die ein Verzeichniseintrag definiert werden soll.
+% \end{description}
+% Es wird außerdem eine Anweisung \cs{scr@dte@def@l@\meta{Stil}} benötigt,
+% über die dann die eigentliche Definition der Eintragsanweisung
+% erfolgt. Diese hat genau ein Argument: \meta{Gliederungsebene}.
+%    \begin{macrocode}
+%<*body>
+\newcommand*{\DeclareTOCStyleEntry}[3][]{%
+  \scr@ifundefinedorrelax{scr@dte@def@l@#2}{%
+    \ClassError{\KOMAClassName}{toc entry style `#2' undefined}{%
+      Somebody told me to define toc entry `#3' with style `#2',\MessageBreak
+      but I do not know style `#2'.\MessageBreak
+      You should first define the style then define the entry.\MessageBreak
+      If you'll continue, I'll ignore the command. This could result
+      in\MessageBreak
+      further error messages.%
+    }%
+  }{%
+    \IfArgIsEmpty{#1}{}{%
+      \def\scr@dte@current{#2}%
+      \csname scr@dte@#3@opts\endcsname
+      \FamilyBoolKey[.dsc]{KOMAarg}{expandtopt}{scr@dsc@expandtopt}%
+      \scr@dsc@expandtoptfalse
+      \FamilyExecuteOptions[.dsc]{KOMAarg}{#1}%
+      \RelaxFamilyKey[.dsc]{KOMAarg}{expandtopt}%
+      \csname scr@dte@#3@relaxopts\endcsname
+      \let\scr@dte@current\relax
+    }%
+    \begingroup
+      \aftergroup\@tempswatrue
+      \def\do##1##2##3##4{%
+        \scr@ifundefinedorrelax{##1#3##3}{%
+          \ClassError{\KOMAClassName}{toc style `#2' needs ##4}{%
+            Usually the ##4 is defined using option `##3'.\MessageBreak
+            In some cases it may be set defining command
+            `\expandafter\string\csname ##1#3##3\endcsname'.\MessageBreak
+            If you'll continue, I'll ignore the command. This could result
+            in\MessageBreak
+            further error messages.%
+          }%
+          \aftergroup\@tempswafalse
+        }{}%
+      }%
+      \@nameuse{scr@dte@#2@needs}%
+    \endgroup
+    \if@tempswa
+      \@nameuse{scr@dte@def@l@#2}{#3}%
+    \fi
+  }%
+}
+%</body>
+%    \end{macrocode}
+% \end{macro}^^A \DeclareTOCStyleEntry
+%
+% TODO: Bisher gehören die Optionen noch \texttt{.dsc}. Über geschickte
+% Definition von \cs{@currname} und \cs{@currext} oder etwas neuem wie
+% \cs{@currmember} könnte man das so flexibilisieren, dass die Optionen
+% wahlweise \texttt{.dsc} oder \texttt{.dte} gehören. In ähnlicher Weise wäre
+% dann auch mit \cs{ifscr@dsc@expandtopt} zu verfahren. Damit wird dieses
+% Modul dann komplett unabhängig von \texttt{scrkernel-sections}
+% verwendbar. Erst das erlaubt es, die Funktionalität später in
+% \textsf{tocbasic} zu verschieben.
+%
+% TODO: Bisher können nur einige Optionen deklariert werden, die dann auch in
+% \cs{DeclareSectionCommand} etc. verwendet werden. Außerdem kann die
+% Definition eines Befehls auch direkt mit \cs{DefineTOCStyleEntry}
+% erfolgen.
 %
 % \Finale
 %
