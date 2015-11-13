@@ -1,4 +1,4 @@
-% \CheckSum{3951}
+% \CheckSum{3982}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -1535,7 +1535,7 @@
 %    \begin{macrocode}
   \scr@dsc@parametersonlyfalse
   \DefineFamilyKey[.dsc]{KOMAarg}{style}{%
-    \ifstr{##1}{}{%
+    \IfArgIsEmpty{##1}{%
       \scr@dsc@parametersonlytrue
       \FamilyKeyStateProcessed
     }{%
@@ -1543,6 +1543,26 @@
         \FamilyKeyStateUnknownValue
       }{%
         \@namedef{scr@\scr@dsc@current @style}{##1}%
+        \FamilyKeyStateProcessed
+      }%
+    }%
+  }%
+%    \end{macrocode}
+%   \changes{v3.20}{2015/11/12}{Option \texttt{tocstyle} frühzeitig
+%     auswerten}^^A
+% In ähnlicher Weise wird Option \texttt{tocstyle} ausgewertet, um später die
+% zum Inhaltsverzeichnis-Eintrags-Stil gehörenden Optionen ebenfalls zu
+% aktivieren.
+%    \begin{macrocode}
+  \DefineFamilyKey[.dsc]{KOMAarg}{tocstyle}{%
+    \IfArgIsEmpty{##1}{%
+      \expandafter\let\csname scr@\scr@dsc@current @tocstyle\endcsname\relax
+      \FamilyKeyStateProcessed
+    }{%
+      \scr@ifundefinedorrelax{scr@dsc@def@tocstyle@##1@command}{%
+        \FamilyKeyStateUnknownValue
+      }{%
+        \@namedef{scr@\scr@dsc@current @tocstyle}{##1}%
         \FamilyKeyStateProcessed
       }%
     }%
@@ -1571,9 +1591,23 @@
 %<trace>    \typeout{TRACE: style=\@nameuse{scr@\scr@dsc@current @style}}%
     \@nameuse{scr@dsc@style@\@nameuse{scr@\scr@dsc@current @style}@options}%
 %    \end{macrocode}
-% Außerdem soll im echten Lauf der Stil nicht erneut ausgewertet werden.
+% Außerdem müssen die Optionen des Verzeichniseintrags-Stils aktiviert werden:
 %    \begin{macrocode}
-    \DefineFamilyKey[.dsc]{KOMAarg}{style}{\FamilyKeyStateProcessed}
+%<trace>    \typeout{TRACE: tocstyle=%
+%<trace>      \@nameuse{scr@\scr@dsc@current @tocstyle}}%
+    \scr@ifundefinedorrelax{scr@\scr@dsc@current @tocstyle}{%
+      \scr@ifundefinedorrelax{l@\scr@dsc@current}{%
+        \@namedef{scr@\scr@dsc@current @tocstyle}{default}%
+      }{}%
+    }{}%
+    \scr@ifundefinedorrelax{scr@\scr@dsc@current @tocstyle}{}{%
+      \@nameuse{scr@dte@\@nameuse{scr@\scr@dsc@current @tocstyle}@opts}%
+    }%
+%    \end{macrocode}
+% Außerdem soll im echten Lauf die Stile nicht erneut ausgewertet werden.
+%    \begin{macrocode}
+    \DefineFamilyKey[.dsc]{KOMAarg}{style}{\FamilyKeyStateProcessed}%
+    \DefineFamilyKey[.dsc]{KOMAarg}{tocstyle}{\FamilyKeyStateProcessed}%
 %    \end{macrocode}
 % Dazu kommen einige Optionen, die es schlicht immer gibt:
 % \begin{description}\item[\texttt{expandtopt}] Schalter, um die Längen zur
@@ -1692,25 +1726,6 @@
       \fi
     }%
 %    \end{macrocode}
-% \begin{description}\item[\texttt{tocstyle}] Stil des
-% Inhaltsverzeichniseintrags\end{description}
-%    \begin{macrocode}
-    \DefineFamilyKey[.dsc]{KOMAarg}{tocstyle}{%
-      \IfArgIsEmpty{##1}{%
-        \expandafter\let\csname scr@\scr@dsc@current @tocstyle\endcsname\relax
-        \FamilyKeyStateProcessed
-      }{%
-        \scr@ifundefinedorrelax{scr@dsc@def@tocstyle@##1@command}{%
-          \FamilyKeyStateUnknownValue
-        }{%
-          \expandafter\let
-          \csname scr@\scr@dsc@current @tocstyle\expandafter\endcsname
-          \csname scr@dsc@def@tocstyle@##1@command\endcsname
-          \FamilyKeyStateProcessed
-        }%
-      }%
-    }%
-%    \end{macrocode}
 %   \changes{v3.20}{2015/11/12}{Optionen werden nur temporär definiert}^^A
 % Optionen ausführen und anschließend wieder freigeben.
 %    \begin{macrocode}
@@ -1721,6 +1736,15 @@
 % Gliederungsbefehls gesetzt sind:
 %    \begin{macrocode}
     \begingroup
+      \scr@ifundefinedorrelax{scr@\scr@dsc@current @tocstyle}{}{%
+        \def\do##1##2##3##4{%
+          \scr@ifundefinedorrelax{##1\scr@dsc@current ##2}{%
+            \scr@declaresectioncommanderror{\scr@dsc@current}{##3}{##4}%
+          }{}%
+        }%
+        \@nameuse{scr@dte@\@nameuse{scr@\scr@dsc@current @tocstyle}@needs}%
+        \let\do\relax
+      }%
       \scr@ifundefinedorrelax{\scr@dsc@current numdepth}{%
         \scr@declaresectioncommanderror{\scr@dsc@current}{section level}{level}%
       }{}%
@@ -1820,7 +1844,12 @@
         \addtocentrydefault{#2}{##1}{##2}%
       }%
       \scr@ifundefinedorrelax{scr@#2@tocstyle}{}{%
-        \@nameuse{scr@#2@tocstyle}{#2}%
+        \scr@ifundefinedorrelax{%
+          scr@dsc@def@tocstyle@\@nameuse{scr@#2@tocstyle}@command%
+        }{}{%
+          \@nameuse{scr@dsc@def@tocstyle@\@nameuse{scr@#2@tocstyle}@command}%
+                   {#2}%
+        }%
       }%
       \scr@ifundefinedorrelax{l@#2}{%
         \scr@dsc@def@tocstyle@default@command{#2}%
@@ -1859,6 +1888,8 @@
 % \end{macro}^^A \scr@declaresectioncommanderror
 % \begin{macro}{\scr@dsc@def@tocstyle@default@command}
 %   \changes{v3.20}{2015/10/06}{neue Anweisung (intern)}^^A
+% \begin{macro}{\scr@dte@default@opts}
+%   \changes{v3.20}{2015/11/12}{neue Anweisung (intern)}^^A
 % Dieser Verzeichnisstil wird verwendet, wenn der Stil nicht explizit
 % festgelegt ist.
 %    \begin{macrocode}
@@ -1866,8 +1897,13 @@
 %<article>  \scr@dsc@def@tocstyle@subsection@command
 %<book|report>  \scr@dsc@def@tocstyle@section@command
 }
+\newcommand*{\scr@dte@default@opts}{%
+%<article>  \@nameuse{scr@dte@subsection@opts}%
+%<book|report>  \@nameuse{scr@dte@section@opts}%
+}
 %    \end{macrocode}
-% \end{macro}^^A \scr@dsc@def@tocstyle@default@command}
+% \end{macro}^^A \scr@dte@default@opts
+% \end{macro}^^A \scr@dsc@def@tocstyle@default@command
 % \begin{macro}{\scr@dsc@def@tocstyle@gobble@command}
 %   \changes{v3.20}{2015/10/06}{neue Anweisung (intern)}^^A
 % Dieser Verzeichnisstil vernichtet den Eintrag.
