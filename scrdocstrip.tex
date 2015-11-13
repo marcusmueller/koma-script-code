@@ -59,7 +59,7 @@
 \expandafter\ifx\csname scrdocstripversion\endcsname\relax
 \else \expandafter\endinput
 \fi
-\Msg{| Using KOMA-Script's docstrip extensions.}
+\Msg{| Using KOMA-Script's docstrip extensions.}%|
 % Support for variables:
 \def\KOMAdefVariable#1#2{%
   \expandafter\def\csname KOMAvar@#1\endcsname{#2}%
@@ -111,7 +111,7 @@
   \fi
 }
 \def\KOMAvalidityTest#1{%
-  \maybeMsg{^^J| Testing validity of distribution: }%
+  \maybeMsg{^^J| Testing validity of distribution: }%|
   \begingroup
     \def\readloop{%
       \ifeof\inFile\else
@@ -165,12 +165,12 @@
     \else
       \def\do##1{,^^J| \@spaces\@spaces\@spaces##1}%
       \errhelp{| You should ask your distributor for a valid and legal
-        distribution.}%
+        distribution.}%|
       \errmessage{^^J%
         | Missing files: \expandafter\expandafter\expandafter\@gobble
         \KOMAFilesMissing\KOMAdocFilesMissing\KOMAnoFilesMissing^^J%
         | Distribution seems to be invalid.^^J%
-        | This error is fatal}%
+        | This error is fatal}%|
       \batchmode
       \csname @@end\endcsname
     \fi
@@ -193,7 +193,7 @@
       | PLEASE NOTE, THAT DISTRIBUTIONS WITHOUT THOSE FILES ARE NOT ALLOWED!^^J%
       | But maybe those files are there and you're TeX distribution simply^^J%
       | cannot open files without extension.^^J%
-      +----------------------------------------------------------------------}
+      +----------------------------------------------------------------------}%|
   \fi
   \ifx\KOMAdocFilesMissing\empty\else
     \Msg{%
@@ -287,7 +287,7 @@
 \def\@genericWarning#1^^J#2\@nil{%
   | #1\XKNL
   \ifx\relax#2\relax\else\@genericWarning#2\@nil\fi
-}
+}%|
 \def\useWarning#1{\let\use@Warning#1}
 \useWarning\genericWarning
 
@@ -305,6 +305,18 @@
 \fi
 
 \chardef\scrdocstripversion 1\relax
+
+\def\fromoptional#1{%
+  \immediate\openin\inputcheck\uptospace#1 \qStop\relax
+  \ifeof\inputcheck
+    \Msg{Ignorring not existing optional file `#1'.}%
+    \expandafter\@gobbletwo
+  \else
+    \immediate\closein\inputcheck
+    \expandafter\from
+  \fi
+  {#1}%
+}
 
 \process@first@batchfile
 \endinput
