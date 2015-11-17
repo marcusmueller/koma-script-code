@@ -214,7 +214,7 @@ maintain_local:
 	$(make_recursive)
 
 distclean_local:
-	$(SRM) scrpage2-ngerman.tex scrpage2-english.tex \
+	$(SRM) scrpage2-ngerman.tex scrpage2-english.tex
 	$(make_recursive)
 
 maintainclean_local:
