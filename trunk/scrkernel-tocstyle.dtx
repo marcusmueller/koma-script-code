@@ -1,4 +1,4 @@
-% \CheckSum{197}
+% \CheckSum{364}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-tocstyle.dtx
@@ -280,7 +280,7 @@
 % \begin{macro}{\DefineTOCEntryNumberOption}
 %   \changes{v3.20}{2015/11/12}{neu}
 % Verwendet \cs{DefineTOCEntryOption}, um eine Option zu definieren, die ein
-% Längenmacro definiert. Es gibt folgende Parameter:
+% Nummernmacro definiert. Es gibt folgende Parameter:
 % \begin{description}
 % \item[\marg{Stil}: \meta{String},] Name des Eintragsstils
 % \item[\marg{Option}: \meta{String},] Name der Option
@@ -333,6 +333,114 @@
 % \end{macro}^^A \@DefineTOCEntryNumberOptionWithoutDefault
 % \end{macro}^^A \DefineTOCEntryNumberOption
 %
+% \begin{macro}{\DefineTOCEntryBoolOption}
+%   \changes{v3.20}{2015/11/17}{neu}
+% Verwendet \cs{DefineTOCEntryOption}, um eine Option zu definieren, die einen
+% Schalter definiert. Es gibt folgende Parameter:
+% \begin{description}
+% \item[\marg{Stil}: \meta{String},] Name des Eintragsstils
+% \item[\marg{Option}: \meta{String},] Name der Option
+% \item[\oarg{Wert}:] der Säumniswert der Option
+% \item[\marg{Prefix}: \meta{String},] Präfix des zu definierenden Makros
+% \item[\marg{Postfix}: \meta{String},] Postfix des zu definierenden Makros
+% \item[\marg{Erklärung}: \meta{String},] Erklärung der Option
+% \end{description}
+% Zwischen Prefix und Postfix wird bei der späteren, tatsächlichen Definition
+% automatisch \cs{scr@dte@current} eingefügt.
+% \begin{macro}{\@DefineTOCEntryBoolOptionWithoutDefault}
+%   \changes{v3.20}{2015/11/12}{neu (intern)}
+% \begin{macro}{\@DefineTOCEntryBoolOptionWithDefault}
+%   \changes{v3.20}{2015/11/12}{neu (intern)}
+% \begin{macro}{\@DefineTOCEntryBoolOptionMacro}
+%   \changes{v3.20}{2015/11/12}{neu (intern)}
+% Da mit einem optionalen Argument an Position 3 gearbeitet wird, werden drei
+% Hilfsmakros benötigt.
+%    \begin{macrocode}
+%<*body>
+\newcommand*{\DefineTOCEntryBoolOption}[2]{%
+  \@ifnextchar [%]
+    {\@DefineTOCEntryBoolOptionWithDefault{#1}{#2}}
+    {\@DefineTOCEntryBoolOptionWithoutDefault{#1}{#2}}%
+}
+\newcommand*{\@DefineTOCEntryBoolOptionWithoutDefault}[5]{%
+  \DefineTOCEntryOption{#1}{#2}{%
+    \@DefineTOCEntryBoolOptionMacro{#2}{#3}{#4}{##1}%
+  }%
+  \TOCStyleNeedsCommandByOption{#1}{if#3}{#4}{#2}{#5}%
+}
+\newcommand*{\@DefineTOCEntryBoolOptionWithDefault}{}
+\def\@DefineTOCEntryBoolOptionWithDefault#1#2[#3]#4#5#6{%
+  \DefineTOCEntryOption{#1}{#2}[{#3}]{%
+    \@DefineTOCEntryBoolOptionMacro{#2}{#4}{#5}{##1}%
+  }%
+  \TOCStyleNeedsCommandByOption{#1}{if#4}{#5}{#2}{#6}%
+}
+\newcommand*{\@DefineTOCEntryBoolOptionMacro}[4]{%
+  \@ifundefined{if#2\scr@dte@current#3}{%
+    \expandafter\newif\csname if#2\scr@dte@current#3\endcsname
+  }{}%
+  \FamilySetBool{KOMAarg}{#1}{#2\scr@dte@current#3}{#4}%
+}
+%</body>
+%    \end{macrocode}
+% \end{macro}^^A \@DefineTOCEntryBoolOptionMacro
+% \end{macro}^^A \@DefineTOCEntryBoolOptionWithDefault
+% \end{macro}^^A \@DefineTOCEntryBoolOptionWithoutDefault
+% \end{macro}^^A \DefineTOCEntryBoolOption
+%
+% \begin{macro}{\DefineTOCEntryCommandOption}
+%   \changes{v3.20}{2015/11/17}{neu}
+% Verwendet \cs{DefineTOCEntryOption}, um eine Option zu definieren, die ein
+% Macro definiert. Es gibt folgende Parameter:
+% \begin{description}
+% \item[\marg{Stil}: \meta{String},] Name des Eintragsstils
+% \item[\marg{Option}: \meta{String},] Name der Option
+% \item[\oarg{Wert}:] der Säumniswert der Option
+% \item[\marg{Prefix}: \meta{String},] Präfix des zu definierenden Makros
+% \item[\marg{Postfix}: \meta{String},] Postfix des zu definierenden Makros
+% \item[\marg{Erklärung}: \meta{String},] Erklärung der Option
+% \end{description}
+% Zwischen Prefix und Postfix wird bei der späteren, tatsächlichen Definition
+% automatisch \cs{scr@dte@current} eingefügt.
+% \begin{macro}{\@DefineTOCEntryCommandOptionWithoutDefault}
+%   \changes{v3.20}{2015/11/12}{neu (intern)}
+% \begin{macro}{\@DefineTOCEntryCommandOptionWithDefault}
+%   \changes{v3.20}{2015/11/12}{neu (intern)}
+% \begin{macro}{\@DefineTOCEntryCommandOptionMacro}
+%   \changes{v3.20}{2015/11/12}{neu (intern)}
+% Da mit einem optionalen Argument an Position 3 gearbeitet wird, werden drei
+% Hilfsmakros benötigt.
+%    \begin{macrocode}
+%<*body>
+\newcommand*{\DefineTOCEntryCommandOption}[2]{%
+  \@ifnextchar [%]
+    {\@DefineTOCEntryCommandOptionWithDefault{#1}{#2}}
+    {\@DefineTOCEntryCommandOptionWithoutDefault{#1}{#2}}%
+}
+\newcommand*{\@DefineTOCEntryCommandOptionWithoutDefault}[5]{%
+  \DefineTOCEntryOption{#1}{#2}{%
+    \@DefineTOCEntryCommandOptionMacro{#2}{#3}{#4}{##1}%
+  }%
+  \TOCStyleNeedsCommandByOption{#1}{#3}{#4}{#2}{#5}%
+}
+\newcommand*{\@DefineTOCEntryCommandOptionWithDefault}{}
+\def\@DefineTOCEntryCommandOptionWithDefault#1#2[#3]#4#5#6{%
+  \DefineTOCEntryOption{#1}{#2}[{#3}]{%
+    \@DefineTOCEntryCommandOptionMacro{#2}{#4}{#5}{##1}%
+  }%
+  \TOCStyleNeedsCommandByOption{#1}{#4}{#5}{#2}{#6}%
+}
+\newcommand*{\@DefineTOCEntryCommandOptionMacro}[4]{%
+  \@namedef{#2\scr@dte@current#3}{#4}%
+  \FamilyKeyStateProcessed
+}
+%</body>
+%    \end{macrocode}
+% \end{macro}^^A \@DefineTOCEntryCommandOptionMacro
+% \end{macro}^^A \@DefineTOCEntryCommandOptionWithDefault
+% \end{macro}^^A \@DefineTOCEntryCommandOptionWithoutDefault
+% \end{macro}^^A \DefineTOCEntryCommandOption
+%
 % \begin{macro}{\TOCStyleNeedsCommandByOption}
 %   \changes{v3.20}{2015/11/12}{neu}
 % Fügt einen oder mehrere Befehle der Liste der benötigten Befehle hinzu.
@@ -351,7 +459,7 @@
 \newcommand*{\TOCStyleNeedsCommandByOption}[5]{%
   \expandafter\providecommand\expandafter*\csname scr@dte@#1@needs\endcsname{}%
   \expandafter\l@addto@macro\csname scr@dte@#1@needs\endcsname{%
-    \do{#2}{#3}{#5}{#4}%
+    \do{#2}{#3}{#4}{#5}%
   }%
 }
 %</body>
@@ -457,7 +565,7 @@
     {\@DeclareTOCEntryStyle{#1}}%
     {\@DeclareTOCEntryStyle{#1}[]}%
 }
-\newcommand*{\@DeclareTOCEntryStyle}{}
+\newcommand{\@DeclareTOCEntryStyle}{}
 \def\@DeclareTOCEntryStyle#1[#2]#3{%
   \@namedef{scr@dte@def@l@#1}##1{%
     \@namedef{l@##1}####1####2{%
@@ -465,15 +573,160 @@
     }%
   }%
   \DefineTOCEntryNumberOption{#1}{level}{}{tocdepth}{toc entry level}%
+  \IfArgIsEmpty{#2}{}{%
+    \@for\reserved@a:=#2\do{%
+      \ifx\reserved@a\@empty\else
+        \def\reserved@b{\scr@dte@define@option{#1}}%
+        \expandafter\reserved@b\reserved@a
+        \@empty\@empty\@empty\@empty\@empty\@empty\@empty\@nil
+      \fi
+    }%
+  }%
+}
 %    \end{macrocode}
-% TODO: An dieser Stelle fehlt noch komplett die Abarbeitung der
-% Optionendeklarationen. Erst über diese wird es möglich sein, die für die
-% Verzeichnisbefehle absolut notwendigen Optionen über \texttt{level} hinaus
-% zu deklarieren.
+% \begin{macro}{\scr@dte@define@option}
+%   \changes{v3.20}{2015/11/17}{neu (intern)}
+% \begin{macro}{\scr@dte@define@option@withoutdefault}
+%   \changes{v3.20}{2015/11/17}{neu (intern)}
+% \begin{macro}{\scr@dte@define@option@withdefault}
+%   \changes{v3.20}{2015/11/17}{neu (intern)}
+% Über diese Anweisungen werden die Optionen tatsächlich definiert. Sie haben
+% mindestens drei und maximal sieben Argumente. Das erste ist dabei immer der
+% Stil. Das dritte ist die Option. Das zweite gibt über einen einzelnen
+% Buchstaben an, wie die übrigen Argumente zu Optionen werden. Derzeit
+% definiert sind:
+% \begin{description}
+% \item[\texttt{b}:] Es handelt sich um eine Boolsche-Option. Argument 4 ist
+%   optional und gibt den Säumniswert an. Argument 5 ist ein Befehlspräfix,
+%   Argument 6 ein Befehlspostfix und Argument 7 ist die Optionenbeschreibung
+%   für Fehlermeldungen. Alle weiteren Argumente werden ignoriert. Ist kein
+%   optionales Argument angegeben, so wird \texttt{true} als Default gesetzt.
+% \item[\texttt{c}:] Es handelt sich um eine Befehls- oder
+%   String-Option. Argument 4 ist optional und gibt den Säumniswert
+%   an. Argument 5 ist ein Befehlspräfix, Argument 6 ein Befehlspostfix und
+%   Argument 7 ist die Optionenbeschreibung für Fehlermeldungen. Alle weiteren
+%   Argumente werden ignoriert.
+% \item[\texttt{l}:] Es handelt sich um eine Längen-Option. Argument 4 ist
+%   optional und gibt den Säumniswert an. Argument 5 ist ein Befehlspräfix,
+%   Argument 6 ein Befehlspostfix und Argument 7 ist die Optionenbeschreibung
+%   für Fehlermeldungen. Alle weiteren Argumente werden ignoriert.
+% \item[\texttt{n}:] Es handelt sich um eine Nummern-Option. Argument 4 ist
+%   optional und gibt den Säumniswert an. Argument 5 ist ein Befehlspräfix,
+%   Argument 6 ein Befehlspostfix und Argument 7 ist die Optionenbeschreibung
+%   für Fehlermeldungen. Alle weiteren Argumente werden ignoriert.
+% \end{description}
+% Wichtig ist, dass alle optionalen Argumente lediglich am \texttt{[} davor
+% erkannt werden. Es gibt kein \texttt{]} am Ende. Korrekte Deklarationen
+% wären also beispielsweise:
+%  |c{test}[{genau}{scr@dte@}{@test}{test entry},%|
+% wobei |{genau}| das optionale Argument wäre.
+% Wichtig ist außerdem, dass derzeit keine Leerzeichen aus der Liste
+% eliminiert werden. Korrekte Kommentierung ist also wichtig. Komplett leere
+% Elemente werden allerdings ignoriert.
 %    \begin{macrocode}
+\newcommand*{\scr@dte@define@option}[3]{%
+  \@ifnextchar [%]
+    {\scr@dte@define@option@withdefault{#1}{#2}{#3}}%
+    {\scr@dte@define@option@withoutdefault{#1}{#2}{#3}}%
+}
+\def\scr@dte@define@option@withoutdefault#1#2#3#4#5#6#7\@nil{%
+  \IfArgIsEmpty{#3}{%
+    \ClassError{\KOMAClassName}{option needs name}{%
+      Definition of toc entry style `#1' has an empty option
+      name,\MessageBreak
+      but toc entry style options must have a name.%
+    }%
+  }{%
+    \IfArgIsEmpty{#6}{%
+      \ClassWarning{\KOMAClassName}{%
+        Definition of toc entry style option `#3'\MessageBreak
+        has an empty description.\MessageBreak
+        This could result in strange error messages.\MessageBreak
+        Please add some descriptive words%
+      }%
+    }{}%
+    \IfArgIsEmpty{#4#5}{%
+      \ClassError{\KOMAClassName}{option needs either prefix or postfix}{%
+        Definition of toc entry style option `#3' has an empty\MessageBreak
+        command name prefix and an empty command name postfix.\MessageBreak
+        At least one of these must not be empty.%
+      }%
+    }{%
+      \if #2l%
+        \DefineTOCEntryLengthOption{#1}{#3}{#4}{#5}{#6}%
+      \else
+        \if #2n%
+          \DefineTOCEntryNumberOption{#1}{#3}{#4}{#5}{#6}%
+        \else
+          \if #2b%
+            \DefineTOCEntryBoolOption{#1}{#3}[true]{#4}{#5}{#6}%
+          \else
+            \if #2c%
+              \DefineTOCEntryCommandOption{#1}{#3}{#4}{#5}{#6}%
+            \else
+              \ClassError{\KOMAClassName}{%
+                unknown toc entry style option type}{%
+                Following types are valid:\MessageBreak
+                \space l: length parameter to be stored in a macro\MessageBreak
+                \space n: number parameter to be stored in a macro\MessageBreak
+                But not `\detokenize{#2}'.%
+              }%
+      \fi\fi\fi\fi
+    }%
+  }%
+}
+\def\scr@dte@define@option@withdefault#1#2#3[#4#5#6#7#8\@nil{%
+  \typeout{TRACE: \string\scr@dte@define@option@withdefault}%
+  \IfArgIsEmpty{#3}{%
+    \ClassError{\KOMAClassName}{option needs name}{%
+      Definition of toc entry style `#1' has an empty option
+      name,\MessageBreak
+      but toc entry style options must have a name.%
+    }%
+  }{%
+    \IfArgIsEmpty{#7}{%
+      \ClassWarning{\KOMAClassName}{%
+        Definition of toc entry style option `#3'\MessageBreak
+        has an empty description.\MessageBreak
+        This could result in strange error messages.\MessageBreak
+        Please add some descriptive words%
+      }%
+    }{}%
+    \IfArgIsEmpty{#5#6}{%
+      \ClassError{\KOMAClassName}{option needs either prefix or postfix}{%
+        Definition of toc entry style option `#3' has an empty\MessageBreak
+        command name prefix and an empty command name postfix.\MessageBreak
+        At least one of these must not be empty.%
+      }%
+    }{%
+      \if #2l%
+        \DefineTOCEntryLengthOption{#1}{#3}[{#4}]{#5}{#6}{#7}%
+      \else
+        \if #2n%
+          \DefineTOCEntryNumberOption{#1}{#3}[{#4}]{#5}{#6}{#7}%
+        \else
+          \if #2b%
+            \DefineTOCEntryBoolOption{#1}{#3}[{#4}]{#5}{#6}{#7}%
+          \else
+            \if #2c%
+              \DefineTOCEntryCommandOption{#1}{#3}[{#4}]{#5}{#6}{#7}%
+            \else
+              \ClassError{\KOMAClassName}{%
+                unknown toc entry style option type}{%
+                Following types are valid:\MessageBreak
+                \space l: length parameter to be stored in a macro\MessageBreak
+                \space n: number parameter to be stored in a macro\MessageBreak
+                But not `\detokenize{#2}'.%
+              }%
+      \fi\fi\fi\fi
+    }%
+  }%
 }
 %</body>
 %    \end{macrocode}
+% \end{macro}^^A \scr@dte@define@option@withoutdefault
+% \end{macro}^^A \scr@dte@define@option@withdefault
+% \end{macro}^^A \scr@dte@define@option
 % \end{macro}^^A \@DeclareTOCEntryStyle
 % \end{macro}^^A \DeclareTOCEntryStyle
 %
