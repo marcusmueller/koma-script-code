@@ -1,4 +1,4 @@
-% \CheckSum{182}
+% \CheckSum{295}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-tocstyle.dtx
@@ -148,6 +148,15 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \changes{v3.20}{2015/11/17}{Verzeichnisstile bekommen das
+%   \texttt{KOMAarg}-Mitglied \texttt{.dte}}^^A
+%    \begin{macrocode}
+%<*body>
+\DefineFamily{KOMAarg}
+\DefineFamilyMember[.dte]{KOMAarg}
+%</body>
+%    \end{macrocode}
+%
 % \begin{macro}{\DefineTOCEntryOption}
 %   \changes{v3.20}{2015/11/10}{neu}
 % Die Definition der Optionen geschieht mit einer einheitlichen
@@ -173,34 +182,34 @@
 %    \begin{macrocode}
 %<*body>
 \newcommand*{\DefineTOCEntryOption}[2]{%
-  \scr@ifundefinedorrelax{scr@dte@#1@opts}{\@namedef{scr@dte@#1@opts}{}}{}%
+  \scr@ifundefinedorrelax{scr@dte@#1@doopts}{%
+    \@namedef{scr@dte@#1@defopts}{}}{}%
+  \expandafter\l@addto@macro\csname scr@dte@#1@doopts\endcsname{\do{#2}}%
+  \scr@ifundefinedorrelax{scr@dte@#1@defopts}{%
+    \@namedef{scr@dte@#1@defopts}{}}{}%
+  \scr@ifundefinedorrelax{scr@dte@#1@relaxopts}{%
+    \@namedef{scr@dte@#1@relaxopts}{}}{}%
   \@ifnextchar [%]
     {\@DefineTOCEntryOptionWithDefault{#1}{#2}}%
     {\@DefineTOCEntryOptionWithoutDefault{#1}{#2}}%
 }
 \newcommand*{\@DefineTOCEntryOptionWithoutDefault}[3]{%
   \DeclareSectionCommandDummyOption{#2}\relax
-  \expandafter\l@addto@macro\csname scr@dte@#1@opts\endcsname{%
-    \DefineFamilyKey[.dsc]{KOMAarg}{#2}{%
-      \scr@ifundefinedorrelax{scr@dte@current}{%
-        \let\scr@dte@current\scr@dsc@current
-        #3%
-        \let\scr@dte@current\relax
-      }{#3}%
-    }%
+  \expandafter\l@addto@macro\csname scr@dte@#1@defopts\endcsname{%
+    \DefineFamilyKey[.dte]{KOMAarg}{#2}{#3}%
   }%
   \expandafter\l@addto@macro\csname scr@dte@#1@relaxopts\endcsname{%
-    \RelaxFamilyKey[.dsc]{KOMAarg}{#2}%
+    \RelaxFamilyKey[.dte]{KOMAarg}{#2}%
   }%
 }
 \newcommand*{\@DefineTOCEntryOptionWithDefault}{}
 \def\@DefineTOCEntryOptionWithDefault#1#2[#3]#4{%
   \DeclareSectionCommandDummyOption{#2}*%
-  \expandafter\l@addto@macro\csname scr@dte@#1@opts\endcsname{%
-    \DefineFamilyKey[.dsc]{KOMAarg}{#2}[{#3}]{#4}%
+  \expandafter\l@addto@macro\csname scr@dte@#1@defopts\endcsname{%
+    \DefineFamilyKey[.dte]{KOMAarg}{#2}[{#3}]{#4}%
   }%
   \expandafter\l@addto@macro\csname scr@dte@#1@relaxopts\endcsname{%
-    \RelaxFamilyKey[.dsc]{KOMAarg}{#2}%
+    \RelaxFamilyKey[.dte]{KOMAarg}{#2}%
   }%
 }
 %</body>
@@ -254,7 +263,7 @@
 \newcommand*{\@DefineTOCEntryLengthOptionMacro}[4]{%
   \FamilySetLength{KOMAarg}{#1}{\@tempskipa}{#4}%
   \ifx\FamilyKeyState\FamilyKeyStateProcessed
-    \ifscr@dsc@expandtopt
+    \ifscr@dte@expandtopt
       \expandafter\edef\csname #2\scr@dte@current#3\endcsname{%
         \the\@tempskipa}%
     \else
@@ -312,15 +321,11 @@
   \TOCStyleNeedsCommandByOption{#1}{#4}{#5}{#2}{#6}%
 }
 \newcommand*{\@DefineTOCEntryNumberOptionMacro}[4]{%
-  \FamilySetCounter{KOMAarg}{#1}{\@tempcnta}{#4}%
-  \ifx\FamilyKeyState\FamilyKeyStateProcessed
-    \ifscr@dsc@expandtopt
-      \expandafter\edef\csname #2\scr@dte@current#3\endcsname{%
-        \the\@tempcnta}%
-    \else
-      \expandafter\edef\csname #2\scr@dte@current#3\endcsname{#4}%
-    \fi
-  \fi
+  \edef\reserved@a{%
+    \noexpand\FamilySetCounterMacro{KOMAarg}{#1}{%
+      \csname #2\scr@dte@current#3\endcsname
+    }{#4}%
+  }\reserved@a
 }
 %</body>
 %    \end{macrocode}
@@ -385,23 +390,29 @@
     }%
   }{%
     \IfArgIsEmpty{#1}{}{%
-      \def\scr@dte@current{#2}%
-      \csname scr@dte@#3@opts\endcsname
-      \FamilyBoolKey[.dsc]{KOMAarg}{expandtopt}{scr@dsc@expandtopt}%
-      \scr@dsc@expandtoptfalse
-      \FamilyExecuteOptions[.dsc]{KOMAarg}{#1}%
-      \RelaxFamilyKey[.dsc]{KOMAarg}{expandtopt}%
-      \csname scr@dte@#3@relaxopts\endcsname
+      \def\scr@dte@current{#3}%
+      \csname scr@dte@#2@defopts\endcsname
+      \FamilyBoolKey[.dte]{KOMAarg}{expandtopt}{scr@dte@expandtopt}%
+      \scr@dte@expandtoptfalse
+      \FamilyExecuteOptions[.dte]{KOMAarg}{#1}%
+      \RelaxFamilyKey[.dte]{KOMAarg}{expandtopt}%
+      \csname scr@dte@#2@relaxopts\endcsname
       \let\scr@dte@current\relax
     }%
+    \scr@ifundefinedorrelax{#3tocdepth}{%
+      \scr@ifundefinedorrelax{#3numdepth}{}{%
+        \expandafter\let\csname #3tocdepth\expanafter\endcsname
+        \csname #3numdepth\endcsname
+      }%
+    }{}%
     \begingroup
       \aftergroup\@tempswatrue
       \def\do##1##2##3##4{%
-        \scr@ifundefinedorrelax{##1#3##3}{%
+        \scr@ifundefinedorrelax{##1#3##2}{%
           \ClassError{\KOMAClassName}{toc style `#2' needs ##4}{%
             Usually the ##4 is defined using option `##3'.\MessageBreak
             In some cases it may be set defining command
-            `\expandafter\string\csname ##1#3##3\endcsname'.\MessageBreak
+            `\expandafter\string\csname ##1#3##2\endcsname'.\MessageBreak
             If you'll continue, I'll ignore the command. This could result
             in\MessageBreak
             further error messages.%
@@ -409,6 +420,7 @@
           \aftergroup\@tempswafalse
         }{}%
       }%
+      \do{}{tocdepth}{level}{toc style level}%
       \@nameuse{scr@dte@#2@needs}%
     \endgroup
     \if@tempswa
@@ -420,19 +432,50 @@
 %    \end{macrocode}
 % \end{macro}^^A \DeclareTOCStyleEntry
 %
-% TODO: Bisher gehören die Optionen noch \texttt{.dsc}. Über geschickte
-% Definition von \cs{@currname} und \cs{@currext} oder etwas neuem wie
-% \cs{@currmember} könnte man das so flexibilisieren, dass die Optionen
-% wahlweise \texttt{.dsc} oder \texttt{.dte} gehören. In ähnlicher Weise wäre
-% dann auch mit \cs{ifscr@dsc@expandtopt} zu verfahren. Damit wird dieses
-% Modul dann komplett unabhängig von \texttt{scrkernel-sections}
-% verwendbar. Erst das erlaubt es, die Funktionalität später in
-% \textsf{tocbasic} zu verschieben.
-%
-% TODO: Bisher können nur einige Optionen deklariert werden, die dann auch in
-% \cs{DeclareSectionCommand} etc. verwendet werden. Außerdem kann die
-% Definition eines Befehls auch direkt mit \cs{DefineTOCStyleEntry}
-% erfolgen.
+% \begin{macro}{\DeclareTOCEntryStyle}
+%   \changes{v3.20}{2015/11/17}{neu}
+% \begin{macro}{\@DeclareTOCEntryStyle}
+%   \changes{v3.20}{2015/11/17}{neu (intern)}
+% Über diese Anweisung wir ein neuer Stil für TOC-Einträge definiert. Ein Stil
+% besteht aus:
+% \begin{description}
+% \item[\marg{Stil}:] Der Stil \meta{string}, der definiert werden soll.
+% \item[\oarg{Optionendeklaration}:] Eine Komma separierte Liste von
+% Optionendeklarationen für diesen Stil. Zur Form dieser Deklarationen siehe unten.
+% \item[\marg{Verzeichnisbefehlsdefinition}:] Dies ist der Körper der
+% Definition des \cs{l@\dots}-Befehls, der verwendet werden soll. Dabei ist
+% \texttt{\#1} der Name der Verzeichnissebene und \texttt{\#\#1} und
+% \texttt{\#\#2} sind die beiden Argumente des \cs{l@dots}-Befehls.
+% \end{description}
+% Unabhängig davon, ob eine \meta{Optionendeklaration} angegeben ist oder
+% nicht, wird immer eine Option \texttt{level} definiert, über die die
+% Verzeichnisebene einen nummerischen Wert erhält.
+%    \begin{macrocode}
+%<*body>
+\newcommand*{\DeclareTOCEntryStyle}[1]{%
+  \@ifnextchar [%]
+    {\@DeclareTOCEntryStyle{#1}}%
+    {\@DeclareTOCEntryStyle{#1}[]}%
+}
+\newcommand*{\@DeclareTOCEntryStyle}{}
+\def\@DeclareTOCEntryStyle#1[#2]#3{%
+  \@namedef{scr@dte@def@l@#1}##1{%
+    \@namedef{l@##1}####1####2{%
+      #3%
+    }%
+  }%
+  \DefineTOCEntryNumberOption{#1}{level}{}{tocdepth}{toc entry level}%
+%    \end{macrocode}
+% TODO: An dieser Stelle fehlt noch komplett die Abarbeitung der
+% Optionendeklarationen. Erst über diese wird es möglich sein, die für die
+% Verzeichnisbefehle absolut notwendigen Optionen über \texttt{level} hinaus
+% zu deklarieren.
+%    \begin{macrocode}
+}
+%</body>
+%    \end{macrocode}
+% \end{macro}^^A \@DeclareTOCEntryStyle
+% \end{macro}^^A \DeclareTOCEntryStyle
 %
 % \Finale
 %
