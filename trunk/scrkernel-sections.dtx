@@ -1564,9 +1564,20 @@
       \expandafter\let\csname scr@\scr@dsc@current @tocstyle\endcsname\relax
       \FamilyKeyStateProcessed
     }{%
+      \typeout{TRACE: option tocstyle=##1}%
+      \typeout{TRACE: command=\scr@dsc@current}%
       \scr@ifundefinedorrelax{scr@dsc@def@tocstyle@##1@command}{%
-        \FamilyKeyStateUnknownValue
+        \typeout{TRACE: command not defined}%
+        \scr@ifundefinedorrelax{scr@dte@def@l@##1}{%
+          \typeout{TRACE: style not defined}%
+          \FamilyKeyStateUnknownValue
+        }{%
+          \typeout{TRACE: style defined}%
+          \@namedef{scr@\scr@dsc@current @tocstyle}{##1}%
+          \FamilyKeyStateProcessed
+        }%
       }{%
+        \typeout{TRACE: command defined}%
         \@namedef{scr@\scr@dsc@current @tocstyle}{##1}%
         \FamilyKeyStateProcessed
       }%
@@ -1635,6 +1646,7 @@
 % keine Verzeichniseintragsoption Namens \texttt{style} geben kann und dass
 % Gliederungsoptionen nicht mit mit \texttt{toc} beginnen dürfen.
 %    \begin{macrocode}
+    \let\scr@dsc@tocstyle@options\@empty
     \begingroup
       \def\do@endgroup{\endgroup}%
       \def\do{%
@@ -1644,16 +1656,18 @@
       }%
       \def\@donodefault##1{%
         \l@addto@macro\do@endgroup{%
-          \DefineFamilyKey[.dsc]{KOMArg}{toc##1}{%
-            \ExecuteFamilyOptions[.dte]{KOMAarg}{##1={####1}}%
+          \DefineFamilyKey[.dsc]{KOMAarg}{toc##1}{%
+            \l@addto@macro{\scr@dsc@tocstyle@options}{##1={####1},}%
+            \FamilyKeyStateProcessed
           }%
         }%
       }%
       \def\@dodefault[##1]##2{%
         \l@addto@macro\do@endgroup{%
           \DefineFamilyKey[.dsc]{KOMAarg}{toc##2}[##1]{%
-            \ExecuteFamilyOptions[.dte]{KOMAarg}{##2={####1}}%
-          }%
+            \l@addto@macro{\scr@dsc@tocstyle@options}{##2={####1},}%
+             \FamilyKeyStateProcessed
+         }%
         }%
       }%
       \@nameuse{scr@dte@\@nameuse{scr@\scr@dsc@current @tocstyle}@doopts}%
@@ -1835,15 +1849,6 @@
 % Gliederungsbefehls gesetzt sind:
 %    \begin{macrocode}
     \begingroup
-      \scr@ifundefinedorrelax{scr@\scr@dsc@current @tocstyle}{}{%
-        \def\do##1##2##3##4{%
-          \scr@ifundefinedorrelax{##1\scr@dsc@current ##2}{%
-            \scr@declaresectioncommanderror{\scr@dsc@current}{##3}{##4}%
-          }{}%
-        }%
-        \@nameuse{scr@dte@\@nameuse{scr@\scr@dsc@current @tocstyle}@needs}%
-        \let\do\relax
-      }%
       \scr@ifundefinedorrelax{\scr@dsc@current numdepth}{%
         \scr@declaresectioncommanderror{\scr@dsc@current}{section level}{level}%
       }{}%
@@ -1947,12 +1952,24 @@
       \scr@ifundefinedorrelax{scr@#2@tocstyle}{}{%
         \scr@ifundefinedorrelax{%
           scr@dsc@def@tocstyle@\@nameuse{scr@#2@tocstyle}@command%
-        }{}{%
+        }{%
+          \scr@ifundefinedorrelax{DeclareTOCStyleEntry}{}{%
+            \DeclareTOCStyleEntry[\scr@dsc@tocstyle@options]{%
+              \@nameuse{scr@#2@tocstyle}%
+            }{#2}%
+          }{}%
+        }{%
           \@nameuse{scr@dsc@def@tocstyle@\@nameuse{scr@#2@tocstyle}@command}%
                    {#2}%
         }%
       }%
       \scr@ifundefinedorrelax{l@#2}{%
+%    \end{macrocode}
+% Todo: So etwas wie ein Default-Stil gibt es bei Verwendung von
+% Verzeichnisstilen mit \texttt{scrkernel-tocstyle} noch nicht. Dafür sind
+% noch diverse Änderungen notwendig. Deshalb wird in dem Fall die nächste
+% Anweisung hier einen Fehler erzeugen.
+%    \begin{macrocode}
         \scr@dsc@def@tocstyle@default@command{#2}%
       }{}%
 %    \end{macrocode}
@@ -4766,12 +4783,26 @@
 %   \changes{v3.20}{2015/10/06}{neue Anweisung (intern)}^^A
 %    \begin{macrocode}
 %<*body>
-%<book|report>\newcommand*{\scr@dsc@def@tocstyle@section@command}[1]{%
-%<article>\newcommand*{\scr@dsc@def@tocstyle@subsection@command}[1]{%
-  \expandafter\def\csname l@#1\endcsname{%
+\scr@ifundefinedorrelax{DeclareTOCEntryStyle}{%
+%<book|report>  \newcommand*{\scr@dsc@def@tocstyle@section@command}[1]{%
+%<article>  \newcommand*{\scr@dsc@def@tocstyle@subsection@command}[1]{%
+    \expandafter\def\csname l@#1\endcsname{%
+      \bprot@dottedtocline{\@nameuse{#1tocdepth}}%
+                          {\@nameuse{scr@#1@tocindent}}%
+                          {\@nameuse{scr@#1@tocnumwidth}}%
+    }%
+  }
+}{%
+%<book>|report>  \DeclareTOCEntryStyle{section}[%
+%<article>  \DeclareTOCEntryStyle{subsection}[%
+    l{indent}{scr@}{@tocindent}{entry indent},%
+    l{numwidth}{scr@}{@tocnumwidth}{entry number width},%
+  ]{%
     \bprot@dottedtocline{\@nameuse{#1tocdepth}}%
                         {\@nameuse{scr@#1@tocindent}}%
                         {\@nameuse{scr@#1@tocnumwidth}}%
+                        {##1}%
+                        {##2}%
   }%
 }
 %</body>
@@ -5249,19 +5280,19 @@
 %<article>  level=\z@,%
 %<report|book>  level=\m@ne,%
 %<report|book>  pagestyle=plain,%
+  tocstyle=part,%
   toclevel=\m@ne,%
   tocindent=\z@,%
-  tocnumwidth=2em,%
-  tocstyle=part%
+  tocnumwidth=2em%
 ]{part}
 %<*book|report>
 \DeclareSectionCommand[%
   style=chapter,%
   level=\z@,%
   pagestyle=plain,%
+  tocstyle=chapter,%
   tocindent=\z@,%
-  tocnumwidth=1.5em,%
-  tocstyle=chapter%
+  tocnumwidth=1.5em%
 ]{chapter}
 %</book|report>
 \DeclareSectionCommand[%
@@ -5270,11 +5301,11 @@
   indent=\z@,%
   beforeskip=-3.5ex \@plus -1ex \@minus -.2ex,%
   afterskip=2.3ex \@plus.2ex,%
+  tocstyle=section,%
 %<article>  tocindent=0pt,%
 %<book|report>  tocindent=1.5em,%
-%<article>  tocnumwidth=1.5em,%
+%<article>  tocnumwidth=1.5em%
 %<book|report>  tocnumwidth=2.3em%
-%<article>  tocstyle=section%
 ]{section}
 \DeclareSectionCommand[%
   style=section,%
@@ -5282,6 +5313,8 @@
   indent=\z@,%
   beforeskip=-3.25ex\@plus -1ex \@minus -.2ex,%
   afterskip=1.5ex \@plus .2ex,%
+%<article>  tocstyle=subsection,%
+%<book|report>  tocstyle=section,%
 %<article>  tocindent=1.5em,%
 %<book|report>  tocindent=3.8em,%
 %<article>  tocnumwidth=2.3em%
@@ -5293,6 +5326,8 @@
   indent=\z@,%
   beforeskip=-3.25ex\@plus -1ex \@minus -.2ex,%
   afterskip=1.5ex \@plus .2ex,%
+%<article>  tocstyle=subsection,%
+%<book|report>  tocstyle=section,%
 %<article>  tocindent=3.8em,%
 %<book|report>  tocindent=7.0em,%
 %<article>  tocnumwidth=3.2em%
@@ -5304,6 +5339,8 @@
   indent=\z@,%
   beforeskip=3.25ex \@plus1ex \@minus.2ex,%
   afterskip=-1em,%
+%<article>  tocstyle=subsection,%
+%<book|report>  tocstyle=section,%
 %<article>  tocindent=7.0em,%
 %<book|report>  tocindent=10em,%
 %<article>  tocnumwidth=4.1em%
@@ -5315,6 +5352,8 @@
   indent=\scr@parindent,%
   beforeskip=3.25ex \@plus1ex \@minus .2ex,%
   afterskip=-1em,%
+%<article>  tocstyle=subsection,%
+%<book|report>  tocstyle=section,%
 %<article>  tocindent=10em,%
 %<book|report>  tocindent=12em,%
 %<article>  tocnumwidth=5em%
