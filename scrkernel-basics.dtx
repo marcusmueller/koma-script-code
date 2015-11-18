@@ -1,4 +1,4 @@
-% \CheckSum{3282}
+% \CheckSum{3355}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -2554,17 +2554,48 @@
       \ifx\scr@key@name\space\else
         \scr@ifundefinedorrelax{KV@#2@\scr@key@name}{%
           \scr@ifundefinedorrelax{KV@#2#1@\scr@key@name}{%
-            \PackageError{scrbase}{%
-              unknown option
-              `\expandafter\detokenize\expandafter{\scr@key@atlist}'%
+%    \end{macrocode}
+%   \changes{v3.20}{2015/11/18}{Besondere Behandlung der
+%     \texttt{@else@}-Option}^^A
+% Es existiert zwar weder eine Familienoption noch eine Mitgliedsoption, aber
+% vielleicht existiert ja die Spezialoption \texttt{@else@}, die in einem
+% solchen Fall die eigentliche Option als Wert erhält.
+%    \begin{macrocode}
+            \scr@ifundefinedorrelax{KV@#2#1@@else@}{%
+              \PackageError{scrbase}{%
+                unknown option
+                `\expandafter\detokenize\expandafter{\scr@key@atlist}'%
+              }{%
+                Member `#1' of family `#2'\MessageBreak
+                cannot handle option `\scr@key@name'.\MessageBreak
+                So it cannot be set%
+                \ifx\scr@key@value\@empty\else
+                  \space to value
+                  `\expandafter\detokenize\expandafter{\scr@key@value}'%
+                \fi.%
+              }%
             }{%
-              Member `#1' of family `#2'\MessageBreak
-              cannot handle option `\scr@key@name'.\MessageBreak
-              So it cannot be set%
-              \ifx\scr@key@value\@empty\else
-                \space to value
-                `\expandafter\detokenize\expandafter{\scr@key@value}'%
-              \fi.%
+              \scr@execute@elseoption{#2#1}%
+%    \end{macrocode}
+% Im Gegensatz zu anderen Optionen bedeuten bei der \texttt{@else@}-Option
+% alle von \cs{FamilyKeyStateProcessed} abweichenden Ergebnisse, dass die
+% Option nicht korrekt verarbeitet werden konnte und deshalb die ursprüngliche
+% Option als Fehler zu melden ist.
+%    \begin{macrocode}
+              \ifx\FamilyKeyState\FamilyKeyStateProcessed\else
+                \PackageError{scrbase}{%
+                  unknown option
+                  `\expandafter\detokenize\expandafter{\scr@key@atlist}'%
+                }{%
+                  Member `#1' of family `#2'\MessageBreak
+                  cannot handle option `\scr@key@name'.\MessageBreak
+                  So it cannot be set%
+                  \ifx\scr@key@value\@empty\else
+                    \space to value
+                    `\expandafter\detokenize\expandafter{\scr@key@value}'%
+                  \fi.%
+                }%
+              \fi
             }%
           }{%
             \scr@execute@option{#2#1}%
@@ -2572,7 +2603,20 @@
         }{%
           \scr@execute@option{#2}%
           \ifstr{#1}{}{}{%
-            \scr@ifundefinedorrelax{KV@#2#1\scr@key@name}{}{%
+%    \end{macrocode}
+%   \changes{v3.20}{2015/11/18}{Memberoptionstest nach Familyoptionsausführung
+%     korrigiert}^^A
+% Auch wenn eine Familienoption ausgeführt wurde, muss eine existierende
+% Mitgliederoption ggf. noch ausgeführt werden. Existiert sie nicht, wird
+% ebenfalls eine existierende \texttt{@else@}-Option ausgeführt. Allerdings
+% führen in diesem Fall von \cs{FamilyKeyStateProcessed} abweichende
+% Ergebnisse nicht zu einer Fehlermeldung.
+%    \begin{macrocode}
+            \scr@ifundefinedorrelax{KV@#2#1@\scr@key@name}{%
+              \scr@ifundefinedorrelax{KV@#2#1@@else@}{}{%
+                \scr@execute@elseoption{#2#1}%
+              }%
+            }{%
               \ifx\FamilyKeyState\FamilyKeyStateProcessed
                 \scr@execute@option{#2#1}%
                 \FamilyKeyStateProcessed
@@ -2811,7 +2855,7 @@
     \noexpand\let\noexpand\KV@err\noexpand\scr@KV@err
     \noexpand\setkeys{#1}{%
       \unexpanded\expandafter{\scr@key@atlist}}%
-     \noexpand\def\noexpand\scr@key@atlist{%
+    \noexpand\def\noexpand\scr@key@atlist{%
       \unexpanded\expandafter{\scr@key@atlist}}%
     \noexpand\def\noexpand\scr@key@name{%
       \unexpanded\expandafter{\scr@key@name}}%
@@ -2871,8 +2915,37 @@
 %    \begin{macrocode}
 \newcommand*{\scr@key@run@errors}{}
 %    \end{macrocode}
-% \end{macro}
+% \end{macro}^^A \scr@key@run@errors}
 % \end{macro}^^A \scr@execute@option
+% \begin{macro}{\scr@execute@elseoption}
+%   \changes{v3.20}{2015/11/18}{neu (intern)}
+% Ist eine Spezialoption mit dem Namen \texttt{@else@} definiert, so wird
+% diese von \cs{FamilyExecuteOptions} genau dann ausgeführt, wenn keine
+% passende Option gefunden wurde. Dafür dient dieses Makro, dessen Argumente
+% und Aufrufstatus genau \cs{scr@execute@option} entspricht. Es soll auch
+% genau dasselbe tun, außer dass es nicht die Option selbst aufruft, sondern
+% die Option als Wert an die \texttt{@else@}-Option übergibt. Es muss also
+% temporär \cs{scr@key@atlist}, \cs{scr@key@name} und \cs{scr@key@value}
+% geändert werden, bevor \cs{scr@execute@option} ausgeführt wird.
+%    \begin{macrocode}
+\newcommand*{\scr@execute@elseoption}[1]{%
+  \protected@edef\reserved@a{%
+    \noexpand\def\noexpand\scr@key@name{@else@}%
+    \noexpand\def\noexpand\scr@key@value{%
+      \unexpanded\expandafter{\scr@key@atlist}}%
+    \noexpand\def\noexpand\scr@key@atlist{%
+      @else@={\unexpanded\expandafter{\scr@key@atlist}}}%
+    \noexpand\scr@execute@option{#1}%
+    \noexpand\def\noexpand\scr@key@atlist{
+      \unexpanded\expandafter{\scr@key@atlist}}%
+    \noexpand\def\noexpand\scr@key@name{%
+      \unexpanded\expandafter{\scr@key@name}}%
+    \noexpand\def\noexpand\scr@key@value{%
+      \unexpanded\expandafter{\scr@key@value}}%
+  }\reserved@a
+}
+%    \end{macrocode}
+% \end{macro}^^A \scr@execute@elseoption
 % \begin{macro}{\ifscr@key@found@}
 %   \changes{v2.97c}{2007/04/19}{Neuer Schalter (intern)}^^A
 %   \changes{v3.00}{2008/04/30}{umbenannt von \cs{ifKOMA@key@found}}
