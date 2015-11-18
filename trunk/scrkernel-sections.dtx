@@ -1,4 +1,4 @@
-% \CheckSum{3981}
+% \CheckSum{4021}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -1078,7 +1078,7 @@
 % werden, so ist \texttt{KOMAarg} zu verwenden.
 %    \begin{macrocode}
 \newcommand*{\DeclareSectionCommandStyleOption}[3]{%
-  \DeclareSectionCommandDummyOption{#2}%
+  \AddToSectionCommandOptionsDoList{#2}%
   \expandafter\g@addto@macro\csname scr@dsc@style@#1@options\endcsname{%
     \DefineFamilyKey[.dsc]{KOMAarg}{#2}{#3}%
   }%
@@ -1086,34 +1086,52 @@
 %    \end{macrocode}
 % \begin{macro}{\DeclareSectionCommandDummyOption}
 %   \changes{v3.17}{2015/03/23}{neue Anweisung (intern)}^^A
-% \begin{macro}{\scr@dsc@dummyoptions}
-%   \changes{v3.17}{2015/03/23}{Neu (intern)}^^A
-% Definiert eine neue Dummy-Option für einen Stil eines
-% \begin{macro}{\scr@dsc@relaxdummyoptions}
-%   \changes{v3.20}{2015/11/12}{Neu (intern)}^^A
-% Gliederungsbefehls. Das einzige Argument ist der Name der Option. Die
-% Dummy-Optionen werden in \cs{scr@dsc@dummyoptions} gesammelt.
-%    \begin{macrocode}
-\newcommand*{\DeclareSectionCommandDummyOption}[1]{%
-  \g@addto@macro{\scr@dsc@relaxdummyoptions}{%
-    \RelaxFamilyKey[.dsc]{KOMAarg}{#1}%
-  }%
-  \@ifstar {%
-    \g@addto@macro{\scr@dsc@dummyoptions}{%
-      \DefineFamilyKey[.dsc]{KOMAarg}{#1}[]{\FamilyKeyStateProcessed}%
-    }%
-  }{%
-    \g@addto@macro{\scr@dsc@dummyoptions}{%
-      \DefineFamilyKey[.dsc]{KOMAarg}{#1}{\FamilyKeyStateProcessed}%
-    }%
-  }%
-}
-\newcommand*{\scr@dsc@dummyoptions}{}
-\newcommand*{\scr@dsc@relaxdummyoptions}{}
-%    \end{macrocode}
-% \end{macro}^^A \scr@dsc@relaxdummyoptions
-% \end{macro}^^A \scr@dsc@dummyoptions
+%   \changes{v3.20}{2015/11/18}{wird nicht mehr benötigt}^^A
 % \end{macro}^^A \DeclareSectionCommandDummyOption
+% \begin{macro}{\AddToSectionCommandOptionsDoList}
+%   \changes{v3.20}{2015/11/18}{neu}
+% \begin{macro}{\@AddToSectionCommandOptionsDoList}
+%   \changes{v3.20}{2015/11/18}{neu (intern)}
+% \begin{macro}{\scr@dsc@doopts}
+%   \changes{v3.20}{2015/11/18}{neu (intern)}
+% Registriert eine neue Gliederungsbefehlsoption, indem sie der internen Liste
+% der Gliederungsbefehlsoptionen hinzugefügt wird.
+%    \begin{macrocode}
+\newcommand*{\AddToSectionCommandOptionsDoList}[1]{%
+  \@ifnextchar [%]
+    {\@AddToSectionCommandOptionListWithDefault{#1}}%
+    {\l@addto@macro\scr@dsc@doopts{\do{#1}}}%
+}
+\newcommand*{\@AddToSectionCommandOptionListWithDefault}{}
+\def\@AddToSectionCommandOptionListWithDefault#1[#2]{%
+  \l@addto@macro\scr@dsc@doopts{\do[{#2}]{#1}}
+}%
+\newcommand*{\scr@dsc@doopts}{}
+%    \end{macrocode}
+% \end{macro}^^A \scr@dsc@dooptions
+% \end{macro}^^A \@AddToSectionCommandOptionsListWithDefault
+% \end{macro}^^A \AddToSectionCommandOptionsDoList
+% \begin{macro}{\RelaxSectionCommandOptions}
+%   \changes{v3.20}{2015/11/18}{neu}
+% Diese Option macht alle Gliederungsbefehlsoptionen ungültig.
+%    \begin{macrocode}
+\newcommand*{\RelaxSectionCommandOptions}{%
+  \begingroup
+    \def\do@endgroup{\endgroup}%
+    \def\do{%
+      \@ifnextchar [%]
+        {\@do}%
+        {\@do[]}%
+    }%
+    \def\@do[##1]##2{%
+      \l@addto@macro\do@endgroup{\RelaxFamilyKey[.dsc]{KOMAarg}{##2}}%
+    }%
+    \scr@dsc@doopts
+  \do@endgroup
+  \typeout{TRACE: Relax done}%
+}
+%    \end{macrocode}
+% \end{macro}^^A \RelaxSectionCommandOptions
 % \end{macro}^^A \DeclareSectionCommandStyleOption
 % \begin{macro}{\DeclareSectionCommandStyleLengthOption}
 %   \changes{v3.17}{2015/03/23}{neue Anweisung}^^A
@@ -1170,18 +1188,6 @@
 }
 %    \end{macrocode}
 % \end{macro}^^A \DeclareSectionCommandStyleFontOption
-% Es folgt die Initialisierung zunächst der Dummys für die Optionen, die es
-% immer gibt. (Erklärung dieser Optionen folgt unten.)
-%    \begin{macrocode}
-\DeclareSectionCommandDummyOption{style}
-\DeclareSectionCommandDummyOption{expandtopt}*
-\DeclareSectionCommandDummyOption{increaselevel}*
-\DeclareSectionCommandDummyOption{level}
-\DeclareSectionCommandDummyOption{toclevel}
-\DeclareSectionCommandDummyOption{tocindent}
-\DeclareSectionCommandDummyOption{tocnumwidth}
-\DeclareSectionCommandDummyOption{tocstyle}
-%    \end{macrocode}
 %
 % \begin{macro}{\scr@dsc@style@section@options}
 %   \changes{v3.17}{2015/03/23}{neue Anweisung (intern)}^^A
@@ -1510,7 +1516,8 @@
 % \end{macro}^^A \scr@dsc@style@part@neededoptionstest
 %
 % \begin{macro}{\ifscr@dsc@parametersonly}
-%   \changes{v3.17}{2015/03/24}{neu}
+%   \changes{v3.17}{2015/03/24}{neu}^^A
+%   \changes{v3.20}{2015/11/18}{es gibt keine Dummy-Optionen mehr}^^A
 % Dieser Schalter wird verwendet, um die Einstellungen entsprechend dem
 % aktuell gültigen Stil zu ändern, die zugehörige Anweisung selbst aber nicht
 % neu zu definieren. Er wird von einem leeren \texttt{style}-Wert lokal
@@ -1524,14 +1531,10 @@
 \newcommand*{\DeclareSectionCommand}[2][]{%
   \edef\scr@dsc@current{#2}%
 %    \end{macrocode}
-% Zunächst sind alle für Gliederungsbefehle bekannten Optionen nur
-% dummy-Optionen.
-%    \begin{macrocode}
-  \scr@dsc@dummyoptions
-%    \end{macrocode}
-% Die einzige Optionen, die wir direkt auswerten, ist der Stil:
-% \begin{description}\item[\texttt{style}] Stil der
-% Gliederungsebene\end{description}
+% Im ersten Durchlauf werden nur die Stil-Optionen ausgewertet:
+% \begin{description}
+% \item[\texttt{style}] Stil der Gliederungsebene
+% \end{description}
 %    \begin{macrocode}
   \scr@dsc@parametersonlyfalse
   \DefineFamilyKey[.dsc]{KOMAarg}{style}{%
@@ -1548,11 +1551,13 @@
     }%
   }%
 %    \end{macrocode}
+% \begin{description}
+% \item[\texttt{tocstyle}] 
 %   \changes{v3.20}{2015/11/12}{Option \texttt{tocstyle} frühzeitig
 %     auswerten}^^A
-% In ähnlicher Weise wird Option \texttt{tocstyle} ausgewertet, um später die
-% zum Inhaltsverzeichnis-Eintrags-Stil gehörenden Optionen ebenfalls zu
-% aktivieren.
+%   Verzeichnis-Eintrags-Stil, damit auch für diesen anschließend die Optionen
+%   definiert bzw. aktiviert werden können.
+% \end{description}
 %    \begin{macrocode}
   \DefineFamilyKey[.dsc]{KOMAarg}{tocstyle}{%
     \IfArgIsEmpty{##1}{%
@@ -1567,15 +1572,38 @@
       }%
     }%
   }%
+%    \end{macrocode}
+% \begin{description}
+% \item[\texttt{@else@}] 
+%   \changes{v3.20}{2015/11/18}{Option \texttt{tocstyle} frühzeitig
+%     auswerten}^^A
+%   Damit keine anderen Optionen ausgewertet werden müssen aber auch nicht als
+%   unbekannte Optionen einen Fehler erzeugen, wird diese Spezialoption
+%   definiert, die einfach nur \cs{FamilyKeyStateProcessed} setzt.
+% \end{description}
+%    \begin{macrocode}
+  \DefineFamilyKey[.dsc]{KOMAarg}{@else@}{%
+%<*trace>
+    \typeout{TRACE: ignoring option `@else@=\detokenize{##1}'}%
+    \typeout{TRACE:
+      \string\scr@key@atlist=`\detokenize\expandafter{\scr@key@atlist}'}%
+    \typeout{TRACE:
+      \string\scr@key@name=`\detokenize\expandafter{\scr@key@name}'}%
+    \typeout{TRACE:
+      \string\scr@key@value=`\detokenize\expandafter{\scr@key@value}'}%
+%</trace>
+    \FamilyKeyStateProcessed
+  }%
   \FamilyExecuteOptions[.dsc]{KOMAarg}{#1}%
 %    \end{macrocode}
-%   \changes{v3.20}{2015/11/12}{Rücknahme der Dummy-Optionen}^^A
-% Außer im Fall, dass mehrere Anweisungen auf einen Schlag konfiguriert
-% werden, werden die Dummy-Optionen wieder freigegeben. Damit werden später
-% Optionen, die für den jeweiligen Stil unbekannt sind, tatsächlich als Fehler
-% gemeldet.
+%   \changes{v3.20}{2015/11/18}{Rüchnahme der Optionen nach dem ersten
+%     Durchgang}^^A
+% Nach dem ersten Druchgang müssen alle Optionen wieder zurückgenommen
+% werden.
 %    \begin{macrocode}
-  \scr@ifundefinedorrelax{scr@local@leveloffset}{\scr@dsc@relaxdummyoptions}{}%
+  \RelaxFamilyKey[.dsc]{KOMAarg}{@else@}%
+  \RelaxFamilyKey[.dsc]{KOMAarg}{tocstyle}%
+  \RelaxFamilyKey[.dsc]{KOMAarg}{style}%
   \begingroup
     \scr@ifundefinedorrelax{scr@\scr@dsc@current @style}{%
       \scr@declaresectioncommanderror{\scr@dsc@current}
@@ -1585,13 +1613,13 @@
   \@firstofone{%
 %    \end{macrocode}
 %   \changes{v3.20}{2015/11/12}{keine Dummy-Optionen für den echten Lauf}^^A
-% Nach nun der Stil für den Gliederungsbefehl bekannt ist, können wir dessen
-% Optionen aktivieren:
+% Nachdem nun der Stil für den Gliederungsbefehl bekannt ist, können wir
+% dessen Optionen aktivieren:
 %    \begin{macrocode}
 %<trace>    \typeout{TRACE: style=\@nameuse{scr@\scr@dsc@current @style}}%
     \@nameuse{scr@dsc@style@\@nameuse{scr@\scr@dsc@current @style}@options}%
 %    \end{macrocode}
-% Außerdem müssen die Optionen des Verzeichniseintrags-Stils aktiviert werden:
+% Außerdem muss der Verzeichniseintrags-Stils initialisiert werden:
 %    \begin{macrocode}
 %<trace>    \typeout{TRACE: tocstyle=%
 %<trace>      \@nameuse{scr@\scr@dsc@current @tocstyle}}%
@@ -1600,11 +1628,10 @@
         \@namedef{scr@\scr@dsc@current @tocstyle}{default}%
       }{}%
     }{}%
-    \scr@ifundefinedorrelax{scr@\scr@dsc@current @tocstyle}{}{%
-      \@nameuse{scr@dte@\@nameuse{scr@\scr@dsc@current @tocstyle}@opts}%
-    }%
 %    \end{macrocode}
-% Außerdem soll im echten Lauf die Stile nicht erneut ausgewertet werden.
+% Todo: An dieser Stelle müssen in Zukunft die Optionen des
+% Verzeichniseintrags auf Optionen der Gliederungsebene abgebildet werden.
+% Danach sollen im echten Lauf die Stile nicht erneut ausgewertet werden.
 %    \begin{macrocode}
     \DefineFamilyKey[.dsc]{KOMAarg}{style}{\FamilyKeyStateProcessed}%
     \DefineFamilyKey[.dsc]{KOMAarg}{tocstyle}{\FamilyKeyStateProcessed}%
@@ -1730,7 +1757,23 @@
 % Optionen ausführen und anschließend wieder freigeben.
 %    \begin{macrocode}
     \FamilyExecuteOptions[.dsc]{KOMAarg}{#1}%
-    \scr@dsc@relaxdummyoptions
+%    \end{macrocode}
+% Todo: Natürlich müssen hier zukünftig auch die durch die
+% Verzeichniseintragsoptionen definierten Gliederungsoptionen wieder
+% aufgehoben werden.
+%    \begin{macrocode}
+    \RelaxSectionCommandOptions
+    \RelaxFamilyKey[.dsc]{KOMAarg}{style}%
+    \RelaxFamilyKey[.dsc]{KOMAarg}{tocstyle}%
+    \RelaxFamilyKey[.dsc]{KOMAarg}{expandtopt}%
+    \scr@ifundefinedorrelax{scr@local@levelincrease}{}{%
+      \RelaxFamilyKey[.dsc]{KOMAarg}{increaselevel}%
+    }%
+    \RelaxFamilyKey[.dsc]{KOMAarg}{level}%
+    \RelaxFamilyKey[.dsc]{KOMAarg}{counterwithin}%
+    \RelaxFamilyKey[.dsc]{KOMAarg}{toclevel}%
+    \RelaxFamilyKey[.dsc]{KOMAarg}{tocindent}%
+    \RelaxFamilyKey[.dsc]{KOMAarg}{tocnumwidth}%
 %    \end{macrocode}
 % Testen, ob alle benötigten Optionen für die (Um-)Definierung des
 % Gliederungsbefehls gesetzt sind:
@@ -1912,7 +1955,7 @@
   \expandafter\def\csname l@#1\endcsname{\@gobbletwo}%
 }
 %    \end{macrocode}
-% \end{macro}^^A \scr@dsc@def@tocstyle@gobble@command}
+% \end{macro}^^A \scr@dsc@def@tocstyle@gobble@command
 % \end{macro}^^A \DeclareSectionCommand
 %
 % \begin{macro}{\DeclareNewSectionCommand}
@@ -2116,9 +2159,9 @@
 % Wenn die Anweisung bereits definiert ist, dann müssen wir trotzdem die
 % Optionen auswerten, wobei allerdings nur die Option \texttt{level} und
 % \texttt{increaselevel} eine Wirkung haben dürfen. Der Rest wird per
-% dummy-Optionen erledigt.
+% \texttt{@else}-Optionen erledigt.
 %    \begin{macrocode}
-      \scr@dsc@dummyoptions
+      \DefineFamilyKey[.dsc]{KOMAarg}{@else@}{\FamilyKeyStateProcessed}%
       \FamilyCounterMacroKey[.dsc]{KOMAarg}{increaselevel}[1]%
         {\scr@local@levelincrease}%
       \DefineFamilyKey[.dsc]{KOMAarg}{level}{%
@@ -2131,6 +2174,9 @@
         }%
       }%
       \FamilyExecuteOptions[.dsc]{KOMAarg}{#1}%
+      \RelaxFamilyKey[.dsc]{KOMAarg}{level}%
+      \RelaxFamilyKey[.dsc]{KOMAarg}{increaselevel}%
+      \RelaxFamilyKey[.dsc]{KOMAarg}{@else@}%
     }%
   }%
   \let\scr@local@levelincrease\relax
