@@ -1,4 +1,4 @@
-% \CheckSum{364}
+% \CheckSum{432}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-tocstyle.dtx
@@ -170,8 +170,10 @@
 % \begin{description}
 % \item[\marg{Stil}: \meta{String},] Name des Eintragsstils
 % \item[\marg{Option}: \meta{String},] Name der Option
-% \item[\oarg{Wert}:] der Säumniswert der Option
-% \item[\marg{Definition}:] Definition der Option
+% \item[\oarg{Wert}:] der Säumniswert der Option abhängig von der
+%   \meta{Definition}
+% \item[\marg{Definition}: \meta{Code},] Definition der Option
+% \item[\oarg{Init}: \meta{Code},] Initialisierung der Option
 % \end{description}
 % \begin{macro}{\@DefineTOCEntryOptionWithoutDefault}
 %   \changes{v3.20}{2015/11/10}{neu (intern)}
@@ -200,6 +202,9 @@
     \RelaxFamilyKey[.dte]{KOMAarg}{#2}%
   }%
   \expandafter\l@addto@macro\csname scr@dte@#1@doopts\endcsname{\do{#2}}%
+  \@ifnextchar [%]
+    {\scr@dte@add@optional@initcode{#1}}%
+    {}%
 }
 \newcommand*{\@DefineTOCEntryOptionWithDefault}{}
 \def\@DefineTOCEntryOptionWithDefault#1#2[#3]#4{%
@@ -210,9 +215,23 @@
     \RelaxFamilyKey[.dte]{KOMAarg}{#2}%
   }%
   \expandafter\l@addto@macro\csname scr@dte@#1@doopts\endcsname{\do[{#3}]{#2}}%
+  \@ifnextchar [%]
+    {\scr@dte@add@optional@initcode{#1}}%
+    {}%
+}
+%    \end{macrocode}
+% \begin{macro}{\scr@dte@add@optional@initcode}
+%   \changes{v3.20}{2015/11/19}{neu (intern)}
+% Macht aus einem zweiten optionalen Argument ein obligatorisches Argument für
+% den Aufruf von \cs{TOCStyleInitCode}.
+%    \begin{macrocode}
+\newcommand*{\scr@dte@add@optional@initcode}{}
+\long\def\scr@dte@add@optional@initcode#1[#2]{%
+  \TOCStyleInitCode{#1}{#2}%
 }
 %</body>
 %    \end{macrocode}
+% \end{macro}^^A \scr@dte@add@optional@initcode
 % \end{macro}^^A \@DefineTOCEntryOptionWithoutDefault
 % \end{macro}^^A \@DefineTOCEntryOptionWithDefault
 % \end{macro}^^A \DefineTOCEntryOption
@@ -228,6 +247,7 @@
 % \item[\marg{Prefix}: \meta{String},] Präfix des zu definierenden Makros
 % \item[\marg{Postfix}: \meta{String},] Postfix des zu definierenden Makros
 % \item[\marg{Erklärung}: \meta{String},] Erklärung der Option
+% \item[\oarg{Init}: \meta{Code},] Initialisierung der Option
 % \end{description}
 % Zwischen Prefix und Postfix wird bei der späteren, tatsächlichen Definition
 % automatisch \cs{scr@dte@current} eingefügt.
@@ -247,17 +267,17 @@
     {\@DefineTOCEntryLengthOptionWithoutDefault{#1}{#2}}%
 }
 \newcommand*{\@DefineTOCEntryLengthOptionWithoutDefault}[5]{%
+  \TOCStyleNeedsCommandByOption{#1}{#3}{#4}{#2}{#5}%
   \DefineTOCEntryOption{#1}{#2}{%
     \@DefineTOCEntryLengthOptionMacro{#2}{#3}{#4}{##1}%
   }%
-  \TOCStyleNeedsCommandByOption{#1}{#3}{#4}{#2}{#5}%
 }
 \newcommand*{\@DefineTOCEntryLengthOptionWithDefault}{}
 \def\@DefineTOCEntryLengthOptionWithDefault#1#2[#3]#4#5#6{%
+  \TOCStyleNeedsCommandByOption{#1}{#4}{#5}{#2}{#6}%
   \DefineTOCEntryOption{#1}{#2}[{#3}]{%
     \@DefineTOCEntryLengthOptionMacro{#2}{#4}{#5}{##1}%
   }%
-  \TOCStyleNeedsCommandByOption{#1}{#4}{#5}{#2}{#6}%
 }
 \newcommand*{\@DefineTOCEntryLengthOptionMacro}[4]{%
   \FamilySetLength{KOMAarg}{#1}{\@tempskipa}{#4}%
@@ -288,6 +308,7 @@
 % \item[\marg{Prefix}: \meta{String},] Präfix des zu definierenden Makros
 % \item[\marg{Postfix}: \meta{String},] Postfix des zu definierenden Makros
 % \item[\marg{Erklärung}: \meta{String},] Erklärung der Option
+% \item[\oarg{Init}: \meta{Code},] Initialisierung der Option
 % \end{description}
 % Zwischen Prefix und Postfix wird bei der späteren, tatsächlichen Definition
 % automatisch \cs{scr@dte@current} eingefügt.
@@ -307,17 +328,17 @@
     {\@DefineTOCEntryNumberOptionWithoutDefault{#1}{#2}}%
 }
 \newcommand*{\@DefineTOCEntryNumberOptionWithoutDefault}[5]{%
+  \TOCStyleNeedsCommandByOption{#1}{#3}{#4}{#2}{#5}%
   \DefineTOCEntryOption{#1}{#2}{%
     \@DefineTOCEntryNumberOptionMacro{#2}{#3}{#4}{##1}%
   }%
-  \TOCStyleNeedsCommandByOption{#1}{#3}{#4}{#2}{#5}%
 }
 \newcommand*{\@DefineTOCEntryNumberOptionWithDefault}{}
 \def\@DefineTOCEntryNumberOptionWithDefault#1#2[#3]#4#5#6{%
+  \TOCStyleNeedsCommandByOption{#1}{#4}{#5}{#2}{#6}%
   \DefineTOCEntryOption{#1}{#2}[{#3}]{%
     \@DefineTOCEntryNumberOptionMacro{#2}{#4}{#5}{##1}%
   }%
-  \TOCStyleNeedsCommandByOption{#1}{#4}{#5}{#2}{#6}%
 }
 \newcommand*{\@DefineTOCEntryNumberOptionMacro}[4]{%
   \edef\reserved@a{%
@@ -344,6 +365,7 @@
 % \item[\marg{Prefix}: \meta{String},] Präfix des zu definierenden Makros
 % \item[\marg{Postfix}: \meta{String},] Postfix des zu definierenden Makros
 % \item[\marg{Erklärung}: \meta{String},] Erklärung der Option
+% \item[\oarg{Init}: \meta{Code},] Initialisierung der Option
 % \end{description}
 % Zwischen Prefix und Postfix wird bei der späteren, tatsächlichen Definition
 % automatisch \cs{scr@dte@current} eingefügt.
@@ -363,17 +385,17 @@
     {\@DefineTOCEntryBoolOptionWithoutDefault{#1}{#2}}%
 }
 \newcommand*{\@DefineTOCEntryBoolOptionWithoutDefault}[5]{%
+  \TOCStyleNeedsCommandByOption{#1}{if#3}{#4}{#2}{#5}%
   \DefineTOCEntryOption{#1}{#2}{%
     \@DefineTOCEntryBoolOptionMacro{#2}{#3}{#4}{##1}%
   }%
-  \TOCStyleNeedsCommandByOption{#1}{if#3}{#4}{#2}{#5}%
 }
 \newcommand*{\@DefineTOCEntryBoolOptionWithDefault}{}
 \def\@DefineTOCEntryBoolOptionWithDefault#1#2[#3]#4#5#6{%
+  \TOCStyleNeedsCommandByOption{#1}{if#4}{#5}{#2}{#6}%
   \DefineTOCEntryOption{#1}{#2}[{#3}]{%
     \@DefineTOCEntryBoolOptionMacro{#2}{#4}{#5}{##1}%
   }%
-  \TOCStyleNeedsCommandByOption{#1}{if#4}{#5}{#2}{#6}%
 }
 \newcommand*{\@DefineTOCEntryBoolOptionMacro}[4]{%
   \@ifundefined{if#2\scr@dte@current#3}{%
@@ -399,6 +421,7 @@
 % \item[\marg{Prefix}: \meta{String},] Präfix des zu definierenden Makros
 % \item[\marg{Postfix}: \meta{String},] Postfix des zu definierenden Makros
 % \item[\marg{Erklärung}: \meta{String},] Erklärung der Option
+% \item[\oarg{Init}: \meta{Code},] Initialisierung der Option
 % \end{description}
 % Zwischen Prefix und Postfix wird bei der späteren, tatsächlichen Definition
 % automatisch \cs{scr@dte@current} eingefügt.
@@ -418,17 +441,17 @@
     {\@DefineTOCEntryCommandOptionWithoutDefault{#1}{#2}}%
 }
 \newcommand*{\@DefineTOCEntryCommandOptionWithoutDefault}[5]{%
+  \TOCStyleNeedsCommandByOption{#1}{#3}{#4}{#2}{#5}%
   \DefineTOCEntryOption{#1}{#2}{%
     \@DefineTOCEntryCommandOptionMacro{#2}{#3}{#4}{##1}%
   }%
-  \TOCStyleNeedsCommandByOption{#1}{#3}{#4}{#2}{#5}%
 }
 \newcommand*{\@DefineTOCEntryCommandOptionWithDefault}{}
 \def\@DefineTOCEntryCommandOptionWithDefault#1#2[#3]#4#5#6{%
+  \TOCStyleNeedsCommandByOption{#1}{#4}{#5}{#2}{#6}%
   \DefineTOCEntryOption{#1}{#2}[{#3}]{%
     \@DefineTOCEntryCommandOptionMacro{#2}{#4}{#5}{##1}%
   }%
-  \TOCStyleNeedsCommandByOption{#1}{#4}{#5}{#2}{#6}%
 }
 \newcommand*{\@DefineTOCEntryCommandOptionMacro}[4]{%
   \@namedef{#2\scr@dte@current#3}{#4}%
@@ -465,6 +488,26 @@
 %</body>
 %    \end{macrocode}
 % \end{macro}^^A \TOCStyleNeedsCommandByOption
+%
+% \begin{macro}{\TOCStyleInitCode}
+%   \changes{v3.20}{2015/11/19}{neu}
+% Führt Befehle aus, bevor ein Verzeichnisbefehl in diesem Stil definiert wird
+% und noch bevor die \emph{needs}-Liste abgearbeitet wird. Argumente sind:
+% \begin{description}
+% \item[\marg{Stil}:] Der Stil \meta{string} für den die Initialisierung
+%   erfolgen soll.
+% \item[\marg{Code}:] Wird zwecks Initialisierung ausgeführt. Innerhalb dieses
+%   Codes ist \cs{scr@dte@current} der Name der Verzeichnisebene.
+% \end{description}
+%    \begin{macrocode}
+%<*body>
+\newcommand{\TOCStyleInitCode}[2]{%
+  \expandafter\providecommand\expandafter*\csname scr@dte@#1@init\endcsname{}%
+  \expandafter\l@addto@macro\csname scr@dte@#1@init\endcsname{#2}%
+}
+%</body>
+%    \end{macrocode}
+% \end{macro}^^A \TOCStyleInitCode
 %
 % \begin{macro}{\DeclareTOCStyleEntry}
 %   \changes{v3.20}{2015/11/13}{neu}
@@ -512,6 +555,9 @@
         \csname #3numdepth\endcsname
       }%
     }{}%
+    \def\scr@dte@current{#3}%
+    \@nameuse{scr@dte@#2@init}%
+    \let\scr@dte@current\relax
     \begingroup
       \aftergroup\@tempswatrue
       \def\do##1##2##3##4{%
@@ -548,12 +594,16 @@
 % \begin{description}
 % \item[\marg{Stil}:] Der Stil \meta{string}, der definiert werden soll.
 % \item[\oarg{Optionendeklaration}:] Eine Komma separierte Liste von
-% Optionendeklarationen für diesen Stil. Zur Form dieser Deklarationen siehe
-% unten.
+%   Optionendeklarationen für diesen Stil. Zur Form dieser Deklarationen siehe
+%   unten.
 % \item[\marg{Verzeichnisbefehlsdefinition}:] Dies ist der Körper der
 % Definition des \cs{l@\dots}-Befehls, der verwendet werden soll. Dabei ist
 % \texttt{\#1} der Name der Verzeichnissebene und \texttt{\#\#1} und
 % \texttt{\#\#2} sind die beiden Argumente des \cs{l@dots}-Befehls.
+% \item[\oarg{Initialisierungscode}:] Dieser Code wird bei der Definition
+%   eines Verzeichnisbefehls noch vor der Abarbeitung der \emph{needs}-Liste
+%   ausgeführt. Wichtig ist, dass dieser Code erst nach dem
+%   Initialisierungscode aus den Optionendeklarationen ausgeführt wird.
 % \end{description}
 % Unabhängig davon, ob eine \meta{Optionendeklaration} angegeben ist oder
 % nicht, wird immer eine Option \texttt{level} definiert, über die die
@@ -578,10 +628,13 @@
       \ifx\reserved@a\@empty\else
         \def\reserved@b{\scr@dte@define@option{#1}}%
         \expandafter\reserved@b\reserved@a
-        \@empty\@empty\@empty\@empty\@empty\@empty\@empty\@nil
+        \@empty\@empty\@empty\@empty\@empty\@empty\@empty\@empty\@empty\@nil
       \fi
     }%
   }%
+  \@ifnextchar [%]
+    {\scr@dte@add@optional@initcode{#1}}%
+    {}%
 }
 %    \end{macrocode}
 % \begin{macro}{\scr@dte@define@option}
@@ -615,6 +668,8 @@
 %   Argument 6 ein Befehlspostfix und Argument 7 ist die Optionenbeschreibung
 %   für Fehlermeldungen. Alle weiteren Argumente werden ignoriert.
 % \end{description}
+% Alle haben als weiteres optionales Argument die Möglickeit, einen
+% Initialisierungscode mit anzugeben.
 % Wichtig ist, dass alle optionalen Argumente lediglich am \texttt{[} davor
 % erkannt werden. Es gibt kein \texttt{]} am Ende. Korrekte Deklarationen
 % wären also beispielsweise:
@@ -629,7 +684,7 @@
     {\scr@dte@define@option@withdefault{#1}{#2}{#3}}%
     {\scr@dte@define@option@withoutdefault{#1}{#2}{#3}}%
 }
-\def\scr@dte@define@option@withoutdefault#1#2#3#4#5#6#7\@nil{%
+\def\scr@dte@define@option@withoutdefault#1#2#3#4#5#6#7#8#9{%
   \IfArgIsEmpty{#3}{%
     \ClassError{\KOMAClassName}{option needs name}{%
       Definition of toc entry style `#1' has an empty option
@@ -653,16 +708,32 @@
       }%
     }{%
       \if #2l%
-        \DefineTOCEntryLengthOption{#1}{#3}{#4}{#5}{#6}%
+        \if #7[%]
+          \DefineTOCEntryLengthOption{#1}{#3}{#4}{#5}{#6}[{#8}]%
+        \else
+          \DefineTOCEntryLengthOption{#1}{#3}{#4}{#5}{#6}%
+        \fi
       \else
         \if #2n%
-          \DefineTOCEntryNumberOption{#1}{#3}{#4}{#5}{#6}%
+          \if #7[%]
+            \DefineTOCEntryNumberOption{#1}{#3}{#4}{#5}{#6}[{#8}]%
+          \else
+            \DefineTOCEntryNumberOption{#1}{#3}{#4}{#5}{#6}%
+          \fi
         \else
           \if #2b%
-            \DefineTOCEntryBoolOption{#1}{#3}[true]{#4}{#5}{#6}%
+            \if #7[%]
+              \DefineTOCEntryBoolOption{#1}{#3}[true]{#4}{#5}{#6}[{#8}]%
+            \else
+              \DefineTOCEntryBoolOption{#1}{#3}[true]{#4}{#5}{#6}%
+            \fi
           \else
             \if #2c%
-              \DefineTOCEntryCommandOption{#1}{#3}{#4}{#5}{#6}%
+              \if #7[%]
+                \DefineTOCEntryCommandOption{#1}{#3}{#4}{#5}{#6}[{#8}]%
+              \else
+                \DefineTOCEntryCommandOption{#1}{#3}{#4}{#5}{#6}%
+              \fi
             \else
               \ClassError{\KOMAClassName}{%
                 unknown toc entry style option type}{%
@@ -674,8 +745,9 @@
       \fi\fi\fi\fi
     }%
   }%
+  \scr@dte@gobble@till@nil
 }
-\def\scr@dte@define@option@withdefault#1#2#3[#4#5#6#7#8\@nil{%
+\def\scr@dte@define@option@withdefault#1#2#3[#4#5#6#7#8#9{%
   \typeout{TRACE: \string\scr@dte@define@option@withdefault}%
   \IfArgIsEmpty{#3}{%
     \ClassError{\KOMAClassName}{option needs name}{%
@@ -700,16 +772,32 @@
       }%
     }{%
       \if #2l%
-        \DefineTOCEntryLengthOption{#1}{#3}[{#4}]{#5}{#6}{#7}%
+        \if #8[%]
+          \DefineTOCEntryLengthOption{#1}{#3}[{#4}]{#5}{#6}{#7}[{#9}]%
+        \else
+          \DefineTOCEntryLengthOption{#1}{#3}[{#4}]{#5}{#6}{#7}%
+        \fi
       \else
         \if #2n%
-          \DefineTOCEntryNumberOption{#1}{#3}[{#4}]{#5}{#6}{#7}%
+          \if #8[%]
+            \DefineTOCEntryNumberOption{#1}{#3}[{#4}]{#5}{#6}{#7}[{#9}]%
+          \else
+            \DefineTOCEntryNumberOption{#1}{#3}[{#4}]{#5}{#6}{#7}%
+          \fi
         \else
           \if #2b%
-            \DefineTOCEntryBoolOption{#1}{#3}[{#4}]{#5}{#6}{#7}%
+            \if #8[%]
+              \DefineTOCEntryBoolOption{#1}{#3}[{#4}]{#5}{#6}{#7}[{#9}]%
+            \else
+              \DefineTOCEntryBoolOption{#1}{#3}[{#4}]{#5}{#6}{#7}%
+            \fi
           \else
             \if #2c%
-              \DefineTOCEntryCommandOption{#1}{#3}[{#4}]{#5}{#6}{#7}%
+              \if #8[%]
+                 \DefineTOCEntryCommandOption{#1}{#3}[{#4}]{#5}{#6}{#7}[{#9}]%
+              \else
+                \DefineTOCEntryCommandOption{#1}{#3}[{#4}]{#5}{#6}{#7}%
+              \fi
             \else
               \ClassError{\KOMAClassName}{%
                 unknown toc entry style option type}{%
@@ -721,7 +809,10 @@
       \fi\fi\fi\fi
     }%
   }%
+  \scr@dte@gobble@till@nil
 }
+\newcommand*{\scr@dte@gobble@till@nil}{}
+\def\scr@dte@gobble@till@nil#1\@nil{}
 %</body>
 %    \end{macrocode}
 % \end{macro}^^A \scr@dte@define@option@withoutdefault
