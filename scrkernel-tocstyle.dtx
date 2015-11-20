@@ -1,4 +1,4 @@
-% \CheckSum{570}
+% \CheckSum{603}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-tocstyle.dtx
@@ -867,7 +867,16 @@
 % \texttt{undottedtocline} dem der \texttt{chapter}-Ebene der
 % Standardklassen. Im Unterschied zu diesen wird jedoch ein Eintragseinzug
 % unterstützt.
+% \begin{macro}{\scr@dte@def@l@largetocline}
+%   \changes{v3.20}{2015/11/20}{neuer Verzeichniseintragsstil
+%     \texttt{largetocline}}^^A
+% Im Unterschied dazu entspricht der Verzeichniseintragsstil
+% \texttt{largetocline} dem der \texttt{part}-Ebene der Standardklassen. Im
+% Unterschied zu diesen wird jedoch ein Eintragseinzug unterstützt. Eine
+% Nummernbreite gibt es hingegen nicht. Stattdessen werden die Einträge nicht
+% hängend gesetzt.
 %    \begin{macrocode}
+%<*dottedtocline|undottedtocline|largetocline>
 %<*dottedtocline>
 %%% - generation of style dottedtocline (run: style,dottedtocline)
 \DeclareTOCEntryStyle{dottedtocline}[%
@@ -877,39 +886,71 @@
 \DeclareTOCEntryStyle{undottedtocline}[%
 %</undottedtocline>
 %<*dottedtocline|undottedtocline>
-  l{indent}{scr@}{@tocindent}{entry indent},%
   l{numwidth}{scr@}{@tocnumwidth}{entry number width},%
+%</dottedtocline|undottedtocline>
+%<*largetocline>
+%%% - generation of style largetocline (run: style, largetocline)
+\DeclareTOCEntryStyle{largetocline}[%
+%</largetocline>
+  l{indent}{scr@}{@tocindent}{entry indent},%
 ]{%
 %<*dottedtocline>
   \@dottedtocline{\@nameuse{#1tocdepth}}{\@nameuse{scr@#1@tocindent}}%
                  {\@nameuse{scr@#1@tocnumwidth}}{##1}{##2}%
 %</dottedtocline>
-%<*undottedtocline>
+%<*undottedtocline|largetocline>
   \ifnum \c@tocdepth >\numexpr \@nameuse{#1tocdepth}-\@ne\relax
 %    \end{macrocode}
 % An dieser Stelle gibt es einen kleinen Unterschied zwischen der
 % \texttt{chapter}-Ebene und der \texttt{section}-Ebene von
 % \textsf{article}. Diesen machen wir hier an der nummerischen Ebene fest.
 %    \begin{macrocode}
-    \ifnum \@nameuse{#1tocdepth}>\z@
-      \addpenalty\@secpenalty
-      \addvspace{1.0em \@plus\p@}%
+    \ifnum \@nameuse{#1tocdepth}<\@ne
+      \scr@ifundefinedorrelax{chapter}{%
+        \addpenalty\@secpenalty
+%<undottedtocline>        \addvspace{1.0em \@plus\p@}%
+%<largetocline>        \addvspace{2.25em \@plus\p@}%
+      }{%
+        \addpenalty{-\@highpenalty}%
+%<undottedtocline>        \vskip 1.0em \@plus\p@
+%<largetocline>        \vskip 2.25em \@plus\p@
+      }%
     \else
-      \addpenalty{-\@highpenalty}%
-      \vskip 1.0em \@plus\p@
+      \addpenalty\@secpenalty
+%<undottedtocline>      \addvspace{1.0em \@plus\p@}%
+%<largetocline>      \addvspace{2.25em \@plus\p@}%
     \fi
-    \setlength\@tempdima{\@nameuse{scr@#1@tocnumwidth}}%
+%<undottedtocline>    \setlength\@tempdima{\@nameuse{scr@#1@tocnumwidth}}%
+%<largetocline>    \setlength\@tempdima{3em}%
     \begingroup
       \parindent \z@ \rightskip \@pnumwidth
       \parfillskip -\@pnumwidth
-      \leavevmode \bfseries
-      \advance\leftskip\dimexpr\@tempdima+\@nameuse{scr@#1@tocindent}\relax
+%<largetocline>      {%
+      \leavevmode 
+%<largetocline>      \large
+      \bfseries
+%<undottedtocline>      \advance\leftskip\@tempdima
+      \advance\leftskip\@nameuse{scr@#1@tocindent}%
+%<*undottedtocline>
       \hskip -\dimexpr \leftskip-\@nameuse{scr@#1@tocindent}\relax
-      ##1\nobreak\hfil \nobreak\hb@xt@\@pnumwidth{\hss ##2}\par
-      \penalty\@highpenalty
+%</undottedtocline>
+      ##1%
+%<undottedtocline>      \nobreak
+      \hfil \nobreak\hb@xt@\@pnumwidth{\hss ##2}%
+%<largetocline>      }
+      \par
+%<undottedtocline>      \penalty\@highpenalty
+%<*largetocline>
+      \nobreak
+      \ifnum 0=
+        \scr@ifundefinedorrelax{chapter}{\if@compatibility 1\else 0\fi}{1}\relax
+        \global\@nobreaktrue
+        \everypar{\global\@nobreakfalse\everypar{}}%
+      \fi
+%</largetocline>
     \endgroup
   \fi
-%</undottedtocline>
+%</undottedtocline|largetocline>
 }[{%
 %    \end{macrocode}
 % Die Werte für \texttt{level}, \texttt{indent} und \texttt{numwidth} sind
@@ -987,6 +1028,7 @@
       }%
     }%
   }{}%
+%<*dottedtocline|undottedtocline>
   \@ifundefined{scr@#1@numwidth}{%
     \ifstr{#1}{figure}{\@namedef{scr@#1@numwidth}{2.3em}}{%
       \ifstr{#1}{table}{\@namedef{scr@#1@numwidth}{2.3em}}{%
@@ -1020,9 +1062,11 @@
       }%
     }%
   }{}%
-}]
 %</dottedtocline|undottedtocline>
+}]
+%</dottedtocline|undottedtocline|largetocline>
 %    \end{macrocode}
+% \end{macro}^^A \scr@dte@def@l@largetocline
 % \end{macro}^^A \scr@dte@def@l@undottedtocline
 % \end{macro}^^A \scr@dte@def@l@dottedtocline
 %
