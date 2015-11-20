@@ -1,4 +1,4 @@
-% \CheckSum{513}
+% \CheckSum{570}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-tocstyle.dtx
@@ -618,7 +618,7 @@
     {\@DeclareTOCEntryStyle{#1}[]}%
 }
 \newcommand{\@DeclareTOCEntryStyle}{}
-\def\@DeclareTOCEntryStyle#1[#2]#3{%
+\long\def\@DeclareTOCEntryStyle#1[#2]#3{%
   \@namedef{scr@dte@def@l@#1}##1{%
     \@namedef{l@##1}####1####2{%
       #3%
@@ -860,15 +860,56 @@
 % jedoch bereits Angaben bezüglich der Nummernbreite und des
 % Eintragseinzugs. Der ohnehin immer definierte Level wird ebenfalls
 % ausgewertet.
+% \begin{macro}{\scr@dte@def@l@undottedtocline}
+%   \changes{v3.20}{2015/11/20}{neuer Verzeichniseintragsstil
+%     \texttt{undottedtocline}}^^A
+% Im Unterschied dazu entspricht der Verzeichniseintragsstil
+% \texttt{undottedtocline} dem der \texttt{chapter}-Ebene der
+% Standardklassen. Im Unterschied zu diesen wird jedoch ein Eintragseinzug
+% unterstützt.
 %    \begin{macrocode}
 %<*dottedtocline>
 %%% - generation of style dottedtocline (run: style,dottedtocline)
 \DeclareTOCEntryStyle{dottedtocline}[%
+%</dottedtocline>
+%<*undottedtocline>
+%%% - generation of style dottedtocline (run: style,undottedtocline)
+\DeclareTOCEntryStyle{undottedtocline}[%
+%</undottedtocline>
+%<*dottedtocline|undottedtocline>
   l{indent}{scr@}{@tocindent}{entry indent},%
   l{numwidth}{scr@}{@tocnumwidth}{entry number width},%
 ]{%
+%<*dottedtocline>
   \@dottedtocline{\@nameuse{#1tocdepth}}{\@nameuse{scr@#1@tocindent}}%
                  {\@nameuse{scr@#1@tocnumwidth}}{##1}{##2}%
+%</dottedtocline>
+%<*undottedtocline>
+  \ifnum \c@tocdepth >\numexpr \@nameuse{#1tocdepth}-\@ne\relax
+%    \end{macrocode}
+% An dieser Stelle gibt es einen kleinen Unterschied zwischen der
+% \texttt{chapter}-Ebene und der \texttt{section}-Ebene von
+% \textsf{article}. Diesen machen wir hier an der nummerischen Ebene fest.
+%    \begin{macrocode}
+    \ifnum \@nameuse{#1tocdepth}>\z@
+      \addpenalty\@secpenalty
+      \addvspace{1.0em \@plus\p@}%
+    \else
+      \addpenalty{-\@highpenalty}%
+      \vskip 1.0em \@plus\p@
+    \fi
+    \setlength\@tempdima{\@nameuse{scr@#1@tocnumwidth}}%
+    \begingroup
+      \parindent \z@ \rightskip \@pnumwidth
+      \parfillskip -\@pnumwidth
+      \leavevmode \bfseries
+      \advance\leftskip\dimexpr\@tempdima+\@nameuse{scr@#1@tocindent}\relax
+      \hskip -\dimexpr \leftskip-\@nameuse{scr@#1@tocindent}\relax
+      ##1\nobreak\hfil \nobreak\hb@xt@\@pnumwidth{\hss ##2}\par
+      \penalty\@highpenalty
+    \endgroup
+  \fi
+%</undottedtocline>
 }[{%
 %    \end{macrocode}
 % Die Werte für \texttt{level}, \texttt{indent} und \texttt{numwidth} sind
@@ -980,8 +1021,9 @@
     }%
   }{}%
 }]
-%</dottedtocline>
+%</dottedtocline|undottedtocline>
 %    \end{macrocode}
+% \end{macro}^^A \scr@dte@def@l@undottedtocline
 % \end{macro}^^A \scr@dte@def@l@dottedtocline
 %
 %
