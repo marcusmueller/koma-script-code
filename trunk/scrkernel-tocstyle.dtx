@@ -1,4 +1,4 @@
-% \CheckSum{432}
+% \CheckSum{513}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-tocstyle.dtx
@@ -126,12 +126,13 @@
 % \changes{v3.20}{2015/11/13}{neu und nur bei Vorhandensein verwendet}
 %
 %
-% \subsection{Verzeichniseintragsstile}
+% \subsection{Grundlagen für Verzeichniseintragsstile}
 %
 % \emph{Hinweis: Dieser Code wird möglicherweise später in \textsf{tocbasic}
 % wandern. Das ist aber erst möglich, wenn die Verwendung der hier
 % deklarierten Optionen innerhalb \cs{DeclareSectionCommand} implementiert
-% ist.}
+% ist und eine Verwendung zusammen mit beispielsweise den Standardklassen
+% möglich ist.}
 %
 % Ab \KOMAScript~3.20 halten Stile Einzug in die Verzeichnisse. Der erste
 % Schritt dabei sind die Stile der Verzeichniseinträge. Jeder Stil besteht aus
@@ -497,13 +498,14 @@
 % \item[\marg{Stil}:] Der Stil \meta{string} für den die Initialisierung
 %   erfolgen soll.
 % \item[\marg{Code}:] Wird zwecks Initialisierung ausgeführt. Innerhalb dieses
-%   Codes ist \cs{scr@dte@current} der Name der Verzeichnisebene.
+%   Codes ist \texttt{\#1} der Name der Verzeichnisebene.
 % \end{description}
 %    \begin{macrocode}
 %<*body>
 \newcommand{\TOCStyleInitCode}[2]{%
-  \expandafter\providecommand\expandafter*\csname scr@dte@#1@init\endcsname{}%
-  \expandafter\l@addto@macro\csname scr@dte@#1@init\endcsname{#2}%
+  \expandafter\providecommand\expandafter*%
+  \csname scr@dte@#1@init\endcsname[1]{}%
+  \expandafter\l@addto@macro@a\csname scr@dte@#1@init\endcsname{#2}%
 }
 %</body>
 %    \end{macrocode}
@@ -555,9 +557,9 @@
         \csname #3numdepth\endcsname
       }%
     }{}%
-    \def\scr@dte@current{#3}%
-    \@nameuse{scr@dte@#2@init}%
-    \let\scr@dte@current\relax
+    \scr@ifundefinedorrelax{scr@dte@#2@init}{}{%
+      \@nameuse{scr@dte@#2@init}{#3}%
+    }
     \begingroup
       \aftergroup\@tempswatrue
       \def\do##1##2##3##4{%
@@ -820,6 +822,168 @@
 % \end{macro}^^A \scr@dte@define@option
 % \end{macro}^^A \@DeclareTOCEntryStyle
 % \end{macro}^^A \DeclareTOCEntryStyle
+%
+% \subsection{Vorgefertigte Verzeichniseintragsstile}
+%
+% Hier wird quasi an Beispielen gezeigt, wie man Verzeichniseintragsstile
+% definieren kann. Einige dieser Stile sind sehr grundlegend. Andere sind
+% stellen Erweiterungen der grundlegenden Stile dar. Die Stile können über
+% mehrere \texttt{docstrip}-Durchgänge einzeln in den Quelltext gelangen.
+%
+% \iffalse
+%<*style>
+% \fi
+%
+% \begin{macro}{scr@dte@def@l@gobble}
+%   \changes{v3.20}{2015/11/20}{neuer Verzeichniseintragsstil
+%     \texttt{gobble}}^^A
+% Der aller einfachste Verzeichniseintragsstil ist \texttt{gobble}. Er nimmt
+% die beiden Argumente für den Verzeichniseintrag und die Seitenzahl und
+% vergisst sie unabhängig von der Ebene des Eintrags einfach. Daher benötigt
+% dieser Stil auch keinerlei Optionen oder Initialisierung.
+%    \begin{macrocode}
+%<*gobble>
+%%% - generation of style gobble (run: style,gobble)
+\DeclareTOCEntryStyle{gobble}{}%
+%</gobble>
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\scr@dte@def@l@dottedtocline}
+%   \changes{v3.20}{2015/11/20}{neuer Verzeichniseintragsstil
+%     \texttt{dottedtocline}}^^A
+% Der einfachste echte Verzeichniseintragsstil ist
+% \texttt{dottedtocline}. Dieser verwendet einfach nur die
+% \LaTeX-Kern-Anweisung \cs{dottedtocline}. Für \KOMAScript{} selbst sollte
+% man dieses Stil nicht verwenden. Man kann ihn aber beispielsweise mit den
+% Standardklassen verwenden, wenn man kompatibel bleiben will. Dieser benötigt
+% jedoch bereits Angaben bezüglich der Nummernbreite und des
+% Eintragseinzugs. Der ohnehin immer definierte Level wird ebenfalls
+% ausgewertet.
+%    \begin{macrocode}
+%<*dottedtocline>
+%%% - generation of style dottedtocline (run: style,dottedtocline)
+\DeclareTOCEntryStyle{dottedtocline}[%
+  l{indent}{scr@}{@tocindent}{entry indent},%
+  l{numwidth}{scr@}{@tocnumwidth}{entry number width},%
+]{%
+  \@dottedtocline{\@nameuse{#1tocdepth}}{\@nameuse{scr@#1@tocindent}}%
+                 {\@nameuse{scr@#1@tocnumwidth}}{##1}{##2}%
+}[{%
+%    \end{macrocode}
+% Die Werte für \texttt{level}, \texttt{indent} und \texttt{numwidth} sind
+% entweder bereits bekannt oder werden mit den Werten initialisiert, die auch
+% bei den Standardklassen verwendet werden:
+%    \begin{macrocode}
+  \@ifundefined{#1tocdepth}{%
+    \ifstr{#1}{part}{\@namedef{#1tocdepth}{-1}}{%
+      \ifstr{#1}{chapter}{\@namedef{#1tocdepth}{0}}{%
+        \ifstr{#1}{section}{\@namedef{#1tocdepth}{1}}{%
+          \ifstr{#1}{subsection}{\@namedef{#1tocdepth}{2}}{%
+            \ifstr{#1}{subsubsection}{\@namedef{#1tocdepth}{3}}{%
+              \ifstr{#1}{paragraph}{\@namedef{#1tocdepth}{4}}{%
+                \ifstr{#1}{subparagraph}{\@namedef{#1tocdepth}{5}}{%
+                  \ifstr{#1}{figure}{\@namedef{#1tocdepth}{1}}{%
+                    \ifstr{#1}{table}{\@namedef{#1tocdepth}{1}}{%
+%    \end{macrocode}
+% Für unbekannte Anweisungen wird vorsichtshalber nichts definiert, sondern
+% der Anwender soll das per Option \texttt{level} selbst machen.
+%    \begin{macrocode}
+                    }%
+                  }%
+                }%
+              }%
+            }%
+          }%
+        }%
+      }%
+    }%
+  }{}%
+%    \end{macrocode}
+% Die Werte für den Einzug und die Nummernbreite unterscheiden sich je
+% nachdem, ob es Kapitel gibt oder nicht. Also wird hier explizit auf das
+% Vorhandensein der Anweisung \cs{chapter} getestet, allerdings nicht für
+% \texttt{figure} oder \texttt{table}, da diese davon unabhängig sind. Die
+% Ebene \texttt{part} wird bei den Standardklassen nicht mit
+% \cs{dottedtocline} gesetzt. Auch eine Nummernbreite gibt es
+% nicht. Deshalb wird für den Einzug Null festgelegt, die Nummernbreite muss
+% der Anwender aber selbst über Option \texttt{numwidth} festlegen. Bei
+% Kapiteln ist es etwas anders, da sind beide Werte indirekt festgelegt und
+% können daher auch übernommen werden.
+%    \begin{macrocode}
+  \@ifundefined{scr@#1@tocindent}{%
+    \ifstr{#1}{figure}{\@namedef{scr@#1@tocindent}{1.5em}}{%
+      \ifstr{#1}{table}{\@namedef{scr@#1@tocindent}{1.5em}}{%
+        \ifstr{#1}{part}{\@namedef{scr@#1@tocindent}{0em}}{%
+          \ifstr{#1}{chapter}{\@namedef{scr@#1@tocindent}{0em}}{%
+          }%
+        }%
+      }%
+    }%
+  }{}%
+  \@ifundefined{scr@#1@tocindent}{%
+    \scr@ifundefinedorrelax{chapter}{%
+      \ifstr{#1}{section}{\@namedef{scr@#1@tocindent}{0pt}}{%
+        \ifstr{#1}{subsection}{\@namedef{scr@#1@tocindent}{1.5em}}{%
+          \ifstr{#1}{subsubsection}{\@namedef{scr@#1@tocindent}{3.8em}}{%
+            \ifstr{#1}{paragraph}{\@namedef{scr@#1@tocindent}{7em}}{%
+              \ifstr{#1}{subparagraph}{\@namedef{scr@#1@tocindent}{10em}}{%
+              }%
+            }%
+          }%
+        }%
+      }%
+    }{%
+      \ifstr{#1}{section}{\@namedef{scr@#1@tocindent}{1.5em}}{%
+        \ifstr{#1}{subsection}{\@namedef{scr@#1@tocindent}{3.8em}}{%
+          \ifstr{#1}{subsubsection}{\@namedef{scr@#1@tocindent}{7.0em}}{%
+            \ifstr{#1}{paragraph}{\@namedef{scr@#1@tocindent}{10em}}{%
+              \ifstr{#1}{subparagraph}{\@namedef{scr@#1@tocindent}{12em}}{%
+              }%
+            }%
+          }%
+        }%
+      }%
+    }%
+  }{}%
+  \@ifundefined{scr@#1@numwidth}{%
+    \ifstr{#1}{figure}{\@namedef{scr@#1@numwidth}{2.3em}}{%
+      \ifstr{#1}{table}{\@namedef{scr@#1@numwidth}{2.3em}}{%
+        \ifstr{#1}{chapter}{\@namedef{scr@#1@numwidth}{1.5em}}{%
+        }%
+      }%
+    }%
+  }{}%
+  \@ifundefined{scr@#1@numwidth}{%
+    \scr@ifundefinedorrelax{chapter}{%
+      \ifstr{#1}{section}{\@namedef{scr@#1@numwidth}{1.5em}}{%
+        \ifstr{#1}{subsection}{\@namedef{scr@#1@numwidth}{2.3em}}{%
+          \ifstr{#1}{subsubsection}{\@namedef{scr@#1@numwidth}{3.2em}}{%
+            \ifstr{#1}{paragraph}{\@namedef{scr@#1@numwidth}{4.1em}}{%
+              \ifstr{#1}{subparagraph}{\@namedef{scr@#1@numwidth}{5m}}{%
+              }%
+            }%
+          }%
+        }%
+      }%
+    }{%
+      \ifstr{#1}{section}{\@namedef{scr@#1@numwidth}{2.3em}}{%
+        \ifstr{#1}{subsection}{\@namedef{scr@#1@numwidth}{3.2em}}{%
+          \ifstr{#1}{subsubsection}{\@namedef{scr@#1@numwidth}{3.1em}}{%
+            \ifstr{#1}{paragraph}{\@namedef{scr@#1@numwidth}{5em}}{%
+              \ifstr{#1}{subparagraph}{\@namedef{scr@#1@numwidth}{6m}}{%
+              }%
+            }%
+          }%
+        }%
+      }%
+    }%
+  }{}%
+}]
+%</dottedtocline>
+%    \end{macrocode}
+% \end{macro}
+%
 %
 % \Finale
 %
