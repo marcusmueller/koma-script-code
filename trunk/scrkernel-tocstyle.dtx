@@ -1,4 +1,4 @@
-% \CheckSum{603}
+% \CheckSum{889}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-tocstyle.dtx
@@ -713,38 +713,44 @@
         \if #7[%]
           \DefineTOCEntryLengthOption{#1}{#3}{#4}{#5}{#6}[{#8}]%
         \else
-          \DefineTOCEntryLengthOption{#1}{#3}{#4}{#5}{#6}%
+          \DefineTOCEntryLengthOption{#1}{#3}{#4}{#5}{#6}\relax
         \fi
       \else
         \if #2n%
           \if #7[%]
             \DefineTOCEntryNumberOption{#1}{#3}{#4}{#5}{#6}[{#8}]%
           \else
-            \DefineTOCEntryNumberOption{#1}{#3}{#4}{#5}{#6}%
+            \DefineTOCEntryNumberOption{#1}{#3}{#4}{#5}{#6}\relax
           \fi
         \else
           \if #2b%
             \if #7[%]
               \DefineTOCEntryBoolOption{#1}{#3}[true]{#4}{#5}{#6}[{#8}]%
             \else
-              \DefineTOCEntryBoolOption{#1}{#3}[true]{#4}{#5}{#6}%
+              \DefineTOCEntryBoolOption{#1}{#3}[true]{#4}{#5}{#6}\relax
             \fi
           \else
             \if #2c%
               \if #7[%]
                 \DefineTOCEntryCommandOption{#1}{#3}{#4}{#5}{#6}[{#8}]%
               \else
-                \DefineTOCEntryCommandOption{#1}{#3}{#4}{#5}{#6}%
+                \DefineTOCEntryCommandOption{#1}{#3}{#4}{#5}{#6}\relax
               \fi
             \else
               \ClassError{\KOMAClassName}{%
                 unknown toc entry style option type}{%
                 Following types are valid:\MessageBreak
+                \space b: boolean parameter to be stored as
+                \expandafter\string\csname if\endcsname...\MessageBreak
+                \space c: code parameter to be stored in a macro\MessageBreak
                 \space l: length parameter to be stored in a macro\MessageBreak
                 \space n: number parameter to be stored in a macro\MessageBreak
                 But not `\detokenize{#2}'.%
               }%
-      \fi\fi\fi\fi
+            \fi
+          \fi
+        \fi
+      \fi
     }%
   }%
   \scr@dte@gobble@till@nil
@@ -777,28 +783,28 @@
         \if #8[%]
           \DefineTOCEntryLengthOption{#1}{#3}[{#4}]{#5}{#6}{#7}[{#9}]%
         \else
-          \DefineTOCEntryLengthOption{#1}{#3}[{#4}]{#5}{#6}{#7}%
+          \DefineTOCEntryLengthOption{#1}{#3}[{#4}]{#5}{#6}{#7}\relax
         \fi
       \else
         \if #2n%
           \if #8[%]
             \DefineTOCEntryNumberOption{#1}{#3}[{#4}]{#5}{#6}{#7}[{#9}]%
           \else
-            \DefineTOCEntryNumberOption{#1}{#3}[{#4}]{#5}{#6}{#7}%
+            \DefineTOCEntryNumberOption{#1}{#3}[{#4}]{#5}{#6}{#7}\relax
           \fi
         \else
           \if #2b%
             \if #8[%]
               \DefineTOCEntryBoolOption{#1}{#3}[{#4}]{#5}{#6}{#7}[{#9}]%
             \else
-              \DefineTOCEntryBoolOption{#1}{#3}[{#4}]{#5}{#6}{#7}%
+              \DefineTOCEntryBoolOption{#1}{#3}[{#4}]{#5}{#6}{#7}\relax
             \fi
           \else
             \if #2c%
               \if #8[%]
                  \DefineTOCEntryCommandOption{#1}{#3}[{#4}]{#5}{#6}{#7}[{#9}]%
               \else
-                \DefineTOCEntryCommandOption{#1}{#3}[{#4}]{#5}{#6}{#7}%
+                \DefineTOCEntryCommandOption{#1}{#3}[{#4}]{#5}{#6}{#7}\relax
               \fi
             \else
               \ClassError{\KOMAClassName}{%
@@ -808,7 +814,10 @@
                 \space n: number parameter to be stored in a macro\MessageBreak
                 But not `\detokenize{#2}'.%
               }%
-      \fi\fi\fi\fi
+            \fi
+          \fi
+        \fi
+      \fi
     }%
   }%
   \scr@dte@gobble@till@nil
@@ -1069,6 +1078,305 @@
 % \end{macro}^^A \scr@dte@def@l@largetocline
 % \end{macro}^^A \scr@dte@def@l@undottedtocline
 % \end{macro}^^A \scr@dte@def@l@dottedtocline
+%
+% \begin{macro}{\scr@dte@def@l@tocline}
+%   \changes{v3.20}{2015/11/22}{neuer Verzeichniseintragsstil
+%     \texttt{tocline}}^^A
+% Das wird der hochflexible Stil für Verzeichniseinträge, die aus einer oder
+% mehreren Zeilen bestehen. Dieser wird über diverse Hilfsmakros definiert.
+%    \begin{macrocode}
+%<*tocline>
+%%% - generation of style dottedtocline (run: style,tocline)
+\DeclareTOCEntryStyle{tocline}[%
+  c{onstarthigherlevel}{scr@dte@}{@LastTOCLevelWasLower}{start higher level
+    entry hook},%
+  c{onstartsamelevel}{scr@dte@}{@LastTOCLevelWasSame}{start same level entry
+    hook},%
+  c{onstartlowerlevel}{scr@dte@}{@LastTOCLevelWasHigher}{start lower level
+    entry hook},%
+  l{beforeskip}{scr@dte@}{@beforeskip}{vertical skip before the entry},%
+  l{indent}{scr@}{@tocindent}{entry indent},%
+  l{numwidth}{scr@}{@tocnumwidth}{entry number width},%
+]{%
+  \scr@dte@tocline{#1}{##1}{##2}%
+}[{%
+%    \end{macrocode}
+% Die Ebene kann auf zweierlei Arten automatisch bestimmt werden. Zum einen
+% wird für Sub-Ebenen die Elternebene um eins erhöht verwendet, falls die
+% Elternebene bereits definiert ist.
+%    \begin{macrocode}
+  \scr@ifundefinedorrelax{#1tocdepth}{%
+    \ifstrstart{#1}{sub}{%
+      \scr@ifundefinedorrelax{\scr@dte@nosub{#1}tocdepth}{}{%
+        \expandafter\edef\csname #1tocdepth\endcsname{%
+          \numexpr \noexpand\@nameuse{\@scr@dte@nosub{#1}tocdepth}+\@ne\relax
+        }%
+      }%
+    }{}%
+  }{}%
+%    \end{macrocode}
+% War der Weg über Elternebenen nicht erfolgreich, so werden Standardwerte
+% angenommen, wie sie bei den Standardklassen und bei \KOMAScript{}
+% zutreffen.
+%    \begin{macrocode}
+  \@ifundefined{#1tocdepth}{%
+    \ifstr{#1}{part}{\@namedef{#1tocdepth}{-1}}{%
+      \ifstr{#1}{chapter}{\@namedef{#1tocdepth}{0}}{%
+        \ifstr{#1}{section}{\@namedef{#1tocdepth}{1}}{%
+          \ifstr{#1}{subsection}{\@namedef{#1tocdepth}{2}}{%
+            \ifstr{#1}{subsubsection}{\@namedef{#1tocdepth}{3}}{%
+              \ifstr{#1}{paragraph}{\@namedef{#1tocdepth}{4}}{%
+                \ifstr{#1}{subparagraph}{\@namedef{#1tocdepth}{5}}{%
+                  \ifstr{#1}{figure}{\@namedef{#1tocdepth}{1}}{%
+                    \ifstr{#1}{table}{\@namedef{#1tocdepth}{1}}{%
+%    \end{macrocode}
+% Für unbekannte Anweisungen wird vorsichtshalber nichts definiert, sondern
+% der Anwender soll das per Option \texttt{level} selbst machen.
+%    \begin{macrocode}
+                    }%
+                  }%
+                }%
+              }%
+            }%
+          }%
+        }%
+      }%
+    }%
+  }{}%
+%    \end{macrocode}
+% Die Standardeinstellungen für die drei Penalty-Hooks sind einfach die
+% Standardanweisungen dafür. Dabei ist das so definiert, dass Änderungen an
+% den Standardanweisungen direkte Auswirkungen haben.
+%    \begin{macrocode}
+  \expandafter\providecommand\expandafter*%
+  \csname scr@dte@#1@LastTOCLevelWasLower\endcsname{\LastTOCLevelWasLower}%
+  \expandafter\providecommand\expandafter*%
+  \csname scr@dte@#1@LastTOCLevelWasSame\endcsname{\LastTOCLevelWasSame}%
+  \expandafter\providecommand\expandafter*%
+  \csname scr@dte@#1@LastTOCLevelWasHigher\endcsname{\LastTOCLevelWasHigher}%
+%    \end{macrocode}
+% Die Voreinstellung für den vertikalen Abstand ist Null mit ein klein wenig
+% Leim, um den Seitenumbruch zu optimieren. Das genügt bei einer normalen
+% A4-Seite aber gerade mal für den Ausgleich einer Zeile.
+%    \begin{macrocode}
+  \expandafter\providecommand\expandafter*%
+  \csname scr@dte@#1@beforeskip\endcsname{\glueexpr \z@ plus .2\p@\relax}%
+%    \end{macrocode}
+% Der Einzug kann wie der Level aus der Elternebene gebildet.
+%    \begin{macrocode}
+  \scr@ifundefinedorrelax{scr@#1@tocindent}{%
+    \ifstrstart{#1}{sub}{%
+      \scr@ifundefinedorrelax{scr@\scr@dte@nosub{#1}@tocindent}{%
+        \scr@ifundefinedorrelax{scr@\scr@dte@nosub{#1}@tocnumwidth}{}{%
+          \expandafter\edef\csname scr@#1@tocindent\endcsname{%
+            \glueexpr \noexpand\@nameuse{scr@\scr@dte@nosub{#1}@tocnumwidth}%
+            \relax
+          }%
+        }%
+      }{%
+        \scr@ifundefinedorrelax{scr@\scr@dte@nosub{#1}@tocnumwidth}{%
+          \expandafter\edef\csname scr@#1@tocindent\endcsname{%
+            \glueexpr \noexpand\@nameuse{scr@\scr@dte@nosub{#1}@tocindent}%
+            \relax
+          }%
+        }{%
+          \expandafter\edef\csname scr@#1@tocindent\endcsname{%
+            \glueexpr \noexpand\@nameuse{scr@\scr@dte@nosub{#1}@tocindent}%
+                     +\noexpand\@nameuse{scr@\scr@dte@nosub{#1}@tocnumwidth}%
+            \relax
+          }%
+        }%
+      }%
+    }{}%
+  }{}%
+%    \end{macrocode}
+% War das nicht erfolgreich, können auch Standardwerte verwendet werden.
+%    \begin{macrocode}
+  \@ifundefined{scr@#1@tocindent}{%
+    \ifstr{#1}{figure}{\@namedef{scr@#1@tocindent}{1.5em}}{%
+      \ifstr{#1}{table}{\@namedef{scr@#1@tocindent}{1.5em}}{%
+        \ifstr{#1}{part}{\@namedef{scr@#1@tocindent}{0em}}{%
+          \ifstr{#1}{chapter}{\@namedef{scr@#1@tocindent}{0em}}{%
+          }%
+        }%
+      }%
+    }%
+  }{}%
+  \@ifundefined{scr@#1@tocindent}{%
+    \scr@ifundefinedorrelax{chapter}{%
+      \ifstr{#1}{section}{\@namedef{scr@#1@tocindent}{0pt}}{%
+        \ifstr{#1}{subsection}{\@namedef{scr@#1@tocindent}{1.5em}}{%
+          \ifstr{#1}{subsubsection}{\@namedef{scr@#1@tocindent}{3.8em}}{%
+            \ifstr{#1}{paragraph}{\@namedef{scr@#1@tocindent}{7em}}{%
+              \ifstr{#1}{subparagraph}{\@namedef{scr@#1@tocindent}{10em}}{%
+              }%
+            }%
+          }%
+        }%
+      }%
+    }{%
+      \ifstr{#1}{section}{\@namedef{scr@#1@tocindent}{1.5em}}{%
+        \ifstr{#1}{subsection}{\@namedef{scr@#1@tocindent}{3.8em}}{%
+          \ifstr{#1}{subsubsection}{\@namedef{scr@#1@tocindent}{7.0em}}{%
+            \ifstr{#1}{paragraph}{\@namedef{scr@#1@tocindent}{10em}}{%
+              \ifstr{#1}{subparagraph}{\@namedef{scr@#1@tocindent}{12em}}{%
+              }%
+            }%
+          }%
+        }%
+      }%
+    }%
+  }{}%
+%    \end{macrocode}
+% Für die Nummernbreite gibt es ebenfalls beide Wege.
+%    \begin{macrocode}
+  \scr@ifundefinedorrelax{scr@#1@tocnumwidth}{%
+    \ifstrstart{#1}{sub}{%
+      \scr@ifundefinedorrelax{scr@\scr@dte@nosub{#1}@tocnumwidth}{}{%
+        \expandafter\edef\csname scr@#1@tocnumwidth\endcsname{%
+          \glueexpr \noexpand\@nameuse{scr@\scr@dte@nosub{#1}@tocnumwidth}%
+                   +.9em%
+          \relax
+        }%
+      }%
+    }{}%
+  }{}%
+  \@ifundefined{scr@#1@numwidth}{%
+    \ifstr{#1}{figure}{\@namedef{scr@#1@numwidth}{2.3em}}{%
+      \ifstr{#1}{table}{\@namedef{scr@#1@numwidth}{2.3em}}{%
+        \ifstr{#1}{chapter}{\@namedef{scr@#1@numwidth}{1.5em}}{%
+        }%
+      }%
+    }%
+  }{}%
+  \@ifundefined{scr@#1@numwidth}{%
+    \scr@ifundefinedorrelax{chapter}{%
+      \ifstr{#1}{section}{\@namedef{scr@#1@numwidth}{1.5em}}{%
+        \ifstr{#1}{subsection}{\@namedef{scr@#1@numwidth}{2.3em}}{%
+          \ifstr{#1}{subsubsection}{\@namedef{scr@#1@numwidth}{3.2em}}{%
+            \ifstr{#1}{paragraph}{\@namedef{scr@#1@numwidth}{4.1em}}{%
+              \ifstr{#1}{subparagraph}{\@namedef{scr@#1@numwidth}{5m}}{%
+              }%
+            }%
+          }%
+        }%
+      }%
+    }{%
+      \ifstr{#1}{section}{\@namedef{scr@#1@numwidth}{2.3em}}{%
+        \ifstr{#1}{subsection}{\@namedef{scr@#1@numwidth}{3.2em}}{%
+          \ifstr{#1}{subsubsection}{\@namedef{scr@#1@numwidth}{3.1em}}{%
+            \ifstr{#1}{paragraph}{\@namedef{scr@#1@numwidth}{5em}}{%
+              \ifstr{#1}{subparagraph}{\@namedef{scr@#1@numwidth}{6m}}{%
+              }%
+            }%
+          }%
+        }%
+      }%
+    }%
+  }{}%
+}]
+%    \end{macrocode}
+% \begin{macro}{\scr@dte@nosub}
+%   \changes{v3.20}{2015/11/23}{neu (intern)}
+% \begin{macro}{\@scr@dte@nosub}
+%   \changes{v3.20}{2015/11/23}{neu (intern)}
+% Über diese Hilfsmacros werden die Buchstaben \texttt{sub} am Anfang des
+% Arguments entfernt. Stehen diese gar nicht am Anfang, so wird ein Fehler
+% wegen falscher Verwendung von \cs{@scr@de@nosub} gemeldet.
+%    \begin{macrocode}
+\newcommand*{\scr@dte@nosub}[1]{\@scr@dte@nosub #1\relax}
+\newcommand*{\@scr@dte@nosub}{}
+\def\@scr@dte@nosub sub#1\relax{#1}
+%    \end{macrocode}
+% \end{macro}^^A \@scr@dte@nosub
+% \end{macro}^^A \scr@dte@nosub
+% \begin{macro}{\scr@dte@tocline}
+%   \changes{v3.20}{2015/11/22}{neu (intern)}
+% In gewisser Weise entspricht diese Anweisung der \LaTeX-Kern-Anweisung
+% \cs{dottedtocline}. Allerdings werden hier vielfältige
+% Eingriffsmöglichkeiten untersützt, die jeweils durch Optionen gesteuert
+% werden können. Daher hat der Befehl auch nur drei Argumente:
+% \begin{description}
+% \item[\marg{Ebene}:] Der Name \meta{string} der Verzeichnisebene.
+% \item[\marg{Eintrag}:] Der Verzeichniseintrag \meta{string}.
+% \item[\marg{Seite}:] Die Seitenzahl \meta{string} des Verzeichniseintrags.
+% \end{description}
+%    \begin{macrocode}
+\newcommand*{\scr@dte@tocline}[3]{%
+  \ifnum \@nameuse{#1tocdepth}>\c@tocdepth
+  \else
+    \DependOnPenaltyAndTOCLevel{#1}%
+    \vskip \@nameuse{scr@dte@#1@beforeskip}\relax
+    {%
+      \leftskip \@nameuse{scr@#1@tocindent}\relax 
+      \rightskip \@tocrmarg 
+      \parfillskip -\rightskip
+      \parindent \@nameuse{scr@#1@tocindent}\relax
+      \@afterindenttrue
+      \interlinepenalty\@M
+      \leavevmode
+      \@tempdima \@nameuse{scr@#1@tocnumwidth}\relax
+      \advance\leftskip \@tempdima 
+      \null\nobreak\hskip -\leftskip
+      {#2}\nobreak
+      \leaders\hbox{$\m@th
+        \mkern \@dotsep mu\hbox{.}\mkern \@dotsep
+        mu$}\hfill
+      \nobreak
+      \hb@xt@\@pnumwidth{\hfil\normalfont \normalcolor #3}%
+      \par
+    }%
+    \SetPenaltyByTOCLevel{#1}%
+  \fi
+}
+%    \end{macrocode}
+% \begin{macro}{\DependOnPenaltyAndTOCLevel}
+%   \changes{v3.20}{2015/11/23}{neu}
+% Führt eine gespeicherte Aktion in Abhängigkeit davon aus, ob der aktuelle
+% Penalty-Wert darauf schließen lässt, dass zuvor ein Eintrag mit einem
+% höheren, demselben oder einem tieferen Wert für die Ebene erfolgte.
+% \begin{macro}{\SetPenaltyByTOCLevel}
+%   \changes{v3.20}{2015/11/23}{neu}
+% Setze die Strafpunkte für einen Umbruch entsprechend der aktuellen
+% Verzeichnisebene.
+% \begin{macro}{\LastTOCLevelWasHigher}
+%   \changes{v3.20}{2015/11/23}{neu}
+% Standardaktion, falls der vorherige Level einen größeren Wert hatte: Umbruch
+% erlauben.
+% \begin{macro}{\LastTOCLevelWasSame}
+%   \changes{v3.20}{2015/11/23}{neu}
+% Standardaktion, falls der vorherige Level denselben Wert hatte: Umbruch
+% erlauben.
+% \begin{macro}{\LastTOCLevelWasLower}
+% Standardaktion, falls der vorherige Level einen kleineren Wert hatte:
+% Penalty beibehalten und damit den Umbruch verbieten.
+%   \changes{v3.20}{2015/11/23}{neu}
+%    \begin{macrocode}
+\newcommand*{\DependOnPenaltyAndTOCLevel}[1]{%
+  \ifnum \lastpenalty<\numexpr 20009-\@nameuse{#1tocdepth}\relax
+    \@nameuse{scr@dte@#1@LastTOCLevelWasHigher}%
+  \else\ifnum \lastpenalty=\numexpr 20009-\@nameuse{#1tocdepth}\relax
+      \@nameuse{scr@dte@#1@LastTOCLevelWasSame}%
+    \else
+      \@nameuse{scr@dte@#1@LastTOCLevelWasLower}%
+    \fi
+  \fi
+}
+\newcommand*{\SetPenaltyByTOCLevel}[1]{%
+  \penalty \numexpr 20009-\@nameuse{#1tocdepth}\relax
+}
+\newcommand*{\LastTOCLevelWasHigher}{\addpenalty{\@lowpenalty}}
+\newcommand*{\LastTOCLevelWasSame}{\addpenalty{\@lowpenalty}}
+\newcommand*{\LastTOCLevelWasLower}{}
+%</tocline>
+%    \end{macrocode}
+% \end{macro}^^A \SetPenaltyByTOCLevel
+% \end{macro}^^A \DependOnPenaltyAndTOCLevel
+% \end{macro}^^A \LastTOCLevelWasLower
+% \end{macro}^^A \LastTOCLevelWasSame
+% \end{macro}^^A \LastTOCLevelWasHigher
+% \end{macro}^^A \scr@dte@tocline
+% \end{macro}^^A \scr@dte@def@l@tocline
 %
 %
 % \iffalse
