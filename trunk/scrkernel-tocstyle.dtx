@@ -1,4 +1,4 @@
-% \CheckSum{889}
+% \CheckSum{937}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-tocstyle.dtx
@@ -1094,6 +1094,8 @@
     hook},%
   c{onstartlowerlevel}{scr@dte@}{@LastTOCLevelWasHigher}{start lower level
     entry hook},%
+  c{entryformat}{scr@dte@}{@entryformat}{entry format},%
+  c{numberformat}{scr@dte@}{@numberformat}{entry number format},%
   l{beforeskip}{scr@dte@}{@beforeskip}{vertical skip before the entry},%
   l{indent}{scr@}{@tocindent}{entry indent},%
   l{numwidth}{scr@}{@tocnumwidth}{entry number width},%
@@ -1274,6 +1276,25 @@
       }%
     }%
   }{}%
+%    \end{macrocode}
+% Es ist gut zu wissen, wie breit die breiteste Nummer ist, damit wir
+% ggf. prüfen können, ob entsprechende Bedingungen eingehalten werden.
+%    \begin{macrocode}
+  \@ifundefined{scr@dte@#1@maxnumwidth}{%
+    \expandafter\newlength\csname scr@dte@#1@maxtocnumwidth\endcsname
+    \setlength{\@nameuse{scr@dte@#1@maxtocnumwidth}}{\z@}%
+  }{}%
+  \providecommand*{\scr@dte@donumwidth}{}%
+  \g@addto@macro{\scr@dte@donumwidth}{\do{#1}}%
+%    \end{macrocode}
+% Jede Ebene kann ihre eigene Formatierungsanweisung für die Nummer haben.
+% Jede Ebene kann auch ihre eigene Formatierungsanweisung für Nummer und Text
+% haben.
+%    \begin{macrocode}
+  \expandafter\providecommand\expandafter*%
+  \csname scr@dte@#1@numberformat\endcsname[1]{##1}%
+  \expandafter\providecommand\expandafter*%
+  \csname scr@dte@#1@entryformat\endcsname[1]{##1}%
 }]
 %    \end{macrocode}
 % \begin{macro}{\scr@dte@nosub}
@@ -1318,7 +1339,22 @@
       \@tempdima \@nameuse{scr@#1@tocnumwidth}\relax
       \advance\leftskip \@tempdima 
       \null\nobreak\hskip -\leftskip
-      {#2}\nobreak
+      {%
+%    \end{macrocode}
+% An dieser Stelle wenden wir einen Trick an, um die Breite einer eventuell
+% vorhandenen Nummer während deren Ausgabe auszumessen.
+%    \begin{macrocode}
+        \let\reserved@a\numberline
+        \def\numberline##1{%
+          \let\numberline\reserved@a
+          \sbox\@tempboxa{\@nameuse{scr@dte@#1@numberformat}{##1}}%
+          \ifdim \wd\@tempboxa>\@nameuse{scr@dte@#1@maxtocnumwidth}\relax
+            \global\@nameuse{scr@dte@#1@maxtocnumwidth}\wd\@tempboxa
+          \fi
+          \numberline{\usebox\@tempboxa}%
+        }%
+        \@nameuse{scr@dte@#1@entryformat}{#2}%
+      }\nobreak
       \leaders\hbox{$\m@th
         \mkern \@dotsep mu\hbox{.}\mkern \@dotsep
         mu$}\hfill
