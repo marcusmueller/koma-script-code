@@ -1,4 +1,4 @@
-% \CheckSum{973}
+% \CheckSum{1068}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-tocstyle.dtx
@@ -1089,6 +1089,7 @@
 %%% - generation of style dottedtocline (run: style,tocline)
 \DeclareTOCEntryStyle{tocline}[%
   b{raggedpagenumber}{scr@dte@}{@raggedpage}{page number ragged flag},%
+  b{dynnumwidth}{scr@dte@}{@dynnumwidth}{dynamic number width flag},%
   c{onstarthigherlevel}{scr@dte@}{@LastTOCLevelWasLower}{start higher level
     entry hook},%
   c{onstartsamelevel}{scr@dte@}{@LastTOCLevelWasSame}{start same level entry
@@ -1104,6 +1105,7 @@
   l{beforeskip}{scr@dte@}{@beforeskip}{vertical skip before the entry},%
   l{indent}{scr@}{@tocindent}{entry indent},%
   l{numwidth}{scr@}{@tocnumwidth}{entry number width},%
+  l{numsep}{scr@dte@}{@tocnumsep}{entry number separation},%
 ]{%
   \scr@dte@tocline{#1}{##1}{##2}%
 }[{%
@@ -1292,6 +1294,12 @@
   \providecommand*{\scr@dte@donumwidth}{}%
   \g@addto@macro{\scr@dte@donumwidth}{\do{#1}}%
 %    \end{macrocode}
+% Eine dieser Bedingungen ist, dass ein Mindestabstand zwischen Nummer und
+% Text eingehalten wird.
+%    \begin{macrocode}
+  \expandafter\providecommand\expandafter*%
+  \csname scr@dte@#1@tocnumsep\endcsname{.4em}%
+%    \end{macrocode}
 % Jede Ebene kann ihre eigene Formatierungsanweisung für die Nummer haben.
 % Jede Ebene kann auch ihre eigene Formatierungsanweisung für Nummer und Text
 % haben.
@@ -1327,7 +1335,28 @@
   \expandafter\providecommand\expandafter*%
   \csname scr@dte@#1@pagenumberbox\endcsname[1]{%
     \hb@xt@\@pnumwidth{\hfil ##1}}%
+  \@ifundefined{ifscr@dte@#1@dynnumwidth}{%
+    \expandafter\newif\csname ifscr@dte@#1@dynnumwidth\endcsname
+  }{}%
 }]
+\AtBeginDocument{%
+  \BeforeClosingMainAux{%
+    \begingroup
+      \def\do#1{%
+        \scr@ifundefinedorrelax{scr@dte@#1@maxtocnumwidth}{}{%
+          \ifdim \@nameuse{scr@dte@#1@maxtocnumwidth}>\z@
+            \protected@write\@mainaux{}{%
+              \string\global\string\@namedef{scr@dte@#1@lastmaxtocnumwidth}%
+              {\the\@nameuse{scr@dte@#1@maxtocnumwidth}}%
+            }%
+            \@nameuse{scr@dte@#1@maxtocnumwidth}\z@
+          \fi
+        }%
+      }%
+      \@nameuse{scr@dte@donumwidth}%
+    \endgroup
+  }%
+}
 %    \end{macrocode}
 % \begin{macro}{\scr@dte@nosub}
 %   \changes{v3.20}{2015/11/23}{neu (intern)}
@@ -1372,6 +1401,15 @@
       \interlinepenalty\@M
       \leavevmode
       \@tempdima \@nameuse{scr@#1@tocnumwidth}\relax
+      \expandafter\ifx\csname ifscr@dte@#1@dynnumwidth\endcsname\iftrue
+        \scr@ifundefinedorrelax{scr@dte@#1@lastmaxtocnumwidth}{}{%
+          \ifdim \dimexpr \@nameuse{scr@dte@#1@lastmaxtocnumwidth}
+                         +\@nameuse{scr@dte@#1@tocnumsep}\relax>\@tempdima
+            \@tempdima\dimexpr \@nameuse{scr@dte@#1@lastmaxtocnumwidth}
+                              +\@nameuse{scr@dte@#1@tocnumsep}\relax
+          \fi
+        }%
+      \fi
       \advance\leftskip \@tempdima 
       \null\nobreak\hskip -\leftskip
       {%
@@ -1385,6 +1423,21 @@
           \sbox\@tempboxa{\@nameuse{scr@dte@#1@numberformat}{##1}}%
           \ifdim \wd\@tempboxa>\@nameuse{scr@dte@#1@maxtocnumwidth}\relax
             \global\@nameuse{scr@dte@#1@maxtocnumwidth}\wd\@tempboxa
+          \fi
+          \expandafter\ifx\csname ifscr@dte@#1@dynnumwidth\endcsname\iftrue
+          \else
+            \ifdim \wd\@tempboxa>\dimexpr \@nameuse{scr@#1@tocnumwidth}%
+                                         -\@nameuse{scr@dte@#1@tocnumsep}\relax
+              \ClassWarning{\KOMAClassName}{%
+                number width of #1 toc entries should be
+                increased!\MessageBreak
+                Currently used number width = \the\wd\@tempboxa,\MessageBreak
+                Wanted number separation
+                \space\space\space = \the\dimexpr\@nameuse{scr@dte@#1@tocnumsep}\relax,\MessageBreak
+                Reserved number width \space\space\space\space\space\space =
+                \the\dimexpr\@nameuse{scr@#1@tocnumwidth}\relax%
+              }%
+            \fi
           \fi
           \numberline{\usebox\@tempboxa}%
         }%
@@ -1436,8 +1489,8 @@
 \newcommand*{\SetPenaltyByTOCLevel}[1]{%
   \penalty \numexpr 20009-\@nameuse{#1tocdepth}\relax
 }
-\newcommand*{\LastTOCLevelWasHigher}{\addpenalty{\@lowpenalty}}
-\newcommand*{\LastTOCLevelWasSame}{\addpenalty{\@lowpenalty}}
+\newcommand*{\LastTOCLevelWasHigher}{\ifvmode\addpenalty{\@lowpenalty}\fi}
+\newcommand*{\LastTOCLevelWasSame}{\ifvmode\addpenalty{\@lowpenalty}\fi}
 \newcommand*{\LastTOCLevelWasLower}{}
 %    \end{macrocode}
 % \end{macro}^^A \SetPenaltyByTOCLevel
