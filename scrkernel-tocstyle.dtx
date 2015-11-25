@@ -1,4 +1,4 @@
-% \CheckSum{999}
+% \CheckSum{1040}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-tocstyle.dtx
@@ -387,6 +387,8 @@
 }
 \newcommand*{\@DefineTOCEntryBoolOptionWithoutDefault}[5]{%
   \TOCStyleNeedsCommandByOption{#1}{if#3}{#4}{#2}{#5}%
+  \TOCStyleNeedsCommandByOption{#1}{#3}{#4false}{#2}{#5}%
+  \TOCStyleNeedsCommandByOption{#1}{#3}{#4false}{#2}{#5}%
   \DefineTOCEntryOption{#1}{#2}{%
     \@DefineTOCEntryBoolOptionMacro{#2}{#3}{#4}{##1}%
   }%
@@ -394,6 +396,8 @@
 \newcommand*{\@DefineTOCEntryBoolOptionWithDefault}{}
 \def\@DefineTOCEntryBoolOptionWithDefault#1#2[#3]#4#5#6{%
   \TOCStyleNeedsCommandByOption{#1}{if#4}{#5}{#2}{#6}%
+  \TOCStyleNeedsCommandByOption{#1}{#4}{#5true}{#2}{#6}%
+  \TOCStyleNeedsCommandByOption{#1}{#4}{#5false}{#2}{#6}%
   \DefineTOCEntryOption{#1}{#2}[{#3}]{%
     \@DefineTOCEntryBoolOptionMacro{#2}{#4}{#5}{##1}%
   }%
@@ -831,6 +835,43 @@
 % \end{macro}^^A \scr@dte@define@option
 % \end{macro}^^A \@DeclareTOCEntryStyle
 % \end{macro}^^A \DeclareTOCEntryStyle
+%
+% \begin{macro}{\CloneTOCEntryStyle}
+%   \changes{v3.20}{2015/11/25}{neu}
+% Diese Anweisung dupliziert einen Stil samt seiner Optionen und
+% Befehle. Anschließend kann man ihn beispielsweise verändern. Das erste
+% Argument ist der Name des ursprünglichen Stils, das zweite der neue Name.
+%    \begin{macrocode}
+%<*body>
+\newcommand*{\CloneTOCEntryStyle}[2]{%
+%    \end{macrocode}
+% Als erstes wird die Anweisung kopiert, mit der die \cs{l@\dots}-Anweisungen
+% definiert werden.
+%    \begin{macrocode}
+  \expandafter\let\csname scr@dte@def@l@#2\expandafter\endcsname
+  \csname scr@dte@def@l@#1\endcsname
+%    \end{macrocode}
+% Der Init-Code wird kopiert.
+%    \begin{macrocode}
+  \expandafter\let\csname scr@dte@#2@init\expandafter\endcsname
+  \csname scr@dte@#1@init\endcsname
+%    \end{macrocode}
+% Die Optionenliste, die Optionendefinitionsliste und die Optionenrelaxliste
+% werden kopiert:
+%    \begin{macrocode}
+  \expandafter\let\csname scr@dte@#2@doopts\expandafter\endcsname
+  \csname scr@dte@#1@doopts\endcsname
+  \expandafter\let\csname scr@dte@#2@defopts\expandafter\endcsname
+  \csname scr@dte@#1@defopts\endcsname
+  \expandafter\let\csname scr@dte@#2@relaxopts\expandafter\endcsname
+  \csname scr@dte@#1@relaxopts\endcsname
+%    \end{macrocode}
+% Das war es dann auch.
+%    \begin{macrocode}
+}
+%</body>
+%    \end{macrocode}
+% \end{macro}
 %
 % \subsection{Vorgefertigte Verzeichniseintragsstile}
 %
