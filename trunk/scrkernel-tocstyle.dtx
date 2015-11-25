@@ -1,4 +1,4 @@
-% \CheckSum{1040}
+% \CheckSum{1039}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-tocstyle.dtx
@@ -760,7 +760,6 @@
   \scr@dte@gobble@till@nil
 }
 \def\scr@dte@define@option@withdefault#1#2#3[#4#5#6#7#8#9{%
-  \typeout{TRACE: \string\scr@dte@define@option@withdefault}%
   \IfArgIsEmpty{#3}{%
     \ClassError{\KOMAClassName}{option needs name}{%
       Definition of toc entry style `#1' has an empty option
@@ -1293,9 +1292,9 @@
 % Es ist gut zu wissen, wie breit die breiteste Nummer ist, damit wir
 % ggf. prüfen können, ob entsprechende Bedingungen eingehalten werden.
 %    \begin{macrocode}
-  \@ifundefined{scr@dte@#1@maxtocnumwidth}{%
-    \expandafter\newlength\csname scr@dte@#1@maxtocnumwidth\endcsname
-    \setlength{\@nameuse{scr@dte@#1@maxtocnumwidth}}{\z@}%
+  \@ifundefined{scr@dte@#1@maxnumwidth}{%
+    \expandafter\newlength\csname scr@dte@#1@maxnumwidth\endcsname
+    \setlength{\@nameuse{scr@dte@#1@maxnumwidth}}{\z@}%
   }{}%
   \providecommand*{\scr@dte@donumwidth}{}%
   \g@addto@macro{\scr@dte@donumwidth}{\do{#1}}%
@@ -1361,13 +1360,13 @@
   \BeforeClosingMainAux{%
     \begingroup
       \def\do#1{%
-        \scr@ifundefinedorrelax{scr@dte@#1@maxtocnumwidth}{}{%
-          \ifdim \@nameuse{scr@dte@#1@maxtocnumwidth}>\z@
+        \scr@ifundefinedorrelax{scr@dte@#1@maxnumwidth}{}{%
+          \ifdim \@nameuse{scr@dte@#1@maxnumwidth}>\z@
             \protected@write\@mainaux{}{%
-              \string\global\string\@namedef{scr@dte@#1@lastmaxtocnumwidth}%
-              {\the\@nameuse{scr@dte@#1@maxtocnumwidth}}%
+              \string\global\string\@namedef{scr@dte@#1@lastmaxnumwidth}%
+              {\the\@nameuse{scr@dte@#1@maxnumwidth}}%
             }%
-            \@nameuse{scr@dte@#1@maxtocnumwidth}\z@
+            \@nameuse{scr@dte@#1@maxnumwidth}\z@
           \fi
         }%
       }%
@@ -1420,10 +1419,10 @@
       \leavevmode
       \@tempdima \@nameuse{scr@tso@#1@numwidth}\relax
       \expandafter\ifx\csname ifscr@tso@#1@dynnumwidth\endcsname\iftrue
-        \scr@ifundefinedorrelax{scr@dte@#1@lastmaxtocnumwidth}{}{%
-          \ifdim \dimexpr \@nameuse{scr@dte@#1@lastmaxtocnumwidth}
+        \scr@ifundefinedorrelax{scr@dte@#1@lastmaxnumwidth}{}{%
+          \ifdim \dimexpr \@nameuse{scr@dte@#1@lastmaxnumwidth}
                          +\@nameuse{scr@tso@#1@numsep}\relax>\@tempdima
-            \@tempdima\dimexpr \@nameuse{scr@dte@#1@lastmaxtocnumwidth}
+            \@tempdima\dimexpr \@nameuse{scr@dte@#1@lastmaxnumwidth}
                               +\@nameuse{scr@tso@#1@numsep}\relax
           \fi
         }%
@@ -1438,26 +1437,30 @@
         \let\scr@dte@numberline\numberline
         \def\numberline##1{%
           \let\numberline\scr@dte@numberline
-          \sbox\@tempboxa{\@nameuse{scr@tso@#1@numberformat}{##1}}%
-          \ifdim \wd\@tempboxa>\@nameuse{scr@dte@#1@maxtocnumwidth}\relax
-            \global\@nameuse{scr@dte@#1@maxtocnumwidth}\wd\@tempboxa
+          \sbox\scr@dte@tocline@numbox{\@nameuse{scr@tso@#1@numberformat}{##1}}%
+          \ifdim \wd\scr@dte@tocline@numbox
+                >\@nameuse{scr@dte@#1@maxnumwidth}\relax
+            \global\@nameuse{scr@dte@#1@maxnumwidth}\wd\scr@dte@tocline@numbox
           \fi
           \expandafter\ifx\csname ifscr@tso@#1@dynnumwidth\endcsname\iftrue
           \else
-            \ifdim \wd\@tempboxa>\dimexpr \@nameuse{scr@tso@#1@numwidth}%
-                                         -\@nameuse{scr@tso@#1@numsep}\relax
+            \ifdim \wd\scr@dte@tocline@numbox
+                  >\dimexpr \@nameuse{scr@tso@#1@numwidth}%
+                           -\@nameuse{scr@tso@#1@numsep}\relax
               \ClassWarning{\KOMAClassName}{%
                 number width of #1 toc entries should be
                 increased!\MessageBreak
-                Currently used number width = \the\wd\@tempboxa,\MessageBreak
+                Currently used number width =
+                \the\wd\scr@dte@tocline@numbox,\MessageBreak
                 Wanted number separation
-                \space\space\space = \the\dimexpr\@nameuse{scr@tso@#1@numsep}\relax,\MessageBreak
+                \space\space\space =
+                \the\dimexpr\@nameuse{scr@tso@#1@numsep}\relax,\MessageBreak
                 Reserved number width \space\space\space\space\space\space =
                 \the\dimexpr\@nameuse{scr@tso@#1@numwidth}\relax%
               }%
             \fi
           \fi
-          \numberline{\usebox\@tempboxa}%
+          \numberline{\usebox\scr@dte@tocline@numbox}%
         }%
         \@nameuse{scr@tso@#1@entryformat}{#2}%
       }\nobreak
@@ -1472,6 +1475,14 @@
   \fi
 }
 %    \end{macrocode}
+% \begin{macro}{\scr@dte@tocline@numbox}
+%   \changes{v3.20}{2015/11/25}{neue Box (intern)}
+% Wird benötigt, um die Breite der Nummer auszumessen und die Nummer später
+% wieder zu verwenden.
+%    \begin{macrocode}
+\newsavebox\scr@dte@tocline@numbox
+%    \end{macrocode}
+% \end{macro}^^A \scr@dte@tocline@numbox
 % \begin{macro}{\DependOnPenaltyAndTOCLevel}
 %   \changes{v3.20}{2015/11/23}{neu}
 % Führt eine gespeicherte Aktion in Abhängigkeit davon aus, ob der aktuelle
