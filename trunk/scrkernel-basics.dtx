@@ -1,4 +1,4 @@
-% \CheckSum{3384}
+% \CheckSum{3463}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -3175,14 +3175,36 @@
 % benötigt.
 %    \begin{macrocode}
 %<*base>
-\newcommand{\l@addto@macro@a}[2]{%
-  \begingroup
+\begingroup
+  \catcode`\^^A=\catcode`\#
+  \@makeother\#
+  \gdef\l@addto@macro@a^^A1{%
+    \begingroup
+      \@makeother\#
+      \def\l@addto@macro@a@cmd{^^A1}%
+      \l@addto@macro@a@
+  }
+  \gdef\l@addto@macro@a@^^A1{%
+    \def\l@addto@macro@a@add{^^A1}%
+    \l@addto@macro@a@@
+  }
+\endgroup
+\begingroup
+  \@makeother\#
+  \gdef\l@addto@macro@a@@{%
+    \@makeother\#
     \edef\reserved@a{%
-      \endgroup
-      \unexpanded{\def#1##1}{\unexpanded\expandafter{#1{##1}#2}}%
+      \detokenize{\endgroup\def}%
+      \detokenize\expandafter{\l@addto@macro@a@cmd#1}%
+      {%
+        \expandafter\detokenize%
+        \expandafter\expandafter\expandafter{\l@addto@macro@a@cmd{#1}}%
+        \expandafter\detokenize\expandafter{\l@addto@macro@a@add}%
+      }%
     }%
-  \reserved@a
-}
+    \expandafter\scantokens\expandafter{\reserved@a}%
+  }%
+\endgroup
 %</base>
 %    \end{macrocode}
 % \end{macro}^^A \l@addto@macro@a
@@ -3207,14 +3229,36 @@
 % benötigt.
 %    \begin{macrocode}
 %<*base>
-\newcommand{\l@preto@macro@a}[2]{%
-  \begingroup
+\begingroup
+  \catcode`\^^A=\catcode`\#
+  \@makeother\#
+  \gdef\l@preto@macro@a^^A1{%
+    \begingroup
+      \@makeother\#
+      \def\l@preto@macro@a@cmd{^^A1}%
+      \l@preto@macro@a@
+  }
+  \gdef\l@preto@macro@a@^^A1{%
+    \def\l@preto@macro@a@add{^^A1}%
+    \l@preto@macro@a@@
+  }
+\endgroup
+\begingroup
+  \@makeother\#
+  \gdef\l@preto@macro@a@@{%
+    \@makeother\#
     \edef\reserved@a{%
-      \endgroup
-      \unexpanded{\def#1##1}{\unexpanded{#2}\unexpanded\expandafter{#1{##1}}}%
+      \detokenize{\endgroup\def}%
+      \detokenize\expandafter{\l@preto@macro@a@cmd#1}%
+      {%
+        \expandafter\detokenize\expandafter{\l@preto@macro@a@add}%
+        \expandafter\detokenize%
+        \expandafter\expandafter\expandafter{\l@preto@macro@a@cmd{#1}}%
+      }%
     }%
-  \reserved@a
-}
+    \expandafter\scantokens\expandafter{\reserved@a}%
+  }%
+\endgroup
 %</base>
 %    \end{macrocode}
 % \end{macro}^^A \l@preto@macro@a
