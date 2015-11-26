@@ -1,4 +1,4 @@
-% \CheckSum{1052}
+% \CheckSum{1118}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-tocstyle.dtx
@@ -10,7 +10,7 @@
 % the LaTeX Project Public License, version 1.3c of the license.
 % The latest version of this license is in
 %   http://www.latex-project.org/lppl.txt
-% and version 1.3c or later is part of all distributions of LaTeX 
+% and version 1.3c or later is part of all distribution<s of LaTeX 
 % version 2005/12/01 or later and of this work.
 %
 % This work has the LPPL maintenance status "author-maintained".
@@ -425,6 +425,7 @@
 % \item[\oarg{Wert}:] der Säumniswert der Option
 % \item[\marg{Prefix}: \meta{String},] Präfix des zu definierenden Makros
 % \item[\marg{Postfix}: \meta{String},] Postfix des zu definierenden Makros
+% \item[\oarg{Argumentzahl}: \meta{Nummer},] Anzahl der Argumente des Makros
 % \item[\marg{Erklärung}: \meta{String},] Erklärung der Option
 % \item[\oarg{Init}: \meta{Code},] Initialisierung der Option
 % \end{description}
@@ -432,10 +433,16 @@
 % automatisch \cs{scr@dte@current} eingefügt.
 % \begin{macro}{\@DefineTOCEntryCommandOptionWithoutDefault}
 %   \changes{v3.20}{2015/11/12}{neu (intern)}
+% \begin{macro}{\@@DefineTOCEntryCommandOptionWithoutDefault}
+%   \changes{v3.20}{2015/11/26}{neu (intern)}
 % \begin{macro}{\@DefineTOCEntryCommandOptionWithDefault}
 %   \changes{v3.20}{2015/11/12}{neu (intern)}
+% \begin{macro}{\@@DefineTOCEntryCommandOptionWithDefault}
+%   \changes{v3.20}{2015/11/26}{neu (intern)}
 % \begin{macro}{\@DefineTOCEntryCommandOptionMacro}
 %   \changes{v3.20}{2015/11/12}{neu (intern)}
+% \begin{macro}{\@@DefineTOCEntryCommandOptionMacro}
+%   \changes{v3.20}{2015/11/26}{neu (intern)}
 % Da mit einem optionalen Argument an Position 3 gearbeitet wird, werden drei
 % Hilfsmakros benötigt.
 %    \begin{macrocode}
@@ -445,27 +452,65 @@
     {\@DefineTOCEntryCommandOptionWithDefault{#1}{#2}}
     {\@DefineTOCEntryCommandOptionWithoutDefault{#1}{#2}}%
 }
-\newcommand*{\@DefineTOCEntryCommandOptionWithoutDefault}[5]{%
-  \TOCEntryStyleNeedsCommandByOption{#1}{#3}{#4}{#2}{#5}%
-  \DefineTOCEntryOption{#1}{#2}{%
-    \@DefineTOCEntryCommandOptionMacro{#2}{#3}{#4}{##1}%
-  }%
+\newcommand*{\@DefineTOCEntryCommandOptionWithoutDefault}[4]{%
+  \@testopt{\@@DefineTOCEntryCommandOptionWithoutDefault{#1}{#2}{#3}{#4}}0%
+}
+\newcommand*{\@@DefineTOCEntryCommandOptionWithoutDefault}{}%
+\def\@@DefineTOCEntryCommandOptionWithoutDefault#1#2#3#4[#5]#6{%
+  \TOCEntryStyleNeedsCommandByOption{#1}{#3}{#4}{#2}{#6}%
+  \ifcase #5
+    \DefineTOCEntryOption{#1}{#2}{%
+      \@DefineTOCEntryCommandOptionMacro{#2}{#3}{#4}[#5]{##1}%
+    }%
+  \or
+    \DefineTOCEntryOption{#1}{#2}{%
+      \@DefineTOCEntryCommandOptionMacro{#2}{#3}{#4}[#5]{##1{####1}}%
+    }%
+  \else
+    \ClassError{\KOMAClassName}{only one argument supported}{%
+      \string\DefineTOCEntryCommandOption\space currently supports only
+      commands with\MessageBreak
+      at most one argument not #5}%
+  \fi
 }
 \newcommand*{\@DefineTOCEntryCommandOptionWithDefault}{}
-\def\@DefineTOCEntryCommandOptionWithDefault#1#2[#3]#4#5#6{%
-  \TOCEntryStyleNeedsCommandByOption{#1}{#4}{#5}{#2}{#6}%
-  \DefineTOCEntryOption{#1}{#2}[{#3}]{%
-    \@DefineTOCEntryCommandOptionMacro{#2}{#4}{#5}{##1}%
-  }%
+\def\@DefineTOCEntryCommandOptionWithDefault#1#2[#3]#4#5{%
+  \@testopt{\@@DefineTOCEntryCommandOptionWithDefault{#1}{#2}{#3}{#4}{#5}}0%
 }
-\newcommand*{\@DefineTOCEntryCommandOptionMacro}[4]{%
-  \@namedef{#2\scr@dte@current#3}{#4}%
+\def\@@DefineTOCEntryCommandOptionWithDefault#1#2#3#4#5[#6]#7{%
+  \TOCEntryStyleNeedsCommandByOption{#1}{#4}{#5}{#2}{#7}%
+  \ifcase #6
+    \DefineTOCEntryOption{#1}{#2}[{#3}]{%
+      \@DefineTOCEntryCommandOptionMacro{#2}{#4}{#5}[#6]{##1}%
+    }%
+  \or
+    \DefineTOCEntryOption{#1}{#2}[{#3}]{%
+      \@DefineTOCEntryCommandOptionMacro{#2}{#4}{#5}[#6]{##1{####1}}%
+    }%
+  \else
+    \ClassError{\KOMAClassName}{only one argument supported}{%
+      \string\DefineTOCEntryCommandOption\space currently supports only
+      commands with\MessageBreak
+      at most one argument not #6}%
+  \fi
+}
+\newcommand*{\@DefineTOCEntryCommandOptionMacro}[3]{%
+  \@testopt{\@@DefineTOCEntryCommandOptionMacro{#1}{#2}{#3}}0%
+}
+\newcommand*{\@@DefineTOCEntryCommandOptionMacro}{}
+\long\def\@@DefineTOCEntryCommandOptionMacro#1#2#3[#4]#5{%
+  \let\l@ngrel@x\long
+%<trace>  \typeout{TRACE: CommandOptionMacro=`\detokenize{#5}'}%
+  \expandafter\@yargdef\csname #2\scr@dte@current#3\endcsname\@ne{#4}{#5}%
   \FamilyKeyStateProcessed
 }
 %</body>
 %    \end{macrocode}
+% \end{macro}^^A \@@DefineTOCEntryCommandOptionMacro
 % \end{macro}^^A \@DefineTOCEntryCommandOptionMacro
+% \end{macro}^^A \@@DefineTOCEntryCommandOptionWithDefault
 % \end{macro}^^A \@DefineTOCEntryCommandOptionWithDefault
+% \end{macro}^^A \@@DefineTOCEntryCommandOptionWithoutDefault
 % \end{macro}^^A \@DefineTOCEntryCommandOptionWithoutDefault
 % \end{macro}^^A \DefineTOCEntryCommandOption
 %
@@ -756,16 +801,29 @@
                 \DefineTOCEntryCommandOption{#1}{#3}{#4}{#5}{#6}\relax
               \fi
             \else
-              \ClassError{\KOMAClassName}{%
-                unknown toc entry style option type}{%
-                Following types are valid:\MessageBreak
-                \space b: boolean parameter to be stored as
-                \expandafter\string\csname if\endcsname...\MessageBreak
-                \space c: code parameter to be stored in a macro\MessageBreak
-                \space l: length parameter to be stored in a macro\MessageBreak
-                \space n: number parameter to be stored in a macro\MessageBreak
-                But not `\detokenize{#2}'.%
-              }%
+              \if #2C%
+                \if #7[%]
+                  \DefineTOCEntryCommandOption{#1}{#3}{#4}{#5}[1]{#6}[{#8}]%
+                \else
+                  \DefineTOCEntryCommandOption{#1}{#3}{#4}{#5}[1]{#6}\relax
+                \fi
+              \else
+                \ClassError{\KOMAClassName}{%
+                  unknown toc entry style option type}{%
+                  Following types are valid:\MessageBreak
+                  \space\space b: boolean parameter to be stored as
+                  \expandafter\string\csname if\endcsname...\MessageBreak
+                  \space\space c: code parameter to be stored in a
+                  macro without parameter\MessageBreak
+                  \space\space C: code parameter to be stored in a
+                  macro with one parameter\MessageBreak
+                  \space\space l: length parameter to be stored in a
+                  macro\MessageBreak
+                  \space\space n: number parameter to be stored in a
+                  macro\MessageBreak
+                  But not `\detokenize{#2}'.%
+                }%
+              \fi
             \fi
           \fi
         \fi
@@ -970,10 +1028,10 @@
     hook},%
   c{onstartlowerlevel}{scr@tso@}{@LastTOCLevelWasHigher}{start lower level
     entry hook},%
-  c{entryformat}{scr@tso@}{@entryformat}{entry format},%
-  c{entrynumberformat}{scr@tso@}{@numberformat}{entry number format},%
-  c{pagenumberformat}{scr@tso@}{@pagenumberformat}{page number format},%
-  c{pagenumberbox}{scr@tso@}{@pagenumberbox}{page number box},%
+  C{entryformat}{scr@tso@}{@entryformat}{entry format},%
+  C{entrynumberformat}{scr@tso@}{@numberformat}{entry number format},%
+  C{pagenumberformat}{scr@tso@}{@pagenumberformat}{page number format},%
+  C{pagenumberbox}{scr@tso@}{@pagenumberbox}{page number box},%
   c{linefill}[{\TOCLineLeaderFill}{scr@tso@}{@linefill}{filling between text
     and page number},%]
   l{beforeskip}{scr@tso@}{@beforeskip}{vertical skip before the entry},%
