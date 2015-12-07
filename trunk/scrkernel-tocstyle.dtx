@@ -1,4 +1,4 @@
-% \CheckSum{1024}
+% \CheckSum{1137}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-tocstyle.dtx
@@ -1374,7 +1374,7 @@
   \ifnum \@nameuse{#1tocdepth}>\c@tocdepth
   \else
     \DependOnPenaltyAndTOCLevel{#1}%
-    \vskip \@nameuse{scr@tso@#1@beforeskip}\relax
+    \addvspace{\@nameuse{scr@tso@#1@beforeskip}}\relax
     {%
       \leftskip \@nameuse{scr@tso@#1@indent}\relax 
       \rightskip \@tocrmarg
@@ -1510,8 +1510,134 @@
 % \end{macro}^^A \TOCLineLeaderFill
 % \end{macro}^^A \scr@dte@tocline
 %
+% Einige Stile sollen nur definiert werden, wenn die Definition in die Klasse
+% geschrieben wird:
+% \iffalse
+%<*class>
+% \fi
+% \begin{macro}{\scr@dte@def@l@part}
+%   \changes{v3.20}{2015/12/07}{neuer Verzeichnisstil \texttt{part}}^^A
+% Dieser Verzeichnisstil existiert bei \textsf{scrbook}, \textsf{scrreprt} und
+% \textsf{scrartcl}. Das Format des Eintrags und der Seitenzahl wird dabei
+% über die Elemente \texttt{partentry} und \texttt{partentrypagenumber}
+% realisiert.
+%    \begin{macrocode}
+%<*part>
+%%%            (run: class,style,part)
+\CloneTOCEntryStyle{tocline}{part}
+\TOCEntryStyleStartInitCode{part}{%
+  \expandafter\providecommand\expandafter*%
+  \csname scr@tso@#1@linefill\endcsname{\hfill}%
+  \expandafter\providecommand\expandafter*%
+  \csname scr@tso@#1@entryformat\endcsname[1]{\usekomafont{partentry}{##1}}%
+  \expandafter\providecommand\expandafter*%
+  \csname scr@tso@#1@pagenumberformat\endcsname[1]{%
+    \usekomafont{partentry}{\usekomafont{partentrypagenumber}{##1}}}%
+  \expandafter\providecommand\expandafter*%
+  \csname scr@tso@#1@beforeskip\endcsname{2.25em \@plus\p@}%
+}
+%</part>
+%    \end{macrocode}
+% \end{macro}^^A \scr@dte@def@l@part
+%
+% \begin{macro}{\scr@dte@def@l@chapter}
+%   \changes{v3.20}{2015/12/07}{neuer Verzeichnisstil \texttt{chapter}}^^A
+% Dieser Verzeichnisstil existier bei \textsf{scrbook} und \textsf{scrreprt}.
+%    \begin{macrocode}
+%<*chapter>
+%%%            (run: class,style,chapter)
+\CloneTOCEntryStyle{tocline}{chapter}
+\TOCEntryStyleStartInitCode{chapter}{%
+  \expandafter\providecommand\expandafter*%
+  \csname scr@tso@#1@linefill\endcsname{%
+    \if@chapterentrywithdots
+      \TOCLineLeaderFill\relax
+    \else
+      \hfill
+    \fi
+  }%
+  \expandafter\providecommand\expandafter*%
+  \csname scr@tso@#1@entryformat\endcsname{\usekomafont{chapterentry}}%
+  \expandafter\providecommand\expandafter*%
+  \csname scr@tso@#1@pagenumberformat\endcsname[1]{%
+    \usekomafont{chapterentry}{\usekomafont{chapterentrypagenumber}{##1}}}%
+  \expandafter\providecommand\expandafter*%
+  \csname scr@tso@#1@beforeskip\endcsname{1.0em \@plus\p@}%
+}
+%</chapter>
+%    \end{macrocode}
+% \end{macro}^^A \scr@dte@def@l@chapter
+%
+% \begin{macro}{\scr@dte@def@l@section}
+%   \changes{v3.20}{2015/12/07}{neuer Verzeichnisstil \texttt{section}}^^A
+% Bei den Klassen \textsf{scrbook} und \textsf{scrreprt} ist das der Stil für
+% die \emph{kleinen} Verzeichnisebenen. Bei \textsf{scrartcl} ist es dagegen
+% der Stil für die obere Verzeichnisebene und entspricht damit obigem Stil
+% \texttt{chapter}.
+%    \begin{macrocode}
+%<*section>
+%%%            (run: class,style,section)
+\CloneTOCEntryStyle{tocline}{section}
+%<*book|report>
+\TOCEntryStyleStartInitCode{section}{%
+  \expandafter\providecommand\expandafter*%
+  \csname scr@tso@#1@linefill\endcsname{\TOCLineLeaderFill\relax}%
+}
+%</book|report>
+%<*article>
+\TOCEntryStyleStartInitCode{section}{%
+  \expandafter\providecommand\expandafter*%
+  \csname scr@tso@#1@linefill\endcsname{%
+    \if@sectionentrywithdots
+      \TOCLineLeaderFill\relax
+    \else
+      \hfill
+    \fi
+  }%
+  % Für die Einträge die Schrift von Element sectionentry verwenden.
+  \expandafter\providecommand\expandafter*%
+  \csname scr@tso@#1@entryformat\endcsname{\usekomafont{sectionentry}}%
+  \expandafter\providecommand\expandafter*%
+  \csname scr@tso@#1@pagenumberformat\endcsname[1]{\usekomafont{sectionentry}{\usekomafont{sectionentrypagenumber}{##1}}}%
+  \expandafter\providecommand\expandafter*%
+  \csname scr@tso@#1@beforeskip\endcsname{1.0em \@plus\p@}%
+}
+%</article>
+%</section>
+%    \end{macrocode}
+% \end{macro}^^A \scr@dte@def@l@section
+%
+% \begin{macro}{\scr@dte@def@l@subsection}
+%   \changes{v3.20}{2015/12/07}{neuer Verzeichnisstil \texttt{subsection}}^^A
+% Dieser Stil existiert nur bei \textsf{scrartcl} und entspricht dann dem Stil
+% \texttt{section} bei \textsf{scrbook} und \textsf{scrreprt}.
+%    \begin{macrocode}
+%<*subsection&article>
+%%%            (run: class,style,subsection)
+\CloneTOCEntryStyle{tocline}{subsection}
+\TOCEntryStyleStartInitCode{subsection}{%
+  \expandafter\providecommand\expandafter*%
+  \csname scr@tso@#1@linefill\endcsname{\TOCLineLeaderFill\relax}%
+}
+%</subsection&article>
+%    \end{macrocode}
+% \end{macro}^^A \scr@dte@def@l@subsection
+%
+% \begin{macro}{\scr@dte@def@l@default}
+%   \changes{v3.20}{2015/12/07}{neuer Verzeichnisstil \texttt{default}}^^A
+% Dieser Stil entspricht bei \textsf{scrbook} und \textsf{scrreprt} dem Stil
+% \texttt{section} und bei \textsf{scrartcl} dem Stil \textsf{subsection}.
+%    \begin{macrocode}
+%<*default>
+%%%            (run: class,style,default)
+%<book|report>\CloneTOCEntryStyle{section}{default}
+%<article>\CloneTOCEntryStyle{subsection}{default}
+%</default>
+%    \end{macrocode}
+% \end{macro}
 %
 % \iffalse
+%</class>
 %</style>
 % \fi
 %
