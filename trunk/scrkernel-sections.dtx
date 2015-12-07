@@ -1,4 +1,4 @@
-% \CheckSum{4078}
+% \CheckSum{4082}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -1643,15 +1643,27 @@
 % der Gliederungsebene abgebildet werden. Dazu erhalten sie in der
 % Gliederungebene den Präfix \texttt{toc}. Das bedeutet gleichzeitig, dass es
 % keine Verzeichniseintragsoption Namens \texttt{style} geben kann und dass
-% Gliederungsoptionen nicht mit mit \texttt{toc} beginnen dürfen.
+% Gliederungsoptionen nicht mit \texttt{toc} beginnen dürfen.
 %    \begin{macrocode}
     \let\scr@dsc@tocstyle@options\@empty
+    \let\scr@dsc@extra@relax@opts\@empty
     \begingroup
+      \def\scr@dte@current{#2}%
+      \edef\reserved@a{%
+        \noexpand\@ExecuteTOCEntryStyleInitCode{%
+          \@nameuse{scr@\scr@dsc@current @tocstyle}%
+        }{\scr@dsc@current}%
+      }\reserved@a
       \def\do@endgroup{\endgroup}%
-      \def\do{%
+      \def\do##1{%
+        \l@addto@macro\do@endgroup{%
+          \l@addto@macro\scr@dsc@extra@relax@opts{%
+            \RelaxFamilyKey[.dsc]{KOMAarg}{toc##1}%
+          }%
+        }%
         \@ifnextchar[%]
-          {\@dodefault}%
-          {\@donodefault}%
+          {\@dodefault{##1}}%
+          {\@donodefault{##1}}%
       }%
       \def\@donodefault##1{%
         \l@addto@macro\do@endgroup{%
@@ -1661,15 +1673,15 @@
           }%
         }%
       }%
-      \def\@dodefault[##1]##2{%
+      \def\@dodefault##1[##2]{%
         \l@addto@macro\do@endgroup{%
-          \DefineFamilyKey[.dsc]{KOMAarg}{toc##2}[##1]{%
-            \l@addto@macro{\scr@dsc@tocstyle@options}{##2={####1},}%
+          \DefineFamilyKey[.dsc]{KOMAarg}{toc##1}[##2]{%
+            \l@addto@macro{\scr@dsc@tocstyle@options}{##1={####1},}%
             \FamilyKeyStateProcessed
           }%
         }%
       }%
-      \@nameuse{scr@dte@\@nameuse{scr@\scr@dsc@current @tocstyle}@doopts}%
+      \scr@dte@doopts
     \do@endgroup
 %    \end{macrocode}
 % Die Optionen für die Stile von Verzeichniseintrag und Gliederungsebene
@@ -1817,20 +1829,8 @@
 % Verzeichniseintragsoptionen definierten Gliederungsoptionen wieder
 % aufgehoben werden.
 %    \begin{macrocode}
-    \begingroup
-      \def\do@endgroup{\endgroup}%
-      \def\do{%
-        \@ifnextchar[%]
-          {\@do}%
-          {\@do[]}%
-      }%
-      \def\@do[##1]##2{%
-        \l@addto@macro\do@endgroup{%
-          \RelaxFamilyKey[.dsc]{KOMAarg}{toc##2}%
-        }%
-      }%
-      \@nameuse{scr@dte@\@nameuse{scr@\scr@dsc@current @tocstyle}@doopts}%
-    \do@endgroup
+    \scr@dsc@extra@relax@opts
+    \let\scr@dsc@extra@relax@opts\relax
     \RelaxSectionCommandOptions
     \RelaxFamilyKey[.dsc]{KOMAarg}{style}%
     \RelaxFamilyKey[.dsc]{KOMAarg}{tocstyle}%
@@ -4792,11 +4792,13 @@
     }%
   }%
 }{%
-%<book|report>  \DeclareTOCEntryStyle{section}[%
-%<article>  \DeclareTOCEntryStyle{subsection}[%
-    l{indent}{scr@}{@tocindent}{entry indent},%
-    l{numwidth}{scr@}{@tocnumwidth}{entry number width},%
-  ]{%
+%<book|report>  \DeclareTOCEntryStyle{section}[{%
+%<article>  \DeclareTOCEntryStyle{subsection}[{%
+    \DefineTOCEntryLengthOption{indent}%
+      {scr@}{@tocindent}{entry indent}%
+    \DefineTOCEntryLengthOption{numwidth}%
+      {scr@}{@tocnumwidth}{entry number width}%
+  }]{%
     \bprot@dottedtocline{\@nameuse{#1tocdepth}}%
                         {\@nameuse{scr@#1@tocindent}}%
                         {\@nameuse{scr@#1@tocnumwidth}}%
