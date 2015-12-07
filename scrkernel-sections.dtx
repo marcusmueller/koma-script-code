@@ -1,4 +1,4 @@
-% \CheckSum{4082}
+% \CheckSum{4088}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -1560,7 +1560,8 @@
 %    \begin{macrocode}
   \DefineFamilyKey[.dsc]{KOMAarg}{tocstyle}{%
     \IfArgIsEmpty{##1}{%
-      \expandafter\let\csname scr@\scr@dsc@current @tocstyle\endcsname\relax
+      \expandafter\let\csname scr@dte@\scr@dsc@current @style\endcsname
+      \relax
       \FamilyKeyStateProcessed
     }{%
 %<trace>      \typeout{TRACE: option tocstyle=##1}%
@@ -1572,12 +1573,12 @@
           \FamilyKeyStateUnknownValue
         }{%
 %<trace>          \typeout{TRACE: style defined}%
-          \@namedef{scr@\scr@dsc@current @tocstyle}{##1}%
+          \@namedef{scr@dte@\scr@dsc@current @style}{##1}%
           \FamilyKeyStateProcessed
         }%
       }{%
 %<trace>        \typeout{TRACE: command defined}%
-        \@namedef{scr@\scr@dsc@current @tocstyle}{##1}%
+        \@namedef{scr@dte@\scr@dsc@current @style}{##1}%
         \FamilyKeyStateProcessed
       }%
     }%
@@ -1632,10 +1633,10 @@
 % Außerdem muss der Verzeichniseintrags-Stils initialisiert werden:
 %    \begin{macrocode}
 %<trace>    \typeout{TRACE: tocstyle=%
-%<trace>      \@nameuse{scr@\scr@dsc@current @tocstyle}}%
-    \scr@ifundefinedorrelax{scr@\scr@dsc@current @tocstyle}{%
+%<trace>      \@nameuse{scr@dte@\scr@dsc@current @style}}%
+    \scr@ifundefinedorrelax{scr@dte@\scr@dsc@current @style}{%
       \scr@ifundefinedorrelax{l@\scr@dsc@current}{%
-        \@namedef{scr@\scr@dsc@current @tocstyle}{default}%
+        \@namedef{scr@dte@\scr@dsc@current @style}{default}%
       }{}%
     }{}%
 %    \end{macrocode}
@@ -1647,42 +1648,44 @@
 %    \begin{macrocode}
     \let\scr@dsc@tocstyle@options\@empty
     \let\scr@dsc@extra@relax@opts\@empty
-    \begingroup
-      \def\scr@dte@current{#2}%
-      \edef\reserved@a{%
-        \noexpand\@ExecuteTOCEntryStyleInitCode{%
-          \@nameuse{scr@\scr@dsc@current @tocstyle}%
-        }{\scr@dsc@current}%
-      }\reserved@a
-      \def\do@endgroup{\endgroup}%
-      \def\do##1{%
-        \l@addto@macro\do@endgroup{%
-          \l@addto@macro\scr@dsc@extra@relax@opts{%
-            \RelaxFamilyKey[.dsc]{KOMAarg}{toc##1}%
+    \scr@ifundefinedorrelax{scr@dte@\scr@dsc@current @style}{}{%
+      \begingroup
+        \def\scr@dte@current{#2}%
+        \edef\reserved@a{%
+          \noexpand\@ExecuteTOCEntryStyleInitCode{%
+            \@nameuse{scr@dte@\scr@dsc@current @style}%
+          }{\scr@dsc@current}%
+        }\reserved@a
+        \def\do@endgroup{\endgroup}%
+        \def\do##1{%
+          \l@addto@macro\do@endgroup{%
+            \l@addto@macro\scr@dsc@extra@relax@opts{%
+              \RelaxFamilyKey[.dsc]{KOMAarg}{toc##1}%
+            }%
+          }%
+          \@ifnextchar[%]
+            {\@dodefault{##1}}%
+            {\@donodefault{##1}}%
+        }%
+        \def\@donodefault##1{%
+          \l@addto@macro\do@endgroup{%
+            \DefineFamilyKey[.dsc]{KOMAarg}{toc##1}{%
+              \l@addto@macro{\scr@dsc@tocstyle@options}{##1={####1},}%
+              \FamilyKeyStateProcessed
+            }%
           }%
         }%
-        \@ifnextchar[%]
-          {\@dodefault{##1}}%
-          {\@donodefault{##1}}%
-      }%
-      \def\@donodefault##1{%
-        \l@addto@macro\do@endgroup{%
-          \DefineFamilyKey[.dsc]{KOMAarg}{toc##1}{%
-            \l@addto@macro{\scr@dsc@tocstyle@options}{##1={####1},}%
-            \FamilyKeyStateProcessed
+        \def\@dodefault##1[##2]{%
+          \l@addto@macro\do@endgroup{%
+            \DefineFamilyKey[.dsc]{KOMAarg}{toc##1}[##2]{%
+              \l@addto@macro{\scr@dsc@tocstyle@options}{##1={####1},}%
+              \FamilyKeyStateProcessed
+            }%
           }%
         }%
-      }%
-      \def\@dodefault##1[##2]{%
-        \l@addto@macro\do@endgroup{%
-          \DefineFamilyKey[.dsc]{KOMAarg}{toc##1}[##2]{%
-            \l@addto@macro{\scr@dsc@tocstyle@options}{##1={####1},}%
-            \FamilyKeyStateProcessed
-          }%
-        }%
-      }%
-      \scr@dte@doopts
-    \do@endgroup
+        \scr@dte@doopts
+      \do@endgroup
+    }%
 %    \end{macrocode}
 % Die Optionen für die Stile von Verzeichniseintrag und Gliederungsebene
 % werden nicht erneut benötigt, müssten aber natürlich erneut verarbeitet
@@ -1824,11 +1827,6 @@
 % Optionen ausführen und anschließend wieder freigeben.
 %    \begin{macrocode}
     \FamilyExecuteOptions[.dsc]{KOMAarg}{#1}%
-%    \end{macrocode}
-% Todo: Natürlich müssen hier zukünftig auch die durch die
-% Verzeichniseintragsoptionen definierten Gliederungsoptionen wieder
-% aufgehoben werden.
-%    \begin{macrocode}
     \scr@dsc@extra@relax@opts
     \let\scr@dsc@extra@relax@opts\relax
     \RelaxSectionCommandOptions
@@ -1935,8 +1933,6 @@
         \DeclareSectionNumberDepth{#2}{\csname #2numdepth\endcsname}%
       }%
 %    \end{macrocode}
-% Todo: Hier müssen künftig die Funktionen für den Verzeichnisstil verwendet
-% werden!
 % Und es gehören Befehle dazu, um einen Eintrag ins Inhaltsverzeichnis zu
 % schreiben und den Eintrag auch darzustellen:
 %    \begin{macrocode}
@@ -1948,28 +1944,26 @@
       \csname add#2tocentry\endcsname[2]{%
         \addtocentrydefault{#2}{##1}{##2}%
       }%
-      \scr@ifundefinedorrelax{scr@#2@tocstyle}{}{%
-        \scr@ifundefinedorrelax{%
-          scr@dsc@def@tocstyle@\@nameuse{scr@#2@tocstyle}@command%
+      \scr@ifundefinedorrelax{scr@dte@#2@style}{}{%
+        \scr@ifundefinedorrelax{DeclareTOCStyleEntry}{%
+          \scr@ifundefinedorrelax{%
+            scr@dsc@def@tocstyle@\@nameuse{scr@dte@#2@style}@command%
+          }{}{%
+            \@nameuse{scr@dsc@def@tocstyle@\@nameuse{scr@dte@#2@style}@command}%
+            {#2}%
+          }%
         }{%
-          \scr@ifundefinedorrelax{DeclareTOCStyleEntry}{}{%
-            \DeclareTOCStyleEntry[\scr@dsc@tocstyle@options]{%
-              \@nameuse{scr@#2@tocstyle}%
-            }{#2}%
-          }{}%
-        }{%
-          \@nameuse{scr@dsc@def@tocstyle@\@nameuse{scr@#2@tocstyle}@command}%
-                   {#2}%
+          \DeclareTOCStyleEntry[\scr@dsc@tocstyle@options]{%
+            \@nameuse{scr@dte@#2@style}%
+          }{#2}%
         }%
       }%
       \scr@ifundefinedorrelax{l@#2}{%
-%    \end{macrocode}
-% Todo: So etwas wie ein Default-Stil gibt es bei Verwendung von
-% Verzeichnisstilen mit \texttt{scrkernel-tocstyle} noch nicht. Dafür sind
-% noch diverse Änderungen notwendig. Deshalb wird in dem Fall die nächste
-% Anweisung hier einen Fehler erzeugen.
-%    \begin{macrocode}
-        \scr@dsc@def@tocstyle@default@command{#2}%
+        \scr@ifundefinedorrelax{DeclareTOCStyleEntry}{%
+          \scr@dsc@def@tocstyle@default@command{#2}%
+        }{%
+          \DeclareTOCStyleEntry[\scr@dsc@tocstyle@options]{default}{#2}%
+        }%
       }{}%
 %    \end{macrocode}
 %   \changes{v3.20}{2015/0/07}{\textsf{hyperref} bei den Ebenen der
@@ -2005,8 +1999,6 @@
 % \end{macro}^^A \scr@declaresectioncommanderror
 % \begin{macro}{\scr@dsc@def@tocstyle@default@command}
 %   \changes{v3.20}{2015/10/06}{neue Anweisung (intern)}^^A
-% Todo: Hier muss der Verzeichnisstil \texttt{default} ein echter Alias für
-% den entsprechenden Stil werden.
 % \begin{macro}{\scr@dte@default@doopts}
 %   \changes{v3.20}{2015/11/12}{neue Anweisung (intern)}^^A
 % Dieser Verzeichnisstil wird verwendet, wenn der Stil nicht explizit
@@ -2025,13 +2017,14 @@
 % \end{macro}^^A \scr@dsc@def@tocstyle@default@command
 % \begin{macro}{\scr@dsc@def@tocstyle@gobble@command}
 %   \changes{v3.20}{2015/10/06}{neue Anweisung (intern)}^^A
-% Todo: Dieser Verzeichnisstil ist über den entsprechenden
-% Verzeichnisstilbefehle zu definieren.
-% Dieser Verzeichnisstil vernichtet den Eintrag.
+% Dieser Verzeichnisstil vernichtet den Eintrag ist aber nur definiert, wenn
+% es nicht einen entsprechenden echten Verzeichnisstil gibt.
 %    \begin{macrocode}
-\newcommand*{\scr@dsc@def@tocstyle@gobble@command}[1]{%
-  \expandafter\def\csname l@#1\endcsname{\@gobbletwo}%
-}
+\scr@ifundefinedorrelax{scr@dte@def@l@gobble}{%
+  \newcommand*{\scr@dsc@def@tocstyle@gobble@command}[1]{%
+    \expandafter\def\csname l@#1\endcsname{\@gobbletwo}%
+  }%
+}{}
 %    \end{macrocode}
 % \end{macro}^^A \scr@dsc@def@tocstyle@gobble@command
 % \end{macro}^^A \DeclareSectionCommand
@@ -3187,8 +3180,6 @@
 %
 % \begin{macro}{\scr@dsc@def@tocstyle@part@command}
 %   \changes{v3.20}{2015/10/06}{neue Anweisung (intern)}^^A
-% Todo: Dieser Verzeichnisstil ist über den entsprechenden
-% Verzeichnisstilbefehle zu definieren.
 % Diese Anweisung definiert einen \cs{l@\dots}-Befehl im Stil
 % \texttt{part}. Dabei ist das einzige Argument der Name der zugehörigen
 % Gliederungsanweisung.
