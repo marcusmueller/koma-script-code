@@ -1,4 +1,4 @@
-% \CheckSum{1141}
+% \CheckSum{1145}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-tocstyle.dtx
@@ -128,26 +128,23 @@
 %
 % \subsection{Grundlagen für Verzeichniseintragsstile}
 %
-% \emph{Hinweis: Dieser Code wird möglicherweise später in \textsf{tocbasic}
-% wandern. Das ist aber erst möglich, wenn die Verwendung der hier
-% deklarierten Optionen innerhalb \cs{DeclareSectionCommand} implementiert
-% ist und eine Verwendung zusammen mit beispielsweise den Standardklassen
-% möglich ist.}
-%
 % Ab \KOMAScript~3.20 halten Stile Einzug in die Verzeichnisse. Der erste
 % Schritt dabei sind die Stile der Verzeichniseinträge. Jeder Stil besteht aus
 % einer Anweisung, mit der ein Verzeichnisbefehl definiert wird und
 % zugehörigen Optionen. Die Optionen dienen dazu, Einstellungen für die
 % einzelnen Verzeichnisbefehle vorzunehmen.
 %
-% \begin{macro}{\scrkernel@tocstyle@available}
-% Diese Anweisung wird nur solange definiert werden, so lange dieses Modul von
-% \KOMAScript{} optional ist. Andere Module können darüber erkennen, ob sie
-% das Modul bereits verwenden können oder nicht.
+% \iffalse
+%<*package>
+% \fi
+%
+% Einige Teile werden nur benötigt, wenn das ganze via \textsf{tocbasic}
+% realisiert wird. Ebenso sollen einige Teile dann nur im Paket landen und
+% nicht in den Klassen. Das Paket benötigt dann erstmals auch \textsf{scrbase}
+% für die Verarbeitung der Optionen.
 %    \begin{macrocode}
-%<prepare>\newcommand*{\scrkernel@tocstyle@available}{}
+%<prepare>\RequirePackage{scrbase}
 %    \end{macrocode}
-% \end{macro}
 %
 % \changes{v3.20}{2015/11/17}{Verzeichnisstile bekommen das
 %   \texttt{KOMAarg}-Mitglied \texttt{.dte}}^^A
@@ -515,7 +512,9 @@
       \@DefineTOCEntryCommandOptionMacro{#2}{#3}{#4}[#5]{##1{####1}}%
     }%
   \else
-    \ClassError{\KOMAClassName}{only one argument supported}{%
+%<class>    \ClassError{\KOMAClassName
+%<package>    \PackageError{tocbasic%
+    }{only one argument supported}{%
       \string\DefineTOCEntryCommandOption\space currently supports only
       commands with\MessageBreak
       at most one argument not #5}%
@@ -540,7 +539,9 @@
       \@DefineTOCEntryCommandOptionMacro{#2}{#4}{#5}[#6]{##1{####1}{####2}}%
     }%
   \else
-    \ClassError{\KOMAClassName}{only one argument supported}{%
+%<class>    \ClassError{\KOMAClassName
+%<package>    \PackageError{tocbasic%
+    }{only one argument supported}{%
       \string\DefineTOCEntryCommandOption\space currently supports only
       commands with\MessageBreak
       at most two argument not #6}%
@@ -711,7 +712,9 @@
 %<*body>
 \newcommand*{\DeclareTOCStyleEntry}[3][]{%
   \scr@ifundefinedorrelax{scr@dte@def@l@#2}{%
-    \ClassError{\KOMAClassName}{toc entry style `#2' undefined}{%
+%<class>    \ClassError{\KOMAClassName
+%<package>    \PackageError{tocbasic%
+    }{toc entry style `#2' undefined}{%
       Somebody told me to define toc entry `#3' with style `#2',\MessageBreak
       but I do not know style `#2'.\MessageBreak
       You should first define the style then define the entry.\MessageBreak
@@ -742,7 +745,9 @@
       \aftergroup\@tempswatrue
       \def\do##1##2##3##4{%
         \scr@ifundefinedorrelax{##1#3##2}{%
-          \ClassError{\KOMAClassName}{toc style `#2' needs ##4}{%
+%<class>          \ClassError{\KOMAClassName
+%<package>          \PackageError{tocbasic%
+          }{toc style `#2' needs ##4}{%
             Usually the ##4 is defined using option `##3'.\MessageBreak
             In some cases it may be set defining command
             `\expandafter\string\csname ##1#3##2\endcsname'.\MessageBreak
@@ -937,6 +942,7 @@
 %<*dottedtocline|undottedtocline|tocline>
   \DefineTOCEntryLengthOption{numwidth}%
     {scr@tso@}{@numwidth}{entry number width}%
+%</dottedtocline|undottedtocline|tocline>
 %    \end{macrocode}
 % Die Ebene, \texttt{level} bzw. \cs{\dots tocdepth}, kann auf zweierlei Arten
 % automatisch bestimmt werden. Zum einen wird für Sub-Ebenen die Elternebene
@@ -985,7 +991,6 @@
     }%
   }{}%
 %    \end{macrocode}
-%</dottedtocline|undottedtocline|tocline>
 % Der Einzug kann wie der Level aus der Elternebene gebildet werden
 %    \begin{macrocode}
 %<*tocline>
@@ -1096,6 +1101,7 @@
 %    \end{macrocode}
 % Für die Nummernbreite gibt es ebenfalls beide Wege.
 %    \begin{macrocode}
+%<*dottedtocline|undottedtocline|tocline>
 %<*tocline>
   \scr@ifundefinedorrelax{scr@tso@#1@numwidth}{%
     \scr@ifundefinedorrelax{scr@#1@tocnumwidth}{%
@@ -1113,7 +1119,6 @@
     }%
   }{}%
 %</tocline>
-%<*dottedtocline|undottedtocline|tocline>
   \@ifundefined{scr@tso@#1@numwidth}{%
 %<*dottedtocline|undottedtocline>
     \@ifundefined{scr@#1@tocnumwidth}{%
@@ -1273,7 +1278,7 @@
       }{%
         \addpenalty{-\@highpenalty}%
 %<undottedtocline>        \vskip 1.0em \@plus\p@
-%<largetocline>        \vskip 2.25em \@plus\p@
+%<largetocline>        \addvspace{2.25em \@plus\p@}%
       }%
     \else
       \addpenalty\@secpenalty
@@ -1416,7 +1421,9 @@
             \ifdim \wd\scr@dte@tocline@numbox
                   >\dimexpr \@nameuse{scr@tso@#1@numwidth}%
                            -\@nameuse{scr@tso@#1@numsep}\relax
-              \ClassWarning{\KOMAClassName}{%
+%<class>              \ClassWarning{\KOMAClassName
+%<package>              \PackageWarning{tocbasic%
+              }{%
                 number width of #1 toc entries should be
                 increased!\MessageBreak
                 Currently used number width =
@@ -1511,11 +1518,21 @@
 % \end{macro}^^A \TOCLineLeaderFill
 % \end{macro}^^A \scr@dte@tocline
 %
-% Einige Stile sollen nur definiert werden, wenn die Definition in die Klasse
-% geschrieben wird:
+% \iffalse
+%</style>
+%</package>
+% \fi
+%
+% \subsubsection{Von den \KOMAScript-Klassen genutzte Stile}
+%
 % \iffalse
 %<*class>
+%<*style>
 % \fi
+%
+% Einige Stile sollen nur definiert werden, wenn die Definition in die Klasse
+% geschrieben wird:
+%
 % \begin{macro}{\scr@dte@def@l@part}
 %   \changes{v3.20}{2015/12/07}{neuer Verzeichnisstil \texttt{part}}^^A
 % Dieser Verzeichnisstil existiert bei \textsf{scrbook}, \textsf{scrreprt} und
@@ -1638,8 +1655,8 @@
 % \end{macro}
 %
 % \iffalse
-%</class>
 %</style>
+%</class>
 % \fi
 %
 % \Finale
