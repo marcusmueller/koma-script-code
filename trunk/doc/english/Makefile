@@ -1,6 +1,6 @@
 # ======================================================================
 # Makefile
-# Copyright (c) Markus Kohm, 2002-2014
+# Copyright (c) Markus Kohm, 2002-2015
 #
 # This file is part of the LaTeX2e KOMA-Script bundle.
 #
@@ -18,7 +18,7 @@
 # This work consists of all files listed in manifest.txt.
 # ----------------------------------------------------------------------
 # Makefile
-# Copyright (c) Markus Kohm, 2002-2014
+# Copyright (c) Markus Kohm, 2002-2015
 #
 # Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 # Version 1.3c, verteilt und/oder veraendert werden.
@@ -47,19 +47,9 @@ LANGUAGELONG     = english
 include $(DOCDIR)Makefile.guide
 
 # ----------------------------------------------------------------------
-# NOTE: Remove these rules after real translation of tocbasic.tex 
-#       is available.
-tocbasic.tex: ../../tocbasic.tex
-	if [ -L $@ ] || ! [ -f $@ ]; then $(SYMLINK) $< .; else touch $@; fi
-
-../../tocbasic.tex: ../../tocbasic.dtx
-	cd ../.. && tex \\nonstopmode\\input $(basename $<)
-# ----------------------------------------------------------------------
 
 maintainclean_local: distclean_local
 	$(RM) guide.pdf $(GUIDENAME).pdf $(GUIDENAME).html
 	[ -L tocbasic.tex ] && $(RM) tocbasic.tex || true
-	[ -L scrwfile.tex ] && $(RM) scrwfile.tex || true
-	[ -L scrlayer-notecolumn.tex ] && $(RM) scrlayer-notecolumn.tex || true
 #
 # end of file `Makefile'
