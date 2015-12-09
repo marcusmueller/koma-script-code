@@ -149,8 +149,9 @@ CLS_MAIN_DTX    = scrkernel-basics.dtx \
 		  scrkernel-paragraphs.dtx \
 		  scrkernel-pseudolengths.dtx \
 		  scrkernel-sections.dtx \
-		  scrkernel-typearea.dtx \
 		  scrkernel-title.dtx \
+		  scrkernel-tocstyle.dtx \
+		  scrkernel-typearea.dtx \
 		  scrkernel-variables.dtx \
 		  scrkernel-version.dtx \
 		  scrlfile.dtx \
@@ -220,7 +221,7 @@ NODIST_GENERATED = $(CLS_DVIS) $(CLS_FILES) $(ALPHA_DOC)
 GENERATED	= $(NODIST_GENERATED) ChangeLog \
 		  scrjura.ins \
 		  scrwfile.ins scrwfile.tex scrwfile.drv \
-		  tocbasic.ins tocbasic.tex \
+		  tocbasic.ins \
 	 	  tocstyle.ins tocstyle.tex tocstyle.dvi tocstyle.drv \
 		  scrlayer.tex scrlayer-scrpage.tex scrlayer-notecolumn.tex
 
