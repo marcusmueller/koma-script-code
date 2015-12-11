@@ -1,4 +1,4 @@
-% \CheckSum{1465}
+% \CheckSum{1400}
 % \iffalse meta-comment
 % ======================================================================
 % tocbasic.dtx
@@ -56,6 +56,12 @@
 %
 % \iffalse
 %%% From File: $Id$
+%<identify>%%%            (run: identify)
+%<prepare>%%%            (run: prepare)
+%<option>%%%            (run: option)
+%<execoption>%%%            (run: execoption)
+%<body>%%%            (run: body)
+%<exit>%%%            (run: exit)
 %<*dtx>
 \ifx\ProvidesFile\undefined\def\ProvidesFile#1[#2]{}\fi
 \begingroup
@@ -66,20 +72,20 @@
 \endgroup
 \ProvidesFile{tocbasic.dtx}[\filedate\space\filerevision\space
 %</dtx>
-%<package>\NeedsTeXFormat{LaTeX2e}[1995/12/01]
-%<package>\ProvidesPackage{tocbasic}[%
-%<*dtx|package|driver>
+%<package&identify>\NeedsTeXFormat{LaTeX2e}[1995/12/01]
+%<package&identify>\ProvidesPackage{tocbasic}[%
+%<*dtx|(package&identify)|driver>
 %!KOMAScriptVersion
   package
-%</dtx|package|driver>
+%</dtx|(package&identify)|driver>
 %<driver>  (driver)%
-%<package>  (handling toc-files)%
+%<package&identify>  (handling toc-files)%
 %<*dtx>
   (dtx)%
 %</dtx>
-%<*dtx|package|driver>
+%<*dtx|(package&identify)|driver>
 ]
-%</dtx|package|driver>
+%</dtx|(package&identify)|driver>
 %<*dtx>
 \ifx\documentclass\undefined
   \input scrdocstrip.tex
@@ -94,13 +100,19 @@
   }
   \generate{\usepreamble\defaultpreamble
     \file{tocbasic.sty}{%
-      \from{tocbasic.dtx}{package}%
-      \from{scrkernel-tocstyle.dtx}{package,prepare,option,body}%
+      \from{tocbasic.dtx}{package,identify}%
+      \from{tocbasic.dtx}{package,prepare}%
+      \from{scrkernel-tocstyle.dtx}{package,prepare}%
+      \from{tocbasic.dtx}{package,option}%
+      \from{scrkernel-tocstyle.dtx}{package,option}%
+      \from{tocbasic.dtx}{package,body}%
+      \from{scrkernel-tocstyle.dtx}{package,body}%
       \from{scrkernel-tocstyle.dtx}{package,style,gobble}%
       \from{scrkernel-tocstyle.dtx}{package,style,dottedtocline}%
       \from{scrkernel-tocstyle.dtx}{package,style,undottedtocline}%
       \from{scrkernel-tocstyle.dtx}{package,style,largetocline}%
       \from{scrkernel-tocstyle.dtx}{package,style,tocline}%
+      \from{tocbasic.dtx}{package,exit}%
       \from{scrlogo.dtx}{logo}%
     }%
   }%
@@ -187,16 +199,22 @@
 % \cs{RequiresPackage}. Using different options by different packages would
 % result in an option clash.
 %    \begin{macrocode}
+%<*option>
 \ProcessOptions\relax
+%</option>
 %    \end{macrocode}
 %
 %
 % \subsection{Required Packages}
 % \label{sec:packages}
 %
-% Currently only graphics bundle's package \textsf{keyval} is needed.
+% Package \textsf{scrbase} is needed to process all macro options. As long as
+% no package options are provided, the \texttt{body}-run is early enough to
+% load it.
 %    \begin{macrocode}
-\RequirePackage{keyval}
+%<*body>
+\RequirePackage{scrbase}
+%</body>
 %    \end{macrocode}
 % We load it after processing the options, because we don't need it for
 % processing options.
@@ -220,6 +238,7 @@
 %
 %   The initial state of the list will be \emph{empty}.
 %    \begin{macrocode}
+%<*body>
 \newcommand*{\tb@listoftocs}{}
 %    \end{macrocode}
 % \end{macro}
@@ -348,11 +367,10 @@
 %   \cs{tocbasic@extend@babel} must not be a local macro (like \cs{@currext})
 %    \begin{macrocode}
 \newcommand*{\tocbasic@extend@babel}[1]{%
-  \begingroup\expandafter\expandafter\expandafter\endgroup
-  \ifx\csname bbl@set@language\endcsname\relax
+  \scr@ifundefinedorrelax{bbl@set@language}{%
     \PackageInfo{tocbasic}{babel extension for `#1' omitted\MessageBreak
       because of missing \string\bbl@set@language}%
-  \else
+  }{%
     \iftocfeature{#1}{nobabel}{%
       \PackageInfo{tocbasic}{omitting babel extension for `#1'\MessageBreak
         because of feature `nobabel' available\MessageBreak
@@ -365,7 +383,7 @@
         \addtocontents{#1}{\xstring\select@language{\languagename}}%
       }%
     }%
-  \fi
+  }%
 }
 %    \end{macrocode}
 %   This feature should be used for all toc-files (unless feature
@@ -487,6 +505,7 @@
 \newcommand{\@@addtoeachtocfile}[1]{%
   \doforeachtocfile{\addtocontents{\@currext}{#1}}%
 }
+%</body>
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -501,6 +520,7 @@
 %   Something like a combination of \cs{addtoeachtocfile} and
 %   \cs{addcontentsline}.
 %    \begin{macrocode}
+%<*body>
 \newcommand{\addcontentslinetoeachtocfile}{%
   \@ifnextchar [%]
     \@addcontentslinetoeachtocfile\@@addcontentslinetoeachtocfile
@@ -531,12 +551,11 @@
 }
 \newcommand*{\@addxcontentsline}{}
 \def\@addxcontentsline#1#2[#3]#4{%
-  \begingroup\expandafter\expandafter\expandafter\endgroup
-  \expandafter\ifx\csname add#2#1entry\endcsname\relax
+  \scr@ifundefinedorrelax{add#2#1entry}{%
     \tocbasic@addxcontentsline{#1}{#2}{#3}{#4}%
-  \else
+  }{%
     \@nameuse{add#2#1entry}{#3}{#4}%
-  \fi
+  }%
 }
 %    \end{macrocode}
 % \begin{macro}{\nonumberline}
@@ -600,6 +619,7 @@
 \def\@@@@addxcontentslinetoeachtocfile#1[#2]#3{%
   \doforeachtocfile{\addxcontentsline{\@currext}{#1}[{#2}]{#3}}%
 }
+%</body>
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -621,6 +641,7 @@
 %   be called, the toc will be started, an individual hook will be called, an
 %   general hook wil be called, that's it.
 %    \begin{macrocode}
+%<*body>
 \newcommand*{\tocbasic@starttoc}[1]{%
   \begingroup
     \edef\@currext{#1}%
@@ -736,14 +757,12 @@
     }{}%
     \iftocfeature{\@currext}{numberline}{\def\nonumberline{\numberline{}}}{}%
     \tocbasic@listhead{#1}%
-    \begingroup\expandafter\expandafter\expandafter\endgroup
-    \expandafter\ifx\csname microtypesetup\endcsname\relax
-    \else
+    \scr@ifundefinedorrelax{microtypesetup}{}{%
       \iftocfeature{\@currext}{noprotrusion}{}{%
         \microtypesetup{protrusion=false}%
         \PackageInfo{tocbasic}{character protrusion at \@currext\space deactivated}%
       }%
-    \fi
+    }%
     \tocbasic@starttoc{#2}%
   \endgroup
 }
@@ -796,8 +815,7 @@
 %    \begin{macrocode}
 \newcommand*{\tocbasic@listhead}[1]{%
   \@ifundefined{tocbasic@listhead@\@currext}{%
-    \begingroup\expandafter\expandafter\expandafter\endgroup
-    \expandafter\ifx\csname chapter\endcsname\relax
+    \scr@ifundefinedorrelax{chapter}{%
       \expandafter\def\csname tocbasic@listhead@\@currext\endcsname##1{%
         \iftocfeature{\@currext}{leveldown}{%
           \iftocfeature{\@currext}{numbered}{%
@@ -837,7 +855,7 @@
           }%
         }%
       }%
-    \else
+    }{%
       \expandafter\def\csname tocbasic@listhead@\@currext\endcsname##1{%
         \iftocfeature{\@currext}{leveldown}{%
           \iftocfeature{\@currext}{numbered}{%
@@ -896,7 +914,7 @@
           }%
         }%
       }%
-    \fi
+    }%
   }{}%
   \csname tb@@beforehead@hook\endcsname
   \csname tb@\@currext @beforehead@hook\endcsname
@@ -934,6 +952,7 @@
   }{}%
   \expandafter\g@addto@macro\csname tb@#1@afterhead@hook\endcsname{#2}%
 }
+%</body>
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -942,22 +961,24 @@
 % \begin{macro}{\MakeMarkcase}
 %   Use upper-case or not?
 %    \begin{macrocode}
+%<*exit>
 \AtBeginDocument{%
   \@ifundefined{MakeMarkcase}{%
-    \begingroup\expandafter\expandafter\expandafter\endgroup
-    \expandafter\ifx\csname KOMAClassName\endcsname\relax
+    \scr@ifundefinedorrelay{KOMAClassName}{%
       \let\MakeMarkcase\MakeUppercase
-    \else
+    }{%
       \let\MakeMarkcase\@firstofone
-    \fi
+    }%
   }{}%
 }
+%</exit>
 %    \end{macrocode}
 % \end{macro}
 %
 % \begin{macro}{\deftocheading}
 %   Define a toc headings command with one argument (the title).
 %    \begin{macrocode}
+%<*body>
 \newcommand*{\deftocheading}[1]{%
   \@namedef{tocbasic@listhead@#1}##1}
 %    \end{macrocode}
@@ -1025,13 +1046,13 @@
 %   We need a test for the features
 %    \begin{macrocode}
 \newcommand*{\iftocfeature}[2]{%
-  \begingroup\expandafter\expandafter\expandafter\endgroup
-  \expandafter\ifx\csname tocbasic@#1@feature@#2\endcsname\relax
+  \scr@ifundefinedorrelax{tocbasic@#1@feature@#2}{%
     \expandafter\@secondoftwo
-  \else
+  }{%
     \expandafter\@firstoftwo
-  \fi
+  }%
 }
+%</body>
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -1050,6 +1071,7 @@
 % may only result in the need of one more \LaTeX{} run, but not in a permanent
 % mistake.
 %    \begin{macrocode}
+%<*body>
 \newcommand*{\tocbasicautomode}{%
   \let\tb@saved@starttoc\@starttoc
   \let\@starttoc\tocbasic@starttoc
@@ -1060,6 +1082,7 @@
     }%
   }%
 }
+%</body>
 %    \end{macrocode}
 % \end{macro}
 %
@@ -1080,6 +1103,7 @@
 %   The type of list is used for environment and counter names and as part of
 %   several internal and user macros.
 %    \begin{macrocode}
+%<*body>
 \define@key{tocbasic}{type}{%
   \tb@ifvalueisnotempty{type}{#1}{\edef\tb@nt@type{#1}}%
 }
@@ -1500,6 +1524,7 @@
 %   This macro saves the float type for auto generated float types.
 %    \begin{macrocode}
 \newcommand*{\tb@nt@autofloattype}{16}
+%</body>
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
