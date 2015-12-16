@@ -1,4 +1,4 @@
-% \CheckSum{1400}
+% \CheckSum{1456}
 % \iffalse meta-comment
 % ======================================================================
 % tocbasic.dtx
@@ -112,6 +112,7 @@
       \from{scrkernel-tocstyle.dtx}{package,style,undottedtocline}%
       \from{scrkernel-tocstyle.dtx}{package,style,largetocline}%
       \from{scrkernel-tocstyle.dtx}{package,style,tocline}%
+      \from{scrkernel-tocstyle.dtx}{package,style,default}%
       \from{tocbasic.dtx}{package,exit}%
       \from{scrlogo.dtx}{logo}%
     }%
@@ -760,7 +761,8 @@
     \scr@ifundefinedorrelax{microtypesetup}{}{%
       \iftocfeature{\@currext}{noprotrusion}{}{%
         \microtypesetup{protrusion=false}%
-        \PackageInfo{tocbasic}{character protrusion at \@currext\space deactivated}%
+        \PackageInfo{tocbasic}{%
+          character protrusion at \@currext\space deactivated}%
       }%
     }%
     \tocbasic@starttoc{#2}%
@@ -1091,198 +1093,355 @@
 % \label{sec:newfloats}
 %
 % \begin{macro}{\DeclareNewTOC}
-%   \changes{v3.06}{2010/06/01}{new high level command}%
+%   \changes{v3.06}{2010/06/01}{new high level command}^^A
+%   \changes{v3.18}{2015/06/20}{\cs{tb@nt@types} and \cs{tb@nt@listname} are
+%     initialised \cs{relax}}^^A
 %   This command defines only a new TOC and a new caption command for this
 %   TOC.  It does not define a new foat unless option float was set!  It does
 %   not define a new nonfloat unless option nonfloat was set!  The optional
 %   argument is used to set up several settings using \textsf{keyval}.  The
 %   mandatory argument is the shortcut.  The default type is the shortcut.
 %   The extension is the shortcut.  The default owner is ``\texttt{float}''.
-%
-%   But first of all, we define the options used by the optional argument:
-%   The type of list is used for environment and counter names and as part of
-%   several internal and user macros.
 %    \begin{macrocode}
 %<*body>
-\define@key{tocbasic}{type}{%
-  \tb@ifvalueisnotempty{type}{#1}{\edef\tb@nt@type{#1}}%
-}
+\DefineFamily{KOMAarg}
+\DefineFamilyMember[.toc]{KOMAarg}
+\newcommand*{\DeclareNewTOC}[2][]{%
+  \newif\iftb@nt@float
+  \newif\iftb@nt@nonfloat
+  \newif\iftb@nt@forcenames
+  \def\tb@nt@floattype{\tb@nt@autofloattype}%
+  \def\tb@nt@floatpos{tbp}%
+  \def\tb@nt@ext{#2}%
+  \edef\tb@nt@type{#2}%
+  \let\tb@nt@types\relax
+  \def\tb@nt@owner{float}%
+  \def\tb@nt@name{\expandafter\protect\expandafter\MakeUppercase\tb@nt@type}%
+  \let\tb@nt@listname\relax
+  \let\tb@nt@counterwithin\@empty
+  \let\tb@nt@atbegin\@empty
+  \let\tb@nt@atend\@empty
+  \def\tb@nt@tocentrystyle{default}%
+  \IfArgIsEmpty{#1}{}{%
+    \def\tb@nt@tocstyle@options{level=1}%
+    \let\tb@nt@extra@relax@opts\@empty
 %    \end{macrocode}
-% \begin{macro}{\tb@nt@counterwithin}
-%   If a counter will be defined, this counter may depend on another counter
-%   (like figure counter depends on chapter counter at book classes). If the
-%   value is empty, the counter does not depend on any other counter.
+%   After initialisation of the local values we need to know the style of the
+%   toc entry, to define style dependend options.
+% \begin{macro}{\tb@nt@type}
+%   \changes{v3.20}{2015/12/16}{local valid only}^^A
+%   The type of list is used for environment and counter names and as part of
+%   several internal and user macros. It is needed before defining the style
+%   dependend options. So we use a first run to set it up.
 %    \begin{macrocode}
-\define@key{tocbasic}{counterwithin}{%
-  \edef\tb@nt@counterwithin{#1}%
-}
+    \DefineFamilyKey[.toc]{KOMAarg}{type}{%
+      \tb@ifvalueisnotempty{##1}{\edef\tb@nt@type{##1}}%
+    }%
 %    \end{macrocode}
 % \end{macro}
-% \begin{macro}{\tb@nt@types}
-%   Sometimes the plural of the type is needed and may be defined by a
-%   seperate option.
+% \begin{macro}{\tb@nt@tocentrystyle}
+%   \changes{v3.20}{2015/12/16}{neu (intern)}
+%   The style of the toc entry. It is needed before defining the style
+%   dependend options. So we use a first run to set it up.
 %    \begin{macrocode}
-\define@key{tocbasic}{types}{%
-  \tb@ifvalueisnotempty{types}{#1}{\edef\tb@nt@types{#1}}%
-}
+    \DefineFamilyKey[.toc]{KOMAarg}{tocentrystyle}[default]{%
+      \IfArgIsEmpty{##1}{%
+        \edef\tb@nt@tocentrystyle{##1}%
+        \FamilyKeyStateProcessed
+      }{%
+        \scr@ifundefinedorrelax{scr@dte@def@l@##1}{%
+          \FamilyKeyStateUnknownValue
+        }{%
+          \edef\tb@nt@tocentrystyle{##1}%
+          \FamilyKeyStateProcessed
+        }%
+      }%
+    }%
 %    \end{macrocode}
 % \end{macro}
-% \begin{macro}{\tb@nt@ext}
-%   Don't tell the user, that the mandatory argument of the command may be
-%   overloaded by this option. This was only done to simplify the definition.
+%   After this we define pseudo option \texttt{@else@} to ignore all currently
+%   not needed options. After this we do the first option execution run.
 %    \begin{macrocode}
-\define@key{tocbasic}{extension}{%
-  \tb@ifvalueisnotempty{extension}{#1}{\edef\tb@nt@ext{#1}}%
-}
+    \DefineFamilyKey[.toc]{KOMAarg}{@else@}{\FamilyKeyStateProcessed}%
+    \FamilyExecuteOptions[.toc]{KOMAarg}{#1}%
+    \RelaxFamilyKey[.toc]{KOMAarg}{@else@}%
 %    \end{macrocode}
-% \end{macro}
-% \begin{macro}{\tb@nt@owner}
-%   The owner of the new list extension.
+%   For the second run we do not need to set up these options again. So define
+%   it as no-opt.
 %    \begin{macrocode}
-\define@key{tocbasic}{owner}{%
-  \tb@ifvalueisnotempty{owner}{#1}{\edef\tb@nt@owner{#1}}%
-}
+    \DefineFamilyKey[.toc]{KOMAarg}{type}{\FamilyKeyStateProcessed}%
+    \DefineFamilyKey[.toc]{KOMAarg}{tocentrystyle}{\FamilyKeyStateProcessed}%
 %    \end{macrocode}
-% \end{macro}
-% \begin{macro}{\tb@nt@name}
-%   We need a name/term for the entries of the new list. This may e.\,g. be used
-%   for |caption| output. A |\<type>name| will also be defined.
+%   \changes{v3.20}{2015/12/16}{defining toc style depending options}^^A
+%   If the toc style is empty we won't define any \cs{l@\dots}. Otherwise we
+%   need to define additional options.
 %    \begin{macrocode}
-\define@key{tocbasic}{name}{%
-  \tb@ifvalueisnotempty{name}{#1}{\edef\tb@nt@name{#1}}%
-}
+    \ifstr{\tb@nt@tocentrystyle}{}{}{%
+      \begingroup
+        \let\scr@dte@current\tb@nt@type
+        \@ExecuteTOCEntryStyleInitCode{\tb@nt@tocentrystyle}{\tb@nt@type}%
+        \def\do@endgroup{\endgroup}%
+        \def\do##1{%
+          \l@addto@macro\do@endgroup{%
+            \l@addto@macro\tb@nt@extra@relax@opts{%
+              \RelaxFamilyKey[.toc]{KOMAarg}{toc##1}%
+            }%
+          }%
+          \@ifnextchar[%]
+            {\@dodefault{##1}}%
+            {\@donodefault{##1}}%
+        }%
+        \def\@donodefault##1{%
+          \l@addto@macro\do@endgroup{%
+            \DefineFamilyKey[.toc]{KOMAarg}{toc##1}{%
+              \l@addto@macro{\tb@nt@tocstyle@options}{,##1={####1}}%
+              \FamilyKeyStateProcessed
+            }%
+          }%
+        }%
+        \def\@dodefault##1[##2]{%
+          \l@addto@macro\do@endgroup{%
+            \DefineFammilyKey[.toc]{KOMAarg}{toc##1}[##2]{%
+              \l@addto@macro{\tb@nt@tocstyle@options}{,##1={####1}}%
+              \FammilyKeyStateProcessed
+            }%
+          }%
+        }%
+        \scr@dte@doopts
+      \do@endgroup
+    }%
 %    \end{macrocode}
-% \end{macro}
-% \begin{macro}{\tb@nt@listname}
-%   \changes{v3.18}{2015/06/20}{using \cs{def} instead of \cs{edef}}
-%   The list itself has a heading. A |\list<type>name| will also be defined.
-%    \begin{macrocode}
-\define@key{tocbasic}{listname}{%
-  \tb@ifvalueisnotempty{listname}{#1}{\def\tb@nt@listname{#1}}%
-}
-%    \end{macrocode}
-% \end{macro}
-% \begin{macro}{\iftb@forcenames}
-%   \changes{v3.06}{2010/06/01}{new internal}
-%   The |\...name| commands will only be defined, if they are not already
-%   defined. But some users may want to define their own names even if there
-%   are already definitions. So this boolean option may switch to force the
-%   definition.
-%    \begin{macrocode}
-\newif\iftb@forcenames
-\define@key{tocbasic}{forcenames}[true]{%
-  \lowercase{\tb@boolkey{#1}}{forcenames}%
-}
-%    \end{macrocode}
-% \end{macro}
-% \begin{macro}{\tb@nt@level}
-%   Each entry to a TOC/list of has a numeric level. You may set up your own
-%   level.
-%    \begin{macrocode}
-\define@key{tocbasic}{level}{%
-  \tb@ifvalueisnotempty{level}{#1}{\tb@numkey\tb@nt@level{#1}}%
-}
-%    \end{macrocode}
-% \end{macro}
-% \begin{macro}{\tb@nt@indent}
-%   Earch entry of a TOC/list of is idented on the left side. This is the
-%   amount of the indention of the number part.
-%    \begin{macrocode}
-\define@key{tocbasic}{indent}{%
-  \tb@ifvalueisnotempty{indent}{#1}{\tb@dimkey\tb@nt@indent{#1}}%
-}
-%    \end{macrocode}
-% \end{macro}
-% \begin{macro}{\tb@nt@hang}
-%   Earch entry of a TOC/list of is idented on the left side. This is the
-%   amount of the indention of the text of the entry.
-%    \begin{macrocode}
-\define@key{tocbasic}{hang}{%
-  \tb@ifvalueisnotempty{hang}{#1}{\tb@dimkey\tb@nt@hang{#1}}%
-}
-%    \end{macrocode}
-% \end{macro}
-% \begin{macro}{\iftb@float}
-%   \changes{v3.06}{2010/06/01}{new internal}
-%   This boolean indicates, that float environments should also be defined.
-%    \begin{macrocode}
-\newif\iftb@float
-\define@key{tocbasic}{float}[true]{%
-  \lowercase{\tb@boolkey{#1}}{float}%
-}
-%    \end{macrocode}
-% \end{macro}
-% \begin{macro}{\iftb@nonfloat}
-%   \changes{v3.06}{2010/06/01}{new internal}
-%   This boolean indicates, that non-float environment should also be
-%   defined. The environment has the postfix ``-''.
-%    \begin{macrocode}
-\newif\iftb@nonfloat
-\define@key{tocbasic}{nonfloat}[true]{%
-  \lowercase{\tb@boolkey{#1}}{nonfloat}%
-}
-%    \end{macrocode}
-% \end{macro}
-% \begin{macro}{\tb@nt@floattype}
-%   Simply the value for the |\ftype@...| macro. It has to be
-%   $1<=\textrm{value}<=31$.
-%    \begin{macrocode}
-\define@key{tocbasic}{floattype}{%
-  \tb@ifvalueisnotempty{floattype}{#1}{\tb@numkey\tb@nt@floattype{#1}}%
-}
-%    \end{macrocode}
-% \end{macro}
-% \begin{macro}{\tb@nt@floatpos}
-%   Simply the value for the |\fps@...| macro.
-%    \begin{macrocode}
-\define@key{tocbasic}{floatpos}{%
-  \tb@ifvalueisnotempty{floatpos}{#1}{\edef\tb@nt@floatpos{#1}}%
-}
-%    \end{macrocode}
-% \end{macro}
+%   After this, we need to define all the other options an do the real option
+%   execution.
 % \begin{macro}{\tb@nt@atbegin}
 %   \changes{v3.09}{2011/03/01}{new optional identifier \texttt{atbegin}}
 %   \changes{v3.11c}{2013/02/01}{\texttt{atbegin} argument may be empty}
+%   \changes{v3.20}{2015/12/16}{local valid only}^^A
 %   Additional code executed at the begin of a new defined environment.
 %    \begin{macrocode}
-\define@key{tocbasic}{atbegin}{%
-  \def\tb@nt@atbegin{#1}%
-}
+    \FamilyStringKey[.toc]{KOMAarg}{atbegin}{\tb@nt@atbegin}%
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\tb@nt@atend}
 %   \changes{v3.09}{2011/03/01}{new optional identifier \texttt{atbend}}
 %   \changes{v3.11c}{2013/02/01}{\texttt{atend} argument may be empty}
+%   \changes{v3.20}{2015/12/16}{local valid only}^^A
 %   Additional code executed at the end of a new defined environment.
 %    \begin{macrocode}
-\define@key{tocbasic}{atend}{%
-  \def\tb@nt@atend{#1}%
-}
+    \FamilyStringKey[.toc]{KOMAarg}{atend}{\tb@nt@atend}%
 %    \end{macrocode}
 % \end{macro}
-% Now the command to define a new list and maybe float or nonfloat.
-%   \changes{v3.18}{2015/06/20}{\cs{tb@nt@types} and \cs{tb@nt@listname} are
-%     initialised \cs{relax}}^^A
+% \begin{macro}{\tb@nt@counterwithin}
+%   \changes{v3.20}{2015/12/16}{local valid only}^^A
+%   If a counter will be defined, this counter may depend on another counter
+%   (like figure counter depends on chapter counter at book classes). If the
+%   value is empty, the counter does not depend on any other counter.
 %    \begin{macrocode}
-\newcommand*{\DeclareNewTOC}[2][]{%
-  \tb@floatfalse
-  \tb@nonfloatfalse
-  \tb@forcenamesfalse
-  \def\tb@nt@floattype{\tb@nt@autofloattype}%
-  \def\tb@nt@floatpos{tbp}%
-  \def\tb@nt@ext{#2}%
-  \def\tb@nt@type{#2}%
-  \let\tb@nt@types\relax
-  \def\tb@nt@owner{float}%
-  \def\tb@nt@name{\expandafter\protect\expandafter\MakeUppercase\tb@nt@type}%
-  \let\tb@nt@listname\relax
-  \def\tb@nt@level{1}%
-  \def\tb@nt@indent{1em}%
-  \def\tb@nt@hang{1.5em}%
-  \let\tb@nt@counterwithin\@empty
-  \let\tb@nt@atbegin\@empty
-  \let\tb@nt@atend\@empty
-  \setkeys{tocbasic}{#1}%
+    \DefineFamilyKey[.toc]{KOMAarg}{counterwithin}{%
+      \edef\tb@nt@counterwithin{##1}\FamilyKeyStateProcessed
+    }%
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\tb@nt@ext}
+%   \changes{v3.20}{2015/12/16}{local valid only}^^A
+%   Don't tell the user, that the mandatory argument of the command may be
+%   overloaded by this option. This was only done to simplify the definition.
+%    \begin{macrocode}
+    \DefineFamilyKey[.toc]{KOMAarg}{extension}{%
+      \tb@ifvalueisnotempty{##1}{\edef\tb@nt@ext{##1}}%
+    }%
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\iftb@nt@float}
+%   \changes{v3.20}{2015/12/16}{local valid only}^^A
+%   \changes{v3.06}{2010/06/01}{new internal}
+%   This boolean indicates, that float environments should also be defined.
+%    \begin{macrocode}
+    \FamilyBoolKey[.toc]{KOMAarg}{float}{tb@nt@float}%
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\tb@nt@floatpos}
+%   \changes{v3.20}{2015/12/16}{local valid only}^^A
+%   Simply the value for the |\fps@...| macro.
+%    \begin{macrocode}
+    \DefineFamilyKey[.toc]{KOMAarg}{floatpos}{%
+      \tb@ifvalueisnotempty{##1}{\edef\tb@nt@floatpos{##1}}%
+    }%
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\tb@nt@floattype}
+%   \changes{v3.20}{2015/12/16}{local valid only}^^A
+%   Simply the value for the |\ftype@...| macro. It has to be
+%   $1<=\textrm{value}<=31$.
+%    \begin{macrocode}
+    \DefineFamilyKey[.toc]{KOMAarg}{floattype}{%
+      \FamilySetCounterMacro{KOMAarg}{floattype}{\reserved@d}{##1}%
+      \ifx\FamilyKeyState\FamilyKeyStateProcessed
+        \ifnum 0=
+          \ifnum\reserved@d<1 0 \else\ifnum\reserved@d>31 0 \else 1 \fi\fi
+          \FamilyKeyStateUnknownValue
+        \else
+          \let\tb@nt@floattype\reserved@d
+        \fi
+      \fi
+    }%
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\iftb@nt@forcenames}
+%   \changes{v3.06}{2010/06/01}{new internal}
+%   \changes{v3.20}{2015/12/16}{local valid only}^^A
+%   The |\...name| commands will only be defined, if they are not already
+%   defined. But some users may want to define their own names even if there
+%   are already definitions. So this boolean option may switch to force the
+%   definition.
+%    \begin{macrocode}
+    \FamilyBoolKey[.toc]{KOMAarg}{forcenames}{tb@nt@forcenames}%
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\tb@nt@hang}
+%   \changes{v3.20}{2015/12/16}{undefined}^^A
+%   \changes{v3.20}{2015/12/16}{local valid only}^^A
+%   Earch entry of a TOC/list of is idented on the left side. This is the
+%   amount of the indention of the text of the entry.
+%    \begin{macrocode}
+    \DefineFamilyKey[.toc]{KOMAarg}{hang}{%
+      \scr@ifundefinedorrelax{KV@KOMAarg.toc@tocindent}{%
+        \PackageWarning{tocbasic}{%
+          deprecated option `hang'.\MessageBreak
+          Option will be ignored, because toc entry style\MessageBreak
+          `\tb@nt@tocentrystyle' does not provide option `indent'%
+        }%
+      }{%
+        \PackageWarning{tocbasic}{%
+          deprecated option `hang'.\MessageBreak
+          You should replace option `hang' by option\MessageBreak
+          `tocindent'%
+        }%
+        \l@addto@macro\tb@nt@tocstyle@options{,indent={##1}}%
+      }%
+      \FamilyKeyStateProcessed
+    }%
+    \scr@ifundefinedorrelax{KV@KOMAarg.toc@tocindent}{}{%
+      \l@addto@macro\tb@nt@tocstyle@options{,indent=1em}%
+    }%
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\tb@nt@indent}
+%   \changes{v3.20}{2015/12/16}{undefined}^^A
+%   \changes{v3.20}{2015/12/16}{local valid only}^^A
+%   Earch entry of a TOC/list of is idented on the left side. This is the
+%   amount of the indention of the number part.
+%    \begin{macrocode}
+    \DefineFamilyKey[.toc]{KOMAarg}{indent}{%
+      \scr@ifundefinedorrelax{KV@KOMAarg.toc@tocnumwidth}{%
+        \PackageWarning{tocbasic}{%
+          deprecated option `indent'.\MessageBreak
+          Option will be ignored, because toc entry style\MessageBreak
+          `\tb@nt@tocentrystyle' does not provide option `numwidth'%
+        }%
+      }{%
+        \PackageWarning{tocbasic}{%
+          deprecated option `indent'.\MessageBreak
+          You should replace option `indent' by option\MessageBreak
+          `tocnumwidth'%
+        }%
+        \l@addto@macro\tb@nt@tocstyle@options{,numwidth={##1}}%
+      }%
+      \FamilyKeyStateProcessed
+    }%
+    \scr@ifundefinedorrelax{KV@KOMAarg.toc@tocnumwidth}{}{%
+      \l@addto@macro\tb@nt@tocstyle@options{,numwidth=1.5em}%
+    }%
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\tb@nt@level}
+%   \changes{v3.20}{2015/12/16}{undefined}^^A
+%   \changes{v3.20}{2015/12/16}{local valid only}^^A
+%   Each entry to a TOC/list of has a numeric level. You may set up your own
+%   level.
+%    \begin{macrocode}
+    \DefineFamilyKey[.toc]{KOMAarg}{level}{%
+      \PackageWarning{tocbasic}{%
+        deprecated option `level'.\MessageBreak
+        You should replace option `level' by option\MessageBreak
+        `toclevel'
+      }%
+      \l@addto@macro\tb@nt@tocstyle@options{,level={##1}}%
+      \FamilyKeyStateProcessed
+    }%
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\tb@nt@listname}
+%   \changes{v3.18}{2015/06/20}{using \cs{def} instead of \cs{edef}}^^A
+%   \changes{v3.20}{2015/12/16}{local valid only}^^A
+%   The list itself has a heading. A |\list<type>name| will also be defined.
+%    \begin{macrocode}
+    \DefineFamilyKey[.toc]{KOMAarg}{listname}{%
+      \tb@ifvalueisnotempty{##1}{\def\tb@nt@listname{##1}}%
+    }%
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\tb@nt@name}
+%   \changes{v3.20}{2015/12/16}{local valid only}^^A
+%   We need a name/term for the entries of the new list. This may e.\,g. be used
+%   for |caption| output. A |\<type>name| will also be defined.
+%    \begin{macrocode}
+    \DefineFamilyKey[.toc]{KOMAarg}{name}{%
+      \tb@ifvalueisnotempty{##1}{\edef\tb@nt@name{##1}}%
+    }%
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\iftb@nt@nonfloat}
+%   \changes{v3.06}{2010/06/01}{new (internal)}^^A
+%   \changes{v3.20}{2015/12/16}{local valid only}^^A
+%   This boolean indicates, that non-float environment should also be
+%   defined. The environment has the postfix ``-''.
+%    \begin{macrocode}
+    \FamilyBoolKey[.toc]{KOMAarg}{nonfloat}{tb@nt@nonfloat}%
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\tb@nt@owner}
+%   \changes{v3.20}{2015/12/16}{local valid only}^^A
+%   The owner of the new list extension.
+%    \begin{macrocode}
+    \DefineFamilyKey[.toc]{KOMAarg}{owner}{%
+      \tb@ifvalueisnotempty{##1}{\edef\tb@nt@owner{##1}}%
+    }%
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\tb@nt@types}
+%   \changes{v3.20}{2015/12/16}{local valid only}^^A
+%   Sometimes the plural of the type is needed and may be defined by a
+%   seperate option.
+%    \begin{macrocode}
+    \DefineFamilyKey[.toc]{KOMAarg}{types}{%
+      \tb@ifvalueisnotempty{##1}{\edef\tb@nt@types{##1}}%
+    }%
+%    \end{macrocode}
+% \end{macro}
+%   Last but not least we have to execute the options and reset the option
+%   definitions.
+%    \begin{macrocode}
+    \FamilyExecuteOptions[.toc]{KOMAarg}{#1}%
+    \RelaxFamilyKey[.toc]{KOMAarg}{types}%
+    \RelaxFamilyKey[.toc]{KOMAarg}{owner}%
+    \RelaxFamilyKey[.toc]{KOMAarg}{nonfload}%
+    \RelaxFamilyKey[.toc]{KOMAarg}{name}%
+    \RelaxFamilyKey[.toc]{KOMAarg}{listname}%
+    \RelaxFamilyKey[.toc]{KOMAarg}{level}%
+    \RelaxFamilyKey[.toc]{KOMAarg}{indent}%
+    \RelaxFamilyKey[.toc]{KOMAarg}{hang}%
+    \RelaxFamilyKey[.toc]{KOMAarg}{forcenames}%
+    \RelaxFamilyKey[.toc]{KOMAarg}{floatpos}%
+    \RelaxFamilyKey[.toc]{KOMAarg}{float}%
+    \RelaxFamilyKey[.toc]{KOMAarg}{extension}%
+    \RelaxFamilyKey[.toc]{KOMAarg}{counterwithin}%
+    \RelaxFamilyKey[.toc]{KOMAarg}{atend}%
+    \RelaxFamilyKey[.toc]{KOMAarg}{atbegin}%
+    \tb@nt@extra@relax@opts
+    \RelaxFamilyKey[.toc]{KOMAarg}{tocentrystyle}%
+    \RelaxFamilyKey[.toc]{KOMAarg}{type}%
+  }%
 %    \end{macrocode}
 %   First of all, every TOC needs a extension, that should be added to the
 %   list of known extensions.
@@ -1302,7 +1461,7 @@
   \@ifundefined{\tb@nt@type name}{%
     \expandafter\protected@edef\csname \tb@nt@type name\endcsname{\tb@nt@name}%
   }{%
-    \iftb@forcenames
+    \iftb@nt@forcenames
       \expandafter\protected@edef\csname \tb@nt@type name\endcsname
       {\tb@nt@name}%
     \fi
@@ -1310,7 +1469,7 @@
   \@ifundefined{list\tb@nt@type name}{%
     \expandafter\let\csname list\tb@nt@type name\endcsname\tb@nt@listname
   }{%
-    \iftb@forcenames
+    \iftb@nt@forcenames
       \expandafter\let\csname list\tb@nt@type name\endcsname\tb@nt@listname
     \fi
   }%
@@ -1324,11 +1483,10 @@
 %    \end{macrocode}
 % The list entry:
 %    \begin{macrocode}
-  \begingroup\edef\@tempa{\endgroup
-    \noexpand\newcommand*\csname l@\tb@nt@type\endcsname{%
-      \noexpand\@dottedtocline{\tb@nt@level}{\tb@nt@indent}{\tb@nt@hang}%
-    }%
-  }\@tempa
+  \ifstr{\tb@nt@tocentrystyle}{}{}{%
+    \expandafter\DeclareTOCStyleEntry\expandafter[\expandafter{%
+      \tb@nt@tocstyle@options}]{\tb@nt@tocentrystyle}{\tb@nt@type}%
+  }%
 %    \end{macrocode}
 % \changes{v3.12}{2013/05/03}{fixed: definition of
 %   \cs{listof\meta{type}entryname} added as explained in the manual}
@@ -1350,7 +1508,7 @@
 % \changes{v3.09a}{2011/05/30}{fixed: floats may have an optional argument}
 % \changes{v3.12}{2013/12/10}{fixed: usage of default placement}
 %    \begin{macrocode}
-  \iftb@float
+  \iftb@nt@float
     \expandafter\newcommand\expandafter*\csname fps@\tb@nt@type\expandafter
     \endcsname\expandafter{\tb@nt@floatpos}%
     \expandafter\newcommand\expandafter*\csname ftype@\tb@nt@type\expandafter
@@ -1389,7 +1547,7 @@
 %    \end{macrocode}
 % The nonfloat environment:
 %    \begin{macrocode}
-  \iftb@nonfloat
+  \iftb@nt@nonfloat
     \begingroup
       \edef\@tempa{%
         \noexpand\endgroup
@@ -1470,54 +1628,32 @@
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\tb@ifvalueisnotempty}
-%   \changes{v3.06}{2010/05/21}{new internal}%
+%   \changes{v3.06}{2010/05/21}{new internal}^^A
+%   \changes{v3.20}{2015/12/16}{simpler definition}^^A
 %   This is only a helper for defining some of the keys.
 %    \begin{macrocode}
-\newcommand*{\tb@ifvalueisnotempty}[2]{%
-  \begingroup
-    \edef\@tempa{#2}\ifx\@tempa\@empty
-      \PackageError{tocbasic}{empty value for key `#1'}{%
-        The argument of key `#1' may not by empty!}%
-      \aftergroup\@gobble
-    \else
-      \aftergroup\@firstofone
-    \fi
-  \endgroup
+\newcommand*{\tb@ifvalueisnotempty}[1]{%
+  \ifstr{#1}{}{%
+    \FamilyKeyStateUnknownValue
+    \expandafter\@gobble
+  }{%
+    \FamilyKeyStateProcessed
+    \expandafter\@firstofone
+  }%
 }
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\tb@boolkey}
-%   \changes{v3.06}{2010/05/21}{new internal}%
-%   This is only a helper for boolean keys.
-%    \begin{macrocode}
-\newcommand*{\tb@boolkey}[2]{%
-  \csname tb@#2\ifx\relax#1\relax true\else#1\fi\endcsname
-}
-%    \end{macrocode}
+%   \changes{v3.06}{2010/05/21}{new (internal)}^^A
+%   \changes{v3.20}{2015/12/16}{undefined}^^A
 % \end{macro}
 % \begin{macro}{\tb@dimkey}
-%   \changes{v3.06}{2010/05/21}{new internal}%
-%   This is only a helper for dimension keys.
-%    \begin{macrocode}
-\newcommand*{\tb@dimkey}[2]{%
-  \begingroup
-    \@defaultunits\@tempdima#2pt\relax\@nnil
-    \edef\@tempa{\noexpand\endgroup\noexpand\def\noexpand#1{\the\@tempdima}}
-  \@tempa
-}
-%    \end{macrocode}
+%   \changes{v3.06}{2010/05/21}{new (internal)}^^A
+%   \changes{v3.20}{2015/12/16}{undefined}^^A
 % \end{macro}
-% \begin{macro}{\tb@dimkey}
+% \begin{macro}{\tb@numkey}
 %   \changes{v3.06}{2010/05/21}{new internal}%
-%   This is only a helper for numerical keys.
-%    \begin{macrocode}
-\newcommand*{\tb@numkey}[2]{%
-  \begingroup
-    \afterassignment\remove@to@nnil\@tempcnta#2\relax\@nnil
-    \edef\@tempa{\noexpand\endgroup\noexpand\def\noexpand#1{\the\@tempcnta}}
-  \@tempa
-}
-%    \end{macrocode}
+%   \changes{v3.20}{2015/12/16}{undefined}^^A
 % \end{macro}
 % \begin{macro}{\tb@nt@autofloattype}
 %   \changes{v3.06}{2010/06/01}{new internal}
@@ -1528,7 +1664,6 @@
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
-%
 %
 %
 % \iffalse
