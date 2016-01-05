@@ -1,8 +1,8 @@
-% \CheckSum{1996}
+% \CheckSum{2070}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-language.dtx
-% Copyright (c) Markus Kohm, 2002-2015
+% Copyright (c) Markus Kohm, 2002-2016
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrkernel-language.dtx
-% Copyright (c) Markus Kohm, 2002-2015
+% Copyright (c) Markus Kohm, 2002-2016
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -258,12 +258,39 @@
 \newcommand*{\scr@def@activateactivelanguageaftergroup}[2]{%
   \@onelevel@sanitize\languagename
   \@tempswafalse
+%<trace>  \typeout{compare `\languagename' and `\scr@reserved@a'}%
   \ifx\languagename\scr@reserved@a
     \@tempswatrue
   \else
-    \ifcsname l@\scr@reserved@a\endcsname
-      \expandafter\ifnum\csname l@\scr@reserved@a\endcsname=\language
-        \@tempswatrue
+%    \end{macrocode}
+%   \changes{v3.20}{2016/01/05}{Sonderbehandlung für \textsf{polyglossia}}^^A
+% Bei Verwendung von \textsf{polyglossia} gibt es die Besonderheit, dass alle
+% Deutschen Sprachen als \texttt{german} definiert sind. Die Unterscheidung
+% zwischen Deutsch, Österreichisch und Schweizerisch geschieht über zwei
+% boolsche Schalter. Für die Unterscheidung alte oder neue Rechtschreibung
+% existiert ein weiterer Schalter. Mit ein paar trickreichen Vergleichen kann
+% man das zusätzlich behandeln. Natürlich muss es so gemacht werden, dass es
+% mit babel trotzdem noch funktioniert.
+%    \begin{macrocode}
+    \edef\scr@reserved@b{\detokenize{german}}%
+    \ifx\languagename\scr@reserved@b
+      \edef\scr@reserved@b{%
+        \expandafter\ifx\csname if@german@oldspelling\expandafter\endcsname
+        \csname iffalse\endcsname n\fi
+        \expandafter\ifx\csname if@austrian@locale\expandafter\endcsname
+        \csname iftrue\endcsname austrian\else
+          \expandafter\ifx\csname if@swiss@locale\expandafter\endcsname
+          \csname iftrue\endcsname swiss\else german\fi\fi
+      }%
+%<trace>      \typeout{compare also `\scr@reserved@a' and `\scr@reserved@b'}%
+      \@onelevel@sanitize\scr@reserved@b
+      \ifx\scr@reserved@a\scr@reserved@b \@tempswatrue\fi
+    \fi
+    \if@tempswa\else
+      \ifcsname l@\scr@reserved@a\endcsname
+        \expandafter\ifnum\csname l@\scr@reserved@a\endcsname=\language
+          \@tempswatrue
+        \fi
       \fi
     \fi
   \fi
@@ -363,6 +390,41 @@
 %    \end{macrocode}
 % \end{macro}^^A \scr@def@captionname
 % \end{macro}^^A \defcaptionname
+%
+% \changes{v3.20}{2016/01/05}{Neue Sonderbehandlung für
+%   \texttt{polyglossia}}^^A
+% Bei Verwendung von \textsf{polyglossia} haben wir nun bei den Sprachen
+% \texttt{austrian}, \texttt{swiss}, \texttt{ngerman}, \texttt{naustrian} und
+% \texttt{nswiss} das Problem, dass diese dort alle in \cs{captionsgerman}
+% vermischt sind. Es werden also also beim Umschalten eventuell gar nicht die
+% richtigen Befehle ausgeführt. Das lässt sich beispielsweise beheben, indem
+% in \cs{init@extra@german} dafür gesorgt wid, dass eben diese doch noch
+% ausgeführt werden:
+%    \begin{macrocode}
+\AfterPackage*{polyglossia}{%
+  \scr@ifundefinedorrelax{init@extras@german}{%
+    \AfterFile{gloss-german.ldf}%
+  }{%
+    \@firstofone
+  }%
+  {%
+    \csgappto{init@extras@german}{%
+      \if@austrian@locale
+        \csuse{captions\if@german@oldspelling\else n\fi austrian}%
+      \else
+        \if@swiss@locale
+          \csuse{captions\if@german@oldspelling\else n\fi swiss}%
+        \else
+          \if@german@oldspelling\else \csuse{captionsngerman}\fi
+        \fi
+      \fi
+    }%
+  }%
+}
+%    \end{macrocode}
+% Ich bin mir natürlich bewusst, dass dieser Code auch nur wieder ein Hack
+% ist. Ideal ist das so nicht. Aber sehr viel sauberer geht es mit
+% \textsf{polyglossia} unter Beibehaltung der Kompatibilität auch nicht mehr.
 %
 % \begin{macro}{\providecaptionname}
 %   \changes{v2.8q}{2001/11/08}{neu}^^A
