@@ -1,8 +1,8 @@
-% \CheckSum{1145}
+% \CheckSum{1159}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-tocstyle.dtx
-% Copyright (c) Markus Kohm, 2015
+% Copyright (c) Markus Kohm, 2015-2016
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrkernel-tocstyle.dtx
-% Copyright (c) Markus Kohm, 2015
+% Copyright (c) Markus Kohm, 2015-2016
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -792,7 +792,9 @@
 \long\def\@DeclareTOCEntryStyle#1[#2]#3{%
   \@namedef{scr@dte@def@l@#1}##1{%
     \@namedef{l@##1}####1####2{%
+      \scr@te@start@hook{##1}%
       #3%
+      \scr@te@end@hook{##1}%
     }%
   }%
   \TOCEntryStyleInitCode{#1}{%
@@ -804,6 +806,48 @@
 %    \end{macrocode}
 % \end{macro}^^A \@DeclareTOCEntryStyle
 % \end{macro}^^A \DeclareTOCEntryStyle
+%
+% \begin{macro}{\@BeforeTOCEntry}
+%   \changes{v3.20}{2016/01/12}{neu (intern)}
+% \begin{macro}{\scr@te@start@hook}
+%   \changes{v3.20}{2016/01/12}{neu (intern)}
+% Bei jedem Eintrag, der über einen Eintragsstil von \KOMAScript{} definiert
+% ist, kann vor dem jeweiligen Eintrag über einen Haken eine Reihe
+% von Anweisungen ausgeführt werden. Innerhalb dieser Anweisungen ist
+% \texttt{\#1} der Name der Gliederungsebene. In der Regel dürfen diese
+% Anweisungen keinerlei Ausgaben tätigen und weder \cs{lastpenalty} noch
+% \cs{lastskip} verändern. Der Anwender ist dafür selbst verantwortlich! Weil
+% diese Einschränkung jedoch etwas kritisch ist und der Aufruf ohnehin ein
+% \cs{makeatletter} benötigt, lieber nur als internes Makro.
+%    \begin{macrocode}
+%<*body>
+\newcommand*{\scr@te@start@hook}[1]{}
+\newcommand*{\@BeforeTOCEntry}{\l@addto@macro@a\scr@te@start@hook}
+%</body>
+%    \end{macrocode}
+% \end{macro}^^A \scr@te@start@hook
+% \end{macro}^^A \@BeforeTOCEntry
+%
+% \begin{macro}{\@AfterTOCEntry}
+%   \changes{v3.20}{2016/01/12}{neu (intern)}
+% \begin{macro}{\scr@te@end@hook}
+%   \changes{v3.20}{2016/01/12}{neu (intern)}
+% Bei jedem Eintrag, der über einen Eintragsstil von \KOMAScript{} definiert
+% ist, kann nach dem jeweiligen Eintrag über einen Haken eine Reihe
+% von Anweisungen ausgeführt werden. Innerhalb dieser Anweisungen ist
+% \texttt{\#1} der Name der Gliederungsebene. In der Regel dürfen diese
+% Anweisungen keinerlei Ausgaben tätigen und weder \cs{lastpenalty} noch
+% \cs{lastskip} verändern. Der Anwender ist dafür selbst verantwortlich! Weil
+% diese Einschränkung jedoch etwas kritisch ist und der Aufruf ohnehin ein
+% \cs{makeatletter} benötigt, lieber nur als internes Makro.
+%    \begin{macrocode}
+%<*body>
+\newcommand*{\scr@te@end@hook}[1]{}
+\newcommand*{\@AfterTOCEntry}{\l@addto@macro@a\scr@te@end@hook}
+%</body>
+%    \end{macrocode}
+% \end{macro}^^A \scr@te@end@hook
+% \end{macro}^^A \@AfterTOCEntry
 %
 % \begin{macro}{\CloneTOCEntryStyle}
 %   \changes{v3.20}{2015/11/25}{neu}
