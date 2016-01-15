@@ -1,4 +1,4 @@
-% \CheckSum{1151}
+% \CheckSum{1215}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-tocstyle.dtx
@@ -1229,10 +1229,27 @@
 %    \end{macrocode}
 % Die Voreinstellung für den vertikalen Abstand ist Null mit ein klein wenig
 % Leim, um den Seitenumbruch zu optimieren. Das genügt bei einer normalen
-% A4-Seite aber gerade mal für den Ausgleich einer Zeile.
+% A4-Seite aber gerade mal für den Ausgleich einer Zeile. Bei den höheren
+% Ebenen werden stattdessen die Voreinstellungen der Standardklassen
+% verwendet.
 %    \begin{macrocode}
-  \expandafter\providecommand\expandafter*%
-  \csname scr@tso@#1@beforeskip\endcsname{\glueexpr \z@ plus .2\p@\relax}%
+  \@ifundefined{scr@tso@#1@beforeskip}{%
+    \ifstr{#1}{part}{%
+      \@namedef{scr@tso@#1@beforeskip}{\glueexpr 2.25em \@plus\p@\relax}%
+    }{%
+      \ifstr{#1}{chapter}{%
+        \@namedef{scr@tso@#1@beforeskip}{\glueexpr 1.0em \@plus\p@\relax}%
+      }{%
+        \ifstr{#1}{section}{%
+          \scr@ifundefinedorrelax{l@chapter}{%
+            \@namedef{scr@tso@#1@beforeskip}{\glueexpr 1.0em \@plus\p@\relax}%
+          }{}%
+        }{}%
+      }%
+    }%
+    \expandafter\providecommand\expandafter*%
+    \csname scr@tso@#1@beforeskip\endcsname{\glueexpr \z@ plus .2\p@\relax}%
+  }{}%
 %    \end{macrocode}
 % Es ist gut zu wissen, wie breit die breiteste Nummer ist, damit wir
 % ggf. prüfen können, ob entsprechende Bedingungen eingehalten werden.
@@ -1252,19 +1269,51 @@
 %    \end{macrocode}
 % Jede Ebene kann ihre eigene Formatierungsanweisung für die Nummer haben.
 % Jede Ebene kann auch ihre eigene Formatierungsanweisung für Nummer und Text
-% haben.
+% haben. Für \texttt{part} wird hier die Voreinstellung der Standardklassen
+% verwendet.
 %    \begin{macrocode}
   \expandafter\providecommand\expandafter*%
   \csname scr@tso@#1@numberformat\endcsname[1]{##1}%
-  \expandafter\providecommand\expandafter*%
-  \csname scr@tso@#1@entryformat\endcsname[1]{##1}%
+  \ifstr{#1}{part}{%
+    \expandafter\providecommand\expandafter*%
+    \csname scr@tso@#1@entryformat\endcsname[1]{\large\bfseries ##1}%
+  }{%
+    \ifstr{#1}{chapter}{%
+      \expandafter\providecommand\expandafter*%
+      \csname scr@tso@#1@entryformat\endcsname[1]{\bfseries ##1}%
+    }{%
+      \scr@ifundefinedorrelax{l@chapter}{%
+        \ifstr{#1}{section}{%
+          \expandafter\providecommand\expandafter*%
+          \csname scr@tso@#1@entryformat\endcsname[1]{\bfseries ##1}%
+        }{}%
+      }{}%
+      \expandafter\providecommand\expandafter*%
+      \csname scr@tso@#1@entryformat\endcsname[1]{##1}%
+    }%
+  }%
 %    \end{macrocode}
 % Die Verbindung zwischen Ende des Eintrags und den Seitenzahlen erfolgt
 % normalerweise mit Pünktchen. Das wird auch genau die Voreinstellung für die
 % Option werden. In der Voreinstellung wird mit \cs{hfill} gefüllt.
 %    \begin{macrocode}
-  \expandafter\providecommand\expandafter*%
-  \csname scr@tso@#1@linefill\endcsname{\hfill}%
+  \@ifundefined{scr@tso@#1@linefill}{%
+    \ifstr{#1}{part}{%
+      \@namedef{scr@tso@#1@linefill}{\hfill}%
+    }{%
+      \ifstr{#1}{chapter}{%
+        \@namedef{scr@tso@#1@linefill}{\hfill}%
+      }{%
+        \scr@ifundefinedorrelax{l@chapter}{%
+          \ifstr{#1}{section}{%
+            \@namedef{scr@tso@#1@linefill}{\hfill}%
+          }{}
+        }{}
+        \expandafter\providecommand\expandafter*%
+        \csname scr@tso@#1@linefill\endcsname{\TOCLineLeaderFill\relax}%
+      }%
+    }%
+  }{}%
 %    \end{macrocode}
 % Keine Verbindung bedeutet nicht automatisch, dass die Seitenzahlen nach vorn
 % rutschen. Das passiert erst, wenn die sie flatternd gesetzt werden:
@@ -1273,9 +1322,14 @@
 %    \end{macrocode}
 % Auch die Seitenzahl kann speziell formatiert werden, wenn das gewünscht ist.
 %    \begin{macrocode}
-  \expandafter\providecommand\expandafter*%
-  \csname scr@tso@#1@pagenumberformat\endcsname[1]{%
-    \normalfont\normalcolor ##1}%
+  \ifstr{#1}{part}{%
+    \expandafter\providecommand\expandafter*%
+    \csname scr@tso@#1@pagenumberformat\endcsname[1]{\large\bfseries ##1}%
+  }{%
+    \expandafter\providecommand\expandafter*%
+    \csname scr@tso@#1@pagenumberformat\endcsname[1]{%
+      \normalfont\normalcolor ##1}%
+  }%
 %    \end{macrocode}
 % Wobei die Seitenzahl normaleweise in eine Box fester Breite gesetzt wird.
 %    \begin{macrocode}
