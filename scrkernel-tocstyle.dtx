@@ -1,4 +1,4 @@
-% \CheckSum{1159}
+% \CheckSum{1151}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-tocstyle.dtx
@@ -792,9 +792,9 @@
 \long\def\@DeclareTOCEntryStyle#1[#2]#3{%
   \@namedef{scr@dte@def@l@#1}##1{%
     \@namedef{l@##1}####1####2{%
-      \scr@te@start@hook{##1}%
+      \TOC@EntryStartHook{##1}%
       #3%
-      \scr@te@end@hook{##1}%
+      \TOC@EntryEndHook{##1}%
     }%
   }%
   \TOCEntryStyleInitCode{#1}{%
@@ -807,9 +807,7 @@
 % \end{macro}^^A \@DeclareTOCEntryStyle
 % \end{macro}^^A \DeclareTOCEntryStyle
 %
-% \begin{macro}{\@BeforeTOCEntry}
-%   \changes{v3.20}{2016/01/12}{neu (intern)}
-% \begin{macro}{\scr@te@start@hook}
+% \begin{macro}{\TOC@EntryStartHook}
 %   \changes{v3.20}{2016/01/12}{neu (intern)}
 % Bei jedem Eintrag, der über einen Eintragsstil von \KOMAScript{} definiert
 % ist, kann vor dem jeweiligen Eintrag über einen Haken eine Reihe
@@ -818,19 +816,16 @@
 % Anweisungen keinerlei Ausgaben tätigen und weder \cs{lastpenalty} noch
 % \cs{lastskip} verändern. Der Anwender ist dafür selbst verantwortlich! Weil
 % diese Einschränkung jedoch etwas kritisch ist und der Aufruf ohnehin ein
-% \cs{makeatletter} benötigt, lieber nur als internes Makro.
+% \cs{makeatletter} benötigt, wird nur der Haken definiert aber keine
+% Anweisung, um diesen zu ändern oder zu erweitern.
 %    \begin{macrocode}
 %<*body>
-\newcommand*{\scr@te@start@hook}[1]{}
-\newcommand*{\@BeforeTOCEntry}{\l@addto@macro@a\scr@te@start@hook}
+\newcommand*{\TOC@EntryStartHook}[1]{}
 %</body>
 %    \end{macrocode}
-% \end{macro}^^A \scr@te@start@hook
-% \end{macro}^^A \@BeforeTOCEntry
+% \end{macro}^^A \TOC@EntryStartHook
 %
-% \begin{macro}{\@AfterTOCEntry}
-%   \changes{v3.20}{2016/01/12}{neu (intern)}
-% \begin{macro}{\scr@te@end@hook}
+% \begin{macro}{\TOC@EntryEndHook}
 %   \changes{v3.20}{2016/01/12}{neu (intern)}
 % Bei jedem Eintrag, der über einen Eintragsstil von \KOMAScript{} definiert
 % ist, kann nach dem jeweiligen Eintrag über einen Haken eine Reihe
@@ -839,15 +834,14 @@
 % Anweisungen keinerlei Ausgaben tätigen und weder \cs{lastpenalty} noch
 % \cs{lastskip} verändern. Der Anwender ist dafür selbst verantwortlich! Weil
 % diese Einschränkung jedoch etwas kritisch ist und der Aufruf ohnehin ein
-% \cs{makeatletter} benötigt, lieber nur als internes Makro.
+% \cs{makeatletter} benötigt,  wird nur der Haken definiert aber keine
+% Anweisung, um diesen zu ändern oder zu erweitern.
 %    \begin{macrocode}
 %<*body>
-\newcommand*{\scr@te@end@hook}[1]{}
-\newcommand*{\@AfterTOCEntry}{\l@addto@macro@a\scr@te@end@hook}
+\newcommand*{\TOC@EntryEndHook}[1]{}
 %</body>
 %    \end{macrocode}
-% \end{macro}^^A \scr@te@end@hook
-% \end{macro}^^A \@AfterTOCEntry
+% \end{macro}^^A \TOC@EntryEndHook
 %
 % \begin{macro}{\CloneTOCEntryStyle}
 %   \changes{v3.20}{2015/11/25}{neu}
@@ -1411,7 +1405,12 @@
 % \item[\marg{Eintrag}:] Der Verzeichniseintrag \meta{string}.
 % \item[\marg{Seite}:] Die Seitenzahl \meta{string} des Verzeichniseintrags.
 % \end{description}
+% \begin{Length}{\scr@dte@tocline@numberwidth}
+%   \changes{v3.20}{2016/01/15}{neu (intern)}
+% Für alle, die es interessiert, gibt diese Länge die tatsächliche Breite der
+% formatierten Nummer an.
 %    \begin{macrocode}
+\newlength\scr@dte@tocline@numberwidth
 \newcommand*{\scr@dte@tocline}[3]{%
   \ifnum \@nameuse{#1tocdepth}>\c@tocdepth
   \else
@@ -1431,10 +1430,8 @@
       \@tempdima \@nameuse{scr@tso@#1@numwidth}\relax
       \@nameuse{Ifscr@tso@#1@dynnumwidth}{%
         \scr@ifundefinedorrelax{scr@dte@#1@lastmaxnumwidth}{}{%
-          \ifdim \dimexpr \@nameuse{scr@dte@#1@lastmaxnumwidth}
-                         +\@nameuse{scr@tso@#1@numsep}\relax>\@tempdima
-            \@tempdima\dimexpr \@nameuse{scr@dte@#1@lastmaxnumwidth}
-                              +\@nameuse{scr@tso@#1@numsep}\relax
+          \ifdim \@nameuse{scr@dte@#1@lastmaxnumwidth}>\@tempdima
+            \@tempdima\@nameuse{scr@dte@#1@lastmaxnumwidth}\relax
           \fi
         }%
       }{}%
@@ -1449,14 +1446,20 @@
         \def\numberline##1{%
           \let\numberline\scr@dte@numberline
           \sbox\scr@dte@tocline@numbox{\@nameuse{scr@tso@#1@numberformat}{##1}}%
-          \ifdim \wd\scr@dte@tocline@numbox
+%    \end{macrocode}
+% Die Zuweisung an die aktuelle Länge der Nummer muss global erfolgen, weil
+% wir hier in einer Gruppe sind.
+%    \begin{macrocode}
+          \global\scr@dte@tocline@numberwidth
+          \dimexpr\wd\scr@dte@tocline@numbox+\@nameuse{scr@tso@#1@numsep}\relax
+          \ifdim \scr@dte@tocline@numberwidth
                 >\@nameuse{scr@dte@#1@maxnumwidth}\relax
-            \global\@nameuse{scr@dte@#1@maxnumwidth}\wd\scr@dte@tocline@numbox
+            \global\@nameuse{scr@dte@#1@maxnumwidth}\scr@dte@tocline@numberwidth
           \fi
           \@nameuse{Ifscr@tso@#1@dynnumwidth}{}{%
-            \ifdim \wd\scr@dte@tocline@numbox
+            \ifdim \scr@dte@tocline@numberwidth
                   >\dimexpr \@nameuse{scr@tso@#1@numwidth}%
-                           -\@nameuse{scr@tso@#1@numsep}\relax
+                           +\@nameuse{scr@tso@#1@numsep}\relax
 %<class>              \ClassWarning{\KOMAClassName
 %<package>              \PackageWarning{tocbasic%
               }{%
@@ -1487,6 +1490,7 @@
   \fi
 }
 %    \end{macrocode}
+% \end{Length}^^A \scr@dte@tocline@numberwidth
 % \begin{macro}{\scr@dte@tocline@numbox}
 %   \changes{v3.20}{2015/11/25}{neue Box (intern)}
 % Wird benötigt, um die Breite der Nummer auszumessen und die Nummer später
