@@ -1,8 +1,8 @@
-% \CheckSum{4086}
+% \CheckSum{4088}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
-% Copyright (c) Markus Kohm, 2002-2015
+% Copyright (c) Markus Kohm, 2002-2016
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrkernel-sections.dtx
-% Copyright (c) Markus Kohm, 2002-2015
+% Copyright (c) Markus Kohm, 2002-2016
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -1224,6 +1224,8 @@
 % \end{macro}^^A \scr@dsc@style@section@options
 % \begin{macro}{\scr@dsc@def@style@section@command}
 %   \changes{v3.18}{2015/05/21}{neue Anweisung (intern)}^^A
+%   \changes{v3.20}{2016/01/19}{korrekte Spitzmarkenprüfung für
+%     \cs{parfillskip}-Änderung}^^A
 % Diese Anweisung left fest, wie ein Gliederungsbefehl für den Stil
 % \texttt{section} zu definieren ist. Das einzige Argument ist dabei der
 % \meta{Name} der Gliederungsebene, beispielsweise \texttt{section},
@@ -1238,7 +1240,7 @@
     {\csname scr@#1@beforeskip\endcsname}%
     {\csname scr@#1@afterskip\endcsname}%
     {%
-      \ifdim\glueexpr\csname scr@#1@beforeskip\endcsname <\z@
+      \ifdim\glueexpr\csname scr@#1@afterskip\endcsname >\z@
         \expandafter\ifnum\scr@v@is@gt{2.96}\relax
           \setlength{\parfillskip}{\z@ plus 1fil}%
         \fi
@@ -3880,8 +3882,6 @@
 %     \cs{raggedsection}}^^A
 %   \changes{v3.17}{2015/04/03}{Verwendung von \cs{usefontofkomafont} für die
 %     initiale Fontumstellung}^^A
-%   \changes{v3.20}{2015/12/23}{\cs{parfillskip} auf \texttt{0pt plus 1fil}
-%     gesetzt}^^A
 %    \begin{macrocode}
 \newcommand*{\scr@@makechapterhead}[2]{%
 %    \end{macrocode}
@@ -3892,9 +3892,11 @@
   \chapterheadstartvskip
 %    \end{macrocode}
 % Dann die eigentliche Überschrift innerhalb einer Gruppe.
+%   \changes{v3.20}{2015/12/23}{\cs{parfillskip} auf \texttt{\cs{z@} plus
+%     1fil} gesetzt}^^A
 %    \begin{macrocode}
   {%
-    \setlength{\parindent}{\z@}\setlength{\parfillskip}{0pt plus 1fil}%
+    \setlength{\parindent}{\z@}\setlength{\parfillskip}{\z@ plus 1fil}%
 %    \end{macrocode}
 %   \changes{v3.19}{2015/08/02}{Verwendung von \cs{chapterlinesformat} und
 %     \cs{chapterlineswithprefixformat}}^^A
@@ -3973,15 +3975,15 @@
 %    \cs{raggedsection}}^^A
 %  \changes{v3.19}{2015/08/02}{an die Änderungen bei \cs{scr@@makechapterhead}
 %    angepasst}^^A
-%   \changes{v3.20}{2015/12/23}{\cs{parfillskip} auf \texttt{0pt plus 1fil}
-%     gesetzt}^^A
+%   \changes{v3.20}{2015/12/23}{\cs{parfillskip} auf \texttt{\cs{z@} plus
+%     1fil} gesetzt}^^A
 %    \begin{macrocode}
 \newcommand*{\scr@@makeschapterhead}[2]{%
   \@tempskipa=\glueexpr \csname scr@#1@beforeskip\endcsname\relax\relax
   \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
   \chapterheadstartvskip
   {%
-    \setlength{\parindent}{\z@}\setlength{\parfillskip}{0pt plus 1fil}%
+    \setlength{\parindent}{\z@}\setlength{\parfillskip}{\z@ plus 1fil}%
     \let\IfUseNumber\secondoftwo
     \if@chapterprefix
       \let\IfUsePrefixLine\@firstoftwo
