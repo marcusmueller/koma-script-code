@@ -1,4 +1,4 @@
-% \CheckSum{3463}
+% \CheckSum{3472}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -757,21 +757,20 @@
 % \begin{macro}{\@globaloptionslist}
 %   \changes{v2.96}{2006/11/26}{new}^^A
 %   \changes{v2.96}{2006/11/26}{Klassenoptionen durchsuchen}^^A
-% Die Lister der globalen Optionen wird teilweise benötigt. Weil
+%   \changes{v3.20}{2016/02/06}{Entscheidung später treffen}^^A
+% Die Liste der globalen Optionen wird teilweise benötigt. Weil
 % \textsl{xkeyval} dämlicherweise glaubt, es müsse alle Optionen mit
 % Gleichheitszeichen aus der Liste der Klassenoptionen entfernen
 % (seltsamerweise aber nicht die (x)keyval-Optionen, die ohne Wert aufgerufen
 % werden, weil ihr Defaultwert verwendet werden soll), wird hier ein eigenes
-% Makro definiert.
+% Makro definiert. Bis \KOMAScript{} 3.19a wurde auch genau hier die Zuweisung
+% durchgeführt. Wenn aber \textsf{scrbase} noch vor \cs{documentclass} geladen
+% wird, dann ist \cs{@classoptionslist} natürlich noch nicht gültig. Deshalb
+% wird die Zuweisung, seit \KOMAScript{} 3.20 in \cs{FamilyProcessOptions}
+% durchgeführt.
 %    \begin{macrocode}
 %<*base>
 \newcommand*{\@globaloptionslist}{}
-\let\@globaloptionslist\@classoptionslist
-\scr@ifundefinedorrelax{XKV@classoptionslist}{}{%
-  \ifx\XKV@classoptionslist\@empty\else
-    \let\@globaloptionslist\XKV@classoptionslist
-  \fi
-}
 %</base>
 %    \end{macrocode}
 % \end{macro}
@@ -842,7 +841,19 @@
 % dazu jedoch keine Fehler oder Warnungen aus.
 %   \changes{v3.18}{2015/06/17}{Behandlung von undefiniertem
 %     \cs{@globaloptionslist}}^^A
+%   \changes{v3.20}{2016/02/06}{\cs{@globaloptionslist} immer neu zuweisen}^^A
 %    \begin{macrocode}
+    \let\@globaloptionslist\@classoptionslist
+    \scr@ifundefinedorrelax{XKV@classoptionslist}{%
+%<trace>    \PackageInfo{scrbase}{Using \string\@classoptionslist}%
+    }{%
+      \ifx\XKV@classoptionslist\@empty
+%<trace>        \PackageInfo{scrbase}{Using \string\@classoptionslist}%
+      \else
+%<trace>        \PackageInfo{scrbase}{Using \string\XKV@classoptionslist}%
+        \let\@globaloptionslist\XKV@classoptionslist
+      \fi
+    }%
     \scr@ifundefinedorrelax{@globaloptionslist}{}{%
       \@for\CurrentOption:=\@globaloptionslist\do{%
 %    \end{macrocode}
