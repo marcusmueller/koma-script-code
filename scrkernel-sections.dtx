@@ -1,4 +1,4 @@
-% \CheckSum{4088}
+% \CheckSum{3643}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -1058,7 +1058,7 @@
 %     ermöglichen}^^A
 %   \changes{v3.18}{2015/05/22}{\cs{scr@dsc@def@style@\dots @command}
 %     definiert alle Stil abhängigen Anweisungen}^^A
-%   \changes{v3.20}{2015/10/03}{\cs{scr@dsc@def@tocstyle@\dots @command}
+%   \changes{v3.20}{2015/10/03}{\cs{DeclareTOCStyleEntry}
 %     definiert die Verzeichnisstil abhängigen Anweisungen}^^A
 % Definition neuer oder Umdefinition existierender Gliederungsbefehle, die auf
 % \cs{scr@startsection} basieren. Ebenso wird ein Verzeichniseintrag erzeugt,
@@ -1415,9 +1415,6 @@
 % mit \cs{aftergroup}\cs{@gobbletwo} dafür, dass die Definition unterbleibt.
 %    \begin{macrocode}
 \newcommand*{\scr@dsc@style@section@neededoptionstest}{%
-%<trace>  \typeout{TRACE:
-%<trace>    \string\scr@dsc@style@section@neededoptionstest\space for
-%<trace>    \scr@dsc@current}%
   \scr@ifundefinedorrelax{scr@\scr@dsc@current @sectionindent}{%
     \scr@declaresectioncommanderror{\scr@dsc@current}{section indent}{indent}%
   }{}%
@@ -1445,9 +1442,6 @@
 %    \begin{macrocode}
 %<*book|report>
 \newcommand*{\scr@dsc@style@chapter@neededoptionstest}{%
-%<trace>  \typeout{TRACE:
-%<trace>    \string\scr@dsc@style@chapter@neededoptionstest\space for
-%<trace>    \scr@dsc@current}%
   \scr@ifundefinedorrelax{\scr@dsc@current pagestyle}{%
     \scr@declaresectioncommanderror{\scr@dsc@current}{initial page style}
     {pagestyle}%
@@ -1484,9 +1478,6 @@
 % mit \cs{aftergroup}\cs{@gobbletwo} dafür, dass die Definition unterbleibt.
 %    \begin{macrocode}
 \newcommand*{\scr@dsc@style@part@neededoptionstest}{%
-%<trace>  \typeout{TRACE:
-%<trace>    \string\scr@dsc@style@part@neededoptionstest\space for
-%<trace>    \scr@dsc@current}%
 %<*book|report>
   \scr@ifundefinedorrelax{\scr@dsc@current pagestyle}{%
     \scr@declaresectioncommanderror{\scr@dsc@current}{initial page style}
@@ -1568,18 +1559,11 @@
     }{%
 %<trace>      \typeout{TRACE: option tocstyle=##1}%
 %<trace>      \typeout{TRACE: command=\scr@dsc@current}%
-      \scr@ifundefinedorrelax{scr@dsc@def@tocstyle@##1@command}{%
-%<trace>        \typeout{TRACE: command not defined}%
-        \scr@ifundefinedorrelax{scr@dte@def@l@##1}{%
-%<trace>          \typeout{TRACE: style not defined}%
-          \FamilyKeyStateUnknownValue
-        }{%
-%<trace>          \typeout{TRACE: style defined}%
-          \@namedef{scr@dte@\scr@dsc@current @style}{##1}%
-          \FamilyKeyStateProcessed
-        }%
+      \scr@ifundefinedorrelax{scr@dte@def@l@##1}{%
+%<trace>        \typeout{TRACE: style not defined}%
+        \FamilyKeyStateUnknownValue
       }{%
-%<trace>        \typeout{TRACE: command defined}%
+%<trace>        \typeout{TRACE: style defined}%
         \@namedef{scr@dte@\scr@dsc@current @style}{##1}%
         \FamilyKeyStateProcessed
       }%
@@ -1758,71 +1742,28 @@
 %    \end{macrocode}
 % \begin{description}
 % \item[\texttt{toclevel}] Ebene im Inhaltsverzeichnis (Voreinstellung ist
-%   derselbe Wert wie für level)
-%
-% Todo: In Zukunft muss diese Option auf den Verzeichnisstil abgebildet
-% werden!
+%   derselbe Wert wie für level); diese Option gibt es nur, wenn der
+%   Verzeichnisstil sie unterstützt (was jeder Verzeichnisstil
+%   sollte); wenn allerdings ein Offset dafür definiert ist, dann wird die
+%   Option nicht einfach an den Stil weitergereicht, muss also noch einmal
+%   umdefiniert werden.
 % \end{description}
 %    \begin{macrocode}
-    \scr@ifundefinedorrelax{scr@local@tocleveloffset}{%
-      \edef\reserved@a{%
-        \noexpand\FamilyCounterMacroKey[.dsc]{KOMAarg}{toclevel}{%
-          \expandafter\noexpand\csname \scr@dsc@current tocdepth\endcsname}%
-      }\reserved@a
-    }{%
-      \edef\reserved@a{%
-        \noexpand\DefineFamilyKey[.dsc]{KOMAarg}{toclevel}{%
-          \noexpand\FamilySetCounterMacro{KOMAarg}{toclevel}{%
-            \expandafter\noexpand\csname \scr@dsc@current tocdepth\endcsname
-          }%
-          \unexpanded{%
-            {\numexpr ##1+\scr@local@tocleveloffset\relax}%
-            \edef\scr@local@tocleveloffset{%
-              \the\numexpr\scr@local@tocleveloffset
-              +\scr@local@levelincrease\relax
+    \scr@ifundefinedorrelax{scr@local@tocleveloffset}{}{%
+      \scr@ifundefinedorrelax{KV@KOMAarg.dsc@toclevel}{%
+      }{%
+        \DefineFamilyKey[.dsc]{KOMAarg}{toclevel}{%
+          \edef\reserved@a{%
+            \noexpand\l@addto@macro{\noexpand\scr@dsc@tocstyle@options}{%
+              level=\the\numexpr ##1+\scr@local@tocleveloffset\relax,%
             }%
+          }\reserved@a
+          \edef\scr@local@tocleveloffset{%
+            \the\numexpr\scr@local@tocleveloffset+\scr@local@levelincrease\relax
           }%
+          \FamilyKeyStateProcessed
         }%
-      }\reserved@a
-    }%
-%    \end{macrocode}
-% \begin{description}
-% \item[\texttt{tocindent}] Einzug des Inhaltsverzeichniseintrags
-%
-% Todo: In Zukunft muss diese Option hier verschwinden!
-% \end{description}
-%    \begin{macrocode}
-    \DefineFamilyKey[.dsc]{KOMAarg}{tocindent}{%
-      \FamilySetLength{KOMAarg}{#2}{\@tempskipa}{##1}%
-      \ifx\FamilyKeyState\FamilyKeyStateProcessed
-        \ifscr@dsc@expandtopt
-          \expandafter\edef\csname scr@\scr@dsc@current @tocindent\endcsname{%
-            \the\@tempskipa}%
-        \else
-          \expandafter\edef\csname scr@\scr@dsc@current @tocindent\endcsname{%
-            ##1}%
-        \fi
-      \fi
-    }%
-%    \end{macrocode}
-% \begin{description}
-% \item[\texttt{tocnumwidth}] Breite der Nummer des
-%   Inhaltsverzeichniseintrags
-%
-% Todo: In Zukunft muss diese Option hier verschwinden!
-% \end{description}
-%    \begin{macrocode}
-    \DefineFamilyKey[.dsc]{KOMAarg}{tocnumwidth}{%
-      \FamilySetLength{KOMAarg}{#2}{\@tempskipa}{##1}%
-      \ifx\FamilyKeyState\FamilyKeyStateProcessed
-        \ifscr@dsc@expandtopt
-          \expandafter\edef\csname scr@\scr@dsc@current @tocnumwidth\endcsname{%
-            \the\@tempskipa}%
-        \else
-          \expandafter\edef\csname scr@\scr@dsc@current @tocnumwidth\endcsname{%
-            ##1}%
-        \fi
-      \fi
+      }%
     }%
 %    \end{macrocode}
 %   \changes{v3.20}{2015/11/12}{Optionen werden nur temporär definiert}^^A
@@ -1840,9 +1781,6 @@
     }%
     \RelaxFamilyKey[.dsc]{KOMAarg}{level}%
     \RelaxFamilyKey[.dsc]{KOMAarg}{counterwithin}%
-    \RelaxFamilyKey[.dsc]{KOMAarg}{toclevel}%
-    \RelaxFamilyKey[.dsc]{KOMAarg}{tocindent}%
-    \RelaxFamilyKey[.dsc]{KOMAarg}{tocnumwidth}%
 %    \end{macrocode}
 % Testen, ob alle benötigten Optionen für die (Um-)Definierung des
 % Gliederungsbefehls gesetzt sind:
@@ -1850,14 +1788,6 @@
     \begingroup
       \scr@ifundefinedorrelax{\scr@dsc@current numdepth}{%
         \scr@declaresectioncommanderror{\scr@dsc@current}{section level}{level}%
-      }{}%
-      \scr@ifundefinedorrelax{scr@\scr@dsc@current @tocindent}{%
-        \scr@declaresectioncommanderror{\scr@dsc@current}{toc entry indent}
-        {tocindent}%
-      }{}%
-      \scr@ifundefinedorrelax{scr@\scr@dsc@current @tocnumwidth}{%
-        \scr@declaresectioncommanderror{\scr@dsc@current}{toc entry number
-          width}{tocnumwidth}%
       }{}%
       \@nameuse{scr@dsc@style@%
         \@nameuse{scr@\scr@dsc@current @style}%
@@ -1938,34 +1868,18 @@
 % Und es gehören Befehle dazu, um einen Eintrag ins Inhaltsverzeichnis zu
 % schreiben und den Eintrag auch darzustellen:
 %    \begin{macrocode}
-      \scr@ifundefinedorrelax{#2tocdepth}{%
-        \expandafter\let\csname #2tocdepth\expandafter\endcsname
-        \csname #2numdepth\endcsname
-      }{}%
       \expandafter\providecommand\expandafter*%
       \csname add#2tocentry\endcsname[2]{%
         \addtocentrydefault{#2}{##1}{##2}%
       }%
-      \scr@ifundefinedorrelax{scr@dte@#2@style}{}{%
-        \scr@ifundefinedorrelax{DeclareTOCStyleEntry}{%
-          \scr@ifundefinedorrelax{%
-            scr@dsc@def@tocstyle@\@nameuse{scr@dte@#2@style}@command%
-          }{}{%
-            \@nameuse{scr@dsc@def@tocstyle@\@nameuse{scr@dte@#2@style}@command}%
-            {#2}%
-          }%
-        }{%
-          \DeclareTOCStyleEntry[\scr@dsc@tocstyle@options]{%
-            \@nameuse{scr@dte@#2@style}%
-          }{#2}%
-        }%
+      \scr@ifundefinedorrelax{scr@dte@#2@style}{%
+      }{%
+        \DeclareTOCStyleEntry[\scr@dsc@tocstyle@options]{%
+          \@nameuse{scr@dte@#2@style}%
+        }{#2}%
       }%
       \scr@ifundefinedorrelax{l@#2}{%
-        \scr@ifundefinedorrelax{DeclareTOCStyleEntry}{%
-          \scr@dsc@def@tocstyle@default@command{#2}%
-        }{%
-          \DeclareTOCStyleEntry[\scr@dsc@tocstyle@options]{default}{#2}%
-        }%
+        \DeclareTOCStyleEntry[\scr@dsc@tocstyle@options]{default}{#2}%
       }{}%
 %    \end{macrocode}
 %   \changes{v3.20}{2015/0/07}{\textsf{hyperref} bei den Ebenen der
@@ -1999,36 +1913,6 @@
 }
 %    \end{macrocode}
 % \end{macro}^^A \scr@declaresectioncommanderror
-% \begin{macro}{\scr@dsc@def@tocstyle@default@command}
-%   \changes{v3.20}{2015/10/06}{neue Anweisung (intern)}^^A
-% \begin{macro}{\scr@dte@default@doopts}
-%   \changes{v3.20}{2015/11/12}{neue Anweisung (intern)}^^A
-% Dieser Verzeichnisstil wird verwendet, wenn der Stil nicht explizit
-% festgelegt ist.
-%    \begin{macrocode}
-\newcommand*{\scr@dsc@def@tocstyle@default@command}{%
-%<article>  \scr@dsc@def@tocstyle@subsection@command
-%<book|report>  \scr@dsc@def@tocstyle@section@command
-}
-\newcommand*{\scr@dte@default@doopts}{%
-%<article>  \@nameuse{scr@dte@subsection@doopts}%
-%<book|report>  \@nameuse{scr@dte@section@doopts}%
-}
-%    \end{macrocode}
-% \end{macro}^^A \scr@dte@default@doopts
-% \end{macro}^^A \scr@dsc@def@tocstyle@default@command
-% \begin{macro}{\scr@dsc@def@tocstyle@gobble@command}
-%   \changes{v3.20}{2015/10/06}{neue Anweisung (intern)}^^A
-% Dieser Verzeichnisstil vernichtet den Eintrag ist aber nur definiert, wenn
-% es nicht einen entsprechenden echten Verzeichnisstil gibt.
-%    \begin{macrocode}
-\scr@ifundefinedorrelax{scr@dte@def@l@gobble}{%
-  \newcommand*{\scr@dsc@def@tocstyle@gobble@command}[1]{%
-    \expandafter\def\csname l@#1\endcsname{\@gobbletwo}%
-  }%
-}{}
-%    \end{macrocode}
-% \end{macro}^^A \scr@dsc@def@tocstyle@gobble@command
 % \end{macro}^^A \DeclareSectionCommand
 %
 % \begin{macro}{\DeclareNewSectionCommand}
@@ -2112,9 +1996,9 @@
 %    \begin{macrocode}
 \newcommand*{\DeclareSectionCommands}[2][]{%
   \edef\reserved@a{#2}%
-  \let\scr@local@levelincrease\z@
-  \let\scr@local@leveloffset\z@
-  \let\scr@local@tocleveloffset\z@
+  \def\scr@local@levelincrease{\z@}%
+  \def\scr@local@leveloffset{\z@}%
+  \def\scr@local@tocleveloffset{\z@}%
   \@for\reserved@a:=\reserved@a\do{%
     \edef\reserved@a{%
       \unexpanded{\DeclareSectionCommand[{#1}]}{\reserved@a}%
@@ -2138,9 +2022,9 @@
 %    \begin{macrocode}
 \newcommand*{\DeclareNewSectionCommands}[2][]{%
   \edef\reserved@a{#2}%
-  \let\scr@local@levelincrease\z@
-  \let\scr@local@leveloffset\z@
-  \let\scr@local@tocleveloffset\z@
+  \def\scr@local@levelincrease{\z@}%
+  \def\scr@local@leveloffset{\z@}%
+  \def\scr@local@tocleveloffset{\z@}%
   \@for\reserved@a:=\reserved@a\do{%
     \@ifundefined{\reserved@a}{}{%
       \ClassError{\KOMAClassName}{%
@@ -2179,9 +2063,9 @@
 %    \begin{macrocode}
 \newcommand*{\RedeclareSectionCommands}[2][]{%
   \edef\reserved@a{#2}%
-  \let\scr@local@levelincrease\z@
-  \let\scr@local@leveloffset\z@
-  \let\scr@local@tocleveloffset\z@
+  \def\scr@local@levelincrease{\z@}%
+  \def\scr@local@leveloffset{\z@}%
+  \def\scr@local@tocleveloffset{\z@}%
   \@for\reserved@a:=\reserved@a\do{%
     \@ifundefined{\reserved@a}{%
       \ClassError{\KOMAClassName}{%
@@ -2218,9 +2102,9 @@
 %    \begin{macrocode}
 \newcommand*{\ProvideSectionCommands}[2][]{%
   \edef\reserved@a{#2}%
-  \let\scr@local@levelincrease\z@
-  \let\scr@local@leveloffset\z@
-  \let\scr@local@tocleveloffset\z@
+  \def\scr@local@levelincrease{\z@}%
+  \def\scr@local@leveloffset{\z@}%
+  \def\scr@local@tocleveloffset{\z@}%
   \@for\reserved@a:=\reserved@a\do{%
     \@ifundefined{\reserved@a}{%
       \edef\reserved@a{%
@@ -2242,11 +2126,15 @@
         \edef\scr@local@leveloffset{%
           \the\numexpr\scr@local@leveloffset+\scr@local@levelincrease\relax
         }%
+      }%
+      \DefineFamilyKey[.dsc]{KOMAarg}{toclevel}{%
+        \FamilySetCounterMacro{KOMAarg}{toclevel}{\reserved@b}{##1}%
         \edef\scr@local@tocleveloffset{%
           \the\numexpr\scr@local@tocleveloffset+\scr@local@levelincrease\relax
         }%
       }%
       \FamilyExecuteOptions[.dsc]{KOMAarg}{#1}%
+      \RelaxFamilyKey[.dsc]{KOMAarg}{toclevel}%
       \RelaxFamilyKey[.dsc]{KOMAarg}{level}%
       \RelaxFamilyKey[.dsc]{KOMAarg}{increaselevel}%
       \RelaxFamilyKey[.dsc]{KOMAarg}{@else@}%
@@ -2814,7 +2702,6 @@
 %    \begin{macrocode}
 \newcommand{\scr@@startpart}{}
 \long\def\scr@@startpart#1[#2]#3{%
-%<trace>  \typeout{TRACE: \string\scr@@startpart{#1}}%
 %    \end{macrocode}
 %   \changes{v3.10}{2011/08/30}{Integration der Erweiterung für das optionale
 %     Argument der Gliederungsbefehle}^^A
@@ -2964,7 +2851,6 @@
 % ist der \meta{Text} für die Überschrift.
 %    \begin{macrocode}
 \newcommand{\scr@@startspart}[2]{%
-%<trace>  \typeout{TRACE: \string\scr@@startspart{#1}}%
 %    \end{macrocode}
 % Für Leute, die unbedingt nach der Sternversion noch ein \cs{addcontentsline}
 % anfügen wollen, muss hier ebenfalls der \textsf{hyperref}-Hook ausgeführt
@@ -3180,11 +3066,6 @@
 % \end{macro}^^A \addpart
 %
 %
-% \begin{macro}{\scr@dsc@def@tocstyle@part@command}
-%   \changes{v3.20}{2015/10/06}{neue Anweisung (intern)}^^A
-% Diese Anweisung definiert einen \cs{l@\dots}-Befehl im Stil
-% \texttt{part}. Dabei ist das einzige Argument der Name der zugehörigen
-% Gliederungsanweisung.
 % \begin{macro}{\l@part}
 %   \changes{v2.97c}{2007/06/21}{\cs{sectfont}\cs{large} durch Verwendung von
 %     Element \texttt{partentry} ersetzt}^^A
@@ -3192,8 +3073,7 @@
 %     verwendet}^^A
 %   \changes{v3.15}{2014/12/23}{Verwendung von \cs{parttocdepth} und
 %     \cs{scr@part@numwidth}}^^A
-%   \changes{v3.20}{2015/10/06}{Überführung in
-%     \cs{scr@dsc@def@tocstyle@part@command}}^^A
+%   \changes{v3.20}{2015/10/06}{Überführung in Verzeichnisstil}^^A
 % Der Eintrag für \cs{part}. Es werden einige Hilfsmakros passend zu
 % \cs{DeclareSectionCommand} definiert. Dadurch können diverse Einstellungen
 % darüber geändert werden. Es kann jedoch derzeit kein neuer Stil zugewiesen
@@ -3209,73 +3089,7 @@
 %   \changes{v3.18}{2015/06/09}{indirekt über \cs{DeclareSectionCommand}}^^A
 % Die definierte Breite der Nummer für den Eintrag ins Inhaltsverzeichnis.
 % \end{macro}
-%    \begin{macrocode}
-\newcommand*{\scr@dsc@def@tocstyle@part@command}[1]{%
-  \expandafter\def\csname l@#1\endcsname##1##2{%
-    \ifnum \c@tocdepth <\@nameuse{#1tocdepth}\else
-%<article>      \addpenalty{\@secpenalty}%
-%<book|report>      \addpenalty{-\@highpenalty}%
-      \addvspace{2.25em \@plus\p@}%
-%    \end{macrocode}
-%  \changes{v2.5e}{1998/07/17}{geänderte part-Formatierung ragte in
-%    den linken Rand}^^A
-%  \changes{v2.9k}{2003/01/02}{Anpassung an Option \texttt{tocleft}}^^A
-%    \begin{macrocode}
-      \setlength{\@tempdima}{\@nameuse{scr@#1@tocnumwidth}}%
-      \setlength{\@tempdimb}{\@nameuse{scr@#1@tocindent}}%
-      \if@tocleft
-        \setlength{\@tempdimb}{\z@}%
-        \ifx\toc@l@number\@empty\else
-          \setlength\@tempdima{0\toc@l@number}%
-        \fi
-      \fi
-      \begingroup
-        \parindent \z@ \rightskip \@pnumwidth
-        \parfillskip -\@pnumwidth
-%    \end{macrocode}
-%  \changes{v2.5c}{1997/11/25}{Formatierung bei Zeilenumbruch im
-%    part-Eintrag korrigiert}^^A
-%  \changes{v2.5e}{1998/07/17}{beinhaltet \cs{sectfont} eine
-%    Größenangabe, so wird diese überschrieben}^^A
-%    \begin{macrocode}
-        \leavevmode
-        \advance\leftskip\dimexpr \@tempdimb+\@tempdima\relax
-        \hskip \dimexpr \@tempdimb-\leftskip\relax
-        \edef\@pnumwidth{\the\dimexpr\@pnumwidth\relax}%
-        \usekomafont{partentry}{##1\nobreak
-          \usekomafont{partentrypagenumber}{\hfil\nobreak
-            \hb@xt@\@pnumwidth{\hss##2}}}\par
-%    \end{macrocode}
-%  \changes{v2.96b}{2006/11/30}{Umbruch zwischen \cs{part}-Eintrag im
-%    Inhaltsverzeichnis und untergeordneten Einträgen verhindern}^^A
-% Aus unerfindlichen Gründen war es bis Version~2.96 erlaubt, dass zwischen
-% der \cs{part}-Überschrift und der nachfolgenden Überschrift ein Umbruch
-% stattfinden kann. Ab Version~2.96a gilt das nur noch, wenn die nachfolgende
-% Überschrift wiederum eine \cs{part}-Überschrift ist.
-%    \begin{macrocode}
-        \expandafter\ifnum\scr@v@is@gt{2.96}\relax
-          \endgroup
-          \penalty\numexpr 20009-\@nameuse{#1tocdepth}\relax
-        \else
-%<*article>
-          \if@compatibility
-            \global\@nobreaktrue
-%    \end{macrocode}
-%  \changes{v2.3g}{1996/01/14}{fehlendes Kommentarzeichen ergänzt}^^A
-%    \begin{macrocode}
-            \everypar{\global\@nobreakfalse\everypar{}}%
-          \else
-%</article>
-            \penalty\@highpenalty
-%<article>           \fi
-        \endgroup
-      \fi
-    \fi
-  }%
-}
-%    \end{macrocode}
 % \end{macro}^^A \l@part
-% \end{macro}^^A \scr@dsc@def@tocstyle@part@command
 %
 %
 % \begin{Counter}{part}
@@ -4311,10 +4125,6 @@
 % \end{macro}^^A \addchap
 %
 %
-% \begin{macro}{\scr@dsc@def@tocstyle@chapter@command}
-%   \changes{v3.20}{2015/10/06}{neu (intern)}
-% Todo: Dieser Verzeichnisstil ist über den entsprechenden
-% Verzeichnisstilbefehle zu definieren.
 % \begin{macro}{\l@chapter}
 %   \changes{v2.9k}{2003/01/02}{Anpassung an Option \texttt{tocleft}}^^A
 %   \changes{v2.96b}{2006/11/30}{Umbruch zwischen \cs{chapter}-Eintrag im
@@ -4331,8 +4141,7 @@
 %     \cs{scr@chapter@tocnumwidth}}^^A
 %   \changes{v3.15}{2014/12/10}{Verwendung von \cs{addvspace} statt \cs{vskip}
 %     für den Abstand am Anfang}^^A
-%   \changes{v3.20}{2015/10/06}{überführt in
-%     \cs{scr@dsc@def@tocstyle@chapter@command}}^^A
+%   \changes{v3.20}{2015/10/06}{überführt in Verzeichnisstil}^^A
 % Für die Definition des Kapiteleintrags ins Inhaltsverzeichnis werden einige
 % Parameter von \cs{DeclareSectionCommand} definiert und teilweise
 % verwendet. Damit kann man dann zumindest einige Änderungen mit
@@ -4357,72 +4166,18 @@
 %<*option>
 \KOMA@ifkey{chapterentrydots}{@chapterentrywithdots}
 %</option>
-%<*body>
 %    \end{macrocode}
 % \end{option}^^A chapterentrydots
-%    \begin{macrocode}
-\newcommand*{\scr@dsc@def@tocstyle@chapter@command}[1]{%
-  \expandafter\def\csname l@#1\endcsname##1##2{%
-    \ifnum \c@tocdepth <\@nameuse{#1tocdepth}\else
-      \ifnum \lastpenalty<\numexpr 20010-\@nameuse{#1tocdepth}\relax
-        \addpenalty{-\@highpenalty}%
-      \fi
-      \expandafter\ifnum\scr@v@is@lt{3.15}%
-        \vskip 1.0em \@plus\p@
-      \else
-        \addvspace{1.0em \@plus\p@}%
-      \fi
-      \setlength\@tempdima{\@nameuse{scr@#1@tocnumwidth}}%
-      \setlength{\@tempdimb}{\@nameuse{scr@#1@tocindent}}%
-      \if@tocleft
-        \setlength{\@tempdimb}{\z@}%
-        \ifx\toc@l@number\@empty\else
-          \setlength\@tempdima{0\toc@l@number}%
-        \fi
-      \fi
-      \begingroup
-        \raggedchapterentry
-        \parindent \z@ \advance\rightskip \@pnumwidth
-        \parfillskip -\@pnumwidth
-        \interlinepenalty\@M
-        \leavevmode
-        \advance\leftskip\dimexpr \@tempdimb+\@tempdima\relax
-        \hskip \dimexpr \@tempdimb-\leftskip\relax
-        \edef\@pnumwidth{\the\dimexpr\@pnumwidth\relax}%
-        \usekomafont{chapterentry}{##1\nobreak
-          \usekomafont{chapterentrypagenumber}{%
-%    \end{macrocode}
-%   \changes{v3.15}{2014/10/12}{optionale Pünktchen im Eintrag}^^A
-%    \begin{macrocode}
-            {\usekomafont{chapterentrydots}{%
-                \if@chapterentrywithdots
-                  \leaders\hbox{$\m@th
-                    \mkern \@dotsep mu\hbox{.}\mkern \@dotsep
-                  mu$}%
-                \fi
-                \hfill
-              }%
-            }\nobreak
-            \hb@xt@\@pnumwidth{\hss##2}%
-          }%
-        }\par
-      \endgroup
-      \expandafter\ifnum\scr@v@is@gt{2.96}\relax
-        \penalty\numexpr 20009-\@nameuse{#1tocdepth}\relax
-      \fi
-    \fi
-  }%
-}
-%    \end{macrocode}
 % \begin{macro}{\raggedchapterentry}
 %   \changes{v2.97c}{2007/06/21}{neue Anweisung}^^A
+%   \changes{v3.20}{2015/02/23}{wird nicht mehr verwendet}^^A
 %   Ausrichtung des Textes der Kapiteleinträge im Inhaltsverzeichnis.
 %    \begin{macrocode}
+%<*body>
 \newcommand*{\raggedchapterentry}{}
 %    \end{macrocode}   
 % \end{macro}^^A \raggedchapterentry
 % \end{macro}^^A \l@chapter
-% \end{macro}^^A \scr@dsc@def@tocstyle@chapter@command
 %
 % \begin{macro}{\l@chapteratlist}
 %   \changes{v2.96a}{2006/12/03}{neues Macro}^^A
@@ -4672,12 +4427,6 @@
 % \end{macro}^^A \size@section
 %
 %
-% \begin{macro}{\scr@dsc@def@tocstyle@section@command}
-%   \changes{v3.20}{2015/10/06}{neue Anweisung (intern)}
-% Todo: Überführung in die entsprechenden Verzeichnisstil-Befehle.
-% Diese Anweisung dient dazu eine \cs{l@\dots}-Anweisung im Verzeichnisstil
-% \texttt{section} zu definieren. Das einzige Argument ist der Name der
-% zugehörigen Gliederungsanweisung.
 % \begin{macro}{\l@section}
 %   \changes{v2.9k}{2003/01/02}{Anpassung an Option \texttt{tocleft}}^^A
 %   \changes{v2.96b}{2006/11/30}{Umbruch zwischen \cs{section}-Eintrag im
@@ -4693,8 +4442,7 @@
 %   \changes{v3.15}{2014/11/24}{\cs{sectiontocdepth},
 %     \cs{scr@section@tocindent} und \cs{scr@section@tocnumwidth} werden
 %     verwendet}^^A
-%   \changes{v3.20}{2015/10/06}{Überführung in
-%     \cs{scr@dsc@def@tocstyle@section@command}}^^A
+%   \changes{v3.20}{2015/10/06}{Überführung in Verzeichnisstil}^^A
 % Bei der Artikel-Klasse folgt die Formatierung für
 % \cs{section}-Einträge, an Stelle der Einträge für \cs{chapter}
 % der Buch- oder der Bericht-Klasse. Bei diesen handelt es sich hier
@@ -4709,105 +4457,19 @@
 \KOMA@ifkey{sectionentrydots}{@sectionentrywithdots}
 %</option>
 %    \end{macrocode}
-% \end{option}^^A chapterentrydots
-%    \begin{macrocode}
-%<*body>
-\newcommand*{\scr@dsc@def@tocstyle@section@command}[1]{%
-  \expandafter\def\csname l@#1\endcsname##1##2{%
-    \ifnum \c@tocdepth <\@nameuse{#1tocdepth}\else
-      \ifnum \lastpenalty<\numexpr 20010-\@nameuse{#1tocdepth}\relax
-        \addpenalty{\@secpenalty}%
-      \fi
-      \addvspace{1.0em \@plus\p@}%
-%    \end{macrocode}
-%   \changes{v3.20}{2015/11/06}{Einzug wird nun auch verwendet}^^A
-% Neben der Nummernbreite wird nun auch der Einzug (vor der Nummer)
-% berücksichtigt. Das darf natürlich bei \texttt{toc=left} nicht passieren.
-%    \begin{macrocode}
-      \setlength\@tempdima{\dimexpr\@nameuse{scr@#1@tocnumwidth}}%
-      \setlength{\@tempdimb}{\@nameuse{scr@#1@tocindent}}%
-      \if@tocleft
-        \setlength{\@tempdimb}{\z@}%
-        \ifx\toc@l@number\@empty\else
-          \setlength\@tempdima{0\toc@l@number}%
-        \fi
-      \fi
-      \begingroup
-        \raggedsectionentry
-        \parindent \z@ \advance\rightskip \@pnumwidth
-        \parfillskip -\@pnumwidth
-        \interlinepenalty\@M
-        \leavevmode
-        \advance\leftskip\dimexpr \@tempdimb+\@tempdima\relax
-        \hskip \dimexpr \@tempdimb-\leftskip\relax
-        \edef\@pnumwidth{\the\dimexpr\@pnumwidth\relax}%
-        \usekomafont{sectionentry}{##1\nobreak
-          \usekomafont{sectionentrypagenumber}{%
-%    \end{macrocode}
-%   \changes{v3.15}{2014/10/12}{optionale Pünktchen im Eintrag}^^A
-%    \begin{macrocode}
-            {\usekomafont{sectionentrydots}{%
-                \if@sectionentrywithdots
-                  \leaders\hbox{$\m@th
-                    \mkern \@dotsep mu\hbox{.}\mkern \@dotsep
-                  mu$}%
-                \fi
-                \hfill
-              }%
-            }\nobreak
-            \hb@xt@\@pnumwidth{\hss##2}%
-          }%
-        }\par
-      \endgroup
-      \expandafter\ifnum\scr@v@is@gt{2.96}\relax
-       \penalty\numexpr 20009-\@nameuse{#1tocdepth}\relax
-    \fi
-  \fi
-  }%
-}
-%    \end{macrocode}   
+% \end{option}^^A sectionentrydots
 % \begin{macro}{\raggedsectionentry}
 %   \changes{v2.97c}{2007/06/21}{neue Anweisung}^^A
+%   \changes{v3.20}{2016/02/23}{nicht mehr verwendet}^^A
 %   Ausrichtung des Textes der Abschnittseinträge im Inhaltsverzeichnis.
 %    \begin{macrocode}
+%<*body>
 \newcommand*{\raggedsectionentry}{}
 %</body>
 %</article>
 %    \end{macrocode}   
 % \end{macro}^^A \raggedsectionentry
-% \begin{macro}{\scr@dsc@def@tocstyle@subsection@command}
-%   \changes{v3.20}{2015/10/06}{neue Anweisung (intern)}^^A
-%    \begin{macrocode}
-%<*body>
-\scr@ifundefinedorrelax{DeclareTOCEntryStyle}{%
-%<book|report>  \newcommand*{\scr@dsc@def@tocstyle@section@command}[1]{%
-%<article>  \newcommand*{\scr@dsc@def@tocstyle@subsection@command}[1]{%
-    \expandafter\def\csname l@#1\endcsname{%
-      \bprot@dottedtocline{\@nameuse{#1tocdepth}}%
-                          {\@nameuse{scr@#1@tocindent}}%
-                          {\@nameuse{scr@#1@tocnumwidth}}%
-    }%
-  }%
-}{%
-%<book|report>  \DeclareTOCEntryStyle{section}[{%
-%<article>  \DeclareTOCEntryStyle{subsection}[{%
-    \DefineTOCEntryLengthOption{indent}%
-      {scr@}{@tocindent}{entry indent}%
-    \DefineTOCEntryLengthOption{numwidth}%
-      {scr@}{@tocnumwidth}{entry number width}%
-  }]{%
-    \bprot@dottedtocline{\@nameuse{#1tocdepth}}%
-                        {\@nameuse{scr@#1@tocindent}}%
-                        {\@nameuse{scr@#1@tocnumwidth}}%
-                        {##1}%
-                        {##2}%
-  }%
-}
-%</body>
-%    \end{macrocode}
-% \end{macro}^^A \scr@dsc@def@tocstyle@subsection@command
 % \end{macro}^^A \l@section
-% \end{macro}^^A \scr@dsc@def@tocstyle@section@command
 %
 %
 % \begin{macro}{\addsec}
