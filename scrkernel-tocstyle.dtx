@@ -1,4 +1,4 @@
-% \CheckSum{1215}
+% \CheckSum{1256}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-tocstyle.dtx
@@ -10,7 +10,7 @@
 % the LaTeX Project Public License, version 1.3c of the license.
 % The latest version of this license is in
 %   http://www.latex-project.org/lppl.txt
-% and version 1.3c or later is part of all distribution<s of LaTeX 
+% and version 1.3c or later is part of all distributions of LaTeX 
 % version 2005/12/01 or later and of this work.
 %
 % This work has the LPPL maintenance status "author-maintained".
@@ -125,6 +125,91 @@
 %
 % \changes{v3.20}{2015/11/13}{neu und nur bei Vorhandensein verwendet}
 %
+%
+% \subsection{Einstellungen unabhängig von Verzeichnisstilen und doch
+%   Grundlage für diese}
+%
+% Bis \KOMAScript~3.20 waren die Befehle, die hier definiert werden, Teil der
+% KOMA-Script-Klassen. Allerdings zeigt sich, dass es für die Definition von
+% Verzeichnisstilen von Vorteil ist, wenn diese Definitionen im Paket
+% vorhanden sind.
+%
+% \iffalse
+%<*package>
+% \fi
+%
+% \begin{macro}{\numberline}
+% \begin{macro}{\scr@numberline}
+%   \changes{v2.3c}{1995/08/06}{\cs{numberline} umdefiniert}^^A
+%   \changes{v3.06}{2010/05/18}{Verwendung von \cs{numberline@prefix} und
+%     \cs{numberline@postfix}}^^A
+%   \changes{v3.12}{2013/11/22}{use \cs{numberline@numberformat} only, if the
+%     argument expands to a non-empty string}^^A
+% Dieses Makro wird indirekt im Inhaltsverzeichnis verwendet und muss
+% umdefiniert werden, um Duden, 20.~Auflage, Regel~5 und Regel~6 zu
+% implementieren.
+%    \begin{macrocode}
+%<*body>
+\newcommand*{\scr@numberline}[1]{%
+  \numberline@box{%
+    \numberline@prefix
+    \ifstr{#1}{}{#1}{\numberline@numberformat{#1}}%
+    \numberline@postfix
+  }%
+}
+%    \end{macrocode}
+% \begin{macro}{\numberline@prefix}
+%   \changes{v3.06}{2010/05/18}{neu (intern)}^^A
+% Das ist in der Voreinstellung einfach leer. Es könnte verwendet werden, um
+% etwas vor die Nummer zu setzen oder die Nummer rechtsbündig zu setzen.
+%    \begin{macrocode}
+\newcommand*{\numberline@prefix}{}
+%    \end{macrocode}
+% \end{macro}^^A \numberline@prefix
+% \begin{macro}{\numberline@postfix}
+%   \changes{v3.06}{2010/05/18}{neu (intern)} 
+% Das ist in der Voreinstellung einfach \cs{hfil} und dient dazu die Nummer
+% linksbündig zu platzieren.
+%    \begin{macrocode}
+\newcommand*{\numberline@postfix}{\hfil}
+%    \end{macrocode}
+% \end{macro}^^A \numberline@postfix
+% \begin{macro}{\numberline@numberformat}
+%   \changes{v3.06}{2010/05/18}{neu (intern)}^^A
+%   \changes{v3.12}{2013/11/22}{don't output anything, if argument expands to
+%     an empty string}^^A
+% Das dient in der Voreinstellung dazu, Regel~5 und 6 aus der 20.~Auflage des
+% DUDENs umzusetzen.
+%    \begin{macrocode}
+\newcommand*{\numberline@numberformat}[1]{\ifstr{#1}{}{}{#1\autodot}}
+%    \end{macrocode}
+% \end{macro}^^A \numberline@numberformat
+% \begin{macro}{\numberline@box}
+%   \changes{v3.06}{2010/05/18}{neu (intern)} 
+% Das dient in der Voreinstellung dazu, die Gliederungsnummer in eine Box zu
+% setzen.
+%    \begin{macrocode}
+\newcommand*{\numberline@box}[1]{\hb@xt@\@tempdima{#1}}
+%</body>
+%    \end{macrocode}
+% \end{macro}^^A \numberline@box
+% \end{macro}^^A \scr@numberline
+%
+% \iffalse
+%</package>
+%<*class>
+% \fi
+%
+%    \begin{macrocode}
+%<*body>
+\let\numberline\scr@numberline
+%</body>
+%    \end{macrocode}
+% \end{macro}^^A \numberline
+%
+% \iffalse
+%</class>
+% \fi
 %
 % \subsection{Grundlagen für Verzeichniseintragsstile}
 %
@@ -867,6 +952,7 @@
 %    \end{macrocode}
 % \end{macro}
 %
+%
 % \subsection{Vorgefertigte Verzeichniseintragsstile}
 %
 % Hier wird quasi an Beispielen gezeigt, wie man Verzeichniseintragsstile
@@ -1496,9 +1582,20 @@
 % An dieser Stelle wenden wir einen Trick an, um die Breite einer eventuell
 % vorhandenen Nummer während deren Ausgabe auszumessen.
 %    \begin{macrocode}
-        \let\scr@dte@numberline\numberline
-        \def\numberline##1{%
-          \let\numberline\scr@dte@numberline
+        \ifx\numberline\scr@numberline
+          \let\scr@dte@numberlinemeasurewarning\relax
+        \else
+          \def\scr@dte@numberlinemeasurewarning{%
+            \PackageWarning{tocbasic}{redefined \string\numberline\space
+              detected.\MessageBreak
+              Because of that redefinition measuring entry\MessageBreak
+              number failed%
+            }%
+          }%
+        \fi
+        \let\scr@dte@numberline@box\numberline@box
+        \def\numberline@box##1{%
+          \global\let\scr@dte@numberlinemeasurewarning\relax
           \sbox\scr@dte@tocline@numbox{\@nameuse{scr@tso@#1@numberformat}{##1}}%
 %    \end{macrocode}
 % Die Zuweisung an die aktuelle Länge der Nummer muss global erfolgen, weil
@@ -1529,9 +1626,10 @@
               }%
             \fi
           }%
-          \numberline{\usebox\scr@dte@tocline@numbox}%
+          \scr@dte@numberline@box{\usebox\scr@dte@tocline@numbox}%
         }%
         \@nameuse{scr@tso@#1@entryformat}{#2}%
+        \scr@dte@numberlinemeasurewarning
       }\nobreak
       \@nameuse{scr@tso@#1@linefill}%
       \nobreak
