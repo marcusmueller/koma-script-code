@@ -731,9 +731,9 @@ getrennte Aneinanderreihung von \PName{Eigenschaften}. Das Paket
   dass vor dem Abschalten des Absatzabstandes für die Verzeichnisse ein
   letztes Mal ein expliziter Absatzabstand eingefügt wird. Dies führt in der
   Regel dazu, dass bei Dokumenten mit Absatzabstand der Abstand zwischen
-  Überschrift und ersten Verzeichniseintrag kleiner wird als zwischen
-  Überschriften und normalem Text. Normalerweise erhält man daher ohne diese
-  Eigenschaft eine einheitlichere Formatierung. 
+  Überschrift und ersten Verzeichniseintrag\index{Verzeichnis>Eintrag} kleiner
+  wird als zwischen Überschriften und normalem Text. Normalerweise erhält man
+  daher ohne diese Eigenschaft eine einheitlichere Formatierung.
 \item[\PValue{noprotrusion}] verhindert\ChangedAt{v3.10}{\Package{tocbasic}}
   das Abschalten des optischen Randausgleichs in den Verzeichnissen. Optischer
   Randausgleich wird standardmäßig abgeschaltet, wenn das Paket
@@ -848,6 +848,198 @@ beschriebenen Eigenschaften \PValue{totoc}, \PValue{numbered} oder
 \PValue{leveldown} unterstützen wollen.
 %
 \EndIndex{Cmd}{iftocfeature}%
+
+
+\section{Konfiguration von Verzeichniseinträgen}
+\seclabel{tocstyle}
+\BeginIndex{}{Verzeichnis>Eintrag}
+
+Neben\ChangedAt[2016/03]{v3.20}{\Package{tocbasic}} den eigentlichen
+Verzeichnissen und den zugehörigen Hilfsdateien, kann man mit Paket
+\Package{tocbasic} ab Version~3.20 auch Einfluss auf die Verzeichniseinträge
+nehmen. Dazu können neue Stile definiert werden. Es stehen aber auch mehrere
+vordefinierte Stile zur Verfügung. Mittelfristig wird \Package{tocbasic} das
+nie offiziell gewordene \KOMAScript-Paket \Package{tocstyle} ablösen. Die
+\KOMAScript-Klassen selbst bauen seit Version~3.20 ebenfalls vollständig auf
+die von \Package{tocbasic} bereitgestellten Stile für Verzeichniseinträge.
+
+\begin{Declaration}
+  \Macro{numberline}\Parameter{Gliederungsnummer}
+\end{Declaration}
+\BeginIndex{Cmd}{numberline}
+Zwar\ChangedAt[2016/03]{v3.20}{\Package{tocbasic}} definiert bereits der
+\LaTeX-Kern eine Anweisung \Macro{numberline}, diese ist allerdings für die
+Anforderungen von \Package{tocbasic} nicht ausreichend. Deshalb definiert es
+eigene Anweisungen (siehe \autoref{sec:tocbasic.internals},
+\autopageref{desc:tocbasic.cmd.scr@numberline}) und setzt \Macro{numberline}
+für die einzelnen Verzeichniseinträgen entsprechend. Eine Umdefinierung von
+\Macro{numberline} ist daher bei Verwendung von \Package{tocbasic} oftmals
+wirkungslos und führt teilweise auch zu Warnungen.%
+\EndIndex{Cmd}{numberline}
+
+
+\begin{Declaration}
+  \Macro{DeclareTOCStyleEntry}\OParameter{Optionenliste}\Parameter{Stil}%
+                              \Parameter{Eintragsebene}
+\end{Declaration}
+\BeginIndex{Cmd}{DeclareTOCStyleEntry}%
+Über\ChangedAt[2016/03]{v3.20}{\Package{tocbasic}} diese Anweisungen werden
+die Verzeichniseinträge für eine bestimmte \PName{Eintragsebene} deklariert
+oder konfiguriert. Dabei ist die \PName{Eintragsebene} der Name der jeweiligen
+Eintragsebene, beispielsweise \PValue{section} für einen zur gleichnamigen
+Gliederungsebene gehörenden Eintrag ins Inhaltsverzeichnis oder
+\PValue{figure} für den Eintrag einer Abbildung ins
+Abbildungsverzeichnis. Jeder \PName{Eintragsebene} wird ein bestimmter
+\PName{Stil} zugeordnet, der zum Zeitpunkt der Deklaration bereits definiert
+sein muss. Über die \PName{Optionenliste} können die verschiedenen, meist vom
+\PName{Stil} abhängenden Eigenschaften des Eintrags festgelegt werden.
+
+Derzeit werden von \Package{tocbasic} die folgenden Eintragsstile definiert:
+\begin{description}
+\item[\PValue{default}] ist in der Voreinstellung ein Klon von Stil
+  \PValue{dottedtocline}. Klassenautoren, die \Package{tocbasic} verwenden,
+  wird empfohlen, diesen Stil mit Hilfe von \Macro{CloneTOCStyle} auf den
+  Standardverzeichniseintragsstil der Klasse zu ändern. Bei den
+  \KOMAScript-Klassen wird \PValue{default} beispielsweise zu einem Klon von
+  Stil \PValue{tocline}.
+\item[\PValue{dottedtocline}] entspricht dem Stil, der von den Standardklassen
+  \Class{book} und \Class{report} für die Inhaltsverzeichniseinträge der
+  Ebenen \PValue{section} bis \PValue{subparagraph} und bei allen
+  Standardklassen für die Einträge in das Abbildungs- und das
+  Tabellenverzeichnis bekannt ist. Er kennt nur die Eigenschaften
+  \PValue{level}, \PValue{indent} und \PValue{numwidth}. Die Einträge werden
+  um \PValue{indent} von links eingezogen in der aktuellen Schrift
+  ausgegeben. \Macro{numberline} wird nicht umdefiniert. Die Breite der Nummer
+  wird von \PValue{numwidth} bestimmt. Bei mehrzeiligen Einträgen wird der
+  Einzug ab der zweiten Zeile um \PValue{numwidth} erhöht. Die Seitenzahl wird
+  mit \Macro{normalfont} ausgegeben. Eintragstext und Seitenzahl werden durch
+  eine punktierte Linie verbunden.
+  % TODO: Eine Abbildung dazu erstellen.
+\item[\PValue{gobble}] ist der denkbar einfachste Stil. Einträge in diesem
+  Stil werden unabhängig von allen Einstellungen für
+  \Counter{tocdepth}\IndexCounter{tocdepth}\important{\Counter{tocdepth}}
+  nicht ausgegeben sondern sozusagen verschluckt. Dennoch verfügt er über die
+  Standardeigenschaft \PValue{level}, die jedoch nie ausgewertet wird.
+\item[\PValue{largetocline}] entspricht dem Stil, der von den Standardklassen
+  für die Ebene \PValue{part} bekannt ist. Er kennt nur die Eigenschaften
+  \PName{level} und \PName{indent}. Letzteres ist gleichsam eine Abweichung
+  von den Standardklassen, die selbst keinen Einzug der \PValue{part}-Einträge
+  unterstützen. Vor dem Eintrag wird ein Seitenumbruch erleichtert. Die
+  Einträge werden um \PValue{indent} von links eingezogen in
+  \Macro{large}\Macro{bfseries} ausgegeben. Sollte \Macro{numberline}
+  verwendet werden, so ist die Nummernbreite fest auf 3\Unit{em}
+  eingestellt. \Macro{numberline} wird nicht umdefiniert. Die Standardklassen
+  verwenden für \PName{part}-Einträge kein \Macro{numberline}. Der Wert hat
+  bei mehrzeiligen Einträgen dennoch eine Auswirkung auf den Einzug ab der
+  zweiten Zeile.
+  % TODO: Eine Abbildung dazu erstellen.
+\item[\PValue{tocline}] ist ein flexibler Stil, der in der Voreinstellung für
+  alle Einträge der \KOMAScript-Klassen verwendet wird. Entsprechend
+  definieren die Standardklasse auch die Klone \PValue{part}, \PValue{chapter}
+  und \PValue{section} mit Hilfe dieses Stils, ändern dann jedoch den
+  \PName{Initialisierungscode} der Klone so ab, dass sie unterschiedliche
+  Voreinstellungen besitzen. Der Stil kennt die Eigenschaften \PValue{level},
+  \PValue{beforeskip}, \PValue{dynnymwidth}, \PValue{entryformat},
+  \PValue{entrynumberformat}, \PValue{indent}, \PValue{linefill},
+  \PValue{numsep}, \PValue{numwidth}, \PValue{onstarthigherlevel},
+  \PValue{onstartlowerlevel}, \PValue{onstartsamelevel},
+  \PValue{pagenumberbox}, \PValue{pagenumberformat} und
+  \PValue{raggedpagenumber}. Die Voreinstellungen all dieser Eigenschaften
+  werden abhängig vom Namen der \PName{Eintragsebene} bestimmt und orientieren
+  sich dann an den Ergebnissen der Standardklassen. Es ist daher möglich, nach
+  Laden von \Package{tocbasic} den Stil der Inhaltsverzeichniseinträge der
+  Standardklassen in \PValue{tocline} zu ändern, ohne dass dies zu größeren
+  Veränderungen im Aussehen der Inhaltsverzeichniseinträge führt. Dasselbe
+  gilt für Abbildungs- und Tabellenverzeichnis der Standardklassen.
+  % TODO: Eine Abbildung dazu erstellen.  
+\item[\PValue{undottedtocline}] entspricht dem Stil, der von den
+  Standardklassen \Class{book} und \Class{report} für die Ebene
+  \PValue{chapter} und von \Class{article} für die Ebene \PValue{section}
+  bekannt ist. Er kennt nur die Eigenschaften \PValue{level}, \PValue{indent}
+  und \PValue{numwidth}. Letztere ist gleichsam eine Abweichung von den
+  Standardklassen, die selbst keinen Einzug für die genannten Ebenen
+  unterstützen. Vor dem Eintrag wird ein Seitenumbruch erleichtert und ein
+  vertikaler Abstand eingefügt. Die Einträge werden um \PValue{indent} von
+  links eingezogen in \Macro{bfseries} ausgegeben. \Macro{numberline} wird
+  nicht umdefiniert. Die Breite der Nummer wird von \PValue{numwidth}
+  bestimmt. Bei mehrzeiligen Einträgen wird der Einzug ab der zweiten Zeile um
+  \PValue{numwidth} erhöht.
+  % TODO: Eine Abbildung dazu erstellen.
+\end{description}
+Eine Erklärung zu den Eigenschaften der von \Package{tocbasic} definieren
+Stile findet sich in \autoref{tab:tocbasic.tocstyle.attributes}.
+% TODO: Tabelle der Eigenschaften muss noch erstellt werden.
+
+Letztlich führt der Aufruf von \Macro{DeclareTOCStyleEntry} zur Definition der
+Anweisung \Macro{l@\PName{Eintragsebene}}.%
+\EndIndex{Cmd}{DeclareTOCStyleEntry}
+
+\begin{Declaration}
+  \Macro{DeclareTOCEntryStyle}\Parameter{Stil}%
+                              \OParameter{Initialisierungscode}%
+                              \Parameter{Befehlscode}%
+\end{Declaration}
+\BeginIndex{Cmd}{DeclareTOCEntryStyle}%
+% TODO: Muss noch dokumentiert werden!
+Muss\ChangedAt[2016/03]{v3.20}{\Package{tocbasic}} noch dokumentiert werden.
+\EndIndex{Cmd}{DeclareTOCEntryStyle}%
+
+\begin{Declaration}
+  \Macro{CloneTOCEntryStyle}\Parameter{Stil}\Parameter{neuer Stil}%
+\end{Declaration}
+\BeginIndex{Cmd}{CloneTOCEntryStyle}%
+Mit\ChangedAt[2016/03]{v3.20}{\Package{tocbasic}} dieser Anweisung kann ein
+existierender \PName{Stil} geklont werden. Dabei wird ein \PName{neuer Stil}
+mit denselben Eigenschaften und Voreinstellungen wie der existierende
+\PName{Stil} deklariert. Das Paket selbst verwendet
+\Macro{CloneTOCEntryStyle}, um den Stil \PValue{default} als Klon von
+\PValue{dottedtocline} zu deklarieren. Die \KOMAScript-Klassen verwenden
+die Anweisung um die Stile \PValue{part}, \PValue{chapter} und
+\PValue{section} zu deklarieren und den Stil \PValue{default} neu als Klon von
+\PValue{section} zu deklarieren.%
+\EndIndex{Cmd}{CloneTOCEntryStyle}%
+
+\begin{Declaration}
+  \Macro{TOCEntryStyleInitCode}\Parameter{Stil}%
+                               \Parameter{Initialisierungscode}\\
+  \Macro{TOCEntryStyleStartInitCode}\Parameter{Stil}%
+                                    \Parameter{Initialisierungscode}
+\end{Declaration}
+\BeginIndex{Cmd}{TOCEntryStyleInitCode}%
+\BeginIndex{Cmd}{TOCEntryStyleStartInitCode}%
+% TODO: Muss noch dokumentiert werden!
+Muss\ChangedAt[2016/03]{v3.20}{\Package{tocbasic}} noch dokumentiert werden.
+\EndIndex{Cmd}{TOCEntryStyleStartInitCode}%
+\EndIndex{Cmd}{TOCEntryStyleInitCode}%
+
+\begin{Declaration}
+  \Macro{DependOnPenaltyAndTOCLevel}\Parameter{Eintragsebene}\\
+  \Macro{SetPenaltyByTOCLevel}\Parameter{Eintragsebene}\\
+  \Macro{LastTOCLevelWasHigher}\\
+  \Macro{LastTOCLevelWasSame}\\
+  \Macro{LastTOCLevelWasLower}
+\end{Declaration}
+\BeginIndex{Cmd}{DependOnPenaltyAndTOCLevel}%
+\BeginIndex{Cmd}{SetPenaltyByTOCLevel}%
+\BeginIndex{Cmd}{LastTOCLevelWasHigher}%
+\BeginIndex{Cmd}{LastTOCLevelWasSame}%
+\BeginIndex{Cmd}{LastTOCLevelWasLower}%
+% TODO: Muss noch dokumentiert werden!
+Muss\ChangedAt[2016/03]{v3.20}{\Package{tocbasic}} noch dokumentiert werden.
+\EndIndex{Cmd}{LastTOCLevelWasLower}%
+\EndIndex{Cmd}{LastTOCLevelWasSame}%
+\EndIndex{Cmd}{LastTOCLevelWasHigher}%
+\EndIndex{Cmd}{SetPenaltyByTOCLevel}%
+\EndIndex{Cmd}{DependOnPenaltyAndTOCLevel}%
+
+\begin{Declaration}
+  \Macro{TOCLineLeaderFill}\Parameter{Füllzeichen}
+\end{Declaration}
+\BeginIndex{Cmd}{TOCLineLeaderFill}%
+% TODO: Muss noch dokumentiert werden!
+Muss\ChangedAt[2016/03]{v3.20}{\Package{tocbasic}} noch dokumentiert werden.
+\EndIndex{Cmd}{TOCLineLeaderFill}%
+\EndIndex{}{Verzeichnis>Eintrag}
 
 
 \section{Interne Anweisungen für Klassen- und Paketautoren}
@@ -1153,8 +1345,8 @@ Titel definieren und dann beispielsweise mit Hilfe des Pakets
 will. Siehe dazu \autoref{sec:scrbase.languageSupport}, ab
 \autopageref{sec:scrbase.languageSupport}.
 
-Jetzt\textnote{Verzeichniseintrag} müssen wir nur noch definieren, wie ein
-einzelner Eintrag in dem Verzeichnis aussehen soll:
+Jetzt\textnote{Verzeichniseintrag}\index{Verzeichnis>Eintrag} müssen wir nur
+noch definieren, wie ein einzelner Eintrag in dem Verzeichnis aussehen soll:
 % Umbruchkorrektur: listings korrigiert!
 \begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
   \newcommand*{\l@remarkbox}{\l@figure}
@@ -1201,14 +1393,15 @@ unterstützen, angepasst gesetzt. Unterstützende Klassen beachten das neue
 Verzeichnis sogar beim Wechsel zu einem neuen Kapitel. Sprachumschaltungen
 durch \Package{babel} werden in dem Verzeichnis ebenfalls berücksichtigt.
 
-Natürlich\textnote{Verzeichniseigenschaften} kann ein Paketautor weiteres hinzufügen. So
-könnte er explizit Optionen anbieten, um die Verwendung von \Macro{setuptoc}
-vor dem Anwender zu verbergen. Andererseits kann er auch auf diese Anleitung
-zu \Package{tocbasic} verweisen, wenn es darum geht, die entsprechenden
-Möglichkeiten zu erklären. Vorteil ist dann, dass der Anwender automatisch von
-etwaigen zukünftigen Erweiterungen von \Package{tocbasic} profitiert. Soll der
-Anwender aber nicht mit der Tatsache belastet werden, dass für die Merksätze
-die Dateierweiterung \File{lor} verwendet wird, so genügt
+Natürlich\textnote{Verzeichniseigenschaften} kann ein Paketautor weiteres
+hinzufügen. So könnte er explizit Optionen anbieten, um die Verwendung von
+\Macro{setuptoc} vor dem Anwender zu verbergen. Andererseits kann er auch auf
+diese Anleitung zu \Package{tocbasic} verweisen, wenn es darum geht, die
+entsprechenden Möglichkeiten zu erklären. Vorteil ist dann, dass der Anwender
+automatisch von etwaigen zukünftigen Erweiterungen von \Package{tocbasic}
+profitiert. Soll der Anwender aber nicht mit der Tatsache belastet werden,
+dass für die Merksätze die Dateierweiterung \File{lor} verwendet wird, so
+genügt
 % Umbruchkorrektur: listings korrigiert!
 \begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
   \newcommand*{\setupremarkboxes}{\setuptoc{lor}}
@@ -1420,16 +1613,17 @@ die möglichen Optionen bietet \autoref{tab:tocbasic.DeclareNewTOC-options} ab
   \entry{\Option{forcenames}}{%
     Siehe Option \Option{name} und \Option{listname}.}%
   \entry{\KOption{hang}\PName{Einzug}}{%
-    Mehrzeilige Verzeichniseinträge in hierarchisch angeordneten
-    Verzeichnissen besitzen ab der zweiten Zeile einen Einzug von
+    Mehrzeilige Verzeichniseinträge\index{Verzeichnis>Eintrag} in hierarchisch
+    angeordneten Verzeichnissen besitzen ab der zweiten Zeile einen Einzug von
     links. Dieser Einzug wird auch für die Position des Textes in der ersten
     Zeile eines nummerierten Eintrags verwendet. Der Wert des Einzugs kann
     über diese Option bestimmt werden. Ohne diese Option wird als
     \PName{Einzug} 1,5\Unit{em} verwendet.}%
   \entry{\KOption{indent}\PName{Einzug}}{%
-    In der hierarchischen Form besitzt jeder Verzeichniseintrag einen Einzug
-    von links. Der Wert des Einzugs kann über diese Option bestimmt
-    werden. Ohne diese Option wird als \PName{Einzug} 1\Unit{em} verwendet.}%
+    In der hierarchischen Form besitzt jeder
+    Verzeichniseintrag\index{Verzeichnis>Eintrag} einen Einzug von links. Der
+    Wert des Einzugs kann über diese Option bestimmt werden. Ohne diese Option
+    wird als \PName{Einzug} 1\Unit{em} verwendet.}%
   \entry{\KOption{level}\PName{Gliederungsebene}}{%
     Jeder Eintrag in ein Verzeichnis hat eine nummerische
     \PName{Gliederungsebene}, die über diese Option gesetzt werden kann. Ist
@@ -1506,3 +1700,8 @@ zu wandeln.%
 %%% End:
 
 %  LocalWords:  Verzeichnisdatei Klonquelle Absatzabstandes Absatzabstand
+
+%  LocalWords:  Verzeichniseinträge Verzeichniseintrag Eintragsstile
+%  LocalWords:  Inhaltsverzeichniseinträge Standardklassen Nummernbreite
+%  LocalWords:  Standardeigenschaft Eintragsebene Optionenliste
+%  LocalWords:  Standardverzeichniseintragsstil Verzeichniseigenschaften
