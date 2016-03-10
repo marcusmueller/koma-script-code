@@ -146,6 +146,7 @@
 \RequirePackage{marginnote}
 \RequirePackage{tabularx}
 \RequirePackage{xcolor,tocstyle}% hyperref needs xcolor with tocstyle
+\RequirePackage{tikz}
 \RequirePackage[\uselanguage]{hyperref}
 \RequirePackage[open,openlevel=0]{bookmark}% improved pdf bookmarks
 \RequirePackage{scrhack}

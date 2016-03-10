@@ -139,6 +139,8 @@
 % \fi
 %
 % \begin{macro}{\numberline}
+%   \changes{v3.20}{2016/03/10}{\cs{numberline} wird indirekt über
+%     \cs{scr@numberline} definiert}^^A
 % \begin{macro}{\scr@numberline}
 %   \changes{v2.3c}{1995/08/06}{\cs{numberline} umdefiniert}^^A
 %   \changes{v3.06}{2010/05/18}{Verwendung von \cs{numberline@prefix} und
@@ -1458,11 +1460,35 @@
 %<undottedtocline>    \setlength\@tempdima{\@nameuse{scr@tso@#1@numwidth}}%
 %<largetocline>    \setlength\@tempdima{3em}%
     \begingroup
+%    \end{macrocode}
+% Es sei darauf hingewiesen, dass hier eigentlich zweimal \cs{@tocrmarg}
+% statt \cs{@pnumwidth} verwendet werden müsste. Allerdings habe ich
+% beschlossen, diesen schon vor Jahren gemeldeten Fehler aus
+% Kompatibilitätsgründen vorerst von den Standardklassen zu übernehmen.
+%    \begin{macrocode}
       \parindent \z@ \rightskip \@pnumwidth
       \parfillskip -\@pnumwidth
-      \leavevmode 
+%    \end{macrocode}
+% Die Standardklassen fügen an dieser Stelle noch eine Gruppe ein, die dann
+% leider vor dem abschließenden \cs{par} bereits beendet wird. Das führt
+% natürlich zu falschen Zeilenabständen bei mehrzeiligen Einträgen. Ich habe
+% lange überlegt, aber schließlich beschlossen, diesen Fehler nicht aus den
+% Standardklassen zu übernehmen. Das war mir dann doch zu krass! Schlimmer
+% noch, würde man den Fehler übernehmen, müsste man das Setzen von
+% \cs{leftskip} abändern, weil natürlich auch das erst am Absatzende
+% wirklich zur Geltung kommt.
+%    \begin{macrocode}
+      \leavevmode
 %<largetocline>      \large
       \bfseries
+%    \end{macrocode}
+% Es sei darauf hingewiesen, dass hier eigentlich auch bei
+% \texttt{largetocline} \cs{@tempdima} mit berücksichtigt werden
+% müsste. Das geht nur deshalb nicht, weil bei den Standardklassen \cs{part}
+% kein \cs{numberline} verwendet. Deshalb werden mehrzeilige Einträge auch
+% nicht korrekt eingerückt. Auch das habe ich aus Kompatibilitätsgründen
+% beibehalten.
+%    \begin{macrocode}
 %<undottedtocline>      \advance\leftskip\@tempdima
       \advance\leftskip\@nameuse{scr@tso@#1@indent}%
 %<*undottedtocline>
@@ -1470,6 +1496,13 @@
 %</undottedtocline>
       ##1%
 %<undottedtocline>      \nobreak
+%    \end{macrocode}
+% Hier schließlich ist \cs{@pnumwidth} aufgrund des vorherigen
+% \cs{large} nicht mehr derselbe absolute Wert wie bei Einträgen ohne
+% \cs{large}. Deshalb müsste eigentlich noch vor dem \cs{large} der Wert
+% beispielsweise in eine Länge wie \cs{@tempdimb} übertragen und dann hier
+% verwendet werden. Auch das habe ich aus Kompatibilitätsgründen übernommen.
+%    \begin{macrocode}
       \hfil \nobreak\hb@xt@\@pnumwidth{\hss ##2}%
       \par
 %<undottedtocline>      \penalty\@highpenalty
