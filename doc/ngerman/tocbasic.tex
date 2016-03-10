@@ -913,8 +913,55 @@ Derzeit werden von \Package{tocbasic} die folgenden Eintragsstile definiert:
   wird von \PValue{numwidth} bestimmt. Bei mehrzeiligen Einträgen wird der
   Einzug ab der zweiten Zeile um \PValue{numwidth} erhöht. Die Seitenzahl wird
   mit \Macro{normalfont} ausgegeben. Eintragstext und Seitenzahl werden durch
-  eine punktierte Linie verbunden.
-  % TODO: Eine Abbildung dazu erstellen.
+  eine punktierte Linie verbunden. \autoref{fig:tocbasic.dottedtocline}
+  illustriert die Eigenschaften des Stils.
+  \begin{figure}
+    \centering
+    \resizebox{.8\linewidth}{!}{%
+      \begin{tikzpicture}
+        \draw[color=lightgray] (0,2\baselineskip) -- (0,-3\baselineskip);
+        \draw[color=lightgray] (\linewidth,2\baselineskip) --
+                               (\linewidth,-3\baselineskip);
+        \node (dottedtocline) at (0,0) [anchor=west,inner sep=0,outer sep=0]
+        {%
+          \hspace*{7em}%
+          \parbox[t]{\dimexpr\linewidth-9.55em}{%
+            \setlength{\parindent}{-3.2em}%
+            \addtolength{\parfillskip}{-2.55em}%
+            \makebox[3.2em][l]{1.1.10}%
+            Überschrift im Verzeichniseintragsstil \PValue{dottedtocline} mit
+            mehr als einer Zeile%
+            \leaders\hbox{$\csname m@th\endcsname
+              \mkern 4.5mu\hbox{.}\mkern 4.5mu$}\hfill\nobreak
+            \makebox[1.55em][r]{12}%
+          }%
+        };
+        \draw[|-|,color=gray,overlay] (0,0) --
+                              node [anchor=north,font=\small] {
+                                \PValue{indent}
+                              }
+                              (3.8em,0);
+        \draw[|-|,color=gray,overlay] (3.8em,\baselineskip) -- 
+                              node [anchor=south,font=\small] {
+                                \PValue{numwidth}
+                              }
+                              (7em,\baselineskip);
+        \draw[|-|,color=gray,overlay] (\linewidth,\ht\strutbox) -- 
+                              node [anchor=south,font=\small] { 
+                                \Macro{@tocrmarg} 
+                              }
+                              (\linewidth-2.55em,\ht\strutbox);
+        \draw[|-|,color=gray,overlay] (\linewidth,-\baselineskip) -- 
+                              node [anchor=north,font=\small] { 
+                                \Macro{@pnumwidth} 
+                              } 
+                              (\linewidth-1.55em,-\baselineskip);
+      \end{tikzpicture}%
+    }
+    \caption{Illustration der Attribute des Verzeichniseintragsstils
+      \PValue{dottedtocline}}
+    \label{fig:tocbasic.dottedtocline}
+  \end{figure}
 \item[\PValue{gobble}] ist der denkbar einfachste Stil. Einträge in diesem
   Stil werden unabhängig von allen Einstellungen für
   \Counter{tocdepth}\IndexCounter{tocdepth}\important{\Counter{tocdepth}}
@@ -930,9 +977,53 @@ Derzeit werden von \Package{tocbasic} die folgenden Eintragsstile definiert:
   verwendet werden, so ist die Nummernbreite fest auf 3\Unit{em}
   eingestellt. \Macro{numberline} wird nicht umdefiniert. Die Standardklassen
   verwenden für \PName{part}-Einträge kein \Macro{numberline}. Der Wert hat
-  bei mehrzeiligen Einträgen dennoch eine Auswirkung auf den Einzug ab der
-  zweiten Zeile.
-  % TODO: Eine Abbildung dazu erstellen.
+  bei mehrzeiligen Einträgen auch keine Auswirkung auf den Einzug ab der
+  zweiten Zeile. \autoref{fig:tocbasic.largetocline} illustriert die
+  Eigenschaften des Stils. Dabei wird auch auffällig, dass der Stil einige
+  Ungereimtheiten der Standardklassen übernommen hat, beispielsweise der
+  fehlende Einzug ab der zweiten Zeile bei mehrzeiligen Einträgen und zwei
+  unterschiedliche Werte für \Macro{@pnumwidth}, die aus einer Abhängigkeit
+  von der Schriftgröße resultieren. Daraus resultiert auch der Umstand, dass
+  im Extremfall der Text der Überschrift der Seitenzahl zu nah kommen kann.
+  Es ist zu beachten, dass die in der Abbildung gezeigte Breite der
+  Gliederungsnummer nur dann Verwendung findet, wenn auch tatsächlich
+  \Macro{numberline} verwendet wird. Die Standardklassen setzen hingegen einen
+  festen Abstand von 1\Unit{1m} nach der Nummer.
+  \begin{figure}
+    \centering
+    \resizebox{.8\linewidth}{!}{%
+      \begin{tikzpicture}
+        \draw[color=lightgray] (0,2\baselineskip) -- (0,-3\baselineskip);
+        \draw[color=lightgray] (\linewidth,2\baselineskip) --
+                               (\linewidth,-3\baselineskip);
+        \node (largetocline) at (0,0) [anchor=west,inner sep=0,outer sep=0] {%
+          \parbox[t]{\dimexpr \linewidth-1.55em\relax}{%
+            \makebox[3em][l]{\large\bfseries I}%
+            \large\bfseries
+            Überschrift im Verzeichniseintragsstil \PValue{largetocline} mit
+            mehr als einer Zeile\hfill 
+            \makebox[0pt][l]{\normalsize\normalfont
+              \makebox[1.55em][r]{\large\bfseries 1}}%
+          }%
+        };
+        \draw[|-|,color=gray] (0,\baselineskip) -- 
+                              node [anchor=south] { 3\,em } 
+                              (3em,\baselineskip);
+        \draw[|-|,color=gray,overlay] (\linewidth,\ht\strutbox) -- 
+                              node [anchor=south] { \Macro{@pnumwidth} }
+                              (\linewidth-1.55em,\ht\strutbox);
+        \large\bfseries
+        \draw[|-|,color=gray,overlay] (\linewidth,-\baselineskip) -- 
+                              node [anchor=north,font=\normalfont\normalsize] { 
+                                \Macro{large}\Macro{@pnumwidth} 
+                              } 
+                              (\linewidth-1.55em,-\baselineskip);
+      \end{tikzpicture}%
+    }
+    \caption{Illustration der Attribute des Verzeichniseintragsstils
+      \PValue{largetocline}}
+    \label{fig:tocbasic.largetocline}
+  \end{figure}
 \item[\PValue{tocline}] ist ein flexibler Stil, der in der Voreinstellung für
   alle Einträge der \KOMAScript-Klassen verwendet wird. Entsprechend
   definieren die Standardklasse auch die Klone \PValue{part}, \PValue{chapter}
@@ -963,8 +1054,46 @@ Derzeit werden von \Package{tocbasic} die folgenden Eintragsstile definiert:
   links eingezogen in \Macro{bfseries} ausgegeben. \Macro{numberline} wird
   nicht umdefiniert. Die Breite der Nummer wird von \PValue{numwidth}
   bestimmt. Bei mehrzeiligen Einträgen wird der Einzug ab der zweiten Zeile um
-  \PValue{numwidth} erhöht.
-  % TODO: Eine Abbildung dazu erstellen.
+  \PValue{numwidth} erhöht. \autoref{fig:tocbasic.undottedtocline} illustriert
+  die Eigenschaften des Stils.
+  \begin{figure}
+    \centering
+    \resizebox{.8\linewidth}{!}{%
+      \begin{tikzpicture}
+        \draw[color=lightgray] (0,2\baselineskip) -- (0,-3\baselineskip);
+        \draw[color=lightgray] (\linewidth,2\baselineskip) --
+                               (\linewidth,-3\baselineskip);
+        \node (undottedtocline) at (0,0) [anchor=west,inner sep=0,outer sep=0]
+        {%
+          \makebox[1.5em][l]{\bfseries 1}%
+          \parbox[t]{\dimexpr \linewidth-4.05em\relax}{%
+            \bfseries
+            Überschrift im Verzeichniseintragsstil \PValue{undottedtocline} mit
+            mehr als einer Zeile%
+          }%
+          \raisebox{-\baselineskip}{\makebox[2.55em][r]{\bfseries 3}}%
+        };
+        \draw[|-|,color=gray,overlay] (0,\baselineskip) -- 
+                              node [anchor=south,font=\small] {
+                                \PValue{numwidth}
+                              }
+                              (1.5em,\baselineskip);
+        \draw[|-|,color=gray,overlay] (\linewidth,\ht\strutbox) -- 
+                              node [anchor=south,font=\small] { 
+                                \Macro{@tocrmarg} 
+                              }
+                              (\linewidth-2.55em,\ht\strutbox);
+        \draw[|-|,color=gray,overlay] (\linewidth,-\baselineskip) -- 
+                              node [anchor=north,font=\small] { 
+                                \Macro{@pnumwidth} 
+                              } 
+                              (\linewidth-1.55em,-\baselineskip);
+      \end{tikzpicture}%
+    }
+    \caption{Illustration der Attribute des Verzeichniseintragsstils
+      \PValue{undottedtocline} am Beispiel einer Kapitelüberschrift}
+    \label{fig:tocbasic.undottedtocline}
+  \end{figure}
 \end{description}
 Eine Erklärung zu den Eigenschaften der von \Package{tocbasic} definieren
 Stile findet sich in \autoref{tab:tocbasic.tocstyle.attributes}.
@@ -1705,3 +1834,5 @@ zu wandeln.%
 %  LocalWords:  Inhaltsverzeichniseinträge Standardklassen Nummernbreite
 %  LocalWords:  Standardeigenschaft Eintragsebene Optionenliste
 %  LocalWords:  Standardverzeichniseintragsstil Verzeichniseigenschaften
+%  LocalWords:  Verzeichniseintragsstil Verzeichniseintragsstils
+%  LocalWords:  Kapitelüberschrift
