@@ -919,9 +919,9 @@ Derzeit werden von \Package{tocbasic} die folgenden Eintragsstile definiert:
     \centering
     \resizebox{.8\linewidth}{!}{%
       \begin{tikzpicture}
-        \draw[color=lightgray] (0,2\baselineskip) -- (0,-3\baselineskip);
+        \draw[color=lightgray] (0,2\baselineskip) -- (0,-2.5\baselineskip);
         \draw[color=lightgray] (\linewidth,2\baselineskip) --
-                               (\linewidth,-3\baselineskip);
+                               (\linewidth,-2.5\baselineskip);
         \node (dottedtocline) at (0,0) [anchor=west,inner sep=0,outer sep=0]
         {%
           \hspace*{7em}%
@@ -993,9 +993,9 @@ Derzeit werden von \Package{tocbasic} die folgenden Eintragsstile definiert:
     \centering
     \resizebox{.8\linewidth}{!}{%
       \begin{tikzpicture}
-        \draw[color=lightgray] (0,2\baselineskip) -- (0,-3\baselineskip);
+        \draw[color=lightgray] (0,2\baselineskip) -- (0,-2.5\baselineskip);
         \draw[color=lightgray] (\linewidth,2\baselineskip) --
-                               (\linewidth,-3\baselineskip);
+                               (\linewidth,-2.5\baselineskip);
         \node (largetocline) at (0,0) [anchor=west,inner sep=0,outer sep=0] {%
           \parbox[t]{\dimexpr \linewidth-1.55em\relax}{%
             \makebox[3em][l]{\large\bfseries I}%
@@ -1016,7 +1016,7 @@ Derzeit werden von \Package{tocbasic} die folgenden Eintragsstile definiert:
         \draw[|-|,color=gray,overlay] (\linewidth,-\baselineskip) -- 
                               node [anchor=north,font=\normalfont\normalsize] { 
                                 \Macro{large}\Macro{@pnumwidth} 
-                              } 
+                              }
                               (\linewidth-1.55em,-\baselineskip);
       \end{tikzpicture}%
     }
@@ -1041,8 +1041,162 @@ Derzeit werden von \Package{tocbasic} die folgenden Eintragsstile definiert:
   Laden von \Package{tocbasic} den Stil der Inhaltsverzeichniseinträge der
   Standardklassen in \PValue{tocline} zu ändern, ohne dass dies zu größeren
   Veränderungen im Aussehen der Inhaltsverzeichniseinträge führt. Dasselbe
-  gilt für Abbildungs- und Tabellenverzeichnis der Standardklassen.
-  % TODO: Eine Abbildung dazu erstellen.  
+  gilt für Abbildungs- und Tabellenverzeichnis der Standardklassen. Aufgrund
+  der hohen Flexibilität kann dieser Stil prinzipiell die Stile
+  \PValue{dottedtocline}, \PValue{undottedtocline} und \PValue{largetocline}
+  ersetzen, bedarf dann jedoch teilweise eines höheren Aufwands bei der
+  Konfiguration. \autoref{fig:tocbasic.tocline} illustriert
+  einige Längen-Eigenschaften des Stils.
+  \begin{figure}
+    \centering
+    \resizebox{.8\linewidth}{!}{%
+      \begin{tikzpicture}
+        \coordinate (subsection) at (0,0);
+        \coordinate (section) at ($(subsection)+(0,1.5\baselineskip)$);
+        \coordinate (chapter) at ($(section)+(0,1.5\baselineskip+1em)$);
+        \coordinate (part)    at ($(chapter)+(0,1.5\baselineskip+2.25em)$);
+
+        \draw[color=lightgray] 
+          ($(part)+(0,2\baselineskip)$) -- 
+          (0,-2.5\baselineskip);
+        \draw[color=lightgray] 
+          ($(part)+(\linewidth,2\baselineskip)$) --
+          (\linewidth,-2.5\baselineskip);
+
+        \coordinate (subsection) at (0,0);
+
+        \node at (part) [anchor=west,inner sep=0,outer sep=0]
+        {%
+          \hspace*{3em}%
+          \parbox[t]{\dimexpr\linewidth-5.55em}{%
+            \setlength{\parindent}{-3em}%
+            \addtolength{\parfillskip}{-2.55em}%
+            \makebox[3em][l]{\large\bfseries I.}%
+            \textbf{\large Überschrift eines Teil-Eintrags im Stil
+            \PValue{tocline} zur Demonstration mit mehr als einer Zeile}%
+            \hfill
+            \makebox[1.55em][r]{\bfseries 12}\large
+          }%
+        };
+        \draw[|-|,color=gray,overlay]
+          ($(part)+(3em,-\baselineskip)$) -- 
+          node [anchor=west,font=\small] {
+            \PValue{afterskip}
+          }
+          ($(chapter)+(3em,\baselineskip)$);
+        \draw[|-|,color=gray,overlay] 
+          (part) --
+          ($(part)+(3em,0)$)
+          node [anchor=north east,font=\small] {
+            \PValue{numwidth}
+          };
+        \draw[|-|,color=gray,overlay] 
+          ($(part)+(\linewidth,\ht\strutbox)$)
+          node [anchor=north,font=\small] { 
+            \Macro{@tocrmarg} 
+          } --
+          ($(part)+(\linewidth-2.55em,\ht\strutbox)$);
+        \draw[|-|,color=gray,overlay] 
+          ($(part)+(\linewidth,-\baselineskip)$) -- 
+          node [anchor=north,font=\small] { 
+            \Macro{@pnumwidth} 
+          } 
+          ($(part)+(\linewidth-1.55em,-\baselineskip)$);
+        \node at (chapter) [anchor=west,inner sep=0,outer sep=0]
+        {%
+          \hspace*{1.5em}%
+          \parbox[t]{\dimexpr\linewidth-4.05em}{%
+            \setlength{\parindent}{-1.5em}%
+            \addtolength{\parfillskip}{-2.55em}%
+            \makebox[1.5em][l]{\bfseries 1.}%
+            \textbf{Überschrift eines Kapiteleintrags im Stil
+            \PValue{tocline} zur Demonstration mit mehr als einer Zeile}%
+            \hfill
+            \makebox[1.55em][r]{\bfseries 12}%
+          }%
+        };
+        \draw[|-|,color=gray,overlay]
+          ($(chapter)+(1.5em,-\baselineskip)$) -- 
+          node [anchor=west,font=\small] {
+            \PValue{afterskip}
+          }
+          ($(section)+(1.5em,.5\baselineskip)$);
+        \draw[|-|,color=gray,overlay] 
+          (chapter) --
+          ($(chapter)+(1.5em,0)$)
+          node [anchor=north east,font=\small] {
+            \PValue{numwidth}
+          };
+        \draw[|-|,color=gray,overlay] 
+          ($(chapter)+(\linewidth,\ht\strutbox)$)
+          node [anchor=north,font=\small] { 
+            \Macro{@tocrmarg} 
+          } --
+          ($(chapter)+(\linewidth-2.55em,\ht\strutbox)$);
+        \draw[|-|,color=gray,overlay] 
+          ($(chapter)+(\linewidth,-\baselineskip)$) -- 
+          node [anchor=north,font=\small] { 
+            \Macro{@pnumwidth} 
+          } 
+          ($(chapter)+(\linewidth-1.55em,-\baselineskip)$);
+        \node at (section) [anchor=west,inner sep=0,outer sep=0]
+        {
+          \hspace*{3.8em}%
+          \parbox[t]{\dimexpr\linewidth-6.35em}{%
+            \setlength{\parindent}{-2.3em}%
+            \addtolength{\parfillskip}{-2.55em}%
+            \makebox[2.3em][l]{1.1.}%
+            Überschrift eines Abschnitteintrags im Stil
+            \PValue{tocline}%
+            \leaders\hbox{$\csname m@th\endcsname
+              \mkern 4.5mu\hbox{.}\mkern 4.5mu$}\hfill\nobreak
+            \makebox[1.55em][r]{3}%
+          }%
+        };
+        \node at (subsection) [anchor=west,inner sep=0,outer sep=0]
+        {%
+          \hspace*{7em}%
+          \parbox[t]{\dimexpr\linewidth-9.55em}{%
+            \setlength{\parindent}{-3.2em}%
+            \addtolength{\parfillskip}{-2.55em}%
+            \makebox[3.2em][l]{1.1.10.}%
+            Überschrift eines Unterabschnitteintrags im Stil
+            \PValue{tocline} mit mehr als einer Zeile%
+            \leaders\hbox{$\csname m@th\endcsname
+              \mkern 4.5mu\hbox{.}\mkern 4.5mu$}\hfill\nobreak
+            \makebox[1.55em][r]{12}%
+          }%
+        };
+        \draw[|-|,color=gray,overlay] 
+          ($(subsection)+(0,\ht\strutbox)$) -- 
+          node [anchor=north,font=\small] {
+            \PValue{indent}
+          }
+          ($(subsection)+(3.8em,\ht\strutbox)$);
+        \draw[|-|,color=gray,overlay] 
+          ($(subsection)+(3.8em,0)$) --
+          ($(subsection)+(7em,0)$)
+          node [anchor=north east,font=\small] {
+            \PValue{numwidth}
+          };
+        \draw[|-|,color=gray,overlay] 
+          ($(subsection)+(\linewidth,\ht\strutbox)$)
+          node [anchor=north,font=\small] { 
+            \Macro{@tocrmarg} 
+          } --
+          ($(subsection)+(\linewidth-2.55em,\ht\strutbox)$);
+        \draw[|-|,color=gray,overlay] 
+          ($(subsection)+(\linewidth,-\baselineskip)$) -- 
+          node [anchor=north,font=\small] { 
+            \Macro{@pnumwidth} 
+          } 
+          ($(subsection)+(\linewidth-1.55em,-\baselineskip)$);
+      \end{tikzpicture}%
+    }
+    \caption{Illustration einiger Attribute des Verzeichniseintragsstils
+      \PValue{tocline}}
+    \label{fig:tocbasic.tocline}
+  \end{figure}
 \item[\PValue{undottedtocline}] entspricht dem Stil, der von den
   Standardklassen \Class{book} und \Class{report} für die Ebene
   \PValue{chapter} und von \Class{article} für die Ebene \PValue{section}
@@ -1060,9 +1214,9 @@ Derzeit werden von \Package{tocbasic} die folgenden Eintragsstile definiert:
     \centering
     \resizebox{.8\linewidth}{!}{%
       \begin{tikzpicture}
-        \draw[color=lightgray] (0,2\baselineskip) -- (0,-3\baselineskip);
+        \draw[color=lightgray] (0,2\baselineskip) -- (0,-2.5\baselineskip);
         \draw[color=lightgray] (\linewidth,2\baselineskip) --
-                               (\linewidth,-3\baselineskip);
+                               (\linewidth,-2.5\baselineskip);
         \node (undottedtocline) at (0,0) [anchor=west,inner sep=0,outer sep=0]
         {%
           \makebox[1.5em][l]{\bfseries 1}%
