@@ -1,6 +1,6 @@
 % ======================================================================
 % scrguide.cls
-% Copyright (c) Markus Kohm, 2005-2015
+% Copyright (c) Markus Kohm, 2005-2016
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -18,7 +18,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrguide.cls
-% Copyright (c) Markus Kohm, 2005-2015
+% Copyright (c) Markus Kohm, 2005-2016
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2015/09/30 v1.9b internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2016/03/11 v1.10 internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -147,6 +147,7 @@
 \RequirePackage{tabularx}
 \RequirePackage{xcolor,tocstyle}% hyperref needs xcolor with tocstyle
 \RequirePackage{tikz}
+\usetikzlibrary{calc}
 \RequirePackage[\uselanguage]{hyperref}
 \RequirePackage[open,openlevel=0]{bookmark}% improved pdf bookmarks
 \RequirePackage{scrhack}
