@@ -870,8 +870,7 @@ die von \Package{tocbasic} bereitgestellten Stile für Verzeichniseinträge.
 Zwar\ChangedAt[2016/03]{v3.20}{\Package{tocbasic}} definiert bereits der
 \LaTeX-Kern eine Anweisung \Macro{numberline}, diese ist allerdings für die
 Anforderungen von \Package{tocbasic} nicht ausreichend. Deshalb definiert es
-eigene Anweisungen (siehe \autoref{sec:tocbasic.internals},
-\autopageref{desc:tocbasic.cmd.scr@numberline}) und setzt \Macro{numberline}
+eigene Anweisungen und setzt \Macro{numberline}
 für die einzelnen Verzeichniseinträgen entsprechend. Eine Umdefinierung von
 \Macro{numberline} ist daher bei Verwendung von \Package{tocbasic} oftmals
 wirkungslos und führt teilweise auch zu Warnungen.%
@@ -1288,12 +1287,33 @@ Anweisung \Macro{l@\PName{Eintragsebene}}.
     zuzüglich des Werts von \PValue{numsep} verwendet.%
   }%
   \entry{\KOption{entryformat}\PName{Befehl}}{%
-    % TODO: Muss noch erklärt werden.
-    Muss noch für Stil \PValue{tocline} erklärt werden.%
+    Über diese Eigenschaft kann die Formatierung des gesamten Eintrags
+    verändert werden. Der dabei als Wert angegebene \PName{Befehl} hat genau
+    ein Argument zu erwarten. Dieses Argument ist nicht zwingend voll
+    expandierbar. Befehle wie \Macro{MakeUppercase}, die ein voll
+    expandierbares Argument erwarten, dürfen an dieser Stelle also nicht
+    verwendet werden. Font-Änderungen über \Option{entryformat} erfolgen
+    ausgehend von \Macro{normalfont}\Macro{normalsize}. Es wird darauf
+    hingewiesen, dass die Ausgabe von \Option{linefill} und der Seitenzahl
+    unabhängig von \Option{entryformat} sind. Siehe dazu auch die Eigenschaft
+    \Option{pagenumberformat}.
+
+    Initialisiert wird die Eigenschaft für die \PName{Eintragsebene}
+    \PValue{part} mit der Ausgabe des übergebenen Argument in
+    \Macro{large}\Macro{bfseries} und für \PValue{chapter} in
+    \Macro{bfseries}. Falls bei der Initialisierung von \PValue{section} noch
+    keine Ebene \PValue{chapter} existiert, wird auch für diese Ebene
+    \Macro{bfseries} verwendet. Bei allen anderen Ebenen wird das Argument
+    unverändert ausgegeben.%
   }%
   \entry{\KOption{entrynumberformat}\PName{Befehl}}{%
-    % TODO: Muss noch erklärt werden.
-    Muss noch für Stil \PValue{tocline} erklärt werden.%
+    Über diese Eigenschaft kann die Formatierung der mit \Macro{numberline}
+    gesetzten Eintragsnummer verändert werden. Der dabei als Wert angegebene
+    \PName{Befehl} hat genau ein Argument zu erwarten. Font-Änderungen
+    erfolgen ausgehend von der Eigenschaft \Option{entryformat}.
+
+    Initialisiert wird die Eigenschaft mit Ausgabe des übergebenen
+    Argument. Die Eintragsnummer wird also unverändert ausgegeben.%
   }%
   \entry{\KOption{indent}\PName{Länge}}{%
     Horizontaler Abstand des Eintrags vom linken Rand (siehe
@@ -1436,8 +1456,16 @@ Anweisung \Macro{l@\PName{Eintragsebene}}.
     Initialisiert wird die Eigenschaft mit der bereits erwähnten Box.%
   }%
   \entry{\KOption{pagenumberformat}\PName{Befehl}}{%
-    % TODO: Muss noch erklärt werden.
-    Muss noch für Stil \PValue{tocline} erklärt werden.%
+    Über diese Eigenschaft kann die Formatierung der Seitenzahl des Eintrags
+    verändert werden. Der dabei als Wert angegebene \PName{Befehl} hat genau
+    ein Argument zu erwarten. Font-Änderungen über \Option{entryformat}
+    erfolgen ausgehend von \Option{entryformat} gefolgt von
+    \Macro{normalfont}\Macro{normalsize}.
+
+    Initialisiert wird die Eigenschaft für die \PName{Eintragsebene}
+    \PValue{part} mit der Ausgabe des übergebenen Arguments in
+    \Macro{large}\Macro{bfseries}. Für alle anderen Ebenen erfolgt die Ausgabe
+    in \Macro{normalfont}\Macro{normalcolor}.%
   }%
   \entry{\KOption{raggedpagenumber}\PName{Schalter}}{%
     \PName{Schalter} ist einer der Werte für einfache Schalter aus
@@ -1497,14 +1525,10 @@ Muss\ChangedAt[2016/03]{v3.20}{\Package{tocbasic}} noch dokumentiert werden.
 \EndIndex{Cmd}{TOCEntryStyleInitCode}%
 
 \begin{Declaration}
-  \Macro{DependOnPenaltyAndTOCLevel}\Parameter{Eintragsebene}\\
-  \Macro{SetPenaltyByTOCLevel}\Parameter{Eintragsebene}\\
   \Macro{LastTOCLevelWasHigher}\\
   \Macro{LastTOCLevelWasSame}\\
   \Macro{LastTOCLevelWasLower}
 \end{Declaration}
-\BeginIndex{Cmd}{DependOnPenaltyAndTOCLevel}%
-\BeginIndex{Cmd}{SetPenaltyByTOCLevel}%
 \BeginIndex{Cmd}{LastTOCLevelWasHigher}%
 \BeginIndex{Cmd}{LastTOCLevelWasSame}%
 \BeginIndex{Cmd}{LastTOCLevelWasLower}%
@@ -1513,8 +1537,7 @@ Muss\ChangedAt[2016/03]{v3.20}{\Package{tocbasic}} noch dokumentiert werden.
 \EndIndex{Cmd}{LastTOCLevelWasLower}%
 \EndIndex{Cmd}{LastTOCLevelWasSame}%
 \EndIndex{Cmd}{LastTOCLevelWasHigher}%
-\EndIndex{Cmd}{SetPenaltyByTOCLevel}%
-\EndIndex{Cmd}{DependOnPenaltyAndTOCLevel}%
+
 
 \begin{Declaration}
   \Macro{TOCLineLeaderFill}\OParameter{Füllzeichen}
@@ -1722,6 +1745,18 @@ bereits beim nächsten \LaTeX-Lauf aus.%
 %
 \EndIndex{Cmd}{nonumberline}%
 \EndIndex{Cmd}{tocbasic@addxcontentsline}%
+
+
+\begin{Declaration}
+  \Macro{tocbasic@DependOnPenaltyAndTOCLevel}\Parameter{Eintragsebene}\\
+  \Macro{tocbasic@SetPenaltyByTOCLevel}\Parameter{Eintragsebene}
+\end{Declaration}
+\BeginIndex{Cmd}{tocbasic@DependOnPenaltyAndTOCLevel}%
+\BeginIndex{Cmd}{tocbasic@SetPenaltyByTOCLevel}%
+% TODO: Muss noch dokumentiert werden!
+Muss\ChangedAt[2016/03]{v3.20}{\Package{tocbasic}} noch dokumentiert werden.%
+\EndIndex{Cmd}{tocbasic@SetPenaltyByTOCLevel}%
+\EndIndex{Cmd}{tocbasic@DependOnPenaltyAndTOCLevel}%
 
 
 \section{Ein komplettes Beispiel}
@@ -2187,7 +2222,8 @@ zu wandeln.%
 
 %  LocalWords:  Verzeichniseinträge Verzeichniseintrag Eintragsstile
 %  LocalWords:  Inhaltsverzeichniseinträge Standardklassen Nummernbreite
-%  LocalWords:  Standardeigenschaft Eintragsebene Optionenliste
+%  LocalWords:  Standardeigenschaft Eintragsebene Optionenliste expandierbar
 %  LocalWords:  Standardverzeichniseintragsstil Verzeichniseigenschaften
 %  LocalWords:  Verzeichniseintragsstil Verzeichniseintragsstils
-%  LocalWords:  Kapitelüberschrift Gliederungsebene
+%  LocalWords:  Kapitelüberschrift Gliederungsebene expandierbares
+%  LocalWords:  Eintragsnummer
