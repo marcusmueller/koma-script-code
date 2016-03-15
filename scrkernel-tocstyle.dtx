@@ -1,4 +1,4 @@
-% \CheckSum{1235}
+% \CheckSum{1240}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-tocstyle.dtx
@@ -91,7 +91,7 @@
   }%
 \reserved@a
 % \iffalse
-\documentclass[halfparskip-]{scrdoc}
+\documentclass[parskip=half-]{scrdoc}
 \usepackage[english,ngerman]{babel}
 \usepackage[latin1]{inputenc}
 \CodelineIndex
@@ -155,11 +155,32 @@
 \newcommand*{\scr@numberline}[1]{%
   \numberline@box{%
     \numberline@prefix
-    \ifstr{#1}{}{#1}{\numberline@numberformat{#1}}%
+    \ifstr{#1}{}{#1}{%
+      \numberline@numberformat{#1}%
+    }%
     \numberline@postfix
   }%
 }
 %    \end{macrocode}
+% \begin{macro}{\usetocbasicnumberline}
+%   \changes{v3.20}{2016/03/15}{neu}^^A
+% Dieses Makro testet, ob \cs{numberline} auf \cs{scr@numberline}
+% basiert. Falls das nicht der Fall ist, führt es das optionale Argument aus
+% und führt dann eine entsprechende Umdefinierung statt. Falls es jedoch der
+% Fall ist, lässt es alles unverändert.
+%    \begin{macrocode}
+\newcommand*{\usetocbasicnumberline}[1][%
+  \PackageInfo{tocbasic}{Using my definition of `\string\numberline'}%
+]{%
+  \@tempswatrue
+  \begingroup
+    \def\scr@numberline##1{\global\@tempswafalse}%
+    \sbox\@tempboxa{\numberline{0}}%
+  \endgroup
+  \if@tempswa #1\renewcommand*{\numberline}[1]{\scr@numberline{##1}}\fi
+}
+%    \end{macrocode}
+% \end{macro}^^A \usetocbasicnumberline
 % \begin{macro}{\numberline@prefix}
 %   \changes{v3.06}{2010/05/18}{neu (intern)}^^A
 % Das ist in der Voreinstellung einfach leer. Es könnte verwendet werden, um
@@ -183,8 +204,30 @@
 % Das dient in der Voreinstellung dazu, Regel~5 und 6 aus der 20.~Auflage des
 % DUDENs umzusetzen.
 %    \begin{macrocode}
-\newcommand*{\numberline@numberformat}[1]{\ifstr{#1}{}{}{#1\autodot}}
+\newcommand*{\numberline@numberformat}[1]{%
+  \ifstr{#1}{}{}{\numberline@numberprefix#1\numberline@numberpostfix}%
+}
 %    \end{macrocode}
+% \begin{macro}{\numberline@numberprefix}
+%   \changes{v3.20}{2016/03/15}{neu (intern)}
+% Wird verwendet, um innerhalb von \cs{numberline@numberformat} der Nummer
+% einen Präfix voran zu stellen. Im Gegensatz zu \cs{numberline@prefix} wird
+% dieser nur ausgegeben, wenn das Argument von \cs{numberline@numberformat},
+% also auch das Argument von \cs{numberline} nicht leer ist.
+%    \begin{macrocode}
+\newcommand*{\numberline@numberprefix}{}
+%    \end{macrocode}
+% \end{macro}^^A \numberline@numberprefix
+% \begin{macro}{\numberline@numberpostfix}
+%   \changes{v3.20}{2016/03/15}{neu (intern)}
+% Wird verwendet, um innerhalb von \cs{numberline@numberformat} der Nummer
+% einen Postfix anzuhängen. Im Gegensatz zu \cs{numberline@prefix} wird
+% dieser nur ausgegeben, wenn das Argument von \cs{numberline@numberformat},
+% also auch das Argument von \cs{numberline} nicht leer ist.
+%    \begin{macrocode}
+\newcommand*{\numberline@numberpostfix}{}
+%    \end{macrocode}
+% \end{macro}^^A \numberline@numberpostfix
 % \end{macro}^^A \numberline@numberformat
 % \begin{macro}{\numberline@box}
 %   \changes{v3.06}{2010/05/18}{neu (intern)} 
@@ -1536,6 +1579,7 @@
   \BeforeClosingMainAux{%
     \begingroup
       \def\do#1{%
+        \relax
         \scr@ifundefinedorrelax{scr@dte@#1@maxnumwidth}{}{%
           \ifdim \@nameuse{scr@dte@#1@maxnumwidth}>\z@
             \protected@write\@mainaux{}{%
@@ -1611,22 +1655,13 @@
       {%
 %    \end{macrocode}
 % An dieser Stelle wenden wir einen Trick an, um die Breite einer eventuell
-% vorhandenen Nummer während deren Ausgabe auszumessen.
+% vorhandenen Nummer während deren Ausgabe auszumessen. Dazu ist es eine
+% schlichte Notwendigkeit, dass \cs{numberline} die interne Definition
+% verwendet.
 %    \begin{macrocode}
-        \ifx\numberline\scr@numberline
-          \let\scr@dte@numberlinemeasurewarning\relax
-        \else
-          \def\scr@dte@numberlinemeasurewarning{%
-            \PackageWarning{tocbasic}{redefined \string\numberline\space
-              detected.\MessageBreak
-              Because of that redefinition measuring entry\MessageBreak
-              number failed%
-            }%
-          }%
-        \fi
+        \usetocbasicnumberline
         \let\scr@dte@numberline@box\numberline@box
         \def\numberline@box##1{%
-          \global\let\scr@dte@numberlinemeasurewarning\relax
           \sbox\scr@dte@tocline@numbox{\@nameuse{scr@tso@#1@numberformat}{##1}}%
 %    \end{macrocode}
 % Die Zuweisung an die aktuelle Länge der Nummer muss global erfolgen, weil
@@ -1657,11 +1692,10 @@
               }%
             \fi
           }%
-          \scr@dte@numberline@box{\usebox\scr@dte@tocline@numbox}%
+          \scr@dte@numberline@box{\@nameuse{scr@tso@#1@numberformat}{##1}}%
         }%
         \@nameuse{scr@tso@#1@entryformat}{%
           #2%
-          \scr@dte@numberlinemeasurewarning
           \nobreak
           {%
             \normalfont\normalsize\@nameuse{scr@tso@#1@linefill}%
