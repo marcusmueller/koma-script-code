@@ -1,4 +1,4 @@
-% \CheckSum{1831}
+% \CheckSum{1841}
 % \iffalse meta-comment
 % ======================================================================
 % tocstyle.dtx
@@ -106,9 +106,6 @@
 
 Copyright (c) 2007-2016 by Markus Kohm <komascript(at)gmx.info>
 
-Copyright (c) 1994-2007
-Markus Kohm and any individual authors listed elsewhere in this file.
-
 This file was generated from file(s) of the KOMA-Script bundle.
 ---------------------------------------------------------------
 
@@ -132,7 +129,7 @@ If this file is a beta version, you are not allowed to distribute it.
 English and German manuals are part of KOMA-Script bundle.
 ----------------------------------------------------------
 
-The english manual is at `tocstyle.dtx', too.
+The english manual is in `tocstyle.dtx', too.
 
 The KOMA-Script bundle (but not this file) was based upon the LaTeX2.09 
 Script family created by Frank Neukam 1993 and the LaTeX2e standard 
@@ -178,7 +175,7 @@ THERE IS NO SUPPORT, IF YOU USE THIS PACKAGE!
   \Msg{* To finish the installation you have to copy the file `tocstyle.sty'}
   \Msg{* to folder `tex/latex/tocstyle/' of one of your TEXMF trees.}
   \Msg{* You should also produce the documentation using}
-  \Msg{*\space\space latex tocstyle.dtx}
+  \Msg{*\space\space pdflatex tocstyle.dtx}
   \Msg{* and copy it to folder `doc/latex/tocstyle/' of one of your}
   \Msg{* TEXMF trees.}
   \Msg{*}
@@ -202,7 +199,7 @@ THERE IS NO SUPPORT, IF YOU USE THIS PACKAGE!
 %<driver>\ProvidesFile{tocstyle.drv}
 %<doc>\ProvidesFile{tocstyle.tex}
 %<*dtx|package|driver|doc>
-  [2016/03/22 v0.2f-alpha KOMA-Script package (versatile toc styles)]
+  [2016/03/23 v0.2g-alpha KOMA-Script package (versatile toc styles)]
 %</dtx|package|driver|doc>
 %<*driver>
 \documentclass{scrdoc}
@@ -287,6 +284,9 @@ author didn't like to change the \LaTeX\ kernel at a class, because this may
 result in serveral problems with other packages. The package
 \Package{tocstyle} will fill the gap. If it conflicts with another package,
 you simply may decide not to use it.
+
+Since \KOMAScript~3.20 most of the features of \Package{tocstyle} are also
+provided by other \KOMAScript{} packages like \Package{tocbasic}.
 %\iffalse
 %</doc>
 %\fi
@@ -300,6 +300,27 @@ you simply may decide not to use it.
 %<*doc>
 %\fi
 %
+\section{Package Status}
+\label{sec:tocstyle.status}
+
+Package \Package{tocstyle} has alpha status for a very long time (since
+2007), despite the fact that it was very stable all over the years. The main
+reason for this is that it was an experiment and I always intended to make a
+better successor. Another reason was, that there are known issues, which are
+hardly to fix. So \Package{tocstyle} never became an official part of
+\KOMAScript. Nevertheless it has been published with \KOMAScript, because I
+thought it would be an useful addition. I never thought that the interim
+status of the package would be for more than eight years.
+
+With \KOMAScript~3.20 several features of \Package{tocstyle} can be found also
+in \Package{tocbasic}. I recommend to use that official and essential part of
+\KOMAScript{} instead of \Package{tocstyle} whenever possible. Nevertheless, I
+plan to ensure the compatibility of \Package{tocstyle} with new releases of
+\KOMAScript{} for at least already existing, unchanged documents as long as it
+is possible. But expect that \Package{tocstyle} will move from
+\KOMAScript{} bundle to another package, e.\,g., \KOMAScript-obsolete or a
+stand-alone package.
+
 \section{How It Works}
 \label{sec:tocstyle.howitworks}
 
@@ -1422,19 +1443,36 @@ usefull to define your own toc styles.
 % Try to redefine the toc commands at startup.
 %   \changes{v0.2f}{2016/03/22}{recognize all subs of part, chapter,
 %     section and paragraph}^^A
+%   \changes{v0.2g}{2016/03/23}{warning for usage of not recommended package
+%     combinations}^^A
 %    \begin{macrocode}
 \AtBeginDocument{%
-  \@ifpackagelater{tocbasic}{2016/03/01}{%
+  \@ifpackageloaded{tocbasic}{%
+    \@ifpackagelater{tocbasic}{2016/03/01}{%
+      \PackageWarningNoLine{tocstyle}{%
+        Usage of `tocstyle' with new `tocbasic' detected.\MessageBreak
+        This is not an error! You can do this.\MessageBreak
+        Nevertheless, you should note, combining `tocstyle'\MessageBreak
+        with this version of `tocbasic' will break several\MessageBreak
+        features of `tocbasic'. You should use `tocstyle'\MessageBreak
+        features instead of `tocbasic' attributes for all\MessageBreak
+        entry changes you want.\MessageBreak
+        You may also get additional warnings because of\MessageBreak
+        redefined `\string\numberline'. Ignore them}%
+    }{}%
+  }{}%
+  \@ifpackageloaded{etoc}{%
     \PackageWarningNoLine{tocstyle}{%
-      Usage of `tocstyle' with new `tocbasic' detected.\MessageBreak
-      This is not an error! You can do this.\MessageBreak
-      Nevertheless, you should note, combining `tocstyle'\MessageBreak
-      with this version of `tocbasic' will break several\MessageBreak
-      features of `tocbasic'. You should use `tocstyle'\MessageBreak
-      features instead of `tocbasic' attributes for all\MessageBreak
-      entry changes you want.\MessageBreak
-      You may also get additional warnings because of\MessageBreak
-      redefined `\string\numberline'. Ignore them}%
+      Usage of `tocstyle' with `etoc' detected.\MessageBreak
+      I suggest to use either `tocstyle' or `etoc'\MessageBreak
+      but not both of them together}%
+  }{}%
+  \@ifpackageloaded{titletoc}{%
+    \PackageWarningNoLine{tocstyle}{%
+      Usage of `tocstyle' with `titletoc' detected.\MessageBreak
+      I suggest to use either `tocstyle' or `titletoc'\MessageBreak
+      but not both of them together. I expect even\MessageBreak
+      error messages because of this combination}%
   }{}%
   \def\tocstyle@test@level{-1}%
   \def\tocstyle@test@levelname{part}%
