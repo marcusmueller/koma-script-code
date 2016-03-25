@@ -1,4 +1,4 @@
-% \CheckSum{1916}
+% \CheckSum{1922}
 % \iffalse meta-comment
 % ======================================================================
 % scrjura.dtx
@@ -70,7 +70,7 @@
 %<driver>\ProvidesFile{scrjura.drv}
 %<package>\ProvidesPackage{scrjura}
 %<*dtx|package|driver>
-                [2016/02/24 v0.9f KOMA-Script for jurists
+                [2016/03/25 v0.9g KOMA-Script for jurists
 %</dtx|package|driver>
 %<driver>                 (driver)%
 %<package>                (package)%
@@ -1255,18 +1255,22 @@ standard classes created by The LaTeX3 Project 1994-1996.
 %     flexibilisiert}^^A
 % \begin{macro}{\parellipsis}
 %   \changes{v0.7}{2013/05/02}{neu}^^A
+%   \changes{v0.9g}{2016/03/25}{in die \texttt{aux}-Datei nur bei
+%     \cs{if@filesw} schreiben}^^A
 % Paragraphen auslassen aber mit zählen.
 %    \begin{macrocode}
 \newcommand*{\ellipsispar}[1][1]{%
   \begingroup
     \KOMAoptions{parnumber=manual}\parellipsis\par
     \addtocounter{par}{#1}%
-    \protected@write\@auxout{}{%
-      \string\newmaxpar{\scrjura@env@type}%
-                       {\csname the\scrjura@env@type 
-                         AbsoluteClause\endcsname}%
-                       {\thepar}%
-    }%
+    \if@filesw
+      \protected@write\@auxout{}{%
+        \string\newmaxpar{\scrjura@env@type}%
+                         {\csname the\scrjura@env@type 
+                           AbsoluteClause\endcsname}%
+                         {\thepar}%
+      }%
+    \fi
   \endgroup
   \addtocounter{par}{-1}\refstepcounter{par}%
   \ignorespaces
@@ -2001,6 +2005,8 @@ standard classes created by The LaTeX3 Project 1994-1996.
 %     flexibilisiert}^^A
 %   \changes{v0.9f}{2016/02/06}{\cs{nobreakspace} durch
 %     \cs{parformatseparation} ersetzt}^^A
+%   \changes{v0.9g}{2016/03/25}{in die \texttt{aux}-Datei nur bei
+%     \cs{if@filesw} schreiben}^^A
 %    \begin{macrocode}
 \newcommand*{\contract@everypar}{%
   \ifparnumber
@@ -2020,15 +2026,17 @@ standard classes created by The LaTeX3 Project 1994-1996.
       \setcounter{sentence}{0}\refstepcounter{sentence}%
     \fi
     \begingroup
-      \protected@write\@auxout{%
-        \expandafter\let\csname \scrjura@env@type @Clauseformat\endcsname
-        \@firstofone
-      }{%
-        \string\newmaxpar{\scrjura@env@type}%
-                         {\csname the\scrjura@env@type 
-                           AbsoluteClause\endcsname}%
-                         {\thepar}%
-      }%
+      \if@filesw
+        \protected@write\@auxout{%
+          \expandafter\let\csname \scrjura@env@type @Clauseformat\endcsname
+          \@firstofone
+        }{%
+          \string\newmaxpar{\scrjura@env@type}%
+                           {\csname the\scrjura@env@type 
+                             AbsoluteClause\endcsname}%
+                           {\thepar}%
+        }%
+      \fi
       \getmaxpar\@tempa{\scrjura@env@type}%
                        {\csname the\scrjura@env@type AbsoluteClause\endcsname}%
       \typeout{Stored max is \@tempa}%
@@ -2542,13 +2550,14 @@ standard classes created by The LaTeX3 Project 1994-1996.
 %
 % \begin{macro}{\newmaxpar}
 %   \changes{v0.6b}{2013/04/16}{\cs{\#1@Clauseformat} expandiert zu seinem
-%     Argument}
+%     Argument}^^A
 % \begin{macro}{\getmaxpar}
 %   \changes{v0.6}{2011/09/30}{Argument 3 muss mit \cs{protected@edef}
-%     expandiert werden}
-%   \changes{v0.5c}{2010/04/26}{\cs{protected@edef} durch \cs{edef} ersetzt}
+%     expandiert werden}^^A
+%   \changes{v0.5c}{2010/04/26}{\cs{protected@edef} durch \cs{edef}
+%     ersetzt}^^A
 %   \changes{v0.5c}{2010/04/26}{\cs{\#2@Clauseformat} expandiert zu seinem
-%     Argument}
+%     Argument}^^A
 % Noch zwei Hilfsmakros, um Zähler in der aux-Datei zwischenzuspeichern und
 % auch dann Werte zu holen, wenn sie nicht in der aux-Datei stehen.
 %    \begin{macrocode}
@@ -2574,14 +2583,18 @@ standard classes created by The LaTeX3 Project 1994-1996.
 }
 %    \end{macrocode}
 %   \changes{v0.7b}{2014/11/10}{Notfallcode in die \texttt{aux}-Datei}^^A
+%   \changes{v0.9g}{2015/03/25}{in die \texttt{aux}-Datei nur bei
+%     \cs{if@filesw} schreiben}^^A
 % Da manche Anwender \texttt{scrjura} aus einem Dokument entfernen, ohne die
 % \texttt{aux}-Dateien zu löschen, sehen wir eine Notlösung vor, um
 % Fehlermeldungen wegen nicht definiertem \cs{newmaxpar} zu vermeiden.
 %    \begin{macrocode}
 \AtBeginDocument{%
-  \immediate\write\@mainaux{%
-    \string\providecommand*{\string\newmaxpar}[3]{}
-  }%
+  \if@filesw
+    \immediate\write\@auxout{%
+      \string\providecommand*\string\newmaxpar[3]{}
+    }%
+  \fi
 }
 %    \end{macrocode}
 % \end{macro}
