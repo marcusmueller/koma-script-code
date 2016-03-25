@@ -703,7 +703,14 @@ getrennte Aneinanderreihung von \PName{Eigenschaften}. Das Paket
   einer (leeren) \Macro{numberline}-Anweisung versehen werden. Das führt in
   der Regel dazu, dass diese Einträge nicht linksbündig mit der Nummer,
   sondern mit dem Text der nummerierten Einträge gleicher Ebene gesetzt
-  werden. Die \KOMAScript-Klassen setzen diese Eigenschaft bei Verwendung der
+  werden. Bei\ChangedAt{v3.20}{\Package{tocbasic}} Verwendung des
+  Verzeichniseintragsstils \PValue{tocline} kann die Eigenschaft weitere
+  Auswirkungen haben. Siehe dazu die Stil-Eigenschaften
+  \Option{breakafternumber} und \Option{entrynumberformat} in
+  \autoref{tab:tocbasic.tocstyle.attributes} ab
+  \autopageref{tab:tocbasic.tocstyle.attributes}.
+
+  Die \KOMAScript-Klassen setzen diese Eigenschaft bei Verwendung der
   Option \OptionValue{listof}{numberline}%
   \important{\OptionValue{listof}{numberline}}%
   \IndexOption{listof~=\PValue{numberline}} für die Dateierweiterungen des
@@ -1053,10 +1060,11 @@ Derzeit werden von \Package{tocbasic} die folgenden Eintragsstile definiert:
 
   Der Stil kennt die Eigenschaften \PValue{level}, \PValue{beforeskip},
   \PValue{dynnumwidth}, \PValue{entryformat}, \PValue{entrynumberformat},
-  \PValue{indent}, \PValue{linefill}, \PValue{numsep}, \PValue{numwidth},
-  \PValue{onstarthigherlevel}, \PValue{onstartlowerlevel},
-  \PValue{onstartsamelevel}, \PValue{pagenumberbox}, \PValue{pagenumberformat}
-  und \PValue{raggedpagenumber}. Die Voreinstellungen all dieser Eigenschaften
+  \PValue{breakafternumber}, \PValue{indent}, \PValue{linefill},
+  \PValue{numsep}, \PValue{numwidth}, \PValue{onstarthigherlevel},
+  \PValue{onstartlowerlevel}, \PValue{onstartsamelevel},
+  \PValue{pagenumberbox}, \PValue{pagenumberformat} und
+  \PValue{raggedpagenumber}. Die Voreinstellungen all dieser Eigenschaften
   werden abhängig vom Namen der \PName{Eintragsebene} bestimmt und orientieren
   sich dann an den Ergebnissen der Standardklassen. Es ist daher möglich, nach
   Laden von \Package{tocbasic} den Stil der Inhaltsverzeichniseinträge der
@@ -1064,7 +1072,7 @@ Derzeit werden von \Package{tocbasic} die folgenden Eintragsstile definiert:
   ändern, ohne dass dies unmittelbar zu größeren Veränderungen im Aussehen der
   Inhaltsverzeichniseinträge führt. So kann man gezielt nur die Eigenschaften
   ändern, die für erwünschte Änderungen notwendig sind.  Dasselbe gilt für
-  Abbildungs- und Tabellenverzeichnis der Standardklassen. 
+  Abbildungs- und Tabellenverzeichnis der Standardklassen.
 
   Aufgrund der hohen Flexibilität kann dieser Stil prinzipiell die Stile
   \PValue{dottedtocline}, \PValue{undottedtocline} und \PValue{largetocline}
@@ -1300,13 +1308,32 @@ Anweisung \Macro{l@\PName{Eintragsebene}}.
       plus 1pt} verwendet. Alle anderen Ebenen werden mit \texttt{0pt plus
       .2pt} initialisiert.%
   }%
-  \entry{\KOption{dynnumwidth}\PName{Schalter}}{%
+  \entry{\KOption{breakafternumber}\PName{Schalter}}{%
     \PName{Schalter} ist einer der Werte für einfache Schalter aus
     \autoref{tab:truefalseswitch}, \autopageref{tab:truefalseswitch}.
-    Ist der Schalter beim Stil \PValue{tocline} aktiviert, wird die
-    Eigenschaft \PValue{numwidth} ignoriert. Stattdessen wird die beim letzten
-    \LaTeX-Lauf ermittelte maximale Breite der Eintragsnummern gleicher Ebene
-    zuzüglich des Werts von \PValue{numsep} verwendet.%
+    Ist der Schalter beim Stil \PValue{tocline} aktiviert, so wird nach der
+    mit \Macro{numberline}\IndexCmd{numberline} gesetzten Nummer eine neue
+    Zeile begonnen, die erneut linksbündig mit der Nummer beginnt.
+
+    In der Voreinstellung ist die Eigenschaft im Stil \PValue{tocline} nicht
+    gesetzt.
+
+    Ist\textnote{Achtung!} für ein Verzeichnis mit \Macro{setuptoc} die
+    Eigenschaft \Option{numberline} gesetzt (siehe \autoref{sec:tocbasic.toc},
+    \autopageref{desc:tocbasic.cmd.setuptoc}), wie dies bei den
+    \KOMAScript-Klassen und Verwendung deren Option
+    \OptionValue{toc}{numberline}\IndexOption{toc~=\PValue{numberline}} der
+    Fall ist, führt dies auch dazu, dass bei nicht nummerierten Einträgen
+    dennoch die Zeile mit der dann leeren Nummer in der Formatierung von
+    \Option{entrynumberformat} gesetzt wird.%
+  }%
+  \entry{\KOption{dynnumwidth}\PName{Schalter}}{%
+    \PName{Schalter} ist einer der Werte für einfache Schalter aus
+    \autoref{tab:truefalseswitch}, \autopageref{tab:truefalseswitch}. Ist der
+    Schalter beim Stil \PValue{tocline} aktiviert, wird die Eigenschaft
+    \PValue{numwidth} ignoriert. Stattdessen wird die beim letzten \LaTeX-Lauf
+    ermittelte maximale Breite der Eintragsnummern gleicher Ebene zuzüglich
+    des Werts von \PValue{numsep} verwendet.%
   }%
   \entry{\KOption{entryformat}\PName{Befehl}}{%
     Über diese Eigenschaft kann die Formatierung des gesamten Eintrags
@@ -1335,7 +1362,15 @@ Anweisung \Macro{l@\PName{Eintragsebene}}.
     erfolgen ausgehend von der Eigenschaft \Option{entryformat}.
 
     Initialisiert wird die Eigenschaft mit Ausgabe des übergebenen
-    Argument. Die Eintragsnummer wird also unverändert ausgegeben.%
+    Arguments. Die Eintragsnummer wird also unverändert ausgegeben.
+
+    Ist\textnote{Achtung!} für ein Verzeichnis mit \Macro{setuptoc} die
+    Eigenschaft \Option{numberline} gesetzt (siehe \autoref{sec:tocbasic.toc},
+    \autopageref{desc:tocbasic.cmd.setuptoc}), wie dies bei den
+    \KOMAScript-Klassen und Verwendung deren Option
+    \OptionValue{toc}{numberline}\IndexOption{toc~=\PValue{numberline}} der
+    Fall ist, führt dies auch dazu, dass bei nicht nummerierten Einträgen
+    \PName{Befehl} dennoch ausgeführt wird.%
   }%
   \entry{\KOption{indent}\PName{Länge}}{%
     Horizontaler Abstand des Eintrags vom linken Rand (siehe
