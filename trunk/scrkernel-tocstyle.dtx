@@ -1,4 +1,4 @@
-% \CheckSum{1242}
+% \CheckSum{1252}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-tocstyle.dtx
@@ -1081,6 +1081,8 @@
 \DeclareTOCEntryStyle{tocline}[{%
   \DefineTOCEntryIfOption{raggedpagenumber}%
     {scr@tso@}{@raggedpage}{page number ragged flag}%
+  \DefineTOCEntryIfOption{breakafternumber}%
+    {scr@tso@}{@breakafternumber}{line break after number flag}%
   \DefineTOCEntryIfOption{dynnumwidth}%
     {scr@tso@}{@dynnumwidth}{dynamic number width flag}%
   \DefineTOCEntryCommandOption{onstarthigherlevel}%
@@ -1430,6 +1432,14 @@
     }%
   }%
 %    \end{macrocode}
+% Nach der Nummer kann wahlweise ein Zeilenumbruch erfolgen, wobei in diesem
+% Fall der Text wieder auf Höhe der Nummer und nicht erst danach
+% erfolgt. Gesteuert wird das über einen Schalter. In der Voreinstellung
+% machen wird das nicht.
+%    \begin{macrocode}
+  \expandafter\providecommand
+  \csname Ifscr@tso@#1@breakafternumber\endcsname[2]{##2}%
+%    \end{macrocode}
 % Die Verbindung zwischen Ende des Eintrags und den Seitenzahlen erfolgt
 % normalerweise mit Pünktchen. Das wird auch genau die Voreinstellung für die
 % Option werden. In der Voreinstellung wird mit \cs{hfill} gefüllt.
@@ -1699,6 +1709,9 @@
             \fi
           }%
           \scr@dte@numberline@box{\@nameuse{scr@tso@#1@numberformat}{##1}}%
+          \@nameuse{Ifscr@tso@#1@breakafternumber}{%
+            \par\nobreak\hskip-\leftskip
+          }{}%
         }%
         \@nameuse{scr@tso@#1@entryformat}{%
           #2%
