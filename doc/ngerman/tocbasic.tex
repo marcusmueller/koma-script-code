@@ -1546,11 +1546,154 @@ Anweisung \Macro{l@\PName{Eintragsebene}}.
 \begin{Declaration}
   \Macro{DeclareTOCEntryStyle}\Parameter{Stil}%
                               \OParameter{Initialisierungscode}%
-                              \Parameter{Befehlscode}%
+                              \Parameter{Befehlscode}\\
+  \Macro{DefineTOCEntryOption}\Parameter{Option}\OParameter{Säumniswert}%
+                              \Parameter{Code}\\
+  \Macro{DefineTOCEntryBooleanOption}\Parameter{Option}\OParameter{Säumniswert}%
+                                     \Parameter{Präfix}%
+                                     \Parameter{Postfix}%
+                                     \Parameter{Erklärung}\\%
+                                     %\OParameter{Initialisierungscode}\\
+  \Macro{DefineTOCEntryCommandOption}\Parameter{Option}\OParameter{Säumniswert}%
+                                     \Parameter{Präfix}%
+                                     \Parameter{Postfix}%
+                                     \Parameter{Erklärung}\\%
+                                     %\OParameter{Initialisierungscode}\\
+  \Macro{DefineTOCEntryIfOption}\Parameter{Option}\OParameter{Säumniswert}%
+                                     \Parameter{Präfix}%
+                                     \Parameter{Postfix}%
+                                     \Parameter{Erklärung}\\%
+                                     %\OParameter{Initialisierungscode}\\
+  \Macro{DefineTOCEntryLengthOption}\Parameter{Option}\OParameter{Säumniswert}%
+                                     \Parameter{Präfix}%
+                                     \Parameter{Postfix}%
+                                     \Parameter{Erklärung}\\%
+                                     %\OParameter{Initialisierungscode}\\
+  \Macro{DefineTOCEntryNumberOption}\Parameter{Option}\OParameter{Säumniswert}%
+                                     \Parameter{Präfix}%
+                                     \Parameter{Postfix}%
+                                     \Parameter{Erklärung}%
+                                     %\OParameter{Initialisierungscode}%
 \end{Declaration}
 \BeginIndex{Cmd}{DeclareTOCEntryStyle}%
-% TODO: Muss noch dokumentiert werden!
-Muss\ChangedAt[2016/03]{v3.20}{\Package{tocbasic}} noch dokumentiert werden.
+\BeginIndex{Cmd}{DefineTOCEntryOption}%
+\BeginIndex{Cmd}{DefineTOCEntryBooleanOption}%
+\BeginIndex{Cmd}{DefineTOCEntryCommandOption}%
+\BeginIndex{Cmd}{DefineTOCEntryIfOption}%
+\BeginIndex{Cmd}{DefineTOCEntryLengthOption}%
+\BeginIndex{Cmd}{DefineTOCEntryNumberOption}%
+\Macro{DeclareTOCEntryStyle}\ChangedAt[2016/03]{v3.20}{\Package{tocbasic}} ist
+eine der komplexesten Anweisungen in \KOMAScript. Sie richtet sich daher
+ausdrücklich an \LaTeX-Entwickler und nicht an \LaTeX-Anwender. Mit ihrer
+Hilfe ist es möglich, einen neuen \PName{Stil} für Verzeichniseinträge zu
+definieren. Üblicherweise werden Verzeichniseinträge mit
+\Macro{addcontentsline}\IndexCmd{addcontentsline} oder bei Verwendung von
+\Package{tocbasic} vorzugsweise mit
+\Macro{addxcontentsline}\IndexCmd{addxcontentsline} (siehe
+\autoref{sec:tocbasic.basics},
+\autopageref{desc:tocbasic.cmd.addxcontentsline}) erzeugt. Dabei schreibt
+\LaTeX{} eine zugehörige Anweisung \Macro{contentsline}\IndexCmd{contentsline}
+in die jeweilige Hilfsdatei. Bei Einlesen dieser Hilfsdatei führt \LaTeX{}
+dann für jedes \Macro{contentsline} eine Anweisung
+\Macro{l@\PName{Eintragsebene}} aus.
+
+Wird später einer \PName{Eintragsebene} über \Macro{DeclareTOCStyleEntry} der
+\PName{Stil} zugewiesen, so wird zunächst der optionale
+\PName{Initialisierungscode} ausgeführt und dann
+\Macro{l@\PName{Eintragsebene}} als \PName{Befehlscode}
+definiert. \PName{Befehlscode} ist also letztlich der Code, der bei
+\Macro{l@\PName{Eintragsebene}} ausgeführt wird. Dabei ist \texttt{\#1} der
+Name der Eintragsebene, während \texttt{\#\#1} und \texttt{\#\#2} Platzhalter
+für die beiden Argumente von \Macro{l@\PName{Eintragsebene}} sind.
+
+Der \PName{Initialisierungscode} dient einerseits dazu, alle Einstellungen zu
+initialisieren. Entwickler sollten darauf achten, dass wirklich alle
+Einstellungen hier bereits einen Wert erhalten, damit
+\Macro{DeclareTOCStyleEntry} auch ohne Angabe einer \PName{Optionenliste}
+fehlerfrei funktioniert. Darüber hinaus hat der \PName{Initialisierungscode}
+auch alle Optionen, die der jeweilige Stil versteht, zu definieren. Zwingend
+vordefiniert wird lediglich \Option{level}. Der eingestellte Wert für
+\Option{level} kann in \PName{Befehlscode} mit
+\Macro{@nameuse}\PParameter{\#1tocdepth}%
+\important{\Macro{\PName{Eintragsebene}tocdepth}}
+abgefragt werden, um ihn beispielsweise mit dem Wert des Zählers
+\Counter{tocdepth}\IndexCounter{tocdepth} zu vergleichen.
+
+Zur Definition neuer Optionen zur Einstellung von Eigenschaften einer
+Eintragsebene stehen nur innerhalb von \PName{Initialisierungscode} die
+Anweisungen \Macro{DefineTOCEntryBooleanOption},
+\Macro{DefineTOCEntryCommandOption}, \Macro{DefineTOCEntryIfOption},
+\Macro{DefineTOCEntryLengthOption} und \Macro{DefineTOCEntryNumberOption}.
+All diese Anweisungen definieren jeweils eine \PName{Option}, die bei ihrem
+Aufruf eine Anweisung
+\Macro{\PName{Präfix}\PName{Eintragsebene}\PName{Postfix}} mit dem übergebenen
+Wert oder bei Fehlen einer Wertzuweisung mit dem \PName{Säumniswert}
+definieren. Eine Besonderheit stellt \Macro{DefineTOCEntryIfOption} dar. Diese
+definiert \Macro{\PName{Präfix}\PName{Eintragsebene}\PName{Postfix}} immer als
+Anweisung mit zwei Argumenten. Ist der an die Option übergebene Wert einer der
+Aktivierungswerte aus \autoref{tab:truefalseswitch},
+\autopageref{tab:truefalseswitch}, so expandiert die Anweisung zum ersten
+Argument. Ist der an die Option übergebene Wert hingegen ein
+Deaktivierungswert, so expandiert die Anweisung zum zweiten Argument.
+
+Die \PName{Erklärung} sollte ein möglichst kurzer Text sein, der den Sinn der
+Option mit wenigen Schlagworten beschreibt. Er wird von \Package{tocbasic} bei
+Fehlermeldungen, Warnungen und Informationen auf dem Terminal und in der
+\File{log}-Datei ausgegeben.
+
+Der einfachste Stil von \Package{tocbasic}, \PValue{gobble}, wurde mit
+\begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
+  \DeclareTOCEntryStyle{gobble}{}%
+\end{lstcode}
+definiert. Würde man nun mit
+\begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
+  \DeclareTOCStyleEntry[level=1]{gobble}{dummy}
+\end{lstcode}
+eine Eintragsebene \PValue{dummy} in diesem Stil definieren, so würde das
+unter anderem
+\begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
+  \def\dummytocdepth{1}
+  \def\l@dummy#1#2{}
+\end{lstcode}
+entsprechen.
+
+Innerhalb von Stil \PValue{tocline} wird beispielsweise
+\begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
+  \DefineTOCEntryCommandOption{linefill}[\TOCLineLeaderFill]%
+  {scr@tso@}{@linefill}{filling between text and page number}%
+\end{lstcode}
+verwendet, um Option \Option{linefill} mit dem \PName{Säumniswert}
+\Macro{TOCLineLeaderFill} zu definieren. Ein Aufruf wie
+\begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
+  \RedeclareTOCStyleEntry[linefill]{tocline}{part}
+\end{lstcode}
+würde daher unter anderem die Definition
+\begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
+  \def\scr@tso@part@linefill{\TOCLineLeaderFill}
+\end{lstcode}
+vornehmen.
+
+Wer sich selbst einen Stil definieren möchte, dem sei empfohlen, zunächst die
+Definition des Stils \PValue{dottedtocline} zu studieren. Nachdem dessen
+Definition verstanden wurde, gibt dann die deutlich komplexere Definition von
+Stil \PValue{tocline} viele Hinweise darauf, wie die Anweisungen sinnvoll zu
+verwenden sind.
+
+In vielen Fällen wird es jedoch auch ausreichen, einen der vorhandenen Stile
+mit \Macro{CloneTOCEntryStil} zu klonen und dann dessen Initialisierungscode
+mit \Macro{TOCEntryStyleInitCode} oder \Macro{TOCEntryStyleStartInitCode}
+abzuändern.
+
+\Macro{DefineTOCEntryOption} dient eher der Definition der übrigen
+Anweisungen und sollte in der Regel nicht direkt verwendet
+werden. Normalerweise besteht dafür auch keine Notwendigkeit. Sie sei hier
+nur der Vollständigkeit halber erwähnt.%
+\EndIndex{Cmd}{DefineTOCEntryNumberOption}%
+\EndIndex{Cmd}{DefineTOCEntryLengthOption}%
+\EndIndex{Cmd}{DefineTOCEntryIfOption}%
+\EndIndex{Cmd}{DefineTOCEntryCommandOption}%
+\EndIndex{Cmd}{DefineTOCEntryBooleanOption}%
+\EndIndex{Cmd}{DefineTOCEntryOption}%
 \EndIndex{Cmd}{DeclareTOCEntryStyle}%
 
 \begin{Declaration}
@@ -1562,10 +1705,10 @@ existierender \PName{Stil} geklont werden. Dabei wird ein \PName{neuer Stil}
 mit denselben Eigenschaften und Voreinstellungen wie der existierende
 \PName{Stil} deklariert. Das Paket selbst verwendet
 \Macro{CloneTOCEntryStyle}, um den Stil \PValue{default} als Klon von
-\PValue{dottedtocline} zu deklarieren. Die \KOMAScript-Klassen verwenden
-die Anweisung um die Stile \PValue{part}, \PValue{chapter} und
-\PValue{section} zu deklarieren und den Stil \PValue{default} neu als Klon von
-\PValue{section} zu deklarieren.%
+\PValue{dottedtocline} zu deklarieren. Die \KOMAScript-Klassen verwenden die
+Anweisung um die Stile \PValue{part}, \PValue{chapter}, \PValue{section} oder
+\PValue{subsection} zu deklarieren und den Stil \PValue{default} neu als Klon
+von \PValue{section} beziehungsweise \PValue{subsection} zu deklarieren.%
 \EndIndex{Cmd}{CloneTOCEntryStyle}%
 
 \begin{Declaration}
@@ -1592,7 +1735,18 @@ erweitert werden. Dabei fügt \Macro{TOCEntryStyleStartInitCode} den neuen
 \PName{Initialisierungscode} hinten an den vorhandenen Code anfügt. Dies wird
 beispielsweise von den \KOMAScript-Klassen verwendet, um für den von
 \PValue{tocline} geklonten Stil \PValue{part} Füllung, Schrift und vertikalen
-Abstand passend zu initialisieren.%
+Abstand passend zu initialisieren. Die Klassen \Class{scrbook} und
+\Class{scrreprt} verwenden beispielsweise
+\begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
+  \CloneTOCEntryStyle{tocline}{section}
+  \TOCEntryStyleStartInitCode{section}{%
+    \expandafter\providecommand%
+    \csname scr@tso@#1@linefill\endcsname
+    {\TOCLineLeaderFill\relax}%
+  }
+\end{lstcode}
+um den Stil \PValue{section} als abgewandelten Klon von \PValue{tocline} zu
+definieren.%
 \EndIndex{Cmd}{TOCEntryStyleStartInitCode}%
 \EndIndex{Cmd}{TOCEntryStyleInitCode}%
 
@@ -2152,7 +2306,7 @@ die möglichen Optionen bietet \autoref{tab:tocbasic.DeclareNewTOC-options} ab
     \label{rem:typo1}
   \end{remarkbox}
 \end{lstcode}
-  Ein Ausschitt aus einer Beispielseite mit dieser Umgebung könnte dann so
+  Ein Ausschnitt aus einer Beispielseite mit dieser Umgebung könnte dann so
   aussehen:
   \begin{center}\footnotesize
     \begin{tabular}
@@ -2319,4 +2473,5 @@ zu wandeln.%
 %  LocalWords:  Standardverzeichniseintragsstil Verzeichniseigenschaften
 %  LocalWords:  Verzeichniseintragsstil Verzeichniseintragsstils
 %  LocalWords:  Kapitelüberschrift Gliederungsebene expandierbares
-%  LocalWords:  Eintragsnummer Initialisierungscode
+%  LocalWords:  Eintragsnummer Initialisierungscode Aktivierungswerte
+%  LocalWords:  Deaktivierungswert
