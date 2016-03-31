@@ -1,8 +1,8 @@
-% \CheckSum{1326}
+% \CheckSum{1493}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-floats.dtx
-% Copyright (c) Markus Kohm, 2002-2015
+% Copyright (c) Markus Kohm, 2002-2016
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrkernel-floats.dtx
-% Copyright (c) Markus Kohm, 2002-2015
+% Copyright (c) Markus Kohm, 2002-2016
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -1033,7 +1033,111 @@
   }%
 }%
 %    \end{macrocode}
-% \end{macro}
+% \end{macro}^^A \setcapwidth
+% \begin{macro}{\setcapdynwidth}
+%   \changes{v3.20}{2016/03/31}{neu}
+% Ulrike findet es blöd, dass \cs{setcapwidth} wie \cs{setlength} arbeitet und
+% ist der Meinung, dass das Argument erst zur Laufzeit ausgewertet werden
+% sollte. Also ein neuer Befehl genau dafür. Es sei allerdings darauf
+% hingewiesen, dass Fehler im Argument dann ggf. erst bei jeder
+% \cs{caption}-Anweisung und nicht bereits hier ausgegeben werden!
+%    \begin{macrocode}
+\newcommand*{\setcapdynwidth}[2][]{%
+  \def\cap@width{#2}%
+  \begingroup
+    \edef\@tempa{#1}%
+    \def\@tempb{c}\ifx\@tempa\@tempb
+      \endgroup
+      \def\cap@margin{%
+        \ifdim \cap@width<\z@
+          \ClassWarning{\KOMAClassName}{%
+            caption width less than 0pt not allowed.\MessageBreak
+            Setting caption width to 0pt%
+          }%
+          \let\cap@width\z@
+        \fi
+        \let\cap@left=\hfill\let\cap@right=\hfill}%
+    \else
+      \def\@tempb{l}\ifx\@tempa\@tempb
+        \endgroup
+        \def\cap@margin{%
+          \ifdim \cap@width<\z@
+            \ClassWarning{\KOMAClassName}{%
+              caption width less than 0pt not allowed.\MessageBreak
+              Setting caption width to 0pt%
+            }%
+            \let\cap@width\z@
+          \fi
+          \let\cap@left=\relax\let\cap@right\hfill}%
+      \else
+        \def\@tempb{r}\ifx\@tempa\@tempb
+          \endgroup
+          \def\cap@margin{%
+            \ifdim \cap@width<\z@
+              \ClassWarning{\KOMAClassName}{%
+                caption width less than 0pt not allowed.\MessageBreak
+                Setting caption width to 0pt%
+              }%
+              \let\cap@width\z@
+            \fi
+            \let\cap@left=\hfill\let\cap@right=\relax}%
+        \else
+          \def\@tempb{i}\ifx\@tempa\@tempb
+            \endgroup
+            \def\cap@margin{%
+              \ifdim \cap@width<\z@
+                \ClassWarning{\KOMAClassName}{%
+                  caption width less than 0pt not allowed.\MessageBreak
+                  Setting caption width to 0pt%
+                }%
+                \let\cap@width\z@
+              \fi
+              \let\cap@left=\relax
+              \let\cap@right=\hfill
+              \if@twoside
+                \ifthispageodd{}{%
+                  \let\cap@left=\hfill
+                  \let\cap@right=\relax
+                }%
+              \fi
+            }%
+          \else
+            \def\@tempb{o}\ifx\@tempa\@tempb
+              \endgroup
+              \def\cap@margin{%
+                \ifdim \cap@width<\z@
+                  \ClassWarning{\KOMAClassName}{%
+                    caption width less than 0pt not allowed.\MessageBreak
+                    Setting caption width to 0pt%
+                  }%
+                  \let\cap@width\z@
+                \fi
+                \let\cap@left=\hfill
+                \let\cap@right=\relax
+                \if@twoside
+                  \ifthispageodd{}{%
+                    \let\cap@left=\relax
+                    \let\cap@right=\hfill
+                  }%
+                \fi
+              }%
+            \else
+              \ifx \@tempa\@empty\else
+                \ClassError{\KOMAClassName}{%
+                  unknown optional position argument%
+                }{%
+                  You've used `#1' as position argument at
+                  \string\setcaptionwidth,\MessageBreak
+                  but only ONE of `c', `l', `r', `i`, `o` ist
+                  allowed.\MessageBreak
+                  Argument will be ignored, if you'll continue.%
+                }%
+              \fi
+              \endgroup
+  \fi\fi\fi\fi\fi
+}
+%    \end{macrocode}
+% \end{macro}^^A \setcapdynwidth
 % \begin{macro}{\cap@margin}
 %   \changes{v2.8q}{2001/11/17}{neu (intern)}^^A
 % Dieses Makro beinhaltet nicht den Wert der Ränder, sondern das
