@@ -1,4 +1,4 @@
-% \CheckSum{3385}
+% \CheckSum{3390}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-notepaper.dtx
@@ -3780,7 +3780,7 @@
 %   \changes{v3.12}{2013/05/13}{neu (intern)}^^A
 % Über diese Option kann eingestellt werden, dass an Stelle von
 % sprachabhängigen Bezeichnern für einige Variablen Symbole verwendet
-% werden. Daztu wird das Paket \textsf{macrosym} benötigt.
+% werden. Dazu wird das Paket \textsf{macrosym} benötigt.
 %    \begin{macrocode}
 %</letter>
 %</body>
@@ -3821,17 +3821,30 @@
         \fi
       \endgroup
     \else
-%<*class>
-      \ifstr{\@currname.\@currext}{\KOMAClassFileName}{%
-        \expandafter\AtEndOfClass
-%</class>
-%<*package>
-      \ifstr{\@currname.\@currext}{scrletter.\scr@pkgextension}{%
-        \expandafter\AtEndOfPackage
-%</package>
-      }{%
+%    \end{macrocode}
+%   \changes{v3.20}{2016/04/01}{Name der Klasse oder des Pakets ist für die
+%     Ladeverzögerung von \textsf{marvosym} egal}^^A
+%   \changes{v3.20}{2016/04/01}{Ladeverzögerung für das Paket
+%     \textsf{marvosym} nur, wenn erforderlich und möglich}^^A
+% In der Dokumentpräambel kann das Paket \textsf{marvosym} selbst geladen
+% werden. Allerdings funktioniert das nicht, solange wir im Optionen-Abschnitt
+% sind. Also muss es ggf. verzögert werden. Wie lange es zu verzögern ist,
+% hängt davon ab, ob wir uns in einer Klasse, einem Paket oder sonst einer
+% Datei mit Optionen-Abschnitt befinden.
+%    \begin{macrocode}
+      \ifx\@fileswith@pti@ns\@badrequireerror
+        \ifstr{\@currext}{\@clsextension}{%
+          \expandafter\AtEndOfClass
+        }{%
+          \ifstr{\@currext}{\@pksextension}{%
+            \expandafter\AtEndOfPackage
+          }{%
+            \expandafter\AtBeginDocument
+          }%
+        }%
+      \else
         \expandafter\@firstofone
-      }%
+      \fi
       {\RequirePackage{marvosym}}%
     \fi
   \fi
