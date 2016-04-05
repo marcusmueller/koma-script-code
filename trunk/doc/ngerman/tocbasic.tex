@@ -813,7 +813,6 @@ Die \KOMAScript-Klassen kennen eine weitere Eigenschaft:
 \begin{lstcode}
   \setuptoc{loa}{chapteratlist}
 \end{lstcode}
-%% NEW FEATURE 3.01
   Wollen Sie außerdem, dass bei Klassen, die \Macro{chapter} als oberste
   Gliederungsebene verwenden, das Verzeichnis automatisch einspaltig gesetzt
   wird, so verwenden Sie zusätzlich
@@ -826,7 +825,6 @@ Die \KOMAScript-Klassen kennen eine weitere Eigenschaft:
   setzt das Paket \Package{scrbase} voraus (siehe
   \autoref{sec:scrbase.if},
   \autopageref{desc:scrbase.cmd.ifundefinedorrelax}).
-%% END NEW FEATURE 3.01
 
   Sollte\textnote{Tipp!} Ihr Paket mit einer anderen Klasse verwendet werden,
   so schadet es trotzdem nicht, dass Sie diese Eigenschaften setzen, im
@@ -1281,7 +1279,14 @@ Derzeit werden von \Package{tocbasic} die folgenden Eintragsstile definiert:
   \end{figure}
 \end{description}
 Eine Erklärung zu den Eigenschaften der von \Package{tocbasic} definierten
-Stile findet sich in \autoref{tab:tocbasic.tocstyle.attributes}.
+Stile findet sich in \autoref{tab:tocbasic.tocstyle.attributes}. Bei
+Verwendung der Eigenschaften als Optionen für \Macro{DeclareNewTOC} (siehe
+\autopageref{desc:tocbasic.cmd.DeclareNewTOC}) oder
+\Macro{DeclareSectionCommand} (siehe
+\autopageref{desc:maincls-experts.cmd.DeclareSectionCommand}) und verwandten
+Anweisungen sind die Namen der Eigenschaften mit dem Präfix \PValue{toc} zu
+versehen, also beispielsweise \Option{toclevel} an Stelle von \PValue{level}
+zu verwenden.
 
 Letztlich führt der Aufruf von \Macro{DeclareTOCStyleEntry} zur Definition der
 Anweisung \Macro{l@\PName{Eintragsebene}}.
@@ -2230,6 +2235,28 @@ Optionen\textnote{Achtung!} können jedoch \emph{nicht} mit
 \Macro{KOMAoptions}\IndexCmd{KOMAoptions} gesetzt werden! Eine Übersicht über
 die möglichen Optionen bietet \autoref{tab:tocbasic.DeclareNewTOC-options} ab
 \autopageref{tab:tocbasic.DeclareNewTOC-options}.
+
+Wird\ChangedAt[2016/03]{v3.20}{\Package{tocbasic}} Option
+\Option{tocentrystyle} nicht gesetzt, so wird bei Bedarf der Stil
+\PValue{default} verwendet. Näheres zu diesem Stil ist
+\autoref{sec:tocbasic.tocstyle} zu entnehmen. Soll kein Befehl für
+Verzeichniseinträge definiert werden, so kann ein leeres Argument, also
+wahlweise \OptionValue{tocentrystyle}{} oder
+\OptionValue{tocentrystyle}{\PParameter{}} verwendet werden. Dies birgt
+allerdings das Risiko, dass bei Ausgabe des entsprechenden Verzeichnisses
+diverse Fehler gemeldet werden.
+
+Abhängig\ChangedAt[2016/03]{v3.20}{\Package{tocbasic}} vom Stil der
+Verzeichniseinträge können auch alle für diesen Stil gültigen Eigenschaften
+gesetzt werden, indem die entsprechenden in
+\autoref{tab:tocbasic.tocstyle.attributes} ab
+\autopageref{tab:tocbasic.tocstyle.attributes} aufgeführten Namen mit dem
+Präfix \PValue{toc} versehen in der \PName{Optionenliste} angegeben
+werden. Nachträgliche Änderungen am Stil sind mit
+\Macro{DeclareTOCStyleEntry}%
+\IndexCmd{DeclareTOCStyleEntry}\important{\Macro{DeclareTOCStyleEntry}}
+jederzeit möglich. Siehe dazu \autoref{sec:tocbasic.tocstyle},
+\autopageref{desc:tocbasic.cmd.DeclareTOCStyleEntry}.
 %
 \begin{Example}
   Das Beispiel aus \autoref{sec:tocbasic.example} kann mit Hilfe der neuen
@@ -2396,21 +2423,43 @@ die möglichen Optionen bietet \autoref{tab:tocbasic.DeclareNewTOC-options} ab
   \entry{\Option{forcenames}}{%
     Siehe Option \Option{name} und \Option{listname}.}%
   \entry{\KOption{hang}\PName{Einzug}}{%
-    Mehrzeilige Verzeichniseinträge\index{Verzeichnis>Eintrag} in hierarchisch
-    angeordneten Verzeichnissen besitzen ab der zweiten Zeile einen Einzug von
-    links. Dieser Einzug wird auch für die Position des Textes in der ersten
-    Zeile eines nummerierten Eintrags verwendet. Der Wert des Einzugs kann
-    über diese Option bestimmt werden. Ohne diese Option wird als
-    \PName{Einzug} 1,5\Unit{em} verwendet.}%
+    \ChangedAt{v3.20}{\Package{tocbasic}}%
+    Diese Option gilt seit \KOMAScript~3.20 als überholt. Die Breite der
+    Nummer des Verzeichniseintrags\index{Verzeichnis>Eintrag} ist nun
+    stattdessen als Eigenschaft in Abhängigkeit des Verzeichniseintragsstils
+    von Option \Option{tocentrystyle} anzugeben. Bei den Stilen von
+    \KOMAScript{} wäre das beispielsweise die Eigenschaft \PValue{numwidth}
+    und damit Option \Option{tocnumwidth}. Besitzt ein Stil diese Eigenschaft,
+    so wird sie von \Macro{DeclareNewTOC} mit 1,5\Unit{em}
+    voreingestellt. Diese Voreinstellung kann durch explizite Angabe von
+    \KOption{tocnumwidth}\PName{Wert} leicht mit einem anderen \PName{Wert}
+    überschrieben werden. Für Abbildungen verwenden die \KOMAScript-Klassen
+    beispielsweise den \PName{Wert} \PValue{2.3em}.}%
   \entry{\KOption{indent}\PName{Einzug}}{%
-    In der hierarchischen Form besitzt jeder
-    Verzeichniseintrag\index{Verzeichnis>Eintrag} einen Einzug von links. Der
-    Wert des Einzugs kann über diese Option bestimmt werden. Ohne diese Option
-    wird als \PName{Einzug} 1\Unit{em} verwendet.}%
+    \ChangedAt{v3.20}{\Package{tocbasic}}%
+    Diese Option gilt seit \KOMAScript~3.20 als überholt. Der Einzug des
+    Verzeichniseintrags\index{Verzeichnis>Eintrag} von links ist nun
+    stattdessen als Eigenschaft in Abhängigkeit des Verzeichniseintragsstils
+    von Option \Option{tocentrystyle} anzugeben. Bei den Stilen von
+    \KOMAScript{} wäre das beispielsweise die Eigenschaft \PValue{indent} und
+    damit Option \Option{tocindent}. Besitzt ein Stil diese Eigenschaft, so
+    wird sie von \Macro{DeclareNewTOC} mit 1\Unit{em} voreingestellt. Diese
+    Voreinstellung kann durch explizite Angabe von
+    \KOption{tocindent}\PName{Wert} leicht mit einem anderen \PName{Wert}
+    überschrieben werden. Für Abbildungen verwenden die \KOMAScript-Klassen
+    beispielsweise den \PName{Wert} \PValue{1.5em}.}%
   \entry{\KOption{level}\PName{Gliederungsebene}}{%
-    Jeder Eintrag in ein Verzeichnis hat eine nummerische
-    \PName{Gliederungsebene}, die über diese Option gesetzt werden kann. Ist
-    diese Option nicht angegeben, so wird der Standardwert 1 verwendet.}%
+    \ChangedAt{v3.20}{\Package{tocbasic}}%
+    Diese Option gilt seit \KOMAScript~3.20 als überholt. Der nummerische Wert
+    der Ebene des Verzeichniseintrags\index{Verzeichnis>Eintrag} ist nun
+    stattdessen als Eigenschaft in Abhängigkeit des Verzeichniseintragsstils
+    von Option \Option{tocentrystyle} anzugeben. Bei den Stilen von
+    \KOMAScript{} wäre das beispielsweise die Eigenschaft \PValue{level} und
+    damit Option \Option{toclevel}. Besitzt ein Stil diese Eigenschaft, so
+    wird sie von \Macro{DeclareNewTOC} mit 1 voreingestellt. Diese
+    Voreinstellung kann durch explizite Angabe von
+    \KOption{toclevel}\PName{Wert} leicht mit einem anderen \PName{Wert}
+    überschrieben werden.}%
   \entry{\KOption{listname}\PName{Verzeichnistitel}}{%
     Jedes Verzeichnis hat eine Überschrift, die durch diese Option bestimmt
     werden kann. Ist die Option nicht angegeben, so wird als Verzeichnistitel
@@ -2445,6 +2494,17 @@ die möglichen Optionen bietet \autoref{tab:tocbasic.DeclareNewTOC-options} ab
     kein Besitzer angegeben, so wird der Besitzer »\PValue{float}« verwendet,
     den auch die \KOMAScript-Klassen für das Abbildungs- und das
     Tabellenverzeichnis verwenden.}%
+  \entry{\KOption{tocentrystyle}\PName{Eintragsstil}}{%
+    \ChangedAt[2016/03]{v3.20}{\Package{tocbasic}}%
+    \PName{Eintragsstil} gibt den Stil an, den Einträge in das entsprechende
+    Verzeichnis haben sollen. Den Namen der Eintragsebene wird dabei über
+    Option \Option{type} bestimmt. Zusätzlich zu den Optionen dieser Tabelle
+    können auch alle Eigenschaften des Stils als Optionen angegeben werden,
+    indem die Namen der Eigenschaften mit dem Präfix \PValue{toc} ergänzt
+    werden. So kann der nummerische Wert der Ebene beispielsweise als
+    \Option{toclevel} angegeben werden. Näheres zu den Stilen ist
+    \autoref{sec:tocbasic.tocstyle} ab \autopageref{sec:tocbasic.tocstyle} zu
+    entnehmen.}%
   \entry{\KOption{type}\PName{Eintragstyp}}{%
     \PName{Eintragstyp} gibt den Typ der Einträge in das entsprechende
     Verzeichnis an. Der Typ wird auch als Basisname für verschiedene Makros
@@ -2488,7 +2548,8 @@ zu wandeln.%
 %  LocalWords:  Inhaltsverzeichniseinträge Standardklassen Nummernbreite
 %  LocalWords:  Standardeigenschaft Eintragsebene Optionenliste expandierbar
 %  LocalWords:  Standardverzeichniseintragsstil Verzeichniseigenschaften
-%  LocalWords:  Verzeichniseintragsstil Verzeichniseintragsstils
+%  LocalWords:  Verzeichniseintragsstil Verzeichniseintragsstils Eintragsstil
 %  LocalWords:  Kapitelüberschrift Gliederungsebene expandierbares
 %  LocalWords:  Eintragsnummer Initialisierungscode Aktivierungswerte
-%  LocalWords:  Deaktivierungswert
+%  LocalWords:  Deaktivierungswert Verzeichnistitel Eintragstyp Eintragstyps
+%  LocalWords:  Verzeichniseintrags

@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2016/03/11 v1.10 internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2016/04/05 v1.11 internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -1322,6 +1322,7 @@
     onehalfspacing,
     PackageError,PackageInfo,PackageWarning,PassOptionsToPackage,
     ProcessOptions,protected@write,ProvidesFile,ProvidesPackage,
+    providecommand,
     RequirePackage,RequirePackageWithOptions,setkey,setlength,
     SelectInputMappings,setkeys,
     textsuperscript}%
@@ -1351,8 +1352,10 @@
     chapter,chapterlinesformat,chapterlineswithprefixformat,
     chapterformat,chaptermarkformat,chapterpagestyle,chead,
     cleardoubleevenemptypage,clearscrheadfoot,closing,cofoot,Comment,
+    CloneTOCEntryStyle,
     DeclareLayer,DeclareNewLayer,DeclareNewPageStyleByLayers,
     DeclarePageStyleByLayers,
+    DeclareTOCStyleEntry,DeclareTOCEntryStyle,
     DeclareNewNoteColumn,DeclareNewPageStyleAlias,
     DeclareNewTOC,DeclareSectionCommand,DeclareNewSectionCommand,
     RedeclareSectionCommand,ProvideSectionCommand,
@@ -1412,6 +1415,7 @@
     thesubsubsection,theparagraph,thesubparagraph,
     thetable,thistime,
     titlehead,tocbasic@extend@babel,TOCclone,todaysname,typearea,%
+    TOCEntryStyleInitCode,TOCEntryStyleStartInitCode,TOCLineLeaderFill,
     UnPreventPackageFromLoading,unitfactor,
     unsettoc,usekomafont,useplength,usekomavar,uppertitleback% 
 }%

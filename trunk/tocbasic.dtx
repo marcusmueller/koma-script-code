@@ -1,4 +1,4 @@
-% \CheckSum{1456}
+% \CheckSum{1471}
 % \iffalse meta-comment
 % ======================================================================
 % tocbasic.dtx
@@ -1476,10 +1476,25 @@
   }\@tempa
 %    \end{macrocode}
 % The list entry:
+%   \changes{v3.20}{2016/04/05}{warning if \cs{l@\dots} is undefined}^^A
 %    \begin{macrocode}
-  \ifstr{\tb@nt@tocentrystyle}{}{}{%
-    \expandafter\DeclareTOCStyleEntry\expandafter[\expandafter{%
-      \tb@nt@tocstyle@options}]{\tb@nt@tocentrystyle}{\tb@nt@type}%
+  \ifstr{\tb@nt@tocentrystyle}{}{%
+    \@ifundefined{l@\tb@nt@type}{%
+      \PackageWarning{tocbasic}{%
+        \expandafter\string\csname l@\tb@nt@type\endcsname\space
+        undefined!\MessageBreak
+        I hope you know, what you are doing, but\MessageBreak
+        maybe it would be better to use proper\MessageBreak
+        `tocentrystyle` settings%
+      }%
+    }{}%
+  }{%
+    \edef\reserved@a{%
+      \noexpand\DeclareTOCStyleEntry[%
+        {\unexpanded\expandafter{\tb@nt@tocstyle@options}}%
+      ]{\tb@nt@tocentrystyle}{\tb@nt@type}%
+    }%
+    \reserved@a
   }%
 %    \end{macrocode}
 % \changes{v3.12}{2013/05/03}{fixed: definition of
@@ -1561,9 +1576,9 @@
 %    \end{macrocode}
 % The counter and hooks of float and nonfloat environments:
 %   \changes{v3.10b}{2012/04/04}{\cs{noexpand} added to fix problems using
-%     \cs{autodot}}%^^A
+%     \cs{autodot}}^^A
 %   \changes{v3.13}{2014/07/31}{add \cs{autodot} only to hierachical
-%     counters}%^^A
+%     counters}^^A
 %    \begin{macrocode}
   \if@tempswa
     \@ifundefined{c@\tb@nt@type}{%
