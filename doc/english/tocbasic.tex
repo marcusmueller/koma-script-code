@@ -1461,7 +1461,102 @@ command \Macro{l@\PName{entry level}}.
 \BeginIndex{Cmd}{DefineTOCEntryIfOption}%
 \BeginIndex{Cmd}{DefineTOCEntryLengthOption}%
 \BeginIndex{Cmd}{DefineTOCEntryNumberOption}%
-\textsc{Todo: Translation still missing!}%
+\Macro{DeclareTOCEntryStyle}\ChangedAt[2016/03]{v3.20}{\Package{tocbasic}} is
+one of the most complex command in \KOMAScript. It is addressed to \LaTeX{}
+developers not the \LaTeX{} users. It provides the definition of a new
+TOC-entry \PName{style}. Usually TOC-entries are made using
+\Macro{addcontentsline}\IndexCmd{addcontentsline} or if you use
+\Package{tocbasic} with recommended
+\Macro{addxcontentsline}\IndexCmd{addxcontentsline} (see
+\autoref{sec:tocbasic.basics},
+\autopageref{desc:tocbasic.cmd.addxcontentsline}). In both cases \LaTeX{}
+writes a corresponding \Macro{contentsline}\IndexCmd{contentsline} into the
+given auxiliary file. Reading this auxiliary file each \Macro{contentsline}
+results in execution of a command \Macro{l@\PName{entry level}}.
+
+Whenever you assign a \PName{style} to a TOC-entry level using
+\Macro{DeclareTOCStyleEntry}, first of all the \PName{initial code} is
+executed and then \Macro{l@\PName{entry level}} is defined to be
+\PName{command code}. So \PName{command code} is the code, that will be
+expanded and executed by \Macro{l@\PName{entry level}}. Inside
+\PName{command code} \texttt{\#1} is the name of the TOC-entry level and
+\texttt{\#\#1} and \texttt{\#\#2} are the arguments of
+\Macro{l@\PName{entry level}}.
+
+The \PName{initial code} should initialise all attributes of the
+\PName{style}. Developers are recommended to use \PName{initial code} to
+initialise really all internal macros of the \PName{style} without the need of
+using an \PName{option list}. The second task of the \PName{initial code} is
+the definition of options to setup the attributes of the \PName{style}. Option
+\Option{level} is always defined automatically. The value of \Option{level}
+can be get in \PName{command code} using
+\Macro{@nameuse}\PParameter{\#1tocdepth}%
+\important{\Macro{\PName{entry level}tocdepth}}, e.\,g., to compare it with
+the counter \Counter{tocdepth}\IndexCounter{tocdepth}.
+
+Commands \Macro{DefineTOCEntryBooleanOption},
+\Macro{DefineTOCEntryCommandOption}, \Macro{DefineTOCEntryIfOption},
+\Macro{DefineTOCEntryLengthOption}, and \Macro{DefineTOCEntryNumberOption}
+should be used to define options for the attributes of the
+\PName{style} inside \PName{initial code} only. If you use an \PName{option}
+defined by one of these commands, a macro \Macro{\PName{prefix}\PName{entry
+    level}\PName{postfix}} will be defined to be the assigned value or the
+\PName{default value} of the option. Somehow special is
+\Macro{DefineTOCEntryIfOption}. It defines \Macro{\PName{prefix}\PName{entry
+    level}\PName{postfix}} as a command with two arguments. If the value to
+the option is an activation value of \autoref{tab:truefalseswitch},
+\autopageref{tab:truefalseswitch} the command expands to the first
+argument. If the value to the option is an deactivation value, the command
+expands to the second argument.
+
+The \PName{description} should be a real short text that described the sense
+of the option with some catchwords. Package \Package{tocbasic} uses this text
+in error messages, warnings or information output on the terminal and into the
+\File{log}-file.
+
+The most simple style of \Package{tocbasic}, \PValue{gobble}, is defined
+using:
+\begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
+  \DeclareTOCEntryStyle{gobble}{}%
+\end{lstcode}
+If you would define a entry level \PValue{dummy} using:
+\begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
+  \DeclareTOCStyleEntry[level=1]{gobble}{dummy}
+\end{lstcode}
+among others this would do something like:
+\begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
+  \def\dummytocdepth{1}
+  \def\l@dummy#1#2{}
+\end{lstcode}
+
+Inside style \PValue{tocline} for example
+\begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
+  \DefineTOCEntryCommandOption{linefill}[\TOCLineLeaderFill]%
+  {scr@tso@}{@linefill}{filling between text and page number}%
+\end{lstcode}
+is used to define option \Option{linefill} with \PName{default value}
+\Macro{TOCLineLeaderFill}. A call like:
+\begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
+  \RedeclareTOCStyleEntry[linefill]{tocline}{part}
+\end{lstcode}
+would therefore result in a definition like:
+\begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
+  \def\scr@tso@part@linefill{\TOCLineLeaderFill}
+\end{lstcode}
+
+Whoever likes to define his own styles is recommended to study first the
+definition of style \PValue{dottedtocline}. If this definition is understood,
+the much more complex definition of style \PValue{tocline} gives a lot of
+hints of the correct usage of the described commands.
+
+In many cases it will be enough to clone an existing style using
+\Macro{CloneTOCEntryStyle} and to change the initial code of the new style
+using \Macro{TOCEntryStyleInitCode} or \Macro{TOCEntryStyleStartInitCode}.
+
+\Macro{DefineTOCEntryOption} is merely used to define the other
+commands. It is not recommended to define options directly using
+\Macro{DefineTOCEntryOption}. Normally this is even not needed. It is
+alluded only for completeness.%
 \EndIndex{Cmd}{DefineTOCEntryNumberOption}%
 \EndIndex{Cmd}{DefineTOCEntryLengthOption}%
 \EndIndex{Cmd}{DefineTOCEntryIfOption}%
@@ -1900,7 +1995,7 @@ about the styles.%
     \Macro{DeclareNewTOC}\ChangedAt{v3.06}{\Package{tocbasic}}%
     \label{tab:tocbasic.DeclareNewTOC-options}%
   }{%
-    Options for command \Macro{DeclareNewTOC} (continuation)%
+    Options for command \Macro{DeclareNewTOC} (\emph{continuation})%
   }%
   \entry{\KOption{atbegin}\PName{instructions}%
     \ChangedAt{v3.09}{\Package{tocbasic}}}{%
