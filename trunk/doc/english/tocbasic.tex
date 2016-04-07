@@ -49,7 +49,7 @@
                  [$Date$
                   KOMA-Script guide (package tocbasic)]
 
-% Date of translated German file: 2016/03/09
+% Date of translated German file: 2016/04/07
 
 \translator{Markus Kohm}
 
@@ -1569,7 +1569,14 @@ alluded only for completeness.%
   \Macro{CloneTOCEntryStyle}\Parameter{style}\Parameter{new style}%
 \end{Declaration}
 \BeginIndex{Cmd}{CloneTOCEntryStyle}%
-\textsc{Todo: Translation still missing!}%
+With\ChangedAt[2016/03]{v3.20}{\Package{tocbasic}} command you can clone an
+existing \PName{style}. This defines a \PName{new style} with the same
+attributes and settings like the existing \PName{style}. The package itself
+uses \Macro{CloneTOCEntryStyle} to declare style \PValue{default} as a clone
+of \PValue{dottedtocline}. The \KOMAScript{} classes use the command to
+declare the styles \PValue{part}, \PValue{section}, and \PValue{chapter} or
+\PValue{subsection} as a clone of \PValue{tocline} and the style
+\PValue{default} new as a clone of \PValue{section} or \PValue{subsection}.%
 \EndIndex{Cmd}{CloneTOCEntryStyle}%
 
 \begin{Declaration}
@@ -1580,7 +1587,32 @@ alluded only for completeness.%
 \end{Declaration}
 \BeginIndex{Cmd}{TOCEntryStyleInitCode}%
 \BeginIndex{Cmd}{TOCEntryStyleStartInitCode}%
-\textsc{Todo: Translation still missing!}%
+Every\ChangedAt[2016/03]{v3.20}{\Package{tocbasic}} TOC-entry style has an
+initialisation code. This is used whenever a \PName{style} is assigned to an
+TOC-entry using \Macro{DeclareTOCEntryStyle}. This \PName{initial code} should
+never do anything global, because it is also used for local initialisation
+inside other commands like \Macro{DeclareNewTOC}\IndexCmd{DeclareNewTOC}. The
+\PName{initial code} not only defines all attributes of a \PName{style}. It
+also should set the defaults for those attributes.
+
+You can use \Macro{TOCEntryStyleStartInitCode} and
+\Macro{TOCEntryStyleInitCode} to extend the already existing initialisation
+code by \PName{initial code}. \Macro{TOCEntryStyleStartInitCode} adds
+\PName{initial code} in front of the existing initialisation
+code. \Macro{TOCEntryStyleInitCode} adds the \PName{initial code} at the end
+of the existing initialisation code. The \KOMAScript{} classes, e.\,g., are
+using \Macro{TOCEntryStyleStartInitCode} to change the filling, font and
+vertical distances of style \PValue{part} that is a clone of
+\PValue{tocline}. Class \Class{scrbook} and \Class{scrreprt} use
+\begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
+  \CloneTOCEntryStyle{tocline}{section}
+  \TOCEntryStyleStartInitCode{section}{%
+    \expandafter\providecommand%
+    \csname scr@tso@#1@linefill\endcsname
+    {\TOCLineLeaderFill\relax}%
+  }
+\end{lstcode}
+to declare \PValue{section} as a modified clone of \PValue{tocline}.%
 \EndIndex{Cmd}{TOCEntryStyleStartInitCode}%
 \EndIndex{Cmd}{TOCEntryStyleInitCode}%
 
@@ -1592,7 +1624,19 @@ alluded only for completeness.%
 \BeginIndex{Cmd}{LastTOCLevelWasHigher}%
 \BeginIndex{Cmd}{LastTOCLevelWasSame}%
 \BeginIndex{Cmd}{LastTOCLevelWasLower}%
-\textsc{Todo: Translation still missing!}%
+At\ChangedAt[2016/03]{v3.20}{\Package{tocbasic}} the very beginning entries
+with style \PValue{tocline} \Package{tocbasic} executes one of these three
+commands depending on \Macro{lastpenalty}. \Macro{LastTOCLevelWasHigher} and
+\Macro{LastTOCLevelWasSame} used in vertical mode add
+\Macro{addpenalty}\PParameter{\Macro{@lowpenalty}} and therefore permit a
+page break before an entry with same or higher hierarchical
+position. \Macro{LastTOCLevelWasLower} is an empty command. Therefore page
+break between an entry and its sub-entry is not permitted.
+
+Users should not redefine these commands. Instead of a redefinition you should
+change the behaviour of single entry levels using attributes
+\PValue{onstartlowerlevel}, \PValue{onstartsamelevel}, and
+\PValue{onstarthigherlevel}.%
 \EndIndex{Cmd}{LastTOCLevelWasLower}%
 \EndIndex{Cmd}{LastTOCLevelWasSame}%
 \EndIndex{Cmd}{LastTOCLevelWasHigher}%
@@ -1601,7 +1645,16 @@ alluded only for completeness.%
   \Macro{TOCLineLeaderFill}\OParameter{filling code}
 \end{Declaration}
 \BeginIndex{Cmd}{TOCLineLeaderFill}%
-\textsc{Todo: Translation still missing!}%
+Command\ChangedAt[2016/03]{v3.20}{\Package{tocbasic}} has been made to be used
+as value of option \Option{linefill} of assigning style \PName{tocline} to a
+TOC-entry. It is a line filler between the end of the entry text and the entry
+page number. The \PName{filling code} will be repeated with constant
+distance. The default for this optional argument is a dot.
+
+As implied by the name of the command it uses \Macro{leaders} to put the
+\PName{filling code}. The distance is defined analogous to the \LaTeX{} kernel
+command \Macro{@dottedtocline} by
+\Macro{mkern}\Macro{@dotsep}\Unit{\texttt{mu}}.%
 \EndIndex{Cmd}{TOCLineLeaderFill}%
 %
 \EndIndex{}{table of contents>entry}
@@ -1777,13 +1830,31 @@ table or list of contents immediately at the next \LaTeX{} run.%
 \EndIndex{Cmd}{tocbasic@addxcontentsline}%
 
 \begin{Declaration}
-  \Macro{tocbasic@DependOnPenaltyAndTOCLevel}\Parameter{Eintragsebene}\\
-  \Macro{tocbasic@SetPenaltyByTOCLevel}\Parameter{Eintragsebene}
+  \Macro{tocbasic@DependOnPenaltyAndTOCLevel}\Parameter{entry level}\\
+  \Macro{tocbasic@SetPenaltyByTOCLevel}\Parameter{entry level}
 \end{Declaration}
 \BeginIndex{Cmd}{tocbasic@DependOnPenaltyAndTOCLevel}%
 \BeginIndex{Cmd}{tocbasic@SetPenaltyByTOCLevel}%
-\textsc{Todo: Translation still missing!}
-EndIndex{Cmd}{tocbasic@SetPenaltyByTOCLevel}%
+At\ChangedAt[2016/03]{v3.20}{\Package{tocbasic}} the end of TOC-entry style
+\PValue{tocline} (see \autoref{sec:tocbasic.tocstyle}) \Macro{penalty} is set
+to prohibit page breaks. The used penalty value depends on the \PName{entry
+  level}. This is done by \Macro{tocbasic@SetPenaltyByTOCLevel}. At the very
+beginning of an entry \Macro{tocbasic@DependOnPenaltyAndTOCLevel} is used to
+execute the value of either style option \Option{onstartlowerlevel},
+\Option{onstartsamelevel}, or \Option{onstarthigherlevel} depending on
+\Macro{lastpenalty} and the current \PName{entry level}. The default of the
+first and second option would be to permit a page break, if used in vertical
+mode.
+
+Developers of \PValue{tocline}-compatible styles should adapt this. To do so,
+they are even allowed to copy the style option declarations of
+\Option{onstartlowerlevel}, \Option{onstartsamelevel}, and
+\Option{onstarthigherlevel}. These options should even use the same internal
+macros \Macro{scr@tso@\PName{entry level}@LastTOCLevelWasHigher},
+\Macro{scr@tso@\PName{entry level}@LastTOCLevelWasSame} and
+\Macro{scr@tso@\PName{entry level}@LastTOCLevelWasLower} to store the current
+values of the options.%
+\EndIndex{Cmd}{tocbasic@SetPenaltyByTOCLevel}%
 \EndIndex{Cmd}{tocbasic@DependOnPenaltyAndTOCLevel}%
 
 
