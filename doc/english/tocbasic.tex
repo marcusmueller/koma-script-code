@@ -76,37 +76,46 @@ exculpate authors of classes and packages from implementation of such
 features.
 
 \KOMAScript{} itself uses \Package{tocbasic} not only for the table of
-contents but also for the already mentioned lists of figures and tables.
+contents but also for the already mentioned lists of figures and
+tables. In\textnote{TOC} this chapter we call all kinds of tables of contents
+or lists of contents simply TOC\Index[indexmain]{TOC}.
 
 \section{Basic Commands}
 \label{sec:tocbasic.basics}
 
-Basic commands are used to handle a list of all extensions\textnote{file
-  extension, table or list of contents} known for files representing a table
-of contents or list of something.  Entries to such files are typically written
-using \Macro{addtocontents}\important{\Macro{addtocontents},
-  \Macro{addcontentsline}} or \Macro{addcontentsline}.  There are also
-commands to do something for all known extensions.  And there are commands to
-set or unset features of an extension or the file represented by the
-extension.  Typically an extension also has an owner\textnote{file owner}.
-This owner may be a class or package or a term decided by the author of the
-class or package using \Package{tocbasic}, e.\,g., \KOMAScript{} uses the
-owner \texttt{float} for list of figures and list of tables, and the file name
-of the class file as owner for the table of contents.
+Basic commands are used to handle a list of all file name
+extensions\textnote{file name extension, table or list of contents} known for
+files representing a table or list of contents. We call these auxiliary
+files\Index{auxiliary file}\footnote{Here we do not talk about the
+  \File{aux}-file but the auxiliary files used indirect via the
+  \File{aux}-file, e.\,g., the \File{toc}-file, the \File{lof}-file, or the
+  \File{lot}-file.}  TOC-files\textnote{TOC-file}\Index[indexmain]{TOC-file}
+independent from the file name extension that is used. Entries to such files
+are typically written using
+\Macro{addtocontents}\important{\Macro{addtocontents},
+  \Macro{addcontentsline}} or \Macro{addcontentsline}. Later in this chapter
+you will learn to know recommended, additional commands.  There are also
+commands to do something for all known extensions. Additionally, there are
+commands to set or unset features of a file name extension or the file
+represented by the extension.  Typically an extension also has an
+owner\textnote{file owner}.  This owner may be a class or package or a term
+decided by the author of the class or package using \Package{tocbasic},
+e.\,g., \KOMAScript{} uses the owner \texttt{float} for list of figures and
+list of tables, and the file name of the class file as owner for the table of
+contents.
 
 \begin{Declaration}
   \Macro{ifattoclist}\Parameter{extension}\Parameter{true
     part}\Parameter{false part}
 \end{Declaration}
 \BeginIndex{Cmd}{ifattoclist}%
-This command
-may be used to ask, whether or not an \PName{extension} is already a known
-extension.  If the \PName{extension} is already known the \PName{true
-  instructions} will be used, otherwise the \PName{false instructions} will be
-used.
+This command may be used to ask, whether or not a file name \PName{extension}
+is already a known extension.  If the \PName{extension} is already known the
+\PName{true instructions} will be used, otherwise the \PName{false
+  instructions} will be used.
 \begin{Example}
-  Maybe you want to know if the extension ``\File{foo}'' is already in use to
-  report an error, if you can not use it:
+  Maybe you want to know if the file name extension ``\File{foo}'' is already
+  in use to report an error, if you can not use it:
 \begin{lstcode}
   \ifattoclist{foo}{%
     \PackageError{bar}{%
@@ -129,12 +138,11 @@ used.
   \Macro{addtotoclist}\OParameter{owner}\Parameter{extension}
 \end{Declaration}
 \BeginIndex{Cmd}{addtotoclist}%
-This command
-adds the \PName{extension} to the list of known extensions. But if the
-\PName{extension} is a known one already, then an error will be reported to
-avoid double usage of the same \PName{extension}.
+This command adds the \PName{extension} to the list of known extensions. But
+if the \PName{extension} is a known one already, then an error will be
+reported to avoid double usage of the same \PName{extension}.
 
-If the optional argument, \OParameter{owner}, was given this \PName{owner}
+If the optional argument, \OParameter{owner}, was given, this \PName{owner}
 will be stored to be the owner of the \PName{extension}.  If the optional
 argument has been omitted, \Package{tocbasic} tries to find out the file name
 of the current processed class or package and stores this as owner.
@@ -153,7 +161,7 @@ result in an empty owner.
   \addtotoclist{foo}
 \end{lstcode}%
   This will add the extension ``\PValue{foo}'' with owner ``\PValue{bar.sty}''
-  to the list of known extensions, if it was not already on the list of known
+  to the list of known extensions, if it was not already in the list of known
   extensions. If the class or another package already added the extension you
   will get the error:
 \begin{lstoutput}
@@ -162,7 +170,7 @@ result in an empty owner.
   See the tocbasic package documentation for explanation.
   Type  H <return>  for immediate help.
 \end{lstoutput}
-  and after typing \texttt{H} and pressing the return key you will get the
+  and after typing \texttt{h} and pressing the return key you will get the
   help:
 \begin{lstoutput}
   File extension `foo' is already used by a toc-file, while bar.sty
@@ -196,19 +204,19 @@ handle the lists of this package. Those are already added to the known
 extensions when the option is used. This is because \KOMAScript{} already
 registers file name extension ``\PValue{lof}'' for the list of figures and
 file name extension ``\PValue{lot}'' for the list of tables with owner
-``\PValue{float}'' and sets options for this owner.
+``\PValue{float}'' and sets options for this owner. Package \Package{scrhack}
+redefines some of package \Package{float}'s commands to do this.%
 \EndIndex{Cmd}{addtotoclist}%
 
 \begin{Declaration}
   \Macro{AtAddToTocList}\OParameter{owner}\Parameter{instructions}
 \end{Declaration}
 \BeginIndex{Cmd}{AtAddToTocList}%
-This command
-adds the \PName{instructions} to a internal list of instructions that will be
-processed whenever a file name extension with the given \PName{owner} will be
-added to the list of known extensions using \Macro{addtotoclist}.  The
-optional argument is handled in the same way as with the command
-\Macro{addtotoclist}. With an empty \PName{owner} you may
+This command adds the \PName{instructions} to an internal list of instructions
+that will be processed whenever a file name extension with the given
+\PName{owner} will be added to the list of known extensions using
+\Macro{addtotoclist}.  The optional argument is handled in the same way as
+with the command \Macro{addtotoclist}. With an empty \PName{owner} you may
 add \Parameter{instructions}, that will be processed at every successful
 \Macro{addtotoclist}, after processing the instructions for the individual
 owner.  While processing the \PValue{instructions},
@@ -229,18 +237,16 @@ the extension of the currently added extension.
 The two \Macro{expandafter} commands are needed, because the argument of
 \Macro{tocbasic@extend@babel} has to be expanded!  See the description of
 \Macro{tocbasic@extend@babel} at \autoref{sec:tocbasic.internals}%
-, \autopageref{desc:tocbasic.cmd.tocbasic@extend@babel}
-for more information.
+, \autopageref{desc:tocbasic.cmd.tocbasic@extend@babel} for more information.%
 \EndIndex{Cmd}{AtAddToTocList}%
 
 \begin{Declaration}
   \Macro{removefromtoclist}\OParameter{owner}\Parameter{extension}
 \end{Declaration}
 \BeginIndex{Cmd}{removefromtoclist}%
-This command
-removes the \PName{extension} from the list of known extensions.  If the
-optional argument, \OParameter{owner}, was given, the \PName{extension} will
-only be removed if it was added by this \PName{owner}. See description of
+This command removes the \PName{extension} from the list of known extensions.
+If the optional argument, \OParameter{owner}, was given, the \PName{extension}
+will only be removed if it was added by this \PName{owner}. See description of
 \Macro{addtotoclist} for information of omitting optional argument. Note that
 an empty \PName{owner} is not the same like omitting the optional argument,
 but removes the \PName{extension} without any owner test.%
@@ -285,31 +291,30 @@ yet added extensions to the list of known extensions and use
 This means that after using \Macro{tocbasicautomode} every table of contents
 or list of something, that will be generated using \Macro{@starttoc} will be
 at least partially under control of \Package{tocbasic}. Whether or not this
-will make the wanted result, depends on the individual table of contents and
-lists of something. At least the \Package{babel} control extension for all
-those tables of contents and lists of something will work. Nevertheless, it
-would be better if the author of the corresponding class or package will use
-\Package{tocbasic} explicitly. In that case additional advantages of
+will make the wanted result, depends on the individual TOC. At least the
+\Package{babel} control extension for all those TOCs will work. Nevertheless,
+it would be better if the author of the corresponding class or package will
+use \Package{tocbasic} explicitly. In that case additional advantages of
 \Package{tocbasic} may be used that will be described at the following
 sections.%
 \EndIndex{Cmd}{tocbasicautomode}%
 
-\section{Creating a Table of Contents or List of Something}
+\section{Creating a Table or List of Contents}
 \label{sec:tocbasic.toc}
 
-In the previous section you've seen commands to handle a list of known
-extensions and to trigger commands while adding a new extension to this
+In the previous section you've seen commands to handle a list of known file
+name extensions and to trigger commands while adding a new extension to this
 list. You've also seen a command to do something for all known extensions or
-all known extensions of one owner. In this section you will see commands to
-handle the file corresponding with an extension or the list of known
-extensions.
+all known extensions of one owner. In this section you will learn to know
+commands to handle the file corresponding with an extension or the list of
+known extensions.
 
 \begin{Declaration}
   \Macro{addtoeachtocfile}\OParameter{owner}\Parameter{content}
 \end{Declaration}
 \BeginIndex{Cmd}{addtoeachtocfile}%
-This command writes \PName{content} to the files of every known file name
-extension of \PName{owner} using \LaTeX{} kernel command
+This command writes \PName{content} to the TOC-files\Index{TOC} of every known
+file name extension of \PName{owner} using \LaTeX{} kernel command
 \Macro{addtocontents}. If you omit the optional argument, \PName{content} is
 written to the files of every known file name extension. Furthermore, the
 practical file name is built from \Macro{jobname} and the file name
@@ -323,7 +328,7 @@ extension of the currently handled file.
       \protect\addvspace{\protect\baselineskip}%
     }
 \end{lstcode}
-  And if you want to do this, only for the toc-files of owner
+  And if you want to do this, only for the TOC-files of owner
   ``\PValue{foo}'':
 \begin{lstcode}
     \addtoeachtocfile[foo]{%
@@ -342,13 +347,13 @@ Commands, that shouldn't be expanded while writing, should be prefixed by
   \Parameter{text}
 \end{Declaration}
 \BeginIndex{Cmd}{addxcontentsline}%
-The command \Macro{addxcontentsline}
-adds an entry of given \PName{level} to toc-file with \PName{extension}. If
-the \Parameter{number} is empty or omitted the entry won't have a number for
-the entry with the given \PName{text}. Entries without number may be left
-aligned to the number of the numbered entries of the same \PName{level} or
-indented like the text of the numbered entries of the same \PName{level},
-depending on the \PValue{numberline} feature.
+The command \Macro{addxcontentsline} adds an entry of given \PName{level} to
+TOC-file with file name \PName{extension}. If the \Parameter{number} is empty
+or omitted the entry will not have number for the entry with the given
+\PName{text}. Entries without number may be left aligned to the number of the
+numbered entries of the same \PName{level} or indented like the text of the
+numbered entries of the same \PName{level}, depending on the
+\PValue{numberline} feature.
 
 \begin{Example}
   Maybe you are not using a \KOMAScript{} class but need a not numbered
@@ -389,12 +394,12 @@ kernel. In difference to that it writes the \PName{contentsline} not only into
 one file, but into all files of all known file name extensions or of all known
 file name extensions of a given owner.
 
-The Command \Macro{addxcontentslinetoeachtocfile} is similar but uses
+The command \Macro{addxcontentslinetoeachtocfile} is similar but uses
 \Macro{addxcontentsline} instead of \Macro{addcontentsline} and
 therefore supports \Package{tocbasic} feature \PValue{numberline}.
 \begin{Example}
   You are a class author and want to write the chapter entry not only to the
-  table of contents toc-file but to all toc-files, while \texttt{\#1} is the
+  table of contents TOC-file but to all TOC-files, while \texttt{\#1} is the
   title, that should be written to the files.
 \begin{lstcode}
     \addxcontentslinetoeachtocfile
@@ -422,22 +427,22 @@ of \Macro{addcontentslinetoeachtocfile} whenever possible.
 \BeginIndex{Cmd}{listoftoc}%
 \BeginIndex{Cmd}{listofeachtoc}%
 \BeginIndex{Cmd}{listof\PName{extension}name}%
-These commands may be used to set the ``list of'' corresponding to file name
-extension. The\important{\Macro{listoftoc*}} star version \Macro{listoftoc*}
-needs only one argument, the extension of the file. It does setup the vertical
-and horizontal spacing of paragraphs, calls before hooks, reads the file, and
-last but not least calls the after hooks.  You may interpret it as direct
-replacement of the \LaTeX{} kernel macro
+These commands may be used to print the TOC corresponding to file name
+\PName{extension}. The\important{\Macro{listoftoc*}} star version
+\Macro{listoftoc*} needs only one argument, the \PName{extension} of the
+file. It does setup the vertical and horizontal spacing of paragraphs, calls
+before hooks, reads the file, and last but not least calls the after hooks.
+You may interpret it as direct replacement of the \LaTeX{} kernel macro
 \Macro{@starttoc}\IndexCmd{@starttoc}\important{\Macro{@starttoc}}.
 
-The\important{\Macro{listoftoc}} version without star, sets the whole file
+The\important{\Macro{listoftoc}} version without star, prints the whole file
 with title, optional table of contents entry, and running heads. If the
 optional argument \OParameter{list of title} was given, it will be used as
 title term, optional table of contents entry and running head. Please
 note\textnote{Attention!}: If the optional argument is empty, this term will
 be empty, too! If you omit the optional argument, but
 \Macro{listof\PName{extension}name} was defined, that will be used. If that is
-also not defined, a standard ersatz name will be used and reported by a
+also not defined, a standard replacement name will be used and reported by a
 warning message.
 
 The\important{\Macro{listofeachtoc}} command \Macro{listofeachtoc} outputs all
@@ -510,16 +515,15 @@ may solve this problem.
 \BeginIndex{Cmd}{BeforeStartingTOC}%
 \BeginIndex{Cmd}{AfterStartingTOC}%
 Sometimes it's useful, to process \PName{instructions} immediately before
-reading the helper file of a list of something.
-These commands
-may be used to process \PName{instructions} before or after loading the file
-with given \PName{extension} using \Macro{listoftoc*}, \Macro{listoftoc}, or
+reading the auxiliary file of a TOC.  These commands may be used to process
+\PName{instructions} before or after loading the file with given
+\PName{extension} using \Macro{listoftoc*}, \Macro{listoftoc}, or
 \Macro{listofeachtoc}.  If you omit the optional argument (or set an empty
 one) the general hooks will be set. The general before hook will be called
 before the individuel one and the general after hook will be called after the
 individuel one. While calling the hooks
 \Macro{@currext}\IndexCmd{@currext}\important{\Macro{@currext}} is the
-extension of the toc-file and should not be changed.
+extension of the TOC-file and should not be changed.
 
 An example\textnote{Example} for usage of \Macro{AfterStartingTOC} may be
 found in \autoref{sec:scrwfile.clonefilefeature} at
@@ -534,11 +538,11 @@ found in \autoref{sec:scrwfile.clonefilefeature} at
 \BeginIndex{Cmd}{BeforeTOCHead}%
 \BeginIndex{Cmd}{AfterTOCHead}%
 This commands may be used to process \PName{instructions} before or after
-setting the title of a list of something corresponding to given file name
-\PName{extension} using \Macro{listoftoc*} or \Macro{listoftoc}. If you omit
-the optional argument (or set an empty one) the general hooks will be set. The
-general before hook will be called before the individuel one and the general
-after hook will be called after the individuel one. While calling the hooks
+setting the title of a TOC corresponding to given file name \PName{extension}
+using \Macro{listoftoc*} or \Macro{listoftoc}. If you omit the optional
+argument (or set an empty one) the general hooks will be set. The general
+before hook will be called before the individuel one and the general after
+hook will be called after the individuel one. While calling the hooks
 \Macro{@currext}IndexCmd{@currext}\important{\Macro{@currext}} is the
 extension of the corresponding file and should not be changed.
 \EndIndex{Cmd}{AfterTOCHead}%
@@ -568,22 +572,22 @@ overwrite that definition.
   \let\MakeMarkcase\MakeLowercase
 \end{lstcode}
 \end{Example}
-Please\textnote{Hint!} allow me some words about \Macro{MakeUppercase}, First
-of all this command isn't fully expandable. This means, that problems may
-occur using it in the context of other commands. Beyond that typographers
-accord, that whenever setting whole words or phrases in capitals, letter
-spacing is absolutely necessary. But correct letter spacing of capitals
-shouldn't be done with a fix white space between all letters. Different pairs
-of letters need different space between each other. Additional some letters
-build holes in the text, that have to be taken into account. Packages like
-\Package{ulem} or \Package{soul} doesn't provide this and
-\Macro{MakeUppercase} doesn't do anything like this. Also automatic letter
-spacing using package \Package{microtype} is only one step to a
-less-than-ideal solution, because it cannot recognize and take into account
-the glyphs of the letters. Because of this\textnote{Attention!} typesetting
-whole words and phrases is expert work and almost ever must be hand made. So
-average users are recommended to not do that or to use it only spare and not
-at exposed places like running heads.%
+Please\textnote{Hint!} allow me some words about
+\Macro{MakeUppercase}\IndexCmd{MakeUppercase}, First of all this command isn't
+fully expandable. This means, that problems may occur using it in the context
+of other commands. Beyond that typographers accord, that whenever setting
+whole words or phrases in capitals, letter spacing is absolutely
+necessary. But correct letter spacing of capitals should not be done with a
+fix white space between all letters. Different pairs of letters need different
+space between each other. Additional some letters build holes in the text,
+that have to be taken into account. Packages like \Package{ulem} or
+\Package{soul} doesn't provide this and \Macro{MakeUppercase} does not do
+anything like this. Also automatic letter spacing using package
+\Package{microtype} is only one step to a less-than-ideal solution, because it
+cannot recognize and take into account the glyphs of the letters. Because of
+this\textnote{Attention!} typesetting whole words and phrases is expert work
+and almost ever must be hand made. So average users are recommended to not do
+that or to use it only spare and not at exposed places like running heads.%
 \EndIndex{Cmd}{MakeMarkcase}%
 
 \begin{Declaration}
@@ -591,14 +595,14 @@ at exposed places like running heads.%
 \end{Declaration}
 \BeginIndex{Cmd}{deftocheading}%
 The package \Package{tocbasic} contains a standard definition for typesetting
-headings of tables of contents or lists of something. This standard definition
-is configurable by several features, described at \Macro{setuptoc} next. But
-if all those features are not enough, an alternative heading command may be
-defined using \Macro{deftocheading}. Thereby \PName{extension} is the file
-name extension of the corresponding helper file. The \PName{definition} of the
-heading command may use one single parameter \PValue{\#1}. While calling the
-newly defined command inside of \Macro{listoftoc} or \Macro{listofeachtoc}
-that \PValue{\#1} will be replaced by the corresponding heading term.
+headings of TOCs. This standard definition is configurable by several
+features, described at \Macro{setuptoc} next. But if all those features are
+not enough, an alternative heading command may be defined using
+\Macro{deftocheading}. Thereby \PName{extension} is the file name extension of
+the corresponding TOC-file. The \PName{definition} of the heading command may
+use one single parameter \PValue{\#1}. While calling the newly defined command
+inside of \Macro{listoftoc} or \Macro{listofeachtoc} that \PValue{\#1} will be
+replaced by the corresponding heading term.%
 \EndIndex{Cmd}{deftocheading}%
 
 \begin{Declaration}
@@ -607,7 +611,7 @@ that \PValue{\#1} will be replaced by the corresponding heading term.
 \end{Declaration}
 \BeginIndex{Cmd}{setuptoc}%
 \BeginIndex{Cmd}{unsettoc}%
-This commands set up and unset features bound to an file name
+This commands set up and unset features bound to a file name
 \PName{extension}. The \PName{feature list} is a comma separated list of
 single features. \Package{tocbasic} does know following features:
 \begin{description}
@@ -622,11 +626,10 @@ single features. \Package{tocbasic} does know following features:
   \IndexOption{listof~=\PValue{leveldown}} for all file name extensions of the
   owner \PValue{float}.
 \item[\texttt{nobabel}] prevents usage of the language switch of
-  \Package{babel}\IndexPackage{babel} at the helper file with the
-  corresponding file name \PName{extension}. This feature should be used only
-  for helper files, that contain text in one language only. Changes of the
-  language inside of the document will not longer regarded at the helper
-  file. Package
+  \Package{babel}\IndexPackage{babel} at the TOC-file with the corresponding
+  file name \PName{extension}. This feature should be used only for auxiliary
+  files, that contain text in one language only. Changes of the language
+  inside of the document will not longer regarded at the TOC-file. Package
   \Package{scrwfile}\important{\Package{scrwfile}}\IndexPackage{scrwfile} uses
   this feature also for clone destinations, because those will get the
   language change from the clone source already.
@@ -636,19 +639,19 @@ single features. \Package{tocbasic} does know following features:
   distance is less vertical space between heading and first entry than between
   normal headings and normal text.
 \item[\texttt{noprotrusion}] prevents\ChangedAt{v3.10}{\Package{tocbasic}}
-  disabling character protrusion at the lists of something. Character
-  protrusion at the lists will be disabled by default if package
+  disabling character protrusion at the TOC. Character protrusion at the TOCs
+  will be disabled by default if package
   \Package{microtype}\IndexPackage{microtype} or another package, that
   supports \Macro{microtypesetup}\IndexCmd{microtypesetup}, was loaded. So if
-  you want protrusion at the lists, you have to set this feature. But
-  note\textnote{Attention!}, that with character protrusion entries at the
-  list may be set wrong. This is a known issue of character protrusion.
-\item[\texttt{numbered}] uses a numbered heading for the table of contents or
-  list of something and because of this also generates an entry to the table
-  of contents. This feature will be evaluated by the internal heading
-  command. On the other hand, if an user defined heading command has been made
-  with \Macro{deftocheading}, that user is responsible for the evaluation of
-  the feature. The \KOMAScript{} classes set this feature using option
+  you want protrusion at a TOC, you have to set this feature. But
+  note\textnote{Attention!}, with character protrusion TOC-entries may be
+  printed wrong. This is a known issue of character protrusion.
+\item[\texttt{numbered}] uses a numbered heading for the TOC and because of
+  this also generates an entry to the table of contents. This feature will be
+  evaluated by the internal heading command. On the other hand, if an user
+  defined heading command has been made with \Macro{deftocheading}, that user
+  is responsible for the evaluation of the feature. The \KOMAScript{} classes
+  set this feature using option
   \OptionValue{listof}{numbered}\important{\OptionValue{listof}{numbered}}%
   \IndexOption{listof~=\PValue{numbered}} for all file name extensions of the
   owner \PValue{float}.
@@ -678,25 +681,23 @@ single features. \Package{tocbasic} does know following features:
   \important{\OptionValue{toc}{nonumberline}}%
   \IndexOption{toc~=\PValue{nonumberline}}.
 \item[\texttt{onecolumn}] \leavevmode\ChangedAt{v3.01}{\Package{tocbasic}}%
-  typesets the corresponding table of contents or list of something with
-  internal one column mode of
+  typesets the corresponding TOC with internal one column mode of
   \Macro{onecolumn}\IndexCmd{onecolumn}. This\textnote{Attention!} will be
-  done only, if the corresponding table of contents or list of something
-  doesn't use feature \PValue{leveldown}\important{\PValue{leveldown}}. The
+  done only, if the corresponding table of contents or list of something does
+  not use feature \PValue{leveldown}\important{\PValue{leveldown}}. The
   \KOMAScript{} classes \Class{scrbook} and \Class{scrreprt} activate this
   feature with \Macro{AtAddToTocList} (see \autoref{sec:tocbasic.basics},
-  \autopageref{desc:tocbasic.cmd.AtAddToTocList}) for all lists of something
-  with owner \PValue{float} or with themselves as owner. With this, e.\,g.,
-  the table of contents, the list of figures and the list of tables of both
-  classes will be single columned automatically. The multiple-column-mode of
-  package \Package{multicol}\IndexPackage{multicol} will not be recognised or
-  changed by this option.
-\item[\texttt{totoc}] writes the title of the corresponding table of contents
-  or the list of something to the table of contents. This feature will be
-  evaluated by the internal heading command. On the other hand, if an user
-  defined heading command has been made with \Macro{deftocheading}, that user
-  is responsible for the evaluation of the feature. The \KOMAScript{} classes
-  set this feature using option
+  \autopageref{desc:tocbasic.cmd.AtAddToTocList}) for all TOCs with owner
+  \PValue{float} or with themselves as owner. With this, e.\,g., the table of
+  contents, the list of figures and the list of tables of both classes will be
+  single columned automatically. The multiple-column-mode of package
+  \Package{multicol}\IndexPackage{multicol} will not be recognised or changed
+  by this option.
+\item[\texttt{totoc}] writes the title of the corresponding TOC to the table
+  of contents. This feature will be evaluated by the internal heading
+  command. On the other hand, if an user defined heading command has been made
+  with \Macro{deftocheading}, that user is responsible for the evaluation of
+  the feature. The \KOMAScript{} classes set this feature using option
   \OptionValue{listof}{totoc}\important{\OptionValue{listof}{totoc}}%
   \IndexOption{listof~=\PValue{totoc}} for all file name extensions of the
   owner \PValue{float}.
@@ -704,10 +705,10 @@ single features. \Package{tocbasic} does know following features:
 Classes and packages may know features, too, e.\,g, the \KOMAScript{} classes
 know following additional features:
 \begin{description}
-\item[\texttt{chapteratlist}] activates special code to be put into the list
-  at start of a new chapter. This code may either be vertical space or the
-  heading of the chapter.
-  See \Option{listof}\IndexOption{listof}\important{\Option{listof}} in
+\item[\texttt{chapteratlist}] activates special code to be put into the TOC at
+  start of a new chapter. This code may either be vertical space or the
+  heading of the chapter.  See
+  \Option{listof}\IndexOption{listof}\important{\Option{listof}} in
   \autoref{sec:maincls.floats}, \autopageref{desc:maincls.option.listof} for
   more information about such features.
 \end{description}
@@ -722,7 +723,7 @@ know following additional features:
 
   And if you want to have the chapter structuring of the \KOMAScript{} classes
   at your own list of algorithms with file name \PName{extension}
-  ``\PValue{load}'' from the previous examples, you may use
+  ``\PValue{loa}'' from the previous examples, you may use
 \begin{lstcode}
   \setuptoc{loa}{chapteratlist}
 \end{lstcode}
@@ -742,7 +743,7 @@ know following additional features:
   class would also recognise the feature your package would automatically use
   the feature of that class.
 \end{Example}
-As you may see, packages, that use \Package{tocbasic}, already provide several
+As you may see, packages that use \Package{tocbasic}, already provide several
 interesting features, without the need of a lot of implementation effort. Such
 an effort would be needed only without \Package{tocbasic} and because of this,
 most packages currently lack of such features.%
@@ -1682,7 +1683,7 @@ Otherwise the meaning of the argument may change until it will be used really.
 
 Normally this command will be used by default for every file name
 \PName{extension} that will be added to the list of known extensions using
-\Macro{addtotoclist}. The may be suppressed using feature
+\Macro{addtotoclist}. This may be suppressed using feature
 \PValue{nobabel}\important{\PValue{nobabel}} (see \Macro{setuptoc},
 \autoref{sec:tocbasic.toc}, \autopageref{desc:tocbasic.cmd.setuptoc}). For the
 file name extensions \File{toc}, \File{lof}, and \File{lot} this will be done
@@ -1691,9 +1692,9 @@ corresponding files.
 
 Normally there isn't any reason to call this command yourself. But there may
 by lists of something, that should not be under control of \Package{tocbasic},
-and to are not in \Package{tocbasic}'s list of known file name extensions, but
+and so are not in \Package{tocbasic}'s list of known file name extensions, but
 nevertheless should be handled by the language change mechanism of
-\Package{babel}. The command may be used explicitly for those files. But pleas
+\Package{babel}. The command may be used explicitly for those files. But please
 note, that this should be done only once per file name extension!%
 \EndIndex{Cmd}{tocbasic@extend@babel}%
 
@@ -1702,11 +1703,11 @@ note, that this should be done only once per file name extension!%
 \end{Declaration}
 \BeginIndex{Cmd}{tocbasic@starttoc}
 This command is something like the \LaTeX{} kernel macro
-\Macro{@starttoc}\IndexCmd{@starttoc}\important{\Macro{@starttoc}}.  It's the
+\Macro{@starttoc}\IndexCmd{@starttoc}\important{\Macro{@starttoc}}.  It is the
 command behind \Macro{listoftoc*} (see \autoref{sec:tocbasic.toc},
 \autopageref{desc:tocbasic.cmd.listoftoc*}). Authors of classes or packages
 who want to participate from the advantages of \Package{tocbasic} should at
-least use this command. Nevertheless it's recommended to use
+least use this command. Nevertheless it is recommended to use
 \Macro{listoftoc}. Command \Macro{tocbasic@starttoc} internally uses
 \Macro{\@starttoc}, but sets
 \Length{parskip}\IndexLength{parskip}\important{\Length{parskip}\\
@@ -1714,13 +1715,13 @@ least use this command. Nevertheless it's recommended to use
   \Length{parfillskip}} and \Length {parindent}\IndexLength{parindent} to 0
 and \Length{parfillskip} to 0 until infinite before. Moreover,
 \Macro{@currext}\important{\Macro{@currext}}\IndexCmd{@currext} will be set to
-the file name extension of the current helper file, so this will be available
+the file name extension of the current TOC-file, so this will be available
 while the execution of the hooks, that will be done before and after reading
-the helper files.
+the auxiliary files.
 
-Because\textnote{Attention!} of \LaTeX{} will immediately open a new helper
-file for writing after reading that file, the usage of
-\Macro{tocbasic@starttoc} may result in an error message like
+Because\textnote{Attention!} of \LaTeX{} will immediately open a new TOC-file
+for writing after reading that file, the usage of \Macro{tocbasic@starttoc}
+may result in an error message like
 \begin{lstoutput}
   ! No room for a new \write .
   \ch@ck ...\else \errmessage {No room for a new #3}
@@ -1739,13 +1740,12 @@ See \autoref{cha:scrwfile} for more information about that package.%
 \BeginIndex{Cmd}{tocbasic@@before@hook}%
 \BeginIndex{Cmd}{tocbasic@@after@hook}%
 The hook \Macro{tocbasic@@before@hook} will be executed immediately before
-reading a helper file for a table of contents or list of something even
-before execution of the instructions of a \Macro{BeforeStartingTOC}
-command. It is permitted to extend this hook using
-\Macro{g@addto@macro}\IndexCmd{g@addto@macro}.
+reading a auxiliary file for a TOC even before execution of the instructions
+of a \Macro{BeforeStartingTOC} command. It is permitted to extend this hook
+using \Macro{g@addto@macro}\IndexCmd{g@addto@macro}.
 
 Similarly \Macro{tocbasic@@after@hook} will be executed immediately after
-reading such a helper file and before execution of instructions of
+reading such an auxiliary file and before execution of instructions of
 \Macro{AfterStartingTOC}. It is permitted to extend this hook using
 \Macro{g@addto@macro}\IndexCmd{g@addto@macro}.
 
@@ -1753,12 +1753,12 @@ reading such a helper file and before execution of instructions of
 the place needed by heading numbers. Only classes and packages should use
 these hooks. Users\textnote{Attention!} should really use
 \Macro{BeforeStartingTOC} and \Macro{AfterStartingTOC} instead. Authors of
-packages should also favour those commands! These hooks shouldn't be used to
+packages should also favour those commands! These hooks should not be used to
 generate any output!
 
 If neither\textnote{Attention!} \Macro{listofeachtoc} nor \Macro{listoftoc}
-nor \Macro{listoftoc*} are used for the output of a table of contents or list
-of something, the hooks should be executed explicitly.%
+nor \Macro{listoftoc*} are used for the output of a TOC, the hooks should be
+executed explicitly.%
 \EndIndex{Cmd}{tocbasic@@before@hook}%
 \EndIndex{Cmd}{tocbasic@@after@hook}%
 
@@ -1769,13 +1769,13 @@ of something, the hooks should be executed explicitly.%
 \BeginIndex{Cmd}{tocbasic@\PName{extension}@before@hook}%
 \BeginIndex{Cmd}{tocbasic@\PName{extension}@after@hook}%
 These hooks are processed after \Macro{tocbasic@@before@hook}, respectively
-before \Macro{tocbasic@@after@hook} before and after loading the helper file
-with the corresponding file \PName{extension}. Authors\textnote{Attention!}
-of classes and packages should never manipulate them! But if
+before \Macro{tocbasic@@after@hook} before and after loading the TOC-file with
+the corresponding file \PName{extension}. Authors\textnote{Attention!}  of
+classes and packages should never manipulate them! But if
 neither\textnote{Attention!} \Macro{listofeachtoc} nor \Macro{listoftoc} nor
-\Macro{listoftoc*} are used for the output of a table of contents or list of
-something, the hooks should be executed explicitly, if they are
-defined. Please note, that they even can be undefined.%
+\Macro{listoftoc*} are used for the output of a TOC, the hooks should be
+executed explicitly, if they are defined. Please note, that they even can be
+undefined.%
 \EndIndex{Cmd}{tocbasic@\PName{extension}@after@hook}%
 \EndIndex{Cmd}{tocbasic@\PName{extension}@before@hook}%
 
@@ -1783,24 +1783,23 @@ defined. Please note, that they even can be undefined.%
   \Macro{tocbasic@listhead}\Parameter{title}
 \end{Declaration}
 \BeginIndex{Cmd}{tocbasic@listhead}%
-This command
-is used by \Macro{listoftoc} to set the heading of the list, either the
-default heading or the individually defined heading. If you define your own
-list command not using \Macro{listoftoc} you may use
+This command is used by \Macro{listoftoc} to set the heading of the TOC,
+either the default heading or the individually defined heading. If you define
+your own TOC-command not using \Macro{listoftoc} you may use
 \Macro{tocbasic@listhead}. In this case you should define
 \Macro{@currext}\important{\Macro{@currext}}\IndexCmd{@currext} to be the file
-extension of the corresponding helper file before using
-\Macro{tocbasic@listhead}.
+extension of the corresponding TOC-file before using
+\Macro{tocbasic@listhead}.%
 \EndIndex{Cmd}{tocbasic@listhead}%
 
 \begin{Declaration}
   \Macro{tocbasic@listhead@\PName{extension}}\Parameter{title}
 \end{Declaration}
 \BeginIndex{Cmd}{tocbasic@listhead@\PName{extension}}%
-This command
-is used in \Macro{tocbasic@listhead} to set the individual headings, optional
-toc-entry, and running head, if it was defined. If it was not defined it will
-be defined and used in \Macro{tocbasic@listhead} automatically.
+This command is used in \Macro{tocbasic@listhead} to set the individual
+headings, optional table of contents entry, and running head, if it was
+defined. If it was not defined it will be defined and used in
+\Macro{tocbasic@listhead} automatically.
 \EndIndex{Cmd}{tocbasic@listhead@\PName{extension}}%
 
 \begin{Declaration}
@@ -1812,19 +1811,19 @@ be defined and used in \Macro{tocbasic@listhead} automatically.
 \BeginIndex{Cmd}{nonumberline}%
 Command\ChangedAt{v3.12}{\Package{tocbasic}} \Macro{tocbasic@addxcontentsline}
 uses \Macro{addcontentsline} to either create a numbered or not numbered text
-entry to toc-file with given \PName{extension}. Note, that all parameters of
-\Macro{tocbasic@addxcontentsline} are mandatory. But you may use an
-empty \PName{number} argument, if you don't want a number. In this case the
+entry to the TOC-file with the given \PName{extension}. Note, all parameters
+of \Macro{tocbasic@addxcontentsline} are mandatory. But you may use an empty
+\PName{number} argument, if you do not want a number. In this case the
 \PName{text} will be prefixed by \Macro{nonumberline} without any argument. In
 the other case, if \PName{number} is not empty, \Macro{numberline} with
 argument \PName{number} will used as usual.
 
 Command \Macro{nonumberline} is redefined inside \Macro{listoftoc} (see
 \autoref{sec:tocbasic.toc}, \autopageref{desc:tocbasic.cmd.listoftoc})
-depending on feature \PValue{numberline} (see
-\autoref{sec:tocbasic.toc}, \autopageref{desc:tocbasic.cmd.setuptoc}). This
-guarantees that changes of the feature results in changes of the corresponding
-table or list of contents immediately at the next \LaTeX{} run.%
+depending on feature \PValue{numberline} (see \autoref{sec:tocbasic.toc},
+\autopageref{desc:tocbasic.cmd.setuptoc}). This guarantees that changes of the
+feature results in changes of the corresponding TOC immediately at the next
+\LaTeX{} run.%
 \EndIndex{Cmd}{nonumberline}%
 \EndIndex{Cmd}{tocbasic@addxcontentsline}%
 
@@ -1864,7 +1863,7 @@ This section will show you a complete example of a user defined floating
 environment with list of that kind of floats and \KOMAScript{} integration
 using \Package{tocbasic}. This example uses internal commands, that have a
 ``\texttt{@}'' in their name. This means\textnote{Attention}, that the code
-has to be put into a own package or class, or has to be placed between
+has to be put into a package or class, or has to be placed between
 \Macro{makeatletter}\important[i]{\Macro{makeatletter}\\\Macro{makeatother}}%
 \IndexCmd{makeatletter} and \Macro{makeatother}\IndexCmd{makeatother}.
 
@@ -1913,12 +1912,12 @@ counter. Last this formatted output has been used for the output of the
 environment number of the \Macro{caption} command.
 
 Floating\textnote{file name extension} environments have lists of themselves
-and those need a helper file with name \Macro{jobname} and a file name
-extension.
+and those need a auxiliary file with name \Macro{jobname} and a file name
+extension, the TOC-file\Index{TOC-file}:
 \begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
   \newcommand*{\ext@remarkbox}{lor}
 \end{lstcode}
-The file name extension of the helper file for the list of
+The file name extension of the TOC-file for the list of
 \Environment{remarkbox}es is ``\File{lor}''.
 
 This was the definition of the floating environment. But the list of this new
@@ -1939,7 +1938,8 @@ Now\textnote{extension} we register the file name extension for package
   \addtotoclist[float]{lor}
 \end{lstcode}
 Thereby the owner \PValue{float} has been used, to allude all further
-\KOMAScript{} options for lists of something also to the new one.
+\KOMAScript{} options for list of figures and list of tables also to the new
+one.
 
 Next\textnote{title} we define a title or heading for the list of
 \Environment{remarkbox}es:
@@ -1955,10 +1955,11 @@ to the list of remarks:
   \newcommand*{\l@remarkbox}{\l@figure}
 \end{lstcode}
 Here simply the entries to the list of remarks get the same layout like the
-entries to the list of figure. This would be the easiest solution. A more
+entries to the list of figures. This would be the easiest solution. A more
 explicit would be, e.\,g.,
 \begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
-  \newcommand*{\l@remarkbox}{\@dottedtocline{1}{1em}{1.5em}}
+  \DeclareTOCStyleEntry[level=1,indent=1em,numwidth=1.5em]%
+                       {tocline}{remarkbox}
 \end{lstcode}
 
 Additionally\textnote{chapter entry} you may want structure the list of
@@ -1966,13 +1967,13 @@ remarks depending on chapters.
 \begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
   \setuptoc{lor}{chapteratlist}
 \end{lstcode}
-The \KOMAScript{} classes provide that feature and may other classes do so
+The \KOMAScript{} classes provide that feature and maybe other classes do so
 too. Unfortunately the standard classes do not.
 
 This\textnote{list of remarks} would already be enough. Now, users may already
 select different kinds of headings either using the corresponding options of
 the \KOMAScript{} classes, or \Macro{setuptoc}, e.\,g., with or without entry
-in the table of contents, with or without number. But a simply
+in the table of contents, with or without number. But a simple
 \begin{lstcode}[belowskip=\dp\strutbox plus 1pt]
   \newcommand*{\listofremarkboxes}{\listoftoc{lor}}
 \end{lstcode}
@@ -1989,7 +1990,7 @@ remarks at every new \Macro{chapter}. Even changes of the current language are
 handled inside the list of remarks like they will inside the list of figures
 or inside the list of tables.
 
-Moreover.\textnote{additional features} an author of a package may add more
+Moreover,\textnote{additional features} an author of a package may add more
 features. For example, options to hide \Macro{setuptoc} from the users may be
 added. On the other hand, the \Package{tocbasic} manual may be referenced to
 describe the corresponding features. The advantage of this would be that user
@@ -2007,27 +2008,25 @@ would be enough to use a list of features argument to
 
 The example from the previous section shows, that using \Package{tocbasic} to
 define floating environments and lists with the captions of those floating
-environments is easy. The following example will show, that is may be even
+environments is easy. The following example will show, that it may be even
 easier.
 
 \begin{Declaration}
   \Macro{DeclareNewTOC}\OParameter{options}\Parameter{extension}
 \end{Declaration}
 \BeginIndex{Cmd}{DeclareNewTOC}%
-This command
-declares\ChangedAt{v3.06}{\Package{tocbasic}} in one step only a new list of
-something, the heading of that list, the term used for the entries to the
-list, and to manage the file name \PName{extension}. Additionally optional
-floating and non-floating environments may be defined, and inside of both such
-environments \Macro{caption}\important{\Macro{caption}}\IndexCmd{caption} may
-be used. The additional features \Macro{captionabove}\important[i]{%
+This command declares\ChangedAt{v3.06}{\Package{tocbasic}} in one step only a
+new TOC, the heading of that TOC, the term used for the TOC-entries, and to
+manage the file name \PName{extension}. Additionally optional floating and
+non-floating environments may be defined, and inside of both such environments
+\Macro{caption}\important{\Macro{caption}}\IndexCmd{caption} may be used. The
+additional features \Macro{captionabove}\important[i]{%
   \Macro{captionabove}\\
   \Macro{captionbelow}}, \Macro{captionbelow}, and \Environment{captionbeside}
-of the \KOMAScript{} classes
-(see \autoref{sec:maincls.floats})
-may also be used inside of those environments.
+of the \KOMAScript{} classes (see \autoref{sec:maincls.floats}) may also be
+used inside of those environments.
 
-Argument \PName{extension} is the file name extension of the helper file, that
+Argument \PName{extension} is the file name extension of the TOC-file, that
 represents the list of something. See \autoref{sec:tocbasic.basics} for more
 information about this. This argument is mandatory and must not be empty!
 
@@ -2136,8 +2135,9 @@ about the styles.%
     change the real \PName{value} using \KOption{toclevel}\PName{value}.%
   }%
   \entry{\KOption{listname}\PName{string}}{%
-    The name of the list of foo. If not given the value of \PValue{types} with
-    upper case first char prefixed by ``List of '' will be used.%
+    The name of the TOC. If not given the value of \PValue{types} with upper
+    case first char using \Macro{MakeUppercase}\IndexCmd{MakeUppercase}
+    prefixed by ``List of '' will be used.%
   }%
   \entry{\KOption{name}\PName{string}}{%
     The name of an element. If no name is given, the value of \PValue{type}
@@ -2154,17 +2154,17 @@ about the styles.%
   \entry{\KOption{tocentrystyle}\PName{TOC-entry style}}{%
     \ChangedAt[2016/03]{v3.20}{\Package{tocbasic}}%
     \PName{TOC-entry style} is the style that should be used for all entries
-    into the list of something corresponding to the \PName{extension}. The
-    name of the entry level is given by option \Option{type}. Additional to
-    the options of this table all attributes of the \PName{TOC-entry style}
-    can be used as options. To do so, you have to prefix the name of such an
-    attribute by \PValue{toc}. For example, you can change the numerical level
-    of the entries using option \Option{toclevel}. For more information about
-    the styles and their attributes see \autoref{sec:tocbasic.tocstyle} from
+    into the TOC corresponding to the \PName{extension}. The name of the entry
+    level is given by option \Option{type}. Additional to the options of this
+    table all attributes of the \PName{TOC-entry style} can be used as
+    options. To do so, you have to prefix the name of such an attribute by
+    \PValue{toc}. For example, you can change the numerical level of the
+    entries using option \Option{toclevel}. For more information about the
+    styles and their attributes see \autoref{sec:tocbasic.tocstyle} from
     \autopageref{sec:tocbasic.tocstyle}.%
   }%
   \entry{\KOption{type}\PName{string}}{%
-    sets the type of the new declared list. The type will be used e.\,g. to
+    sets the type of the new declared TOC. The type will be used e.\,g. to
     defined a \Macro{listof}\PName{string}. If no type is set up the extension
     from the mandatory argument will be used.%
   }%
@@ -2243,7 +2243,7 @@ about the styles.%
       & numeric float type for order perpetuation\\[1ex]
       \File{lor} & \File{lof}
       &
-      & file name extension of the helper file of the respective list \\
+      & file name extension of the TOC-file of the respective list \\
       \bottomrule
     \end{tabularx}
   \end{table}
@@ -2276,9 +2276,9 @@ about the styles.%
 
 Users of \Package{hyperref} should always use option
 \Option{listname}. Otherwise they may get an error message, because
-\Package{hyperref} usually has a problem with the \Macro{MakeUppercase}
-command that is used to change the case of the first letter of \Option{types}
-in the name of the list.%
+\Package{hyperref} usually has a problem with the
+\Macro{MakeUppercase}\IndexCmd{MakeUppercase} command that is used to change
+the case of the first letter of \Option{types} in the name of the list.%
 \EndIndex{Cmd}{DeclareNewTOC}%
 \EndIndex{Package}{tocbasic}%
 \EndIndex{}{table of contents}%
