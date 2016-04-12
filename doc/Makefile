@@ -131,6 +131,7 @@ MAINTAIN_FILES	= $(DIST_FILES)
 # ----------------------------------------------------------------------
 # local rules
 prepare_local: $(STATIC_DOC_LINKS)
+	$(make_recursive)
 
 default_local: $(STATIC_DOC) $(DOC_FILES)
 	$(make_recursive)
