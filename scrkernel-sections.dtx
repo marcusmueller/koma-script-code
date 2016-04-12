@@ -1,4 +1,4 @@
-% \CheckSum{3646}
+% \CheckSum{3682}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -555,15 +555,40 @@
 %     ersetzt}^^A
 % \begin{macro}{\scr@saved@startsection}
 %   \changes{v3.13a}{2014/09/11}{Neue interne Anweisung}^^A
+%   \changes{v3.20}{2016/04/12}{Tests funktionieren jetzt auch mit
+%     \textsf{amsgen}}^^A
 % \KOMAScript{} benötigt ein eigenes \cs{@startsection}, weil die
 % Funktionalität des \cs{@startsection} aus dem \LaTeX-Kern nicht
 % genügt. Bevor allerdings die eigene Definition in Angriff genommen wird,
 % muss kontrolliert werden, ob die aufgefundene Definition noch den
 % Erwartungen entspricht. Alles andere wäre ein deutlicher Hinweis, dass
 % eventuell in \KOMAScript{} ebenfalls eine Anpassung vorzunehmen wäre.
+% Da es offenbar Leute gibt, die bei der Umdefinierung von \cs{section}
+% etc. mit Hilfe von \cs{@startsection} Leerzeichen zwischen die Argumente
+% packen und gleichzeitig \textsf{amsgen} verwenden, sorgen wir hier dafür,
+% dass dann trotzdem noch die Warnungen funktionieren und nebenbei der Code
+% mit etwas Glück sogar ebenfalls. Dazu ist es notwendig, dass die Version von
+% \cs{@startsection} gespeichert wird, die \cs{kernel@ifstar} verwendet.
 %    \begin{macrocode}
 %<*body>
 \newcommand*{\scr@saved@startsection}[6]{%
+  \if@noskipsec \leavevmode \fi
+  \par
+  \@tempskipa #4\relax
+  \@afterindenttrue
+  \ifdim \@tempskipa <\z@
+    \@tempskipa -\@tempskipa \@afterindentfalse
+  \fi
+  \if@nobreak
+    \everypar{}%
+  \else
+    \addpenalty\@secpenalty\addvspace\@tempskipa
+  \fi
+  \kernel@ifstar
+    {\@ssect{#3}{#4}{#5}{#6}}%
+    {\@dblarg{\@sect{#1}{#2}{#3}{#4}{#5}{#6}}}%
+}
+\def\reserved@a#1#2#3#4#5#6{%
   \if@noskipsec \leavevmode \fi
   \par
   \@tempskipa #4\relax
@@ -580,7 +605,12 @@
     {\@ssect{#3}{#4}{#5}{#6}}%
     {\@dblarg{\@sect{#1}{#2}{#3}{#4}{#5}{#6}}}%
 }
-\ifx\@startsection\scr@saved@startsection
+\ifcase \ifx\@startsection\scr@saved@startsection 0
+        \else
+          \ifx\@startsection\reserved@a 0
+          \else 1
+          \fi
+        \fi
   \newcommand*{\scr@startsection}[6]{%
     \if@noskipsec \leavevmode \fi
     \par
