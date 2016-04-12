@@ -1,4 +1,4 @@
-% \CheckSum{781}
+% \CheckSum{785}
 % \iffalse meta-comment
 % ======================================================================
 % scrlfile.dtx
@@ -744,6 +744,8 @@
 %  \begin{macro}{\AfterClass}
 %   \changes{v3.20}{2016/04/12}{\cs{@ifnextchar} replaced by
 %     \cs{kernel@ifnextchar}}^^A
+%   \changes{v3.20}{2016/04/12}{\cs{@ifstar} durch \cs{kernel@ifstar}
+%     ersetzt}^^A
 %  \begin{macro}{\AfterAtEndOfClass}
 %  \begin{macro}{\@AfterClass}
 %  \begin{macro}{\@@AfterClass}
@@ -755,6 +757,8 @@
 %  \begin{macro}{\AfterPackage}
 %   \changes{v3.20}{2016/04/12}{\cs{@ifnextchar} replaced by
 %     \cs{kernel@ifnextchar}}^^A
+%   \changes{v3.20}{2016/04/12}{\cs{@ifstar} durch \cs{kernel@ifstar}
+%     ersetzt}^^A
 %  \begin{macro}{\AfterAtEndOfPackage}
 %  \begin{macro}{\@AfterPackage}
 %  \begin{macro}{\@@AfterPackage}
@@ -776,7 +780,7 @@
 \newcommand*{\BeforeClass}[1]{%
   \scr@set@load@hook{before}{#1.\@clsextension}}
 \newcommand*{\AfterClass}{%
-  \@ifstar {\@sAfterClass}{%
+  \kernel@ifstar {\@sAfterClass}{%
     \kernel@ifnextchar +\@@AfterClass{%
       \kernel@ifnextchar !\@@@AfterClass\@AfterClass
     }%
@@ -816,7 +820,7 @@
 \newcommand*{\BeforePackage}[1]{%
   \scr@set@load@hook{before}{#1.\@pkgextension}}
 \newcommand*{\AfterPackage}{%
-  \@ifstar {\@sAfterPackage}{%
+  \kernel@ifstar {\@sAfterPackage}{%
     \kernel@ifnextchar +\@@AfterPackage{%
       \kernel@ifnextchar !\@@@AfterPackage\@AfterPackage
     }%
@@ -876,6 +880,8 @@
 %   \changes{v3.11a}{2012/06/13}{write fault error in \cs{MessageBreak} fixed}
 %   \changes{v3.12}{2012/06/15}{new star version allowes empty argument with
 %     info instead of warning}
+%   \changes{v3.20}{2016/04/12}{\cs{@ifstar} durch \cs{kernel@ifstar}
+%     ersetzt}^^A
 % \begin{macro}{\@PreventPackageFromLoading}
 %   \changes{v3.12}{2012/06/15}{New (internal)}^^A
 %   \changes{v3.20}{2016/04/12}{\cs{@ifnextchar} replaced by
@@ -893,7 +899,7 @@
 \let\scrlfile@excludedpackages\@empty
 \newcommand*{\scrlfile@saved@RequirePackage}{}
 \newcommand*{\PreventPackageFromLoading}{%
-  \@ifstar{\@PreventPackageFromLoading\PackageInfo}%
+  \kernel@ifstar{\@PreventPackageFromLoading\PackageInfo}%
           {\@PreventPackageFromLoading\PackageWarning}%
 }
 \newcommand*{\@PreventPackageFromLoading}[1]{%
@@ -1010,13 +1016,15 @@
 %    \end{macrocode}
 % \begin{macro}{\UnPreventPackageFromLoading}
 %   \changes{v3.12}{2013/11/22}{New}^^A
+%   \changes{v3.20}{2016/04/12}{\cs{@ifstar} durch \cs{kernel@ifstar}
+%     ersetzt}^^A
 % \begin{macro}{\@UnPreventPackageFromLoading}
 %   \changes{v3.12}{2013/11/22}{New (internal)}^^A
 % This removes packages from the prevent exclude list. The star variant also
 % undefines the instead code.
 %    \begin{macrocode}
 \newcommand*{\UnPreventPackageFromLoading}{%
-  \@ifstar {\@tempswatrue\@UnPreventPackageFromLoading}%
+  \kernel@ifstar {\@tempswatrue\@UnPreventPackageFromLoading}%
            {\@tempswafalse\@UnPreventPackageFromLoading}%
 }
 \newcommand*{\@UnPreventPackageFromLoading}[1]{%
@@ -1118,6 +1126,16 @@
 \newcommand{\scr@gobbleopt}[1][]{}
 %    \end{macrocode}
 % \end{macro}
+%
+% \begin{macro}{\kernel@ifstar}
+%   \changes{v3.20}{2016/04/12}{New (internal)}
+% I hope, the \LaTeX{} kernel will define this command in future. But
+% nevertheless, there are \LaTeX{} kernels in real live without this
+% command. So I do it again if needed:
+%    \begin{macrocode}
+\providecommand*\kernel@ifstar[1]{\kernel@ifnextchar*{\@firstoftwo{#1}}}
+%    \end{macrocode}
+% \end{macro}^^A \kernel@ifstar
 %
 % \begin{macro}{\BeforeClosingMainAux}
 %   \changes{v2.95}{2002/09/03}{new}
