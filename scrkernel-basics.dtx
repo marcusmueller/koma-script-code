@@ -1,4 +1,4 @@
-% \CheckSum{3476}
+% \CheckSum{3545}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -3490,15 +3490,26 @@
 % Name des \LaTeX-Zählers, das vierte schließlich der gewünschte Wert.
 %    \begin{macrocode}
 \newcommand*{\FamilySetCounter}[4]{%
-  \ifiscount{#4}{\value{#3}=#4\FamilyKeyStateProcessed}{%
-    \ifisdimen{#4}{\value{#3}=#4\FamilyKeyStateProcessed}{%
-      \ifisskip{#4}{\value{#3}=#4\FamilyKeyStateProcessed}{%
-        \ifisnumexpr{#4}{\value{#3}=#4\FamilyKeyStateProcessed}{%
-          \ifisdimexpr{#4}{\value{#3}=#4\FamilyKeyStateProcessed}{%
-            \ifisinteger{#4}{\value{#3}=#4\FamilyKeyStateProcessed}{%
-              \ifiscounter{#4}{\value{#3}=\value{#4}\FamilyKeyStateProcessed}{%
-                \FamilyUnknownKeyValue{#1}{#2}{#4}{%
-                  integer numbers, counters, lengths, skips, dimens
+  \begingroup
+    \protected@edef\reserved@a{#4}%
+    \def\reserved@b{\endgroup\value{#3}=#4 \FamilyKeyStateProcessed}%
+    \expandafter\ifiscount\expandafter{\reserved@a}{}{%
+      \expandafter\ifisdimen\expandafter{\reserved@a}{}{%
+        \expandafter\ifisskip\expandafter{\reserved@a}{}{%
+          \expandafter\ifisnumexpr\expandafter{\reserved@a}{}{%
+            \expandafter\ifisdimexpr\expandafter{\reserved@a}{}{%
+              \expandafter\ifisinteger\expandafter{\reserved@a}{}{%
+                \expandafter\ifiscounter\expandafter{\reserved@a}{%
+                  \def\reserved@b{%
+                    \endgroup\value{#3}=\value{#4}\FamilyKeyStateProcessed
+                  }%
+                }{%
+                  \def\reserved@b{%
+                    \endgroup
+                    \FamilyUnknownKeyValue{#1}{#2}{#4}{%
+                      integer numbers, counters, lengths, skips, dimens
+                    }%
+                  }%
                 }%
               }%
             }%
@@ -3506,7 +3517,7 @@
         }%
       }%
     }%
-  }%
+  \reserved@b
 }
 %</base>
 %    \end{macrocode}
@@ -3557,28 +3568,28 @@
 }
 \newcommand*{\FamilySetCounterMacro}[4]{%
   \begingroup
-    \ifiscount{#4}{\@tempcnta=#4\aftergroup\FamilyKeyStateProcessed}{%
-      \ifisdimen{#4}{\@tempcnta=#4\aftergroup\FamilyKeyStateProcessed}{%
-        \ifisskip{#4}{\@tempcnta=#4\aftergroup\FamilyKeyStateProcessed}{%
-          \ifisnumexpr{#4}{\@tempcnta=#4\aftergroup\FamilyKeyStateProcessed}{%
-            \ifisdimexpr{#4}{\@tempcnta=#4\aftergroup\FamilyKeyStateProcessed}{%
-              \ifisinteger{#4}{%
-                \@tempcnta=#4\aftergroup\FamilyKeyStateProcessed
-              }{%
-                \ifiscounter{#4}{%
-                  \@tempcnta=\value{#4}\FamilyKeyStateProcessed}{%
-                  \FamilyUnknownKeyValue{#1}{#2}{#4}{%
-                    integer numbers, counters, lengths, skips, dimens
-                  }%
-                }%
-              }%
-            }%
-          }%
+%    \end{macrocode}
+% An dieser Stelle wird nun der immer definierte Zähler page als lokaler
+% Zähler verwendet. Das ist nur möglich, weil \cs{FamilySetCounter} nicht
+% global mit \cs{setcounter} arbeitet, sondern lokal mit einer Zuweisung an
+% \cs{value}.
+%    \begin{macrocode}
+    \FamilySetCounter{#1}{#2}{page}{#4}%
+    \ifx\FamilyKeyState\FamilyKeyStateProcessed
+      \edef\reserved@a{%
+        \unexpanded{\endgroup\def#3}%
+        {\the\value{page}}%
+        \noexpand\FamilyKeyStateProcessed
+      }%
+    \else
+      \def\reserved@a{%
+        \endgroup
+        \FamilyUnknownKeyValue{#1}{#2}{#4}{%
+          integer numbers, counters, lengths, skips, dimens
         }%
       }%
-    }%
-  \expandafter\expandafter\expandafter\endgroup
-  \expandafter\def\expandafter#3\expandafter{\the\@tempcnta}%
+    \fi
+  \reserved@a
 }    
 %</base>
 %    \end{macrocode}
@@ -3623,26 +3634,48 @@
 %   \changes{v3.15}{2015/01/02}{\cs{ifglueexpr} hinzugefügt}^^A
 %   \changes{v3.18a}{2015/07/06}{korrekte Verwendung von
 %     \cs{FamilyKeyStateProcessed}}^^A
+%   \changes{v3.20}{2016/04/27}{Expansion vor dem Test}^^A
 % Über diese Anweisung wird der Wert dann gesetzt. Dabei ist das erste
 % Argument die Familie, das zweite der Name des Schlüssels, das dritte der
 % Name der \LaTeX-Länge, das vierte schließlich der gewünschte Wert.
 %    \begin{macrocode}
 \newcommand*{\FamilySetLength}[4]{%
-  \ifiscount{#4}{#3=#4\FamilyKeyStateProcessed}{%
-    \ifisdimen{#4}{#3=#4\FamilyKeyStateProcessed}{%
-      \ifisskip{#4}{#3=#4\FamilyKeyStateProcessed}{%
-        \ifisnumexpr{#4}{#3=#4\FamilyKeyStateProcessed}{%
-          \ifisdimexpr{#4}{#3=#4\FamilyKeyStateProcessed}{%
-            \ifisglueexpr{#4}{#3=#4\FamilyKeyStateProcessed}{%
-              \ifisglue{#4}{#3=#4\FamilyKeyStateProcessed}{%
-                \FamilyUnknownKeyValue{#1}{#2}{#4}{%
-                  length values, counters, lengths, skips, dimens
-                }%
+  \begingroup
+    \protected@edef\reserved@a{#4}%
+    \expandafter\ifiscount\expandafter{\reserved@a}{%
+      \aftergroup\@firstoftwo
+    }{%
+    \expandafter\ifisdimen\expandafter{\reserved@a}{%
+      \aftergroup\@firstoftwo
+    }{%
+      \expandafter\ifisskip\expandafter{\reserved@a}{%
+        \aftergroup\@firstoftwo
+      }{%
+        \expandafter\ifisnumexpr\expandafter{\reserved@a}{%
+          \aftergroup\@firstoftwo
+        }{%
+          \expandafter\ifisdimexpr\expandafter{\reserved@a}{%
+            \aftergroup\@firstoftwo
+          }{%
+            \expandafter\ifisglueexpr\expandafter{\reserved@a}{%
+              \aftergroup\@firstoftwo
+            }{%
+              \expandafter\ifisglue\expandafter{\reserved@a}{%
+                \aftergroup\@firstoftwo
+              }{%
+                \aftergroup\@secondoftwo
               }%
             }%
           }%
         }%
       }%
+    }%
+  }%
+  \endgroup
+  {#3=#4\FamilyKeyStateProcessed}%
+  {%
+    \FamilyUnknownKeyValue{#1}{#2}{#4}{%
+      length values, counters, lengths, skips, dimens
     }%
   }%
 }
@@ -3664,10 +3697,11 @@
 %   \changes{v3.15}{2015/01/02}{\cs{ifglueexpr} hinzugefügt}^^A
 %   \changes{v3.18a}{2015/07/06}{korrekte Verwendung von
 %     \cs{FamilyKeyStateProcessed}}^^A
-%   \changes{v3.20}{2016/04/12}{\cs{@ifnextchar} replaced by
+%   \changes{v3.20}{2016/04/12}{\cs{@ifnextchar} ersetzt durch
 %     \cs{kernel@ifnextchar}}^^A
-% Diese Anweisungen arbeitet fast wie \cs{FamilyCounterKey} und
-% \cs{FamilySetCounter}, allerdings wird nicht ein Zähler gesetzt, sondern
+%   \changes{v3.20}{2016/04/27}{interne Verwendung von \cs{FamilySetLength}}^^A
+% Diese Anweisungen arbeitet fast wie \cs{FamilyLengthKey} und
+% \cs{FamilySetLengt}, allerdings wird nicht eine Länge gesetzt, sondern
 % ein Makro auf einen Wert definiert. Dabei ist das erste Argument die
 % Familie, das zweite der Name des Schlüssels, das dritte das Makro, das
 % vierte schließlich der gewünschte Wert.
@@ -3693,31 +3727,81 @@
 }
 \newcommand*{\FamilySetLengthMacro}[4]{%
   \begingroup
-    \ifiscount{#4}{\@tempskipa=#4\aftergroup\FamilyKeyStateProcessed}{%
-      \ifisdimen{#4}{\@tempskipa=#4\aftergroup\FamilyKeyStateProcessed}{%
-        \ifisskip{#4}{\@tempkipa=#4\aftergroup\FamilyKeyStateProcessed}{%
-          \ifisnumexpr{#4}{\@tempskipa=#4\aftergroup\FamilyKeyStateProcessed}{%
-            \ifisdimexpr{#4}{%
-              \@tempskipa=#4\aftergroup\FamilyKeyStateProcessed
-            }{%
-              \ifisglueexpr{#4}{%
-                \@tempskipa=#4\aftergroup\FamilyKeyStateProcessed
-              }{%
-                \ifisglue{#4}{%
-                  \@tempskipa=#4\aftergroup\FamilyKeyStateProcessed
-                }{%
-                  \FamilyUnknownKeyValue{#1}{#2}{#4}{%
-                    length values, counters, lengths, skips, dimens
-                  }%
-                }%
-              }%
-            }%
-          }%
+    \FamilySetLength{#1}{#2}{\@tempskipa}{#4}%
+    \ifx\FamilyKeyState\FamilyKeyStateProcessed
+      \edef\reserved@a{%
+        \unexpanded{\endgroup\def#3}%
+        {\the\@tempskipa}%
+        \noexpand\FamilyKeyStateProcessed
+      }%
+    \else
+      \def\reserved@a{%
+        \endgroup
+        \FamilyUnknownKeyValue{#1}{#2}{#4}{%
+          length values, counters, lengths, skips, dimens
         }%
       }%
-    }%
-  \expandafter\expandafter\expandafter\endgroup
-  \expandafter\def\expandafter#3\expandafter{\the\@tempskipa}%
+    \fi
+  \reserved@a
+}    
+%</base>
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+%
+% \begin{macro}{\FamilyUseLengthMacroKey}
+%   \changes{v3.20}{2016/04/27}{neu}^^A
+% \begin{macro}{\FamilySetLengthMacro}
+%   \changes{v3.20}{2016/04/27}{neu}^^A
+% Diese Anweisungen arbeitet fast wie \cs{FamilyLengthKey} und
+% \cs{FamilySetLengt}, allerdings wird das Makro nicht als den Wert des Werts,
+% sondern als den Wert selbst definiert. Eine Expansion des Werts findet nur
+% für die Prüfung statt. Änderungen am Wert wirken sich also ggf. weiterhing
+% aus. Dabei ist das erste Argument die Familie, das zweite der Name des
+% Schlüssels, das dritte das Makro, das vierte schließlich der gewünschte
+% Wert.
+% \begin{macro}{\Family@@UseLength@@Macro@@Key}
+%   \changes{v3.20}{2016/04/27}{neu (intern)}^^A
+% \begin{macro}{\Family@USeLength@Macro@Key}
+%   \changes{v3.20}{2016/04/27}{neu (intern)}^^A
+%    \begin{macrocode}
+%<*base>
+\newcommand*{\FamilyUseLengthMacroKey}[3][.\@currname.\@currext]{%
+  \kernel@ifnextchar [%]
+    {\Family@@UseLength@@Macro@@Key{#1}{#2}{#3}}%
+    {\Family@UseLength@Macro@Key{#1}{#2}{#3}}%
+}
+\newcommand*{\Family@@UseLength@@Macro@@Key}{}
+\def\Family@@UseLength@@Macro@@Key#1#2#3[#4]#5{%
+  \ifdefined#5\else\let#5\z@\fi
+  \DefineFamilyKey[{#1}]{#2}{#3}[{#4}]{%
+    \FamilySetUseLengthMacro{#2}{#3}{#5}{##1}%
+  }%
+}
+\newcommand*{\Family@UseLength@Macro@Key}[4]{%
+  \ifdefined#4\else\let#4\z@\fi
+  \DefineFamilyKey[{#1}]{#2}{#3}{\FamilySetUseLengthMacro{#2}{#3}{#4}{##1}}%
+}
+\newcommand*{\FamilySetUseLengthMacro}[4]{%
+  \begingroup
+    \FamilySetLength{#1}{#2}{\@tempskipa}{#4}%
+    \ifx\FamilyKeyState\FamilyKeyStateProcessed
+      \def\reserved@a{%
+        \endgroup\def#3{#4}%
+        \FamilyKeyStateProcessed
+      }%
+    \else
+      \def\reserved@a{%
+        \endgroup
+        \FamilyUnknownKeyValue{#1}{#2}{#4}{%
+          length values, counters, lengths, skips, dimens
+        }%
+      }%
+    \fi
+  \reserved@a
 }    
 %</base>
 %    \end{macrocode}
