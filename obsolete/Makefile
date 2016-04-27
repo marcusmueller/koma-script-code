@@ -60,7 +60,7 @@ dist-tds: $(DIST_FILES)
 	cp texmf/doc/latex/koma-script-obsolete/README \
 	   texmf/source/latex/koma-script-obsolete/README
 	cd texmf && \
-	zip -r ../koma-script-obsolete-$(RELEASEDATE).tds.zip .
+	zip -r ../koma-script-obsolete-$(RELEASE).tds.zip .
 	rm -r texmf
 
 help:
