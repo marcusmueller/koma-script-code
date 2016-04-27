@@ -1,4 +1,4 @@
-% \CheckSum{3682}
+% \CheckSum{3692}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -1170,13 +1170,16 @@
 % \end{macro}^^A \DeclareSectionCommandStyleOption
 % \begin{macro}{\DeclareSectionCommandStyleLengthOption}
 %   \changes{v3.17}{2015/03/23}{neue Anweisung}^^A
+%   \changes{v3.20}{2016/04/25}{Argument wird ggf. expandiert}^^A
 % Definiert eine für die aktuelle Ebene \cs{scr@dsc@current} eine neue
 % Längenoption und speichert das Ergebnis in einem Makro, das sich aus
 % Argument 3 gefolgt von der aktuellen Ebene gefolgt von Argument 4 ergibt.
 %    \begin{macrocode}
 \newcommand*{\DeclareSectionCommandStyleLengthOption}[4]{%
   \DeclareSectionCommandStyleOption{#1}{#2}{%
-    \FamilySetLength{KOMAarg}{#2}{\@tempskipa}{##1}%
+    \protected@edef\reserved@a{%
+      \noexpand\FamilySetLength{KOMAarg}{#2}{\noexpand\@tempskipa}{##1}%
+    }\reserved@a
     \ifx\FamilyKeyState\FamilyKeyStateProcessed
       \ifscr@dsc@expandtopt
         \expandafter\edef\csname #3\scr@dsc@current#4\endcsname{%
@@ -1191,13 +1194,16 @@
 % \end{macro}^^A \DeclareSectionCommandStyleLengthOption
 % \begin{macro}{\DeclareSectionCommandStyleNumberOption}
 %   \changes{v3.17}{2015/03/23}{neue Anweisung}^^A
+%   \changes{v3.20}{2016/04/25}{Argument wird expandiert}^^A
 % Definiert eine für die aktuelle Ebene \cs{scr@dsc@current} eine neue
 % Zahlenoption und speichert das Ergebnis in einem Makro, das sich aus
 % Argument 3 gefolgt von der aktuellen Ebene gefolgt von Argument 4 ergibt.
 %    \begin{macrocode}
 \newcommand*{\DeclareSectionCommandStyleNumberOption}[4]{%
   \DeclareSectionCommandStyleOption{#1}{#2}{%
-    \FamilySetCounterMacro{KOMAarg}{#2}{\reserved@a}{##1}%
+    \protected@edef\reserved@a{%
+      \noexpand\FamilySetCounterMacro{KOMAarg}{#2}{\noexpand\reserved@a}{##1}
+    }\reserved@a
     \ifx\FamilyKeyState\FamilyKeyStateProcessed
       \expandafter\let\csname #3\scr@dsc@current#4 \endcsname\reserved@a
     \fi
