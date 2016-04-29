@@ -1,4 +1,4 @@
-% \CheckSum{1471}
+% \CheckSum{1499}
 % \iffalse meta-comment
 % ======================================================================
 % tocbasic.dtx
@@ -1142,8 +1142,40 @@
   \let\tb@nt@atbegin\@empty
   \let\tb@nt@atend\@empty
   \def\tb@nt@tocentrystyle{default}%
-  \IfArgIsEmpty{#1}{}{%
-    \def\tb@nt@tocstyle@options{level=1}%
+%    \end{macrocode}
+%   \changes{v3.20}{2016/04/29}{need more initialization for empty optional
+%     argument}^^A
+%    \begin{macrocode}
+  \def\tb@nt@tocstyle@options{level=1}%
+  \IfArgIsEmpty{#1}{%
+%    \end{macrocode}
+% Also need to call the style init code, to set the defaults for options
+% \texttt{numwidth} and \texttt{indent}.
+%    \begin{macrocode}
+    \begingroup
+      \let\scr@dte@current\tb@nt@type
+      \@ExecuteTOCEntryStyleInitCode{\tb@nt@tocentrystyle}{\tb@nt@type}%
+      \def\do@endgroup{\endgroup}%
+      \def\do##1{%
+        \ifstr{##1}{numwidth}{%
+          \l@addto@macro\do@endgroup{%
+            \l@addto@macro{\tb@nt@tocstyle@options}{,numwidth=1.5em}%
+          }%
+        }{%
+          \ifstr{##1}{indent}{%
+            \l@addto@macro\do@endgroup{%
+              \l@addto@macro{\tb@nt@tocstyle@options}{,indent=1em}%
+            }%
+          }{}%
+        }%
+        \kernel@ifnextchar[%]
+          {\@dodefault}%
+          {}%
+      }%
+      \def\@dodefault[##1]{}%
+      \scr@dte@doopts
+    \do@endgroup
+  }{%
     \let\tb@nt@extra@relax@opts\@empty
 %    \end{macrocode}
 %   After initialisation of the local values we need to know the style of the
@@ -1342,7 +1374,7 @@
       \FamilyKeyStateProcessed
     }%
     \scr@ifundefinedorrelax{KV@KOMAarg.toc@tocnumwidth}{}{%
-      \l@addto@macro\tb@nt@tocstyle@options{numwidth=1.5em}%
+      \l@addto@macro\tb@nt@tocstyle@options{,numwidth=1.5em}%
     }%
 %    \end{macrocode}
 % \end{macro}
@@ -1365,7 +1397,7 @@
           You should replace option `indent' by option\MessageBreak
           `tocindent'%
         }%
-        \l@addto@macro\tb@nt@tocstyle@options{,numwidth={##1}}%
+        \l@addto@macro\tb@nt@tocstyle@options{,indent={##1}}%
       }%
       \FamilyKeyStateProcessed
     }%
