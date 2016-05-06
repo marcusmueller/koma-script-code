@@ -185,7 +185,7 @@ CLS_MAIN_SUBINS	= scrstrip.inc scrstrop.inc scrdocstrip.tex
 
 ALPHA_INS       = tocstyle.dtx scrjura.dtx scrwfile.dtx
 
-ALPHA_DOC       = tocstyle.pdf scrjura.pdf scrhack.pdf
+ALPHA_DOC       = tocstyle.pdf scrhack.pdf
 
 ALPHA_DTX       = $(subst .pdf,.dtx,$(ALPHA_DOC))
 
