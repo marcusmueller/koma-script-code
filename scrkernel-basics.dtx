@@ -1,4 +1,4 @@
-% \CheckSum{3545}
+% \CheckSum{3571}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -2313,8 +2313,9 @@
 }
 %    \end{macrocode}
 % \begin{macro}{\test@@ifdimunt}
-% Anschließend wird dann getestet, ob es sich um eine der neun üblichen
-% Einheiten handelt.
+%   \changes{v3.21}{2016/05/27}{elf bis zwölf Einheiten nicht neun}
+% Anschließend wird dann getestet, ob es sich um eine der elf bis zwölf
+% üblichen Einheiten handelt.
 %    \begin{macrocode}
 \newcommand*\test@@ifdimunt[1]{%
   \@tempswafalse
@@ -2326,7 +2327,15 @@
             \ifstr{#1}{mm}{\@tempswatrue}{%
               \ifstr{#1}{dd}{\@tempswatrue}{%
                 \ifstr{#1}{cc}{\@tempswatrue}{%
-                  \ifstr{#1}{sp}{\@tempswatrue}{}%
+                  \ifstr{#1}{sp}{\@tempswatrue}{%
+                    \ifstr{#1}{ex}{\@tempswatrue}{%
+                      \ifstr{#1}{em}{\@tempswatrue}{%
+                        \scr@ifpdfoutput{%
+                          \ifstr{#1}{px}{\@tempswatrue}{}%
+                        }{}%
+                      }%
+                    }%
+                  }%
                 }%
               }%
             }%
@@ -2361,6 +2370,29 @@
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
+%
+% \begin{macro}{\scr@ifluatex}
+%   \changes{v3.21}{2016/05/27}{neu (intern)}^^A
+% If-the-else-Konstrukt, um zu testen, ob lua\TeX{} verwendet wird.
+%    \begin{macrocode}
+%<*base>
+\newcommand{\scr@ifluatex}{\ifnotundefined{luatexversion}}
+%</base>
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\scr@ifpdforluatex}
+%   \changes{v3.21}{2016/05/27}{neu (intern)}^^A
+% If-then-else-Konstrukt, um zu testen, ob pdf\TeX{} oder lua\TeX{} verwendet
+% wird.
+%    \begin{macrocode}
+%<*base>
+\newcommand*{\scr@ifpdforluatex}{%
+  \scr@ifpdftex{\@firstofone}{\scr@ifluatex{\@firstofone}{\secondofone}}%
+}
+%</base>
+%    \end{macrocode}
+% \end{macro}
 %  
 % \begin{macro}{\ifVTeX}
 %   \changes{v2.95}{2002/08/19}{neu}^^A
@@ -2389,6 +2421,7 @@
 %   \changes{v2.8q}{2001/11/13}{funktioniert}^^A
 %   \changes{v2.95}{2002/08/21}{berücksichtigt V\TeX}^^A
 %   \changes{v2.95}{2004/07/20}{Expandierbarkeit verbessert}^^A
+%   \changes{v3.21}{2016/05/27}{lua\TeX{} nach 0.85 berücksichtigt}^^A
 % If-then-else-Konstrukt, um abhängig davon, ob als \texttt{pdf}
 % ausgegeben wird oder nicht, Befehle auszuführen. Dieses Makro wird
 % für die Deklaration der Option \texttt{pagesize} benötigt.
@@ -2396,10 +2429,18 @@
 %<*base>
 \newcommand{\scr@ifpdfoutput}{%
   \scr@ifundefinedorrelax{pdfoutput}{%
-    \scr@ifundefinedorrelax{OpMode}{%
-      \expandafter\@secondoftwo%
+    \scr@ifundefinedorrelax{outputmode}{%
+      \scr@ifundefinedorrelax{OpMode}{%
+        \expandafter\@secondoftwo%
+      }{%
+        \ifnum\OpMode=1
+          \expandafter\@firstoftwo
+        \else
+          \expandafter\@secondoftwo
+        \fi
+      }%
     }{%
-      \ifnum\OpMode=1
+      \ifnum\outputmode>0
         \expandafter\@firstoftwo
       \else
         \expandafter\@secondoftwo
