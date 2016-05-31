@@ -1,4 +1,4 @@
-% \CheckSum{1493}
+% \CheckSum{1479}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-floats.dtx
@@ -1262,100 +1262,157 @@
 %   \cs{usekomafont{captionlabel}}ersetzt}%
 % \changes{v3.12}{2013/06/12}{ein \cs{usekomafont} durch
 %   \cs{usesizeofkomafont} ersetzt}
+% \changes{v3.21}{2016/05/31}{Neuimplementierung}
 %    \begin{macrocode}
 \newcommand{\@@makecaption}[3]{%
+%    \end{macrocode}
+% Als erstes werden die Makros für den linken und rechten Rand generiert.
+%    \begin{macrocode}
   \cap@margin
-  \ifonelinecaptions
-    \@tempcnta=\value{mpfootnote}\@tempcntb=\value{footnote}%
-    \let\scr@tmp@footnotetext=\@footnotetext
-    \let\@footnotetext=\@gobble
-    \sbox\@tempboxa{%
-      {\usekomafont{caption}{\strut\ignorespaces
-        #1{{\usekomafont{captionlabel}{#2\captionformat}}}%
-        #3\unskip\strut}}%
-    }%
-    \let\@footnotetext=\scr@tmp@footnotetext
-    \let\scr@tmp@footnotetext=\undefined
-    \setcounter{footnote}{\@tempcntb}%
-    \setcounter{mpfootnote}{\@tempcnta}%
-  \else
-    \sbox\@tempboxa{\hspace*{2\cap@width}}%
-  \fi
-  \begingroup%
-    \setlength{\@tempdima}{\cap@width}%
-    \ifdim \wd\@tempboxa >\@tempdima
+%    \end{macrocode}
+% Danach wird der Test vorgenommen, ob der Text einzeilig oder
+% mehrzeilig zu setzen ist und entsprechend gehandelt:
+%    \begin{macrocode}
+  \begingroup
+    \ifonelinecaptions
+      \let\stepcounter\@gobble
+      \let\refstepcounter\@gobble
+      \let\label\@gobble
+      \let\@footnotetext=\@gobble
+      \let\hypertarget\@gobbletwo
+      \settowidth{\@tempdima}{\scr@@makesinglelinecaption{#1}{#2}{#3}}%
+      \ifdim\@tempdima>\linewidth
+        \aftergroup\scr@makemultilinecaption
+      \else
+        \aftergroup\scr@makesinglelinecaption
+      \fi
+    \else
+      \aftergroup\scr@makemultilinecaption
+    \fi
+  \endgroup
+  {#1}{#2}{#3}%
+}
+%    \end{macrocode}
+% \begin{macro}{\scr@makesinglelinecaption}
+%   \changes{v3.21}{2016/05/31}{neu (intern)}
+% \begin{macro}{\scr@@makesinglelinecaption}
+%   \changes{v3.21}{2016/05/31}{neu (intern)}
+% Diesen Anweisungen übernehmen die komplette Ausgabe von einzeiligen Texten.
+% Das erste Argumen hat \cs{@gobble} oder \cs{@firstofone} zu sein und
+% bestimmt darüber ob das Label ausgegeben wird oder nicht. Der Text wird
+% dagegen immer ausgegeben! Das vierte Argument im internen Makro ist entweder
+% \cs{par} oder leer.
+%    \begin{macrocode}
+\newcommand{\scr@makesinglelinecaption}[3]{%
+  {%
+    \usefontofkomafont{caption}{%
       \hb@xt@\hsize{%
-        \setbox\@tempboxa\vbox{\hsize=\cap@width
+        \cap@left
+        \scr@@makesinglelinecaption{#1}{#2}{#3}%
+        \cap@right
+      }\par\kern\dp\strutbox%
+    }%
+  }\kern-\dp\strutbox
+}
+\newcommand{\scr@@makesinglelinecaption}[3]{%
+    \usekomafont{caption}{\strut\ignorespaces
+      #1{{\usekomafont{captionlabel}{#2\captionformat}}}%
+      \ignorespaces #3\unskip}%
+}
 %    \end{macrocode}
-% Im Fall, dass nun also mehrzeilig gesetzt werden muss, ist zu
-% unterscheiden, ob wie bisher voll hängend gearbeitet werden soll
-% oder nicht. In ersterem Fall machen wir das, wie bisher, allerdings
-% wird der \cs{capfont} früher aktiviert, damit darin auch globale
-% Größsenänderungen für den Titel Platz finden. Außerdem wird die
-% geänderte Parameterübergabe berücksichtigt.
-% \changes{v2.97c}{2007/09/17}{\cs{scr@smashdp} eingefügt}
-%    \begin{macrocode} 
+% \end{macro}^^A \scr@@makesinglelinecaption
+% \end{macro}^^A \scr@makesinglelinecaption
+% \begin{macro}{\scr@makemultilinecaption}
+%   \changes{v3.21}{2016/05/31}{neu (intern)}
+%    \begin{macrocode}
+\newcommand{\scr@makemultilinecaption}[3]{%
+  {%
+    \usefontofkomafont{caption}{%
+      \hb@xt@\hsize{%
+        \cap@left
+        \vbox{\hsize\cap@width\linewidth\hsize
+%    \end{macrocode}
+% Wenn der Schalter \cs{ifdofullc@p} gesetzt ist, wird der Text bezüglich des
+% Labels vollständig hängend gesetzt:
+%    \begin{macrocode}
           \ifdofullc@p
-            {\usekomafont{caption}{\@hangfrom{\scr@smashdp{\strut\ignorespaces
-                  #1{{\usekomafont{captionlabel}{#2\captionformat}}}}}%
-              {#3\unskip\strut\par}}}%
+            \@hangfrom{%
+              \strut
+              \scr@smashdp{%
+                #1{%
+                  \usekomafont{caption}{%
+                    \usekomafont{captionlabel}{#2\captionformat}%
+                  }%
+                }%
+              }%
+            }%
+            {\usekomafont{caption}{#3\unskip\strut\par}}%
 %    \end{macrocode}
-% Im zweiten Fall ist nun zu unterscheiden, ob nach dem Label ein
-% Umbruch erfolgen soll oder nicht. Dabei ist der Einzug zu beachten.
-% Ist der Einzug negativ, so findet ebenfalls ein Umbruch statt und
-% nur die erste Folgezeile wird eingezogen.
-%    \begin{macrocode} 
-          \else%
+% Anderenfalls soll entweder nach dem Label direkt ein Umbruch erfolgen und
+% ein Einzug nur der ersten Zeile zu setzen:
+%    \begin{macrocode}
+          \else
             \ifdim\cap@indent<\z@
-              {\usekomafont{caption}{\strut\ignorespaces
-                #1{{\usekomafont{captionlabel}{#2\captionformat\par}}}%
-                \noindent\hspace*{-\cap@indent}#3\unskip\strut\par}}%
-            \else%
+              \strut
+              #1{%
+                \usekomafont{caption}{%
+                  \usekomafont{captionlabel}{#2\captionformat\par}%
+                }%
+              }%
+              \noindent{\usekomafont{caption}{%
+                  \hspace*{-\cap@indent}#3\unskip\strut\par
+              }}%
+%    \end{macrocode}
+% Oder es soll nach dem Label ein Umbruch erfolgen und danach alle Zeilen mit
+% dem entsprechenden Einzug gesetzt werden:
+%    \begin{macrocode}
+            \else
               \if@capbreak
-                {\usekomafont{caption}{\strut\ignorespaces
-                  #1{{\usekomafont{captionlabel}{#2\captionformat\par}}}%
-                  \noindent\@hangfrom{\hspace*{\cap@indent}}{#3\par}}}%
+                \strut
+                #1{%
+                  \usekomafont{caption}{%
+                    \usekomafont{captionlabel}{#2\captionformat\par}%
+                  }%
+                }%
+                \noindent\@hangfrom{\hspace*{\cap@indent}}%
+                {\usekomafont{caption}{#3\unskip\strut\par}}%
+%    \end{macrocode}
+% Oder es soll gar kein Umbruch erfolgen aber trotzdem alles mit einem
+% gewissen Einzug gesetzt werden:
+%    \begin{macrocode}
               \else
-                {\usekomafont{caption}{%
-                    \@hangfrom{\scr@smashdp\strut\hspace*{\cap@indent}}%
-                  {\hspace{-\cap@indent}\scr@smashdp{\ignorespaces#1%
-                    {{\usekomafont{captionlabel}{%
-                          #2\captionformat}}}}#3\unskip\strut\par}}}%
+                \@hangfrom{\scr@smashdp\strut\hspace*{\cap@indent}}%
+                {%
+                  \hspace{-\cap@indent}%
+                  \scr@smashdp{%
+                    #1{\usekomafont{captionlabel}{#2\captionformat}}%
+                  }%
+                  {\usekomafont{caption}{#3\unskip\strut}\par}%
+                }%
               \fi
             \fi
           \fi
-        }%
-        \setlength{\@tempdima}{\ht\@tempboxa}%
-        \addtolength{\@tempdima}{\dp\@tempboxa}%
-        \addtolength{\@tempdima}{-\ht\strutbox}%
-        \ht\@tempboxa\ht\strutbox
-        \dp\@tempboxa\@tempdima
-        \strut\cap@left
-        \box\@tempboxa
-        \cap@right\strut
-      }%
-    \else
-      \global \@minipagefalse
 %    \end{macrocode}
-% Im einzeiligen Fall wird nun die Box wie oben erneut erzeugt und gleich
-% gesetzt. Im Prinzip ginge das auch direkt ohne erst eine Box zu erzeugen.
-% \changes{v3.02a}{2009/01/24}{die Box selbst muss im \cs{capfont} gesetzt
-%   werden, falls darin eine Größenumschaltung stattfindet}
+% Eigentlich fehlt hier nur die einfachste, gar nicht hängende Form:
 %    \begin{macrocode}
-      \sbox\@tempboxa{%
-        {\usekomafont{caption}{\scr@smashdp{\strut\ignorespaces
-          #1{{\usekomafont{captionlabel}{#2\captionformat}}}}%
-          #3}}%
-      }%
-      {\usesizeofkomafont{caption}{%
-          \hb@xt@\hsize{\strut\cap@left\box\@tempboxa\cap@right\strut}}}%
-    \fi
-  \endgroup
+%<*neverusethis>
+%          #1{{\usekomafont{captionlabel}{#2\captionformat}}}%
+%          \ignorespaces #3\unskip\strut\par
+%</neverusethis>
+%    \end{macrocode}
+% Die allerdings durch die Form mit Einzug 0 abgedeckt wird.
+%    \begin{macrocode}
+        }%
+        \cap@right
+      }\par\kern\dp\strutbox
+    }%
+  }\kern-\dp\strutbox
 }
 %    \end{macrocode}
-% \end{macro}
-% \end{macro}
-% \end{macro}
+% \end{macro}^^A \scr@makemultilinecaption
+% \end{macro}^^A \@@makecaption
+% \end{macro}^^A \@makecaption
+% \end{macro}^^A \caption
 %
 % \begin{macro}{\LT@makecaption}
 %   \changes{v2.8j}{2001/07/30}{neu (intern)}^^A
