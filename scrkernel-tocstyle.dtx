@@ -1,4 +1,4 @@
-% \CheckSum{1261}
+% \CheckSum{1304}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-tocstyle.dtx
@@ -1081,32 +1081,50 @@
 %<*tocline>
 %%%            (run: style,tocline)
 \DeclareTOCEntryStyle{tocline}[{%
-  \DefineTOCEntryIfOption{raggedpagenumber}%
-    {scr@tso@}{@raggedpage}{page number ragged flag}%
+  \DefineTOCEntryLengthOption{beforeskip}%
+    {scr@tso@}{@beforeskip}{vertical skip before the entry}%
   \DefineTOCEntryIfOption{breakafternumber}%
     {scr@tso@}{@breakafternumber}{line break after number flag}%
   \DefineTOCEntryIfOption{dynnumwidth}%
     {scr@tso@}{@dynnumwidth}{dynamic number width flag}%
-  \DefineTOCEntryCommandOption{onstarthigherlevel}%
-    {scr@tso@}{@LastTOCLevelWasLower}{start higher level entry hook}%
-  \DefineTOCEntryCommandOption{onstartsamelevel}%
-    {scr@tso@}{@LastTOCLevelWasSame}{start same level entry hook}%
-  \DefineTOCEntryCommandOption{onstartlowerlevel}%
-    {scr@tso@}{@LastTOCLevelWasHigher}{start lower level entry hook}%
   \DefineTOCEntryCommandOption{entryformat}%
     {scr@tso@}{@entryformat}[1]{entry format}%
   \DefineTOCEntryCommandOption{entrynumberformat}%
     {scr@tso@}{@numberformat}[1]{entry number format}%
-  \DefineTOCEntryCommandOption{pagenumberformat}%
-    {scr@tso@}{@pagenumberformat}[1]{page number format}%
-  \DefineTOCEntryCommandOption{pagenumberbox}%
-    {scr@tso@}{@pagenumberbox}[1]{page number box}%
   \DefineTOCEntryCommandOption{linefill}[\TOCLineLeaderFill]%
     {scr@tso@}{@linefill}{filling between text and page number}%
-  \DefineTOCEntryLengthOption{beforeskip}%
-    {scr@tso@}{@beforeskip}{vertical skip before the entry}%
   \DefineTOCEntryLengthOption{numsep}%
     {scr@tso@}{@numsep}{entry number separation}%
+  \DefineTOCEntryCommandOption{onstarthigherlevel}%
+    {scr@tso@}{@LastTOCLevelWasLower}{start higher level entry hook}%
+  \DefineTOCEntryCommandOption{onstartlowerlevel}%
+    {scr@tso@}{@LastTOCLevelWasHigher}{start lower level entry hook}%
+  \DefineTOCEntryCommandOption{onstartsamelevel}%
+    {scr@tso@}{@LastTOCLevelWasSame}{start same level entry hook}%
+  \DefineTOCEntryCommandOption{pagenumberbox}%
+    {scr@tso@}{@pagenumberbox}[1]{page number box}%
+  \DefineTOCEntryCommandOption{pagenumberformat}%
+    {scr@tso@}{@pagenumberformat}[1]{page number format}%
+%    \end{macrocode}
+%   \changes{v3.21}{2016/06/06}{neue Option \texttt{raggedentrytext}}^^A
+% Die Option \texttt{raggedentrytext} muss leider etwas umständlich definiert
+% werden, damit sie mit der früheren Definition eines Makros
+% \cs{raggedchapterentry} halbwegs kompatibel ist.
+%    \begin{macrocode}
+  \DefineTOCEntryOption{raggedentrytext}[true]{%
+    \FamilySetBool{KOMAarg}{raggedentrytext}{@tempswa}{##1}%
+    \ifx\FamilyKeyState\FamilyKeyStateProcessed
+      \if@tempswa
+        \expandafter\let\csname ragged\scr@dte@current entry\endcsname
+        \raggedright
+      \else
+        \expandafter\let\csname ragged\scr@dte@current entry\endcsname
+        \relax
+      \fi
+    \fi
+  }%
+  \DefineTOCEntryIfOption{raggedpagenumber}%
+    {scr@tso@}{@raggedpage}{page number ragged flag}%
 %</tocline>
   \DefineTOCEntryLengthOption{indent}%
     {scr@tso@}{@indent}{entry indent}%
@@ -1661,6 +1679,18 @@
       \parindent \@nameuse{scr@tso@#1@indent}\relax
       \@afterindenttrue
       \interlinepenalty\@M
+%    \end{macrocode}
+%   \changes{v3.21}{2016/06/06}{\cs{ragged\dots entry} wird (wieder)
+%     ausgewertet}^^A
+%    \begin{macrocode}
+      \expandafter\ifx\csname ragged#1entry\endcsname\raggedright
+        \addtolength\rightskip\@flushglue
+      \else
+        \def\reserved@a{\raggedright}%
+        \expandafter\ifx\csname ragged#1entry\endcsname\reserved@a
+          \addtolength\rightskip\@flushflue
+        \fi
+      \fi
       \leavevmode
       \@tempdima \@nameuse{scr@tso@#1@numwidth}\relax
       \@nameuse{Ifscr@tso@#1@dynnumwidth}{%
