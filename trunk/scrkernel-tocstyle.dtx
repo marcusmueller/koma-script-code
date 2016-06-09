@@ -1,4 +1,4 @@
-% \CheckSum{1317}
+% \CheckSum{1338}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-tocstyle.dtx
@@ -894,6 +894,27 @@
     \if@tempswa
       \@nameuse{scr@dte@def@l@#2}{#3}%
       \expandafter\edef\csname scr@dte@#3@style\endcsname{#2}%
+%    \end{macrocode}
+%   \changes{v3.21}{2016/06/09}{\cs{toclevel@\emph{ebene}} wird für
+%     \textsf{hyperref} neu gesetzt}^^A
+% Da verschiedene Pakete davon ausgehen, dass die Ebene
+% \textsf{hyperref}-kompatibel gespeichert ist, setzen wir die hier
+% zusätzlich. Das \textsf{hyperref} die Einstellungen ggf. überschreibt,
+% machen wir das in der Dokumentpräambel auch mehrfach.
+%    \begin{macrocode}
+      \expandafter\let\csname toclevel@#3\expandafter\endcsname
+      \csname #3tocdepth\endcsname
+      \if@atdocument\else
+        \scr@ifundefinedorrelax{AfterPackage}{%
+          \AtBeginDocument
+        }{%
+          \AfterPackage*{hyperref}%
+        }%
+        {%
+          \expandafter\let\csname toclevel@#3\expandafter\endcsname
+          \csname #3tocdepth\endcsname
+        }%
+      \fi
     \fi
   }%
 }
@@ -1136,13 +1157,14 @@
 % Die Ebene, \texttt{level} bzw. \cs{\dots tocdepth}, kann auf zweierlei Arten
 % automatisch bestimmt werden. Zum einen wird für Sub-Ebenen die Elternebene
 % um eins erhöht verwendet, falls die Elternebene bereits definiert ist.
+%   \changes{v3.21}{2016/06/09}{\cs{the} eingefügt}^^A
 %    \begin{macrocode}
 %<*tocline>
   \scr@ifundefinedorrelax{#1tocdepth}{%
     \ifstrstart{#1}{sub}{%
       \scr@ifundefinedorrelax{\scr@dte@nosub{#1}tocdepth}{}{%
         \expandafter\edef\csname #1tocdepth\endcsname{%
-          \numexpr \noexpand\@nameuse{\scr@dte@nosub{#1}tocdepth}+\@ne\relax
+          \the\numexpr \noexpand\@nameuse{\scr@dte@nosub{#1}tocdepth}+\@ne\relax
         }%
       }%
     }{}%
