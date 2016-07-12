@@ -1,4 +1,4 @@
-% \CheckSum{3710}
+% \CheckSum{3735}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -825,16 +825,16 @@
     \scr@istest#7=\@nil
   \fi
   \if@scr@tempswa
-    \setkeys{KOMAarg.section}{tocentry={#8},head={#8},#7}%
+    \setkeys{KOMAarg.section}{tocentry={#8},head={#8},reference={#8},#7}%
   \else
     \ifcase \scr@osectarg\relax
-      \setkeys{KOMAarg.section}{tocentry={#7},head={#7}}%
+      \setkeys{KOMAarg.section}{tocentry={#7},head={#7},reference={#7}}%
     \or
-      \setkeys{KOMAarg.section}{tocentry={#8},head={#7}}%
+      \setkeys{KOMAarg.section}{tocentry={#8},head={#7},reference={#8}}%
     \or
-      \setkeys{KOMAarg.section}{tocentry={#7},head={#8}}%
+      \setkeys{KOMAarg.section}{tocentry={#7},head={#8},reference={#7}}%
     \or
-      \setkeys{KOMAarg.section}{tocentry={#7},head={#7}}%
+      \setkeys{KOMAarg.section}{tocentry={#7},head={#7},reference={#7}}%
     \fi
   \fi
   \let\IfUsePrefixLine\@secondoftwo
@@ -857,10 +857,14 @@
       #6{\nobreak\interlinepenalty \@M
         \sectionlinesformat{#1}{\glueexpr #3\relax}\@svsec{#8}\@@par}%
     \endgroup
-%<trace>    \ClassInfo{\KOMAClassName}{head=`\scr@ds@head'}%
-    \expandafter\csname #1mark\expandafter\endcsname\expandafter{\scr@ds@head}%
-%<trace>    \ClassInfo{\KOMAClassName}{tocentry=`\scr@ds@tocentry'}%
-    \ifx\scr@ds@tocentry\@empty\else
+%<*trace>
+    \ClassInfo{\KOMAClassName}{%
+      head=`\detokenize\expandafter{\@currentheadentry}'\MessageBreak
+      tocentry=`\detokenize\expandafter{\@currenttocentry}'\MessageBreak
+      reference=`\detokenize\expandafter{\@currenttocentry}'}%
+%</trace>
+    \expandafter\csname #1mark\expandafter\endcsname\expandafter{\@currentheadentry}%
+    \ifx\@currenttocentry\@empty\else
       \scr@ifundefinedorrelax{add#1tocentry}{%
         \expandafter\global\expandafter\def
         \csname add#1tocentry\endcsname##1##2{%
@@ -868,10 +872,10 @@
         }%
       }{}%
       \ifnum \numexpr #2\relax>\c@secnumdepth
-        \csname add#1tocentry\endcsname{}{\scr@ds@tocentry}%
+        \csname add#1tocentry\endcsname{}{\@currenttocentry}%
       \else
         \csname add#1tocentry\endcsname{\csname the#1\endcsname}{%
-          \scr@ds@tocentry}%
+          \@currenttocentry}%
       \fi
     \fi
   \else
@@ -883,11 +887,15 @@
 %    \begin{macrocode}
     \def\@svsechd{%
       #6{\nobreak\sectioncatchphraseformat{#1}{\glueexpr #3\relax}\@svsec{#8}}%
-%<trace>      \ClassInfo{\KOMAClassName}{head=`\scr@ds@head'}%
-       \expandafter\csname #1mark\expandafter\endcsname
-       \expandafter{\scr@ds@head}%
-%<trace>      \ClassInfo{\KOMAClassName}{tocentry=`\scr@ds@tocentry'}%
-      \ifx\scr@ds@tocentry\@empty\else
+%<*trace>
+      \ClassInfo{\KOMAClassName}{%
+        head=`\detokenize\expandafter{\@currentheadentry}'\MessageBreak
+        tocentry=`\detokenize\expandafter{\@currenttocentry}'\MessageBreak
+        reference=`\detokenize\expandafter{\@currenttocentry}'}%
+%</trace>
+      \expandafter\csname #1mark\expandafter\endcsname
+      \expandafter{\@currentheadentry}%
+      \ifx\@currenttocentry\@empty\else
         \scr@ifundefinedorrelax{add#1tocentry}{%
           \expandafter\global\expandafter\def
           \csname add#1tocentry\endcsname####1####2{%
@@ -895,10 +903,10 @@
           }%
         }{}%
         \ifnum \numexpr #2\relax>\c@secnumdepth
-          \csname add#1tocentry\endcsname{}{\scr@ds@tocentry}%
+          \csname add#1tocentry\endcsname{}{\@currenttocentry}%
         \else
           \csname add#1tocentry\endcsname{\csname the#1\endcsname}{%
-            \scr@ds@tocentry}%
+            \@currenttocentry}%
         \fi
       \fi
     }%
@@ -909,8 +917,16 @@
 %    \end{macrocode}
 % \begin{macro}{\scr@ds@tocentry}
 %   \changes{v3.10}{2011/08/30}{neu (intern)}^^A
+% \begin{macro}{\@currenttocentry}
+%   \changes{v3.22}{2016/07/12}{\cs{scr@ds@tocentry} (semi-intern)
+%     umbenannt}^^A
 % \begin{macro}{\scr@ds@head}
 %   \changes{v3.10}{2011/08/30}{neu (intern)}^^A
+% \begin{macro}{\@currentheadentry}
+%   \changes{v3.22}{2016/07/12}{\cs{scr@ds@head} (semi-intern)
+%     umbenannt}^^A
+% \begin{macro}{\@currentlabelname}
+%   \changes{v3.22}{2016/07/12}{neu (semi-intern)}
 % \begin{macro}{\if@scr@tempswa}
 %   \changes{v3.10}{2011/08/30}{neu (intern)}^^A
 % \begin{macro}{\scr@istest}
@@ -920,10 +936,24 @@
 %    \begin{macrocode}
 \DefineFamily{KOMAarg}
 \DefineFamilyMember[.section]{KOMAarg}
-\DefineFamilyKey[.section]{KOMAarg}{tocentry}{\def\scr@ds@tocentry{#1}}
-\DefineFamilyKey[.section]{KOMAarg}{head}{\def\scr@ds@head{#1}}
-\newcommand*\scr@ds@tocentry{}
-\newcommand*\scr@ds@head{}
+\providecommand*\@currenttocentry{}
+\providecommand*\@currentheadentry{}
+\providecommand*\@currentlabelname{}
+\FamilyStringKey[.section]{KOMAarg}{tocentry}{\@currenttocentry}
+\FamilyStringKey[.section]{KOMAarg}{head}{\@currentheadentry}
+\DefineFamilyKey[.section]{KOMAarg}{reference}{%
+  \scr@ifundefinedorrelax{NR@gettitle}{%
+    \scr@ifundefinedorrelax{GetTitleString}{%
+      \def\@currentlabelname{#1}%
+    }{%
+      \GetTitleString{#1}%
+      \let\@currentlabelname\GetTitleStringResult
+    }%
+  }{%
+    \NR@gettitle{#1}%
+  }%
+  \FamilyKeyStateProcessed
+}
 \newcommand*{\scr@istest}{}
 \def\scr@istest#1=#2\@nil{%
   \ifx\relax#2\relax\@scr@tempswafalse\else\@scr@tempswatrue\fi
@@ -932,7 +962,10 @@
 %    \end{macrocode}
 % \end{macro}^^A \scr@istest
 % \end{macro}^^A \if@scr@tempswa
+% \end{macro}^^A \@currentlabelname
+% \end{macro}^^A \@currentheadentry
 % \end{macro}^^A \scr@ds@head
+% \end{macro}^^A \@currenttocentry
 % \end{macro}^^A \scr@ds@tocentry
 % \begin{macro}{\sectionlinesformat}
 %   \changes{v3.19}{2015/07/17}{neue Anweisung}^^A
@@ -2798,16 +2831,16 @@
     \scr@istest#2=\@nil
   \fi
   \if@scr@tempswa
-    \setkeys{KOMAarg.section}{tocentry={#3},head={#3},#2}%
+    \setkeys{KOMAarg.section}{tocentry={#3},head={#3},reference={#3},#2}%
   \else
     \ifcase \scr@osectarg\relax
-      \setkeys{KOMAarg.section}{tocentry={#2},head={#2}}%
+      \setkeys{KOMAarg.section}{tocentry={#2},head={#2},reference={#2}}%
     \or
-      \setkeys{KOMAarg.section}{tocentry={#3},head={#2}}%
+      \setkeys{KOMAarg.section}{tocentry={#3},head={#2},reference={#3}}%
     \or
-      \setkeys{KOMAarg.section}{tocentry={#2},head={#3}}%
+      \setkeys{KOMAarg.section}{tocentry={#2},head={#3},reference={#2}}%
     \or
-      \setkeys{KOMAarg.section}{tocentry={#2},head={#2}}%
+      \setkeys{KOMAarg.section}{tocentry={#2},head={#2},reference={#2}}%
     \fi
   \fi
 %    \end{macrocode}
@@ -2824,12 +2857,12 @@
     \@maybeautodot\thepart%
     \expandafter\@maybeautodot\csname the#1\endcsname
     \typeout{#1 \csname the#1\endcsname.}%
-    \ifx\scr@ds@tocentry\@empty\else
+    \ifx\@currenttocentry\@empty\else
       \scr@ifundefinedorrelax{add#1tocentry}{%
         \addtocentrydefault{#1}%
       }{%
         \@nameuse{add#1tocentry}%
-      }{\csname the#1\endcsname}{\scr@ds@tocentry}%
+      }{\csname the#1\endcsname}{\@currenttocentry}%
     \fi
   }{%
 %    \end{macrocode}
@@ -2846,7 +2879,7 @@
       \endgroup
     \fi
     \typeout{#1 without number}%
-    \ifx\scr@ds@tocentry\@empty\else
+    \ifx\@currenttocentry\@empty\else
 %    \end{macrocode}
 % An dieser Stelle muss ggf. der \textsf{hyperref}-Hook für nicht nummerierte
 % Inhaltsverzeichniseinträge ausgeführt werden.
@@ -2858,7 +2891,7 @@
         \addtocentrydefault{#1}%
       }{%
         \@nameuse{add#1tocentry}%
-      }{}{\scr@ds@tocentry}%
+      }{}{\@currenttocentry}%
     \fi
   }%
 %    \end{macrocode}
@@ -2897,7 +2930,7 @@
     \expandafter\ifx\csname #1mark\endcsname\@gobble
       \@mkboth{}{}%
     \else
-      \csname #1mark\expandafter\endcsname\expandafter{\scr@ds@head}%
+      \csname #1mark\expandafter\endcsname\expandafter{\@currentheadentry}%
     \fi
     \par
   \endgroup
@@ -3544,16 +3577,16 @@
     \scr@istest#2=\@nil
   \fi
   \if@scr@tempswa
-    \setkeys{KOMAarg.section}{tocentry={#3},head={#3},#2}%
+    \setkeys{KOMAarg.section}{tocentry={#3},head={#3},reference={#3},#2}%
   \else
     \ifcase \scr@osectarg\relax
-      \setkeys{KOMAarg.section}{tocentry={#2},head={#2}}%
+      \setkeys{KOMAarg.section}{tocentry={#2},head={#2},reference={#2}}%
     \or
-      \setkeys{KOMAarg.section}{tocentry={#3},head={#2}}%
+      \setkeys{KOMAarg.section}{tocentry={#3},head={#2},reference={#3}}%
     \or
-      \setkeys{KOMAarg.section}{tocentry={#2},head={#3}}%
+      \setkeys{KOMAarg.section}{tocentry={#2},head={#3},reference={#2}}%
     \or
-      \setkeys{KOMAarg.section}{tocentry={#2},head={#2}}%
+      \setkeys{KOMAarg.section}{tocentry={#2},head={#2},reference={#2}}%
     \fi
   \fi
 %    \end{macrocode}
@@ -3575,12 +3608,12 @@
     \refstepcounter{#1}%
     \expandafter\@maybeautodot\csname the#1\endcsname
     \typeout{#1 \csname the#1\endcsname.}%
-    \ifx\scr@ds@tocentry\@empty\else
+    \ifx\@currenttocentry\@empty\else
       \scr@ifundefinedorrelax{add#1tocentry}{%
         \addtocentrydefault{#1}%
       }{%
         \@nameuse{add#1tocentry}%
-      }{\csname the#1\endcsname}{\scr@ds@tocentry}%
+      }{\csname the#1\endcsname}{\@currenttocentry}%
     \fi
 %    \end{macrocode}
 % Für alle nicht nummerieten Überschriften dieser Ebene trotzdem die
@@ -3595,7 +3628,7 @@
       \endgroup
     \fi
     \typeout{#1 without number}%
-    \ifx\scr@ds@tocentry\@empty\else
+    \ifx\@currenttocentry\@empty\else
 %    \end{macrocode}
 % An dieser Stelle muss ggf. der \textsf{hyperref}-Hook für nicht nummerierte
 % Inhaltsverzeichniseinträge ausgeführt werden.
@@ -3605,13 +3638,13 @@
         \addtocentrydefault{#1}%
       }{%
         \@nameuse{add#1tocentry}%
-      }{}{\scr@ds@tocentry}%
+      }{}{\@currenttocentry}%
     \fi
   \fi
 %    \end{macrocode}
 % Jetzt kommt der Kolumnentitel an die Reihe.
 %    \begin{macrocode}
-  \csname #1mark\expandafter\endcsname\expandafter{\scr@ds@head}%
+  \csname #1mark\expandafter\endcsname\expandafter{\@currentheadentry}%
 %    \end{macrocode}
 % Und die Abstände in die andere Verzeichnisse.
 %   \changes{v2.8g}{2001/07/18}{per \cs{float@addtolists} wird nun
