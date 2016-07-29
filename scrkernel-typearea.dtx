@@ -1,4 +1,4 @@
-% \CheckSum{2654}
+% \CheckSum{2736}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-typearea.dtx
@@ -418,7 +418,7 @@
     \advance\@tempcnta by\m@ne
   }
 %    \end{macrocode}
-% Zum Schluß muss nun die genannte Multiplitkation erfolgen. Da
+% Zum Schluß muss nun die genannte Multiplikation erfolgen. Da
 % "`mm"' kein ganzzahliges Vielfaches von "`sp"' ist, beinhaltet diese
 % Multiplikation eigentlich einen Fehler und eine Abweichung von der
 % Norm. Da jedoch "`sp"' die Rechengenauigkeit von {\TeX} darstellt,
@@ -429,16 +429,41 @@
   \multiply\paperheight by186468
 %    \end{macrocode}
 % Jetzt noch die gewünschte Ausrichtung beachten.
-%   \changes{v2.97e}{2007/10/23}{gewünschte Papierausrichtung wird beachtet}^^A
+%   \changes{v2.97e}{2007/10/23}{gewünschte Papierausrichtung wird
+%     beachtet}^^A
+%   \changes{v3.22}{2016/07/29}{Papierausrichtung entsprechend dem
+%     tatsächlichen Format}^^A
 %    \begin{macrocode}
-  \if@landscape
-    \setlength{\@tempdima}{\paperwidth}%
-    \setlength{\paperwidth}{\paperheight}%
-    \setlength{\paperheight}{\@tempdima}%
+  \expandafter\ifnum\scr@ta@v@is@ge{3.22}\relax
+    \scr@setpaperorientation
+  \else
+    \if@landscape\scr@switchpapersizes\fi
   \fi
 }
 %    \end{macrocode}
 % \end{macro}
+% \begin{macro}{\scr@setpaperorientation}
+%   \changes{v3.22}{2016/07/29}{neu (intern)}
+% Stellt die Papierausrichtung entsprechend \cs{if@landscape} ein.
+%    \begin{macrocode}
+\newcommand*\scr@setpaperorientation{%
+  \ifdim\paperheight>\paperwidth
+    \if@landscape\scr@switchpapersizes\fi
+  \else
+    \if@landscape\else\scr@switchpapersizes\fi
+  \fi
+}
+%    \end{macrocode}
+% \begin{macro}{\scr@switchpapersizes}
+%   \changes{v3.22}{2016/07/29}{neu (intern)}
+% Vertauscht zwei Längen.
+%    \begin{macrocode}
+\newcommand*\scr@switchpapersizes{%
+  \@tempdima\paperwidth\paperwidth\paperheight\paperheight\@tempdima
+}
+%    \end{macrocode}
+% \end{macro}^^A \scr@switchlength
+% \end{macro}^^A \scr@setpaperorientation
 % \begin{macro}{\iso@paper}
 %   \changes{v2.95}{2002/12/03}{neu (intern)}^^A
 % Ein ganz ähnlicher interner Befehl erhält den gesamten Namen des
@@ -1429,7 +1454,9 @@
 %   \changes{v3.01b}{2008/12/09}{Höhe und Breite vertauscht}^^A
 %   \changes{v3.02c}{2009/02/12}{neuer Wert \texttt{seascape}}
 %   \changes{v3.12}{2013/03/05}{Verwendung der Status-Signalisierung mit
-%     \cs{FamilyKeyState}}
+%     \cs{FamilyKeyState}}^^A
+%   \changes{v3.22}{2016/07/29}{Papierausrichtung entsprechend dem
+%     tatsächlichen Format}^^A
 % Im Normalfall wird die Papiergröße jedoch über diese Option
 % gesetzt. Dabei sind neben den Standard- und den ISO-Reihen A, B, C
 % und D auch Wertepaare der Form
@@ -1439,32 +1466,44 @@
 \KOMA@key{paper}{%
   \ifstr{#1}{seascape}{%
     \@seascapetrue
-    \if@landscape\else
-      \setlength{\@tempdima}{\paperwidth}%
-      \setlength{\paperwidth}{\paperheight}%
-      \setlength{\paperheight}{\@tempdima}%
+    \expandafter\ifnum\scr@ta@v@is@ge{3.22}\relax
       \@landscapetrue
+      \scr@setpaperorientation
+    \else
+      \if@landscape\else\scr@switchpapersizes\@landscapetrue\fi
     \fi
     \FamilyKeyStateProcessed
+    \KOMA@kav@remove{.typearea.\scr@pkgextension}{paper}{landscape}%
+    \KOMA@kav@remove{.typearea.\scr@pkgextension}{paper}{portrait}%
+    \KOMA@kav@remove{.typearea.\scr@pkgextension}{paper}{seascape}%
+    \KOMA@kav@add{.typearea.\scr@pkgextension}{paper}{seascape}%
   }{%      
     \ifstr{#1}{landscape}{%
       \@seascapefalse
-      \if@landscape\else
-        \setlength{\@tempdima}{\paperwidth}%
-        \setlength{\paperwidth}{\paperheight}%
-        \setlength{\paperheight}{\@tempdima}%
+      \expandafter\ifnum\scr@ta@v@is@ge{3.22}\relax
         \@landscapetrue
+        \scr@setpaperorientation
+      \else
+        \if@landscape\else\scr@switchpapersizes\@landscapetrue\fi
       \fi
       \FamilyKeyStateProcessed
+      \KOMA@kav@remove{.typearea.\scr@pkgextension}{paper}{landscape}%
+      \KOMA@kav@remove{.typearea.\scr@pkgextension}{paper}{portrait}%
+      \KOMA@kav@remove{.typearea.\scr@pkgextension}{paper}{seascape}%
+      \KOMA@kav@add{.typearea.\scr@pkgextension}{paper}{landscape}%
     }{%
       \ifstr{#1}{portrait}{%
-        \if@landscape
-          \setlength{\@tempdima}{\paperwidth}%
-          \setlength{\paperwidth}{\paperheight}%
-          \setlength{\paperheight}{\@tempdima}%
+        \expandafter\ifnum\scr@ta@v@is@ge{3.22}\relax
           \@landscapefalse
+          \scr@setpaperorientation
+        \else
+          \if@landscape\scr@switchpapersizes\@landscapefalse\fi
         \fi
         \FamilyKeyStateProcessed
+        \KOMA@kav@remove{.typearea.\scr@pkgextension}{paper}{landscape}%
+        \KOMA@kav@remove{.typearea.\scr@pkgextension}{paper}{portrait}%
+        \KOMA@kav@remove{.typearea.\scr@pkgextension}{paper}{seascape}%
+        \KOMA@kav@add{.typearea.\scr@pkgextension}{paper}{portrait}%
       }{%
         \ifstr{#1}{letter}{%
           \if@landscape
@@ -1477,6 +1516,10 @@
           \FamilyKeyStateProcessed
           \KOMA@kav@removekey{.typearea.\scr@pkgextension}{paper}%
           \KOMA@kav@add{.typearea.\scr@pkgextension}{paper}{letter}%
+          \KOMA@kav@xadd{.typearea.\scr@pkgextension}{paper}{%
+            \if@seascape seascape\else
+            \if@landscape landscape\else portrait\fi\fi
+          }%
         }{%
           \ifstr{#1}{legal}{%
             \if@landscape
@@ -1489,6 +1532,10 @@
             \FamilyKeyStateProcessed
             \KOMA@kav@removekey{.typearea.\scr@pkgextension}{paper}%
             \KOMA@kav@add{.typearea.\scr@pkgextension}{paper}{legal}%
+            \KOMA@kav@xadd{.typearea.\scr@pkgextension}{paper}{%
+              \if@seascape seascape\else
+              \if@landscape landscape\else portrait\fi\fi
+            }%
           }{%
             \ifstr{#1}{executive}{%
               \if@landscape
@@ -1497,19 +1544,29 @@
               \else
                 \setlength\paperheight{10.5in}%
                 \setlength\paperwidth {7.25in}%
-             \fi
-             \FamilyKeyStateProcessed
-             \KOMA@kav@removekey{.typearea.\scr@pkgextension}{paper}%
-             \KOMA@kav@add{.typearea.\scr@pkgextension}{paper}{executive}%
+              \fi
+              \FamilyKeyStateProcessed
+              \KOMA@kav@removekey{.typearea.\scr@pkgextension}{paper}%
+              \KOMA@kav@add{.typearea.\scr@pkgextension}{paper}{executive}%
+              \KOMA@kav@xadd{.typearea.\scr@pkgextension}{paper}{%
+                \if@seascape seascape\else
+                \if@landscape landscape\else portrait\fi\fi
+              }%
             }{%
               \iso@paper{#1}%
               \if@tempswa
                 \FamilyKeyStateProcessed
                 \KOMA@kav@removekey{.typearea.\scr@pkgextension}{paper}%
                 \KOMA@kav@xadd{.typearea.\scr@pkgextension}{paper}{#1}%
+                \KOMA@kav@xadd{.typearea.\scr@pkgextension}{paper}{%
+                  \if@seascape seascape\else
+                  \if@landscape landscape\else portrait\fi\fi
+                }%
               \else
                 \expandafter\maybe@pair#1::\@nil
                 \if@tempswa
+                  \FamilyKeyStateProcessed
+                  \KOMA@kav@removekey{.typearea.\scr@pkgextension}{paper}%
                   \expandafter\ifnum \scr@ta@v@is@lt{3.01b}\relax
                     \PackageWarningNoLine{typearea}{%
                       You may have to exchange height and width!\MessageBreak
@@ -1518,20 +1575,28 @@
                       instead of `paper=width:height'.\MessageBreak
                       I've switched back to that old interpretation\MessageBreak
                       because of the given compatiblity settings}%
-                    \setlength\paperheight{\@tempa}%
                     \setlength\paperwidth{\@tempb}%
+                    \setlength\paperheight{\@tempa}%
                   \else
                     \setlength\paperwidth{\@tempa}%
                     \setlength\paperheight{\@tempb}%
                   \fi
-                  \FamilyKeyStateProcessed
-                  \KOMA@kav@removekey{.typearea.\scr@pkgextension}{paper}%
-                  \if@landscape
-                    \KOMA@kav@xadd{.typearea.\scr@pkgextension}{paper}{\@tempa:\@tempb}%
+                  \expandafter\ifnum \scr@ta@v@is@lt{3.22}\relax
+                    \if@landscape
+                      \KOMA@kav@xadd{.typearea.\scr@pkgextension}{paper}{\@tempa:\@tempb}%
+                    \else
+                      \KOMA@kav@xadd{.typearea.\scr@pkgextension}{paper}{\@tempb:\@tempa}%
+                    \fi
                   \else
-                    \KOMA@kav@xadd{.typearea.\scr@pkgextension}{paper}{\@tempb:\@tempa}%
+                    \scr@setpaperorientation
+                    \KOMA@kav@xadd{.typearea.\scr@pkgextension}{paper}{%
+                      \the\paperwidth:\the\paperheight}%
                   \fi
-               \else
+                  \KOMA@kav@xadd{.typearea.\scr@pkgextension}{paper}{%
+                    \if@seascape seascape\else
+                    \if@landscape landscape\else portrait\fi\fi
+                  }%
+                \else
                   \KOMA@unknown@keyval{paper}{#1}{%
                     `letter', `legal', `executive', `a'<nr>, `b'<nr>,
                     `c'<nr>, `d'<nr>,\MessageBreak
@@ -1542,17 +1607,6 @@
             }%
           }%
         }%
-        \ifx\FamilyKeyState\FamilyKeyStateProcessed
-          \if@landscape
-            \if@seascape
-              \KOMA@kav@add{.typearea.\scr@pkgextension}{paper}{seascape}%
-            \else
-              \KOMA@kav@add{.typearea.\scr@pkgextension}{paper}{landscape}%
-            \fi
-          \else
-            \KOMA@kav@add{.typearea.\scr@pkgextension}{paper}{portrait}%
-          \fi
-        \fi
       }%
     }%
   }%
