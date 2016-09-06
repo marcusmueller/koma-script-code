@@ -1,4 +1,4 @@
-% \CheckSum{1533}
+% \CheckSum{1535}
 % \iffalse meta-comment
 % ======================================================================
 % tocbasic.dtx
@@ -410,6 +410,10 @@
 % \begin{macro}{\removefromtoclist}
 %   \changes{v3.20}{2016/04/12}{\cs{@ifnextchar} replaced by
 %     \cs{kernel@ifnextchar}}^^A
+% \begin{macro}{\@removefromtoclist}
+%   \changes{v3.22}{2016/09/06}{missing \cs{global} added}^^A
+% \begin{macro}{\@@removefromtoclist}
+%   \changes{v3.22}{2016/09/06}{missing \cs{global} added}^^A
 %   This command will remove an extension from the list of toc-files. If the
 %   first, optional argument is given, the extension will only be removed, if
 %   it was added by the given owner. NOTE: An empty first argument is not the
@@ -426,9 +430,10 @@
       \edef\reserved@a{##1}%
       \ifx\reserved@a\reserved@b
         \begingroup
-          \edef\reserved@a{##2}%
+          \edef\@currext{##2}%
           \edef\reserved@b{#1}%
-          \ifx\reserved@a\reserved@b\else
+          \ifx\@currext\reserved@b
+          \else
             \g@addto@macro\tb@listoftocs{\do{##1}{##2}}%
           \fi
         \endgroup
@@ -436,7 +441,7 @@
         \g@addto@macro\tb@listoftocs{\do{##1}{##2}}%
       \fi
     }%
-    \edef\reserved@b{#2}\let\tb@listoftocs\@empty
+    \edef\reserved@b{#2}\global\let\tb@listoftocs\@empty
     \tb@oldlist
   \endgroup
 }
@@ -445,15 +450,18 @@
     \let\tb@oldlist\tb@listoftocs
     \def\do##1##2{%
       \edef\reserved@a{##1}%
-      \ifx\reserved@a\reserved@b\else
+      \ifx\reserved@a\reserved@b
+      \else
         \g@addto@macro\tb@listoftocs{\do{##1}{##2}}%
       \fi
     }%
-    \edef\reserved@b{#1}\let\tb@listoftocs\@empty
+    \edef\reserved@b{#1}\global\let\tb@listoftocs\@empty
     \tb@oldlist
   \endgroup
 }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 %
 % \begin{macro}{\doforeachtocfile}
