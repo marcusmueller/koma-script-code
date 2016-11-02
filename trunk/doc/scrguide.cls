@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2016/04/05 v1.11 internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2016/11/02 v1.11a internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -1629,6 +1629,7 @@ KOMAScript \endcsname
 % \end{macro}
 %
 % \begin{macro}{\printmultiindex}
+%   \changes{v1.11a}{2016/11/02}{index label generation delayed}^^A
 %   Print one part of the multi part index.
 %    \begin{macrocode}
   \newcommand*{\printmultiindex}[3][]{%
@@ -1654,7 +1655,7 @@ KOMAScript \endcsname
       \ifx\relax#1\relax\let\index@preamble=\relax
       \else\def\index@preamble{#1}%
       \fi
-      \label{idx:#3}%
+      \def\index@setlabel{\label{idx:#3}}%
       \@input@{\jobname-#3.ind}%
     \endgroup
   }
@@ -1671,7 +1672,7 @@ KOMAScript \endcsname
     \setlength{\parskip}{\z@ \@plus .3\p@}%
     \setlength{\parfillskip}{\z@ \@plus 1fil}%
     \let\item\@idxitem
-    \small
+    \small\csname index@setlabel\endcsname
   }{%
     \end{multicols}%
   }
