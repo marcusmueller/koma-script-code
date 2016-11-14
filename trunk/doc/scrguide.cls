@@ -194,22 +194,31 @@
     \RequirePackage{xcolor}%
     \RequirePackage{scrlayer-scrpage}%
     \clearpairofpagestyles
-    \ohead{\smash{%
-        \rule[-\dp\strutbox]{0pt}{\headheight}\headmark\hspace{2mm}}%
+    \ihead{%
+      \smash{%
+        \hspace*{.5em}\rule[-\dp\strutbox]{0pt}{\headheight}\headmark
+      }%
     }%
-    \ihead[{\smash{\colorbox{yellow!50}{%
-        \makebox[\dimexpr\linewidth-2\fboxsep\relax][l]{%
-            \rule[-\dp\strutbox]{0pt}{\headheight}%
-            \makebox[2em][r]\pagemark}}}}]%
-      {\smash{\colorbox{yellow!50}{%
-          \makebox[\dimexpr\linewidth-2\fboxsep\relax][l]{%
-            \rule[-\dp\strutbox]{0pt}{\headheight}%
-            \makebox[2em][r]\pagemark}}}}%
+    \ohead*{\smash{\pagemark\hspace{2mm}}}%
+    \DeclareNewLayer[head,background,
+      hoffset=0pt,
+      width=\paperwidth,
+      addheight=\dimexpr \topmargin+1in+\dp\strutbox\relax,
+      addvoffset=2\dp\strutbox,
+      contents={%
+        \color{yellow!50}\rule{\layerwidth}{\layerheight}}]
+    {headbackground}%
+    \AddLayersAtBeginOfPageStyle{scrheadings}{headbackground}%
     \setkomafont{pageheadfoot}{\normalfont\sffamily}%
     \setkomafont{pagenumber}{}%
     \renewcommand*{\chaptermark}[1]{%
-      \markboth\chaptermarkformat\chaptermarkformat}%
-    \renewcommand*{\chaptermarkformat}{\chapapp~\thechapter\autodot}%
+      \@mkdouble{\ifnumbered{chapter}{\chaptermarkformat}{}##1}%
+    }%
+    \renewcommand*{\chaptermarkformat}{%
+      \makebox[\dimexpr \oddsidemargin+1in-.5em][r]{%
+        \chapapp~\thechapter:~%
+      }%
+    }%
     \renewcommand*{\chapterformat}{}%
     \renewcommand*{\chapterpagestyle}{scrheadings}%
     \setlength{\@tempdimc}{\oddsidemargin}%
@@ -542,6 +551,47 @@
 % \end{macro}
 % \end{macro}
 %
+% \begin{macro}{\DeclareSpecialMarkup}
+%   Command to declare special markup commands, that behave different in- and
+%   outside |Description| environment. Parameters are:
+%   \begin{declaration}
+%     \item[\arg{command}:] The the markup command, that should be defined.
+%     \item[\arg{outside definition}:] Definition of the markup command
+%       outside |Description| environment.
+%     \item[\arg{inside definition}:] Definition of the markup command inside
+%       |Description| environment.
+%     \item{\oarg{inside end definition}:] Definition of the \cs{end} command,
+%       if inside |Description| an markup environment instead of an markup
+%       command would be used.
+%   \end{declaration}
+%   At the end color \meta{command name} will be black and \cs{\meta{command
+%   name}}, \cs{text\meta{command name}, \cs{Desc\meta{command name}}, and
+%   optionally \cs{endDesc\meta{command name} will be defined, with
+%   \cs{\meta{command name}} is \meta{command}.
+%    \begin{macrocode}
+\newcommand\DeclareSpecialMarkup[3]{%
+  \newcommand*#1{}%
+  \expandafter\colorlet\expandafter{\expandafter\@gobble\string#1}{black}%
+  \expandafter\newcommand\expandafter*%
+  \csname text\expandafter\@gobble\string #1\endcsname[1]{#2}%
+  \expandafter\DeclareRobustCommand\expandafter*\expandafter#1\expandafter{%
+    \csname text\expandafter\@gobble\string #1\endcsname}%
+  \expandafter\newcommand\expandafter*%
+  \csname Desc\expandafter\@gobble\string #1\endcsname[1]{#3}%
+  \kernel@ifnextchar [%
+    {\expandafter\@optdef
+     \csname endDesc\expandafter\@gobble\string #1\endcsname}%
+    {}%]
+}
+%    \end{macrocode}
+% \begin{macro}{\@optdef}
+%   Helper to define a macro via optional instead of mandatory argument
+\newcommand*{\@optdef}{}
+\long\def\@optdef#1[#2]{\def#1{#2}}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
 % \begin{macro}{\Macro}
 % \begin{macro}{\Option}
 % \begin{macro}{\KOption}
@@ -551,7 +601,7 @@
 % \begin{macro}{\Length}
 % \begin{macro}{\PLength}
 % \begin{macro}{\FloatStyle}
-% \begin{macro}{\Pagestyle}
+% \begin{macro}{\PageStyle}
 % \begin{macro}{\Variable}
 % \begin{macro}{\FontElement}
 % \begin{macro}{\PName}
@@ -581,31 +631,231 @@
 %     environment
 %   \end{description}
 %    \begin{macrocode}
-\DeclareRobustCommand*{\Macro}[1]{\mbox{\texttt{\char`\\#1}}}
-\DeclareRobustCommand*{\Option}[1]{\mbox{\texttt{#1}}}
-\DeclareRobustCommand*{\KOption}[1]{\mbox{\Option{#1}\texttt=}}
-\DeclareRobustCommand*{\OptionValue}[2]{\mbox{\texttt{#1=#2}}}
-\DeclareRobustCommand*{\FloatStyle}[1]{\mbox{\texttt{#1}}}
-\DeclareRobustCommand*{\Pagestyle}[1]{\mbox{\texttt{#1}}}
-\DeclareRobustCommand*{\Environment}[1]{\mbox{\texttt{#1}}}
-\DeclareRobustCommand*{\Counter}[1]{\mbox{\texttt{#1}}}
-\DeclareRobustCommand*{\Length}[1]{\mbox{\texttt{\char`\\#1}}}
-\DeclareRobustCommand*{\PLength}[1]{\mbox{\PValue{#1}}}
-\DeclareRobustCommand*{\Variable}[1]{\mbox{\PValue{#1}}}
-\DeclareRobustCommand*{\FontElement}[1]{\PValue{#1}}
+\DeclareSpecialMarkup{\Macro}{\mbox{\texttt{\char`\\#1}}}{%
+  \par
+  \settowidth{\leftskip}{\textMacro{#1}}% indent from left
+  \hskip-\leftskip
+  \BeginIndex{Cmd}{#1}% index entry
+  \begingroup
+    \csname phantomsection\endcsname
+    \label@sanitize
+    \label{\label@desc@prefix\label@base.cmd.#1\label@suffix}%
+  \endgroup
+  \textMacro{#1}%
+}
+\DeclareSpecialMarkup{\Option}{\mbox{\texttt{#1}}}{%
+  \par
+  \leftskip\z@
+  \BeginIndex{Option}{#1}% index entry
+  \begingroup
+    \csname phantomsection\endcsname
+    \label@sanitize
+    \expandafter\gdef
+    \csname \label@desc@prefix\label@base.option.#1\label@suffix\endcsname{}%
+    \label{\label@desc@prefix\label@base.option.#1\label@suffix}%
+  \endgroup
+  \textOption{#1}%
+}
+\DeclareSpecialMarkup{\KOption}{\mbox{\textOption{#1=}}\linebreak[0]}{%
+  \ClassWarning{scrguide}{You should replace
+    \string\KOption{#1}\string\PName{...}\MessageBreak
+    by \string\OptionVName{#1}{...}}%
+  \par
+  \leftskip\z@
+  \BeginIndex{Option}{#1}% index entry
+  \begingroup
+    \csname phantomsection\endcsname
+    \label@sanitize
+    \expandafter\gdef
+    \csname \label@desc@prefix\label@base.option.#1\label@suffix\endcsname{}%
+    \label{\label@desc@prefix\label@base.option.#1\label@suffix}%
+  \endgroup
+  \textOption{#1=}%
+}
+\newcommand*{\maybelinebreak}{%
+  \ifvmode\else
+    \ifnum\lastpenalty<\z@\else
+      \ifnum\lastpenalty<\@medpenalty
+        \hskip\z@skip
+      \fi
+    \fi
+  \fi
+}
+\DeclareRobustCommand*{\textKValue}[1]{\maybelinebreak\mbox{\texttt{#1}}}
+\newcommand*{\KValue}{}
+\let\KValue\textKValue
+\newcommand*{\textOptionValue}[2]{%
+  \textKOption{#1}\textKValue{#2}%
+}
+\DeclareRobustCommand*{\OptionValue}{\textOptionValue}%
+\newcommand*{\DescOptionValue}[2]{%
+  \par
+  \leftskip\z@
+  \BeginIndex{Option}{#1}%
+  \BeginIndex{Option}{#1~=\KValue{#2}}%
+  \begingroup
+    \csname phantomsection\endcsname
+    \label@sanitize
+    \scr@ifundefinedorrelax{%
+      \label@desc@prefix\label@base.option.#1\label@suffix}{%
+      \expandafter\gdef
+      \csname \label@desc@prefix\label@base.option.#1\label@suffix\endcsname{}%
+      \label{\label@desc@prefix\label@base.option.#1\label@suffix}%
+    }{}%
+    \label{\label@desc@prefix\label@base.option.#1.#2\label@suffix}%
+  \endgroup
+  \textOptionValue{#1}{#2}%
+}
+\newcommand*{\textOptionVName}[2]{%
+  \textKOption{#1}\PName{#2}%
+}
+\DeclareRobustCommand*{\OptionVName}{\textOptionVName}%
+\newcommand*{\DescOptionVName}[2]{%
+  \par
+  \leftskip\z@
+%  \BeginIndex{Option}{#1}%
+  \BeginIndex{Option}{#1~=\PName{#2}}%
+  \begingroup
+    \csname phantomsection\endcsname
+    \label@sanitize
+    \scr@ifundefinedorrelax{%
+      \label@desc@prefix\label@base.option.#1\label@suffix}{%
+      \expandafter\gdef
+      \csname \label@desc@prefix\label@base.option.#1\label@suffix\endcsname{}%
+      \label{\label@desc@prefix\label@base.option.#1\label@suffix}%
+    }{}%
+    \label@sanitize
+    \label{\label@desc@prefix\label@base.option.#1=#2\label@suffix}%
+  \endgroup
+  \textOptionVName{#1}{#2}%
+}
+\DeclareSpecialMarkup{\FloatStyle}{\mbox{\texttt{#1}}}{%
+  \par
+  \leftskip\z@
+  \BeginIndex{Floatstyle}{#1}%
+  \begingroup
+    \@nameuse{phantomsection}%
+    \label@sanitize
+    \label{\label@desc@prefix\label@base.floatstyle.#1\label@suffix}%
+  \endgroup
+  \textFloatStyle{#1}%
+}
+\newcommand*{\PageStyleLabel}[2][\label@suffix]{%
+  \begingroup
+    \@nameuse{phantomsection}%
+    \label@sanitize
+    \label{\label@desc@prefix\label@base.pagestyle.#2#1}%
+  \endgroup
+}
+\DeclareSpecialMarkup{\PageStyle}{\mbox{\texttt{#1}}}{%
+  \par
+  \leftskip\z@
+  \BeginIndex{Pagestyle}{#1}%
+  \PageStyleLabel{#1}%
+  \textMacro{pagestyle}\PParameter{#1}%
+}
+\DeclareSpecialMarkup{\Environment}{\mbox{\texttt{#1}}}{%
+  \par
+  \settowidth{\leftskip}{\textMacro{begin}\PParameter{#1}}% siehe Macro
+  \hskip-\leftskip
+  \BeginIndex{Env}{#1}%
+  \begingroup
+    \csname phantomsection\endcsname
+    \label@sanitize
+    \label{\label@desc@prefix\label@base.env.#1\label@suffix}%
+  \endgroup
+  \textMacro{begin}\PParameter{#1}%
+  \def\d@EnvironmentName{#1}% Umgebungsnamen merken für das Ende
+}[{%
+  \ifvmode\hskip-\leftskip\else \unskip\,\dots\fi% \begin{…}…\end{…}
+  \textMacro{end}\expandafter\PParameter\expandafter{\d@EnvironmentName}\par
+}]%
+\DeclareSpecialMarkup{\Counter}{\mbox{\texttt{#1}}}{%
+  \par
+  \leftskip\z@
+  \BeginIndex{Counter}{#1}%
+  \begingroup
+    \csname phantomsection\endcsname
+    \label@sanitize
+    \label{\label@desc@prefix\label@base.counter.#1\label@suffix}%
+  \endgroup
+  \textCounter{#1}%
+}
+\DeclareSpecialMarkup{\Length}{\mbox{\texttt{\char`\\#1}}}{%
+  \par
+  \leftskip\z@
+  \BeginIndex{Length}{#1}% index entry
+  \begingroup
+    \csname phantomsection\endcsname
+    \label@sanitize
+    \label{\label@desc@prefix\label@base.length.#1\label@suffix}%
+  \endgroup
+  \textLength{#1}%
+}
+\DeclareSpecialMarkup{\PLength}{\mbox{\texttt{#1}}}{%
+  \par
+  \leftskip\z@
+  \BeginIndex{PLength}{#1}%
+  \begingroup
+    \csname phantomsection\endcsname
+    \label@sanitize
+    \label{\label@desc@prefix\label@base.plength.#1\label@suffix}%
+  \endgroup
+  \textMacro{@setplength}\PParameter{#1}\Parameter{\lengthname}%
+}
+\DeclareSpecialMarkup{\Variable}{\mbox{\texttt{#1}}}{%
+  \par
+  \leftskip\z@
+  \BeginIndex{Variable}{#1}%
+  \begingroup
+    \csname phantomsection\endcsname
+    \label@sanitize
+    \label{\label@desc@prefix\label@base.variable.#1\label@suffix}%
+  \endgroup
+  \textMacro{setkomavar}\PParameter{#1}\OParameter{\descriptionname}%
+  \Parameter{\contentname}%
+}
+\newcommand*{\FontElementLabel}[2][\label@suffix]{%
+  \begingroup
+    \@nameuse{phantomsection}%
+    \label@sanitize
+    \label{\label@desc@prefix\label@base.fontelement.#2#1}%
+  \endgroup
+}
+\DeclareSpecialMarkup{\FontElement}{\mbox{\texttt{#1}}}{%
+ \par
+  \leftskip\z@
+  \BeginIndex{FontElement}{#1}%
+  \FontElementLabel{#1}%
+  \textMacro{setkomafont}\PParameter{#1}\OParameter{\fontsettingname}%
+}
 \DeclareRobustCommand*{\PName}[1]{\texttt{\textit{#1}}}
 \DeclareRobustCommand*{\PValue}[1]{\texttt{#1}}
-\DeclareRobustCommand*{\Parameter}[1]{\texttt{\{}\PName{#1}\texttt{\}}}
+\DeclareRobustCommand*{\Parameter}[1]{%
+  \maybelinebreak\texttt{\{}\PName{#1}\texttt{\}}}
 \DeclareRobustCommand*{\OParameter}[1]{%
-  \texttt{[%]
+  \maybelinebreak\texttt{[%]
   }\PName{#1}\texttt{%[
     ]}}
 \DeclareRobustCommand*{\AParameter}[1]{%
-  \texttt{(%)
+  \maybelinebreak\texttt{(%)
   }\PName{#1}\texttt{%(
     )}}
-\DeclareRobustCommand*{\PParameter}[1]{\texttt{\{#1\}}}
-\DeclareRobustCommand*{\POParameter}[1]{\texttt{[#1]}}
+\DeclareRobustCommand*{\PParameter}[1]{\maybelinebreak\texttt{\{#1\}}}
+\DeclareRobustCommand*{\POParameter}[1]{\maybelinebreak\texttt{[#1]}}
+\newcommand\label@sanitize{%
+  \renewcommand*{\"}[1]{##1e}%
+  \renewcommand*{\IeC}[1]{\expandafter\@gobble\string##1}%
+  \renewcommand*{\textup}[1]{##1}%
+  \renewcommand*{\PName}[1]{/##1/}%
+}
+\newcommand*{\label@desc@prefix}{desc:}
+\newcommand*{\label@suffix}{}
+\newcommand*{\labelsuffix}[1][]{% Werden Dinge mehrfach dokumentiert benötigen
+                                % sie ein zusätzliches Unterscheidungsmerkmal
+                                % beim gesetzten Label.
+  \IfArgIsEmpty{#1}{\let\label@suffix\@empty}{\edef\label@suffix{.#1}}%
+}
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -749,75 +999,110 @@
 %   length, variables etc.\footnote{TODO: Redefining most declaration commands
 %     to also write labels.}
 %    \begin{macrocode}
+\colorlet{Declaration}{yellow}
+\newsavebox\Declaration@Box
+\newcommand*{\Declaration@Width}{\linewidth}
+\newcommand*{\Declaration@LeftIndent}{-2\fboxsep}
+\newcommand*{\Declaration@UseBox}[1]{%
+  \colorbox{Declaration}{\usebox\Declaration@Box}%
+}
 \newenvironment{Declaration}{%
-%    \end{macrocode}
-% \begin{macro}{\new@element}
-%   Help macro to define new Declaration elements.
-%    \begin{macrocode}
-  \newcommand*{\new@element}[1]{%
-    \expandafter\newcommand\expandafter*\csname X##1\endcsname{}%
-    \expandafter\let\csname X##1\expandafter\endcsname
-    \csname ##1\endcsname
-    \expandafter\newcommand\expandafter*\csname new##1\endcsname[1]{%
-%      \begingroup
-%        \let\ensuremath\@firstofone
-%        \let\textit\@firstofone
-%        \lowercase{\def\@tempa{##1}}%
-%        \pdfstringdef\@tempb{\label@base.\@tempa.####1}%
-%        \xdef\@currentHref{\@tempb}%
-%        \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
-%        \label{desc:\label@base.\@tempa.####1}%
-%      \endgroup
-      \csname X##1\endcsname{####1}\ignorespaces
-    }%
-    \expandafter\let\csname ##1\expandafter\endcsname\csname new##1\endcsname
+  % Als erstes wird eine neue Index-Gruppe begonnen. Dagegen darf die
+  % vorherige Index-Gruppe hier nicht automatisch geschlossen werden, weil
+  % beispielsweise ein Abschnitt oder ein Kapitel ebenfalls eine Index-Gruppe
+  % sein könnte (aber nicht muss).
+  \BeginIndexGroup
+  % Die Absatzformatierung anpassen. Eigentlich hier noch nicht notwendig,
+  % schadet aber auch nichts.
+  \parindent\z@
+  \parfillskip\@flushglue
+  \parskip\z@
+  % \Macro, \Environment, etc. so umdefinieren, dass sie passend für die
+  % Umgebung formatiert werden und auch gleich Label und Index-Einträge
+  % erzeugt werden.
+  \scr@Desc@let\Macro
+  \scr@Desc@let\Option
+  \scr@Desc@let\KOption
+  \scr@Desc@let\OptionValue
+  \scr@Desc@let\OptionVName
+  \scr@Desc@let\Variable
+  \scr@Desc@let\Environment
+  \let\endEnvironment\endDescEnvironment
+  \scr@Desc@let\Counter
+  \scr@Desc@let\Length
+  \scr@Desc@let\PageStyle
+  \scr@Desc@let\PLength
+  \scr@Desc@let\FontElement
+  \scr@Desc@let\FloatStyle
+  % Todo: Replace the following by the correct definitions:
+  \let\XMacro\textMacro
+  \let\XEnvironment\textEnvironment
+  \let\XOption\textOption
+  \let\XOptionValue\textOptionValue
+  \newenvironment{Body}{% Umgebung für den (vertikalen) Inhalt einer Umgebung
+    \\
+    \setlength{\leftskip}{1em}%
+    \minipage{\dimexpr\linewidth-\leftskip}%
+      \raggedright
+      \newcommand*{\BodyDots}{%
+        \par
+        \hskip-\leftskip
+        \raisebox{0pt}[1.1\ht\strutbox][.5\dp\strutbox]{$\vdots$}%
+        \par
+      }%
+  }{%
+      \par
+    \endminipage
+    \\
   }%
-  \newcommand*{\new@xelement}[2]{%
-    \expandafter\newcommand\expandafter*\csname X##1\endcsname{}%
-    \expandafter\let\csname X##1\expandafter\endcsname
-    \csname ##1\endcsname
-    \expandafter\newcommand\expandafter*\csname new##1\endcsname[2]{%
-%      \begingroup
-%        \let\ensuremath\@firstofone
-%        \let\textit\@firstofone
-%        \lowercase{\def\@tempa{##1}}%
-%        \pdfstringdef\@tempb{\label@base.\@tempa.####1.####2}%
-%        \xdef\@currentHref{\@tempb}%
-%        \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
-%        \label{desc:\label@base.\@tempa.####1.####2}%
-%      \endgroup
-      \csname X##1\endcsname{####1}{##2{####2}}\ignorespaces
-    }%
-    \expandafter\let\csname ##1\expandafter\endcsname\csname new##1\endcsname
-  }%
-%    \end{macrocode}
-%    \begin{macrocode}
-  \new@element{Option}%
-  \new@element{Macro}%
-  \new@element{Environment}%
-  \new@element{Counter}%
-  \new@element{FloatStyle}%
-  \new@element{PLength}%
-  \new@element{Variable}%
-  \new@xelement{OptionValue}{\PValue}%
-%    \end{macrocode}
-% \end{macro}
-%    \begin{macrocode}
-  \ifvmode\else\par\fi\small\addvspace{2\baselineskip}%
-  \vspace{-\baselineskip}%
-  \vspace{\z@ plus \baselineskip}%
-  \noindent
-  \start@Declaration
-  \tabular{|l|}\hline\ignorespaces
+  % Todo: Behandlung für Optionen, Längen, Zähler, Font-Elemente, Seitenstile,
+  %       etc.
+  % Maybe: Vielleicht wäre es besser, die \X…-Definitionen von hier direkt zur
+  %        Definition der entsprechenden Elemente zu verlagern und sie \D… zu
+  %        nennen. Das wird dann eventuell übersichtlicher als alles hier zu
+  %        machen. Hier gäbe es dann nur noch für jedes Element genau ein
+  %        \let\…\D….
+  % Jetzt wird der ganze Inhalt der Umgebung linksbündig in eine Box gepackt
+  \begin{lrbox}{\Declaration@Box}%
+    \minipage{\Declaration@Width}%
+    \raggedright
+    \parskip\baselineskip
+    \small
+    \addtolength{\parskip}{-\baselineskip}%
+    \catcode`\^^M=9 % ignore line ends
 }{%
-  \\\hline\endtabular\nobreak\after@Declaration\nobreak\par\nobreak
-  \vspace{1.5\baselineskip}\nobreak\vspace{-\baselineskip}\nobreak%
-  \vspace{0pt minus .5\baselineskip}\nobreak%
+    \par
+    \endminipage
+  \end{lrbox}
+  \vskip 1\baselineskip \@plus .75\baselineskip \@minus .25\baselineskip
+  % Hier darf ein Seitenumbruch ohne vertikalen Ausgleich erfolgen, wenn nicht
+  % mindestens für die Deklaration und zwei Zeilen Platz ist.
+  \vskip \dimexpr\ht\Declaration@Box+\dp\Declaration@Box+2\baselineskip\relax
+  \penalty-\@medpenalty
+  \vskip -\dimexpr\ht\Declaration@Box+\dp\Declaration@Box+2\baselineskip\relax
+  \begingroup% Dann wird die erzeugte Box farbig hinterlegt leicht im linken
+             % Rand ausgegeben.
+    \parfillskip\@flushglue
+    \parindent\z@
+    \leavevmode
+    \hspace*{\Declaration@LeftIndent}%
+    \Declaration@UseBox{\Declaration@Box}%
+    \par\nobreak\vskip\fboxsep
+  \endgroup\nobreak
+  % Der nachfolgende Text soll wie bei einer Überschrift behandelt werden.
   \aftergroup\@afterindentfalse\aftergroup\@afterheading
 }
-\newcommand*{\start@Declaration}{\hspace{-1em}}
-\newcommand*{\after@Declaration}{}
 %    \end{macrocode}
+% \begin{macro}{\scr@Desc@let}
+% Redefine the internal command of a robust command.
+%    \begin{macrocode}
+\newcommand*{\scr@Desc@let}[1]{%
+  \expandafter\def
+  \csname \expandafter\@gobble\string #1 \expandafter\endcsname\expandafter{%
+    \csname Desc\expandafter\@gobble\string #1\endcsname}%
+}
+%    \end{macrocode}
+% \end{macro}
 % \end{environment}
 %
 % \begin{environment}{Example}
@@ -1845,77 +2130,158 @@ KOMAScript \endcsname
 \newif\ifnolabel
 \def\nolabelfalse{\global\let\ifnolabel\iffalse}%
 \def\nolabeltrue{\global\let\ifnolabel\iftrue}%
-\newlength\PreserveSkip
 \newcommand*{\BeginIndex}[3][indexmain]{%
-  \ifvmode\PreserveSkip=\lastskip\else\PreserveSkip=\z@\fi
   \expandafter\ifx\csname Index#2\endcsname\relax
     \GenericError{(scrguide)\@spaces\@spaces\@spaces\@spaces}{%
       Document scrguide Error: \string\BeginIndex\space with unknown
       index%
     }{Check the \string\BeginIndex-command or add a new index type
       ``#2''.}{%
-      See scrguide2.tex for more information.}%
+      See scrguide.cls for more information.}%
   \else
     \csname Index#2\endcsname[(%)
       #1]{#3}%
+    \push@IndexStack{{\do{#1}{#2}{#3}}}%
   \fi
-  \ifnolabel\nolabelfalse\else
-    \ifx\relax#2\relax\else
-        \begingroup
-        \def\SplitIndexValue##1~=##2~=##3\@nil{%
-          ##1\expandafter\ifx\expandafter\relax##2\relax\else.##2\fi
-        }%
-        \let\PName\@gobble
-        \let\PValue\@firstofone
-        \let\ensuremath\@firstofone
-        \let\textit\@firstofone
-        \def~{\string~}%
-        \lowercase{\def\@tempa{#2}}%
-        \edef\@tempa{\label@base.\@tempa.\SplitIndexValue#3~=~=\@nil}%
-        \pdfstringdef\@tempb{\@tempa}%
-        \expandafter\ifx\csname \@tempb\endcsname\relax
-          \expandafter\xdef\csname \@tempb\endcsname{\the\inputlineno}%
-          \xdef\@currentHref{\@tempb}%
-          \ClassInfo{scrguide}{Anchor: `\@currentHref'}%
-          \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
-          \label{desc:\@tempa}%
-        \else
-          \ClassWarning{scrguide}{%
-            Label \@tempa\space already defined at \csname
-            \@tempb\endcsname,\MessageBreak
-            ignored}%
-        \fi
-      \endgroup
-    \fi
-  \fi
-  \ifvmode\ifdim \PreserveSkip=\z@\else
-      \vskip -\PreserveSkip\vskip\PreserveSkip
-  \fi\fi
-  \ignorespaces
+  % \ifnolabel\nolabelfalse\else
+  %   \ifx\relax#2\relax\else
+  %       \begingroup
+  %       \def\SplitIndexValue##1~=##2~=##3\@nil{%
+  %         ##1\expandafter\ifx\expandafter\relax##2\relax\else.##2\fi
+  %       }%
+  %       \let\PName\@gobble
+  %       \let\PValue\@firstofone
+  %       \let\ensuremath\@firstofone
+  %       \let\textit\@firstofone
+  %       \def~{\string~}%
+  %       \lowercase{\def\@tempa{#2}}%
+  %       \edef\@tempa{\label@base.\@tempa.\SplitIndexValue#3~=~=\@nil}%
+  %       \pdfstringdef\@tempb{\@tempa}%
+  %       \expandafter\ifx\csname \@tempb\endcsname\relax
+  %         \expandafter\xdef\csname \@tempb\endcsname{\the\inputlineno}%
+  %         \xdef\@currentHref{\@tempb}%
+  %         \ClassInfo{scrguide}{Anchor: `\@currentHref'}%
+  %         \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
+  %         \label{desc:\@tempa}%
+  %       \else
+  %         \ClassWarning{scrguide}{%
+  %           Label \@tempa\space already defined at \csname
+  %           \@tempb\endcsname,\MessageBreak
+  %           ignored}%
+  %       \fi
+  %     \endgroup
+  %   \fi
+  % \fi
+  \penalty\@M\ignorespaces
 }
-\newcommand*{\EndIndex}[3][indexmain]{%
-  \@tempdima\lastskip
-  \ifdim \lastskip>\z@
-    \vskip -\lastskip
+\newlength\PreserveSkip
+\newcount\PreservePenalty
+\newcommand*{\CloseIndex}[3][indexmain]{%
+  \PreservePenalty\lastpenalty
+  \ifvmode\PreserveSkip\lastskip\else\unskip\PreserveSkip\z@\fi
+  \ifdim \PreserveSkip>\z@
+    \vskip -\PreserveSkip
   \fi
+  \penalty\@M
   \expandafter\ifx\csname Index#2\endcsname\relax
     \GenericError{(scrguide)\@spaces\@spaces\@spaces\@spaces}{%
       Document scrguide Error: \string\EndIndex\space with unknown
       index%
     }{Check the \string\BeginIndex-command or add a new index type
       ``#2''.}{%
-      See scrguide2.tex for more information.}%
+      See scrguide.cls for more information.}%
   \else
     \csname Index#2\endcsname[%(
       )#1]{#3}%
   \fi
-  \ifdim\@tempdima >\z@
-    \vskip\@tempdima
+  \ifdim\PreserveSkip >\z@
+    \vskip\PreserveSkip
   \fi
+  \penalty\PreservePenalty
+}
+\newcommand*{\EndIndex}[3][indexmain]{%
+  \begingroup
+    \@tempswatrue
+    \def\do##1##2##3{%
+      \ifstr{#1}{##1}{%
+        \ifstr{#2}{##2}{%
+          \ifstr{\detokenize{#3}}{\detokenize{##3}}{}{\@tempswafalse}%
+        }{\@tempswafalse}%
+      }{\@tempswafalse}%
+      \if@tempswa
+      \else
+        \ClassWarning{scrguide}{Index stack error!\MessageBreak
+          Should pop \string\do{#1}{#2}{\detokenize{#3}}\MessageBreak
+          but have \string\do{##1}{##2}{\detokenize{##3}}%
+        }%
+        \push@IndexStack{{\do{##1}{##2}{##3}}}%
+      \fi
+    }%
+    \def\StopIndexGroup{%
+      \ClassWarning{scrguide}{Index stack error!\MessageBreak
+        Should pop \string\do{#1}{#2}{\detokenize{#3}}\MessageBreak
+        but have \string\StopIndexGroup
+      }%
+      \push@IndexStack{\StopIndexGroup}%
+    }%
+    \expandafter\pop@IndexStack\@IndexStack\@nil
+  \endgroup
+  \CloseIndex[#1]{#2}{#3}%
 }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
+\let\@IndexStack\@empty
+\newcommand*{\push@IndexStack}[1]{% Einen Eintrag auf den Index Stapel werfen.
+  \xdef\@IndexStack{\unexpanded{#1}\unexpanded\expandafter{\@IndexStack}}%
+}
+\newcommand*{\BeginIndexGroup}{% Am Anfang einer Gruppe auf den Stack die
+                               % Index-Gruppen-Trennmarke packen.
+  \push@IndexStack{\StopIndexGroup}%
+}
+\newcommand*{\EndIndexGroup}{% Den Stapel bis zur nächsten Stop-Marke
+                             % verarbeiten.
+  \ifx\@IndexStack\@empty
+    \ClassError{scrguide}{cannot end index group}{%
+      You've told me to end the current index group,\MessageBreak
+      but there is no more index group open%
+    }%
+  \else
+    \begingroup
+      \let\StopIndexGroup\@tempswafalse
+      \@tempswatrue%(
+      \def\do##1##2##3{%
+        \CloseIndex[##1]{##2}{##3}%
+      }%
+      \@whilesw \if@tempswa \fi {%
+        \expandafter\pop@IndexStack\@IndexStack\@nil
+      }%
+    \endgroup
+  \fi
+}
+\def\pop@IndexStack#1#2\@nil{% Ein Argument von Stapel holen und verarbeiten.
+  \gdef\@IndexStack{#2}#1%
+}
+\newcommand*\CleanUpIndexStack{%
+  \ifx\@IndexStack\@empty\else
+    \ClassWarning{scrguide}{Index stack error!\MessageBreak%
+      The index stack should be empty\MessageBreak
+      but it still contains: \MessageBreak
+      \expandafter\detokenize\expandafter{\@IndexStack}%
+    }%
+    \begingroup
+      \let\StopIndexGroup\relax
+      \def\do##1##2##3{%
+        \CloseIndex[##1]{##2}{##3}%
+      }%
+      \@IndexStack
+      \global\let\@IndexStack\@empty
+    \endgroup
+  \fi
+}
+\AtEndDocument{\CleanUpIndexStack}
+\l@preto@macro\chapter{\CleanUpIndexStack}
+\l@preto@macro\part{\CleanUpIndexStack}
 %
 % Now we have to define different kinds of index entries. We have entries that
 % will be added to only one index. We have entries that will be added to one
