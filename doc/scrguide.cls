@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2016/11/02 v1.11a internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2016/11/14 v1.12 internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -631,29 +631,47 @@
 %     environment
 %   \end{description}
 %    \begin{macrocode}
+\newcommand*{\LabelMacro}[2][\label@suffix]{%
+  \begingroup
+    \protected@edef\@currentlabel{\Macro{#2}}%
+    \label@sanitize
+    \Hy@MakeCurrentHref{\label@desc@prefix\label@base.cmd.#2#1}%
+    \ClassInfo{scrguide}{Anchor: `\@currentHref'}%
+    \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
+    \label{\label@desc@prefix\label@base.cmd.#2#1}%
+  \endgroup
+}
+\DeclareRobustCommand*{\DescRef}{%
+  \kernel@ifstar {\@DescRef*}{\@DescRef\@empty}%
+}
+\newcommand*{\@DescRef}[2]{\expandafter\ref#1{\label@desc@prefix#2}}
+\DeclareRobustCommand*{\DescPageRef}{%
+  \kernel@ifstar {\@DescPageRef*}{\@DescPageRef\space}%
+}
+\newcommand*{\@DescPageRef}[2]{\expandafter\autopageref#1{\label@desc@prefix#2}}
 \DeclareSpecialMarkup{\Macro}{\mbox{\texttt{\char`\\#1}}}{%
   \par
   \settowidth{\leftskip}{\textMacro{#1}}% indent from left
   \hskip-\leftskip
   \BeginIndex{Cmd}{#1}% index entry
-  \begingroup
-    \csname phantomsection\endcsname
-    \label@sanitize
-    \label{\label@desc@prefix\label@base.cmd.#1\label@suffix}%
-  \endgroup
+  \LabelMacro{#1}%
   \textMacro{#1}%
+}
+\newcommand*{\LabelOption}[2][\label@suffix]{%
+  \begingroup
+    \protected@edef\@currentlabel{\Option{#2}}%
+    \label@sanitize
+    \Hy@MakeCurrentHref{\label@desc@prefix\label@base.option.#2#1}%
+    \ClassInfo{scrguide}{Anchor: `\@currentHref'}%
+    \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
+    \label{\label@desc@prefix\label@base.option.#2#1}%
+  \endgroup
 }
 \DeclareSpecialMarkup{\Option}{\mbox{\texttt{#1}}}{%
   \par
   \leftskip\z@
   \BeginIndex{Option}{#1}% index entry
-  \begingroup
-    \csname phantomsection\endcsname
-    \label@sanitize
-    \expandafter\gdef
-    \csname \label@desc@prefix\label@base.option.#1\label@suffix\endcsname{}%
-    \label{\label@desc@prefix\label@base.option.#1\label@suffix}%
-  \endgroup
+  \LabelOption{#1}%
   \textOption{#1}%
 }
 \DeclareSpecialMarkup{\KOption}{\mbox{\textOption{#1=}}\linebreak[0]}{%
@@ -664,7 +682,7 @@
   \leftskip\z@
   \BeginIndex{Option}{#1}% index entry
   \begingroup
-    \csname phantomsection\endcsname
+    \@nameuse{phantomsection}%
     \label@sanitize
     \expandafter\gdef
     \csname \label@desc@prefix\label@base.option.#1\label@suffix\endcsname{}%
@@ -688,22 +706,56 @@
   \textKOption{#1}\textKValue{#2}%
 }
 \DeclareRobustCommand*{\OptionValue}{\textOptionValue}%
+\newcommand*{\LabelOptionValue}[3][\label@suffix]{%
+  \begingroup
+    \protected@edef\@currentlabellong{\OptionValue{#2}{#3}}%
+    \protected@edef\@currentlabelshort{\Option{#2}}%
+    \label@sanitize
+    \scr@ifundefinedorrelax{%
+      \label@desc@prefix\label@base.option.#1\label@suffix
+    }{%
+      \expandafter\gdef
+      \csname \label@desc@prefix\label@base.option.#1\label@suffix\endcsname{}%
+      \Hy@MakeCurrentHref{\label@desc@prefix\label@base.option.#2.#1}%
+      \ClassInfo{scrguide}{Anchor: `\@currentHref'}%
+      \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
+      \let\@currentlabel\@currentlabelshort
+      \label{\label@desc@prefix\label@base.option.#2#1}%
+    }{}%
+    \Hy@MakeCurrentHref{\label@desc@prefix\label@base.option.#2.#3#1}%
+    \ClassInfo{scrguide}{Anchor: `\@currentHref'}%
+    \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
+    \let\@currentlabel\@currentlabellong
+    \label{\label@desc@prefix\label@base.option.#2.#3#1}%
+  \endgroup
+}
+\newcommand*{\RefOptionValue}{%
+  \kernel@ifstar {\@RefOptionValue1}{\@RefOptionValue0}%
+}
+\newcommand*{\@RefOptionValue}[1]{%
+  \kernel@ifnextchar [%]
+  {\@@RefOptionValue#1}{\@@RefOptionValue#1[]}%
+}
+\newcommand*{\@@RefOptionValue}{}
+\def\@@RefOptionValue#1[#2]#3#4{%
+  \scr@ifundefinedorrelax{r@\label@desc@prefix#3.#4#2}{%
+    \ifcase #1
+      \expandafter\@gobbleopt
+    \else
+      \expandafter\hyperref
+    \fi
+    [\label@desc@prefix#3#2]%
+    {\OptionValue{\ref*{\label@desc@prefix#3#2}}{#4}}%
+  }{%
+    \expandafter\ref\ifcase #1 *\fi{\label@desc@prefix#3.#4#2}%
+  }%
+}
 \newcommand*{\DescOptionValue}[2]{%
   \par
   \leftskip\z@
   \BeginIndex{Option}{#1}%
   \BeginIndex{Option}{#1~=\KValue{#2}}%
-  \begingroup
-    \csname phantomsection\endcsname
-    \label@sanitize
-    \scr@ifundefinedorrelax{%
-      \label@desc@prefix\label@base.option.#1\label@suffix}{%
-      \expandafter\gdef
-      \csname \label@desc@prefix\label@base.option.#1\label@suffix\endcsname{}%
-      \label{\label@desc@prefix\label@base.option.#1\label@suffix}%
-    }{}%
-    \label{\label@desc@prefix\label@base.option.#1.#2\label@suffix}%
-  \endgroup
+  \LabelOptionValue{#1}{#2}%
   \textOptionValue{#1}{#2}%
 }
 \newcommand*{\textOptionVName}[2]{%
@@ -716,7 +768,7 @@
 %  \BeginIndex{Option}{#1}%
   \BeginIndex{Option}{#1~=\PName{#2}}%
   \begingroup
-    \csname phantomsection\endcsname
+    \@nameuse{phantomsection}%
     \label@sanitize
     \scr@ifundefinedorrelax{%
       \label@desc@prefix\label@base.option.#1\label@suffix}{%
@@ -760,7 +812,7 @@
   \hskip-\leftskip
   \BeginIndex{Env}{#1}%
   \begingroup
-    \csname phantomsection\endcsname
+    \@nameuse{phantomsection}%
     \label@sanitize
     \label{\label@desc@prefix\label@base.env.#1\label@suffix}%
   \endgroup
@@ -775,7 +827,7 @@
   \leftskip\z@
   \BeginIndex{Counter}{#1}%
   \begingroup
-    \csname phantomsection\endcsname
+    \@nameuse{phantomsection}%
     \label@sanitize
     \label{\label@desc@prefix\label@base.counter.#1\label@suffix}%
   \endgroup
@@ -786,7 +838,7 @@
   \leftskip\z@
   \BeginIndex{Length}{#1}% index entry
   \begingroup
-    \csname phantomsection\endcsname
+    \@nameuse{phantomsection}%
     \label@sanitize
     \label{\label@desc@prefix\label@base.length.#1\label@suffix}%
   \endgroup
@@ -797,7 +849,7 @@
   \leftskip\z@
   \BeginIndex{PLength}{#1}%
   \begingroup
-    \csname phantomsection\endcsname
+    \@nameuse{phantomsection}%
     \label@sanitize
     \label{\label@desc@prefix\label@base.plength.#1\label@suffix}%
   \endgroup
@@ -808,7 +860,7 @@
   \leftskip\z@
   \BeginIndex{Variable}{#1}%
   \begingroup
-    \csname phantomsection\endcsname
+    \@nameuse{phantomsection}%
     \label@sanitize
     \label{\label@desc@prefix\label@base.variable.#1\label@suffix}%
   \endgroup
