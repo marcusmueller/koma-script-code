@@ -81,36 +81,47 @@ while ( $auxfile=shift ) {
     open AUX,"<$auxfile" or die "Cannot read $auxfile!\n";
     while (<AUX>) {
 	my $line=$_;
-	if ( /^\\newlabel{desc:[^}]+}{{[^}]*}{([^}]*)}{[^}]*}{([^}]*)}/ ) {
-	    my $anchor=$2;
-	    my $page=$1;
-	    my $entry;
-	    if ( $anchor =~ /^([^.]+)\.([^.]+)\.([^.]+)$/ ) {
-		$entry = "$3.$page.$1.$2";
-		if ( "$2" eq "option" ) {
-		    push @option,$entry;
-		} elsif ( "$2" eq "cmd" ) {
-		    push @macro,$entry;
-		} elsif ( "$2" eq "env" ) {
-		    push @environment,$entry;
-		} elsif ( "$2" eq "plength" ) {
-		    push @plength,$entry;
-		} elsif ( "$2" eq "variable" ) {
-		    push @variable,$entry;
-		} elsif ( "$2" eq "pagestyle" ) {
-		    push @pagestyle,$entry;
-		} elsif ( "$2" eq "counter" ) {
-		    push @counter,$entry;
-		} elsif ( "$2" eq "floatstyle" ) {
-		    push @floatstyle,$entry;
-		} elsif ( "$2" eq "fontelement" ) {
-		    push @fontelement,$entry;
-		} elsif ( "$2" eq "package" ) {
-		    push @file,$entry;
-		} elsif ( "$2" eq "length" ) {
-		    push @length,$entry;
-		} else {
-		    print STDERR "Unknown type $2!\n";
+	if ( /^\\newlabel{(desc:[^}]+)}{(.*)}$/ ) {
+            my $label=$1;
+	    my $refargs=$2;
+	    if ( $refargs =~ /^{([^{}]*({((?:(?>[^{}]*)|(?1))*)})*)}{([^}]+)}(.*)$/ ) {
+		my $ref=$1;
+		my $page=$4;
+		my $rest=$5;
+		if ( $rest =~ /^{([^{}]*({((?:(?>[^{}]*)|(?1))*)})*)}{([^}]*)}{(.*)}$/ ) {
+		    my $title=$1;
+		    my $anchor=$4;
+		    my $ignore=$5;
+#		    print STDERR "ref=\"$ref\", page=\"$page\", title=\"$title\", anchor=\"$anchor\", ignore=\"$ignore\"\n";
+		    my $entry;
+		    if ( $anchor =~ /^desc:([^.]+)\.([^.]+)\.([^.]+)$/ ) {
+			$entry = "$3.$page.$1.$2";
+			if ( "$2" eq "option" ) {
+			    push @option,$entry;
+			} elsif ( "$2" eq "cmd" ) {
+			    push @macro,$entry;
+			} elsif ( "$2" eq "env" ) {
+			    push @environment,$entry;
+			} elsif ( "$2" eq "plength" ) {
+			    push @plength,$entry;
+			} elsif ( "$2" eq "variable" ) {
+			    push @variable,$entry;
+			} elsif ( "$2" eq "pagestyle" ) {
+			    push @pagestyle,$entry;
+			} elsif ( "$2" eq "counter" ) {
+			    push @counter,$entry;
+			} elsif ( "$2" eq "floatstyle" ) {
+			    push @floatstyle,$entry;
+			} elsif ( "$2" eq "fontelement" ) {
+			    push @fontelement,$entry;
+			} elsif ( "$2" eq "package" ) {
+			    push @file,$entry;
+			} elsif ( "$2" eq "length" ) {
+			    push @length,$entry;
+			} else {
+			    print STDERR "Unknown type $2!\n";
+			}
+		    }
 		}
 	    }
 	}
@@ -136,7 +147,7 @@ sub process {
 	    } else {
 		print ", ";
 	    }
-	    print "<a href=\"$baselink\#$3.$4.$1\">$2</a>";
+	    print "<a href=\"$baselink\#desc:$3.$4.$1\">$2</a>";
 	} @entries;
 	print "</li>\n" if ( $entry ne "" );
 	print "</ul>\n";
