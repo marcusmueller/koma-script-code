@@ -255,16 +255,94 @@
 % \section{Load common paragraphs}
 %
 % \begin{macrocode}
-\newcounter{commonpar}
+\newcommand*{\ThisCommonFile}{}%
+\newcommand*{\ThisCommonLabelBase}{}
+\newcommand*{\IfThisCommonLabelBase}[1]{%
+  \expandafter\ifstr\expandafter{\ThisCommonLabelBase}{#1}%
+  \@firstoftwo\@secondoftwo
+}
+\newcommand*{\IfThisCommonLabelBaseOneOf}[1]{%
+  \begingroup
+    \@tempswafalse
+    \@for \reserved@a:=#1\do{%
+      \expandafter\IfThisCommonLabelBase\expandafter{\reserved@a}%
+      {\@tempswatrue}{}%
+    }%
+    \if@tempswa
+      \aftergroup\@firstoftwo
+    \else
+      \aftergroup\@secondoftwo
+    \fi
+  \endgroup
+}
+\newcommand*{\IfThisCommonLabelBaseNotOneOf}[1]{%
+  \begingroup
+    \@tempswafalse
+    \@for \reserved@a:=#1\do{%
+      \expandafter\IfThisCommonLabelBase\expandafter{\reserved@a}%
+      {\@tempswatrue}{}%
+    }%
+    \if@tempswa
+      \aftergroup\@secondoftwo
+    \else
+      \aftergroup\@firstoftwo
+    \fi
+  \endgroup
+}
+\newcommand*{\ThisCommonFileFirstLabelBase}{%
+  \@nameuse{CommonFile@\ThisCommonFile @LabelBase}%
+}
+\newif\ifthiscommonfirst
+\newcommand*{\IfThisCommonFirstRun}{%
+  \ifthiscommonfirst \expandafter\@firstoftwo
+  \else \expandafter\@secondoftwo \fi
+}
+\newcommand*{\LoadCommonFile}[1]{%
+  \ifstr{\ThisCommonFile}{}{%
+    \def\ThisCommonFile{#1}%
+    \let\ThisCommonLabelBase\label@base
+    \@ifundefined{CommonFile@\ThisCommonFile @LabelBase}{%
+      \expandafter\let\csname CommonFile@\ThisCommonFile @LabelBase\endcsname
+      \ThisCommonLabelBase
+      \thiscommonfirsttrue
+    }{\thiscommonfirstfalse}%
+    \input{common-\ThisCommonFile.tex}%
+    \thiscommonfirstfalse
+    \let\ThisCommonLabelBase\@empty
+    \let\ThisCommonFile\@empty
+  }{%
+    \ClassError{scrguide}{recursive \string\LoadCommon}{%
+      You can not use \string\LoadCommon\space inside another
+      common file.%
+    }%
+  }%
+}
+\newcommand*{\InternalCommonFileUsageError}{%
+  \GenericError{%
+    (common-\ThisCommonFile.tex)\@spaces
+  }{%
+    Common File common-\ThisCommonFile.tex Error: Unprepared usage%
+  }{%
+    You have to prepare the file for the label base \ThisCommonLabelBase.%
+  }{}%
+}
+%
 \newcommand*{\LoadCommon}[2][\label@base]{%
-  \setcounter{commonpar}{#2}%
   \@ifundefined{ifCommon#1}{%
     \expandafter\csname newif\expandafter\endcsname
     \csname ifCommon#1\endcsname
   }{}%
+  \scr@ifundefinedorrelax{Common@#2@First}{%
+    \@namedef{Common@#2@First}{#1}%
+  }{%
+  }%
   \csname Common#1true\endcsname
   \input{common-#2.tex}%
   \csname Common#1false\endcsname
+}
+\newcommand*{\IfCommonFirstUsage}{%
+  \ifcommonfirstusage \expandafter\@firstoftwo
+  \else \expandafter\@secondftwo\fi
 }
 \newcommand*{\IfCommon}[1]{%
   \ifstr{\label@base}{#1}{%
@@ -664,6 +742,8 @@
     \Hy@MakeCurrentHref{\label@desc@prefix\label@base.option.#2#1}%
     \ClassInfo{scrguide}{Anchor: `\@currentHref'}%
     \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
+    \expandafter\gdef
+    \csname \label@desc@prefix\label@base.option.#2#1\endcsname{}%
     \label{\label@desc@prefix\label@base.option.#2#1}%
   \endgroup
 }
@@ -712,11 +792,11 @@
     \protected@edef\@currentlabelshort{\Option{#2}}%
     \label@sanitize
     \scr@ifundefinedorrelax{%
-      \label@desc@prefix\label@base.option.#1\label@suffix
+      \label@desc@prefix\label@base.option.#2\label@suffix
     }{%
       \expandafter\gdef
-      \csname \label@desc@prefix\label@base.option.#1\label@suffix\endcsname{}%
-      \Hy@MakeCurrentHref{\label@desc@prefix\label@base.option.#2.#1}%
+      \csname \label@desc@prefix\label@base.option.#2\label@suffix\endcsname{}%
+      \Hy@MakeCurrentHref{\label@desc@prefix\label@base.option.#2#1}%
       \ClassInfo{scrguide}{Anchor: `\@currentHref'}%
       \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
       \let\@currentlabel\@currentlabelshort
@@ -771,7 +851,8 @@
     \@nameuse{phantomsection}%
     \label@sanitize
     \scr@ifundefinedorrelax{%
-      \label@desc@prefix\label@base.option.#1\label@suffix}{%
+      \label@desc@prefix\label@base.option.#1\label@suffix
+    }{%
       \expandafter\gdef
       \csname \label@desc@prefix\label@base.option.#1\label@suffix\endcsname{}%
       \label{\label@desc@prefix\label@base.option.#1\label@suffix}%
