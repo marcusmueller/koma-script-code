@@ -2343,7 +2343,7 @@ KOMAScript \endcsname
       }{\@tempswafalse}%
       \if@tempswa
       \else
-        \ClassWarning{scrguide}{Index stack error!\MessageBreak
+        \ClassError{scrguide}{Index stack error}{%
           Should pop \string\do{#1}{#2}{\detokenize{#3}}\MessageBreak
           but have \string\do{##1}{##2}{\detokenize{##3}}%
         }%
@@ -2351,7 +2351,7 @@ KOMAScript \endcsname
       \fi
     }%
     \def\StopIndexGroup{%
-      \ClassWarning{scrguide}{Index stack error!\MessageBreak
+      \ClassError{scrguide}{Index stack error}{%
         Should pop \string\do{#1}{#2}{\detokenize{#3}}\MessageBreak
         but have \string\StopIndexGroup
       }%
@@ -2397,7 +2397,7 @@ KOMAScript \endcsname
 }
 \newcommand*\CleanUpIndexStack{%
   \ifx\@IndexStack\@empty\else
-    \ClassWarning{scrguide}{Index stack error!\MessageBreak%
+    \ClassError{scrguide}{Index stack error}{%
       The index stack should be empty\MessageBreak
       but it still contains: \MessageBreak
       \expandafter\detokenize\expandafter{\@IndexStack}%
