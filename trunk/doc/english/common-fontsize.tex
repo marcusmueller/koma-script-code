@@ -1,5 +1,5 @@
 % ======================================================================
-% common-4.tex
+% common-fontsize.tex
 % Copyright (c) Markus Kohm, 2001-2016
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
@@ -17,7 +17,7 @@
 %
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
-% common-4.tex
+% common-fontsize.tex
 % Copyright (c) Markus Kohm, 2001-2016
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
@@ -45,29 +45,28 @@
 %
 % ======================================================================
 
-\KOMAProvidesFile{common-4.tex}
+\KOMAProvidesFile{common-fontsize.tex}
                  [$Date$
                   KOMA-Script guide (common paragraphs: fontsize)]
 \translator{Markus Kohm\and Krickette Murabayashi}
 
 % Date of the translated German file: 2016-11-14
 
-\makeatletter
-\@ifundefined{ifCommonmaincls}{\newif\ifCommonmaincls}{}%
-\@ifundefined{ifCommonscrextend}{\newif\ifCommonscrextend}{}%
-\@ifundefined{ifCommonscrlttr}{\newif\ifCommonscrlttr}{}%
-\@ifundefined{ifIgnoreThis}{\newif\ifIgnoreThis}{}%
-\makeatother
-
-
-\seclabel{fontOptions}
+\section{Selection of the Document Font Size}
+\seclabel{fontOptions}%
 \BeginIndexGroup
-\BeginIndex{}{font>size}
+\BeginIndex{}{font>size}%
 
-\ifshortversion\IgnoreThisfalse\IfCommon{scrextend}{\IgnoreThistrue}\fi%
-\ifIgnoreThis %+++++++++++++++++++++++++++++++++++++++++++++ nur scrextend +
-What is described in \autoref{sec:maincls.fontOptions} applies, mutatis mutandis.
-\else %--------------------------------------------------- nicht scrextend -
+\IfThisCommonFirstRun{}{%
+  What is described in \autoref{sec:\ThisCommonFileFirstLabelBase.fontOptions}
+  applies, mutatis mutandis.  So if you have alread read and understood
+  \autoref{sec:\ThisCommonFileFirstLabelBase.fontOptions} you can jump to the
+  \IfThisCommonLabelBase{scrlttr2}{example at the }{%
+    \IfThisCommonLabelBase{last paragraph at the }{}%
+  }%
+  end of this section on
+  \autopageref{sec:\ThisCommonLabelBase.fontOptions.end}.%
+}
 
 The main document font size is one of the basic decisions for the document
 layout. The maximum width of the text area, and therefore splitting the page
@@ -91,12 +90,11 @@ using a number without unit of measure means \PValue{pt}.\iffree{}{ More
 
 If you use this option inside the document, the main document font size and
 all dependent sizes will change from this point. This may be useful, e.\,g.,
-if \IfCommon{maincls}{the appendix }%
-\IfCommon{scrlttr2}{one more letter }%
-\IfCommon{scrextend}{the appendix }%
+if \IfThisCommonLabelBase{scrlttr2}{one more letter }{the appendix }%
 should be set using smaller fonts on the whole. It should be noted that
 changing the main font size does not result in an automatic recalculation of
-type area and margins (see \Macro{recalctypearea}\IndexCmd{recalctypearea},
+type area and margins (see
+\DescRef{typearea.cmd.recalctypearea}\IndexCmd{recalctypearea},
 \autoref{sec:typearea.options},
 \autopageref{desc:typearea.cmd.recalctypearea}). On the other hand, each
 recalculation of type area and margins will be done on the basis of the
@@ -104,18 +102,59 @@ current main font size. The effects of changing the main font size to other
 additionally loaded packages or the used document class depend on those
 packages and the class. This may even result in error messages or typesetting
 errors, which cannot be considered a fault of \KOMAScript, and even the
-\KOMAScript{} classes do not change all lenghts if the main font size
-changes after loading the class.
+\KOMAScript{} classes do not change all lenghts if the main font size changes
+after loading the class.
 
 This\textnote{Attention!} option is not intended to be a substitution for
 \Macro{fontsize} (see \cite{latex:fntguide}). Also, you should not use it
 instead of one of the main font depending font size commands \Macro{tiny} up
 to \Macro{Huge}!%
-\IfCommon{scrlttr2}{ Default at \Class{scrlttr2} is
-  \OptionValue{fontsize}{12pt}.}
+\phantomsection\label{sec:\ThisCommonLabelBase.fontOptions.end}%
+\IfThisCommonLabelBase{scrlttr2}{%
+  \ Default at \Class{scrlttr2} is \OptionValue{fontsize}{12pt}.
 
-\fi  %*********************************************** Ende nicht scrextend *
+  \begin{Example}
+    Assumed, the example is a letter to \emph{``The friends of insane font
+      sizes''} and therefor it should be printed with 14\Unit{pt} instead of
+    12\Unit{pt}. Only a simple change of the first line is needed:%
+    \lstinputcode[xleftmargin=1em]{letter-6}%
+    Alternatively the option may be set at the optional argument of the
+    \Environment{letter} environment:%
+    \lstinputcode[xleftmargin=1em]{letter-5}%
+    In the case of this late change of the font size no recalculation of the
+    type area will happen. Because of this, the two results of
+    \autoref{fig:scrlttr2.letter-5-6} differ.
+    \begin{figure}
+      \centering
+      \frame{\includegraphics[width=.4\textwidth]{letter-5}}\quad
+      \frame{\includegraphics[width=.4\textwidth]{letter-6}}
+      \caption[{Example: letter with addressee, opening, text,
+        closing, postscript, distribution list, enclosure, and insane large
+        font size}]{%
+        result of a small letter with addressee, opening, text, closing,
+        postscript, distribution list, enclosure, and insane large font size
+        (date and folding marks are defaults of DIN-letters): at left one the
+        font size has been defined by the optional argument of
+        \Environment{letter}, at the right one the optional argument of
+        \Macro{documentclass} has been used}
+      \label{fig:scrlttr2.letter-5-6}
+    \end{figure}
+  \end{Example}
+}{%
+  \IfThisCommonLabelBase{maincls}{%
+    The default at \Class{scrbook}, \Class{scrreprt}, and \Class{scrartcl} is
+    \OptionValue{fontsize}{11pt}.\textnote{\KOMAScript{} vs. standard classes}
+    In contrast, the default of the standard classes would be
+    \Option{10pt}. You may attend to this if you switch from a standard class
+    to a \KOMAScript{} class.%
+  }{}%
+}%
+%
+\EndIndexGroup
+%
+\EndIndexGroup
 
+\endinput
 
 %%% Local Variables:
 %%% mode: latex
