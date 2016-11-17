@@ -145,7 +145,8 @@
 \RequirePackage{multicol}
 \RequirePackage{marginnote}
 \RequirePackage{tabularx}
-\RequirePackage{xcolor,tocstyle}% hyperref needs xcolor with tocstyle
+\RequirePackage[svgnames]{xcolor}
+\RequirePackage{tocstyle}% hyperref needs xcolor with tocstyle
 \RequirePackage{tikz}
 \usetikzlibrary{calc}
 \RequirePackage[\uselanguage]{hyperref}
@@ -191,7 +192,6 @@
     \geometry{papersize={180mm,210mm},%
       includehead,includemp,reversemp,marginparwidth=4em,%
       vmargin={1.5mm,3mm},hmargin=1.75mm}%
-    \RequirePackage{xcolor}%
     \RequirePackage{scrlayer-scrpage}%
     \clearpairofpagestyles
     \ihead{%
@@ -200,17 +200,19 @@
       }%
     }%
     \ohead*{\smash{\pagemark\hspace{2mm}}}%
+    \colorlet{headbackground}{DarkBlue}%
+    \colorlet{headline}{white}%
+    \setkomafont{pageheadfoot}{\small\sffamily\bfseries\color{headline}}%
+    \setkomafont{pagenumber}{}%
     \DeclareNewLayer[head,background,
       hoffset=0pt,
       width=\paperwidth,
       addheight=\dimexpr \topmargin+1in+\dp\strutbox\relax,
       addvoffset=2\dp\strutbox,
       contents={%
-        \color{yellow!50}\rule{\layerwidth}{\layerheight}}]
+        \color{headbackground}\rule{\layerwidth}{\layerheight}}]
     {headbackground}%
     \AddLayersAtBeginOfPageStyle{scrheadings}{headbackground}%
-    \setkomafont{pageheadfoot}{\normalfont\sffamily}%
-    \setkomafont{pagenumber}{}%
     \renewcommand*{\chaptermark}[1]{%
       \@mkdouble{\ifnumbered{chapter}{\chaptermarkformat}{}##1}%
     }%
@@ -1187,7 +1189,7 @@
 %   length, variables etc.\footnote{TODO: Redefining most declaration commands
 %     to also write labels.}
 %    \begin{macrocode}
-\colorlet{Declaration}{yellow}
+\colorlet{Declaration}{PaleTurquoise}
 \newsavebox\Declaration@Box
 \newcommand*{\Declaration@Width}{\linewidth}
 \newcommand*{\Declaration@LeftIndent}{-2\fboxsep}
@@ -1468,7 +1470,7 @@
 %    \begin{macrocode}
 \providecommand*{\ChangedAt}[3][]{%
   \ifstr{#1}{}{%
-    \marginnote{\footnotesize\fbox{\strut#2}}%
+    \marginnote{\tiny\fbox{\strut#2}}%
   }{%
     \def\reserved@a##1/##2\@nil{%
       \count@\year
@@ -1478,9 +1480,9 @@
       \advance\count@-##2\relax
     }\reserved@a#1\@nil
     \ifnum\count@<13
-      \marginnote{\footnotesize Beta-Feature}%
+      \marginnote{\tiny Beta-Feature}%
     \else
-      \marginnote{\footnotesize\fbox{\strut #2}}%
+      \marginnote{\tiny\fbox{\strut #2}}%
     \fi
   }%
   \begingroup
