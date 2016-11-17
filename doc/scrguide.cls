@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2016/11/14 v1.12 internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2016/11/17 v1.12a internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -329,13 +329,8 @@
 %
 \newcommand*{\LoadCommon}[2][\label@base]{%
   \@ifundefined{ifCommon#1}{%
-    \expandafter\csname newif\expandafter\endcsname
-    \csname ifCommon#1\endcsname
+    \expandafter\newif\csname ifCommon#1\endcsname
   }{}%
-  \scr@ifundefinedorrelax{Common@#2@First}{%
-    \@namedef{Common@#2@First}{#1}%
-  }{%
-  }%
   \csname Common#1true\endcsname
   \input{common-#2.tex}%
   \csname Common#1false\endcsname
@@ -809,8 +804,8 @@
     \label{\label@desc@prefix\label@base.option.#2.#3#1}%
   \endgroup
 }
-\newcommand*{\RefOptionValue}{%
-  \kernel@ifstar {\@RefOptionValue1}{\@RefOptionValue0}%
+\newcommand*{\OptionValueRef}{%
+  \kernel@ifstar {\@RefOptionValue0}{\@RefOptionValue1}%
 }
 \newcommand*{\@RefOptionValue}[1]{%
   \kernel@ifnextchar [%]
@@ -820,7 +815,7 @@
 \def\@@RefOptionValue#1[#2]#3#4{%
   \scr@ifundefinedorrelax{r@\label@desc@prefix#3.#4#2}{%
     \ifcase #1
-      \expandafter\@gobbleopt
+      \expandafter\scr@no@hyperref
     \else
       \expandafter\hyperref
     \fi
@@ -830,6 +825,7 @@
     \expandafter\ref\ifcase #1 *\fi{\label@desc@prefix#3.#4#2}%
   }%
 }
+\newcommand*{\scr@no@hyperref}[2][]{#2}
 \newcommand*{\DescOptionValue}[2]{%
   \par
   \leftskip\z@
@@ -842,38 +838,55 @@
   \textKOption{#1}\PName{#2}%
 }
 \DeclareRobustCommand*{\OptionVName}{\textOptionVName}%
+\newcommand*{\LabelOptionVName}[3][\label@suffix]{%
+  \begingroup
+    \protected@edef\@currentlabellong{\OptionVName{#2}{#3}}%
+    \protected@edef\@currentlabelshort{\Option{#2}}%
+    \label@sanitize
+    \scr@ifundefinedorrelax{%
+      \label@desc@prefix\label@base.option.#2\label@suffix
+    }{%
+      \expandafter\gdef
+      \csname \label@desc@prefix\label@base.option.#2\label@suffix\endcsname{}%
+      \Hy@MakeCurrentHref{\label@desc@prefix\label@base.option.#2#1}%
+      \ClassInfo{scrguide}{Anchor: `\@currentHref'}%
+      \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
+      \let\@currentlabel\@currentlabelshort
+      \label{\label@desc@prefix\label@base.option.#2#1}%
+    }{}%
+    \Hy@MakeCurrentHref{\label@desc@prefix\label@base.option.#2=#3#1}%
+    \ClassInfo{scrguide}{Anchor: `\@currentHref'}%
+    \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
+    \let\@currentlabel\@currentlabellong
+    \label{\label@desc@prefix\label@base.option.#2=#3#1}%
+  \endgroup
+}
 \newcommand*{\DescOptionVName}[2]{%
   \par
   \leftskip\z@
 %  \BeginIndex{Option}{#1}%
   \BeginIndex{Option}{#1~=\PName{#2}}%
-  \begingroup
-    \@nameuse{phantomsection}%
-    \label@sanitize
-    \scr@ifundefinedorrelax{%
-      \label@desc@prefix\label@base.option.#1\label@suffix
-    }{%
-      \expandafter\gdef
-      \csname \label@desc@prefix\label@base.option.#1\label@suffix\endcsname{}%
-      \label{\label@desc@prefix\label@base.option.#1\label@suffix}%
-    }{}%
-    \label@sanitize
-    \label{\label@desc@prefix\label@base.option.#1=#2\label@suffix}%
-  \endgroup
+  \LabelOptionVName{#1}{#2}%
   \textOptionVName{#1}{#2}%
+}
+\newcommand*{\LabelFloatStyle}[2][\label@suffix]{%
+  \begingroup
+    \protected@edef\@currentlabel{\FloatStyle{#2}}%
+    \label@sanitize
+    \Hy@MakeCurrentHref{\label@desc@prefix\label@base.floatstyle.#2#1}%
+    \ClassInfo{scrguide}{Anchor: `\@currentHref'}%
+    \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
+    \label{\label@desc@prefix\label@base.floatstyle.#2#1}%
+  \endgroup
 }
 \DeclareSpecialMarkup{\FloatStyle}{\mbox{\texttt{#1}}}{%
   \par
   \leftskip\z@
   \BeginIndex{Floatstyle}{#1}%
-  \begingroup
-    \@nameuse{phantomsection}%
-    \label@sanitize
-    \label{\label@desc@prefix\label@base.floatstyle.#1\label@suffix}%
-  \endgroup
+  \LabelFloatStyle{#1}%
   \textFloatStyle{#1}%
 }
-\newcommand*{\PageStyleLabel}[2][\label@suffix]{%
+\newcommand*{\LabelPageStyle}[2][\label@suffix]{%
   \begingroup
     \@nameuse{phantomsection}%
     \label@sanitize
@@ -884,67 +897,97 @@
   \par
   \leftskip\z@
   \BeginIndex{Pagestyle}{#1}%
-  \PageStyleLabel{#1}%
+  \LabelPageStyle{#1}%
   \textMacro{pagestyle}\PParameter{#1}%
+}
+\newcommand*{\LabelEnvironment}[2][\label@suffix]{%
+  \begingroup
+    \protected@edef\@currentlabel{\Environment{#2}}%
+    \label@sanitize
+    \Hy@MakeCurrentHref{\label@desc@prefix\label@base.env.#2#1}%
+    \ClassInfo{scrguide}{Anchor: `\@currentHref'}%
+    \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
+    \label{\label@desc@prefix\label@base.env.#2#1}%
+  \endgroup
 }
 \DeclareSpecialMarkup{\Environment}{\mbox{\texttt{#1}}}{%
   \par
   \settowidth{\leftskip}{\textMacro{begin}\PParameter{#1}}% siehe Macro
   \hskip-\leftskip
   \BeginIndex{Env}{#1}%
-  \begingroup
-    \@nameuse{phantomsection}%
-    \label@sanitize
-    \label{\label@desc@prefix\label@base.env.#1\label@suffix}%
-  \endgroup
+  \LabelEnvironment{#1}%
   \textMacro{begin}\PParameter{#1}%
   \def\d@EnvironmentName{#1}% Umgebungsnamen merken für das Ende
 }[{%
   \ifvmode\hskip-\leftskip\else \unskip\,\dots\fi% \begin{…}…\end{…}
   \textMacro{end}\expandafter\PParameter\expandafter{\d@EnvironmentName}\par
 }]%
+\newcommand*{\LabelCounter}[2][\label@suffix]{%
+  \begingroup
+    \protected@edef\@currentlabel{\Counter{#2}}%
+    \label@sanitize
+    \Hy@MakeCurrentHref{\label@desc@prefix\label@base.counter.#2#1}%
+    \ClassInfo{scrguide}{Anchor: `\@currentHref'}%
+    \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
+    \label{\label@desc@prefix\label@base.counter.#2#1}%
+  \endgroup
+}
 \DeclareSpecialMarkup{\Counter}{\mbox{\texttt{#1}}}{%
   \par
   \leftskip\z@
   \BeginIndex{Counter}{#1}%
-  \begingroup
-    \@nameuse{phantomsection}%
-    \label@sanitize
-    \label{\label@desc@prefix\label@base.counter.#1\label@suffix}%
-  \endgroup
+  \LabelCounter{#1}%
   \textCounter{#1}%
+}
+\newcommand*{\LabelLength}[2][\label@suffix]{%
+  \begingroup
+    \protected@edef\@currentlabel{\Length{#2}}%
+    \label@sanitize
+    \Hy@MakeCurrentHref{\label@desc@prefix\label@base.length.#2#1}%
+    \ClassInfo{scrguide}{Anchor: `\@currentHref'}%
+    \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
+    \label{\label@desc@prefix\label@base.length.#2#1}%
+  \endgroup
 }
 \DeclareSpecialMarkup{\Length}{\mbox{\texttt{\char`\\#1}}}{%
   \par
   \leftskip\z@
   \BeginIndex{Length}{#1}% index entry
-  \begingroup
-    \@nameuse{phantomsection}%
-    \label@sanitize
-    \label{\label@desc@prefix\label@base.length.#1\label@suffix}%
-  \endgroup
+  \LabelLength{#1}%
   \textLength{#1}%
+}
+\newcommand*{\LabelPLength}[2][\label@suffix]{%
+  \begingroup
+    \protected@edef\@currentlabel{\PLength{#2}}%
+    \label@sanitize
+    \Hy@MakeCurrentHref{\label@desc@prefix\label@base.plength.#2#1}%
+    \ClassInfo{scrguide}{Anchor: `\@currentHref'}%
+    \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
+    \label{\label@desc@prefix\label@base.plength.#2#1}%
+  \endgroup
 }
 \DeclareSpecialMarkup{\PLength}{\mbox{\texttt{#1}}}{%
   \par
   \leftskip\z@
   \BeginIndex{PLength}{#1}%
-  \begingroup
-    \@nameuse{phantomsection}%
-    \label@sanitize
-    \label{\label@desc@prefix\label@base.plength.#1\label@suffix}%
-  \endgroup
+  \LabelPLength{#1}%
   \textMacro{@setplength}\PParameter{#1}\Parameter{\lengthname}%
+}
+\newcommand*{\LabelVariable}[2][\label@suffix]{%
+  \begingroup
+    \protected@edef\@currentlabel{\Variable{#2}}%
+    \label@sanitize
+    \Hy@MakeCurrentHref{\label@desc@prefix\label@base.variable.#2#1}%
+    \ClassInfo{scrguide}{Anchor: `\@currentHref'}%
+    \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
+    \label{\label@desc@prefix\label@base.variable.#2#1}%
+  \endgroup
 }
 \DeclareSpecialMarkup{\Variable}{\mbox{\texttt{#1}}}{%
   \par
   \leftskip\z@
   \BeginIndex{Variable}{#1}%
-  \begingroup
-    \@nameuse{phantomsection}%
-    \label@sanitize
-    \label{\label@desc@prefix\label@base.variable.#1\label@suffix}%
-  \endgroup
+  \LabelVariable{#1}%
   \textMacro{setkomavar}\PParameter{#1}\OParameter{\descriptionname}%
   \Parameter{\contentname}%
 }
@@ -1086,24 +1129,32 @@
 %
 % \section{Identification}
 %
+%   
 % \begin{macro}{\labelbase}
 %    \begin{macrocode}
 \newcommand*{\labelbase}[1]{%
+  \ifstr{\label@base@sec}{unknown}{}{%
+    \labelofbase[sec]{\label@base@sec.next}%
+    \gdef\label@base@sec{}%
+  }%
   \renewcommand*{\label@base}{#1}%
   \label{cha:#1}%
 }
 %    \end{macrocode}
 % \begin{macro}{\label@base}
+% \begin{macro}{\label@base.sec}
 %    \begin{macrocode}
 \newcommand*{\label@base}{unknown}
+\newcommand*{\label@base@sec}{}
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \begin{macro}{\labelofbase}
 % Sets a label depending on \cs{label@base}. First optional argument is the
 % label prefix, second is the the label postfix.
 %    \begin{macrocode}
-\newcommand*{\labelofbase}[2][lab:]{%
+\newcommand*{\labelofbase}[2][lab]{%
   \label{#1:\label@base.#2}%
 }
 %    \end{macrocode}
@@ -1112,6 +1163,10 @@
 % Sets a label of type section.
 %    \begin{macrocode}
 \newcommand*{\seclabel}[1]{%
+  \ifx\label@base@sec\@empty\else
+    \labelofbase[sec]{\label@base@sec.next}%
+  \fi
+  \xdef\label@base@sec{#1}%
   \labelofbase[sec]{#1}%
 }
 %    \end{macrocode}
