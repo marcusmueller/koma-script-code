@@ -291,7 +291,7 @@
     \fi
   \endgroup
 }
-\newcommand*{\ThisCommonFileFirstLabelBase}{%
+\newcommand*{\ThisCommonFirstLabelBase}{%
   \@nameuse{CommonFile@\ThisCommonFile @LabelBase}%
 }
 \newif\ifthiscommonfirst
@@ -1299,6 +1299,7 @@
 %   This environment is used for all examples at the \KOMAScript{} guide.
 %    \begin{macrocode}
 \newenvironment{Example}{%
+  \lstset{belowskip=0pt plus 1pt minus .5pt}%
   \labeling{{\usekomafont{disposition}\GuideExample:\ }}
   \item[{\usekomafont{disposition}\GuideExample:\ }]%
 }{%
@@ -1777,14 +1778,13 @@
 %
 % Setup listings:
 %    \begin{macrocode}
-\lstdefinestyle{basics}{%
+\lstset{%
   basicstyle=\ttfamily,%
   columns=fullflexible,keepspaces,%
   aboveskip=.4\baselineskip,%
-  belowskip=0pt%
+  belowskip=\dp\strutbox plus 1pt minus .5pt%
 }%
 \lstdefinestyle{code}{%
-  style=basics,%
   language=[LaTeX]TeX,%
   moretexcs={%
     @auxout, @currext, @dottedtocline, @empty, @float, @ifpackagelater,
@@ -1803,7 +1803,7 @@
     textsuperscript}%
 }%
 \lstdefinestyle{output}{%
-  style=basics,breaklines,prebreak=\mbox{$\hookleftarrow$}%
+  breaklines,prebreak=\mbox{$\hookleftarrow$}%
 }%
 \lstdefinestyle{KOMA}{%
   style=code,%
@@ -1894,12 +1894,15 @@
     TOCEntryStyleInitCode,TOCEntryStyleStartInitCode,TOCLineLeaderFill,
     UnPreventPackageFromLoading,unitfactor,
     unsettoc,usekomafont,useplength,usekomavar,uppertitleback% 
+  }%
 }%
-} \lstset{style=basics} \lstnewenvironment{lstoutput}[1][]{%
+\lstnewenvironment{lstoutput}[1][]{%
   \lstset{style=output,basicstyle=\ttfamily\small,#1}%
-}{} \lstnewenvironment{lstcode}[1][]{%
+}{}%
+\lstnewenvironment{lstcode}[1][]{%
   \lstset{style=KOMA,basicstyle=\ttfamily\small,#1}%
-}{} \newcommand*{\lstinputcode}[1][]{%
+}{}%
+\newcommand*{\lstinputcode}[1][]{%
   \lstinputlisting[style=KOMA,basicstyle=\ttfamily\small,#1]%
 }
 %    \end{macrocode}
