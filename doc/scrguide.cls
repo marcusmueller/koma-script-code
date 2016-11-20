@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2016/11/17 v1.12a internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2016/11/20 v1.13 internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -327,33 +327,6 @@
   }{%
     You have to prepare the file for the label base \ThisCommonLabelBase.%
   }{}%
-}
-%
-\newcommand*{\LoadCommon}[2][\label@base]{%
-  \@ifundefined{ifCommon#1}{%
-    \expandafter\newif\csname ifCommon#1\endcsname
-  }{}%
-  \csname Common#1true\endcsname
-  \input{common-#2.tex}%
-  \csname Common#1false\endcsname
-}
-\newcommand*{\IfCommonFirstUsage}{%
-  \ifcommonfirstusage \expandafter\@firstoftwo
-  \else \expandafter\@secondftwo\fi
-}
-\newcommand*{\IfCommon}[1]{%
-  \ifstr{\label@base}{#1}{%
-    \@firstofone
-  }{%
-    \@gobble
-  }%
-}
-\newcommand*{\IfNotCommon}[1]{%
-  \ifstr{\label@base}{#1}{%
-    \@gobble
-  }{%
-    \@firstofone
-  }%
 }
 % \end{macrocode}
 %
