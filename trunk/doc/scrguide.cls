@@ -779,6 +779,11 @@
     \label{\label@desc@prefix\label@base.option.#2.#3#1}%
   \endgroup
 }
+%    \end{macrocode}
+% \begin{macro}{\OptionValueRef}
+%   \cs{OptionValue} by reference. Use it like
+%   |\OptionValueRef[suffix]{maincls}{version}{3.20}|.
+%    \begin{macrocode}
 \newcommand*{\OptionValueRef}{%
   \kernel@ifstar {\@RefOptionValue0}{\@RefOptionValue1}%
 }
@@ -787,20 +792,23 @@
   {\@@RefOptionValue#1}{\@@RefOptionValue#1[]}%
 }
 \newcommand*{\@@RefOptionValue}{}
-\def\@@RefOptionValue#1[#2]#3#4{%
-  \scr@ifundefinedorrelax{r@\label@desc@prefix#3.#4#2}{%
+\def\@@RefOptionValue#1[#2]#3#4#5{%
+  \scr@ifundefinedorrelax{r@\label@desc@prefix#3.option.#4.#5#2}{%
     \ifcase #1
       \expandafter\scr@no@hyperref
     \else
       \expandafter\hyperref
     \fi
-    [\label@desc@prefix#3#2]%
-    {\OptionValue{\ref*{\label@desc@prefix#3#2}}{#4}}%
+    [\label@desc@prefix#3.option.#4#2]%
+    {\OptionValue{\ref*{\label@desc@prefix#3.option.#4#2}}{#5}}%
   }{%
-    \expandafter\ref\ifcase #1 *\fi{\label@desc@prefix#3.#4#2}%
+    \expandafter\ref\ifcase #1 *\fi{\label@desc@prefix#3.option.#4.#5#2}%
   }%
 }
 \newcommand*{\scr@no@hyperref}[2][]{#2}
+%    \end{macrocode}
+% \end{macro}
+%    \begin{macrocode}
 \newcommand*{\DescOptionValue}[2]{%
   \par
   \leftskip\z@
@@ -1104,7 +1112,7 @@
 %
 % \section{Identification}
 %
-%   
+% \begin{macro}{\LabelBase}
 % \begin{macro}{\labelbase}
 %    \begin{macrocode}
 \newcommand*{\labelbase}[1]{%
@@ -1133,6 +1141,15 @@
   \label{#1:\label@base.#2}%
 }
 %    \end{macrocode}
+% \begin{macro}{\prefix@ref}
+% Internal command to set a \cs{ref}, \cs{pageref}, or \cs{autoref} to an
+% label with prefix. Use it, e.g., like
+% |\label@base@ref{\autoref}{sec}{maincls.cmd.foo}|.
+%    \begin{macrocode}
+\newcommand*{\prefix@ref}[3]{%
+  #1{#2:#3}%
+}
+%    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\seclabel}
 % Sets a label of type section.
@@ -1146,12 +1163,29 @@
 }
 %    \end{macrocode}
 % \end{macro}
-% \begin{macro}{\exlabel}
+% \begin{macro}{\xmpllabel}
+% \begin{macro}{\Refxmpl}
+% \begin{macro}{\PageRefxmpl}
 % Sets a label of type example.
 %    \begin{macrocode}
-\newcommand*{\exlabel}[1]{%
-  \labelofbase[example]{#1}%
+\newcommand*{\xmpllabel}[1]{%
+  \labelofbase[xmpl]{#1}%
 }
+\newcommand*{\Refxmpl}{%
+  \kernel@ifstar {\prefix@ref{\autoref*}{xmpl}}%
+                 {\prefix@ref{\autoref}{xmpl}}%
+}
+\newcommand*{\PageRefxmpl}{%
+  \kernel@ifstar {\prefix@ref{\autopageref*}{xmpl}}%
+                 {\prefix@ref{\autopageref}{xmpl}}%
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% User command to get the current label base.
+%    \begin{macrocode}
+\newcommand*{\LabelBase}{\@nameuse{label@base}} 
 %    \end{macrocode}
 % \end{macro}
 %
