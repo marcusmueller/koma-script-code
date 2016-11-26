@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2016/11/20 v1.13 internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2016/11/26 v1.13 internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -954,7 +954,16 @@
   \leftskip\z@
   \BeginIndex{PLength}{#1}%
   \LabelPLength{#1}%
-  \textMacro{@setplength}\PParameter{#1}\Parameter{\lengthname}%
+  \scr@ifundefinedorrelax{%
+    r@\label@desc@prefix scrlttr2-experts.cmd.@setplength}{%
+    \textMacro{@setplength}%
+  }{%
+    \begingroup
+      \let\Macro\textMacro
+      \DescRef{scrlttr2-experts.cmd.@setplength}%
+    \endgroup
+  }%
+  \PParameter{#1}\Parameter{\lengthname}%
 }
 \newcommand*{\LabelVariable}[2][\label@suffix]{%
   \begingroup
@@ -971,7 +980,15 @@
   \leftskip\z@
   \BeginIndex{Variable}{#1}%
   \LabelVariable{#1}%
-  \textMacro{setkomavar}\PParameter{#1}\OParameter{\descriptionname}%
+  \scr@ifundefinedorrelax{r@\label@desc@prefix scrlttr2.cmd.setkomavar}{%
+    \textMacro{setkomavar}%
+  }{%
+    \begingroup
+      \let\Macro\textMacro
+      \DescRef{scrlttr2.cmd.setkomavar}%
+    \endgroup
+  }%
+  \PParameter{#1}\OParameter{\descriptionname}%
   \Parameter{\contentname}%
 }
 \newcommand*{\FontElementLabel}[2][\label@suffix]{%
@@ -986,7 +1003,22 @@
   \leftskip\z@
   \BeginIndex{FontElement}{#1}%
   \FontElementLabel{#1}%
-  \textMacro{setkomafont}\PParameter{#1}\OParameter{\fontsettingname}%
+  \scr@ifundefinedorrelax{r@\label@desc@prefix\LabelBase.cmd.setkomafont}{%
+    \scr@ifundefinedorrelax{r@\label@desc@prefix maincls.cmd.setkomafont}{%
+      \textMacro{setkomafont}%
+    }{%
+      \begingroup
+        \let\Macro\textMacro
+        \DescRef{maincls.cmd.setkomafont}%
+      \endgroup
+    }%
+  }{%
+    \begingroup
+      \let\Macro\textMacro
+      \DescRef{\LabelBase.cmd.setkomafont}%
+    \endgroup
+  }%
+  \PParameter{#1}\OParameter{\fontsettingname}%
 }
 \DeclareRobustCommand*{\PName}[1]{\texttt{\textit{#1}}}
 \DeclareRobustCommand*{\PValue}[1]{\texttt{#1}}
