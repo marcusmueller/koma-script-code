@@ -881,7 +881,14 @@
   \leftskip\z@
   \BeginIndex{Pagestyle}{#1}%
   \LabelPageStyle{#1}%
-  \textMacro{pagestyle}\PParameter{#1}%
+  \scr@ifundefinedorrelax{r@\label@desc@prefix maincls.cmd.pagestyle}{%
+    \textMacro{pagestyle}%
+  }{%
+    \begingroup
+      \let\Macro\textMacro
+      \DescRef{maincls.cmd.pagestyle}%
+    \endgroup
+  }\PParameter{#1}%
 }
 \newcommand*{\LabelEnvironment}[2][\label@suffix]{%
   \begingroup
