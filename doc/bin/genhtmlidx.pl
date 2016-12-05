@@ -4,7 +4,7 @@ eval 'exec perl -S $0 ${1+"$@"}'
 
 # ======================================================================
 # genhtmlidx.pl
-# Copyright (c) Markus Kohm, 2002-2013
+# Copyright (c) Markus Kohm, 2002-2016
 #
 # This file is part of the LaTeX2e KOMA-Script bundle.
 #
@@ -22,7 +22,7 @@ eval 'exec perl -S $0 ${1+"$@"}'
 # This work consists of all files listed in manifest.txt.
 # ----------------------------------------------------------------------
 # genhtmlidx.pl
-# Copyright (c) Markus Kohm, 2002-2013
+# Copyright (c) Markus Kohm, 2002-2016
 #
 # Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 # Version 1.3c, verteilt und/oder veraendert werden.
@@ -97,6 +97,10 @@ while ( $auxfile=shift ) {
 		    if ( $anchor =~ /^desc:([^.]+)\.([^.]+)\.([^.]+)$/ ) {
 			$entry = "$3.$page.$1.$2";
 			if ( "$2" eq "option" ) {
+			    my $i=$1;
+			    if ( $3 =~ /^([^=]+)=(.+)$/ ) {
+				$entry = "$1.$page.$i.option";
+			    }
 			    push @option,$entry;
 			} elsif ( "$2" eq "cmd" ) {
 			    push @macro,$entry;
@@ -135,6 +139,9 @@ sub process {
     my $arrayref=shift;
     my @entries=sort { $a cmp $b } @$arrayref;
     my $entry="";
+    my $lastpage="";
+    my $lastlink="";
+    my $pageprefix="";
     if ( @entries > 0 ) {
 	print "<h2><a name=\"$group\">$titles{$group}</a></h2>\n";
 	print "<ul>\n";
@@ -143,11 +150,17 @@ sub process {
 	    if ( $entry ne $1 ) {
 		print "</li>\n" if ( $entry ne "" );
 		$entry=$1;
+		$lastpage="";
+		$lastlink="";
+		$pageprefix="";
 		print "<li><a name=\"$4.$entry\"></a><a href=\"\#$4.$entry\">$prefix$entry</a> --&gt; ";
-	    } else {
-		print ", ";
 	    }
-	    print "<a href=\"$baselink\#desc:$3.$4.$1\">$2</a>";
+	    if ( ( $lastlink ne "$3.$4.$1" ) || ( $lastpage ne "$2" ) ) {
+		print "$pageprefix<a href=\"$baselink\#desc:$3.$4.$1\">$2</a>";
+		$lastlink="$3.$4.$1";
+		$lastpage="$2";
+		$pageprefix=", ";
+	    }
 	} @entries;
 	print "</li>\n" if ( $entry ne "" );
 	print "</ul>\n";
