@@ -1,4 +1,4 @@
-% \CheckSum{3896}
+% \CheckSum{3902}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlayer.dtx
@@ -676,18 +676,33 @@
 % same they do at \Package{scrpage2}. The difference is, that single-side or
 % two-side doesn't matter here (but it does inside of the definitions of the
 % marks itself).
+%
 % ToDo: Maybe \Option{manualmark} should become deprecated and
 % \Option{automark} should have simple values or a new option, that also
 % handles \Option{autooneside}?
+%   \changes{v3.22}{2016/12/07}{prepared for classes without \cs{section} or
+%     \cs{subsection}}^^A
 %    \begin{macrocode}
 %<*options>
 \KOMA@key{automark}[]{%
   \scrlayer@testunexpectedarg{automark}{#1}%
   \scrlayer@AtEndOfPackage{%
     \if@chapter
-      \automark[section]{chapter}%
+      \scr@ifundefinedorrelax{section}{%
+        \automark{chapter}%
+      }{%
+        \automark[section]{chapter}%
+      }%
     \else
-      \automark[subsection]{section}%
+      \scr@ifundefinedorrelax{section}{%
+        \automark{}%
+      }{%
+        \scr@ifundefinedorrelax{subsection}{%
+          \automark{section}%
+        }{%
+          \automark[subsection]{section}%
+        }
+      }%
     \fi
   }%
   \FamilyKeyStateProcessed
