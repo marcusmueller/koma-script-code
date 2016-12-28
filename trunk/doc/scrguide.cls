@@ -998,10 +998,13 @@
   \PParameter{#1}\OParameter{\descriptionname}%
   \Parameter{\contentname}%
 }
-\newcommand*{\FontElementLabel}[2][\label@suffix]{%
+\newcommand*{\LabelFontElement}[2][\label@suffix]{%
   \begingroup
-    \@nameuse{phantomsection}%
+    \protected@edef\@currentlabel{\FontElement{#2}}%
     \label@sanitize
+    \Hy@MakeCurrentHref{\label@desc@prefix\label@base.fontelement.#2#1}%
+    \ClassInfo{scrguide}{Anchor: `\@currentHref'}%
+    \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
     \label{\label@desc@prefix\label@base.fontelement.#2#1}%
   \endgroup
 }
@@ -1009,7 +1012,7 @@
  \par
   \leftskip\z@
   \BeginIndex{FontElement}{#1}%
-  \FontElementLabel{#1}%
+  \LabelFontElement{#1}%
   \scr@ifundefinedorrelax{r@\label@desc@prefix\LabelBase.cmd.setkomafont}{%
     \scr@ifundefinedorrelax{r@\label@desc@prefix maincls.cmd.setkomafont}{%
       \textMacro{setkomafont}%
@@ -1674,7 +1677,15 @@
     \entry{\Variable{##1}\IndexVariable[indexmain]{##1}}%
   }%
   \newcommand*{\feentry}[1]{%
-    \entry{\FontElement{##1}\IndexFontElement[indexmain]{##1}}%
+    \entry{%
+      \scr@ifundefinedorrelax{r@\label@desc@prefix\LabelBase.fontelement.##1}{%
+        \ClassWarning{scrguide}{%
+          Reference `\label@desc@prefix\LabelBase.fontelement.##1' undefined}%
+        \FontElement{##1}%
+      }{%
+        \DescRef{\LabelBase.fontelement.##1}%
+      }%
+      \IndexFontElement[indexmain]{##1}}%
   }%
   \newcommand*{\oentry}[1]{%
     \entry{\Option{##1}\IndexOption[indexmain]{##1}}%
