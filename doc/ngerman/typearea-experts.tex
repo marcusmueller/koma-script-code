@@ -1,6 +1,6 @@
 % ======================================================================
 % typearea-experts.tex
-% Copyright (c) Markus Kohm, 2008-2016
+% Copyright (c) Markus Kohm, 2008-2017
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -18,7 +18,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % typearea-experts.tex
-% Copyright (c) Markus Kohm, 2008-2016
+% Copyright (c) Markus Kohm, 2008-2017
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -66,6 +66,73 @@ basieren. Ein weiterer Teil der Informationen behandelt Möglichkeiten von
 oder früheren Versionen von \KOMAScript{} existieren. Die Teile, die nur aus
 Gründen der Kompatibilität zu früheren Versionen von \KOMAScript{} existieren,
 sind in serifenloser Schrift gesetzt und sollten nicht mehr verwendet werden.
+
+
+\section{Experimentelle Möglichkeiten}
+\seclabel{experimental}
+
+In diesem Abschnitt werden experimentelle Möglichkeiten
+beschrieben. Experimentell bedeutet in diesem Zusammenhang, dass die Funktion
+nicht garantiert werden kann. Dafür kann es zwei Gründe geben. Zum einen
+steht die endgültige Funktion oder Implementierung eventuell noch nicht
+abschließend fest. Zum anderen hängen die Möglichkeiten teilweise von Interna
+anderer Pakete ab und können deshalb in ihrer Funktion nur so lange garantiert
+werden, wie diese anderen Pakete nicht geändert werden.
+
+\begin{Declaration}
+  \OptionVName{usegeometry}{Ein-Aus-Wert}
+\end{Declaration}
+Normalerweise kümmert sich \Package{typearea} wenig darum, ob es in irgend
+einer Konstellation zusammen mit dem Paket
+\Package{geometry}\IndexPackage{geometry} (siehe \cite{package:geometry})
+verwendet wird. Das bedeutet insbesondere, dass \Package{geometry} nach wie
+vor nichts davon mit bekommt, wenn man mit \Package{typearea} beispielsweise
+die Papiergröße ändert -- etwas, das \Package{geometry} selbst gar nicht
+bietet.
+
+Sobald Option \Option{usegeometry} gesetzt wird versucht \Package{typearea}
+alle eigenen Optionen auch in Optionen für \Package{geometry} zu übersetzen
+und innerhalb des Dokuments wird sogar \Macro{newgeometry} aufgerufen, wenn
+neue Parameter aktiviert werden (siehe \DescRef{\LabelBase.cmd.activateareas}
+im nachfolgenden Abschnitt). Da \Package{geometry} keine Änderung der
+Papiergröße oder Papierausrichtung via \Macro{newgeometry} bietet, wird diese
+bei Bedarf über interne Anweisungen und Längen von \Package{geometry}
+umgesetzt. Getestet ist dies für \Package{geometry}~5.3 bis 5.6. 
+
+Die Option bedeutet übrigens nicht, dass bei Verwendung von \Package{geometry}
+nach einer Papiergrößen- oder Papierausrichtungsänderung mit
+\Package{typearea} das neue Papier direkt optimal genutzt wird. Da
+\Package{geometry} aus Komfortgründen deutlich mehr Optionen für die
+Papiereinstellung bietet, als für die Bestimmung von Textbereich, Rändern,
+Kopf, Fuß etc. benötigt werden -- man spricht von \emph{Überbestimmung} -- und
+gleichzeitig bei neuen Aufrufen von \Macro{newgeometry} fehlende Angaben aus
+bereits bekannten ableitet -- man spricht von \emph{Werterhalt} --,
+muss man gegebenenfalls durch explizite vollständige Bestimmung neuer Werte
+bei einem eigenen Aufruf von \Macro{newgeometry} alle gewünschten
+Einstellungen explizit vornehmen. Nichts desto Trotz kann die Berücksichtigung
+von \Package{geometry} durch \Package{typearea} zusätzliche Möglichkeiten
+eröffnen.%
+\EndIndexGroup
+
+
+\begin{Declaration}
+  \OptionVName{areasetadvanced}{Ein-Aus-Wert}
+  \Macro{areaset}\OParameter{BCOR}\Parameter{Breite}\Parameter{Höhe}
+\end{Declaration}
+Normalerweise berücksichtigt \DescRef{typearea.cmd.areaset} Optionen zur
+Bestimmung der Höhe von Kopf und Fuß oder zur Festlegung, ob Randelemente Teil
+des Satzspiegels sein sollen, nicht in gleicher Weise wie
+\DescRef{typearea.cmd.typearea}. Mit Option \Option{areasetadvanced} kann
+jedoch eingestellt werden, dass sich \DescRef{typearea.cmd.areaset}
+diesbezüglich mehr wie \DescRef{typearea.cmd.typearea} verhalten
+soll. Trotzdem unterscheiden sich Einstellungen, die zu gleich großen
+Textbereichen führen zwischen den beiden Befehlen weiterhin, da
+\DescRef{typearea.cmd.typearea} immer auf ganze Zeile rundet und dabei
+gegebenenfalls den unteren Rand um bis zu eine Zeile kleiner wählt, während
+\DescRef{typearea.cmd.areaset} den oberen und unteren Rand immer im Verhältnis
+1:2 einstellt. Die Textbereiche der unterschiedlichen Befehle können also bei
+gleicher Größe vertikal leicht verschoben sein.%
+\EndIndexGroup
 
 
 \section{Anweisungen für Experten}
