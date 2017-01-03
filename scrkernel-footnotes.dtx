@@ -1,4 +1,4 @@
-% \CheckSum{432}
+% \CheckSum{469}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-footnotes.dtx
@@ -353,6 +353,7 @@
 %   \changes{v2.9l}{2003/01/28}{\cs{edef}\cs{@tempa} ersetzt}
 %   \changes{v2.9q}{2004/01/31}{\cs{ftn@font} erlaubt aus Gr"unden der
 %      Kompatibilit‰t mit dem \textsl{footnote} Paket kein Argument mehr}
+%   \changes{v3.22}{2017/01/03}{Neuimplementierung}^^A
 % Dieses Makro zur Definition der Gestalt von Fuﬂnoten erlaubt einen
 % optionalen und erwartet drei weitere Parameter. Der erste, optionale
 % gibt den Einzug der ersten Zeile des Fuﬂnotentextes vom linken Rand
@@ -366,28 +367,47 @@
 % der Fuﬂnote. Diese wird zus‰tzlich in eine \cs{hbox} gesetzt.
 %    \begin{macrocode}
 \newcommand\deffootnote[4][]{%
-  \long\def\@makefntext##1{%
-    \setlength{\@tempdimc}{#3}%
-    \def\@tempa{#1}\ifx\@tempa\@empty
-      \@setpar{\@@par
-        \@tempdima = \hsize
-        \addtolength{\@tempdima}{-#2}%
-        \parshape \@ne #2 \@tempdima}%
-    \else
-      \addtolength{\@tempdimc}{#2}%
-      \addtolength{\@tempdimc}{-#1}%
-      \@setpar{\@@par
-        \@tempdima = \hsize
-        \addtolength{\@tempdima}{-#1}%
-        \@tempdimb = \hsize
-        \addtolength{\@tempdimb}{-#2}%
-        \parshape \tw@ #1 \@tempdima #2 \@tempdimb
+  \expandafter\ifnum\scr@v@is@ge{3.22}\relax
+    \long\def\@makefntext##1{%
+      \leftskip #2
+      \l@addto@macro\@trivlist{%
+        \ifnum\@listdepth=\@ne\advance\leftmargin #2\relax\fi
       }%
-    \fi
-    \par
-    \parindent\@tempdimc\noindent
-    \ftn@font\hbox to \z@{\hss\@@makefnmark}##1%
-  }%
+      \parindent #3\noindent
+      \IfArgIsEmpty{#1}{}{%
+        \hskip \dimexpr #1-#2\relax
+      }%
+      \ftn@font\hbox to \z@{\hss\@@makefnmark}##1%
+    }%
+  \else
+%<class>    \ClassInfo{\KOMAClassName}{%
+%<package>    \PackageInfo{scrextend}{%
+      Using old \string\@makefntext\space due to compatibility
+      level\MessageBreak
+      less than 3.22}%
+    \long\def\@makefntext##1{%
+      \setlength{\@tempdimc}{#3}%
+      \def\@tempa{#1}\ifx\@tempa\@empty
+        \@setpar{\@@par
+          \@tempdima = \hsize
+          \addtolength{\@tempdima}{-#2}%
+          \parshape \@ne #2 \@tempdima}%
+      \else
+        \addtolength{\@tempdimc}{#2}%
+        \addtolength{\@tempdimc}{-#1}%
+        \@setpar{\@@par
+          \@tempdima = \hsize
+          \addtolength{\@tempdima}{-#1}%
+          \@tempdimb = \hsize
+          \addtolength{\@tempdimb}{-#2}%
+          \parshape \tw@ #1 \@tempdima #2 \@tempdimb
+        }%
+      \fi
+      \par
+      \parindent\@tempdimc\noindent
+      \ftn@font\hbox to \z@{\hss\@@makefnmark}##1%
+    }%
+  \fi
 %    \end{macrocode}
 % \begin{macro}{\@@makefnmark}
 %   \changes{v2.4l}{1997/02/06}{neu}^^A
@@ -584,7 +604,7 @@
 %    Fuﬂnotengestaltgebung}^^A
 % \begin{macro}{\@makefnmark}
 %   \changes{v3.10}{2011/09/27}{\textsf{scrextend} redefines \cs{@makefnmark}
-%     to use \cs{thefootnotemark}}
+%     to use \cs{thefootnotemark}}^^A
 %    \begin{macrocode}
 %<*class>
 \deffootnote[1em]{1.5em}{1em}{\textsuperscript{\thefootnotemark}}
