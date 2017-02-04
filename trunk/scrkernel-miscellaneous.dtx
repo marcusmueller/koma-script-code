@@ -1,8 +1,8 @@
-% \CheckSum{449}
+% \CheckSum{585}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-miscellaneous.dtx
-% Copyright (c) Markus Kohm, 2002-2016
+% Copyright (c) Markus Kohm, 2002-2017
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrkernel-miscellaneous.dtx
-% Copyright (c) Markus Kohm, 2002-2016
+% Copyright (c) Markus Kohm, 2002-2017
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -755,16 +755,125 @@
 % und Optionen von \KOMAScript{} nicht.
 %    \begin{macrocode}
 \scr@package@not@recommended{titleps}{%
-  package `scrlayer-scrpage`}
+  package `scrlayer-scrpage'}
 %</class>
+%    \end{macrocode}
+%   \changes{v3.23}{2017/02/04}{Verwendung von \textsf{minitoc} kann nicht
+%     empfohlen werden}^^A
+% \textsf{minitoc} definiert u.\,a. \cs{@sect} hart um und zerstört so diverse
+% Erweiterungen von \KOMAScript. Es ist nicht abschließend untersucht, was das
+% Paket noch alles zerstört. Derzeit gibt es nur einen Workaround für das
+% genannte Problem mit \cs{@sect}.
+%    \begin{macrocode}
+\scr@package@not@recommended{minitoc}{}
 %    \end{macrocode}
 % \end{macro}^^A \scr@package@not@recommended
 %
 % \subsection{Workarounds für fremde Pakete}
 % \label{sec:packageworkarounds}
 %
+% \changes{v3.23}{2017/02/04}{\textsf{minitoc} verursacht ein schwerwiegendes
+%   Problem}^^A
+% Das Paket \textsf{minitoc} verursacht ein schwerwiegendes Problem indem es
+% \cs{@sect} hart umdefiniert, ohne zuvor zu testen, ob die Definition den
+% Erwartungen entspricht. Ich werde hier einmal versuchen, mich darum herum zu
+% lavieren. Eine wirklich gute Lösung ist das sicher nicht. Man sollte das
+% Paket schlicht besser nicht mit \KOMAScript{} zusammen verwenden.
+%    \begin{macrocode}
+%<*class>
+%<*!letter>
+\BeforePackage{minitoc}{%
+  \let\scr@mt@saved@sect\@sect
+}
+\AfterPackage{minitoc}{%
+  \def\@tempa#1#2#3#4#5#6[#7]#8{%
+    \ifnum #2<1 \relax 
+      \addtocontents{toc}{\protect\sectbegin}
+    \fi 
+    \stc@sect{#1}{#2}{#3}{#4}{#5}{#6}[{#7}]{#8}%
+  }%
+  \ifx\@sect\@tempa
+%    \end{macrocode}
+% Note: There are several bugs in this definition (e.g. missing
+% \cs{expandafter} and orphan spaced). Nevertheless its the original one from
+% \textsf{minitoc} 61 and so I have to use it.
+%    \begin{macrocode}
+    \def\@tempa#1#2#3#4#5#6[#7]#8{
+      \expandafter
+      \ifx\csname #1\endcsname\section\relax
+        \addcontentsline{lof}{xsect}{#7}%
+        \addcontentsline{lot}{xsect}{#7}%
+      \fi
+      \ifx\csname #1\endcsname\starsection\relax
+        \addcontentsline{lof}{xsect}{#7}%
+        \addcontentsline{lot}{xsect}{#7}%
+      \fi
+      \ifnum #2>\c@secnumdepth\relax
+        \let\@svsec\@empty
+      \else
+        \refstepcounter{#1}%
+        \edef\@svsec{\csname the#1\endcsname\hskip 1em}%
+      \fi
+      \@tempskipa #5\relax
+      \ifdim \@tempskipa>\z@
+        \begingroup #6\relax
+          \@hangfrom{\hskip #3\relax\@svsec}%
+          {\interlinepenalty \@M #8\par}%
+        \endgroup
+        \csname #1mark\endcsname{#7}%
+        \addcontentsline{toc}{#1}{%
+          \ifnum #2>\c@secnumdepth\relax
+          \else
+            \protect\numberline{\csname the#1\endcsname}%
+          \fi
+          #7%
+        }%
+      \else
+        \def\@svsechd{#6\hskip #3\relax
+          \@svsec #8\csname #1mark\endcsname{#7}%
+          \addcontentsline{toc}{#1}{%
+            \ifnum #2>\c@secnumdepth\relax
+            \else
+              \protect\numberline{\csname the#1\endcsname}
+            \fi
+            #7}%
+        }%
+      \fi
+      \@xsect{#5}%
+    }%
+    \ifx\stc@sect\@tempa
+      \ClassWarning{\KOMAClassName}{%
+        Redefining minitoc's internal command
+        `\string\stc@sect'\MessageBreak
+        to prevent minitoc to destroy several features\MessageBreak
+        of KOMA-Script%
+      }%
+      \let\stc@sect\scr@mt@saved@sect
+    \else
+      \ClassInfo{\KOMAClassName}{%
+        Deactivating the `minitoc' workaround,\MessageBreak
+        because of unexpected definition of\MessageBreak
+        `\string\stc@sect'%
+      }%
+      \show\@tempa
+      \show\stc@sect
+      \let\scr@mt@saved@sect\relax
+    \fi
+  \else
+    \ClassInfo{\KOMAClassName}{%
+      Deactivating the `minitoc' workaround,\MessageBreak
+      because of unexpected definition of\MessageBreak
+      `\string\@sect'%
+    }%
+    \let\scr@mt@saved@sect\relax
+  \fi
+}
+%</!letter>
+%</class>
+%    \end{macrocode}
+%
 % \changes{v3.13a}{2014/10/09}{\textsf{titlesec} hat ein schwerwiegendes
-%   Problem}
+%   Problem}^^A
 % Das Paket \textsf{titlesec} hat ein schwerwiegendes Problem, wenn
 % Überschriften nicht per \cs{@startsection} definiert sind. Ich werde hier
 % einmal versuchen, mich darum herum zu lavieren. Eine wirklich gute Lösung
@@ -791,11 +900,11 @@
 %    \begin{macrocode}
   \@ifpackagelater{titlesec}{2016/03/22}{%
     \ClassInfo{\KOMAClassName}{%
-      Deactivating the `titlesec` workaround,\MessageBreak
+      Deactivating the `titlesec' workaround,\MessageBreak
       because package is newer than expected%
     }%
   }{%
-    \PackageWarning{\KOMAClassName}{%
+    \ClassWarning{\KOMAClassName}{%
       Activating an ugly workaround for a missing\MessageBreak
       feature of package `titlesec`%
     }%
