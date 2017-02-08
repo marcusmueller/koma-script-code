@@ -1,4 +1,4 @@
-% \CheckSum{1607}
+% \CheckSum{1652}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlayer-notecolumn.dtx
@@ -924,6 +924,11 @@
                   \expandafter\unvbox\csname slnc@#1@box\endcsname
                   \ifdim\@tempdima>\z@ \kern\@tempdima\fi
                 \fi
+%    \end{macrocode}
+%   \changes{v0.1.2582}{2017/02/08}{restore several commands}^^A
+% Some commands have to be restored when processing the note.
+%    \begin{macrocode}
+                \slnc@restoreinnote
                 \strut\ignorespaces ##4\par
               }%
             }%
@@ -997,6 +1002,36 @@
   }
 }
 %    \end{macrocode}
+% \begin{macro}{\restoreinnote}
+%   \changes{0.1.2582}{2017/02/08}{new command}^^A
+% \begin{macro}{\slnc@restoreinnote}
+%   \changes{0.1.2582}{2017/02/08}{new (internal)}^^A
+% Some commands have to be restored while processing the notes. By default
+% these are \cs{label}, \cs{index}, \cs{glossary}. More can be added using
+% \cs{restoreinnote}. The storage is \cs{slnc@restoreinnote}.
+%    \begin{macrocode}
+\scrlayerAddToInterface\slnc@restoreinnote{%
+  \let\slnc@restoreinnote\@empty
+}
+\scrlayerAddToInterface\restoreinnote{%
+  \newcommand*\restoreinnote[1]{%
+    \AtBeginDocument{%
+      \expandafter\scrlayerAddCsToInterface[scrlayer-notecolumn.sty]{slnc\string#1}{%
+        \expandafter\let\csname slnc\string#1\endcsname#1%
+        \g@addto@macro\slnc@restoreinnote{%
+          \expandafter\let\expandafter#1\csname slnc\string#1\endcsname
+        }%
+      }%
+    }%
+  }%
+  \@onlypreamble\restoreinnote
+  \restoreinnote\label
+  \restoreinnote\index
+  \restoreinnote\glossary
+}
+% \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \begin{macro}{\slnc@readnotes}
 % Read as long notes from the notes file until the number at \#2 of
 % \Macro{slnc@note} or \Macro{slnc@sync} in the file is greater than
