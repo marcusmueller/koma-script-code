@@ -1,4 +1,4 @@
-% \CheckSum{1652}
+% \CheckSum{1661}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlayer-notecolumn.dtx
@@ -767,17 +767,32 @@
 %     to use \Macro{protect} if a macro shouldn't be expanded while writing or
 %     may break while writing.
 %   \end{description}
+%   There is a star variant with the same parameters, that writes the
+%   \meta{code} un-expanded. To do so, we need some internal commands.
+% \begin{macro}{\slnc@unexpanded}
+%   \changes{0.1.2583}{2017/02/08}{new (internal)}^^A
+% \begin{macro}{\slnc@makenote}
+%   \changes{0.1.2583}{2017/02/08}{new (internal)}^^A
 %    \begin{macrocode}
 %<*body>
+\scrlayerAddToInterface\slnc@unexpanded{%
+  \let\slnc@unexpanded\detokenize
+}
 \scrlayerAddToInterface\makenote{%
-  \newcommand{\makenote}[2][marginpar]{%
+  \newcommand*{\makenote}{%
+    \kernel@ifstar{\let\slnc@unexpanded\detokenize\slnc@makenote}%
+                  {\let\slnc@unexpanded\@firstofone\slnc@makenote}%
+  }%
+}
+\scrlayerAddToInterface\slnc@makenote{%
+  \newcommand{\slnc@makenote}[2][marginpar]{%
     \@bsphack
     \scr@savepos
     \addtocontents{slnc}{%
       \string\slnc@note{#1}%
                        {\noexpand\number\value{slncpage}}%
                        {\noexpand\number\scr@lastypos}%
-                       {#2}%
+                       {\slnc@unexpanded{#2}}%
     }%
     \@esphack
   }%
@@ -798,6 +813,8 @@
 %</body>
 %    \end{macrocode}
 %^^A \end{counter}^^A slncpage
+% \end{macro}^^A \slnc@unexpanded
+% \end{macro}^^A \slnc@makenote
 % \end{macro}^^A \makenote
 %
 % \begin{macro}{\slnc@processnotes}
@@ -1029,9 +1046,9 @@
   \restoreinnote\index
   \restoreinnote\glossary
 }
-% \end{macrocode}
-% \end{macro}
-% \end{macro}
+%    \end{macrocode}
+% \end{macro}^^A \slnc@restoreinnote
+% \end{macro}^^A \restoreinnote
 % \begin{macro}{\slnc@readnotes}
 % Read as long notes from the notes file until the number at \#2 of
 % \Macro{slnc@note} or \Macro{slnc@sync} in the file is greater than
