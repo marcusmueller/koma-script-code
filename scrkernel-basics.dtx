@@ -1,4 +1,4 @@
-% \CheckSum{3578}
+% \CheckSum{3587}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -2499,19 +2499,28 @@
 % \begin{macro}{\scr@ifdvioutput}
 %   \changes{v2.95}{2002/08/21}{neu (intern)}^^A
 %   \changes{v2.95}{2004/07/20}{Expandierbarkeit verbessert}^^A
+%   \changes{v3.23}{2017/02/14}{lua\TeX{} nach 0.85 berücksichtigt}^^A
 % If-then-else-Konstrukt, um abhängig davon, ob \texttt{dvi}
 % ausgegeben wird oder nicht, Befehle auszuführen.
 %    \begin{macrocode}
 %<*base>
 \newcommand*{\scr@ifdvioutput}{%
   \scr@ifundefinedorrelax{pdfoutput}{%
-    \scr@ifundefinedorrelax{OpMode}{%
-      \expandafter\@firstoftwo
-    }{%
-      \ifnum\OpMode=0
+    \scr@ifundefinedorrelax{outputmode}{%
+      \scr@ifundefinedorrelax{OpMode}{%
         \expandafter\@firstoftwo
-      \else
+      }{%
+        \ifnum\OpMode=0
+          \expandafter\@firstoftwo
+        \else
+          \expandafter\@secondoftwo
+        \fi
+      }%
+    }{%
+      \ifnum\outputmode>0
         \expandafter\@secondoftwo
+      \else
+        \expandafter\@firstoftwo
       \fi
     }%
   }{%
