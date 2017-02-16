@@ -871,8 +871,11 @@
     }%
   }%
   \ifx\AtEndOfFamilyOptions\@firstofone
+    \@namedef{scr@after@options@#2@hook@topmost}{}%
     \expandafter\l@addto@macro\csname scr@after@options@#2@hook\endcsname{%
       \let\AtEndOfFamilyOptions\@firstofone
+      \@nameuse{scr@after@options@#2@hook@topmost}%
+      \@namedef{scr@after@options@#2@hook@topmost}{}%
     }%
     \let\AtEndOfFamilyOptions\scr@AtEndOfFamilyOptions
   \fi
@@ -984,21 +987,31 @@
 % \end{macro}^^A \BeforeFamilyProcessOptions
 % \begin{macro}{\AtEndOfFamilyOptions}
 %   \changes{v3.12}{2013/03/04}{Neue Anweisung}^^A
+%   \changes{v3.23}{2017/02/16}{Sternvariante}^^A
 % Mit dieser Option kann innerhalb der Ausführung einer Option Material auf
 % das Ende der aktuellen \cs{FamilyProcessOptions}, \cs{FamilyExecuteOptions},
 % \cs{FamilyOptions} oder \cs{FamilyOption} verzögert werden. Als einziges
 % Argument wird der zu verzögernde Code erwartet, der an \cs{l@addto@macro}
-% delegiert wird.
+% delegiert wird. Die Normalvariante verzögert bei verschachtelten
+% \cs{FamilyOptions} bis zum Ende der aktuellen Schachtet, die Sternvariante
+% bis zum Ende der äußeren Schachtel.
 % \begin{macro}{\scr@AtEndOfFamilyOptions}
 %   \changes{v3.12}{2013/05/29}{Neue Anweisung (intern)}^^A
+% \begin{macro}{\scr@@AtEndOfFamilyOptions}
+%   \changes{v3.23}{2017/02/16}{Neue Anweisung (intern)}^^A
 %    \begin{macrocode}
 \newcommand*{\scr@AtEndOfFamilyOptions}{%
+  \kernel@ifstar {\scr@@AtEndOfFamilyOptions{@topmost}}%
+                 {\scr@@AtEndOfFamilyOptions\@empty}%
+}
+\newcommand*{\scr@@AtEndOfFamilyOptions}[1]{%
   \expandafter
-  \l@addto@macro\csname scr@after@options@\FamilyOfKey @hook\endcsname
+  \l@addto@macro\csname scr@after@options@\FamilyOfKey @hook#1\endcsname
 }
 \newcommand*{\AtEndOfFamilyOptions}{}
 \let\AtEndOfFamilyOptions\@firstofone
 %    \end{macrocode}
+% \end{macro}^^A \scr@AtEndOfFamilyOptions
 % \end{macro}^^A \scr@AtEndOfFamilyOptions
 % \end{macro}^^A \AtEndOfFamilyOptions
 % \begin{macro}{\scr@ifprocess@curroption}
@@ -2852,6 +2865,15 @@
       }%
     }%
   }%
+  \scr@ifundefinedorrelax{scr@after@options@#1@hook@topmost}{%
+    \@namedef{scr@after@options@#1@hook@topmost}{}%
+  }{}%
+  \expandafter\ifx\csname scr@after@options@#1@hook@topmost\endcsname\@empty
+    \expandafter\l@addto@macro\csname scr@after@options@#1@hook\endcsname{%
+      \@nameuse{scr@after@options@#1@hook@topmost}%
+      \@namedef{scr@after@options@#1@hook@topmost}{}%
+    }%
+  \fi
 %    \end{macrocode}
 % \begin{description}
 % \item[Anmerkung:] Es wird nicht auf \textsf{xkeyval} und den dortigen Befehl
