@@ -1,4 +1,4 @@
-% \CheckSum{3630}
+% \CheckSum{3639}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -861,12 +861,20 @@
 %    \begin{macrocode}
   \scr@ifundefinedorrelax{scr@after@options@#2@hook}{%
     \@namedef{scr@after@options@#2@hook}{%
+%    \end{macrocode}
+% Die erste Aktion im Haken wird sein, den Haken selbst zu löschen.
+%    \begin{macrocode}
       \@namedef{scr@after@options@#2@hook}{}%
     }%
   }{%
     \expandafter\edef\csname scr@after@options@#2@hook\endcsname{%
+%    \end{macrocode}
+% Die erste Aktion im Haken wird sein, die jetzige Form des Hakens wieder
+% herzustellen.
+%    \begin{macrocode}
       \noexpand\@namedef{scr@after@options@#2@hook}{%
-        \unexpanded\expandafter{\csname scr@after@options@#2@hook\endcsname}%
+        \unexpanded\expandafter\expandafter\expandafter
+        {\csname scr@after@options@#2@hook\endcsname}%
       }%
     }%
   }%
@@ -875,10 +883,10 @@
 % Seit Version 3.23 wird hier auch der neuen Haken vor
 % \cs{AtEndOfFamilyOptions*} initialisiert und ausgeführt.
 %    \begin{macrocode}
-  \ifx\AtEndOfFamilyOptions\@firstofone
+  \ifx\AtEndOfFamilyOptions\scr@AtEndOfFamilyOptions@immediate
     \@namedef{scr@after@options@#2@hook@topmost}{}%
     \expandafter\l@addto@macro\csname scr@after@options@#2@hook\endcsname{%
-      \let\AtEndOfFamilyOptions\@firstofone
+      \let\AtEndOfFamilyOptions\scr@AtEndOfFamilyOptions@immediate
       \@nameuse{scr@after@options@#2@hook@topmost}%
       \@namedef{scr@after@options@#2@hook@topmost}{}%
     }%
@@ -1004,6 +1012,8 @@
 %   \changes{v3.12}{2013/05/29}{Neue Anweisung (intern)}^^A
 % \begin{macro}{\scr@@AtEndOfFamilyOptions}
 %   \changes{v3.23}{2017/02/16}{Neue Anweisung (intern)}^^A
+% \begin{macro}{\scr@AtEndOfFamilyOptions@immediate}
+%   \changes{v3.23}{2017/02/16}{Neue Anweisung (intern)}^^A
 %    \begin{macrocode}
 \newcommand*{\scr@AtEndOfFamilyOptions}{%
   \kernel@ifstar {\scr@@AtEndOfFamilyOptions{@topmost}}%
@@ -1013,10 +1023,14 @@
   \expandafter
   \l@addto@macro\csname scr@after@options@\FamilyOfKey @hook#1\endcsname
 }
+\newcommand*{\scr@AtEndOfFamilyOptions@immediate}{%
+  \kernel@ifstar {\@firstofone}{\@firstofone}%
+}
 \newcommand*{\AtEndOfFamilyOptions}{}
-\let\AtEndOfFamilyOptions\@firstofone
+\let\AtEndOfFamilyOptions\scr@AtEndOfFamilyOptions@immediate
 %    \end{macrocode}
-% \end{macro}^^A \scr@AtEndOfFamilyOptions
+% \end{macro}^^A \scr@AtEndOfFamilyOptions@immediate
+% \end{macro}^^A \scr@@AtEndOfFamilyOptions
 % \end{macro}^^A \scr@AtEndOfFamilyOptions
 % \end{macro}^^A \AtEndOfFamilyOptions
 % \begin{macro}{\scr@ifprocess@curroption}
@@ -2687,7 +2701,8 @@
   }{%
     \expandafter\edef\csname scr@after@options@#2@hook\endcsname{%
       \noexpand\@namedef{scr@after@options@#2@hook}{%
-        \unexpanded\expandafter{\csname scr@after@options@#2@hook\endcsname}%
+        \unexpanded\expandafter\expandafter\expandafter
+        {\csname scr@after@options@#2@hook\endcsname}%
       }%
     }%
   }%
@@ -2866,7 +2881,8 @@
   }{%
     \expandafter\edef\csname scr@after@options@#1@hook\endcsname{%
       \noexpand\@namedef{scr@after@options@#1@hook}{%
-        \unexpanded\expandafter\expandafter\expandafter{\csname scr@after@options@#1@hook\endcsname}%
+        \unexpanded\expandafter\expandafter\expandafter
+        {\csname scr@after@options@#1@hook\endcsname}%
       }%
     }%
   }%
@@ -3036,8 +3052,9 @@
       \noexpand\def\noexpand\scr@key@run@errors{%
         \unexpanded\expandafter{\scr@key@run@errors}}%
     \fi
-    \ifx\AtEndOfFamilyOptions\@firstofone
-      \noexpand\let\noexpand\AtEndOfFamilyOptions\noexpand\@firstofone
+    \ifx\AtEndOfFamilyOptions\scr@AtEndOfFamilyOptions@immediate
+      \noexpand\let\noexpand\AtEndOfFamilyOptions
+      \noexpand\scr@AtEndOfFamilyOptions@immediate
     \fi
   }%
   \let\AtEndOfFamilyOptions\scr@AtEndOfFamilyOptions
