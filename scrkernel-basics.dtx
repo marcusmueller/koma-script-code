@@ -1,4 +1,4 @@
-% \CheckSum{3587}
+% \CheckSum{3607}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -55,8 +55,10 @@
 %   Right brace   \}     Tilde         \~}
 %
 % \iffalse
-%%% From File: $Id$
-%<package&option>\NeedsTeXFormat{LaTeX2e}[1995/06/01]
+%<prepare>%%% From File: $Id$ (prepare)
+%<option>%%% From File: $Id$ (option)
+%<body>%%% From File: $Id$ (body)
+%<package&prepare>\NeedsTeXFormat{LaTeX2e}[1995/06/01]
 %<*driver>
 \ifx\ProvidesFile\undefined\def\ProvidesFile#1[#2]{}\fi
 \begingroup
@@ -72,7 +74,7 @@
   }
 \reserved@a
 %</driver>
-%<*driver|(package&option)>
+%<*driver|(package&prepare)>
 %<package>\ProvidesPackage{%
 %<package&base>  scrbase%
 %<package&koma>  scrkbase%
@@ -82,7 +84,7 @@
 %<base>    KOMA-Script-independent
 %<koma>    KOMA-Script-dependent
  basics and keyval usage)]
-%</driver|(package&option)>
+%</driver|(package&prepare)>
 %<*dtx>
 \ifx\documentclass\undefined
   \input scrdocstrip.tex
@@ -92,6 +94,7 @@
   \generate{\usepreamble\defaultpreamble
     \file{scrbase.sty}{%
       \from{scrkernel-version.dtx}{trace,package,scrbase}%
+      \from{scrkernel-basics.dtx}{trace,package,prepare,base}%
       \from{scrkernel-basics.dtx}{trace,package,option,base}%
       \from{scrkernel-language.dtx}{trace,package,option,base}%
       \from{scrlfile.dtx}{trace,load}%
@@ -167,7 +170,7 @@
 %
 % \iffalse
 %</load>
-%<*option>
+%<*prepare>
 % \fi
 %
 % \subsection{\eTeX-Test}
@@ -202,6 +205,7 @@
 \expandafter\reserved@a\expandafter{\reserved@b}
 %</base>
 %    \end{macrocode}
+%
 %
 % \subsection{Der abhängige Teil lädt den unabhängigen Teil}
 %
@@ -855,8 +859,23 @@
 %     statt des Mitglieds}^^A
 % Jetzt \cs{AtEndOfFamilyOptions} samt Haken initialisieren.
 %    \begin{macrocode}
-  \let\AtEndOfFamilyOptions\scr@AtEndOfFamilyOptions
-  \@namedef{scr@after@options@#2@hook}{\@namedef{scr@after@options@#2@hook}{}}%
+  \scr@ifundefinedorrelax{scr@after@options@#2@hook}{%
+    \@namedef{scr@after@options@#2@hook}{%
+      \@namedef{scr@after@options@#2@hook}{}%
+    }%
+  }{%
+    \expandafter\edef\csname scr@after@options@#2@hook\endcsname{%
+      \noexpand\@namedef{scr@after@options@#2@hook}{%
+        \unexpanded\expandafter{\csname scr@after@options@#2@hook\endcsname}%
+      }%
+    }%
+  }%
+  \ifx\AtEndOfFamilyOptions\@firstofone
+    \expandafter\l@addto@macro\csname scr@after@options@#2@hook\endcsname{%
+      \let\AtEndOfFamilyOptions\@firstofone
+    }%
+    \let\AtEndOfFamilyOptions\scr@AtEndOfFamilyOptions
+  \fi
   \let\ds@\@empty
   \edef\@curroptions{\@ptionlist{\@currname.\@currext}}%
   \ifx\@currext\@clsextension\else
@@ -940,7 +959,6 @@
 %   \changes{v3.23}{2017/02/16}{Korrektur: Haken danach verwendet die Familie
 %     statt des Mitglieds}^^A
 %    \begin{macrocode}
-  \let\AtEndOfFamilyOptions\@firstofone
   \@nameuse{scr@after@options@#2@hook}%
 }
 \@onlypreamble\FamilyProcessOptions
@@ -1083,6 +1101,11 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \iffalse
+%</prepare>
+%<*option>
+% \fi
+%
 % \begin{option}{internalonly}
 %   \changes{v2.96}{2006/11/26}{neu}^^A
 %   \changes{v2.97c}{2007/06/20}{geht auch ohne Argument}^^A
@@ -1112,6 +1135,7 @@
 %    \end{macrocode}
 % \end{macro}
 % \end{option}
+%
 %
 % \changes{v2.96}{2006/08/20}{Optionen werden abgearbeitet}^^A
 % \changes{v2.97c}{2007/04/18}{Optionen werden mit \cs{KOMAProcessOptions}^^A
@@ -2638,7 +2662,17 @@
   \@FamilyExecuteOptions[{#1}]{#2}%
 }
 \newcommand{\@FamilyExecuteOptions}[3][.\@currname.\@currext]{%
-  \@namedef{scr@after@options@#2@hook}{\@namedef{scr@after@options@#2@hook}{}}%
+  \scr@ifundefinedorrelax{scr@after@options@#2@hook}{%
+    \@namedef{scr@after@options@#2@hook}{%
+      \@namedef{scr@after@options@#2@hook}{}%
+    }%
+  }{%
+    \expandafter\edef\csname scr@after@options@#2@hook\endcsname{%
+      \noexpand\@namedef{scr@after@options@#2@hook}{%
+        \unexpanded\expandafter{\csname scr@after@options@#2@hook\endcsname}%
+      }%
+    }%
+  }%
   \@for\scr@key@atlist:=#3\do{%
     \expandafter\scr@key@split@name@value\scr@key@atlist==\@nil
     \ifx\scr@key@name\@empty\else
@@ -2807,7 +2841,17 @@
 %<*base>
 \newcommand{\FamilyOptions}[1]{\@FamilyOptions{#1}}
 \newcommand{\@FamilyOptions}[2]{%
-  \@namedef{scr@after@options@#1@hook}{\@namedef{scr@after@options@#1@hook}{}}%
+  \scr@ifundefinedorrelax{scr@after@options@#1@hook}{%
+    \@namedef{scr@after@options@#1@hook}{%
+      \@namedef{scr@after@options@#1@hook}{}%
+    }%
+  }{%
+    \expandafter\edef\csname scr@after@options@#1@hook\endcsname{%
+      \noexpand\@namedef{scr@after@options@#1@hook}{%
+        \unexpanded\expandafter\expandafter\expandafter{\csname scr@after@options@#1@hook\endcsname}%
+      }%
+    }%
+  }%
 %    \end{macrocode}
 % \begin{description}
 % \item[Anmerkung:] Es wird nicht auf \textsf{xkeyval} und den dortigen Befehl
@@ -2937,6 +2981,8 @@
 %     ergänzt}^^A
 %   \changes{v3.13a}{2014/08/13}{Leerzeichen durch fehlendes Prozentzeichen
 %     beseitigt}^^A
+%   \changes{v3.23}{2017/02/16}{den \cs{AtEndOfFamilyOptions} Haken hier zu
+%     sichern nützt nichts}^^A
 % Es wird die bereits gesplittete Option ausgeführt, ohne dass die dabei
 % wesentlichen Macros (aber nicht \cs{reserved@a}!)  verändert werden. Das
 % erste Argument ist bereits der Besitzer in \textsf{keyval}-Syntax.
@@ -2958,20 +3004,12 @@
       \noexpand\def\noexpand\scr@key@run@errors{%
         \unexpanded\expandafter{\scr@key@run@errors}}%
     \fi
-    \expandafter\ifx\csname scr@after@options@#1@hook\endcsname\relax
-      \noexpand\expandafter\noexpand\let\noexpand\csname
-      scr@after@options@#1@hook\endcsname\relax
-    \else
-      \noexpand\def\expandafter\noexpand
-      \csname scr@after@options@#1@hook\endcsname{%
-        \expandafter\unexpanded\expandafter\expandafter\expandafter{%
-          \csname scr@after@options@#1@hook\endcsname
-        }}%
+    \ifx\AtEndOfFamilyOptions\@firstofone
+      \noexpand\let\noexpand\AtEndOfFamilyOptions\noexpand\@firstofone
     \fi
   }%
   \let\AtEndOfFamilyOptions\scr@AtEndOfFamilyOptions
   \reserved@a
-  \let\AtEndOfFamilyOptions\@firstofone
   \ifx\FamilyKeyState\FamilyKeyStateUnknown
     \PackageInfo{scrbase}{Unknown processing state.\MessageBreak
       Processing option 
@@ -3205,12 +3243,12 @@
 %   \changes{v3.12}{2013/03/04}{entfernt}^^A
 % \end{macro}^^A \post@kopt@hook
 % \begin{macro}{\AfterKOMAoptions}
-%   \changes{v3.12}{2013/03/04}{Verwendung von \cs{AtEndOfFamilyOptions}}
+%   \changes{v3.12}{2013/03/04}{Verwendung von \cs{AtEndOfFamilyOptions}}^^A
+%   \changes{v3.23}{2017/02/16}{kein \cs{let}}^^A
 % Eine Option kann dafür sorgen, dass nach den Optionen noch etwas passiert.
 %    \begin{macrocode}
 %<*koma>
-\newcommand*{\AfterKOMAoptions}{}
-\let\AfterKOMAoptions\AtEndOfFamilyOptions
+\newcommand*{\AfterKOMAoptions}{\AtEndOfFamilyOptions}
 %</koma>
 %    \end{macrocode}
 % \end{macro}^^A \AfterKOMAoptions
@@ -3225,8 +3263,10 @@
 %   \changes{v3.12}{2013/04/20}{veraltete \eTeX-freie Version entfernt}^^A
 %   \changes{v3.12}{2013/04/20}{Warnung, falls eine inkompatible Definition
 %     von \cs{l@addto@macro} entdeckt wird}
+%   \changes{v3.23}{2017/02/16}{in den Optionen-Teil verschoben}^^A
 %    \begin{macrocode}
-%<*base>
+%</body>
+%<*base&prepare>
 \@ifundefined{l@addto@macro}{}{%
   \begingroup
     \long\def\reserved@a#1#2{%
@@ -3255,7 +3295,8 @@
 \long\def\l@addto@macro#1#2{%
   \edef#1{\unexpanded\expandafter{#1#2}}%
 }%
-%</base>
+%</base&prepare>
+%<*body>
 %    \end{macrocode}
 % \end{macro}^^A \l@addto@macro
 %
