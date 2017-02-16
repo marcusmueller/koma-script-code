@@ -850,8 +850,13 @@
     \expandafter\let\csname scr@before@process@options@#2#1@hook\endcsname
     \relax
   }%
+%    \end{macrocode}
+%   \changes{v3.23}{2017/02/16}{Korrektur: Haken danach verwendet die Familie
+%     statt des Mitglieds}^^A
+% Jetzt \cs{AtEndOfFamilyOptions} samt Haken initialisieren.
+%    \begin{macrocode}
   \let\AtEndOfFamilyOptions\scr@AtEndOfFamilyOptions
-  \@namedef{scr@after@options@#1@hook}{\@namedef{scr@after@options@#1@hook}{}}%
+  \@namedef{scr@after@options@#2@hook}{\@namedef{scr@after@options@#2@hook}{}}%
   \let\ds@\@empty
   \edef\@curroptions{\@ptionlist{\@currname.\@currext}}%
   \ifx\@currext\@clsextension\else
@@ -932,9 +937,11 @@
   \AtEndOfPackage{\let\@unprocessedoptions\relax}%
 %    \end{macrocode}
 % Jetzt muss noch der Hook ausgeführt und wieder gelöscht werden.
+%   \changes{v3.23}{2017/02/16}{Korrektur: Haken danach verwendet die Familie
+%     statt des Mitglieds}^^A
 %    \begin{macrocode}
   \let\AtEndOfFamilyOptions\@firstofone
-  \@nameuse{scr@after@options@#1@hook}%
+  \@nameuse{scr@after@options@#2@hook}%
 }
 \@onlypreamble\FamilyProcessOptions
 %    \end{macrocode}
@@ -2620,6 +2627,8 @@
 %   verarbeitet}^^A
 % \begin{macro}{\@FamilyExecuteOptions}
 %   \changes{v3.14}{2014/10/17}{Neue streng interne Anweisung}^^A
+%   \changes{v3.23}{2017/02/16}{Korrektur: Haken danach verwendet die Familie
+%     statt des Mitglieds}^^A
 % Entspriche \cs{ExecuteOptions} jedoch \textsf{keyval}-Optionen. Insbesondere
 % ist die Anweisung reentrant! Es ist jedoch zu beachten, dass der hook lokal
 % zum jeweiligen Aufruf ist.
@@ -2629,7 +2638,7 @@
   \@FamilyExecuteOptions[{#1}]{#2}%
 }
 \newcommand{\@FamilyExecuteOptions}[3][.\@currname.\@currext]{%
-  \@namedef{scr@after@options@#1@hook}{\@namedef{scr@after@options@#1@hook}{}}%
+  \@namedef{scr@after@options@#2@hook}{\@namedef{scr@after@options@#2@hook}{}}%
   \@for\scr@key@atlist:=#3\do{%
     \expandafter\scr@key@split@name@value\scr@key@atlist==\@nil
     \ifx\scr@key@name\@empty\else
@@ -2712,7 +2721,7 @@
       \fi
     \fi
   }%
-  \@nameuse{scr@after@options@#1@hook}%
+  \@nameuse{scr@after@options@#2@hook}%
 }
 %</base>
 %    \end{macrocode}
