@@ -1,4 +1,4 @@
-% \CheckSum{3639}
+% \CheckSum{3640}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -881,17 +881,39 @@
 %    \end{macrocode}
 %   \changes{v3.23}{2017/02/16}{neuer Haken für \cs{AtEndOfFamilyOptions*}}^^A
 % Seit Version 3.23 wird hier auch der neuen Haken vor
-% \cs{AtEndOfFamilyOptions*} initialisiert und ausgeführt.
+% \cs{AtEndOfFamilyOptions*} initialisiert und ausgeführt. Erkannt wird die
+% oberste Ebene hier einfach an der Definition von \cs{AtEndOfFamilyOptions},
+% weil das schneller geht als die Erkennung über die Definition des Hakens
+% selbst (wie sie in \cs{FamilyOptions} verwendet werden muss).
 %    \begin{macrocode}
   \ifx\AtEndOfFamilyOptions\scr@AtEndOfFamilyOptions@immediate
-    \@namedef{scr@after@options@#2@hook@topmost}{}%
+    \@namedef{scr@after@options@#2@hook@topmost}{%
+%    \end{macrocode}
+% Auch dieser Haken wird so definiert, dass er sich bei seiner Ausführung als
+% erstes selbst löscht. Das ist auch für rekursive Aufrufe wichtig, um tiefere
+% Ebenen eindeutig von der höchsten Ebene unterscheiden zu können.
+%    \begin{macrocode}
+      \@namedef{scr@after@options@#2@hook@topmost}{}%
+    }%
+%    \end{macrocode}
+% Der Top-Haken wird außerdem zusammen mit dem Zurücksetzen der Definition von
+% \cs{AtEndOfFamilyOptions} in den Haken der (obersten) Ebene
+% eingefügt.
+%    \begin{macrocode}
     \expandafter\l@addto@macro\csname scr@after@options@#2@hook\endcsname{%
       \let\AtEndOfFamilyOptions\scr@AtEndOfFamilyOptions@immediate
       \@nameuse{scr@after@options@#2@hook@topmost}%
-      \@namedef{scr@after@options@#2@hook@topmost}{}%
     }%
+%    \end{macrocode}
+% Natürlich darf nicht vergessen werden, den Befehl für das Befüllen der
+% beiden Haken nun von der direkten Ausführung eben auf das Befüllen der Haken
+% umzustellen.
+%    \begin{macrocode}
     \let\AtEndOfFamilyOptions\scr@AtEndOfFamilyOptions
   \fi
+%    \end{macrocode}
+% Jetzt geht es weiter mit der Adaption des Codes aus \cs{ProcessOptions}.
+%    \begin{macrocode}
   \let\ds@\@empty
   \edef\@curroptions{\@ptionlist{\@currname.\@currext}}%
   \ifx\@currext\@clsextension\else
@@ -2889,14 +2911,28 @@
 %    \end{macrocode}
 %   \changes{v3.23}{2017/02/16}{neuer Haken für \cs{AtEndOfFamilyOptions*}}^^A
 % Seit Version 3.23 wird hier auch der neuen Haken vor
-% \cs{AtEndOfFamilyOptions*} initialisiert und ausgeführt.
+% \cs{AtEndOfFamilyOptions*} initialisiert. Zunächst findet eine Art
+% Vorinitialisierung statt, bei der der Haken lediglich leer definiert wird,
+% falls er noch nicht existiert. Falls er nämlich existiert, kann an einem
+% leeren Haken die oberste Ebene erkannt werden.
 %    \begin{macrocode}
   \scr@ifundefinedorrelax{scr@after@options@#1@hook@topmost}{%
     \@namedef{scr@after@options@#1@hook@topmost}{}%
   }{}%
+%    \end{macrocode}
+% Dann wird an einem leeren Haken die oberste Ausführungsebene erkennt. In
+% diesem Fall wird zum einen die Ausführung des Hakens in den normalen
+% Ebenen-Haken (das ist dann automatische der oberste Ebenen-Haken)
+% eingehängt und zum anderen der Haken selbst so initialisiert, dass er sich
+% bei seiner Ausführung als erstes selbst löscht. Gleichzeitig ist der Haken
+% selbst dadurch nicht mehr leer, so dass sich tiefere Ebenen von der höchsten
+% eindeutig unterscheiden.
+%    \begin{macrocode}
   \expandafter\ifx\csname scr@after@options@#1@hook@topmost\endcsname\@empty
     \expandafter\l@addto@macro\csname scr@after@options@#1@hook\endcsname{%
       \@nameuse{scr@after@options@#1@hook@topmost}%
+    }%
+    \@namedef{scr@after@options@#1@hook@topmost}{%
       \@namedef{scr@after@options@#1@hook@topmost}{}%
     }%
   \fi
