@@ -1,4 +1,4 @@
-% \CheckSum{2732}
+% \CheckSum{2794}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-typearea.dtx
@@ -91,6 +91,7 @@
       \from{scrkernel-typearea.dtx}{trace,package,typearea,identify}%
       \from{scrkernel-basics.dtx}{trace,load}%
       \from{scrkernel-compatibility.dtx}{trace,package,typearea,init}%
+      \from{scrkernel-typearea.dtx}{trace,package,typearea,init}%
       \from{scrkernel-typearea.dtx}{trace,package,typearea,option}%
       \from{scrkernel-compatibility.dtx}{trace,package,typearea,option}%
       \from{scrkernel-typearea.dtx}{trace,package,typearea,body}%
@@ -307,9 +308,169 @@
 % \end{macro}
 % \end{macro}
 %
-% Jetzt kommt ein Stück, das nur im Paket benötigt wird.
+% Jetzt kommt ein Stück, das nur in Paketen benötigt wird. Dafür aber bereits
+% vor Auswertung der Optionen.
 %    \begin{macrocode}
-%<*package>
+%</option>
+%</class|(package&typearea)>
+%<*package&init>
+%    \end{macrocode}
+%
+% \begin{macro}{\PaperNameToSize}
+%   \changes{v3.23}{2017/02/22}{neu}^^A
+%   Dieses Makro zu diversen Papiernamen die Größen \cs{paperheight} und
+%   \cs{paperwidth}. Derzeit werden die ISO-Formate A, B, C und D sowie
+%   letter, legal und executive unterstützt.
+%    \begin{macrocode}
+\providecommand*{\PaperNameToSize}[2][warning]{%
+  \ifstr{#2}{letter}{%
+    \setlength\paperheight{11in}%
+    \setlength\paperwidth {8.5in}%
+  }{%
+    \ifstr{#2}{legal}{%
+      \setlength\paperheight{14in}%
+      \setlength\paperwidth {8.5in}%
+    }{%
+      \ifstr{#2}{executive}{%
+        \setlength\paperheight{10.5in}%
+        \setlength\paperwidth {7.25in}%
+      }{%
+        \ifstr{#2}{}{%
+          \ISO@PaperNameToSize[#1]{}{}\@nil
+        }{%
+          \edef\reserved@a{\noexpand\ISO@PaperNameToSize[#1]#2 \noexpand\@nil}%
+          \reserved@a
+        }%
+      }%
+    }%
+  }%
+}
+%    \end{macrocode}
+% \begin{macro}{\ISO@PaperNameToSize}
+%   \changes{v3.23}{2017/02/22}{neu}^^A
+%   Setzt zu einer ISO-Papiergrößenangabe die Größen \cs{paperheight} und
+%   \cs{paperwidth}. Derzeit werden die ISO-Formate A, B, C und D
+%   unterstützt.
+%    \begin{macrocode}
+\scr@ifundefinedorrelax{ISO@PaperNameToSize}{%
+  \def\ISO@PaperNameToSize[#1]#2#3\@nil{%
+    \lowercase{\edef\reserved@a{#2}}%
+    \@tempswafalse
+    \if \reserved@a a%
+      \ifnumber{#3}{%
+        \setlength{\paperwidth}{841sp}%
+        \setlength{\paperheight}{1189sp}%
+        \@tempswatrue
+      }{}%
+    \else
+      \if \reserved@a b%
+        \ifnumber{#3}{%
+          \setlength{\paperwidth}{1000sp}%
+          \setlength{\paperheight}{1414sp}%
+          \@tempswatrue
+        }{}%
+      \else
+        \if \reserved@a c%
+          \ifnumber{#3}{%
+            \setlength{\paperwidth}{917sp}%
+            \setlength{\paperheight}{1297sp}%
+            \@tempswatrue
+          }{}%
+        \else
+          \if \reserved@a d%
+            \ifnumber{#3}{%
+              \setlength{\paperwidth}{771sp}%
+              \setlength{\paperheight}{1090sp}%
+              \@tempswatrue
+            }{}%
+          \fi
+        \fi
+      \fi
+    \fi
+    \if@tempswa
+      \@tempcnta=#3\relax
+      \@whilenum\@tempcnta>\z@
+      \do{\setlength{\@tempdima}{\paperwidth}%
+        \setlength{\paperwidth}{.5\paperheight}%
+        \setlength{\paperheight}{\@tempdima}%
+        \advance\@tempcnta by\m@ne
+      }%
+      \multiply\paperwidth by186468
+      \multiply\paperheight by186468
+    \else
+      \scr@ifundefinedorrelax{scr@UnknownPaperSize@#1}{%
+        \scr@UnknownPaperSize@error{#2#3}%
+      }{%
+        \@nameuse{scr@UnknownPaperSize@#1}{#2#3}%
+      }%
+    \fi
+  }%
+}{}
+%    \end{macrocode}
+% \begin{macro}{\ProvideUnknownPaperSizeError}
+%   \changes{v3.23}{2017/02/22}{neu}
+%   Definiert eine Fehlerbehandlung für unbekannte Papiergrößen. Die
+%   Fehlerbehandlung hat genau ein Argument, nämlich die Papiergröße.
+%    \begin{macrocode}
+\providecommand*{\ProvideUnknownPaperSizeError}[1]{%
+  \expandafter\providecommand\expandafter*%
+  \csname scr@UnknownPaperSize@#1\endcsname[1]%
+}
+%    \end{macrocode}
+% \begin{macro}{\scr@UnkownPaperSize@error}
+%   \changes{v3.23}{2017/02/22}{neu (intern)}
+% \begin{macro}{\scr@UnkownPaperSize@warning}
+%   \changes{v3.23}{2017/02/22}{neu (intern)}
+% \begin{macro}{\scr@UnkownPaperSize@info}
+%   \changes{v3.23}{2017/02/22}{neu (intern)}
+% \begin{macro}{\scr@UnkownPaperSize@ignore}
+%   \changes{v3.23}{2017/02/22}{neu (intern)}
+%   Fehlerbehandlungen für \cs{PaperNameToSize}.
+%    \begin{macrocode}
+\ProvideUnknownPaperSizeError{error}{%
+  \PackageError{%
+%<typearea>    typearea%
+%<letter>    scrletter%
+  }{Unknown paper size #1}{%
+    \string\paperwidth\space and \string\paperheight\space stay unchanged,
+    because of unknown paper size.%
+  }%
+}
+%<*typearea>
+\ProvideUnknownPaperSizeError{warning}{%
+  \PackageWarning{%
+    typearea%
+  }{%
+    \string\paperwidth\space and \string\paperheight\space stay
+    unchanged, because\MessageBreak
+    of unknown paper size #1%
+  }%
+}
+\ProvideUnknownPaperSizeError{info}{%
+  \PackageInfo{%
+    typearea
+  }{%
+    \string\paperwidth\space and \string\paperheight\space stay
+    unchanged, because\MessageBreak
+    of unknown paper size #1%
+  }%
+}
+\ProvideUnknownPaperSizeError{ignore}{}
+%</typearea>
+%</package&init>
+%    \end{macrocode}
+% \end{macro}^^A \scr@UnknownPaperSize@error
+% \end{macro}^^A \scr@UnknownPaperSize@warning
+% \end{macro}^^A \scr@UnknownPaperSize@info
+% \end{macro}^^A \scr@UnknownPaperSize@ignore
+% \end{macro}^^A \ProvideUnknownPaperSizeError
+% \end{macro}^^A \ISO@PaperNameToSize
+% \end{macro}^^A \PaperNameToSize
+%
+% Das wird dann unmittelbar in \textsf{typearea} für die Auswertung der
+% Papiergröße verwendet:
+%    \begin{macrocode}
+%<*package&typearea&option>
 %    \end{macrocode}
 %
 % \begin{macro}{\x@paper}
@@ -321,6 +482,7 @@
 % \begin{macro}{\isopaper}
 %   \changes{v2.5}{1997/06/17}{neu}^^A
 %   \changes{v2.95}{2002/12/03}{es sind auch Großbuchstaben erlaubt}^^A
+%   \changes{v3.23}{2017/02/22}{verwendet \cs{ISO@PaperNameToSize}}^^A
 % Da das Makro \cs{isopaper} zur Berechnung unterschiedlicher
 % ISO/DIN-Papierformate in der Mustererkennung für die Papiergröße
 % benötigt wird, wurde dieses Makro ebenfalls vorgezogen.
@@ -337,84 +499,8 @@
 % \item[d] -- ISO/DIN-D-Format
 % \end{description}
 % Der zweite Paremeter gibt dann die Skalierung an.
-%
-% Als Grundgröße wird jeweils die 0-Größe eingesetzt.
 %    \begin{macrocode}
-  \ifx a#1
-    \setlength{\paperwidth}{841sp}%
-    \setlength{\paperheight}{1189sp}%
-  \else\ifx A#1
-      \setlength{\paperwidth}{841sp}%
-      \setlength{\paperheight}{1189sp}%
-    \else\ifx b#1
-        \setlength{\paperwidth}{1000sp}%
-        \setlength{\paperheight}{1414sp}%
-      \else\ifx B#1
-          \setlength{\paperwidth}{1000sp}%
-          \setlength{\paperheight}{1414sp}%
-        \else\ifx c#1
-            \setlength{\paperwidth}{917sp}%
-            \setlength{\paperheight}{1297sp}%
-          \else\ifx C#1
-              \setlength{\paperwidth}{917sp}%
-              \setlength{\paperheight}{1297sp}%
-            \else\ifx d#1
-                \setlength{\paperwidth}{771sp}%
-                \setlength{\paperheight}{1090sp}%
-              \else\ifx D#1
-                  \setlength{\paperwidth}{771sp}%
-                  \setlength{\paperheight}{1090sp}%
-%    \end{macrocode}
-% Wurde ein anderer Buchstabe angegeben, ist ein Fehler auszugeben.
-%   \changes{v2.5a}{1997/06/22}{Ausgabe der gewählten Papiergröße
-%     entfernt} 
-%    \begin{macrocode}
-                \else
-                  \PackageError{typearea}{%
-                    Unknown ISO/DIN-papersize-letter #1%
-                  }{%
-                    There are only four defined paper scalings:\MessageBreak
-                    a = ISO/DIN-A, b = ISO/DIN-B, c = ISO/DIN-C, 
-                    d = ISO/DIN-D\MessageBreak
-                    Read KOMA-Script-documentation for further information.%
-                  }%
-                  \setlength{\paperwidth}{841sp}%
-                  \setlength{\paperheight}{1189sp}%
-                \fi
-              \fi
-            \fi
-          \fi
-        \fi
-      \fi
-    \fi
-  \fi
-%    \end{macrocode}
-% Es dürfte aufgefallen sein, dass bei der Größenfestlegung statt
-% der Einheit "`mm"' die Einheit "`sp"' geschrieben wurde. Die Maße
-% sind also um ein Vielfaches zu klein und müssen später noch mit
-% 186468 multiplitziert werden, um auf Millimeter zu kommen. Dieser
-% Trick ist jedoch notwendig, weil die Norm vorschreibt, dass bei der
-% nun folgenden $n$-fachen Halbierung der Seiten ($n =
-% \mathrm{Skalierung} + 1$) jeweils auf ganze Millimeter abgerundet
-% werden muss. 
-%    \begin{macrocode}
-  \@tempcnta=#2\relax
-  \@whilenum\@tempcnta>0
-  \do{\setlength{\@tempdima}{\paperwidth}
-    \setlength{\paperwidth}{.5\paperheight}
-    \setlength{\paperheight}{\@tempdima}
-    \advance\@tempcnta by\m@ne
-  }
-%    \end{macrocode}
-% Zum Schluß muss nun die genannte Multiplikation erfolgen. Da
-% "`mm"' kein ganzzahliges Vielfaches von "`sp"' ist, beinhaltet diese
-% Multiplikation eigentlich einen Fehler und eine Abweichung von der
-% Norm. Da jedoch "`sp"' die Rechengenauigkeit von {\TeX} darstellt,
-% stellt auch die Angabe eines ganzzahligen Millimeterwertes bereits
-% einen solchen Fehler dar. 
-%    \begin{macrocode}
-  \multiply\paperwidth by186468
-  \multiply\paperheight by186468
+  \ISO@PaperNameToSize[typearea]#1#2\@nil
 %    \end{macrocode}
 % Jetzt noch die gewünschte Ausrichtung beachten.
 %   \changes{v2.97e}{2007/10/23}{gewünschte Papierausrichtung wird
@@ -429,7 +515,25 @@
   \fi
 }
 %    \end{macrocode}
-% \end{macro}
+% \textsf{typearea} verwendet eine eigene Fehlerausgabe.
+% \begin{macro}{\scr@UnknownPaperSize@typearea}
+%   \changes{v3.23}{2017/02/22}{neu (intern)}
+%    \begin{macrocode}
+\ProvideUnknownPaperSizeError{typearea}{%
+  \PackageError{typearea}{%
+    Unknown ISO/DIN-papersize-letter #1%
+  }{%
+    There are only four defined paper scalings:\MessageBreak
+    a = ISO/DIN-A, b = ISO/DIN-B, c = ISO/DIN-C, 
+    d = ISO/DIN-D\MessageBreak
+    Read KOMA-Script-documentation for further information.%
+  }%
+  \setlength{\paperwidth}{841sp}%
+  \setlength{\paperheight}{1189sp}%
+}
+%    \end{macrocode}
+% \end{macro}^^A \scr@UnknownPaperSize@typearea
+% \end{macro}^^A \isopaper
 % \begin{macro}{\scr@setpaperorientation}
 %   \changes{v3.22}{2016/07/29}{neu (intern)}
 % Stellt die Papierausrichtung entsprechend \cs{if@landscape} ein.
@@ -479,12 +583,14 @@
   \fi
 }
 %    \end{macrocode}
-% \end{macro}
-% \end{macro}
+% \end{macro}^^A \iso@@paper
+% \end{macro}^^A \iso@paper
 %
 % Jetzt wird es wieder für alle interessant:
 %    \begin{macrocode}
-%</package>
+%</package&typearea&option>
+%<*class|(package&typearea)>
+%<*option>
 %    \end{macrocode}
 %
 % Zurück zur Mustererkennung. Diese ist tatsächlich etwas einfacher

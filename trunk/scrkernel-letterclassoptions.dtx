@@ -1,8 +1,8 @@
-% \CheckSum{1750}
+% \CheckSum{1753}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-letterclassoptions.dtx
-% Copyright (c) Markus Kohm, 2006-2016
+% Copyright (c) Markus Kohm, 2006-2017
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrkernel-letterclassoptions.dtx
-% Copyright (c) Markus Kohm, 2006-2016
+% Copyright (c) Markus Kohm, 2006-2017
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -311,6 +311,7 @@
 %   \changes{v2.8q}{2002/03/25}{Neu (intern)}^^A
 %   \changes{v3.12}{2013/11/05}{Abweichung von 1\,mm nach unten und oben
 %     erlaubt}^^A
+%   \changes{v3.23}{2017/02/22}{Verwendung des neuen \cs{PaperNameToSize}}^^A
 % \begin{macro}{\@@PapersizeWarning}
 %   \changes{v2.8q}{2002/03/25}{Neu (intern)}^^A
 % \begin{macro}{\LOPNP@size}
@@ -347,27 +348,28 @@
     \def\@tempb{letter}\ifx\LOPNP@size\@tempb%
       \setlength{\paperheight}{11in}\setlength{\paperwidth}{8.5in}%
     \else\def\@tempb{legal}\ifx\LOPNP@size\@tempb%
-      \setlength{\paperheight}{14in}\setlength{\paperwidth}{8.5in}%
-    \else\def\@tempb{executive}\ifx\LOPNP@size\@tempb%
-      \setlength{\paperheight}{10.5in}\setlength{\paperwidth}{7.25in}%
-    \else%
-      \def\ta@opt@err{%
-%<class>        \ClassError{scrlttr2%
-%<package>        \PackageError{scrletter%
-          }{papersize `\LOPNP@size' undefined}{%
-          You've told me to check for paper size
-          `\LOPNP@size'\MessageBreak
-          at letter option file `\LOPNP@option.lco',\MessageBreak
-          but this paper size is not supported.\MessageBreak
-          See the KOMA-Script manual for informations about known
-          paper sizes.}%
-        }%
-      \let\@headlines\ta@opt@err%
-      \expandafter\x@@paper\LOPNP@size paperpaper\x@@paper%
-    \fi\fi\fi
+        \setlength{\paperheight}{14in}\setlength{\paperwidth}{8.5in}%
+      \else\def\@tempb{executive}\ifx\LOPNP@size\@tempb%
+          \setlength{\paperheight}{10.5in}\setlength{\paperwidth}{7.25in}%
+        \else%
+          \PaperNameToSize[letter]{\LOPNP@size}%
+        \fi 
+      \fi
+    \fi
     \@tempc
   \endgroup%
 }
+\ProvideUnknownPaperSizeError{letter}{%
+%<class>  \ClassError{scrlttr2}{%
+%<package>  \PackageError{scrletter}{%
+    papersize `\LOPNP@size' undefined}{%
+    You've told me to check for paper size
+    `\LOPNP@size'\MessageBreak
+    at letter option file `\LOPNP@option.lco',\MessageBreak
+    but this paper size is not supported.\MessageBreak
+    See the KOMA-Script manual for informations about known
+    paper sizes.}%
+}    
 \newcommand*{\@@PapersizeWarning}{%
   \if@tempswa\else%
 %<class>  \ClassWarningNoLine{scrlttr2%
@@ -376,8 +378,16 @@
     Letter option file `\LOPNP@option.lco'\MessageBreak
     needs paper size `\LOPNP@size'.\MessageBreak
     Current paper size is not `\LOPNP@size'!\MessageBreak
-    You should add `paper=\LOPNP@size' at the\MessageBreak
-    option list of \string\documentclass!\MessageBreak
+    \scr@ifundefinedorrelax{KOMAClassName}{%
+      You should load package `typearea' either\MessageBreak
+      with option `paper=\LOPNP@size,paper=portrait' or
+      additionally\MessageBreak
+    }{%
+      You should add `paper=\LOPNP@size,paper=portrait' at the\MessageBreak
+      option list of `\string\documentclass' or\MessageBreak
+    }%
+    add `\string\KOMAoptions{paper=\LOPNP@size,paper=portrait}'\MessageBreak
+    before starting this letter!\MessageBreak
     Maybe you know what you are doing,\MessageBreak
     so I do not change this myself}%
   \fi
