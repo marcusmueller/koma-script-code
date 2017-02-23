@@ -1,4 +1,4 @@
-% \CheckSum{1535}
+% \CheckSum{1564}
 % \iffalse meta-comment
 % ======================================================================
 % tocbasic.dtx
@@ -390,11 +390,29 @@
         because of feature `nobabel' available\MessageBreak
         for `#1'}%
     }{%
-      \PackageInfo{tocbasic}{setting babel extension for `#1'}%
-      \expandafter\gdef\expandafter\bbl@set@language\expandafter##\expandafter1%
-      \expandafter{%
-        \bbl@set@language{##1}%
-        \addtocontents{#1}{\xstring\select@language{\languagename}}%
+%    \end{macrocode}
+%   \changes{v3.23}{2017/02/23}{using \cs{BabelContentsFiles} if available}^^A
+% Since version 3.9a provides adding extensions to the language switch
+% preparation. So it is used if it is available.
+%    \begin{macrocode}
+      \scr@ifundefinedorrelax{BabelContentsFiles}{%
+        \PackageInfo{tocbasic}{setting babel extension for `#1'}%
+        \expandafter\gdef\expandafter\bbl@set@language
+        \expandafter##\expandafter1%
+        \expandafter{%
+          \bbl@set@language{##1}%
+          \addtocontents{#1}{\xstring\select@language{\languagename}}%
+        }%
+      }{%
+        \@expandtwoargs\in@{,#1,}{,\BabelContentsFiles,}%
+        \ifin@
+          \PackageInfo{tocbasic}{omitting babel extension for
+            `#1'\MessageBreak
+            because it is already in \string\BabelContentsFiles}%
+        \else
+          \PackageInfo{tocbasic}{setting babel extension for `#1'}%
+          \xdef\BabelContentsFiles{\BabelContentsFiles,#1}%
+        \fi
       }%
     }%
   }%
@@ -841,6 +859,17 @@
 % \end{macro}
 % \end{macro}
 %
+% \begin{macro}{\ext@toc}
+%   \changes{v3.23}{2017/02/23}{use indirect extension for toc}^^A
+%   We do not longer hard code extension \texttt{toc} for the table of
+%   contents. This allowes users to change it. Classes or other packages may
+%   also define it. So it seems to be better to \cs{providecommand} instead of
+%   \cs{newcommand} here.
+%    \begin{macrocode}
+\providecommand*{\ext@toc}{toc}
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}{\tocbasic@listhead}
 %   \changes{v3.02a}{2009/01/20}{no explicite marks if ``numbered''}%
 %   \changes{v3.09a}{2011/04/12}{again no explicite marks if ``numbered''}%
@@ -868,7 +897,8 @@
             \ifvmode\@tempcnta\lastpenalty\@tempskipa\lastskip\unskip\fi
             \begingroup
               \iftocfeature{\@currext}{totoc}{%
-                \addxcontentsline{toc}{subsection}{##1}%
+                \expandafter\addxcontentsline\expandafter{\ext@toc}%
+                {subsection}{##1}%
               }{}%
               \@ifundefined{@mkright}{%
                 \ifx\@mkboth\@gobbletwo\else\markright{\MakeMarkcase{##1}}\fi
@@ -886,7 +916,8 @@
             \ifvmode\@tempcnta\lastpenalty\@tempskipa\lastskip\unskip\fi
             \begingroup
               \iftocfeature{\@currext}{totoc}{%
-                \addxcontentsline{toc}{section}{##1}%
+                \expandafter\addxcontentsline\expandafter{\ext@toc}%
+                {section}{##1}%
               }{}%
               \@ifundefined{@mkdouble}{%
                 \@mkboth{\MakeMarkcase{##1}}{\MakeMarkcase{##1}}%
@@ -916,7 +947,8 @@
                     }{%
                       \@mkright{\MakeMarkcase{##1}}%
                     }%
-                    \addxcontentsline{toc}{section}{##1}%
+                    \expandafter\addxcontentsline\expandafter{\ext@toc}%
+                    {section}{##1}%
                   \endgroup
                   \ifvmode\penalty\@tempcnta\vskip\@tempskipa\fi
                 }{%
@@ -950,7 +982,8 @@
                 \@mkdouble{\MakeMarkcase{##1}}%
               }%
               \iftocfeature{\@currext}{totoc}{%
-                \addxcontentsline{toc}{chapter}{##1}%
+                \expandafter\addxcontentsline\expandafter{\ext@toc}%
+                {chapter}{##1}%
               }{}%
             \endgroup
             \ifvmode\penalty\@tempcnta\vskip\@tempskipa\fi
@@ -1803,6 +1836,7 @@
 % Tell the package, what files are used:
 %    \begin{macrocode}
 \addtotoclist{toc}
+\ifstr{\ext@toc}{toc}{}{\expandafter\addtotoclist\expandafter{\ext@toc}}
 \addtotoclist[float]{lof}
 \addtotoclist[float]{lot}
 %    \end{macrocode}
