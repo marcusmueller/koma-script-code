@@ -1,6 +1,6 @@
 % ======================================================================
 % scrguide.cls
-% Copyright (c) Markus Kohm, 2005-2016
+% Copyright (c) Markus Kohm, 2005-2017
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -18,7 +18,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrguide.cls
-% Copyright (c) Markus Kohm, 2005-2016
+% Copyright (c) Markus Kohm, 2005-2017
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2016/11/26 v1.13 internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2017/03/03 v1.13a internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -525,14 +525,15 @@
   \ifx\@translator\@empty\else
     #1%
     \begingroup
-%   \end{macrocode}
+%    \end{macrocode}
 % Run through all translators, but store each once only.
+%    \begin{macrocode}
       \let\@tempb\@empty
       \@tempcnta=\z@
       \expandafter\@for \expandafter\@tempa\expandafter:\expandafter=%
       \@translator\do {%
         \ifx\@tempa\@empty\else
-          \typeout{Test: `,\@tempa,' at `,\@tempb,'}%
+%<trace>          \typeout{Test: `,\@tempa,' at `,\@tempb,'}%
           \@expandtwoargs\in@{,\@tempa,}{,\@tempb,}%
           \ifin@\else
             \edef\@tempb{\@tempb\@tempa,}%
