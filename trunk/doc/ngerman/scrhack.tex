@@ -154,7 +154,8 @@ ganzen Zahl expandiert. Aus Kompatibilitätsgründen definiert \KOMAScript{}
 Schriftgrößen erlaubt, kann dabei \Macro{@ptsize} natürlich auch zu einem
 Dezimalbruch expandieren.
 
-Eines der Pakete, die damit nicht zurecht kommen, ist das Paket
+Eines\ChangedAt{v3.17}{\Package{scrhack}} der Pakete, die damit nicht zurecht
+kommen, ist das Paket
 \Package{setspace}\IndexPackage[indexmain]{setspace}. Darüber hinaus sind die
 von diesem Paket eingestellten Werte immer von der Grundschriftgröße abhängig,
 auch wenn die Einstellung im Kontext einer anderen Schriftgröße erfolgt. Paket
@@ -187,13 +188,15 @@ entsprechender Patch aufgenommen. Zwar kann dieser ebenfalls durch
 stattdessen die aktuelle Version von \Package{hyperref} zu verwenden. In
 diesem Fall wird die Änderung durch \Package{scrhack} automatisch verhindert.
 
+
 \section{Inkonsistente Behandlung von \Length{textwidth} und \Length{textheight}}
 \seclabel{lscape}
 
-Das Paket \Package{lscape}\IndexPackage[indexmain]{lscape} definiert eine
-Umgebung \Environment{landscape}\IndexEnv{landscape}, um den Inhalt einer
-Seite aber nicht deren Kopf und Fuß quer zu setzen. Innerhalb dieser Umgebung
-wird \Length{textheight}\IndexLength{textheight} auf den Wert von
+Das\ChangedAt{v3.18}{\Package{scrhack}} Paket
+\Package{lscape}\IndexPackage[indexmain]{lscape} definiert eine Umgebung
+\Environment{landscape}\IndexEnv{landscape}, um den Inhalt einer Seite aber
+nicht deren Kopf und Fuß quer zu setzen. Innerhalb dieser Umgebung wird
+\Length{textheight}\IndexLength{textheight} auf den Wert von
 \Length{textwidth} gesetzt. Umgekehrt wird jedoch \Length{textwidth} nicht auf
 den vorherigen Wert von \Length{textheight} gesetzt. Das ist
 inkonsistent. Meines Wissens wird \Length{textwidth} nicht entsprechend
@@ -219,8 +222,32 @@ war.
 Im übrigens\textnote{Achtung!} wird \Package{lscape} auch von dem Paket
 \Package{pdflscape}\IndexPackage[indexmain]{pdflscape} verwendet, so dass
 \Package{scrhack} sich auch auf die Funktion dieses Pakets auswirkt.%
+
+
+\section{Sonderfall \Package{nomencl}}
+\seclabel{nomencl}
+
+Eine\ChangedAt{v3.23}{\Package{scrhack}} Besonderheit stellt der Hack für das
+Paket \Package{nomencl}\IndexPackage[indexmain]{nomencl} dar. Dieser rüstet
+einerseits nach, dass der optionale Inhaltsverzeichniseintrag für die
+Nomenklatur Option \OptionValueRef{maincls}{toc}{indentunnumbered}
+beachtet. Quasi nebenbei werden aber auch gleich die Endungen \File{nlo} und
+\File{nls} über das Paket \Package{tocbasic} reserviert (siehe
+\DescRef{tocbasic.cmd.addtotoclist}, \autoref{sec:tocbasic.basics},
+\DescPageRef{tocbasic.cmd.addtotoclist}). Darüber hinaus können mit dem Hack
+diverse Attribute für die Endung \File{nls} über
+\DescRef{tocbasic.cmd.setuptoc} gesetzt werden. So ist es beispielsweise
+möglich, mit
+\DescRef{tocbasic.cmd.setuptoc}\PParameter{nls}\PParameter{numbered} die
+Nomenklatur nicht nur ins Inhaltsverzeichnis einzutragen sondern auch gleich
+zu nummerieren. Als weiterer Nebeneffekt erhält die Nomenklatur mit diesem
+Hack außerdem einen passenden Kolumnentitel, falls lebende Kolumnentitel
+beispielsweise durch Verwendung von Seitenstil
+\DescRef{maincls.pagestyle.headings} aktiviert wurden. All dies wird mit einem
+kleinen Patch der Umgebung \Environment{thenomenclature} erreicht.%
 %
 \EndIndexGroup
+
 
 %%% Local Variables: 
 %%% mode: latex
