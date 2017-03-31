@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2017/03/03 v1.13a internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2017/03/31 v1.13b internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -872,8 +872,11 @@
 }
 \newcommand*{\LabelPageStyle}[2][\label@suffix]{%
   \begingroup
-    \@nameuse{phantomsection}%
+    \protected@edef\@currentlabel{\FloatStyle{#2}}%
     \label@sanitize
+    \Hy@MakeCurrentHref{\label@desc@prefix\label@base.pagestyle.#2#1}%
+    \ClassInfo{scrguide}{Anchor: `\@currentHref'}%
+    \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
     \label{\label@desc@prefix\label@base.pagestyle.#2#1}%
   \endgroup
 }

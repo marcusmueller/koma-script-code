@@ -151,13 +151,14 @@ basic font size is neither 10\Unit{pt} nor 11\Unit{pt} nor
 12\Unit{pt}. \KOMAScript{} also provides non-integer font sizes. So
 \Macro{@ptsize} can expand to a non-integer number, too.
 
-Package \Package{setspace}\IndexPackage[indexmain]{setspace} is one of the
-packages that fail with non-integer number expansion of
-\Macro{@ptsize}. Additionally the line stretching of that package always
-depends on the basic font size even if setting is made in the context of
-another font size. Package \Package{scrhack} solves both problems by
-redefining \Macro{onehalfspacing} and \Macro{doublespacing} using always the
-current font size while setting the stretch.
+Package\ChangedAt{v3.17}{\Package{scrhack}}
+\Package{setspace}\IndexPackage[indexmain]{setspace} is one of the packages
+that fail with non-integer number expansion of \Macro{@ptsize}. Additionally
+the line stretching of that package always depends on the basic font size even
+if setting is made in the context of another font size. Package
+\Package{scrhack} solves both problems by redefining \Macro{onehalfspacing}
+and \Macro{doublespacing} using always the current font size while setting the
+stretch.
 
 If the modification for the package is not wanted or causes problems,
 then it can be deactivated selectively with option
@@ -186,9 +187,10 @@ automatically deactivate the not longer needed patch.%
 \section{Inconsistent Handling of \Length{textwidth} and \Length{textheight}}
 \seclabel{lscape}
 
-Package \Package{lscape}\IndexPackage[indexmain]{lscape} defines an
-environment \Environment{landscape}\IndexEnv{landscape} to set the page
-contents but not head and foot landscape. Inside this environment it changes
+Package\ChangedAt{v3.18}{\Package{scrhack}}
+\Package{lscape}\IndexPackage[indexmain]{lscape} defines an environment
+\Environment{landscape}\IndexEnv{landscape} to set the page contents but not
+head and foot landscape. Inside this environment it changes
 \Length{textheight}\IndexLength{textheight} to the value of
 \Length{textwidth}, but it does not change \Length{textwidth} to the former
 value of \Length{textheight}.  This is inconsistent. As far as I know,
@@ -212,6 +214,28 @@ loading \Package{lscape} respectively \Package{scrhack}, if
 Please note\textnote{Attention!},
 \Package{pdflscape}\IndexPackage[indexmain]{pdflscape} also uses
 \Package{lscape} and therefore is influenced by \Package{scrhack}, too.%
+
+
+\section{Special Case \Package{nomencl}}
+\label{sec:nomencl}
+
+The\ChangedAt{v3.23}{\Package{scrhack}} hack for package
+\Package{nomencl}\IndexPackage[indexmain]{nomencl} is a somehow special
+case. First of all it extends \Package{nomencl}'s option \Option{intoc} to
+respect \KOMAScript's option
+\OptionValueRef{maincls}{toc}{indentunnumbered}. As a sidestep it also
+reserves the file extensions \File{nlo} and \File{nls} for package
+\Package{tocbasic} (see \DescRef{tocbasic.cmd.addtotoclist},
+\autoref{sec:tocbasic.basics},
+\DescPageRef{tocbasic.cmd.addtotoclist}). Furthermore, you can use several
+features for the file extension \File{nls} using
+\DescRef{tocbasic.cmd.setuptoc}. For example, you can use
+\DescRef{tocbasic.cmd.setuptoc}\PParameter{nls}\PParameter{numbered} to not
+only add an entry to the table of contents but also number the headings of the
+nomenclature. As an side effect the nomenclature also gets a running head if
+automatic running heads are activated, e.\,g., using page style
+\DescRef{maincls.pagestyle.headings}. All these extension are done by a small
+patch of environment \Environment{thenomenclature}.
 %
 \EndIndexGroup
 

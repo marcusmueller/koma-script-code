@@ -1,6 +1,6 @@
 # ======================================================================
 # Makefile
-# Copyright (c) Markus Kohm, 2002-2014
+# Copyright (c) Markus Kohm, 2002-2017
 #
 # This file is part of the LaTeX2e KOMA-Script bundle.
 #
@@ -18,7 +18,7 @@
 # This work consists of all files listed in manifest.txt.
 # ----------------------------------------------------------------------
 # Makefile
-# Copyright (c) Markus Kohm, 2002-2014
+# Copyright (c) Markus Kohm, 2002-2017
 #
 # Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 # Version 1.3c, verteilt und/oder veraendert werden.
@@ -108,6 +108,7 @@ CLS_MAIN	= scrbook.cls \
 		  floatrow.hak \
 		  hyperref.hak \
 		  listings.hak \
+		  nomencl.hak \
 		  setspace.hak \
 		  lscape.hak \
 		  scrfontsizes.sty \
