@@ -1,4 +1,4 @@
-% \CheckSum{3814}
+% \CheckSum{3928}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -1534,7 +1534,9 @@
 % \end{macro}^^A \scr@dsc@def@style@part@command
 %
 % \begin{macro}{\scr@dsc@style@section@neededoptionstest}
-%   \changes{v3.17}{2015/03/24}{Neu (intern)}
+%   \changes{v3.17}{2015/03/24}{Neu (intern)}^^A
+%   \changes{v3.24}{2017/04/25}{Voreinstellungen für \texttt{indent} und
+%     \texttt{font}}^^A
 % Dieses Anweisung überprüft, ob alle notwendigen Eigenschaften für die
 % Definition der spezifischen Gliederungsebene im section-Stil bekannt
 % sind. Sollte das nicht der Fall sein, meldet sie einen Fehler und sorgt sie
@@ -1542,25 +1544,31 @@
 %    \begin{macrocode}
 \newcommand*{\scr@dsc@style@section@neededoptionstest}{%
   \scr@ifundefinedorrelax{scr@\scr@dsc@current @sectionindent}{%
-    \scr@declaresectioncommanderror{\scr@dsc@current}{section indent}{indent}%
+    \scr@declaresectioncommandwarning{\scr@dsc@current}%
+                                     {section indent}{indent}{0pt}%
+    \@namedef{scr@\scr@dsc@current @sectionindent}{0pt}%
   }{}%
   \scr@ifundefinedorrelax{scr@\scr@dsc@current @beforeskip}{%
-    \scr@declaresectioncommanderror{\scr@dsc@current}{before section skip}
-    {beforeskip}%
+    \scr@declaresectioncommanderror{\scr@dsc@current}%
+                                   {before section skip}{beforeskip}%
   }{}%
   \scr@ifundefinedorrelax{scr@\scr@dsc@current @afterskip}{%
-    \scr@declaresectioncommanderror{\scr@dsc@current}{after section skip}
-    {afterskip}%
+    \scr@declaresectioncommanderror{\scr@dsc@current}%
+                                   {after section skip}{afterskip}%
   }{}%
   \IfExistskomafont{\scr@dsc@current}{}{%
-    \scr@declaresectioncommanderror{\scr@dsc@current}{font}{font}%
-  }{}%
+    \scr@declaresectioncommandwarning{\scr@dsc@current}%
+                                     {font}{font}{\normalsize}%
+    \newkomafont{\scr@dsc@current}{\normalsize}%
+  }%
 }
 %    \end{macrocode}
 % \end{macro}^^A \scr@dsc@style@section@neededoptionstest
 %
 % \begin{macro}{\scr@dsc@style@chapter@neededoptionstest}
-%   \changes{v3.17}{2015/03/24}{Neu (intern)}
+%   \changes{v3.17}{2015/03/24}{Neu (intern)}^^A
+%   \changes{v3.24}{2017/04/25}{Voreinstellungen für alle außer auf Ebene
+%     \texttt{chapter}}^^A
 % Dieses Anweisung überprüft, ob alle notwendigen Eigenschaften für die
 % Definition der spezifischen Gliederungsebene im chapter-Stil bekannt
 % sind. Sollte das nicht der Fall sein, meldet sie einen Fehler und sorgt sie
@@ -1569,27 +1577,69 @@
 %<*book|report>
 \newcommand*{\scr@dsc@style@chapter@neededoptionstest}{%
   \scr@ifundefinedorrelax{\scr@dsc@current pagestyle}{%
-    \scr@declaresectioncommanderror{\scr@dsc@current}{initial page style}
-    {pagestyle}%
+    \ifstr{\scr@dsc@current}{chapter}{%
+      \scr@declaresectioncommanderror{\scr@dsc@current}%
+                                     {initial page style}{pagestyle}%
+    }{%
+      \scr@declaresectioncommandwarning{\scr@dsc@current}%
+                                       {initial page style}{pagestyle}%
+                                       {\chapterpagestyle}%
+      \@namedef{\scr@dsc@current pagestyle}{\chapterpagestyle}%
+    }%
   }{}%
   \scr@ifundefinedorrelax{scr@\scr@dsc@current @innerskip}{%
-    \scr@declaresectioncommanderror{\scr@dsc@current}{inner chapter skip}
-    {innerskip}%
+    \ifstr{\scr@dsc@current}{chapter}{%
+      \scr@declaresectioncommanderror{\scr@dsc@current}%
+                                     {inner chapter skip}{innerskip}%
+    }{%
+      \scr@declaresectioncommandwarning{\scr@dsc@current}%
+                                       {inner chapter skip}{innerskip}%
+                                       {\scr@chapter@innerskip}%
+      \@namedef{scr@\scr@dsc@current @innerskip}{\scr@chapter@inntersekip}%
+    }%
   }{}%
   \scr@ifundefinedorrelax{scr@\scr@dsc@current @beforeskip}{%
-    \scr@declaresectioncommanderror{\scr@dsc@current}{before chapter skip}
-    {beforeskip}%
+    \ifstr{\scr@dsc@current}{chapter}{%
+      \scr@declaresectioncommanderror{\scr@dsc@current}%
+                                     {before chapter skip}{beforeskip}%
+    }{%
+      \scr@declaresectioncommandwarning{\scr@dsc@current}%
+                                       {before chapter skip}{beforeskip}%
+                                       {\scr@chapter@beforeskip}%
+      \@namedef{scr@\scr@dsc@current @beforeskip}{\scr@chapter@beforeskip}%
+    }%
   }{}%
   \scr@ifundefinedorrelax{scr@\scr@dsc@current @afterskip}{%
-    \scr@declaresectioncommanderror{\scr@dsc@current}{after chaper skip}
-    {afterskip}%
+    \ifstr{\scr@dsc@current}{chapter}{%
+      \scr@declaresectioncommanderror{\scr@dsc@current}%
+                                     {after chaper skip}{afterskip}%
+    }{%
+      \scr@declaresectioncommandwarning{\scr@dsc@current}%
+                                       {after chaper skip}{afterskip}%
+                                       {\scr@chapter@afterskip}%
+      \@namedef{scr@\scr@dsc@current @afterskip}{\scr@chapter@afterskip}%
+    }%
   }{}%
   \IfExistskomafont{\scr@dsc@current}{}{%
-    \scr@declaresectioncommanderror{\scr@dsc@current}{font}{font}%
-  }{}%
+    \ifstr{\scr@dsc@current}{chapter}{%
+      \scr@declaresectioncommanderror{\scr@dsc@current}{font}{font}%
+    }{%
+      \scr@declaresectioncommandwarning{\scr@dsc@current}%
+                                       {font}{font}%
+                                       {\usekomafont{chapter}}%
+      \newkomafont{\scr@dsc@current}{\usekomafont{chapter}}%
+    }%
+  }%
   \IfExistskomafont{\scr@dsc@current prefix}{}{%
-    \scr@declaresectioncommanderror{\scr@dsc@current}{prefix line font}
-    {prefixfont}%
+    \ifstr{\scr@dsc@current}{chapter}{%
+      \scr@declaresectioncommanderror{\scr@dsc@current}%
+                                     {prefix line font}{prefixfont}%
+    }{%
+      \scr@declaresectioncommandwarning{\scr@dsc@current}%
+                                       {prefix line font}{prefixfont}%
+                                       {\usekomafont{chapterprefix}}%
+      \newkomafont{\scr@dsc@current prefix}{\usekomafont{chapterprefix}}%
+    }%
   }{}%
 }
 %</book|report>
@@ -1598,6 +1648,8 @@
 %
 % \begin{macro}{\scr@dsc@style@part@neededoptionstest}
 %   \changes{v3.17}{2015/03/24}{Neu (intern)}
+%   \changes{v3.24}{2017/04/25}{Voreinstellungen für alle außer auf Ebene
+%     \texttt{part}}^^A
 % Dieses Anweisung überprüft, ob alle notwendigen Eigenschaften für die
 % Definition der spezifischen Gliederungsebene im part-Stil bekannt
 % sind. Sollte das nicht der Fall sein, meldet sie einen Fehler und sorgt sie
@@ -1606,28 +1658,69 @@
 \newcommand*{\scr@dsc@style@part@neededoptionstest}{%
 %<*book|report>
   \scr@ifundefinedorrelax{\scr@dsc@current pagestyle}{%
-    \scr@declaresectioncommanderror{\scr@dsc@current}{initial page style}
-    {pagestyle}%
+    \ifstr{\scr@dsc@current}{part}{%
+      \scr@declaresectioncommanderror{\scr@dsc@current}%
+                                     {initial page style}{pagestyle}%
+    }{%
+      \scr@declaresectioncommandwarning{\scr@dsc@current}%
+                                       {initial page style}{pagestyle}%
+                                       {\partpagestyle}%
+      \@namedef{\scr@dsc@current pagestyle}{\partpagestyle}%
+    }%
   }{}%
   \scr@ifundefinedorrelax{scr@\scr@dsc@current @innerskip}{%
-    \scr@declaresectioncommanderror{\scr@dsc@current}{inner part skip}
-    {innerskip}%
+    \ifstr{\scr@dsc@current}{part}{%
+      \scr@declaresectioncommanderror{\scr@dsc@current}%
+                                     {inner part skip}{innerskip}%
+    }{%
+      \scr@declaresectioncommandwarning{\scr@dsc@current}%
+                                       {inner part skip}{innerskip}%
+                                       {\scr@part@innerskip}%
+      \@namedef{scr@\scr@dsc@current @innerskip}{\scr@part@innerskip}%
+    }%
   }{}%
 %</book|report>
   \scr@ifundefinedorrelax{scr@\scr@dsc@current @beforeskip}{%
-    \scr@declaresectioncommanderror{\scr@dsc@current}{before part skip}
-    {beforeskip}%
+    \ifstr{\scr@dsc@current}{part}{%
+      \scr@declaresectioncommanderror{\scr@dsc@current}%
+                                     {before part skip}{beforeskip}%
+    }{%
+      \scr@declaresectioncommandwarning{\scr@dsc@current}%
+                                       {before part skip}{beforeskip}%
+                                       {\scr@part@beforeskip}%
+      \@namedef{scr@\scr@dsc@current @beforeskip}{\scr@part@beforeskip}%
+    }%
   }{}%
   \scr@ifundefinedorrelax{scr@\scr@dsc@current @afterskip}{%
-    \scr@declaresectioncommanderror{\scr@dsc@current}{after part skip}
-    {afterskip}%
+    \ifstr{\scr@dsc@current}{part}{%
+      \scr@declaresectioncommanderror{\scr@dsc@current}%
+                                     {after part skip}{afterskip}%
+    }{%
+      \scr@declaresectioncommandwarning{\scr@dsc@current}%
+                                       {after part skip}{afterskip}%
+                                       {\scr@part@afterskip}%
+      \@namedef{scr@\scr@dsc@current @afterskip}{\scr@part@afterskip}%
+    }%
   }{}%
   \IfExistskomafont{\scr@dsc@current}{}{%
-    \scr@declaresectioncommanderror{\scr@dsc@current}{font}{font}%
+    \ifstr{\scr@dsc@current}{part}{%
+      \scr@declaresectioncommanderror{\scr@dsc@current}{font}{font}%
+    }{%
+      \scr@declaresectioncommandwarning{\scr@dsc@current}{font}{font}%
+                                       {\usekomafont{part}}%
+      \newkomafont{\scr@scr@current}{\usekomafont{part}}
+    }%
   }{}%
   \IfExistskomafont{\scr@dsc@current prefix}{}{%
-    \scr@declaresectioncommanderror{\scr@dsc@current}{number font}
-    {prefixfont}%
+    \ifstr{\scr@dsc@current}{part}{%
+      \scr@declaresectioncommanderror{\scr@dsc@current}%
+                                     {number font}{prefixfont}%
+    }{%
+      \scr@declaresectioncommandwarning{\scr@dsc@current}%
+                                       {number font}{prefixfont}%
+                                       {\usekomafont{partprefix}}%
+      \newkomafont{\scr@scr@current prefix}{\usekomafont{partprefix}}
+    }%
   }{}%
 }
 %    \end{macrocode}
@@ -2052,6 +2145,26 @@
 }
 %    \end{macrocode}
 % \end{macro}^^A \scr@declaresectioncommanderror
+% \begin{macro}{\scr@declaresectioncommandwarning}
+%   \changes{v3.24}{2017/04/25}{neue (interne) Anweisung}^^A
+% In einigen Fällen genügt es hingegen eine Warnung oder Info für fehlende
+% Optionen auszugeben und einen Defaultwert zu verwenden. Das erste Argument
+% ist auch hier der Name des zu deklarierenden Befehls, das zweite eine
+% textuelle Beschreibung der fehlenden Option und das dritte der Name der
+% fehlenden Option. Das vierte ist der Defaultwert, der ersatzweise verwendet
+% wird. Der Befehl hat im Gegensatz zu \cs{scr@declaresectioncommanderror}
+% keine Seiteneffekte.
+%    \begin{macrocode}
+\newcommand*{\scr@declaresectioncommandwarning}[5]{%
+  \ClassWarning{\KOMAClassName}{%
+    #2 of \expandafter\string\csname #1\endcsname\space unknown.\MessageBreak
+    You should use option `#3' if you\MessageBreak
+    do not want to use the default value
+    `\detokenize{#5}'%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}^^A \scr@declaresectioncommandwarning
 % \end{macro}^^A \DeclareSectionCommand
 %
 % \begin{macro}{\DeclareNewSectionCommand}
