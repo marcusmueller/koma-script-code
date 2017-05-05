@@ -1,4 +1,4 @@
-% \CheckSum{3296}
+% \CheckSum{3309}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-fonts.dtx
@@ -2019,12 +2019,14 @@
 % \end{macro}^^A \g@scr@usefont
 % \begin{macro}{\scr@komafontrelaxlist}
 %   \changes{v3.17}{2015/04/03}{neu (intern)}^^A
+%   \changes{v3.24}{2017/05/05}{\cs{uppercase}, \cs{lowercase},
+%     \cs{MakeUppercase} und \cs{MakeLowercase} nach
+%     \cs{scr@komafontonearglist} verschoben}^^A
 % Hilfsmakro mit einer |\do|-Liste aller Makros, die in obigen Font-Makros vor
 % der Anwendung des Fonts |\relax| verwenden sollen.
 %    \begin{macrocode}
 \newcommand*{\scr@komafontrelaxlist}{%
   \do\normalcolor 
-  \do\uppercase \do\lowercase \do\MakeUppercase \do\MakeLowercase
 }
 %    \end{macrocode}
 % \end{macro}^^A \scr@komafontrelaxlist
@@ -2038,9 +2040,20 @@
 }
 %    \end{macrocode}
 % \end{macro}^^A \scr@komafontgobblelist
+% \begin{macro}{\scr@komafontonearglist}
+%   \changes{v3.24}{2017/05/05}{neu (intern)}^^A
+%   Hilfsmakro mit einer |\do|-Liste aller Makros, die in obige Font-Makros
+%   vor der Anwendung des Fonts |\@firstofone| verwenden sollen.
+%    \begin{macrocode}
+\newcommand*{\scr@komafontonearglist}{%
+  \do\uppercase \do\lowercase \do\MakeUppercase \do\MakeLowercase
+}
+%    \end{macrocode}
+% \end{macro}
 % \begin{macro}{\scr@prepareforkomafont}
 %   \changes{v3.17}{2015/04/03}{neu (intern)}^^A
 %   \changes{v3.19}{2015/08/20}{abarbeiten von \cs{scr@komafontgobblelist}}^^A
+%   \changes{v3.24}{2017/05/05}{abarbeiten von \cs{scr@komafontonearglist}}^^A
 % Hilfsmakro, das die Vorbereitungen für die obigen Font-Makros trifft. In der
 % Voreinstellung ist das lediglich die Anwendung der |\do|-Liste, so dass die
 % dort angegebenen Makros alle |\relax| bzw. |\@gobble| werden. Da die
@@ -2050,6 +2063,7 @@
 \newcommand*{\scr@prepareforkomafont}{%
   \long\def\do##1{\let##1\relax}\scr@komafontrelaxlist
   \long\def\do##1{\let##1\@gobble}\scr@komafontgobblelist
+  \long\def\do##1{\let##1\@firstofone}\scr@komafontonearglist
 }
 %    \end{macrocode}
 % \end{macro}^^A \scr@prepareforkomafont
@@ -2073,6 +2087,16 @@
 }
 %    \end{macrocode}
 % \end{macro}^^A \addtokomafontgobblelist
+% \begin{macro}{\addtokomafontonearglist}
+%   \changes{v3.24}{2017/05/05}{Neu}
+%   Diese Anweisung erlaubt es genau ein Makro der obigen |\do|-Liste
+%   hinzuzufügen
+%    \begin{macrocode}
+\newcommand*{\addtokomafontonearglist}[1]{%
+  \l@addto@macro\scr@komafontonearglist{\do#1}%
+}
+%    \end{macrocode}
+% \end{macro}^^A \addtokonafontonearglist
 % \end{macro}
 % \end{macro}
 % \end{macro}
