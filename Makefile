@@ -317,10 +317,10 @@ ctandist:tdsdist
 	$(HEAD) 18 $(notdir $(DISTDIR))-ctan/texmf/source/latex/koma-script/README > $(notdir $(DISTDIR))-ctan/README.distributors
 	$(SECHO) 'File komascript.tds.zip is a complete TEXMF tree of KOMA-Script.  It may be' >> $(notdir $(DISTDIR))-ctan/README.distributors
 	$(SECHO) 'used for manual installation or by distributors for distributions like' >> $(notdir $(DISTDIR))-ctan/README.distributors
-	$(SECHO) '<http://www.ctan.org/tex-archive/install/macros/latex/contrib/komascript.tds.zip>.' >> $(notdir $(DISTDIR))-ctan/README.distributors
+	$(SECHO) '<http://mirror.ctan.org/tex-archive/install/macros/latex/contrib/komascript.tds.zip>.' >> $(notdir $(DISTDIR))-ctan/README.distributors
 	$(SECHO) "File $(notdir $(DISTDIR)).ctan-src.zip is a file with sources and manuals of KOMA-Script"  >> $(notdir $(DISTDIR))-ctan/README.distributors
 	$(SECHO) 'that CTAN seems to prefer for the distribution at'  >> $(notdir $(DISTDIR))-ctan/README.distributors
-	$(SECHO) '<http://www.ctan.org/tex-archive/macros/latex/contrib/komascript>.' >> $(notdir $(DISTDIR))-ctan/README.distributors
+	$(SECHO) '<http://mirror.ctan.org/tex-archive/macros/latex/contrib/komascript>.' >> $(notdir $(DISTDIR))-ctan/README.distributors
 	$(SECHO) 'Note, that it is not easy to generate a ready to use and complete installation' >> $(notdir $(DISTDIR))-ctan/README.distributors
 	$(SECHO) "from $(notdir $(DISTDIR)).ctan-src.zip.  So it is hardly recommended to use" >> $(notdir $(DISTDIR))-ctan/README.distributors
 	$(SECHO) 'komascript.tds.zip not only by users, but redistributors also.' >> $(notdir $(DISTDIR))-ctan/README.distributors
