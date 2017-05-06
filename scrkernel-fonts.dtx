@@ -1,4 +1,4 @@
-% \CheckSum{3309}
+% \CheckSum{3376}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-fonts.dtx
@@ -1925,22 +1925,28 @@
 % \begin{macro}{\usesizeofkomafont}
 %   \changes{v3.12}{2013/03/30}{neu}^^A
 %   \changes{v3.17}{2015/04/03}{robustere Neuimplementierung}^^A
+%   \changes{v3.24}{2017/05/06}{robustere Neuimplementierung}^^A
 % \begin{macro}{\usefamilyofkomafont}
 %   \changes{v3.12}{2013/03/30}{neu}^^A
 %   \changes{v3.17}{2015/04/03}{basiert auf robusterer Neuimplementierung}^^A
+%   \changes{v3.24}{2017/05/06}{basiert auf robusterer Neuimplementierung}^^A
 % \begin{macro}{\useseriesofkomafont}
 %   \changes{v3.12}{2013/03/30}{neu}^^A
 %   \changes{v3.17}{2015/04/03}{basiert auf robusterer Neuimplementierung}^^A
+%   \changes{v3.24}{2017/05/06}{basiert auf robusterer Neuimplementierung}^^A
 % \begin{macro}{\useshapeofkomafont}
 %   \changes{v3.12}{2013/03/30}{neu}^^A
 %   \changes{v3.16a}{2015/02/20}{Makroname korrigiert}^^A
 %   \changes{v3.17}{2015/04/03}{basiert auf robusterer Neuimplementierung}^^A
+%   \changes{v3.24}{2017/05/06}{basiert auf robusterer Neuimplementierung}^^A
 % \begin{macro}{\useencodingofkomafont}
 %   \changes{v3.12}{2013/03/30}{neu}^^A
 %   \changes{v3.17}{2015/04/03}{basiert auf robusterer Neuimplementierung}^^A
+%   \changes{v3.24}{2017/05/06}{basiert auf robusterer Neuimplementierung}^^A
 % \begin{macro}{\usefontofkomafont}
 %   \changes{v3.12}{2013/03/30}{neu}^^A
 %   \changes{v3.17}{2015/04/03}{robustere Neuimplementierung}^^A
+%   \changes{v3.24}{2017/05/06}{robustere Neuimplementierung}^^A
 % Manchmal wollen die Leute tatsächlich gar nicht den kompletten Font eines
 % Elements, sondern nur einen Teilaspekt davon. Aber Version~3.12 wird das mit
 % Hilfe neuer Anweisungen unterstützt.
@@ -1948,15 +1954,19 @@
 \newcommand*{\usesizeofkomafont}[1]{%
   \begingroup
     \scr@prepareforkomafont
+    \def\selectfont{%
+      \global\let\g@scr@f@size\f@size
+      \global\let\g@scr@f@baselineskip\f@baselineskip
+      \global\let\g@scr@f@linespread\f@linespread
+    }%
+    \selectfont
     \sbox\@tempboxa{%
-      \usekomafont{#1}{%
-        \xdef\g@scr@usefont{%
-          \noexpand\fontsize{\f@size}{\f@baselineskip}\noexpand\selectfont
-        }%
-      }%
+      \usekomafont{#1}{\relax}%
     }%
   \endgroup
-  \g@scr@usefont
+  \linespread{\g@scr@f@linespread}%
+  \fontsize{\g@scr@f@size}{\g@scr@f@baselineskip}%
+  \selectfont
 }
 \newcommand*{\usefamilyofkomafont}{\use@ofkomafont{family}}
 \newcommand*{\useseriesofkomafont}{\use@ofkomafont{series}}
@@ -1965,62 +1975,85 @@
 \newcommand*{\usefontofkomafont}[1]{%
   \begingroup
     \scr@prepareforkomafont
+    \def\selectfont{%
+      \global\let\g@scr@f@encoding\f@encoding
+      \global\let\g@scr@f@family\f@family
+      \global\let\g@scr@f@series\f@series
+      \global\let\g@scr@f@shape\f@shape
+      \global\let\g@scr@f@size\f@size
+      \global\let\g@scr@f@baselineskip\f@baselineskip
+      \global\let\g@scr@f@linespread\f@linespread
+    }%
+    \selectfont
     \sbox\@tempboxa{%
-      \usekomafont{#1}{%
-        \xdef\g@scr@usefont{%
-          \noexpand\fontsize{\f@size}{\f@baselineskip}%
-          \noexpand\usefont{\f@encoding}{\f@family}{\f@series}{\f@shape}%
-        }%
-      }%
+      \usekomafont{#1}{\relax}%
     }%
   \endgroup
-  \g@scr@usefont
+  \linespread{\g@scr@f@linespread}%
+  \fontsize{\g@scr@f@size}{\g@scr@f@baselineskip}%
+  \usefont{\g@scr@f@encoding}{\g@scr@f@family}{\g@scr@f@series}{\g@scr@f@shape}%
 }
 %    \end{macrocode}
 % \begin{macro}{\use@ofkomafont}
 %   \changes{v3.12}{2013/03/30}{neu (intern)}^^A
 %   \changes{v3.17}{2015/04/03}{robustere Neuimplementierung}^^A
+%   \changes{v3.24}{2017/05/06}{robustere Neuimplementierung}^^A
 % Kleines Hilfsmakro für all diese Anweisungen bis auf die erste und die letzte.
 %    \begin{macrocode}
 \newcommand*{\use@ofkomafont}[2]{%
   \begingroup
     \scr@prepareforkomafont
+    \def\selectfont{%
+      \global\expandafter\let\csname g@scr@f@#1\expandafter\endcsname
+                             \csname f@#1\endcsname
+    }%
+    \selectfont
     \sbox\@tempboxa{%
-      \usekomafont{#2}{%
-        \xdef\g@scr@usefont{%
-          \expandafter\noexpand
-          \csname font#1\endcsname{\csname f@#1\endcsname}\noexpand\selectfont
-        }%
-      }%
+      \usekomafont{#2}{\relax}%
     }%
   \endgroup
-  \g@scr@usefont
+  \@nameuse{font#1}{\csname g@scr@f@#1\endcsname}%
+  \selectfont
 }
 %    \end{macrocode}
 % \begin{macro}{\g@scr@usefont}
 %   \changes{v3.17}{2015/04/03}{neu (intern)}^^A
-% Globale definiertes Hilfsmakro. Dieses Makro sollte niemals für irgend etwas
-% anderes als obige Befehle verwendet werden. Anderenfalls ist die Funktion
-% sowohl dieses anderen als auch obiger Befehle nicht mehr gewährleistet!
-%    \begin{macrocode}
-\newcommand*{\g@scr@usefont}{%
-  \PackageError{scrkbase}{%
-    undefined usage of \string\g@scr@usefont
-  }{%
-    \string\g@scr@usefont\space is an internal macro of KOMA-Script and
-    should\MessageBreak
-    not be used this way.\MessageBreak
-    This may be an internal error of KOMA-Script, a mistake of a package
-    author,\MessageBreak
-    or a mistake of the user.%
-  }%
-}
-%    \end{macrocode}
+%   \changes{v3.24}{2017/05/06}{entfernt}^^A
 % \end{macro}^^A \g@scr@usefont
+% \begin{macro}{\g@scr@f@encoding}
+%   \changes{v3.24}{2017/05/06}{neu (intern)}^^A
+% \begin{macro}{\g@scr@f@family}
+%   \changes{v3.24}{2017/05/06}{neu (intern)}^^A
+% \begin{macro}{\g@scr@f@series}
+%   \changes{v3.24}{2017/05/06}{neu (intern)}^^A
+% \begin{macro}{\g@scr@f@shape}
+%   \changes{v3.24}{2017/05/06}{neu (intern)}^^A
+% \begin{macro}{\g@scr@f@size}
+%   \changes{v3.24}{2017/05/06}{neu (intern)}^^A
+% \begin{macro}{\g@scr@f@baselineskip}
+%   \changes{v3.24}{2017/05/06}{neu (intern)}^^A
+% \begin{macro}{\g@scr@f@linespread}
+%   \changes{v3.24}{2017/05/06}{neu (intern)}^^A
+%    \begin{macrocode}
+\newcommand*{\g@scr@f@encoding}{}\let\g@scr@f@encoding\f@encoding
+\newcommand*{\g@scr@f@family}{}\let\g@scr@f@family\f@family
+\newcommand*{\g@scr@f@series}{}\let\g@scr@f@series\f@series
+\newcommand*{\g@scr@f@shape}{}\let\g@scr@f@shape\f@shape
+\newcommand*{\g@scr@f@size}{}\let\g@scr@f@size\f@size
+\newcommand*{\g@scr@f@baselineskip}{}\let\g@scr@f@baselineskip\f@baselineskip
+\newcommand*{\g@scr@f@linespread}{}\let\g@scr@f@linespread\f@linespread
+%    \end{macrocode}
+% \end{macro}^^A \g@scr@f@linespread
+% \end{macro}^^A \g@scr@f@family
+% \end{macro}^^A \g@scr@f@series
+% \end{macro}^^A \g@scr@f@shape
+% \end{macro}^^A \g@scr@f@size
+% \end{macro}^^A \g@scr@f@baselineskip
+% \end{macro}^^A \g@scr@f@linespread
 % \begin{macro}{\scr@komafontrelaxlist}
 %   \changes{v3.17}{2015/04/03}{neu (intern)}^^A
-%   \changes{v3.24}{2017/05/05}{\cs{uppercase}, \cs{lowercase},
-%     \cs{MakeUppercase} und \cs{MakeLowercase} nach
+%   \changes{v3.24}{2017/05/05}{\cs{uppercase} und \cs{lowercase} entfernt}^^A
+%   \changes{v3.24}{2017/05/05}{\cs{MakeUppercase} und \cs{MakeLowercase} nach
 %     \cs{scr@komafontonearglist} verschoben}^^A
 % Hilfsmakro mit einer |\do|-Liste aller Makros, die in obigen Font-Makros vor
 % der Anwendung des Fonts |\relax| verwenden sollen.
@@ -2046,7 +2079,7 @@
 %   vor der Anwendung des Fonts |\@firstofone| verwenden sollen.
 %    \begin{macrocode}
 \newcommand*{\scr@komafontonearglist}{%
-  \do\uppercase \do\lowercase \do\MakeUppercase \do\MakeLowercase
+  \do\MakeUppercase \do\MakeLowercase
 }
 %    \end{macrocode}
 % \end{macro}
