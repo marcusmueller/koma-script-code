@@ -1,6 +1,6 @@
 % ======================================================================
 % scrstrip.inc
-% Copyright (c) Markus Kohm, 2002-2016
+% Copyright (c) Markus Kohm, 2002-2017
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -22,7 +22,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrstrip.inc
-% Copyright (c) Markus Kohm, 2002-2016
+% Copyright (c) Markus Kohm, 2002-2017
 %
 % Diese Datei ist Teil des LaTeX2e-KOMA-Script-Pakets.
 %
@@ -54,7 +54,7 @@
 \KOMAdefVariable{AUTHOR}{Markus Kohm}
 \KOMAdefVariable{EMAIL}{[komascript at gmx info]}
 \KOMAdefVariable{COPYRIGHTFROM}{1994}
-\KOMAdefVariable{COPYRIGHTTILL}{2016}
+\KOMAdefVariable{COPYRIGHTTILL}{2017}
 
 \let\ifbeta=\iftrue % with = will be replaced by release process
 
@@ -108,7 +108,7 @@ The KOMA-Script bundle (but maybe not this file) was based upon the
 LaTeX 2.09 Script family created by Frank Neukam 1993 and the LaTeX2e
 standard classes created by The LaTeX3 Project 1994-1996.  You may
 find a complete unmodified copy of LaTeX2e at 
-<http://www.ctan.org/pub/tex-archive/macros/latex/base/>.
+<http://mirror.ctan.org/tex-archive/macros/latex/base/>.
 
 \endpreamble
 
