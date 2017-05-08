@@ -1,4 +1,4 @@
-% \CheckSum{3906}
+% \CheckSum{3912}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlayer.dtx
@@ -2007,7 +2007,7 @@
                  \if t\layervalign -\ht\strutbox
                  \else
                    \if b\layervalign -\dimexpr\layerheight-\dp\strutbox\relax
-                   \else -.5\dimexpr \layerheight+\ht\strutbox-\dp\strutbox\relax
+                   \else -.5\dimexpr\layerheight+\ht\strutbox-\dp\strutbox\relax
                    \fi
                  \fi})
 %    \end{macrocode}
@@ -2862,6 +2862,10 @@
 %   \changes{v3.20}{2016/04/12}{\cs{@ifnextchar} replaced by
 %     \cs{kernel@ifnextchar}}^^A
 % \begin{macro}{\scr@@layerbox}
+%   \changes{v3.24}{2017/05/08}{\cs{edef} replaced by \cs{protected@edef}}^^A
+%   \changes{v3.24}{2017/05/08}{\cs{dimexpr} added to \cs{layer\dots}}^^A
+%   \changes{v3.24}{2017/05/08}{\cs{dimexpr} removed from usage of
+%   \cs{layer\dots}}^^A
 % The layer box is used to output a layer in \cs{@oddhead}, \cs{@evenhead},
 % \cs{@oddfoot}, or \cs{@evenfoot}. Is has two pairs of arguments: ($x,y$)
 % and ($w,h$), where $x$ is the distance from left paper edge, $y$ is the
@@ -2878,10 +2882,10 @@
 }
 \def\scr@@layerbox(#1,#2)(#3,#4)[#5]#6{%
   \begingroup
-    \edef\layerxoffset{#1}%
-    \edef\layeryoffset{#2}%
-    \edef\layerwidth{#3}%
-    \edef\layerheight{#4}%
+    \protected@edef\layerxoffset{\noexpand\dimexpr #1\relax}%
+    \protected@edef\layeryoffset{\noexpand\dimexpr #2\relax}%
+    \protected@edef\layerwidth{\noexpand\dimexpr #3\relax}%
+    \protected@edef\layerheight{\noexpand\dimexpr #4\relax}%
     \def\layervalign{t}%
     \def\layerhalign{l}%
     \edef\reserved@b{#5}%
@@ -2914,7 +2918,7 @@
     \parbox[t][\z@][t]{\z@}{%
       \vskip\layeryoffset
       \if b\layervalign\vskip-\layerheight\fi
-      \if c\layervalign\vskip-.5\dimexpr\layerheight\relax\fi
+      \if c\layervalign\vskip-.5\layerheight\fi
 %    \end{macrocode}
 % \changes{3.23a}{2017/04/22}{\textsf{bidi} code added}^^A
 % \changes{v3.24}{2017/05/04}{usage of \textsf{scrbase}'s \cs{IfRTL}}^^A
@@ -2963,6 +2967,7 @@
 %
 % \begin{macro}{\layerpicturemode}
 %   \changes{v3.19}{2015/07/30}{new command}^^A
+%   \changes{v3.24}{2017/05/08}{redundant \cs{dimexpr} removed}^^A
 % This is a bit more complicated. It is the layer output for \texttt{picture}
 % layers. In this case we use a picture environment and internally define some
 % additional commands.
@@ -2982,8 +2987,8 @@
     \long\def\putLR##1{\put(\LenToUnit{\layerwidth},0){##1}}%
     \long\def\putUR##1{\put(\LenToUnit{\layerwidth},%
                                 \LenToUnit{\layerheight}){##1}}%
-    \long\def\putC##1{\put(\LenToUnit{.5\dimexpr\layerwidth\relax},%
-                           \LenToUnit{.5\dimexpr\layerheight\relax}){##1}}%
+    \long\def\putC##1{\put(\LenToUnit{.5\layerwidth},%
+                           \LenToUnit{.5\layerheight}){##1}}%
     #1%
   \end{picture}%
 }
