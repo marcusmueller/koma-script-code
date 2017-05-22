@@ -1,4 +1,4 @@
-% \CheckSum{2469}
+% \CheckSum{2502}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlayer-scrpage.dtx
@@ -1080,27 +1080,34 @@
 % \end{macro}^^A \setheadtopline
 %
 % \begin{length}{\headheight}
-% Some classes set \Length{headheight} to a very, very small value. We'll
-% warn about that:
+%   \changes{v3.24}{2017/05/22}{warning depends on option
+%     \texttt{singlespacing}}^^A
+%   Some classes set \Length{headheight} to a very, very small value. We'll
+%   warn about that:
 %    \begin{macrocode}
 %<*body>
 \AtBeginDocument{%
-  \ifdim \headheight <\baselineskip
+  \ifdim \headheight
+         <\if@ps@singlespacing\f@baselineskip\else\baselineskip\fi\relax
     \PackageWarningNoLine{scrlayer-scrpage}{Very small head height
       detected!\MessageBreak
       Using scrlayer-scrpage the head height\MessageBreak
       should be at least \string\baselineskip, which is\MessageBreak
-      \the\baselineskip\space currently.\MessageBreak
+      \if@ps@singlespacing\f@baselineskip\else\the\baselineskip\fi\space 
+      currently.\MessageBreak
       But head height is currently
       \the\headheight\space only.\MessageBreak
       You may use\MessageBreak
       \@ifpackageloaded{geometry}{%
-        geometry option `head=\the\baselineskip'%
+        geometry option 
+        `head=\if@ps@singlespacing\f@baselineskip\else\the\baselineskip\fi'%
       }{%
         \@ifpackageloaded{typearea}{%
-          typearea option `headheight=\the\baselineskip'%
+          typearea option `headheight=%
+          \if@ps@singlespacing\f@baselineskip\else\the\baselineskip\fi'%
         }{%
-          \string\setlength{\string\headheight}{\the\baselineskip}%
+          \string\setlength{\string\headheight}%
+          {\if@ps@singlespacing\f@baselineskip\else\the\baselineskip\fi}%
         }%
       }\MessageBreak
       to avoid this warning%
