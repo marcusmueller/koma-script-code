@@ -1,4 +1,4 @@
-% \CheckSum{2502}
+% \CheckSum{2569}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlayer-scrpage.dtx
@@ -1083,7 +1083,10 @@
 %   \changes{v3.24}{2017/05/22}{warning depends on option
 %     \texttt{singlespacing}}^^A
 %   Some classes set \Length{headheight} to a very, very small value. We'll
-%   warn about that:
+%   warn about that.
+% \begin{length}{\footheight}
+%   \changes{v3.24}{2017/05/23}{also warn for low \cs{footheight}}^^A
+%   If the \Length{headheight} is OK, we also test for \Length{footheight}.
 %    \begin{macrocode}
 %<*body>
 \AtBeginDocument{%
@@ -1110,13 +1113,45 @@
           {\if@ps@singlespacing\f@baselineskip\else\the\baselineskip\fi}%
         }%
       }\MessageBreak
+      \if@ps@singlespacing\else\ifdim \headheight<\f@baselineskip\else
+        or load package `scrlayer-scrpage' with\MessageBreak
+        option `singlespacing=true'\MessageBreak
+      \fi\fi
       to avoid this warning%
     }%
+  \else
+    \ifdim \footheight
+           <\if@ps@singlespacing\f@baselineskip\else\baselineskip\fi\relax
+      \PackageWarningNoLine{scrlayer-scrpage}{Very small foot height
+        detected!\MessageBreak
+        Using scrlayer-scrpage the foot height\MessageBreak
+        should be at least \string\baselineskip, which is\MessageBreak
+        \if@ps@singlespacing\f@baselineskip\else\the\baselineskip\fi\space 
+        currently.\MessageBreak
+        But foot height is currently
+        \the\footheight\space only.\MessageBreak
+        You may use\MessageBreak
+        \@ifpackageloaded{typearea}{%
+          typearea option `footheight=%
+          \if@ps@singlespacing\f@baselineskip\else\the\baselineskip\fi'%
+        }{%
+          \string\setlength{\string\footheight}%
+          {\if@ps@singlespacing\f@baselineskip\else\the\baselineskip\fi}%
+        }%
+        \MessageBreak
+        \if@ps@singlespacing\else\ifdim \footheight<\f@baselineskip\else
+          or load package `scrlayer-scrpage' with\MessageBreak
+          option `singlespacing=true'\MessageBreak
+        \fi\fi
+        to avoid this warning%
+      }%
+    \fi
   \fi
 }
 %</body>
 %    \end{macrocode}
-% \end{length}
+% \end{length}^^A \footheight
+% \end{length}^^A \headheight
 %
 %
 % \section{Style of Running Heads}
