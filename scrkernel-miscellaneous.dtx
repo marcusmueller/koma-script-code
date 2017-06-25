@@ -1,4 +1,4 @@
-% \CheckSum{611}
+% \CheckSum{639}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-miscellaneous.dtx
@@ -729,22 +729,48 @@
 %   \changes{v3.12}{2013/07/08}{neu (intern)}^^A
 % Beim Laden verschiedener Pakete wird nun eine Warnung ausgegeben. In der
 % Regel mit einer Alternativempfehlung.
+% \begin{macro}{\class@shoulddisablepackagewarning@list}
+%   \changes{v3.24}{2017/06/25}{neu (nur für Klassenautoren)}^^A
+% Ab \KOMAScript~3.24 ist für Klassenautoren und nur für diese dokumentiert,
+% dass bei Vorhandensein des Makros
+% \cs{class@shoulddisablepackagewarning@list} während dem Laden der
+% \KOMAScript-Klasse für nicht empfohlene Pakete ein
+% \cs{in@}-Vergleich gegen genau den Inhalt dieses Makros stattfindet. Wird
+% der Paketname dabei gefunden, so unterbleibt das Absetzen der Warnung. Zur
+% korrekten Syntax des zweiten Arguments von \cs{in@} sei ausdrücklich auf den
+% Kernel hingewiesen. Ebenso sind Klassenautoren verantwortlich, eine bereits
+% vorhandene Liste nicht einfach zu überschreiben, sondern korrekt zu
+% ergänzen! Eine Definition von \cs{class@shoulddisablepackagewarning@list}
+% nach dem Laden der \KOMAScript-Klasse ist wirkungslos. Da diese
+% Schnittstelle Klassenautoren vorbehalten bleiben soll, die wissen, was sie
+% tun, gibt es keine weitergehende Dokumentation dazu und natürlich auch kein
+% Beispiel.
 %    \begin{macrocode}
 %<*class>
 \newcommand*{\scr@package@not@recommended}[2]{%
-  \BeforePackage{#1}{%
-    \ClassWarning{\KOMAClassName}{%
-      Usage of package `#1' together\MessageBreak
-      with a KOMA-Script class is not recommended.\MessageBreak
-      \if\relax\detokenize{#2}\relax\else
-        I'd suggest to use #2.\MessageBreak
-      \fi
-      Nevertheless, using requested\MessageBreak
-      package `#1'%
+  \scr@ifundefinedorrelax{class@shoulddisablepackagewarning@list}{%
+    \@firstofone
+  }{%
+    \edef\reserved@a{%
+      \noexpand\in@{#1}{\class@shoulddisablepackagewarning@list}}%
+    \reserved@a
+    \ifin@\expandafter\@gobble\else\expandafter\@firstofone\fi
+  }{%
+    \BeforePackage{#1}{%
+      \ClassWarning{\KOMAClassName}{%
+        Usage of package `#1' together\MessageBreak
+        with a KOMA-Script class is not recommended.\MessageBreak
+        \if\relax\detokenize{#2}\relax\else
+          I'd suggest to use #2.\MessageBreak
+        \fi
+        Nevertheless, using requested\MessageBreak
+        package `#1'%
+      }%
     }%
   }%
 }%
 %    \end{macrocode}
+% \end{macro}^^A \class@shoulddisablepackagewarning@list
 % \textsf{emptypage} wird nicht benötigt, weil es bereits entsprechende
 % Einstellungen in \KOMAScript{} gibt. Darüber hinaus verwendet es
 % \cs{thispagestyle} an Stelle von \cs{pagestyle} in einer Gruppe, was
@@ -766,13 +792,20 @@
 % \textsf{fancyhdr} verwendet veraltete Font-Befehle und beachtet die
 % Font-Einstellungen und diverse andere Befehle und Optionen von \KOMAScript{}
 % nicht.
+%   \changes{v3.24}{2017/06/25}{improved \textsf{fancyhdr} warning}^^A
 %    \begin{macrocode}
 \scr@package@not@recommended{fancyhdr}{%
   \MessageBreak
-  package `scrlayer-scrpage'}
+  package `scrlayer' or `scrlayer-scrpage', because\MessageBreak
+  they support KOMA-Script classes.\MessageBreak
+  With `fancyhdr' several features of class `\KOMAClassName'\MessageBreak
+  like options `headsepline', `footsepline' or command\MessageBreak
+  `\string\MakeMarkcase' and the commands `\string\setkomafont' and\MessageBreak
+  `\string\addtokomafont' for the page style elements need\MessageBreak
+  explicite user intervention to work}
 %    \end{macrocode}
 % \textsf{titlesec} beschädigt diverse \KOMAScript{} Erweiterungen und
-% benötigt eigene Workarounds (siehe Abschnitt~\ref{sec:packageworarounds}),
+% benötigt eigene Workarounds (siehe Abschnitt~\ref{sec:packageworkarounds}),
 % so dass es einfach nicht gut mit \KOMAScript{} harmoniert.
 %    \begin{macrocode}
 \scr@package@not@recommended{titlesec}{%
