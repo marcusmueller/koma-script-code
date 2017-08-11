@@ -1,4 +1,4 @@
-% \CheckSum{1669}
+% \CheckSum{1715}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlayer-notecolumn.dtx
@@ -865,7 +865,9 @@
       }%
       \long\def\slnc@note##1##2##3##4{%
         \let\PackageInfo\PackageWarning
+%<trace>        \typeout{TRACE (slnc): ##2<=\theslncpage?}%
         \ifnum ##2>\value{slncpage}\relax
+%<trace>          \typeout{TRACE (slnc): no: unprocess note}%
           \expandafter\g@addto@macro\csname slnc@#1@unprocessed\endcsname{%
             \slnc@note{##1}{##2}{##3}{##4}%
           }%
@@ -1246,6 +1248,19 @@
         \edef\slnc@cmp@value{\expandafter\slnc@firstof\reserved@a\@nil}%
         \edef\reserved@a{\expandafter\slnc@secondof\reserved@a\@nil}%
       }%
+%<*trace>
+      \typeout{TRACE (slnc): clearnote=\@nameuse{theslnc@clearnote@label},
+        abspage=\the\value{slncpage}, until page=\slnc@cmp@value,
+        process=\reserved@a, pagetotal=\the\pagetotal, topskip=\the\topskip}%
+%</trace>
+      \ifvmode\ifdim \pagetotal<\topskip
+%    \end{macrocode}
+% \Macro{clearpage} wouldn't result in a new page, so we do not have to output
+% the notes of this page but only until the previous.
+%    \begin{macrocode}
+          \edef\slnc@cmp@value{\the\numexpr\slnc@cmp@value-1}%
+%<trace>          \typeout{TRACE (slnc): until page=\slnc@cmp@value}%
+      \fi\fi
       \ifnum \reserved@a=\z@
 %    \end{macrocode}
 % Next we read all notes until the end of the current page, but only
@@ -1253,11 +1268,6 @@
 %    \begin{macrocode}
         \ifvmode
           \ifdim \pagetotal<\topskip
-%    \end{macrocode}
-% \Macro{clearpage} wouldn't result in a new page, so we do not have to output
-% the notes of this page but only until the previous.
-%    \begin{macrocode}
-            \edef\slnc@cmp@value{\numexpr\slnc@cmp@value-1}%
           \else
             \slnc@readnotes{\slnc@cmp@value}%
           \fi
@@ -1294,6 +1304,7 @@
         \@tempswatrue
       \fi
       \@whilesw\if@tempswa\fi{%
+%<trace>        \typeout{TRACE (slnc): add \string\clearpage}%
 %    \end{macrocode}
 % Yes, we have (maybe again)!
 %    \begin{macrocode}
@@ -1415,18 +1426,26 @@
         \edef\slnc@cmp@value{\expandafter\slnc@firstof\reserved@a\@nil}%
         \edef\reserved@a{\expandafter\slnc@secondof\reserved@a\@nil}%
       }%
-      \ifcase \reserved@a\relax
+%<*trace>
+      \typeout{TRACE (slnc): clearnote=\@nameuse{theslnc@clearnote@label},
+        abspage=\theslncpage, until page=\slnc@cmp@value,
+        process=\reserved@a, pagetotal=\the\pagetotal, topskip=\the\topskip}%
+%</trace>
+      \ifvmode\ifdim \pagetotal<\topskip
+%    \end{macrocode}
+% \Macro{clearpage} wouldn't result in a new page, so we do not have to output
+% the notes of this page but only until the previous.
+%    \begin{macrocode}
+          \edef\slnc@cmp@value{\the\numexpr\slnc@cmp@value-1}%
+%<trace>          \typeout{TRACE (slnc): until page=\slnc@cmp@value}%
+      \fi\fi
+      \ifnum \reserved@a=\z@
 %    \end{macrocode}
 % Next we read all notes until the end of the current page, but only
 % if a \Macro{clearpage} wouldn't result in a new page.
 %    \begin{macrocode}
         \ifvmode
           \ifdim \pagetotal<\topskip
-%    \end{macrocode}
-% \Macro{clearpage} wouldn't result in a new page, so we do not have to output
-% the notes of this page but only until the previous.
-%    \begin{macrocode}
-            \edef\slnc@cmp@value{\numexpr\slnc@cmp@value-1}%
           \else
             \slnc@readnotes{\slnc@cmp@value}%
           \fi
@@ -1464,6 +1483,7 @@
         \@tempswatrue
       \fi
       \@whilesw\if@tempswa\fi{%
+%<trace>        \typeout{TRACE (slnc): add \string\clearpage}%
 %    \end{macrocode}
 % Yes, we have (maybe again)!
 %    \begin{macrocode}
