@@ -1333,6 +1333,98 @@ gesetzt werden.%
 
 
 \begin{Declaration}
+  \Macro{partlineswithprefixformat}%
+    \Parameter{Ebene}\Parameter{Nummer}\Parameter{Text}
+\end{Declaration}
+Diese\ChangedAt{v3.25}{\Class{scrbook}\and \Class{scrreprt}\and
+  \Class{scrartcl}} Anweisung wird von Überschriften des Stils
+\PValue{part}\textnote{Gliederungsstil
+  \PValue{part}}\Index{Gliederung>Stil>~\PValue{part}} verwendet. Die beiden
+Argumente \PName{Nummer} und \PName{Text} sind dabei einschließlich
+Einstellung der Fonts für sich bereits fertig formatiert. Letztlich regelt die
+Anweisung also die Anordnung der beiden Teile der Überschrift. Bei nicht
+nummerierten Überschriften ist \PName{Nummer} ein komplett leeres Argument,
+enthält also auch keine Formatierungsanweisungen.
+
+Vordefiniert ist die Anweisung mit:
+\begin{lstcode}
+  \newcommand{\partlineswithprefixformat}[3]{%
+    #2#3%
+  }
+\end{lstcode}
+bisher eher spartanisch.
+
+\begin{Example}
+  Sie wollen die Teile-Überschriften in eine hellblaue Box mit blauer
+  Umrandung stellen, die nur etwa drei Viertel der Breite des Textbereichs
+  einnimmt. Hierzu verwenden Sie
+\begin{lstcode}
+  \documentclass{scrbook}
+  \usepackage{xcolor}
+  \renewcommand*{\partlineswithprefixformat}[3]{%
+    \fcolorbox{blue}{blue!25}{%
+      \parbox{.75\linewidth}{#2#3}%
+    }%
+  }
+  \begin{document}
+  \part{Umrahmte Teile}
+  \end{document}  
+\end{lstcode}
+  Allerdings fällt Ihnen auf, dass die Überschrift dabei nicht wie sonst
+  für Teile üblich zentriert wird -- weder die Box selbst noch der Text
+  innerhalb der Box.
+
+  Die Ursache für die fehlende Zentrierung der Box liegt
+  darin, dass aufgrund der Änderung das in Argument 3 versteckte Absatzende
+  nur noch den Absatz innerhalb der Box beendet aber nicht mehr den Absatz mit
+  der \Macro{parbox}. Also ergänzen Sie ein \Macro{par} am Ende der Definition.
+
+  Die Ursache der fehlenden Zentrierung innerhalb der Box ist, dass in der
+  \Macro{parbox}-Anweisung die Ausrichtung von
+  \DescRef{maincls.cmd.raggedpart} nicht automatisch gültig ist. Daher
+  ergänzen Sie diese Anweisung innerhalb der Box.
+
+  Mit
+\begin{lstcode}
+  \documentclass{scrbook}
+  \usepackage{xcolor}
+  \renewcommand*{\partlineswithprefixformat}[3]{%
+    \fcolorbox{blue}{blue!25}{%
+      \parbox{.75\linewidth}{\raggedpart #2#3}%
+    }%
+  }
+  \par
+  \begin{document}
+  \part{Umrahmte Teile}
+  \end{document}  
+\end{lstcode}
+  erhalten Sie die gewünschte Formatierung.
+\end{Example}
+
+Wie im Beispiel gezeigt, ist der Anwender bei der Umdefinierung der
+Anweisung für einige Dinge selbst verantwortlich. Dazu gehört neben dem
+Erhalt der voreingestellten Ausrichtung auch, dass innerhalb der Überschrift
+kein Seitenumbruch beispielsweise an zusätzlich eingefügten Absätzen oder
+Abständen erfolgen kann. Das gezeigte Beispiel ist diesbezüglich
+unproblematisch. Nicht nur, dass die beiden Boxen ohnehin keinen Seitenumbruch
+erlauben. \KOMAScript{} verändert außerdem \Macro{interlinepenalty} als Teil
+von \PName{Text} so, dass darin kein Seitenumbruch stattfinden
+darf. Gleichzeitig endet \PName{Text} immer mit einem internen Absatz,
+\Macro{@@par}.
+
+Das erste Argument, \PName{Ebene}, wird von
+\Macro{partlineswithprefixformat} in der Voreinstellung nicht verwendet und
+ist auch im Beispiel nicht erforderlich. Erst, wenn der Anwender mehrere
+Anweisungen im Stil \PValue{part} definiert und man innerhalb der Definition
+nach den Anweisungen unterscheiden will, kann dies über \PName{Ebene}
+erfolgen. Dabei ist \PName{Ebene} der vom Namen der Anweisung abgeleitete Name
+der Gliederungsebene. Bei \DescRef{maincls.cmd.part},
+\DescRef{maincls.cmd.part*}, \DescRef{maincls.cmd.addpart} und
+\DescRef{maincls.cmd.addpart*} ist \PName{Ebene} daher einheitlich
+\PValue{part}.%
+\EndIndexGroup
+
+\begin{Declaration}
   \Macro{chapterlineswithprefixformat}%
     \Parameter{Ebene}\Parameter{Nummer}\Parameter{Text}
   \Macro{chapterlinesformat}%
@@ -1435,7 +1527,7 @@ unproblematisch. Nicht nur, dass die beiden Boxen ohnehin keinen Seitenumbruch
 erlauben. \KOMAScript{} verändert außerdem \Macro{interlinepenalty} als Teil
 von \PName{Text} so, dass darin kein Seitenumbruch stattfinden
 darf. Gleichzeitig endet \PName{Text} immer mit einem internen Absatz,
-\Macro{@par}.
+\Macro{@@par}.
 
 Die Anweisung \DescRef{maincls.cmd.raggedchapter} ist übrigens nicht
 Bestandteil von \PName{Text}, weil anderenfalls beispielsweise die Verwendung
