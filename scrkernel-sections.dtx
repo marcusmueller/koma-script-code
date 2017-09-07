@@ -1,4 +1,4 @@
-% \CheckSum{3937}
+% \CheckSum{3954}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -3073,29 +3073,41 @@
 %   \changes{v3.18}{2015/05/23}{\cs{size@\dots} durch \cs{usekomafont}
 %     ersetzt}^^A
 %   \changes{v3.21}{2016/06/12}{fehlendes \cs{nobreak} ergänzt}^^A
+%   \changes{v3.25}{2017/09/07}{\cs{IfUseNumber} definiert}^^A
+%   \changes{v3.25}{2017/09/07}{\cs{sectfont} durch \cs{usekomafont}
+%     ersetzt}^^A
+%   \changes{v3.25}{2017/09/07}{Umstellung auf
+%     \cs{partlineswithprefixformat}}^^A
 %    \begin{macrocode}
   \begingroup
     \setparsizes{\z@}{\z@}{\z@\@plus 1fil}\par@updaterelative
+    \def\IfUseNumber{\ifnumbered{#1}}%
     \raggedpart
-    \interlinepenalty \@M
-    \normalfont\sectfont\nobreak
-    \ifnumbered{#1}{%
-      \usekomafont{#1prefix}{\nobreak\@nameuse{#1format}}%
-%<book|report>      \setlength{\@tempskipa}{\@nameuse{scr@#1@innerskip}}%
-      \partheadmidvskip
-    }{}%
-    \usekomafont{part}{\nobreak #3}\strut
+    \normalfont\usekomafont{disposition}{\nobreak
+      \IfUseNumber{%
+        \partlineswithprefixformat{#1}{%
+          \usekomafont{#1prefix}{\nobreak\@nameuse{#1format}}%
+%<book|report>        \setlength{\@tempskipa}{\@nameuse{scr@#1@innerskip}}%
+          \partheadmidvskip
+        }{%
+          \usekomafont{part}{\nobreak\interlinepenalty \@M#3\strut\@@par}%
+        }%
+      }{%
+        \partlineswithprefixformat{#1}{}{%
+          \usekomafont{part}{\nobreak\interlinepenalty \@M#3\strut\@@par}%
+        }
+      }%
 %    \end{macrocode}
 %   \changes{v3.10}{2011/08/30}{Wenn \cs{partmark} \cs{@gobble} ist, wird
 %     stattdessen \cs{@mkboth}{}{} aufgerufen.}^^A
 % Und noch den Kolumnentitel setzen.
 %    \begin{macrocode}
-    \expandafter\ifx\csname #1mark\endcsname\@gobble
-      \@mkboth{}{}%
-    \else
-      \csname #1mark\expandafter\endcsname\expandafter{\@currentheadentry}%
-    \fi
-    \par
+      \expandafter\ifx\csname #1mark\endcsname\@gobble
+        \@mkboth{}{}%
+      \else
+        \csname #1mark\expandafter\endcsname\expandafter{\@currentheadentry}%
+      \fi
+    }%
   \endgroup
 %    \end{macrocode}
 % Ganz zum Schluss muss noch einmal ein Abstand eingefügt werden.
@@ -3147,13 +3159,23 @@
 %    \end{macrocode}
 % Erst dann erfolgt die tatsächliche Ausgabe der Überschrift.
 %   \changes{v3.21}{2016/06/12}{fehlendes \cs{nobreak} ergänzt}^^A
+%   \changes{v3.25}{2017/09/07}{\cs{IfUseNumber} definiert}^^A
+%   \changes{v3.25}{2017/09/07}{\cs{sectfont} durch \cs{usekomafont}
+%     ersetzt}^^A
+%   \changes{v3.25}{2017/09/07}{Umstellung auf
+%     \cs{partlineswithprefixformat}}^^A
 %    \begin{macrocode}
   \begingroup
     \setparsizes{\z@}{\z@}{\z@\@plus 1fil}\par@updaterelative
+    \let\IfUseNumber\@secondoftwo
     \raggedpart
-    \interlinepenalty \@M
-    \normalfont
-    \sectfont\nobreak\usekomafont{#1}{\nobreak #2}\strut\@mkboth{}{}\par
+    \normalfont\usekomafont{disposition}{%
+      \nobreak
+      \partlineswithprefixformat{#1}{}{%
+        \usekomafont{#1}{\nobreak\interlinepenalty \@M#2\strut\@@par}%
+      }%
+      \@mkboth{}{}%
+    }%
   \endgroup
 %<*article>
   \nobreak
@@ -3166,6 +3188,30 @@
 }
 %    \end{macrocode}
 % \end{macro}^^A \scr@@startspart
+%
+% \begin{macro}{\partlineswithprefixformat}
+%   \changes{v3.25}{2017/09/07}{neu}
+% Diese Anweisung definiert das Format der eigentlichen Überschriften im Stil
+% \texttt{part}. Fonteinstellungen sind zu diesem Zeitpunkt bereits erfolgt
+% order Teil der Argumente. Die Argumente sind:
+% \begin{description}
+% \item[\meta{Befehlsname} --] der Name der Gliederungsebene, normalerweise
+%   \texttt{chapter}.
+% \item[\meta{Gliederungsnummer} --] die bereits fertig formatierte
+%   Gliederungsnummer einschließlich des nachfolgenden vertikalen Abstands
+%   oder leer, falls keine Gliederungsnummer auszugeben ist.
+% \item[\meta{Text} --] der Text der Überschrift.
+% \end{description}
+% Der Anwender ist selbst verantwortlich, dass innerhalb der Überschrift kein
+% Seitenumbruch erfolgen kann. Nach der Überschrift wird jedoch zwangsweise
+% ein \cs{@@par} ausgeführt, so dass sichergestellt ist, dass mit einem
+% internen Absatz abgeschlossen wird.
+%    \begin{macrocode}
+\newcommand{\partlineswithprefixformat}[3]{%
+  #2#3%
+}
+%    \end{macrocode}
+% \end{macro}^^A \partlineswithprefixformat
 %
 % \begin{macro}{\scr@@endpart}
 %   \changes{v3.18}{2015/05/23}{neue Anweisung (intern)}^^A
@@ -4079,6 +4125,7 @@
 %     1fil} gesetzt}^^A
 %   \changes{v3.22}{2016/12/21}{\cs{@afterindentrue} wird bei positivem
 %     \texttt{beforeskip} gesetzt}^^A
+%   \changes{v3.25}{2017/09/07}{\cs{IfUseNumber} korrigiert}^^A
 %    \begin{macrocode}
 \newcommand*{\scr@@makeschapterhead}[2]{%
   \@tempskipa=\glueexpr \csname scr@#1@beforeskip\endcsname\relax\relax
@@ -4088,7 +4135,7 @@
   \chapterheadstartvskip
   {%
     \setlength{\parindent}{\z@}\setlength{\parfillskip}{\z@ plus 1fil}%
-    \let\IfUseNumber\secondoftwo
+    \let\IfUseNumber\@secondoftwo
     \if@chapterprefix
       \let\IfUsePrefixLine\@firstoftwo
     \else
@@ -4122,7 +4169,7 @@
 % \begin{macro}{\chapterlineswithprefixformat}
 %   \changes{v3.19}{2015/08/02}{neue Anweisung}
 % Diese Anweisung definiert das Format der eigentlichen Überschriften im Stil
-% \texttt{section}, wenn mit Überschriftenzeilen gearbeitet
+% \texttt{chapter}, wenn mit Überschriftenzeilen gearbeitet
 % wird. Fonteinstellungen sind zu diesem Zeitpunkt bereits erfolgt. Die
 % Argumente sind:
 % \begin{description}
