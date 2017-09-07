@@ -54,7 +54,7 @@
 
 \translator{Gernot Hassenpflug\and Markus Kohm}
 
-% Date of the translated German file: 2017-05-08
+% Date of the translated German file: 2017-09-07
 
 \chapter[{Additional Information about the Main Classes and 
   \Package{scrextend}}]{Additional Information about the Main Classes 
@@ -1199,6 +1199,91 @@ to print extra rules above and below the chapter heading may be found at
 
 
 \begin{Declaration}
+  \Macro{partlineswithprefixformat}%
+    \Parameter{level}\Parameter{number}\Parameter{text}%
+\end{Declaration}
+This\ChangedAt{v3.25}{\Class{scrbook}\and \Class{scrreprt}\and
+  \Class{scrartcl}} command is used by headings with style \PValue{part} to
+output the heading number and heading text. The arguments \PName{number} and
+\PName{text} are already formatted, i.\,e., they contain font selections. At
+least the order and layout of both has to be done with this command. If a
+heading has no number argument \PName{number} will be completely empty also
+without any format or font commands.
+
+The default definition ist very simple:
+\begin{lstcode}
+  \newcommand{\partlineswithprefixformat}[3]{%
+    #2#3%
+  }
+\end{lstcode}
+
+\begin{Example}
+  You want to have part headings in a light blue box with blue frame. The
+  width should be restricted to about three quarters of the full text
+  width. So you try:
+\begin{lstcode}
+  \documentclass{scrbook}
+  \usepackage{xcolor}
+  \renewcommand*{\partlineswithprefixformat}[3]{%
+    \fcolorbox{blue}{blue!25}{%
+      \parbox{.75\linewidth}{#2#3}%
+    }%
+  }
+  \begin{document}
+  \part{Framed Part}
+  \end{document}  
+\end{lstcode}
+  But surprisingly the heading is not longer centered\,---\,neither the box
+  itself nor the text inside the box.
+
+  The reason for the missing centering of the box is that the end of the
+  paragraph is hidden in the third argument of the command. So it still
+  finishes the paragraph of the text inside the box but not the paragraph of
+  the \Macro{parbox} itself. To solve this you add a \Macro{par} at the end of
+  the definition.
+
+  The reason for the missing centering inside the box is that the alignment of
+  \DescRef{maincls.cmd.raggedpart} is valid outside the box but not
+  automatically inside a \Macro{parbox}. To solve this you add
+  \Macro{raggedpart} inside the box.
+
+  With
+\begin{lstcode}
+  \documentclass{scrbook}
+  \usepackage{xcolor}
+  \renewcommand*{\partlineswithprefixformat}[3]{%
+    \fcolorbox{blue}{blue!25}{%
+      \parbox{.75\linewidth}{\raggedpart #2#3}%
+    }%
+  }
+  \par
+  \begin{document}
+  \part{Framed Part}
+  \end{document}  
+\end{lstcode}
+  you get the expected result.  
+\end{Example}
+
+As the example shows, users, who change the definition this command,
+should take care of several side effects. The alignment of the text is only
+one thing. They also have to prevent page breaks in the headings, e.\,g., if
+they add extra space into the output. The example above does not have page
+break problems. Not only the box prevents page breaks. \KOMAScript{} itself
+also changes \Macro{interlinepenalty} as part of \PName{text} to prevent page
+breaks. It also finishes \PName{text} with an internal paragraph break using
+\Macro{@@par}.
+
+The first argument, \PName{level}, is not used by the default definition and
+also not needed in the example above. It is of interest only, if a user would
+define several commands with \PValue{part} style and need to distinguish
+the different levels. The predefined commands \DescRef{maincls.cmd.part},
+\DescRef{maincls.cmd.part*}, \DescRef{maincls.cmd.addpart}, and
+\DescRef{maincls.cmd.addpart*} all share the same \PName{level}
+\PName{part}.%
+\EndIndexGroup
+
+
+\begin{Declaration}
   \Macro{chapterlineswithprefixformat}%
     \Parameter{level}\Parameter{number}\Parameter{text}%
   \Macro{chapterlinesformat}%
@@ -1292,7 +1377,7 @@ they add extra space into the output. The example above does not have page
 break problems. Not only the boxes prevent page breaks. \KOMAScript{} itself
 also changes \Macro{interlinepenalty} as part of \PName{text} to prevent page
 breaks. It also finishes \PName{text} with an internal paragraph break using
-\Macro{@par}.
+\Macro{@@par}.
 
 Command \DescRef{maincls.cmd.raggedchapter} is not part of \PName{text} but
 executed before \Macro{chapterlineswithprefixformat} or
