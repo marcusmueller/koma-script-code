@@ -1,4 +1,4 @@
-% \CheckSum{1498}
+% \CheckSum{1483}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-floats.dtx
@@ -1695,7 +1695,7 @@
 % \end{macro}
 % \begin{macro}{\ftype@figure}
 % Um die verschiedenen \emph{float}-Typen unterscheiden zu können,
-% benätigen sie eine Nummer. Abbildungen bekommen hier willkürlich
+% benötigen sie eine Nummer. Abbildungen bekommen hier willkürlich
 % die Nummer 1.
 %    \begin{macrocode}
   floattype=1,
@@ -1703,7 +1703,6 @@
 % \end{macro}
 %   \changes{v3.11c}{2013/03/01}{fix: one \cs{caption} change removed}^^A
 %   \changes{v3.20}{2016/04/07}{Interne Umdefinierung von \cs{caption}}^^A
-%   \changes{v3.25}{2017/10/10}{explite Verwendung von Stil \texttt{default}}^^A
 %    \begin{macrocode}
   tocentryindent=1.5em,
   tocentrynumwidth=2.3em,
@@ -1745,8 +1744,8 @@
 %    \begin{macrocode}
 \newcommand*{\fnum@figure}{\figureformat}
 \newcommand*{\figureformat}{%
-  \figurename~\thefigure%
-%<report|book>  \autodot%
+  \figurename~\thefigure
+  \csname autodot\endcsname
 }
 %    \end{macrocode}
 % \iffalse
@@ -1764,17 +1763,54 @@
 %   \changes{v2.2c}{1995/05/25}{Tabellenausgabe auf CJK umgestellt}^^A
 %   \changes{v2.8h}{2001/07/19}{bei Tabellen kann der Default für
 %      \cs{caption} von Unter- auf Überschriften geändert werden} 
+%   \changes{v3.25}{2017/10/10}{Reimplementierung mit \textsf{tocbasic}}^^A
 % Auch verschiebbare Tabellen sind möglich. Das Prinzip ist das
 % gleiche wie bei den Abbildungen.
 % \begin{Counter}{table}
+%   \changes{v3.25}{2017/10/10}{Der Zähler wird implizit von
+%     \cs{DeclareNewTOC} definiert.}^^A
+% \end{Counter}
+% Der ganze Rest kann mit \cs{DeclareNewTOC} erledigt werden.
+%    \begin{macrocode}
+\DeclareNewTOC[%
+  type=table,
+  float,
+%<book|report>  counterwithin=chapter,
+%    \end{macrocode}
+% \begin{macro}{\fps@table}
+% Die Standardplatzierung für Tabellen ist \emph{t}op,
+% \emph{b}ottom, \emph{p}age.
+%    \begin{macrocode}
+  floatpos=tbp,
+% \end{macro}
+% \begin{macro}{\ftype@table}
+% Um die verschiedenen \emph{float}-Typen unterscheiden zu können,
+% benötigen sie eine Nummer. Tabellen bekommen hier willkürlich
+% die Nummer 2.
+%    \begin{macrocode}
+  floattype=2,
+%    \end{macrocode}
+% \end{macro}
+%   \changes{v3.20}{2016/04/07}{Interne Umdefinierung von \cs{caption}}^^A
+%    \begin{macrocode}
+  tocentryindent=1.5em,
+  tocentrynumwidth=2.3em,
+  atbegin=\def\caption{%
+    \if@tablecaptionabove\expandafter\captionabove
+    \else\expandafter\captionbelow\fi
+  }
+%    \end{macrocode}
+% \begin{macro}{\ext@table}
+% Die Extension der Datei für das Abbildungsverzeichnis.
+%    \begin{macrocode}
+]{lot}
+%    \end{macrocode}
+% \end{macro}
 % \begin{macro}{\thetable}
 %   \changes{v2.97e}{2007/11/23}{Kapitelnummer nur im Hauptteil}^^A
-% \begin{macro}{\tableformat}
-%   \changes{v2.3c}{1995/08/06}{neu}^^A
 %    \begin{macrocode}
-%<article>\newcounter{table}
-%<book|report>\newcounter{table}[chapter]
-\renewcommand*\thetable{%
+%<*book|report>
+%<book|report>\renewcommand*\thetable{%
 %<*book>
   \expandafter\ifnum\scr@v@is@gt{2.97d}\relax
     \if@mainmatter\thechapter.\fi
@@ -1784,61 +1820,29 @@
 %<book>  \fi
   \@arabic\c@table
 }
-\newcommand*{\tableformat}{%
-  \tablename~\thetable%
-%<report|book>  \autodot%
-}
-%    \end{macrocode}
-% \end{macro}
-% \end{macro}
-% \end{Counter}
-% \begin{macro}{\fps@table}
-%    \begin{macrocode}
-\newcommand*{\fps@table}{tbp}
-%    \end{macrocode}
-% \end{macro}
-% \begin{macro}{\ftype@table}
-% Allerdings wird für Tabellen willkürlich Nummer 2 verwendet.
-%    \begin{macrocode}
-\newcommand*{\ftype@table}{2}
-%    \end{macrocode}
-% \end{macro}
-% \begin{macro}{\ext@table}
-% Natürlich haben sie auch eine andere Extension.
-%    \begin{macrocode}
-\newcommand*{\ext@table}{lot}
+%</book|report>
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\fnum@table}
-% Die Ausgabe der Nummer kann ebenfalls abweichen.
+% \begin{macro}{\tableformat}
+%   \changes{v2.3c}{1995/08/06}{neu}^^A
+% Die Ausgabe der Abbildungsnummer wird implizit von \cs{DeclareNewTOC} als
+% \iffalse
+%<*ignore>
+% \fi
 %    \begin{macrocode}
 \newcommand*{\fnum@table}{\tableformat}
+\newcommand*{\tableformat}{%
+  \tablename~\thetable
+  \csname autodot\endcsname
+}
 %    \end{macrocode}
+% \iffalse
+%</ignore>
+% \fi
+% definiert.
 % \end{macro}
-%   \changes{v3.20}{2016/04/07}{Interne Umdefinierung von \cs{caption}}^^A
-% Ob es \cs{caption} in der Voreinstellung eine Tabellenüberschrift
-% oder eine Tabellenunterschrift erzeugt, hängt hier von den Optionen
-% ab.
-%    \begin{macrocode}
-\newenvironment{table}{%
-  \def\caption{%
-    \if@tablecaptionabove\expandafter\captionabove
-    \else\expandafter\captionbelow\fi
-  }%
-  \@float{table}%
-}{%
-  \end@float
-}
-\newenvironment{table*}{%
-  \def\caption{%
-    \if@tablecaptionabove\expandafter\captionabove
-    \else\expandafter\captionbelow\fi
-  }%
-  \@dblfloat{table}%
-}{%
-  \end@dblfloat
-}
-%    \end{macrocode}
+% \end{macro}
 % \end{environment}
 %
 % \iffalse
