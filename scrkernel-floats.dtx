@@ -1,4 +1,4 @@
-% \CheckSum{1515}
+% \CheckSum{1498}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-floats.dtx
@@ -1673,89 +1673,88 @@
 % \begin{environment}{figure}
 %   \changes{v2.2c}{1995/05/25}{Abbildungsausgabe auf CJK umgestellt}^^A
 %   \changes{v2.8h}{2001/07/19}{\cs{caption} wird explizit zu
-%      \cs{captionbelow}}^^A
+%     \cs{captionbelow}}^^A
+%   \changes{v3.25}{2017/10/10}{Reimplementierung mit \textsf{tocbasic}}^^A
 % Zunächst werden \texttt{figure}s, also Abbildungen behandelt.
 % \begin{Counter}{figure}
-% \begin{macro}{\thefigure}
-%   \changes{v2.97e}{2007/11/23}{Kapitelnummer nur im Hauptteil}^^A
-% \begin{macro}{\figureformat}
-%   \changes{v2.3c}{1995/08/06}{neu}^^A
-% Dafür wird ein neuer Zähler benötigt, der bei der Buch- und der
-% Bericht-Klasse mit \cs{chapter} zurückgesetzt wird und auch den
-% Kapitelzähler mit enthält.
-%    \begin{macrocode}
-%<book|report>\newcounter{figure}[chapter]
-%<article>\newcounter{figure}
-\renewcommand*\thefigure{%
-%<*book>
-  \expandafter\ifnum\scr@v@is@gt{2.97d}\relax
-    \if@mainmatter\thechapter.\fi
-  \else
-%</book>
-%<book|report>  \thechapter.%
-%<book>  \fi
-  \@arabic\c@figure
-}
-\newcommand*{\figureformat}{%
-  \figurename~\thefigure%
-%<report|book>  \autodot%
-}
-%    \end{macrocode}
-% \end{macro}
-% \end{macro}
+%   \changes{v3.25}{2017/10/10}{Der Zähler wird implizit von
+%     \cs{DeclareNewTOC} definiert.}^^A
 % \end{Counter}
+% Der ganze Rest kann mit \cs{DeclareNewTOC} erledigt werden.
+%    \begin{macrocode}
+\DeclareNewTOC[%
+  type=figure,
+  float,
+%<book|report>  counterwithin=chapter,
+%    \end{macrocode}
 % \begin{macro}{\fps@figure}
 % Die Standardplatzierung für Abbildungen ist \emph{t}op,
 % \emph{b}ottom, \emph{p}age.
 %    \begin{macrocode}
-\newcommand*{\fps@figure}{tbp}
-%    \end{macrocode}
+  floatpos=tbp,
 % \end{macro}
 % \begin{macro}{\ftype@figure}
 % Um die verschiedenen \emph{float}-Typen unterscheiden zu können,
 % benätigen sie eine Nummer. Abbildungen bekommen hier willkürlich
 % die Nummer 1.
 %    \begin{macrocode}
-\newcommand*{\ftype@figure}{1}
+  floattype=1,
 %    \end{macrocode}
 % \end{macro}
+%   \changes{v3.11c}{2013/03/01}{fix: one \cs{caption} change removed}^^A
+%   \changes{v3.20}{2016/04/07}{Interne Umdefinierung von \cs{caption}}^^A
+%   \changes{v3.25}{2017/10/10}{explite Verwendung von Stil \texttt{default}}^^A
+%    \begin{macrocode}
+  tocentryindent=1.5em,
+  tocentrynumwidth=2.3em,
+  atbegin=\def\caption{%
+    \if@figurecaptionabove\expandafter\captionabove
+    \else\expandafter\captionbelow\fi
+  }
+%    \end{macrocode}
 % \begin{macro}{\ext@figure}
 % Die Extension der Datei für das Abbildungsverzeichnis.
 %    \begin{macrocode}
-\newcommand*{\ext@figure}{lof}
+]{lof}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\thefigure}
+%   \changes{v2.97e}{2007/11/23}{Kapitelnummer nur im Hauptteil}^^A
+%    \begin{macrocode}
+%<*book|report>
+\renewcommand*\thefigure{%
+%<*book>
+  \expandafter\ifnum\scr@v@is@gt{2.97d}\relax
+    \if@mainmatter\thechapter.\fi
+  \else
+%</book>
+    \thechapter.%
+%<book>  \fi
+  \@arabic\c@figure
+}
+%</book|report>
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\fnum@figure}
-% Die Ausgabe der Abbildungsnummer.
+% \begin{macro}{\figureformat}
+%   \changes{v2.3c}{1995/08/06}{neu}^^A
+% Die Ausgabe der Abbildungsnummer wird implizit von \cs{DeclareNewTOC} als
+% \iffalse
+%<*ignore>
+% \fi
 %    \begin{macrocode}
 \newcommand*{\fnum@figure}{\figureformat}
+\newcommand*{\figureformat}{%
+  \figurename~\thefigure%
+%<report|book>  \autodot%
+}
 %    \end{macrocode}
+% \iffalse
+%</ignore>
+% \fi
+% definiert.
 % \end{macro}
-% Jetzt aber zurück zur Umgebung. Wie üblich gibt es eine Version mit
-% und eine Version ihne Stern. Zur unterschiedlichen Bedeutung bei
-% zweispaltigem Satz siehe \texttt{classes.dtx} und \texttt{source2e}.
-%   \changes{v3.11c}{2013/03/01}{fix: one \cs{caption} change removed}^^A
-%   \changes{v3.20}{2016/04/07}{Interne Umdefinierung von \cs{caption}}^^A
-%    \begin{macrocode}
-\newenvironment{figure}{%
-  \def\caption{%
-    \if@figurecaptionabove\expandafter\captionabove
-    \else\expandafter\captionbelow\fi
-  }%
-  \@float{figure}%
-}{%
-  \end@float
-}
-\newenvironment{figure*}{%
-  \def\caption{%
-    \if@figurecaptionabove\expandafter\captionabove
-    \else\expandafter\captionbelow\fi
-  }%
-  \@dblfloat{figure}%
-}{%
-  \end@dblfloat
-}
-%    \end{macrocode}
+% \end{macro}
 % \end{environment}
 %
 %
