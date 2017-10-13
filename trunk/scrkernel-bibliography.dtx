@@ -1,4 +1,4 @@
-% \CheckSum{460}
+% \CheckSum{417}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-bibliography.dtx
@@ -271,31 +271,29 @@
 % \changes{v3.13b}{2014/10/10}{running head with \texttt{leveldown}^^A
 %   fixed}^^A
 % \changes{v3.25}{2017/10/13}{use always \cs{@mkright} and \cs{@mkdouble}}^^A
+% \changes{v3.25}{2017/10/13}{using \cs{bibliography@heading}}^^A
+% \begin{macro}{\bibliography@heading}
+% \changes{v3.25}{2017/10/13}{neu (intern)}
 % Befehl zum Setzen der Überschrift des Literaturverzeichnisses.
 %    \begin{macrocode}
-\newcommand*\bib@heading{%
-%<*article>
+\newcommand*{\bib@heading}{%
+%<article>  \bibliography@heading{\refname}%
+%<book|report>  \bibliography@heading{\bibname}%
+}
+\newcommand*{\bibliography@heading}[1]{%
   \ifbib@leveldown
-    \subsection*{\refname}%
-    \@mkright{\MakeMarkcase{\refname}}%
+%<article>    \subsection*{#1}%
+%<book|report>    \section*{#1}%
+    \@mkright{\MakeMarkcase{#1}}%
   \else
-    \section*{\refname}%
-    \@mkdouble{\MakeMarkcase{\refname}}%
+%<article>    \section*{#1}%
+%<book|report>    \chapter*{#1}%
+    \@mkdouble{\MakeMarkcase{#1}}%
   \fi
-%</article>
-%<*book|report>
-  \ifbib@leveldown
-    \section*{\bibname}%
-    \@mkright{\MakeMarkcase{\bibname}}%
-  \else
-    \chapter*{\bibname}%
-    \@mkdouble{\MakeMarkcase{\bibname}}%
-  \fi
-%</book|report>
 }%
 %    \end{macrocode}
 % \end{macro}
-%
+% \end{macro}%
 %
 %
 % \subsection{Optionen für das Literaturverzeichnis}
@@ -312,7 +310,10 @@
 %   \changes{v3.12}{2013/09/28}{Es werden keine Kapiteleinträge in andere
 %     Verzeichnisse geschrieben.}^^A
 %   \changes{v3.17}{2015/03/12}{interne Speicherung der Werte}^^A
-%   \changes{v3.25}{2017/10/13}{use always \cs{@mkright} and \cs{@mkdouble}}^^A
+%   \changes{v3.25}{2017/10/13}{use always \cs{@mkright} and
+%     \cs{@mkdouble}}^^A
+%   \changes{v3.25}{2017/10/13}{redefines \cs{bibliography@heading} instead of
+%     \cs{bib@heading}}^^A
 %   Dies ist der Generalschlüssel für alle Optionen, die das
 %   Literaturverzeichnis betreffen. Neu ist, dass verschiedene Stile definiert
 %   werden können. Desweiteren kann man \texttt{totoc} und
@@ -342,25 +343,16 @@
       \KOMA@kav@remove{.\KOMAClassFileName}{bibliography}{totoc}%
       \KOMA@kav@remove{.\KOMAClassFileName}{bibliography}{numbered}%
       \KOMA@kav@add{.\KOMAClassFileName}{bibliography}{notoc}%
-      \renewcommand*\bib@heading{%
-%<*article>
+      \renewcommand*{\bibliography@heading}[1]{%
         \ifbib@leveldown
-          \subsection*{\refname}%
-          \@mkright{\MakeMarkcase{\refname}}%
+%<article>          \subsection*{##1}%
+%<book|report>          \section*{##1}%
+          \@mkright{\MakeMarkcase{#1}}%
         \else
-          \section*{\refname}%
-          \@mkdouble{\MakeMarkcase{\refname}}%
+%<article>          \section*{##1}%
+%<book|report>          \chapter*{##1}%
+          \@mkdouble{\MakeMarkcase{##1}}%
         \fi
-%</article>
-%<*book|report>
-        \ifbib@leveldown
-          \section*{\bibname}%
-          \@mkright{\MakeMarkcase{\bibname}}%
-        \else
-          \chapter*{\bibname}%
-          \@mkdouble{\MakeMarkcase{\bibname}}%
-        \fi
-%</book|report>
       }%
     \or% totoc
       \KOMA@kav@remove{.\KOMAClassFileName}{toc}{nobibliography}%
@@ -371,35 +363,36 @@
       \KOMA@kav@remove{.\KOMAClassFileName}{bibliography}{totoc}%
       \KOMA@kav@remove{.\KOMAClassFileName}{bibliography}{numbered}%
       \KOMA@kav@add{.\KOMAClassFileName}{bibliography}{totoc}%
-      \renewcommand*\bib@heading{%
+      \renewcommand*{\bibliography@heading}[1]{%
 %<*article>
         \ifbib@leveldown
 %    \end{macrocode}
-%   \changes{v3.23}{2017/02/23}{Verwendung von \cs{ext@toc}}^^A
-%   Ab Version 3.23 wird das von \textsf{tocbasic} bereitgestellte
-%   \cs{ext@toc} statt dem hart codierten \texttt{toc} verwendet.
+% \changes{v3.23}{2017/02/23}{Verwendung von \cs{ext@toc}}^^A
+% \changes{v3.25}{2017/10/13}{Verwendung von \cs{addsubsectiontocentry} statt
+%   \cs{addxcontentsline}}^^A
+% Ab Version 3.23 wird das von \textsf{tocbasic} bereitgestellte
+% \cs{ext@toc} statt dem hart codierten \texttt{toc} verwendet.
 %    \begin{macrocode}
           \subsection*{%
-                \expandafter\addxcontentsline\expandafter{\ext@toc}%
-                {subsection}{\refname}%
-                \refname
+                \addsubsectiontocentry{}{##1}%
+                ##1%
               }%
-          \@mkright{\MakeMarkcase{\refname}%
+          \@mkright{\MakeMarkcase{##1}}%
         \else
-          \addsec{\refname}
-          \@mkdouble{\MakeMarkcase{\refname}}%
+          \addsec{#1}%
+          \@mkdouble{\MakeMarkcase{##1}}%
         \fi
 %</article>
 %<*book|report>
         \ifbib@leveldown
-          \addsec{\bibname}
+          \addsec{##1}%
         \else
           \if@chaptertolists
-            \@chaptertolistsfalse\addchap{\bibname}\@chaptertoliststrue
+            \@chaptertolistsfalse\addchap{##1}\@chaptertoliststrue
           \else
-            \addchap{\bibname}
+            \addchap{##1}%
           \fi
-          \@mkdouble{\MakeMarkcase{\bibname}}%
+          \@mkdouble{\MakeMarkcase{##1}}%
         \fi
 %</book|report>
       }%
@@ -412,25 +405,25 @@
       \KOMA@kav@remove{.\KOMAClassFileName}{bibliography}{totoc}%
       \KOMA@kav@remove{.\KOMAClassFileName}{bibliography}{numbered}%
       \KOMA@kav@add{.\KOMAClassFileName}{bibliography}{numbered}%
-      \renewcommand*\bib@heading{%
+      \renewcommand*{\bibliography@heading}[1]{%
 %<*article>
         \ifbib@leveldown
-          \subsection{\refname}%
+          \subsection{##1}%
         \else
-          \section{\refname}%
-          \@mkdouble{\MakeMarkcase{\sectionmarkformat \refname}}%
+          \section{##1}%
+          \@mkdouble{\MakeMarkcase{\sectionmarkformat ##1}}%
         \fi
 %</article>
 %<*book|report>
         \ifbib@leveldown
-          \section{\bibname}%
+          \section{##1}%
         \else
           \if@chaptertolists
-            \@chaptertolistsfalse\chapter{\bibname}\@chaptertoliststrue
+            \@chaptertolistsfalse\chapter{##1}\@chaptertoliststrue
           \else
-            \chapter{\bibname}
+            \chapter{##1}
           \fi
-          \@mkdouble{\MakeMarkcase{\chaptermarkformat \bibname}}%
+          \@mkdouble{\MakeMarkcase{\chaptermarkformat ##1}}%
         \fi
 %</book|report>
       }
