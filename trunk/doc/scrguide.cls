@@ -845,6 +845,35 @@
     \label{\label@desc@prefix\label@base.option.#2=#3#1}%
   \endgroup
 }
+%    \end{macrocode}
+% \begin{macro}{\OptionVNameRef}
+%   \cs{OptionVName} by reference. Use it like
+%   |\OptionVNameRef[suffix]{maincls}{version}{value}|.
+%    \begin{macrocode}
+\newcommand*{\OptionVNameRef}{%
+  \kernel@ifstar {\@RefOptionVName0}{\@RefOptionVName1}%
+}
+\newcommand*{\@RefOptionVName}[1]{%
+  \kernel@ifnextchar [%]
+  {\@@RefOptionVName#1}{\@@RefOptionVName#1[]}%
+}
+\newcommand*{\@@RefOptionVName}{}
+\def\@@RefOptionVName#1[#2]#3#4#5{%
+  \scr@ifundefinedorrelax{r@\label@desc@prefix#3.option.#4=#5#2}{%
+    \ifcase #1
+      \expandafter\scr@no@hyperref
+    \else
+      \expandafter\hyperref
+    \fi
+    [\label@desc@prefix#3.option.#4#2]%
+    {\OptionVName{\ref*{\label@desc@prefix#3.option.#4#2}}{#5}}%
+  }{%
+    \expandafter\ref\ifcase #1 *\fi{\label@desc@prefix#3.option.#4=#5#2}%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
+%    \begin{macrocode}
 \newcommand*{\DescOptionVName}[2]{%
   \par
   \leftskip\z@
@@ -872,7 +901,7 @@
 }
 \newcommand*{\LabelPageStyle}[2][\label@suffix]{%
   \begingroup
-    \protected@edef\@currentlabel{\FloatStyle{#2}}%
+    \protected@edef\@currentlabel{\PageStyle{#2}}%
     \label@sanitize
     \Hy@MakeCurrentHref{\label@desc@prefix\label@base.pagestyle.#2#1}%
     \ClassInfo{scrguide}{Anchor: `\@currentHref'}%
