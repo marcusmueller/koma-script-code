@@ -2123,6 +2123,15 @@ KOMAScript \endcsname
 %    \end{macrocode}
 %
 %
+% \section{Logos}
+%
+% I don't want to use package \textsf{hologo} for only one logo:
+%    \begin{macrocode}
+\DeclareRobustCommand{\XeTeX}{%
+  X\kern-.125em\lower.5ex\hbox{\reflectbox{E}}\kern-.10em\TeX%
+}%
+%    \end{macrocode}
+%
 % \section{Appendix}
 %
 % \begin{macro}{\appendix}
