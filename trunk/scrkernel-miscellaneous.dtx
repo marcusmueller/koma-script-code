@@ -1,4 +1,4 @@
-% \CheckSum{639}
+% \CheckSum{610}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-miscellaneous.dtx
@@ -154,6 +154,10 @@
 % \fi
 % \subsection{Test auf die eine \KOMAScript-Klasse}
 %
+% Hier haben wir zunächst ein paar Definitionen speziell für das Paket
+% \textsf{scrletter}, die genau dann benötigt werden, wenn das Paket nicht mit
+% einer \KOMAScript-Klasse verwendet wird.
+%
 %    \begin{macrocode}
 %<*package&letter>
 \scr@ifundefinedorrelax{KOMAClassName}{%
@@ -195,42 +199,23 @@
 %    \end{macrocode}
 %
 % \begin{macro}{\scr@renewforletter}
-%   \changes{v3.20}{2014/04/10}{neu Anweisung}^^A
+% \changes{v3.20}{2014/04/10}{neu Anweisung}^^A
+% \changes{v3.25}{2017/11/15}{als unbenutzt entfernt}^^A
 % Wird wie \cs{renewcommand} verwendet, verzögert die Umdefinierung aber bis
 % zu einem optionalen Zeitpunkt. Dazu wird intern
 % \cs{scrletter@extra@\meta{macro}} definiert.
 % \begin{macro}{\@renewforletter}
-%   \changes{v3.20}{2014/04/10}{neu Anweisung (intern)}^^A
+% \changes{v3.20}{2014/04/10}{neu Anweisung (intern)}^^A
+% \changes{v3.25}{2017/11/15}{als unbenutzt entfernt}^^A
 % \begin{macro}{\do@renewforletter@list}
-%   \changes{v3.20}{2014/04/10}{neu Anweisung (intern)}^^A
+% \changes{v3.20}{2014/04/10}{neu Anweisung (intern)}^^A
+% \changes{v3.25}{2017/11/15}{als unbenutzt entfernt}^^A
 % Die do-Liste der später umzudefinierenden Anweisungen.
 % \begin{macro}{\do@renewforletter}
-%   \changes{v3.20}{2014/04/10}{neu Anweisung (intern)}^^A
+% \changes{v3.20}{2014/04/10}{neu Anweisung (intern)}^^A
+% \changes{v3.25}{2017/11/15}{als unbenutzt entfernt}^^A
 % Definiert die in der do-Liste gespeicherten Anweisungen um.
 %    \begin{macrocode}
-\newcommand*{\scr@renewforletter}{%
-  \kernel@ifstar {\@renewforletter*}%
-                 {\@renewforletter{}}%
-}
-\newcommand*{\@renewforletter}[2]{%
-  \g@addto@macro\do@renewforletter@list{\do#2}%
-  \edef\reserved@a{%
-    \noexpand\newcommand\noexpand#1\expandafter\noexpand
-    \csname scrletter@extra@\string#2\endcsname
-  }%
-  \expandafter\reserved@a
-}
-\newcommand*{\do@renewforletter@list}{}
-\newcommand*{\do@renewforletter}{%
-  \begingroup
-    \def\do##1{%
-      \aftergroup\let\aftergroup##1
-      \expandafter\aftergroup\csname scrletter@extra@\string##1\endcsname
-    }%
-    \do@renewforletter@list
-  \endgroup
-  \let\do@renewforletter@list\@empty
-}
 %</package&letter>
 %    \end{macrocode}
 % \end{macro}
@@ -695,12 +680,13 @@
 % \subsection{Definitionen für tiefer gestellten Text}
 %
 % \begin{macro}{\textsubscript}
-%   \changes{v2.8h}{2001/07/19}{neu}%
+% \changes{v2.8h}{2001/07/19}{neu}^^A
 % \begin{macro}{\@textsubscript}
-%   \changes{v2.8h}{2001/07/19}{neu (intern)}%
-%   \changes{v3.10}{2011/09/05}{\cs{providecommand} statt \cs{newcommand},
-%     damit das auch noch funktioniert, wenn \textsf{scrextend} nach
-%     \textsf{fixltx2e} geladen wird}%
+% \changes{v2.8h}{2001/07/19}{neu (intern)}^^A
+% \changes{v3.10}{2011/09/05}{\cs{providecommand} statt \cs{newcommand},
+%   damit das auch noch funktioniert, wenn \textsf{scrextend} nach
+%   \textsf{fixltx2e} geladen wird}^^A
+% \changes{v3.25}{2017/11/15}{wird nur noch definiert, wenn nicht vorhanden}^^A
 % Im \LaTeX-Kern wird zwar ein Makro \cs{textsuperscript} definiert,
 % um Texte hochstellen zu können, die entsprechende Anweisung zum
 % Tiefstellen fehlt jedoch. Das wird hier nachgeholt, wobei nahezu
@@ -708,8 +694,16 @@
 % wird.
 %    \begin{macrocode}
 %<*class|extend>
-\DeclareRobustCommand*\textsubscript[1]{%
-  \@textsubscript{\selectfont#1}%
+\scr@ifundefinedorrelax{textsubscript}{%
+  \DeclareRobustCommand*\textsubscript[1]{%
+    \@textsubscript{\selectfont#1}%
+  }%
+}{%
+  \scr@ifundefinedorrelax{textsubscript }{%
+    \DeclareRobustCommand*\textsubscript[1]{%
+      \@textsubscript{\selectfont#1}%
+    }%
+  }{}%
 }
 \providecommand*{\@textsubscript}[1]{%
   {\m@th\ensuremath{_{\mbox{\fontsize\sf@size\z@#1}}}}%
@@ -717,6 +711,26 @@
 %</class|extend>
 %    \end{macrocode}
 % \end{macro}
+% \end{macro}
+%
+%
+% \subsection{Unsichtbare Stütze}
+% \label{sec:strut}
+%
+% \begin{macro}{\scr@endstrut}
+% \changes{v3.25}{2017/11/15}{neu (intern)}^^A
+% Wird am Ende eines vermutlich horizontalen Materials eine unsichtbare Stütze
+% der Art \cs{strut} eingebaut, werden Leerzeichen, die davor stehen plötzlich
+% zu Leerzeichen in der Ausgabe, auch wenn das gar nicht erwünscht wird. Das
+% kann man verhindern, indem man \cs{unskip} davor setzt. Dummer Weise hat
+% eine solche Stütze dann aber das Problem, dass das letzte Wort davor nicht
+% mehr getrennt wird. Verrückter Weise kann man das wiederum mit \cs{nobreak}
+% lösen. Das sollte dann auch nur im horizontalen Modus gemacht werden.
+%    \begin{macrocode}
+%<*class|letter|extend>
+\providecommand*{\scr@endstrut}{\unskip\ifhmode\nobreak\strut\fi}
+%</class|letter|extend>
+%    \end{macrocode}
 % \end{macro}
 %
 %
