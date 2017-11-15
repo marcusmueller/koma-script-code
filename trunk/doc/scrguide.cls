@@ -1971,7 +1971,7 @@
     sectionformat,subsectionformat,subsubsectionformat,
     sectionmarkformat,sectioncatchphraseformat,sectionlinesformat,
     Sentence,sentencename,sentenceshortname,
-    setbibpreamble,setcapindent,setcapwidth,
+    setbibpreamble,setcapindent,setcapwidth,setcaptionalignment,
     setchapterpreamble,setfootbotline,setfootsepline,setfootwidth,
     setheadsepline,setheadtopline,setheadwidth,setindexpreamble,setkomafont,
     setkomavar,setlengthtoplength,setparsizes,setpartpreamble,setuptoc,

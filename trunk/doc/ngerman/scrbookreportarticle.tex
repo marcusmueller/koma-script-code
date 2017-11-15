@@ -3083,8 +3083,8 @@ Anfang dieses Abschnitts zu finden ist. Aus Gründen der Kompatibilität ist
 voreingestellt, dass sich \Macro{caption} bei allen Gleitumgebungen wie
 \Macro{captionbelow} verhält. Es wird jedoch empfohlen\textnote{Tipp!},
 Tabellenüberschriften zu verwenden und auf die Formatierung mit
-\OptionValueRef{\LabelBase}{captions}{tableheading} entsprechend umzustellen oder bei
-Tabellen auf \Macro{captionabove} zurück zu greifen.
+\OptionValueRef{\LabelBase}{captions}{tableheading} entsprechend umzustellen
+oder bei Tabellen auf \Macro{captionabove} zurück zu greifen.
 %
 \begin{Example}
   Sie wollen mit
@@ -3845,6 +3845,122 @@ trickreiche Anwendung für \Macro{setcapwidth} in
 %
 \EndIndexGroup
 
+\begin{Declaration}
+  \Macro{setcaptionalignment}\OParameter{Gleitumgebung}\Parameter{Ausrichtung}
+\end{Declaration}
+Normalerweise\ChangedAt{v3.25}{\Class{scrbook}\and \Class{scrreprt}\and
+  \Class{scrartcl}} werden mehrzeilige\textnote{Ausrichtung mehrzeiliger
+  Beschreibungen} Beschreibungen im Blocksatz gesetzt. Dies entspricht
+\Macro{setcaptionalignment}\PParameter{j}. Manchmal wird allerdings eine davon
+abweichende Ausrichtung gewünscht, beispielsweise linksbündiger
+Flattersatz. Eine entsprechende Änderung ist mit \Macro{setcaptionalignment}
+jederzeit möglich. Für \PName{Ausrichtung} kann dabei genau einer der
+Buchstaben aus \autoref{tab:maincls.captionalignment} angegeben werden. Wird
+eine unbekannte \PName{Ausrichtung} angegeben, so resultiert dies in einer
+Fehlermeldung.
+%
+\begin{table}
+%  \centering
+  \KOMAoptions{captions=topbeside}%
+  \setcapindent{0pt}%
+  \begin{captionbeside}
+    [{Ausrichtungen für mehrzeilige Beschreibungen von Gleitumgebungen}]
+    {\label{tab:maincls.captionalignment}%
+      Ausrichtungen für mehrzeilige Beschreibungen von Gleitumgebungen}
+    [l]
+    \begin{tabular}[t]{ll}
+      \toprule
+      c & zentriert \\
+      j & Blocksatz \\
+      l & linksbündig \\
+      r & rechtsbündig \\
+      C & zentriert mit \Package{ragged2e} \\
+      J & Blocksatz mit \Package{ragged2e} \\
+      L & linksbündig mit \Package{ragged2e} \\
+      R & rechtsbündig mit \Package{ragged2e} \\
+      \bottomrule
+    \end{tabular}
+  \end{captionbeside}
+\end{table}
+
+Die vier Möglichkeiten mit Paket
+\Package{ragged2e}\important{\Package{ragged2e}}\IndexPackage{ragged2e} stehen
+nur zur Verfügung, wenn das Paket vor Verwendung von
+\Macro{setcaptionalignment} geladen wurde. Anderenfalls werden sie auf die
+entsprechenden Möglichkeiten ohne \Package{ragged2e} abgebildet. Zur
+Sicherheit wird in diesem Fall eine Warnung ausgegeben.
+
+Verwendet man den Befehl ohne\textnote{kein optionaler Parameter} den
+optionalen Parameter, so hängt das Ergebnis davon ab, ob der Aufruf innerhalb
+oder außerhalb einer Gleitumgebung stattfindet. Innerhalb einer Gleitumgebung
+wird dann die Ausrichtung für diese Gleitumgebung gesetzt. Außerhalb wird
+hingegen ein leerer optionaler Parameter angenommen.
+
+Beim Aufruf mit einem leeren\textnote{leerer optionaler Parameter} optionalen
+Parameter oder außerhalb einer Gleitumgebung auch komplett ohne optionalem
+Parameter wird die allgemeine Ausrichtung festgelegt. Diese wird immer dann
+verwendet, wenn keine Ausrichtung für den aktuellen Gleitumgebungstyp
+definiert ist.
+
+Will man nur die Ausrichtung eines bestimmen Typs\textnote{mit
+  \PName{Gleitumgebung}} von Gleitumgebungen festlegen, ohne
+\PName{Ausrichtung} auch für andere Arten von Gleitumgebungen zu verändern, so
+gibt man den Typ der Gleitumgebung, beispielsweise \PValue{figure} oder
+\PValue{table}, als optionalen Parameter \PName{Gleitumgebung} an.
+%
+\begin{Example}
+  Sie wollen, dass Bildunterschriften auch dann vollständig zentriert unter
+  den Bildern stehen, wenn sie mehrzeilig sind. Um das zunächst einmal nur für
+  eine einzige Abbildung zu testen, verwenden Sie\textnote{in der
+    Gleitumgebung}:
+\begin{lstcode}
+  \begin{figure}
+    \centering
+    \setcaptionalignment{c}
+    \includegraphics{example-image}
+    \caption{\blindtext}
+  \end{figure}
+\end{lstcode}
+  Da Sie mit dem Ergebnis zufrieden sind, verschieben Sie die
+  Anweisung\textnote{in der Dokumentpräambel}
+\begin{lstcode}
+  \setcaptionalignment{c}
+\end{lstcode}
+  in die Dokumentpräambel. Daraufhin bemerken Sie allerdings, dass Ihnen
+  diese Änderung für Tabellenüberschriften überhaupt nicht gefällt. Daher
+  beschränken Sie mit\textnote{nur für Abbildungen}
+\begin{lstcode}
+  \setcaptionalignment[figure]{c}
+\end{lstcode}
+  die Zentrierung auf Abbildungen.
+
+  Etwas später stellen Sie fest, dass die Zentrierung doch nicht so günstig
+  ist. Stattdessen wollen Sie nun lieber eine linksbündige Ausrichtung im
+  Flattersatz haben. Also ändern Sie die Anweisung erneut zu:
+\begin{lstcode}
+  \setcaptionalignment[figure]{l}
+\end{lstcode}
+  Allerdings gefällt Ihnen nun nicht, dass die Zeilen sehr unterschiedlich
+  lang werden. Als Ursache machen Sie die fehlende Trennung aus, wodurch lange
+  Wörter komplett in die nächste Zeile rutschen und so große Lücken
+  hinterlassen. Also wollen Sie zusätzlich Trennung nach Bedarf
+  ermöglichen. Dies ist mit Hilfe des Pakets
+  \Package{ragged2e}\important{\Package{ragged2e}}\IndexPackage{ragged2e}
+  leicht möglich. Dabei genügt es allerdings nicht, das Paket mit
+\begin{lstcode}
+  \usepackage{ragged2e}
+\end{lstcode}
+  zu laden. Auch Option \Option{newcommands} beim Laden des Pakets bringt
+  keine Abhilfe. Stattdessen muss zusätzlich die \PName{Ausrichtung} geändert
+  werden:
+\begin{lstcode}
+  \usepackage{ragged2e}
+  \setcaptionalignment[figure]{L}
+\end{lstcode}
+  Beachten\textnote{Achtung!} Sie den Großbuchstabe für \PName{Ausrichtung}.
+\end{Example}
+\EndIndexGroup
+
 
 \begin{Declaration}
   \Option{origlongtable}
@@ -4503,3 +4619,5 @@ zuständig.%
 
 
 
+%  LocalWords:  Bildunterschriften Dokumentpräambel Tabellenüberschriften
+%  LocalWords:  Gleitumgebungstyp

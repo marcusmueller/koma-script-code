@@ -1,4 +1,4 @@
-% \CheckSum{1478}
+% \CheckSum{1692}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-floats.dtx
@@ -1352,7 +1352,7 @@
 % \end{macro}^^A \scr@@makesinglelinecaption
 % \end{macro}^^A \scr@makesinglelinecaption
 % \begin{macro}{\scr@makemultilinecaption}
-%   \changes{v3.21}{2016/05/31}{neu (intern)}
+% \changes{v3.21}{2016/05/31}{neu (intern)}^^A
 %    \begin{macrocode}
 \newcommand{\scr@makemultilinecaption}[3]{%
   {%
@@ -1360,6 +1360,29 @@
       \hb@xt@\hsize{%
         \cap@left
         \vbox{\hsize\cap@width\linewidth\hsize
+%    \end{macrocode}
+% \changes{v3.25}{2017/11/15}{caption Ausrichtung hinzugefügt}^^A
+% Bevor wir irgend etwas anderes machen, führen wir an der Stelle die
+% Ausrichtung für die gesamte \emph{caption} einschließlich Label aus. Dabei
+% hat eine vorhandene spezielle Ausrichtung für den Gleitungebungstyp Vorrang
+% vor der allgemeinen Ausrichtung für alle Gleitumgebungen:
+%    \begin{macrocode}
+          \scr@ifundefinedorrelax{@captype}{%
+            \ClassWarning{\KOMAClassName}{%
+              `\string\caption' outside float.\MessageBreak
+              Seems you are using `\string\caption' outside a
+              float.\MessageBreak
+              Maybe you are using a package that uses
+              `\string\@makecaption'\MessageBreak
+              without setting `\string\@captype' before.\MessageBreak
+              Because I cannot detect the caption type, I'm using\MessageBreak
+              the empty one.%
+            }%
+            \let\@captype\@empty
+          }{}%
+          \scr@ifundefinedorrelax{ragged\@captype caption}{\raggedcaption}{%
+            \@nameuse{ragged\@captype caption}%
+          }%
 %    \end{macrocode}
 % Wenn der Schalter \cs{ifdofullc@p} gesetzt ist, wird der Text bezüglich des
 % Labels vollständig hängend gesetzt:
@@ -1440,6 +1463,175 @@
   }\kern-\dp\strutbox
 }
 %    \end{macrocode}
+% \begin{macro}{\setcaptionalignment}
+% \changes{v3.25}{2017/11/15}{neu}^^A
+% Da es etwas lästig und fehleranfällig ist, die ganzen \cs{raggedcaption}
+% und \cs{ragged\dots caption} von Hand zu definieren, gibt es dafür einen
+% Befehl. Das erste, optionale Argument ist dabei die Gleitungebung für die
+% die Definition erfolgen soll. Ist das Argument nicht leer, wird bei
+% definiertem \cs{@captype} dieses als Gleitumgebung angenommen. Ist das
+% Argument leer wird stattdessen die allgemeine Ausrichtung festgelegt. Das
+% zweite Argument ist ein einzelner Buchstaben, der für die Ausrichtung steht.
+%    \begin{macrocode}
+\newcommand*\setcaptionalignment{%
+  \kernel@ifnextchar [%]
+    {\@setcaptionalignment}
+    {%
+      \scr@ifundefinedorrelax{@captype}{\@setcaptionalignment}{%
+        \edef\reserved@a{\noexpand\@setcaptionalignment[{\@captype}]}\reserved@a
+      }%
+    }%
+}%
+\newcommand*\@setcaptionalignment[2][]{%
+%    \end{macrocode}
+% Wenn das optionale Argument nicht leer ist, sollte es eine bereits
+% definierte Gleitumgebung sein. Anderenfalls wird vorsichtshalber zumindest
+% eine Warnung ausgegeben. Die Ausrichtung wird aber trotzde, definiert.
+%    \begin{macrocode}
+  \IfArgIsEmpty{#1}{}{%
+    \expandafter\ifnum 
+    \scr@ifundefinedorrelax{#1}{0}{\scr@ifundefinedorrelax{end#1}{0}{1}}=0
+      \ClassWarning{\KOMAClassName}{%
+        float type `#1' defined not yet,\MessageBreak
+        but setting ragged mode for captions of\MessageBreak
+        float type `#1'%
+      }%
+    \fi
+  }%
+%    \end{macrocode}
+% Danach gehen wir die Buchstaben durch. Erlaubt sind:
+% \begin{description}
+% \item[\texttt{j}] -- Blocksatz (\cs{ragged\dots caption} wird \cs{relax}.
+% \item[\texttt{l}] -- Blocksatz (\cs{ragged\dots caption} wird
+%                      \cs{raggedright}.
+% \item[\texttt{r}] -- Blocksatz (\cs{ragged\dots caption} wird
+%                      \cs{raggedleft}.
+% \item[\texttt{c}] -- Blocksatz (\cs{ragged\dots caption} wird
+%                      \cs{centering}.
+% \end{description}
+% Ist das Paket \textsf{ragged2e} geladen, werden stattdessen die Befehle
+% \cs{LaTeXraggedright}, \cs{LaTeXraggedleft} und \cs{LaTeXcentering}
+% verwendet. Außerdem führen dann die entsprechenden Großbuchstaben zu
+% \cs{justifying}, \cs{RaggedRight}, \cs{RaggedLeft} und
+% \cs{Centering}. Anderenfalls werden die Großbuchstaben wie die
+% Kleinbuchstaben behandelt und geben zusätzlich eine Warnung aus.
+%    \begin{macrocode}
+  \def\reserved@a{#2}%
+  \ifstr{\reserved@a}{j}{%
+    \expandafter\let\csname ragged#1caption\endcsname\@empty
+  }{%
+    \ifstr{\reserved@a}{l}{%
+      \scr@ifundefinedorrelax{LaTeXraggedright}{%
+        \expandafter\let\csname ragged#1caption\endcsname\raggedright
+      }{%
+        \expandafter\let\csname ragged#1caption\endcsname\LaTeXraggedright
+      }%
+    }{%
+      \ifstr{\reserved@a}{r}{%
+        \scr@ifundefinedorrelax{LaTeXraggedleft}{%
+          \expandafter\let\csname ragged#1caption\endcsname\raggedleft
+        }{%
+          \expandafter\let\csname ragged#1caption\endcsname\LaTeXraggedleft
+        }%
+      }{%
+        \ifstr{\reserved@a}{c}{%
+          \scr@ifundefinedorrelax{LaTeXcentering}{%
+            \expandafter\let\csname ragged#1caption\endcsname\centering
+          }{%
+            \expandafter\let\csname ragged#1caption\endcsname\LaTeXcentering
+          }%
+        }{%
+          \ifstr{\reserved@a}{J}{%
+            \scr@ifundefinedorrelax{justifying}{%
+              \scr@caption@raggede@warning{J}{\justifying}%
+              \expandafter\let\csname ragged#1caption\endcsname\@empty
+            }{%
+              \expandafter\let\csname ragged#1caption\endcsname\justifying
+            }%
+          }{%
+            \ifstr{\reserved@a}{L}{%
+              \scr@ifundefinedorrelax{RaggedRight}{%
+                \scr@caption@raggede@warning{L}{\RaggedRight}%
+                \expandafter\let\csname ragged#1caption\endcsname\raggedright
+              }{%
+                \expandafter\let\csname ragged#1caption\endcsname\RaggedRight
+              }%
+            }{%
+              \ifstr{\reserved@a}{R}{%
+                \scr@ifundefinedorrelax{RaggedLeft}{%
+                  \scr@caption@raggede@warning{R}{\RaggedLeft}%
+                  \expandafter\let\csname ragged#1caption\endcsname\raggedleft
+                }{%
+                  \expandafter\let\csname ragged#1caption\endcsname\RaggedLeft
+                }%
+              }{%
+                \ifstr{\reserved@a}{C}{%
+                  \scr@ifundefinedorrelax{Centering}{%
+                    \scr@caption@raggede@warning{C}{\Centering}%
+                    \expandafter\let\csname ragged#1caption\endcsname\centering
+                  }{%
+                    \expandafter\let\csname ragged#1caption\endcsname\Centering
+                  }%
+                }{%
+                  \ifstr{\reserved@a}{}{%
+                    \expandafter\let\csname ragged#1caption\endcsname\relax
+                  }{%
+                    \ClassError{\KOMAClassName}{unknown alignment char `#2'}{%
+                      \string\setcaptionalignment\space supports
+                      only:\MessageBreak 
+                      \space\space c - centered captions,\MessageBreak
+                      \space\space j - justified captions,\MessageBreak
+                      \space\space l - left align captions,\MessageBreak
+                      \space\space r - right aligned captions,\MessageBreak
+                      \space\space C - centered captions with
+                      `ragged2e',\MessageBreak 
+                      \space\space J - justified captions with
+                      `ragged2e',\MessageBreak 
+                      \space\space L - left align captions with
+                      `ragged2e',\MessageBreak 
+                      \space\space R - right aligned captions with
+                      `ragged2e',\MessageBreak 
+                      or an empty argument to remove special
+                      alignment.\MessageBreak 
+                      If you'd continue, I'd not change the alignment.%
+                    }%
+                  }%
+                }%
+              }%
+            }%
+          }%
+        }%
+      }%
+    }%
+  }%
+}
+%    \end{macrocode}
+% \begin{macro}{\scr@caption@raggede@warning}
+% \changes{v3.25}{2017/11/15}{neu (intern)}^^A
+% Das ist die oben erwähnte Warnung.
+%    \begin{macrocode}
+\newcommand*{\scr@caption@raggede@warning}[2]{%
+  \begingroup
+    \lowercase{\def\reserved@a{#1}}%
+    \ClassWarning{\KOMAClassName}{%
+      `\string#2' undefined!\MessageBreak
+      To avoid replacing caption alignment `#1' by `\reserved@a'\MessageBreak
+      you should load package `ragged2e' before using\MessageBreak
+      `\string\setcaptionalignment'%
+    }%
+  \endgroup
+}
+%    \end{macrocode}
+% \begin{macro}{\raggedcaption}
+% \changes{v3.25}{2017/11/15}{neu}^^A
+% Und natürlich wird eine Standardausrichtung benötigt. Ich bevorzuge hier die
+% leere Ausrichtung, weil \LaTeX{} \cs{relax} nicht als definiert erkennt.
+%    \begin{macrocode}
+\newcommand*\raggedcaption{}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}^^A \scr@caption@raggede@warning
+% \end{macro}^^A \setcaptionalignment
 % \end{macro}^^A \scr@makemultilinecaption
 % \end{macro}^^A \@@makecaption
 % \end{macro}^^A \@makecaption
@@ -1498,6 +1690,12 @@
       }%
       \LT@mcol\LT@cols c{%
         \hbox to\z@{\hss\parbox[t]\linewidth{%
+%    \end{macrocode}
+% \changes{v3.25}{2017/11/15}{\cs{@captype} auf \texttt{table} gesetzt}^^A
+% Damit \cs{raggedtablecaption} ggf. verwendet wird, wird hier \cs{@captype}
+% explizit auf \texttt{table} gesetzt.
+%    \begin{macrocode}
+            \def\@captype{table}%
             \@@makecaption{#1}{#2}{#3}%
             \endgraf
             \if@captionabove
