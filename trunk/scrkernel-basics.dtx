@@ -1,4 +1,4 @@
-% \CheckSum{3675}
+% \CheckSum{3706}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -2742,7 +2742,7 @@
 %   \changes{v3.00}{2008/04/30}{Neue Anweisung}^^A
 %   \changes{v3.04b}{2010/01/29}{\cs{edef} durch \cs{protected@edef} ersetzt}^^A
 %   \changes{v3.04b}{2010/02/02}{\cs{scr@key@atlist} und \cs{scr@key@name}^^A
-%     vor Überschreiben in \cs{serkeys} geschützt}^^A
+%     vor Überschreiben in \cs{setkeys} geschützt}^^A
 %   \changes{v3.12}{2013/03/04}{neue Implementierung}^^A
 %   \changes{v3.12}{2013/03/04}{darf auch noch nach der Präambel verwendet
 %     werden}^^A
@@ -3177,7 +3177,10 @@
 % \end{macro}^^A \scr@key@run@errors}
 % \end{macro}^^A \scr@execute@option
 % \begin{macro}{\scr@execute@elseoption}
-%   \changes{v3.20}{2015/11/18}{neu (intern)}
+% \changes{v3.20}{2015/11/18}{neu (intern)}^^A
+% \changes{v3.25}{2017/11/16}{Gruppe eingefügt}^^A
+% \changes{v3.25}{2017/11/16}{\cs{scr@key@name@else} und
+%   \cs{scr@key@value@else} neu}^^A
 % Ist eine Spezialoption mit dem Namen \texttt{@else@} definiert, so wird
 % diese von \cs{FamilyExecuteOptions} genau dann ausgeführt, wenn keine
 % passende Option gefunden wurde. Dafür dient dieses Makro, dessen Argumente
@@ -3185,22 +3188,47 @@
 % genau dasselbe tun, außer dass es nicht die Option selbst aufruft, sondern
 % die Option als Wert an die \texttt{@else@}-Option übergibt. Es muss also
 % temporär \cs{scr@key@atlist}, \cs{scr@key@name} und \cs{scr@key@value}
-% geändert werden, bevor \cs{scr@execute@option} ausgeführt wird.
+% geändert werden, bevor \cs{scr@execute@option} ausgeführt wird. Da
+% allerdings die Originalwerte ggf. von der \texttt{@else@}-Option ausgewertet
+% werden sollen, wird das originale \cs{scr@key@atlist} zum Wert der
+% \texttt{@else@}-Option. Damit diese nicht erneut aufgespaltet werden muss,
+% werden die originalen \cs{scr@key@name} und \cs{scr@key@value} zusätzlich in
+% \cs{scr@key@name@else} und \cs{scr@key@value@else} gespeichert.
 %    \begin{macrocode}
 \newcommand*{\scr@execute@elseoption}[1]{%
+  \begingroup
   \protected@edef\reserved@a{%
-    \noexpand\def\noexpand\scr@key@name{@else@}%
+    \unexpanded{%
+      \endgroup
+      \let\scr@key@name@else\scr@key@name
+      \let\scr@key@value@else\scr@key@value
+      \def\scr@key@name{@else@}%
+    }%
     \noexpand\def\noexpand\scr@key@value{%
       \unexpanded\expandafter{\scr@key@atlist}}%
     \noexpand\def\noexpand\scr@key@atlist{%
       @else@={\unexpanded\expandafter{\scr@key@atlist}}}%
     \noexpand\scr@execute@option{#1}%
-    \noexpand\def\noexpand\scr@key@atlist{
+    \noexpand\def\noexpand\scr@key@atlist{%
       \unexpanded\expandafter{\scr@key@atlist}}%
     \noexpand\def\noexpand\scr@key@name{%
       \unexpanded\expandafter{\scr@key@name}}%
     \noexpand\def\noexpand\scr@key@value{%
       \unexpanded\expandafter{\scr@key@value}}%
+    \scr@ifundefinedorrelax{scr@key@name@else}{%
+      \unexpanded{\let\scr@key@name@else\relax}%
+    }{%
+      \noexpand\def\noexpand\scr@key@name@else{%
+        \unexpanded\expandafter{\scr@key@name@else}%
+      }%
+    }
+    \scr@ifundefinedorrelax{scr@key@value@else}{%
+      \unexpanded{\let\scr@key@value@else\relax}%
+    }{%
+      \noexpand\def\noexpand\scr@key@value@else{%
+        \unexpanded\expandafter{\scr@key@value@else}%
+      }%
+    }%
   }\reserved@a
 }
 %    \end{macrocode}
