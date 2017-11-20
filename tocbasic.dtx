@@ -1,4 +1,4 @@
-% \CheckSum{1574}
+% \CheckSum{1582}
 % \iffalse meta-comment
 % ======================================================================
 % tocbasic.dtx
@@ -1266,6 +1266,17 @@
     }%
 %    \end{macrocode}
 % \end{macro}
+% \begin{macro}{\tb@nt@ext}
+%   \changes{v3.20}{2015/12/16}{local valid only}^^A
+%   \changes{v3.25}{2017/11/20}{moved to pass 1}^^A
+%   Don't tell the user, that the mandatory argument of the command may be
+%   overloaded by this option. This was only done to simplify the definition.
+%    \begin{macrocode}
+    \DefineFamilyKey[.toc]{KOMAarg}{extension}{%
+      \tb@ifvalueisnotempty{##1}{\edef\tb@nt@ext{##1}}%
+    }%
+%    \end{macrocode}
+% \end{macro}
 %   After this we define pseudo option \texttt{@else@} to ignore all currently
 %   not needed options. After this we do the first option execution run.
 %    \begin{macrocode}
@@ -1278,6 +1289,7 @@
 %    \begin{macrocode}
     \DefineFamilyKey[.toc]{KOMAarg}{type}{\FamilyKeyStateProcessed}%
     \DefineFamilyKey[.toc]{KOMAarg}{tocentrystyle}{\FamilyKeyStateProcessed}%
+    \DefineFamilyKey[.toc]{KOMAarg}{extension}{\FamilyKeyStateProcessed}%
 %    \end{macrocode}
 %   \changes{v3.20}{2015/12/16}{defining toc style depending options}^^A
 %   \changes{v3.20}{2016/06/12}{using prefix \texttt{tocentry} instead of
@@ -1363,16 +1375,6 @@
 %    \begin{macrocode}
     \DefineFamilyKey[.toc]{KOMAarg}{counterwithin}{%
       \edef\tb@nt@counterwithin{##1}\FamilyKeyStateProcessed
-    }%
-%    \end{macrocode}
-% \end{macro}
-% \begin{macro}{\tb@nt@ext}
-%   \changes{v3.20}{2015/12/16}{local valid only}^^A
-%   Don't tell the user, that the mandatory argument of the command may be
-%   overloaded by this option. This was only done to simplify the definition.
-%    \begin{macrocode}
-    \DefineFamilyKey[.toc]{KOMAarg}{extension}{%
-      \tb@ifvalueisnotempty{##1}{\edef\tb@nt@ext{##1}}%
     }%
 %    \end{macrocode}
 % \end{macro}
@@ -1544,6 +1546,24 @@
     }%
 %    \end{macrocode}
 % \end{macro}
+% \changes{v3.25}{2017/11/20}{new (internal)}
+% The new option \texttt{setup} allowes to setup ToC features provided by
+% \cs{setuptoc}. Note, currently there is no test whether or not a feature
+% does exist!
+%    \begin{macrocode}
+    \DefineFamilyKey[.toc]{KOMAarg}{setup}{%
+      \setuptoc\tb@nt@ext{##1}%
+    }%
+%    \end{macrocode}
+% \changes{v3.25}{2017/11/20}{new (internal)}
+% The new option \texttt{unset} allowes to unset ToC features provided
+% by \cs{unsettoc}. Note, currently there is no test whether or not a feature
+% does exist!
+%    \begin{macrocode}
+    \DefineFamilyKey[.toc]{KOMAarg}{unset}{%
+      \unsettoc\tb@nt@ext{##1}%
+    }%
+%    \end{macrocode}
 %   Last but not least we have to execute the options and reset the option
 %   definitions.
 %   \changes{v3.25}{2017/09/27}{\texttt{nonfloat} fixed}^^A
@@ -1569,7 +1589,7 @@
     \RelaxFamilyKey[.toc]{KOMAarg}{type}%
   }%
 %    \end{macrocode}
-%   First of all, every TOC needs a extension, that should be added to the
+%   First of all, every TOC needs an extension, that should be added to the
 %   list of known extensions.
 %    \begin{macrocode}
   \expandafter\newcommand\csname ext@\tb@nt@type\endcsname{}%
