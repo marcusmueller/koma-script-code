@@ -1,4 +1,4 @@
-% \CheckSum{1582}
+% \CheckSum{1612}
 % \iffalse meta-comment
 % ======================================================================
 % tocbasic.dtx
@@ -826,6 +826,39 @@
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
+%
+% \changes{v3.25}{2017/11/21}{\textsf{tocbibind} warning added}^^A
+% Using \textsf{tocbibind} and \textsf{tocbasic} together can break features
+% either of \textsf{tocbibind} or \textsf{tocbasic}.  Here we add at least a
+% warning:
+%    \begin{macrocode}
+\@ifpackageloaded{tocbibind}{}{%
+  \AtBeginDocument{%
+    \@ifpackageloaded{tocbibind}{%
+      \PackageInfo{tocbasic}{usage of `tocbibind' detected}%
+      \newcommand*{\tb@tocbibindpatch}[3]{%
+        \long\def\reserved@a{\tocfile{#2}{#1} }%
+        \ifx #3\reserved@a
+          \PackageWarningNoLine{tocbasic}{%
+            `tocbibind' redefinition of `\string#3'\MessageBreak
+            detected.\MessageBreak
+            Note: Loading `tocbibind' without option `not#1'\MessageBreak
+            can break several features of `tocbasic'%
+            \scr@ifundefinedorrelax{KOMAClassName}{%
+              .\MessageBreak
+              Loading `tocbibind' before `tocbasic' would avoid\MessageBreak
+              this warning message%
+            }{}%
+          }%
+        \fi
+      }%
+      \tb@tocbibindpatch{toc}{\contentsname}{\tableofcontents}%
+      \tb@tocbibindpatch{lof}{\listfigurename}{\listoffigures}%
+      \tb@tocbibindpatch{lot}{\listtablename}{\listoftables}%
+    }{}%
+  }%
+}
+%    \end{macrocode}
 %
 % \begin{macro}{\listofname}
 %   While this is only an emergancy command, we don't support languages.
