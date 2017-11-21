@@ -1,4 +1,4 @@
-% \CheckSum{618}
+% \CheckSum{659}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-miscellaneous.dtx
@@ -231,17 +231,18 @@
 % \subsection{Optionen für Entwürfe}
 % 
 % \begin{option}{draft}
-%   \changes{v2.95}{2002/12/05}{mit \textsl{keyval} reimplementiert}^^A
-%   \changes{v3.17}{2015/03/12}{interne Speicherung der Werte}^^A
+% \changes{v2.95}{2002/12/05}{mit \textsl{keyval} reimplementiert}^^A
+% \changes{v3.17}{2015/03/12}{interne Speicherung der Werte}^^A
+% \changes{v3.25}{2017/11/21}{Beachtung von Option \texttt{overfullrule}}^^A
 % \begin{option}{final}
-%   \changes{v2.95}{2002/12/05}{obsolete Option}^^A
-%   \changes{v2.97d}{2007/10/03}{\cs{PackageInfo} durch \cs{PackageInfoNoLine}
-%     ersetzt}
-%   \changes{v3.01a}{2008/11/21}{standard statt obsolet}^^A
-%   \changes{v3.02c}{2008/02/17}{optionales Argument im Fall von
-%     \textsf{scrextend} gesetzt}
-%   \changes{v3.12}{2013/03/05}{Nutzung der Status-Signalisierung mit
-%     \cs{FamilyKeyStateProcessed}}%
+% \changes{v2.95}{2002/12/05}{obsolete Option}^^A
+% \changes{v2.97d}{2007/10/03}{\cs{PackageInfo} durch \cs{PackageInfoNoLine}
+%   ersetzt}
+% \changes{v3.01a}{2008/11/21}{standard statt obsolet}^^A
+% \changes{v3.02c}{2008/02/17}{optionales Argument im Fall von
+%   \textsf{scrextend} gesetzt}
+% \changes{v3.12}{2013/03/05}{Nutzung der Status-Signalisierung mit
+% \cs{FamilyKeyStateProcessed}}%
 % Der einzige Unterschied zwischen Entwürfen und Endversionen ist aus
 % Sicht der Klassen, ob Zeilenüberhänge mit einem schwarzen Balken
 % angezeigt werden sollen oder nicht.
@@ -255,12 +256,20 @@
 %<class>        \KOMAClassFileName
 %<package&extend>        scrextend.\scr@pkgextension
       }{draft}{@tempswa}%
+      \KOMA@kav@replacebool{.%
+%<class>        \KOMAClassFileName
+%<package&extend>        scrextend.\scr@pkgextension
+      }{overfullrule}{@tempswa}%
       \setlength{\overfullrule}{5pt}%
     \else
       \KOMA@kav@replacebool{.%
 %<class>        \KOMAClassFileName
 %<package&extend>        scrextend.\scr@pkgextension
       }{draft}{@tempswa}%
+      \KOMA@kav@replacebool{.%
+%<class>        \KOMAClassFileName
+%<package&extend>        scrextend.\scr@pkgextension
+      }{overfullrule}{@tempswa}%
       \setlength{\overfullrule}{\z@}%
     \fi
   \fi
@@ -276,8 +285,52 @@
 {final}{draft=false}
 %</class|extend>
 %    \end{macrocode}
-% \end{option}
-% \end{option}
+% \begin{option}{overfullrule}
+% \changes{v3.25}{2017/11/21}{new option}^^A
+% \selectlanguage{english}^^A
+% Because option \texttt{draft} can result in unwanted effects I've added a
+% new option to explicite only change the overfull rule setting. However for
+% \textsf{scrextend} and the \KOMAScript{} classes the result is the same.
+%    \begin{macrocode}
+%<*class|extend>
+\KOMA@key{overfullrule}[true]{%
+  \KOMA@set@ifkey{overfullrule}{@tempswa}{#1}%
+  \ifx\FamilyKeyState\FamilyKeyStateProcessed
+    \if@tempswa
+      \KOMA@kav@replacebool{.%
+%<class>        \KOMAClassFileName
+%<package&extend>        scrextend.\scr@pkgextension
+      }{draft}{@tempswa}%
+      \KOMA@kav@replacebool{.%
+%<class>        \KOMAClassFileName
+%<package&extend>        scrextend.\scr@pkgextension
+      }{overfullrule}{@tempswa}%
+      \setlength{\overfullrule}{5pt}%
+    \else
+      \KOMA@kav@replacebool{.%
+%<class>        \KOMAClassFileName
+%<package&extend>        scrextend.\scr@pkgextension
+      }{draft}{@tempswa}%
+      \KOMA@kav@replacebool{.%
+%<class>        \KOMAClassFileName
+%<package&extend>        scrextend.\scr@pkgextension
+      }{overfullrule}{@tempswa}%
+      \setlength{\overfullrule}{\z@}%
+    \fi
+  \fi
+}
+%<class>\KOMA@kav@add{.\KOMAClassFileName}{overfullrule}{false}
+%<*package&extend>
+\KOMA@kav@xadd{.scrextend.\scr@pkgextension}{overfullrule}{%
+  \ifdim\overfullrule>\z@ true\else false\fi
+}
+%</package&extend>
+%</class|extend>
+%    \end{macrocode}
+% \selectlanguage{ngerman}^^A
+% \end{option}^^A overfullrule
+% \end{option}^^A final
+% \end{option}^^A draft
 %
 %
 % \subsection{Optionen für Gleichungen}
