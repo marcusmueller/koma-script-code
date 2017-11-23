@@ -1,4 +1,4 @@
-% \CheckSum{1340}
+% \CheckSum{1353}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-tocstyle.dtx
@@ -1496,8 +1496,8 @@
         \scr@ifundefinedorrelax{l@chapter}{%
           \ifstr{#1}{section}{%
             \@namedef{scr@tso@#1@linefill}{\hfill}%
-          }{}
-        }{}
+          }{}%
+        }{}%
         \expandafter\providecommand%
         \csname scr@tso@#1@linefill\endcsname{\TOCLineLeaderFill\relax}%
       }%
@@ -1512,12 +1512,39 @@
 % Auch die Seitenzahl kann speziell formatiert werden, wenn das gewünscht ist.
 %    \begin{macrocode}
   \ifstr{#1}{part}{%
+%    \end{macrocode}
+% Für \texttt{part} normalerweise groß und fett:
+%    \begin{macrocode}
     \expandafter\providecommand%
     \csname scr@tso@#1@pagenumberformat\endcsname[1]{\large\bfseries ##1}%
   }{%
-    \expandafter\providecommand%
-    \csname scr@tso@#1@pagenumberformat\endcsname[1]{%
-      \normalfont\normalcolor ##1}%
+%    \end{macrocode}
+% \changes{v3.25}{2017/11/23}{Seitenzahlen für \texttt{chapter}-Einräge in der
+%   Voreinstellung fett}^^A
+% Für \texttt{chapter} nur fett:
+%    \begin{macrocode}
+    \ifstr{#1}{chapter}{%
+      \expandafter\providecommand%
+      \csname scr@tso@#1@pagenumberformat\endcsname[1]{\bfseries ##1}%
+    }{%
+      \scr@ifundefinedorrelax{l@chapter}{%
+        \ifstr{#1}{section}{%
+%    \end{macrocode}
+% \changes{v3.25}{2017/11/23}{Seitenzahlen für \texttt{section}-Einräge in der
+%   Voreinstellung unter Umständen fett}^^A
+% Für \texttt{section} ggf. auch fett:
+%    \begin{macrocode}
+          \expandafter\providecommand%
+          \csname scr@tso@#1@pagenumberformat\endcsname[1]{\bfseries ##1}%
+        }{}%
+      }{}%
+%    \end{macrocode}
+% Sonst in normaler Schrift und Farbe:
+%    \begin{macrocode}
+      \expandafter\providecommand%
+      \csname scr@tso@#1@pagenumberformat\endcsname[1]{%
+        \normalfont\normalcolor ##1}%
+    }%
   }%
 %    \end{macrocode}
 % Wobei die Seitenzahl normaleweise in eine Box fester Breite gesetzt wird.
