@@ -2314,11 +2314,15 @@ bei denen ein automatischer Kolumnentitel erzeugt wird.
 {\KOMAScript} bietet über die Gliederungsbefehle der Standardklassen hinaus
 die Anweisungen \Macro{addpart}, \Macro{addchap} und \Macro{addsec}. Diese
 ähneln bis auf die fehlende Nummerierung sehr den Standardanweisungen
-\DescRef{\LabelBase.cmd.part}, \DescRef{\LabelBase.cmd.chapter} und
-\DescRef{\LabelBase.cmd.section}. Sie erzeugen also sowohl einen automatischen
-Kolumnentitel als auch einen Eintrag im Inhaltsverzeichnis, wobei auch die
-Einstellungen von Option \DescRef{\LabelBase.option.headings}%
-\important{\DescRef{\LabelBase.option.headings}} beachtet werden, also
+\DescRef{\LabelBase.cmd.part}\IndexCmd{part}%
+\important[i]{\DescRef{\LabelBase.cmd.part}, \DescRef{\LabelBase.cmd.chapter},
+  \DescRef{\LabelBase.cmd.section}},
+\DescRef{\LabelBase.cmd.chapter}\IndexCmd{chapter} und
+\DescRef{\LabelBase.cmd.section}\IndexCmd{section}. Sie erzeugen sowohl
+einen automatischen Kolumnentitel als auch einen Eintrag im
+Inhaltsverzeichnis, wobei auch die Einstellungen von Option
+\DescRef{\LabelBase.option.headings}%
+\important{\DescRef{\LabelBase.option.headings}} beachtet werden,
 insbesondere auch die entsprechende Erweiterung des optionalen Arguments
 verfügbar ist.
 
@@ -2329,8 +2333,14 @@ Unterschied: Die Kolumnentitel werden gelöscht. Dadurch wird der oben erwähnte
 Effekt veralteter Kolumnentitel ausgeschlossen.  Stattdessen bleibt der
 Kolumnentitel auf Folgeseiten leer.  \OnlyAt{\Class{scrbook}\and
   \Class{scrreprt}}\Macro{addchap} und \Macro{addchap*} existieren
-selbstverständlich nur bei Buch- und Berichtklassen, also bei \Class{scrbook}
-und \Class{scrreprt}, nicht jedoch bei der Artikelklasse \Class{scrartcl}.
+\iffree{%
+  selbstverständlich nur bei Buch- und Berichtklassen, also bei
+  \Class{scrbook} und \Class{scrreprt}, nicht jedoch bei der Artikelklasse
+  \Class{scrartcl}.%
+}{%
+  nur bei \Class{scrbook} und \Class{scrreprt}, nicht jedoch bei
+  \Class{scrartcl}.%
+}
 
 Die Anweisung \Macro{addpart} erstellt entsprechend einen nicht nummerierten
 Dokumentteil mit einem Eintrag im Inhaltsverzeichnis. Da bereits
@@ -2347,6 +2357,75 @@ umschalten. Der jeweilige Seitenstil ist in den Makros
 \DescRef{\LabelBase.cmd.chapterpagestyle} abgelegt (siehe
 \autoref{sec:\LabelBase.pagestyle},
 \DescPageRef{\LabelBase.cmd.titlepagestyle}).
+\iffree{\iffalse}{\csname iftrue\endcsname}% Umbruchkorrekturbeispiel
+\begin{Example}
+  Sie schreiben ein Buch mit einem ausladenden Nachwort über mehrere
+  Seiten. Dieses soll weder einen Kolumnentitel noch einen Eintrag ins
+  Inhaltsverzeichnis erhalten. Daher verwenden Sie zunächst
+  \DescRef{\LabelBase.cmd.chapter*}:
+\begin{lstcode}
+  \documentclass{scrbook}
+  \usepackage[ngerman]{babel}
+  \usepackage{blindtext}
+  \begin{document}
+  \tableofcontents
+  \blinddocument
+  \chapter*{Nachwort}
+  \Blindtext[10]
+  \end{document}
+\end{lstcode}
+  Allerdings entdecken Sie, dass auf der zweiten und dritten Seite des
+  Nachworts der Kolumnentitel des vorherigen Kapitels wieder auftaucht. Das
+  wollen Sie natürlich nicht. Deshalb verwenden Sie nun \Macro{addchap*}:
+\begin{lstcode}
+  \documentclass{scrbook}
+  \usepackage[ngerman]{babel}
+  \usepackage{blindtext}
+  \begin{document}
+  \tableofcontents
+  \blinddocument
+  \addchap*{Nachwort}
+  \Blindtext[10]
+  \end{document}
+\end{lstcode}
+  Wunschgemäß ist das komplette Nachwort nun ohne Kolumnentitel. Doch auch das
+  entspricht nicht ganz Ihren Vorstellungen. Ein Kolumnentitel wäre doch
+  schön, mit:
+\begin{lstcode}
+  \documentclass{scrbook}
+  \usepackage[ngerman]{babel}
+  \usepackage{blindtext}
+  \begin{document}
+  \tableofcontents
+  \blinddocument
+  \addchap{Nachwort}
+  \Blindtext[10]
+  \end{document}
+\end{lstcode}
+  Erhalten Sie nun sowohl »Nachwort« als Kolumnentitel der geraden Seiten, als
+  auch einen Inhaltsverzeichniseintrag. Genau an diesem Eintrag stört sich
+  dann aber der Verlag. Er besteht darauf, dass das Nachwort keinen Eintrag
+  ins Inhaltsverzeichnis zu erhalten hat. Auch wenn Ihnen das seltsam
+  erscheint, wollen Sie den Verlag zufrieden stellen. Also aktivieren Sie mit
+  \OptionValueRef{\LabelBase}{headings}{optiontotocandhead} zunächst die
+  erweiterte Funktion für das optionale Argument und setzen dann für das
+  Inhaltsverzeichnis ein leeres Argument:
+\begin{lstcode}
+  \documentclass[headings=optiontotocandhead]{scrbook}
+  \usepackage[ngerman]{babel}
+  \usepackage{blindtext}
+  \begin{document}
+  \tableofcontents
+  \blinddocument
+  \addchap[tocentry={}]{Nachwort}
+  \Blindtext[10]
+  \end{document}
+\end{lstcode}
+  Der Kolumnentitel wird von \OptionValue{tocentry}{\{\}} nicht verändert.
+  Da \Class{scrbook} leere Einträge ins Inhaltsverzeichnis automatisch
+  unterdrückt, ist nun auch der Verlag zufrieden gestellt.
+\end{Example}%
+\fi
 
 Bezüglich der Möglichkeiten der Schriftumschaltung\ChangedAt{v2.8p}{%
   \Class{scrbook}\and \Class{scrreprt}\and \Class{scrartcl}} %
@@ -2367,9 +2446,9 @@ nachfolgenden Text zusammenhängt. Eine solche Überschrift soll dann ohne große
 Abstände gesetzt werden.
 
 Der Befehl \Macro{minisec} bewirkt genau eine derartige Überschrift. Diese
-Überschrift ist keiner Gliederungsebene zugeordnet. Eine solche
-\emph{Mini-Section} wird nicht in das Inhaltsverzeichnis aufgenommen und
-erhält auch keine Nummerierung.
+Überschrift ist keiner Gliederungsebene\textnote{ohne Gliederungsebene}
+zugeordnet. Eine solche \emph{Mini-Section} wird nicht in das
+Inhaltsverzeichnis aufgenommen und erhält auch keine Nummerierung.
 
 \BeginIndexGroup
 \BeginIndex{FontElement}{minisec}\LabelFontElement{minisec}%
@@ -2423,19 +2502,19 @@ werden (siehe \autoref{tab:maincls.fontelements},
 
   \minisec{Montage}
 
-  Zunächst suche man das Mauseloch. Dann lege man die
-  Reißzwecke innen unmittelbar hinter das Loch, damit 
-  bei den folgenden Aktionen die Maus nicht 
+  Zunächst suche man das Mauseloch. Dann lege man
+  die Reißzwecke innen unmittelbar hinter das Loch,
+  damit bei den folgenden Aktionen die Maus nicht 
   entschlüpfen kann.
   Anschließend klopfe man mit dem Hammer den
   Bierflaschenschnappverschluss in das Mauseloch. 
-  Sollte der Verschluss nicht groß genug sein, um das
-  Loch vollständig und dauerhaft zu verschließen, 
-  nehme man stattdessen das Brett und schraube es
-  unter Zuhilfenahme der beiden Schrauben und des
-  Messers vor das Loch. Statt des Messers kann
-  selbstverständlich auch ein Schraubendreher
-  verwendet werden.
+  Sollte der Verschluss nicht groß genug sein, um
+  das Loch vollständig und dauerhaft zu
+  verschließen, nehme man stattdessen das Brett
+  und schraube es unter Zuhilfenahme der beiden
+  Schrauben und des Messers vor das Loch. Statt
+  des Messers kann selbstverständlich auch ein
+  Schraubendreher verwendet werden.
   Die Kugelschreiberfeder ist dem Tierschutz zum
   Opfer gefallen.
   \end{document}
@@ -2569,7 +2648,8 @@ umdefiniert werden.
   \Macro{subsubsectionformat}
   \Macro{paragraphformat}
   \Macro{subparagraphformat}
-  \Macro{othersectionlevelsformat}\Parameter{Gliederungsname}\Parameter{}\Parameter{Zählerausgabe}
+  \Macro{othersectionlevelsformat}\Parameter{Gliederungsname}\Parameter{}
+                                  \Parameter{Zählerausgabe}
   \Macro{IfUsePrefixLine}\Parameter{Dann-Teil}\Parameter{Sonst-Teil}
   \Macro{autodot}
 \end{Declaration}%
@@ -2603,7 +2683,8 @@ in Ausnahmefällen verwendet, wenn für eine Gliederungsebene keine
 Format-Anweisung definiert oder diese \Macro{relax} ist, was jedoch in der
 Voreinstellung für die Gliederungsebenen von KOMA-Script nicht zutrifft. Daher
 wird sie auch nicht mehr offiziell dokumentiert. Bei einer
-Kompatibilitätseinstellung zu Versionen vor 3.17 (siehe Option
+Kompatibilitätseinstellung zu Versionen vor
+3.17\important{\OptionValueRef{\LabelBase}{version}{3.17}} (siehe Option
 \DescRef{\LabelBase.option.version},
 \autoref{sec:\LabelBase.compatibilityOptions},
 \DescPageRef{\LabelBase.option.version}) haben hingegen die Anweisungen
@@ -2621,35 +2702,42 @@ anzupassen.  Nachfolgend finden Sie einige Definitionen, die denen aus den
     \mbox{\chapappifchapterprefix{\nobreakspace}\thechapter
       \autodot\IfUsePrefixLine{}{\enskip}}}
   \newcommand*{\sectionformat}{\thesection\autodot\enskip}
+  \newcommand*{\subsectionformat}{%
+    \thesubsection\autodot\enskip}
+  \newcommand*{\subsubsectionformat}{%
+    \thesubsubsection\autodot\enskip}
+  \newcommand*{\paragraphformat}{\theparagraph\autodot\enskip}
+  \newcommand*{\subparagraphformat}{%
+    \thesubparagraph\autodot\enskip}
   \newcommand*{\othersectionlevelsformat}[3]{%
     #3\autodot\enskip}
 \end{lstcode}
-Die Definitionen der tieferen Ebenen entsprechen der von
-\Macro{sectionformat}. 
 
 Wegen\ChangedAt{v3.17}{\Class{scrbook}\and \Class{scrreprt}} der Verwendung
-von \Macro{IfUsePrefixLine} sollte \Macro{chapterformat} nicht außerhalb von
-\DescRef{\LabelBase.cmd.chapter} verwendet werden. Diese Anweisung ist nur innerhalb der
-Gliederungsbefehle von \KOMAScript{} wohldefiniert. In diesem Fall wird im
-Falle der Verwendung einer Präfixzeile für die Nummer der Überschrift der
-\PName{Dann-Teil} ausgeführt, während im anderen Fall der \PName{Sonst-Teil}
-verwendet wird.
+von \Macro{IfUsePrefixLine} sollte die Anweisung \Macro{chapterformat} nicht
+außerhalb von \DescRef{\LabelBase.cmd.chapter} verwendet
+werden. \Macro{IfUsePrefixLine} ist nur innerhalb der Gliederungsbefehle von
+\KOMAScript{} wohldefiniert. Dort wird dann im Falle der Verwendung einer
+Präfixzeile für die Nummer der Überschrift der \PName{Dann-Teil} ausgeführt,
+während im anderen Fall der \PName{Sonst-Teil} zur Ausführung kommt.
 
-Bitte\textnote{Achtung!} beachten Sie außerdem, dass bei der
-Umdefinierung \Macro{newcommand} durch \Macro{renewcommand} zu ersetzen ist.
+Bitte\textnote{Achtung!} beachten Sie außerdem, dass bei der Umdefinierung
+selbstverständlich \Macro{newcommand} durch \Macro{renewcommand} zu ersetzen
+ist.
 
 \begin{Example}
-  Angenommen, Sie wollen, dass bei \DescRef{\LabelBase.cmd.part} das Wort »Teil« vor
-  der Nummer nicht ausgegeben wird. Dann können Sie beispielsweise
+  Angenommen, Sie wollen, dass bei \DescRef{\LabelBase.cmd.part} das Wort
+  »Teil« vor der Nummer nicht ausgegeben wird. Dann können Sie beispielsweise
   folgende Anweisung in die Präambel Ihres Dokuments schreiben:
 \begin{lstcode}
   \renewcommand*{\partformat}{\thepart\autodot}
 \end{lstcode}
   Genau genommen könnten Sie an dieser Stelle auch auf \Macro{autodot}
-  verzichten und stattdessen einen festen Punkt setzen. Da \DescRef{\LabelBase.cmd.part} mit
-  römischen Zahlen nummeriert wird, muss der Punkt laut \cite{DUDEN} folgen.
-  Allerdings bringen Sie sich dann um die Möglichkeit, die Option
-  \DescRef{\LabelBase.option.numbers}\important{\DescRef{\LabelBase.option.numbers}} einzusetzen und so von der
+  verzichten und stattdessen einen festen Punkt setzen. Da
+  \DescRef{\LabelBase.cmd.part} mit römischen Zahlen nummeriert wird, muss der
+  Punkt laut \cite{DUDEN} folgen. Allerdings bringen Sie sich dann um die
+  Möglichkeit, die Option \DescRef{\LabelBase.option.numbers}%
+  \important{\DescRef{\LabelBase.option.numbers}} einzusetzen und so von der
   Regel abzuweichen. Näheres zu der Option siehe
   \DescPageRef{\LabelBase.option.numbers}.
   
@@ -2663,24 +2751,37 @@ Umdefinierung \Macro{newcommand} durch \Macro{renewcommand} zu ersetzen ist.
   \renewcommand*{\subsectionformat}{%
     \makebox[0pt][r]{\thesubsection\autodot\enskip}}
   \renewcommand*{\subsubsectionformat}{%
-    \makebox[0pt][r]{\thesubsubsection\autodot\enskip}}
+    \makebox[0pt][r]{%
+      \thesubsubsection\autodot\enskip}}
   \renewcommand*{\paragraphformat}{%
     \makebox[0pt][r]{\theparagraph\autodot\enskip}}
   \renewcommand*{\paragraphformat}{%
-    \makebox[0pt][r]{\thesubparagraph\autodot\enskip}}
+    \makebox[0pt][r]{%
+      \thesubparagraph\autodot\enskip}}
 \end{lstcode}
+  Die optionalen Argumente der \Macro{makebox}-Anweisungen fordern von
+  \LaTeX{} dabei eine Box der Breite Null, deren Inhalt rechtsbündig
+  angeordnet ist. Im Ergebnis wird der Inhalt der Box links von der aktuellen
+  Position ausgegeben.\iffree{}{ %Umbruchkorrekturtext
+    Mit diesem beliebten Trick wird vermieden, dass zunächst die Breite von
+    Nummer und Abstand ausgemessen werden muss, um dann die aktuelle Position
+    entsprechend mit \Macro{hspace} zu verändern.}
   Näheres zu den optionalen Argumenten von \Macro{makebox} ist
   \cite{latex:usrguide} zu entnehmen.
 \end{Example}
 
-Für Formatierungsänderungen bei den Überschriften, die über die Ausgabe der
-Nummer hinaus gehen, sei ausdrücklich auf
-\DescRef{maincls-experts.cmd.chapterlineswithprefixformat},
-\DescRef{maincls-experts.cmd.chapterlinesformat},
-\DescRef{maincls-experts.cmd.sectionlinesformat} und
-\DescRef{maincls-experts.cmd.sectioncatchphraseformat} in
-\autoref{sec:maincls-experts.experts}, ab
-\DescPageRef{maincls-experts.cmd.chapterlineswithprefixformat} verwiesen.%
+Für Formatierungsänderungen bei den Überschriften, die über die reine Ausgabe
+der Nummer hinaus gehen, sei ausdrücklich auf
+\DescRef{maincls-experts.cmd.partlineswithprefixformat}%
+\IndexCmd{partlineswithprefixformat},
+\DescRef{maincls-experts.cmd.chapterlineswithprefixformat}%
+\IndexCmd{chapterlineswithprefixformat} und
+\DescRef{maincls-experts.cmd.chapterlinesformat}\IndexCmd{chapterlinesformat}
+sowie
+\DescRef{maincls-experts.cmd.sectionlinesformat}\IndexCmd{sectionlinesformat}
+und das zugehörige \DescRef{maincls-experts.cmd.sectioncatchphraseformat}%
+\IndexCmd{sectioncatchphraseformat} in \autoref{sec:maincls-experts.experts},
+ab \DescPageRef{maincls-experts.cmd.partlineswithprefixformat} verwiesen.%
 \EndIndexGroup
 
 
@@ -4855,4 +4956,5 @@ zuständig.%
 %  LocalWords:  serifenlosen Abschnittseinträge Gliederungsebenen Paketoption
 %  LocalWords:  Nummerierungsstilen Seitenstilen Seitenankern Vakatseite
 %  LocalWords:  Nummerierungsstil Eingangskommentar Nummerierungsstils
-%  LocalWords:  Standardanweisung Einstellmöglichkeiten
+%  LocalWords:  Standardanweisung Einstellmöglichkeiten Umbruchkorrekturtext
+%  LocalWords:  Inhaltsverzeichniseintrag Formatierungsänderungen Präfixzeile
