@@ -725,7 +725,9 @@
   \LabelOption{#1}%
   \textOption{#1}%
 }
-\DeclareSpecialMarkup{\KOption}{\mbox{\textOption{#1=}}\linebreak[0]}{%
+\DeclareSpecialMarkup{\KOption}{%
+  \mbox{\textOption{#1=}}\linebreak[0]%
+}{%
   \ClassWarning{scrguide}{You should replace
     \string\KOption{#1}\string\PName{...}\MessageBreak
     by \string\OptionVName{#1}{...}}%
