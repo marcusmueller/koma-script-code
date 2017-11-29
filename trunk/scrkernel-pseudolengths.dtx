@@ -1,4 +1,4 @@
-% \CheckSum{101}
+% \CheckSum{98}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-pseudolengths.dtx
@@ -161,21 +161,18 @@
 % \end{macro}
 %
 % \begin{macro}{\useplength}
-%   \changes{v2.8q}{2001/10/06}{Neu}^^A
-%   \changes{v2.97c}{2007/09/17}{\cs{dimexpr} statt \cs{number} verwendet,
-%     wenn \eTeX{} verwendet wird}
+% \changes{v2.8q}{2001/10/06}{Neu}^^A
+% \changes{v2.97c}{2007/09/17}{\cs{dimexpr} statt \cs{number} verwendet,
+% wenn \eTeX{} verwendet wird}
+% \changes{v3.25}{2017/11/29}{\eTeX{} ist zwingend}
+% \changes{v3.25}{2017/11/29}{\cs{dimexpr} durch \cs{glueexpr} ersetzt}^^A
 % Natürlich muss auf eine solche Pseudo-Länge auch wieder lesend
 % zugeriffen werden können. Wir definieren dies hier so, dass es
 % außerdem möglich ist, ein Vorzeichen oder einen Faktor zu verwenden. Dafür
 % wird allerdings \eTeX{} benötigt.
 %    \begin{macrocode}
-\scr@ifundefinedorrelax{dimexpr}{%
-  \newcommand*{\useplength}[1]{%
-    \number \csname ltx@len@#1\endcsname\relax}%
-}{%
-  \newcommand*{\useplength}[1]{%
-    \dimexpr \csname ltr@len@#1\endcsname\relax}%
-}
+\newcommand*{\useplength}[1]{%
+  \glueexpr \csname ltr@len@#1\endcsname\relax}%
 %    \end{macrocode}
 % \end{macro}
 %
@@ -192,7 +189,8 @@
 %    \end{macrocode}
 %
 % \begin{macro}{\@setplength}
-%   \changes{v2.8q}{2001/10/06}{Neu}^^A
+% \changes{v2.8q}{2001/10/06}{Neu}^^A
+% \changes{v3.25}{2017/11/29}{\cs{glueexpr} eingefügt}^^A
 % Natürlich wird ebenfalls eine Möglichkeit benötigt, einer
 % Pseudo-Länge einen Wert zuzuweisen. Dies geschieht unter lokaler
 % Anwendung einer Länge, damit sichergestellt ist, dass eine
@@ -201,7 +199,7 @@
 %    \begin{macrocode}
 \newcommand*{\@setplength}[3][]{%
   \begingroup%
-    \setlength{\@tempskipa}{#3}%
+    \setlength{\@tempskipa}{\glueexpr #3\relax}%
     \setlength{\@tempskipa}{#1\@tempskipa}%
     \edef\@tempa{\noexpand\endgroup%
       \noexpand\expandafter\noexpand\renewcommand\noexpand\expandafter*%
@@ -229,13 +227,14 @@
 %    \end{macrocode}
 %
 % \begin{macro}{\@addtoplength}
-%   \changes{v2.8q}{2001/10/06}{Neu}^^A
+% \changes{v2.8q}{2001/10/06}{Neu}^^A
+% \changes{v3.25}{2017/11/29}{\cs{glueexpr} eingefügt}^^A
 % Ebenso wird ein Makro benötigt, mit dem zu einer Pseudo-Länge das
 % Vielfache eines Wertes addiert werden kann.
 %    \begin{macrocode}
 \newcommand*{\@addtoplength}[3][]{%
   \begingroup%
-    \setlength{\@tempskipa}{#3}%
+    \setlength{\@tempskipa}{\glueexpr #3\relax}%
     \setlength{\@tempskipa}{#1\@tempskipa}%
     \addtolengthplength{\@tempskipa}{#2}%
     \edef\@tempa{\noexpand\endgroup%
