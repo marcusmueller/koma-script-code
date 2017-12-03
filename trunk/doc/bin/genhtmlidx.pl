@@ -81,14 +81,14 @@ while ( $auxfile=shift ) {
     open AUX,"<$auxfile" or die "Cannot read $auxfile!\n";
     while (<AUX>) {
 	my $line=$_;
-	if ( /^\\newlabel{(desc:[^}]+)}{(.*)}$/ ) {
+	if ( /^\\newlabel\{(desc:[^\}]+)\}\{(.*)\}$/ ) {
             my $label=$1;
 	    my $refargs=$2;
-	    if ( $refargs =~ /^{([^{}]*({((?:(?>[^{}]*)|(?1))*)})*)}{([^}]+)}(.*)$/ ) {
+	    if ( $refargs =~ /^\{([^\{\}]*(\{((?:(?>[^\{\}]*)|(?1))*)\})*)\}\{([^\}]+)\}(.*)$/ ) {
 		my $ref=$1;
 		my $page=$4;
 		my $rest=$5;
-		if ( $rest =~ /^{([^{}]*({((?:(?>[^{}]*)|(?1))*)})*)}{([^}]*)}{(.*)}$/ ) {
+		if ( $rest =~ /^\{([^\{\}]*(\{((?:(?>[^\{\}]*)|(?1))*)\})*)\}\{([^\}]*)\}\{(.*)\}$/ ) {
 		    my $title=$1;
 		    my $anchor=$4;
 		    my $ignore=$5;
