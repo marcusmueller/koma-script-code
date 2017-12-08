@@ -1,4 +1,4 @@
-% \CheckSum{3383}
+% \CheckSum{3406}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-fonts.dtx
@@ -2175,9 +2175,10 @@
 % Hilfsmakros:
 %
 % \begin{macro}{\newkomafont}
-%   \changes{v2.95}{2004/07/21}{neu}^^A
-%   \changes{v3.05a}{2010/03/24}{nach \textsf{scrkbase} verschoben}
-%   \changes{v3.11c}{2013/02/18}{die Warnung hat ein Argument}^^A
+% \changes{v2.95}{2004/07/21}{neu}^^A
+% \changes{v3.05a}{2010/03/24}{nach \textsf{scrkbase} verschoben}
+% \changes{v3.11c}{2013/02/18}{die Warnung hat ein Argument}^^A
+% \changes{v3.25}{2017/12/08}{Warnung, wenn bereits als Alias definiert}^^A
 % Mit \cs{newkomafont} wird ein neues Element definiert. Das erste optionale
 % Argument ist dabei die optionale Warnung. Ist dieses nicht gesetzt oder
 % \cs{relax}, so wird keine Warnung definiert. Das erste obligatorische
@@ -2186,6 +2187,13 @@
 % \cs{@\emph{Elementname}font} definiert.
 %    \begin{macrocode}
 \newcommand*{\newkomafont}[3][\relax]{%
+  \scr@ifundefinedorrelax{scr@fnt@instead@#2}{}{%
+    \PackageWarning{scrkbase}{%
+      Making stand alone element `#2' from\MessageBreak
+      alias to `\@nameuse{scr@fnt@instead@#2}'
+    }%
+    \expandafter\let\csname scr@fnt@instead@#2\endcsname\relax
+  }%
   \expandafter\newcommand\expandafter*\csname @#2font\endcsname{#3}%
   \expandafter\expandafter\expandafter\newcommand
   \expandafter\expandafter\expandafter*%
@@ -2198,13 +2206,24 @@
 }
 %    \end{macrocode}
 % \begin{macro}{\aliaskomafont}
-%   \changes{v2.95}{2004/07/21}{neu}^^A
-%   \changes{v3.05a}{2010/03/24}{nach \textsf{scrkbase} verschoben}
+% \changes{v2.95}{2004/07/21}{neu}^^A
+% \changes{v3.05a}{2010/03/24}{nach \textsf{scrkbase} verschoben}^^A
+% \changes{v3.25}{2017/12/08}{Warnung, wenn bereits als Font definiert}^^A
 % Mit \cs{aliaskomafont} wird hingegen einfach ein Alias definiert. Dieser
-% Befehlt kennt zwei Argumente: der Name des Elements und der Names des
+% Befehl kennt zwei Argumente: der Name des Elements und der Names des
 % Elements, das stattdessen verwendet werden soll.
 %    \begin{macrocode}
 \newcommand*{\aliaskomafont}[2]{%
+  \scr@ifundefinedorrelax{scr@fnt@#1}{}{%
+    \PackageWarning{scrkbase}{%
+      Redefining stand alone element `#1' as\MessageBreak
+      alias to `#2'%
+    }
+    \expandafter\let\csname scr@fnt@#1\endcsname\relax
+  }%
+  \scr@ifundefinedorrelax{scr@fnt@wrn@#1}{}{%
+    \expandafter\let\csname scr@fnt@wrn@#1\encsname\relax
+  }
   \expandafter\newcommand\expandafter*\csname scr@fnt@instead@#1\endcsname{%
     #2%
   }%
