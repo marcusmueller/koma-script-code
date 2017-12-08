@@ -208,9 +208,10 @@ die existierende Definition lediglich erweitert.  Es wird empfohlen, beide
 Anweisungen nicht innerhalb des Dokuments, sondern nur in der Dokumentpräambel
 zu verwenden. Beispiele für die Verwendung entnehmen Sie bitte den Abschnitten
 zu den jeweiligen Elementen.%
-\IfThisCommonLabelBaseOneOf{scrjura,scrlayer-notecolumn}{}{%
+\IfThisCommonLabelBase{scrlayer-notecolumn}{}{%
   \ Namen und Bedeutung der einzelnen Elemente
-  \IfThisCommonLabelBase{scrlayer-scrpage}{und deren Voreinstellungen }{}%
+  \IfThisCommonLabelBaseOneOf{scrlayer-scrpage,scrjura}{und deren
+    Voreinstellungen }{}%
   sind in %
   \IfThisCommonLabelBase{scrextend}{%
     \autoref{tab:maincls.fontelements}, \autopageref{tab:maincls.fontelements}
@@ -225,15 +226,18 @@ zu den jeweiligen Elementen.%
     \DescRef{maincls.fontelement.disposition} ist zwar auch verfügbar, wird
     jedoch von \Package{scrextend} ebenfalls nur für den Dokumenttitel
     verwendet.%
-  }{}%
-  \IfThisCommonLabelBase{scrlayer-scrpage}{ %
-    Die angegebenen Voreinstellungen gelten nur, wenn das jeweilige Element
-    beim Laden von \Package{scrlayer-scrpage} nicht bereits definiert
-    ist. Beispielsweise definieren die \KOMAScript-Klassen
-    \DescRef{maincls.fontelement.pageheadfoot} und es gilt dann die von
-    \Package{scrlayer-scrpage} vorgefundene Einstellung.%
-  }{ %
-    Die Voreinstellungen sind den jeweiligen Abschnitten zu entnehmen.%
+  }{%
+    \IfThisCommonLabelBase{scrlayer-scrpage}{ %
+      Die angegebenen Voreinstellungen gelten nur, wenn das jeweilige Element
+      beim Laden von \Package{scrlayer-scrpage} nicht bereits definiert
+      ist. Beispielsweise definieren die \KOMAScript-Klassen
+      \DescRef{maincls.fontelement.pageheadfoot} und es gilt dann die von
+      \Package{scrlayer-scrpage} vorgefundene Einstellung.%
+    }{%
+      \IfThisCommonLabelBase{scrjura}{}{ %
+        Die Voreinstellungen sind den jeweiligen Abschnitten zu entnehmen.%
+      }%
+    }%
   }%
 }%
 
@@ -745,8 +749,55 @@ zu den jeweiligen Elementen.%
           }%
         \end{desclist}
       }{%
-        \IfThisCommonLabelBaseOneOf{scrjura,scrlayer-notecolumn}{}{%
-          \InternalCommonFileUsageError%
+        \IfThisCommonLabelBase{scrjura}{%
+          \begin{table}
+            \caption{Elemente, deren Schrift bei \Package{scrjura} mit
+              \Macro{setkomafont} und \Macro{addtokomafont} verändert werden
+              kann, einschließlich der jeweiligen Voreinstellung}%
+            \label{tab:scrjura.fontelements}%
+            \begin{desctabular}
+              \feentry{Clause}{%
+                Alias für \FontElement{\PName{Umgebungsname}.Clause}
+                innerhalb einer Vertragsumgebung, beispielsweise
+                \FontElement{contract.Clause} innerhalb von
+                \DescRef{\ThisCommonLabelBase.env.contract}; ist kein
+                entsprechendes Element definiert, so wird auf
+                \FontElement{contract.Clause} zurückgegriffen%
+              }%
+              \feentry{contract.Clause}{%
+                Überschrift eines Paragraphen innerhalb von
+                \DescRef{\ThisCommonLabelBase.env.contract} (siehe
+                \autoref{sec:\ThisCommonLabelBase.contract},
+                \DescPageRef{\ThisCommonLabelBase.fontelement.contract.Clause});
+                \par
+                \mbox{Voreinstellung:
+                  \Macro{sffamily}\Macro{bfseries}\Macro{large}}%
+              }%
+              \entry{\DescRef{\ThisCommonLabelBase.fontelement./Name/.Clause}}{%
+                \IndexFontElement[indexmain]{\PName{Name}.Clause}%
+                Überschrift eines Paragraphen innerhalb einer Umgebung
+                \PName{Name}, die mit
+                \DescRef{\ThisCommonLabelBase.cmd.DeclareNewJuraEnvironment}
+                definierten wurde, soweit bei der Definition mit
+                \Option{ClauseFont} eine Einstellung vorgenommen wurde oder
+                das Element nachträglich definiert wurde (siehe
+                \autoref{sec:\ThisCommonLabelBase.newenv},
+                \DescPageRef{\ThisCommonLabelBase.fontelement./Name/.Clause});
+                \par
+                \mbox{Voreinstellung: \emph{keine}}%
+              }%
+              \feentry{parnumber}{%
+                Absatznummern innerhalb einer
+                Vertragsumgebung (siehe \autoref{sec:\ThisCommonLabelBase.par},
+                \DescPageRef{\ThisCommonLabelBase.fontelement.parnumber});\par
+                \mbox{Voreinstellung: \emph{leer}}%
+              }%
+            \end{desctabular}
+          \end{table}
+        }{%
+          \IfThisCommonLabelBase{scrlayer-notecolumn}{}{%
+            \InternalCommonFileUsageError%
+          }%
         }%
       }%
     }%
@@ -781,17 +832,20 @@ Mit den übrigen Anweisungen können auch einzelne Schriftattribute
 Schriftgröße als auch den Grundlinienabstand.%
 %
 \IfThisCommonLabelBase{scrextend}{% Umbruchvariante!
-%  \par%
-%  Vor dem Missbrauch der Schrifteinstellungen
-%  wird dennoch dringend gewarnt (siehe \autoref{sec:maincls-experts.experts},
-%  \DescPageRef{maincls-experts.cmd.addtokomafontrelaxlist})!%
 }{%
-  \par%
-  Diese Befehle sollten jedoch nicht als Legitimation dafür verstanden werden,
-  in die Schrifteinstellungen der Elemente beliebige Anweisungen
-  einzufügen. Das kann nämlich sehr schnell zu Fehlern führen (siehe
-  \autoref{sec:maincls-experts.experts},
-  \DescPageRef{maincls-experts.cmd.addtokomafontrelaxlist}).%
+  \IfThisCommonLabelBase{scrjura}{%
+    \par%
+    Vor dem Missbrauch der Schrifteinstellungen wird dennoch dringend gewarnt
+    (siehe \autoref{sec:maincls-experts.experts},
+    \DescPageRef{maincls-experts.cmd.addtokomafontrelaxlist})!%
+  }{%
+    \par%
+    Diese Befehle sollten jedoch nicht als Legitimation dafür verstanden
+    werden, in die Schrifteinstellungen der Elemente beliebige Anweisungen
+    einzufügen. Das kann nämlich sehr schnell zu Fehlern führen (siehe
+    \autoref{sec:maincls-experts.experts},
+    \DescPageRef{maincls-experts.cmd.addtokomafontrelaxlist}).%
+  }%
 }%
 \EndIndexGroup
 %
