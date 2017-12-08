@@ -1,4 +1,4 @@
-% \CheckSum{1934}
+% \CheckSum{1932}
 % \iffalse meta-comment
 % ======================================================================
 % scrjura.dtx
@@ -741,43 +741,52 @@
 \@onlypreamble\DeclareNewJuraEnvironment
 %    \end{macrocode}
 % \begin{macro}{\@defjuraenvironment}
-%   \changes{v0.9}{2014/11/04}{Neue (interne) Anweisung}
-% Diese Anweisunge soll irgendwann einmal dazu dienen, weitere
-% Umgebungen einfach definieren zu können. Allerdings wird das vor Version 1.0
-% offiziell nichts werden. Bis dahin funktioniert die Anweisung bzw. die damit
-% definierten Umgebungen nicht korrekt und sollten nicht verwendet werden!
+% \changes{v0.9}{2014/11/04}{Neue (interne) Anweisung}^^A
+% \changes{v3.25}{2017/12/08}{neue Option \texttt{ClauseFont}}^^A
+% \changes{v3.25}{2017/12/08}{\cs{reserved@defjuraenvironment} wird wieder
+%   \cs{relax}}^^A
+% \changes{v3.25}{2017/12/08}{Umstellung von globalen auf lokale Optionen}^^A
+% Diese Anweisung dient dazu, weitere Umgebungen einfach definieren zu können.
+% Dabei werden optional diverse Optionen unterstützt. Näheres ist der
+% Anleitung zu entnehmen.
 %    \begin{macrocode}
 \DefineFamily{KOMAarg}
 \DefineFamilyMember{KOMAarg}
-\DefineFamilyKey{KOMAarg}{Clause}{%
-  \expandafter\gdef\csname \scrjura@env@type @Clause\endcsname{#1}%
-}
-\DefineFamilyKey{KOMAarg}{SubClause}{%
-  \expandafter\gdef\csname \scrjura@env@type @SubClause\endcsname{#1}%
-}
-\DefineFamilyKey{KOMAarg}{Sentence}{%
-  \expandafter\gdef\csname \scrjura@env@type @Sentence\endcsname{#1}%
-}
-\DefineFamilyKey{KOMAarg}{ClauseNumberFormat}{%
-  \expandafter\gdef\csname \scrjura@env@type @Clauseformat \endcsname
-  ##1{#1{##1}}
-  \expandafter\xdef\csname \scrjura@env@type @Clauseformat\endcsname{%
-    \noexpand\protect\expandafter\noexpand
-    \csname \scrjura@env@type @Clauseformat \endcsname
-  }%
-}
 \newcommand{\@defjuraenvironment}{}
 \long\def\@defjuraenvironment#1[#2]#3#4{%
+  \let\reserved@defjuraenvironment\relax
 %    \end{macrocode}
 % Die Zähler definieren:
 %    \begin{macrocode}
   \newcounter{#1Clause}%
   \newcounter{#1AbsoluteClause}%
   \newcounter{#1SubClause}%
-  \begingroup
-    \edef\scrjura@env@type{#1}%
-    \FamilyExecuteOptions[.scrjura.sty]{KOMAarg}{#2}%
-  \endgroup
+  \FamilyCSKey[.scrjura.sty]{KOMAarg}{Clause}{#1@Clause}%
+  \FamilyCSKey[.scrjura.sty]{KOMAarg}{SubClause}{#1@SubClause}%
+  \FamilyCSKey[.scrjura.sty]{KOMAarg}{Sentence}{#1@Sentence}%
+  \DefineFamilyKey[.scrjura.sty]{KOMAarg}{ClauseNumberFormat}{%
+    \expandafter\def\csname #1@Clauseformat \endcsname####1{##1{####1}}%
+    \expandafter\edef\csname #1@Clauseformat\endcsname{%
+      \noexpand\protect\expandafter\noexpand\csname #1@Clauseformat \endcsname
+    }%
+    \FamilyKeyStateProcessed
+  }
+  \DefineFamilyKey[.scrjura.sty]{KOMAarg}{ClauseFont}{%
+    \IfExistskomafont{#1.Clause}{%
+      \IfIsAliaskomafont{#1.Clause}{%
+        \expandafter\let\csname scr@fnt@instead@#1.Clause\endcsname\relax
+        \newkomafont{#1.Clause}{##1}%
+      }{\setkomafont{#1.Clause}{##1}}%
+    }{%
+      \newkomafont{#1.Clause}{##1}%
+    }%
+  }
+  \FamilyExecuteOptions[.scrjura.sty]{KOMAarg}{#2}%
+  \RelaxFamilyKey[.scrjura.sty]{KOMAarg}{ClauseFont}%
+  \RelaxFamilyKey[.scrjura.sty]{KOMAarg}{ClauseNumberFormat}%
+  \RelaxFamilyKey[.scrjura.sty]{KOMAarg}{Sentence}%
+  \RelaxFamilyKey[.scrjura.sty]{KOMAarg}{SubClause}%
+  \RelaxFamilyKey[.scrjura.sty]{KOMAarg}{Clause}%
   \@ifundefined{#1@Clauseformat}{%
     \expandafter\DeclareRobustCommand\expandafter*%
     \csname #1@Clauseformat\endcsname[1]{\Clauseformat{##1}}%
@@ -831,14 +840,14 @@
 % \texttt{contract.Clause} verwendet.
 % \changes{v3.25}{2017/12/08}{Fontalias korrigiert}^^A
 %    \begin{macrocode}
-      \@ifundefined{scr@fnt@#1}{%
-        \@ifundefined{scr@fnt@instead@#1}{%
-          \aliaskomafont{Clause}{contract.Clause}%
+      \IfExistskomafont{#1.Clause}{%
+        \IfIsAliaskomafont{#1.Clause}{%
+          \aliaskomafont{Clause}{\csname scr@fnt@instead@#1.Clause\endcsname}%
         }{%
-          \aliaskomafont{Clause}{\csname scr@fnt@instead@#1\endcsname}%
+          \aliaskomafont{Clause}{#1.Clause}%
         }%
       }{%
-        \aliaskomafont{Clause}{#1.Clause}%
+        \aliaskomafont{Clause}{contract.Clause}%
       }%
       #3%
     \else
@@ -947,11 +956,15 @@
 % \end{macro}
 % \end{option}
 % \begin{macro}{\contract@paragraph@font}
-%   Das muss noch auf die Element-Schnittstelle von \KOMAScript{} umgestellt
-%   werden!
+% \changes{v3.25}{2017/12/08}{Es wird Element \texttt{Clause} statt
+%   \texttt{contract.Clause} verwendet}^^A
+% Eigentlich müsste die Anweisung \cs{contract@paragraph@format} heißen. Da
+% sie jedoch für irgendwelche Tricks verwendet wurde. will ich das ungern
+% ändern. Ebenso müsste die Anweisung eigentlich je nach Vertragsumgebung
+% neu definiert und dann jene Defintion verwendet werden.
 %    \begin{macrocode}
 \newkomafont{contract.Clause}{\sffamily\bfseries\large}
-\newcommand*{\contract@paragraph@font}{\usekomafont{contract.Clause}%
+\newcommand*{\contract@paragraph@font}{\usekomafont{Clause}%
   \@hangfrom}
 %    \end{macrocode}
 % \end{macro}
