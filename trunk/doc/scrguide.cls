@@ -1926,6 +1926,7 @@
     cleardoubleevenemptypage,cleardoubleoddpage,
     clearscrheadfoot,closing,cofoot,Comment,
     CloneTOCEntryStyle,
+    DeclareNewJuraEnvironment,
     DeclareLayer,DeclareNewLayer,DeclareNewPageStyleByLayers,
     DeclarePageStyleByLayers,
     DeclareTOCStyleEntry,DeclareTOCEntryStyle,
