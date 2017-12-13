@@ -1943,7 +1943,7 @@
     FamilyKeyStateUnknownValue,FamilyKeyStateNeedValue,
     FamilyNumericalKey,%
     FamilyOption,FamilyOptions,FamilyProcessOptions,FamilySetBool,
-    FamilyStringKey,
+    FamilyStringKey,FamilyUnknownKeyValue,
     figureformat,figurename,firstfoot,firsthead,FirstName,footfont,footref,
     ForEachLayerOfPageStyle,
     FreeI,FreeII,FreeIII,FreeIV,
