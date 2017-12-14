@@ -1086,25 +1086,27 @@ führen. \Package{scrbase} geht daher auf Nummer sicher.
 \end{Declaration}
 Von \Package{scrbase} werden einige Verzweigungsanweisungen
 bereitgestellt. Dabei verwendet es primär die Bezeichnungen
-\Macro{scr@\PName{Name}}. Es handelt sich somit um interne
-Anweisungen. Diese werden auch intern von \KOMAScript{} verwendet. Paket- und
-Klassenautoren können diese Anweisungen ebenfalls verwenden, sollten sie aber
-nicht umdefinieren. Da einige dieser Anweisungen auch für Benutzer nützlich
-sein können, werden die gleichen Anweisungen normalerweise auch als
-\Macro{\PName{Name}} bereitgestellt. Da eventuell andere Pakete
-gleichnamige Anweisungen mit anderer Syntax bereitstellen könnten und es so zu
-Konflikten kommen könnte, kann der Anwender die Definition von
-\Macro{\PName{Name}} verhindern. Dazu gibt er entweder die Option
-ohne Wertangabe an. In diesem Fall werden nur die internen
-Verzweigungsanweisungen definiert. Oder er gibt genau die Anweisungen, die
-nicht definiert werden sollen, als Wert an, wobei er »\Macro{}« durch
-»\texttt{/}« ersetzt.
+\Macro{scr@\PName{Name}}\textnote{Paketautoren}. Es handelt sich somit
+um interne Anweisungen. Diese werden auch intern von \KOMAScript{}
+verwendet. Paket- und Klassenautoren können diese Anweisungen ebenfalls
+verwenden, sollten sie aber nicht umdefinieren. Da einige dieser Anweisungen
+auch für Benutzer nützlich sein können, werden die gleichen Anweisungen
+normalerweise auch als \Macro{\PName{Name}}\textnote{Anwender}
+bereitgestellt. Da eventuell andere Pakete gleichnamige Anweisungen mit
+anderer Syntax bereitstellen könnten und es so zu Konflikten kommen könnte,
+kann der Anwender die Definition von \Macro{\PName{Name}} verhindern. Dazu
+gibt er entweder die Option ohne Wertangabe an. In diesem Fall werden nur die
+internen Verzweigungsanweisungen definiert. Oder er gibt genau die
+Anweisungen, die nicht definiert werden sollen, als Wert an, wobei er
+»\Macro{}« durch »\texttt{/}« ersetzt.
 
 Paket- und Klassenautoren sollten diese Option normalerweise nicht verwenden.
 Anwender können sie mit oder ohne Wertangabe entweder als globale Option bei
-\Macro{documentclass} oder per \Macro{PassOptionsToPackage} angeben.
+\DescRef{maincls.cmd.documentclass} oder per
+\Macro{PassOptionsToPackage}\IndexCmd{PassOptionsToPackage} angeben.
 \begin{Example}
-  Der Anwender will nicht, dass die Anweisungen \Macro{ifVTeX} und
+  Der Anwender will nicht, dass die Anweisungen
+  \DescRef{\LabelBase.cmd.ifVTeX} und
   \DescRef{\LabelBase.cmd.ifundefinedorrelax} von \Package{scrbase} definiert
   werden. Also verwendet er beim Laden der Klasse:
 \begin{lstcode}
@@ -1113,18 +1115,14 @@ Anwender können sie mit oder ohne Wertangabe entweder als globale Option bei
   ]{foo}
 \end{lstcode}
   Der Klassenname \Class{foo} wird hier als Platzhalter für irgendeine Klasse
-  verwendet.  Die Bedeutungen der Anweisungen \DescRef{\LabelBase.cmd.ifVTeX}
-  und \DescRef{\LabelBase.cmd.ifundefinedorrelax} sowie weitere
-  Verzweigungsanweisungen sind 
-  \autoref{sec:scrbase.if}, %\DescPageRef{scrbase.cmd.ifVTeX} und
-  %\DescPageRef{scrbase.cmd.ifundefinedorrelax} 
-  ab \autopageref{sec:scrbase.if} zu entnehmen.
+  verwendet.  Die Anweisungen \DescRef{\LabelBase.cmd.ifVTeX}
+  und \DescRef{\LabelBase.cmd.ifundefinedorrelax} werden im weiteren Verlauf
+  dieses Abschnittes erklärt.%
 \end{Example}
 
 Paket- und Klassenautoren sollten wie \KOMAScript{} selbst auch die internen
 Namen verwenden. Zur Vollständigkeit sind in den nachfolgenden Erklärungen
-aber auch die Anwenderanweisungen angegeben.
-%
+aber auch die Anwenderanweisungen angegeben.%
 \EndIndexGroup
 
 
@@ -1134,16 +1132,68 @@ aber auch die Anwenderanweisungen angegeben.
   \Macro{ifundefinedorrelax}
   \Parameter{Name}\Parameter{Dann-Teil}\Parameter{Sonst-Teil}
 \end{Declaration}
-Diese Anweisung funktioniert prinzipiell wie 
-\Macro{@ifundefined} aus dem \LaTeX-Kern (siehe \cite{latex:source2e}). Es
-wird also der \PName{Dann-Teil} ausgeführt, wenn \PName{Name} der
-Name einer undefinierten Anweisung oder \Macro{\PName{Name}} derzeit
-\Macro{relax} ist. Im Unterschied zu \Macro{@ifundefined} wird
-allerdings \Macro{\PName{Name}} nicht als \Macro{relax} definiert,
-wenn es zuvor undefiniert war. Unter Verwendung von \eTeX{} wird in diesem Fall
-noch nicht einmal Hash-Speicher belegt.
-%
+Diese Anweisung funktioniert prinzipiell wie \Macro{@ifundefined} aus dem
+\LaTeX-Kern (siehe \cite{latex:source2e}). Es wird also der \PName{Dann-Teil}
+ausgeführt, wenn \PName{Name} der Name einer undefinierten Anweisung oder
+\Macro{\PName{Name}} derzeit \Macro{relax} ist. Im Unterschied zu
+\Macro{@ifundefined} wird %
+\iftrue% Umbruchvarianten
+weder Hash-Speicher belegt noch \Macro{\PName{Name}} %
+\else%
+\Macro{\PName{Name}} nicht %
+\fi%
+zu \Macro{relax}, wenn \Macro{\PName{Name}} zuvor undefiniert war.%
 \EndIndexGroup
+
+
+\begin{Declaration}
+  \Macro{ifnotundefined}\Parameter{Name}%
+  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
+\end{Declaration}
+Ist die Anweisung mit dem angegebenen Namen bereits definiert wird der
+\PName{Dann-Teil} ausgeführt, anderenfalls der \PName{Sonst-Teil}. Da es bei
+\eTeX{} bereits ein Primitiv \Macro{ifdefined} gibt, musste leider diese
+etwas unhandliche Bezeichnung gewählt werden. %
+\iftrue% Umbruchvaritanten
+Von dieser Anweisung gibt es keine interne Variante.%
+\else%
+Es gibt keine interne Variante.%
+\fi%
+\EndIndexGroup
+
+
+\begin{Declaration}
+  \Macro{scr@ifluatex}
+  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
+\end{Declaration}
+Wird\ChangedAt{v3.21}{\Package{scrbase}} mit lua\TeX{} gearbeitet, wird der
+\PName{Dann-Teil} ausgeführt, anderenfalls der \PName{Sonst-Teil}.
+\iftrue% Umbruchkorrekturtext
+Diese Unterscheidung ist nur sehr selten wirklich von Nutzen. %
+\fi%
+In der Regel sollte man besser auf die gewünschte Anweisung
+testen. Von\textnote{Achtung!} dieser Anweisung gibt es kein
+Benutzeräquivalent. Verwenden Sie stattdessen bei Bedarf das Paket
+\Package{ifluatex}\important{\Package{ifluatex}} (siehe
+\cite{package:ifluatex}).%
+\EndIndexGroup
+
+
+\iffalse% Es ergibt keinen Sinn, diese Anweisung noch zu dokumentieren
+\begin{Declaration}
+  \Macro{scr@ifpdforluatex}
+  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
+\end{Declaration}
+Bis lua\TeX~0.85 war es meist unerheblich, ob mit pdf\TeX{} oder lua\TeX{}
+gearbeitet wurde. Von daher stammt diese Anweisung, die in beiden Fällen den
+\PName{Dann-Teil} ausführt. Wird weder mit pdf\TeX{} noch mit lua\TeX{}
+gearbeitet, so wird der \PName{Sonst-Teil} ausgeführt.
+Seit Version 0.85 wurde bei lua\TeX{} die Kompatibilität bei vielen der
+zusätzlichen Befehle jedoch aufgegeben. Daher ist diese Unterscheidung in der
+Praxis nicht mehr von Nutzen und wird von \KOMAScript{} selbst auch nicht mehr
+verwendet. Von dieser Anweisung gibt es auch kein Benutzeräquivalent.%
+\EndIndexGroup
+\fi
 
 
 \begin{Declaration}
@@ -1152,12 +1202,13 @@ noch nicht einmal Hash-Speicher belegt.
   \Macro{ifpdftex}
   \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
 \end{Declaration}
-Wird mit pdf\TeX{} gearbeitet, so wird der \PName{Dann-Teil} ausgeführt,
+Wird mit pdf\TeX{} gearbeitet, wird der \PName{Dann-Teil} ausgeführt,
 anderenfalls der \PName{Sonst-Teil}. Dabei ist es unerheblich, ob tatsächlich
-eine PDF-Datei ausgegeben werden soll, oder nicht. Diese Unterscheidung ist
-nur sehr selten wirklich von Nutzen. In der Regel sollte man eher auf die
-gewünschte Anweisung testen.
-%
+eine PDF-Datei ausgegeben werden soll, oder nicht.
+\iftrue% Umbruchkorrekturtext
+Diese Unterscheidung ist nur sehr selten wirklich von Nutzen. %
+\fi%
+In der Regel sollte man besser auf die gewünschte Anweisung testen.%
 \EndIndexGroup
 
 
@@ -1167,11 +1218,12 @@ gewünschte Anweisung testen.
   \Macro{ifVTeX}
   \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
 \end{Declaration}
-Wird mit V\TeX{} gearbeitet, so wird der \PName{Dann-Teil} ausgeführt,
-anderenfalls der \PName{Sonst-Teil}. Diese Unterscheidung ist nur sehr selten
-wirklich von Nutzen. In der Regel sollte man eher auf die gewünschte Anweisung
-testen.
-%
+Wird mit V\TeX{} gearbeitet, wird der \PName{Dann-Teil} ausgeführt,
+anderenfalls der \PName{Sonst-Teil}.
+\iftrue% Umbruchkorrekturtext
+Diese Unterscheidung ist nur sehr selten wirklich von Nutzen. %
+\fi%
+In der Regel sollte man besser auf die gewünschte Anweisung testen.%
 \EndIndexGroup
 
 
@@ -1181,10 +1233,10 @@ testen.
   \Macro{ifpdfoutput}
   \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
 \end{Declaration}
-Wird eine PDF-Datei erzeugt, so wird der \PName{Dann-Teil} ausgeführt,
+Wird eine PDF-Datei erzeugt, wird der \PName{Dann-Teil} ausgeführt,
 anderenfalls der \PName{Sonst-Teil}. Dabei ist es unerheblich, ob die
-PDF-Datei mit Hilfe von pdf\TeX{} oder mit Hilfe von V\TeX{} erzeugt wird.
-%
+PDF-Datei mit Hilfe von lua\TeX{}, pdf\TeX{}, V\TeX{} oder \XeTeX{} erzeugt
+wird.%
 \EndIndexGroup
 
 
@@ -1194,12 +1246,13 @@ PDF-Datei mit Hilfe von pdf\TeX{} oder mit Hilfe von V\TeX{} erzeugt wird.
   \Macro{ifpsoutput}
   \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
 \end{Declaration}
-Wird eine PostScript-Datei erzeugt, so wird der \PName{Dann-Teil} ausgeführt,
+Wird eine PostScript-Datei erzeugt, wird der \PName{Dann-Teil} ausgeführt,
 anderenfalls der \PName{Sonst-Teil}. V\TeX{} kann PostScript direkt erzeugen,
-was hier auch erkannt wird. Wird hingegen kein V\TeX{} verwendet, ist aber ein
+was hier erkannt wird. Wird hingegen kein V\TeX{} verwendet, ist aber ein
 Schalter \Macro{if@dvips} definiert, so wird die Entscheidung darüber
-getroffen. \KOMAScript{} stellt \Macro{if@dvips} in \Package{typearea} bereit.
-%
+getroffen. \KOMAScript{} stellt \Macro{if@dvips} in
+\hyperref[cha:typearea]{\Package{typearea}}\IndexPackage{typearea}%
+\IndexCmd{if@dvips} bereit.%
 \EndIndexGroup
 
 
@@ -1212,190 +1265,7 @@ getroffen. \KOMAScript{} stellt \Macro{if@dvips} in \Package{typearea} bereit.
 Wird eine DVI-Datei erzeugt, so wird der \PName{Dann-Teil} ausgeführt,
 anderenfalls der \PName{Sonst-Teil}. Es wird immer dann davon ausgegangen,
 dass eine DVI-Datei erzeugt wird, wenn keine direkte Ausgabe einer PDF- oder
-Postscript-Datei erkannt werden kann.
-%
-\EndIndexGroup
-
-
-\begin{Declaration}
-  \Macro{ifnotundefined}\Parameter{Name}%
-  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
-\end{Declaration}
-Unter Verwendung von \eTeX{} wird hier tatsächlich getestet, ob die Anweisung
-mit dem angegebenen \PName{Name} noch undefiniert ist. Von dieser Anweisung
-gibt es keine interne Variante.
-%
-\EndIndexGroup
-
-
-\begin{Declaration}
-  \Macro{ifstr}\Parameter{Zeichenfolge}\Parameter{Zeichenfolge}%
-  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
-\end{Declaration}
-Die beiden Argumente \PName{Zeichenfolge} werden expandiert und dann
-verglichen. Sind sie dabei gleich, so wird der \PName{Dann-Teil} ausgeführt,
-anderenfalls der \PName{Sonst-Teil}. Von dieser Anweisung gibt es keine
-interne Variante.
-%
-\EndIndexGroup
-
-
-\begin{Declaration}
-  \Macro{ifstrstart}\Parameter{Zeichenfolge}\Parameter{Zeichenfolge}
-                    \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
-\end{Declaration}
-Die\ChangedAt{v3.12}{\Package{scrbase}} beiden Argumente \PName{Zeichenfolge}
-werden expandiert und dann verglichen. Beginnt die erste Zeichenfolge von
-Leerzeichen abgesehen mit der zweiten Zeichenfolge, so wird der
-\PName{Dann-Teil} ausgeführt, anderenfalls der \PName{Sonst-Teil}. Von dieser
-Anweisung gibt es keine interne Variante.%
-%
-\EndIndexGroup
-
-
-\begin{Declaration}
-  \Macro{ifisdimen}\Parameter{Code}\Parameter{Dann-Teil}\Parameter{Sonst-Teil}
-\end{Declaration}
-Wenn\ChangedAt{v3.12}{\Package{scrbase}} die Expansion von \PName{Code} in
-einem \Macro{dimen}, also einem \TeX-Längenregister, resultiert, wird der
-\PName{Dann-Teil} ausgeführt, anderenfalls der \PName{Sonst-Teil}. Die
-Anweisung ist nicht voll expandierbar. Von dieser
-Anweisung gibt es keine interne Variante.%
-\EndIndexGroup
-
-
-\begin{Declaration}
-  \Macro{ifisdimension}\Parameter{Code}%
-  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
-\end{Declaration}
-Wenn\ChangedAt{v3.12}{\Package{scrbase}} die Expansion von \PName{Code} in
-etwas resultiert, das syntaktisch dem Wert einer Länge entspricht, wird der
-\PName{Dann-Teil} ausgeführt, anderenfalls der \PName{Sonst-Teil}. Es ist zu
-beachten,\textnote{Achtung!} dass derzeit unbekannte Einheiten zu einer
-Fehlermeldung führen. Die Anweisung ist nicht voll expandierbar. Von dieser
-Anweisung gibt es keine interne Variante.%
-\EndIndexGroup
-
-
-\begin{Declaration}
-  \Macro{ifisdimexpr}\Parameter{Code}
-  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
-\end{Declaration}
-Wenn\ChangedAt{v3.12}{\Package{scrbase}} die Expansion von \PName{Code} in
-einer \Macro{dimexpr}, also einem \TeX-Längenausdruck resultiert, wird der
-\PName{Dann-Teil} ausgeführt, anderenfalls der \PName{Sonst-Teil}. Es ist zu
-beachten,\textnote{Achtung!} dass fehlerhafte Ausdrücke zu Fehlermeldungen
-führen! Die Anweisung ist nicht voll expandierbar. Von dieser
-Anweisung gibt es keine interne Variante.%
-\EndIndexGroup
-
-
-\begin{Declaration}
-  \Macro{ifisskip}\Parameter{Code}\Parameter{Dann-Teil}\Parameter{Sonst-Teil}
-\end{Declaration}
-Wenn\ChangedAt{v3.12}{\Package{scrbase}} die Expansion von \PName{Code} in
-einem \Macro{skip}, also einem \TeX-Abstand, resultiert, wird der
-\PName{Dann-Teil} ausgeführt, anderenfalls der \PName{Sonst-Teil}. Die
-Anweisung ist nicht voll expandierbar. Von dieser
-Anweisung gibt es keine interne Variante.%
-\EndIndexGroup
-
-
-\begin{Declaration}
-  \Macro{ifisglue}\Parameter{Code}%
-  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
-\end{Declaration}
-Wenn\ChangedAt{v3.12}{\Package{scrbase}} die Expansion von \PName{Code} in
-etwas resultiert, das syntaktisch dem Wert eines Abstandes entspricht, wird der
-\PName{Dann-Teil} ausgeführt, anderenfalls der \PName{Sonst-Teil}. Es ist zu
-beachten,\textnote{Achtung!} dass derzeit unbekannte Einheiten zu einer
-Fehlermeldung führen. Die Anweisung ist nicht voll expandierbar. Von dieser
-Anweisung gibt es keine interne Variante.%
-\EndIndexGroup
-
-
-\begin{Declaration}
-  \Macro{ifisglueexpr}\Parameter{Code}%
-  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
-\end{Declaration}
-Wenn\ChangedAt{v3.12}{\Package{scrbase}} die Expansion von \PName{Code} in
-einer \Macro{glueexpr}, also einem \TeX-Abstandsausdruck resultiert, wird der
-\PName{Dann-Teil} ausgeführt, anderenfalls der \PName{Sonst-Teil}. Es ist zu
-beachten,\textnote{Achtung!} dass fehlerhafte Ausdrücke zu Fehlermeldungen
-führen! Die Anweisung ist nicht voll expandierbar. Von dieser
-Anweisung gibt es keine interne Variante.%
-\EndIndexGroup
-
-
-\begin{Declaration}
-  \Macro{ifiscount}\Parameter{Code}\Parameter{Dann-Teil}\Parameter{Sonst-Teil}
-\end{Declaration}
-Wenn\ChangedAt{v3.12}{\Package{scrbase}} die Expansion von \PName{Code} in
-einem \Macro{count}, also einem \TeX-Zähler, resultiert, wird der
-\PName{Dann-Teil} ausgeführt, anderenfalls der \PName{Sonst-Teil}. Die
-Anweisung ist nicht voll expandierbar. Für einen Test auf einen \LaTeX-Zähler
-siehe \DescRef{\LabelBase.cmd.ifiscounter}. Von dieser
-Anweisung gibt es keine interne Variante.%
-\EndIndexGroup
-
-
-\begin{Declaration}
-  \Macro{ifisinteger}\Parameter{Code}%
-  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
-\end{Declaration}
-Wenn\ChangedAt{v3.12}{\Package{scrbase}} die Expansion von \PName{Code} in
-etwas resultiert, das syntaktisch dem Wert eines Zählers entspricht, also eine
-negative oder positive ganze Zahl ist, wird der \PName{Dann-Teil} ausgeführt,
-anderenfalls der \PName{Sonst-Teil}. Die Anweisung ist nicht voll
-expandierbar. Von dieser Anweisung gibt es keine interne Variante.%
-\EndIndexGroup
-
-
-\begin{Declaration}
-  \Macro{ifisnumexpr}\Parameter{Code}%
-  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
-\end{Declaration}
-Wenn\ChangedAt{v3.12}{\Package{scrbase}} die Expansion von \PName{Code} in
-einer \Macro{numexpr}, also einem \TeX-Zahlenausdruck resultiert, wird der
-\PName{Dann-Teil} ausgeführt, anderenfalls der \PName{Sonst-Teil}. Es ist zu
-beachten,\textnote{Achtung!} dass fehlerhafte Ausdrücke zu Fehlermeldungen
-führen! Die Anweisung ist nicht voll expandierbar. Von dieser
-Anweisung gibt es keine interne Variante.%
-\EndIndexGroup
-
-
-\begin{Declaration}
-  \Macro{ifiscounter}\Parameter{Zähler}%
-  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
-\end{Declaration}
-Wenn\ChangedAt{v3.12}{\Package{scrbase}} \PName{Zähler} ein definierter
-\LaTeX-Zähler ist, wird der \PName{Dann-Teil} ausgeführt, anderenfalls der
-\PName{Sonst-Teil}. Die Anweisung ist nicht voll expandierbar. Von dieser
-Anweisung gibt es keine interne Variante.%
-\EndIndexGroup
-
-
-\begin{Declaration}
-  \Macro{ifnumber}\Parameter{Zeichenfolge}%
-  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
-\end{Declaration}
-Hier werden keine Zahlen verglichen. Der \PName{Dann-Teil} wird vielmehr
-ausgeführt, wenn die einfache Expansion der \PName{Zeichenfolge} nur aus
-Ziffern besteht. Anderenfalls wird der \PName{Sonst-Teil} verwendet. Von
-dieser Anweisung gibt es keine interne Variante.%
-\EndIndexGroup
-
-
-\begin{Declaration}
-  \Macro{ifdimen}\Parameter{Zeichenfolge}%
-  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
-\end{Declaration}
-Hier werden keine Längen verglichen. Der \PName{Dann-Teil} wird vielmehr
-ausgeführt, wenn die einfache Expansion der \PName{Zeichenfolge} eine gültige
-Länge mit einer gültigen Längeneinheit ist. Anderenfalls wird der
-\PName{Sonst-Teil} verwendet. Von dieser Anweisung gibt es keine interne
-Variante.
-%
+Postscript-Datei erkannt werden kann.%
 \EndIndexGroup
 
 
@@ -1415,10 +1285,249 @@ und nicht in \LaTeX-Syntax handelt!
 \EndIndexGroup
 
 
+\begin{Declaration}
+  \Macro{ifstr}\Parameter{Zeichenfolge}\Parameter{Zeichenfolge}%
+  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
+\end{Declaration}
+Die beiden Argumente \PName{Zeichenfolge} werden expandiert und dann
+verglichen. Sind sie dabei gleich, so wird der \PName{Dann-Teil} ausgeführt,
+anderenfalls der \PName{Sonst-Teil}. %
+\iftrue% Umbruchvaritanten
+Von dieser Anweisung gibt es keine interne Variante.%
+\else%
+Es gibt keine interne Variante.%
+\fi%
+\EndIndexGroup
+
+
+\begin{Declaration}
+  \Macro{ifstrstart}\Parameter{Zeichenfolge}\Parameter{Zeichenfolge}
+                    \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
+\end{Declaration}
+Die\ChangedAt{v3.12}{\Package{scrbase}} beiden Argumente \PName{Zeichenfolge}
+werden expandiert und dann verglichen. Beginnt die erste Zeichenfolge von
+Leerzeichen abgesehen mit der zweiten Zeichenfolge, so wird der
+\PName{Dann-Teil} ausgeführt, anderenfalls der \PName{Sonst-Teil}. %
+\iftrue% Umbruchvaritanten
+Von dieser Anweisung gibt es keine interne Variante.%
+\else%
+Es gibt keine interne Variante.%
+\fi%
+\EndIndexGroup
+
+
+\begin{Declaration}
+  \Macro{ifisdimen}\Parameter{Code}\Parameter{Dann-Teil}\Parameter{Sonst-Teil}
+\end{Declaration}
+Wenn\ChangedAt{v3.12}{\Package{scrbase}} die Expansion von \PName{Code} in
+einem \Macro{dimen}, also einem \TeX-Längenregister, resultiert, wird der
+\PName{Dann-Teil} ausgeführt, anderenfalls der \PName{Sonst-Teil}. Die
+Anweisung ist nicht voll expandierbar.  %
+\iftrue% Umbruchvaritanten
+Von dieser Anweisung gibt es keine interne Variante.%
+\else%
+Es gibt keine interne Variante.%
+\fi%
+\EndIndexGroup
+
+
+\begin{Declaration}
+  \Macro{ifisdimension}\Parameter{Code}%
+  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
+\end{Declaration}
+Wenn\ChangedAt{v3.12}{\Package{scrbase}} die Expansion von \PName{Code} in
+etwas resultiert, das syntaktisch dem Wert einer Länge entspricht, wird der
+\PName{Dann-Teil} ausgeführt, anderenfalls der \PName{Sonst-Teil}. Es ist zu
+beachten,\textnote{Achtung!} dass derzeit unbekannte Einheiten zu einer
+Fehlermeldung führen. Die Anweisung ist nicht voll expandierbar. %
+\iftrue% Umbruchvaritanten
+Von dieser Anweisung gibt es keine interne Variante.%
+\else%
+Es gibt keine interne Variante.%
+\fi%
+\EndIndexGroup
+
+
+\begin{Declaration}
+  \Macro{ifdimen}\Parameter{Zeichenfolge}%
+  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
+\end{Declaration}
+Der \PName{Dann-Teil} wird ausgeführt, wenn die einfache Expansion der
+\PName{Zeichenfolge} eine gültige Länge mit einer gültigen Längeneinheit
+ist. Anderenfalls wird der \PName{Sonst-Teil} verwendet. %
+\iftrue% Umbruchvaritanten
+Von dieser Anweisung gibt es keine interne Variante.%
+\else%
+Es gibt keine interne Variante.%
+\fi%
+%
+\EndIndexGroup
+
+
+\begin{Declaration}
+  \Macro{ifisdimexpr}\Parameter{Code}
+  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
+\end{Declaration}
+Wenn\ChangedAt{v3.12}{\Package{scrbase}} die Expansion von \PName{Code} in
+einer \Macro{dimexpr}\IndexCmd{dimexpr}, also einem \eTeX-Längenausdruck
+resultiert, wird der \PName{Dann-Teil} ausgeführt, anderenfalls der
+\PName{Sonst-Teil}. Es ist zu beachten,\textnote{Achtung!} dass fehlerhafte
+Ausdrücke zu Fehlermeldungen führen! Die Anweisung ist nicht voll
+expandierbar. %
+\iftrue% Umbruchvaritanten
+Von dieser Anweisung gibt es keine interne Variante.%
+\else%
+Es gibt keine interne Variante.%
+\fi%
+\EndIndexGroup
+
+
+\begin{Declaration}
+  \Macro{ifisskip}\Parameter{Code}\Parameter{Dann-Teil}\Parameter{Sonst-Teil}
+\end{Declaration}
+Wenn\ChangedAt{v3.12}{\Package{scrbase}} die Expansion von \PName{Code} in
+einem \Macro{skip}, also einem \TeX-Abstand, resultiert, wird der
+\PName{Dann-Teil} ausgeführt, anderenfalls der \PName{Sonst-Teil}. Die
+Anweisung ist nicht voll expandierbar. %
+\iftrue% Umbruchvaritanten
+Von dieser Anweisung gibt es keine interne Variante.%
+\else%
+Es gibt keine interne Variante.%
+\fi%
+\EndIndexGroup
+
+
+\begin{Declaration}
+  \Macro{ifisglue}\Parameter{Code}%
+  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
+\end{Declaration}
+Wenn\ChangedAt{v3.12}{\Package{scrbase}} die Expansion von \PName{Code} in
+etwas resultiert, das syntaktisch dem Wert eines Abstandes entspricht, wird der
+\PName{Dann-Teil} ausgeführt, anderenfalls der \PName{Sonst-Teil}. Es ist zu
+beachten,\textnote{Achtung!} dass derzeit unbekannte Einheiten zu einer
+Fehlermeldung führen. Die Anweisung ist nicht voll expandierbar. %
+\iffalse% Umbruchvaritanten
+Von dieser Anweisung gibt es keine interne Variante.%
+\else%
+Es gibt keine interne Variante.%
+\fi%
+\EndIndexGroup
+
+
+\begin{Declaration}
+  \Macro{ifisglueexpr}\Parameter{Code}%
+  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
+\end{Declaration}
+Wenn\ChangedAt{v3.12}{\Package{scrbase}} die Expansion von \PName{Code} in
+einer \Macro{glueexpr}\IndexCmd{glueexpr}, also einem \eTeX-Abstandsausdruck
+resultiert, wird der \PName{Dann-Teil} ausgeführt, anderenfalls der
+\PName{Sonst-Teil}. Es ist zu beachten,\textnote{Achtung!} dass fehlerhafte
+Ausdrücke zu Fehlermeldungen führen! Die Anweisung ist nicht voll
+expandierbar. %
+\iftrue% Umbruchvaritanten
+Von dieser Anweisung gibt es keine interne Variante.%
+\else%
+Es gibt keine interne Variante.%
+\fi%
+\EndIndexGroup
+
+
+\begin{Declaration}
+  \Macro{ifiscounter}\Parameter{Zähler}%
+  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
+\end{Declaration}
+Wenn\ChangedAt{v3.12}{\Package{scrbase}} \PName{Zähler} ein definierter
+\LaTeX-Zähler ist, wird der \PName{Dann-Teil} ausgeführt, anderenfalls der
+\PName{Sonst-Teil}. Die Anweisung ist nicht voll expandierbar. %
+\iftrue% Umbruchvaritanten
+Von dieser Anweisung gibt es keine interne Variante.%
+\else%
+Es gibt keine interne Variante.%
+\fi%
+\EndIndexGroup
+
+
+\begin{Declaration}
+  \Macro{ifiscount}\Parameter{Code}\Parameter{Dann-Teil}\Parameter{Sonst-Teil}
+\end{Declaration}
+Wenn\ChangedAt{v3.12}{\Package{scrbase}} die Expansion von \PName{Code} in
+einem \Macro{count}, also einem \TeX-Zähler, resultiert, wird der
+\PName{Dann-Teil} ausgeführt, anderenfalls der \PName{Sonst-Teil}. Die
+Anweisung ist nicht voll expandierbar. Für einen Test auf einen \LaTeX-Zähler
+siehe \DescRef{\LabelBase.cmd.ifiscounter}. %
+\iftrue% Umbruchvaritanten
+Von dieser Anweisung gibt es keine interne Variante.%
+\else%
+Es gibt keine interne Variante.%
+\fi%
+\EndIndexGroup
+
+
+\begin{Declaration}
+  \Macro{ifisinteger}\Parameter{Code}%
+  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
+\end{Declaration}
+Wenn\ChangedAt{v3.12}{\Package{scrbase}} die Expansion von \PName{Code} in
+etwas resultiert, das syntaktisch dem Wert eines Zählers entspricht, also eine
+negative oder positive ganze Zahl ist, wird der \PName{Dann-Teil} ausgeführt,
+anderenfalls der \PName{Sonst-Teil}. Die Anweisung ist nicht voll
+expandierbar. %
+\iftrue% Umbruchvaritanten
+Von dieser Anweisung gibt es keine interne Variante.%
+\else%
+Es gibt keine interne Variante.%
+\fi%
+\EndIndexGroup
+
+
+\begin{Declaration}
+  \Macro{ifnumber}\Parameter{Zeichenfolge}%
+  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
+\end{Declaration}
+Der \PName{Dann-Teil} wird ausgeführt, wenn die einfache Expansion der
+\PName{Zeichenfolge} nur aus Ziffern besteht. In allen anderen Fällen wird der
+\PName{Sonst-Teil} verwendet. %
+\iftrue% Umbruchvaritanten
+Von dieser Anweisung gibt es keine interne Variante.%
+\else%
+Es gibt keine interne Variante.%
+\fi%
+\EndIndexGroup
+
+
+\begin{Declaration}
+  \Macro{ifisnumexpr}\Parameter{Code}%
+  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
+\end{Declaration}
+Wenn\ChangedAt{v3.12}{\Package{scrbase}} die Expansion von \PName{Code} in
+einer \Macro{numexpr}\IndexCmd{numexpr}, also einem \eTeX-Zahlenausdruck
+resultiert, wird der \PName{Dann-Teil} ausgeführt, anderenfalls der
+\PName{Sonst-Teil}. Es ist zu beachten,\textnote{Achtung!} dass fehlerhafte
+Ausdrücke zu Fehlermeldungen führen! Die Anweisung ist nicht voll
+expandierbar. %
+\iftrue% Umbruchvaritanten
+Von dieser Anweisung gibt es keine interne Variante.%
+\else%
+Es gibt keine interne Variante.%
+\fi%
+\EndIndexGroup
+
+
 \section{Definition sprachabhängiger Bezeichner}
 \seclabel{languageSupport}
 \BeginIndexGroup
 \BeginIndex{}{Sprachdefinition}
+
+\iftrue
+Anfänger haben häufig Probleme damit, sprachabhängige Begriffe wie
+\Macro{listfigurename}\IndexCmd{listfigurename}, in der Voreinstellung meist
+»List of Figures« beziehungsweise in Deutsch: »Abbildungsverzeichnis«, zu
+ändern. Werden diese beispielsweise einfach mit \Macro{renewcommand} in der
+Dokumentpräambel umdefiniert, so überleben sie eine spätere Umschaltung der
+Sprache nicht. Bei Verwendung von \Package{babel}\IndexCmd{babel} wird die
+Umdefinierung in der Dokumentpräambel bereits von
+\Macro{begin}\PParameter{document} wieder überschrieben.
+\fi
 
 Normalerweise muss man zur Definition oder zur Änderung sprachabhängiger
 Begriffe Anweisungen wie \Macro{captionsngerman} so umdefinieren, dass
@@ -1430,9 +1539,12 @@ erneut definiert werden. Bei den genannten Paketen geschieht dies leider in
 einer Form, die alle zuvor gemachten Änderungen zunichte macht. Aus diesem
 Grund ist es sinnvoll die Änderungen mit Hilfe von \Macro{AtBeginDocument} bis
 \Macro{begin}\PParameter{document}, also bis nach dem Laden aller Pakete, zu
-verzögern. Auch der Anwender muss entweder von \Macro{AtBeginDocument}
+verzögern.
+\iftrue
+Auch der Anwender muss entweder von \Macro{AtBeginDocument}
 Gebrauch machen oder aber seine Änderungen nicht in die Dokumentpräambel,
 sondern hinter \Macro{begin}\PParameter{document} einfügen.
+\fi
 
 Darüber hinaus kommt erschwerend hinzu, dass einige Pakete zusätzliche,
 sprachabhängige Begriffe in \Macro{captions\PName{Sprache}} definieren,
@@ -1440,9 +1552,11 @@ während andere dafür \Macro{extras\PName{Sprache}} verwenden. So muss der
 Anwender sich schon sehr genau auskennen, um die richtige Anweisung auf die
 richtige Weise zu ergänzen.
 
-Das Paket \Package{scrbase} bietet dem Anwender daher für die Definition
-selbst einige zusätzliche Anweisungen, die ihn von vielen dieser Überlegungen
-entlasten.
+Das Paket \Package{scrbase} bietet dem Anwender daher für die Definition und
+Änderung selbst einige zusätzliche Anweisungen, die ihn von vielen dieser
+Überlegungen entlasten. Gleichzeitig erlauben diese Befehle, die
+sprachabhängigen Begriffe mehrerer Dialekte oder Ausprägungen einer Sprache
+gleichzeitig zu definieren oder zu ändern.
 
 \begin{Declaration}
   \Macro{defcaptionname}
@@ -1469,18 +1583,18 @@ zuzuweisen. Mehrere Sprachen können durch Komma voneinander getrennt als
 
 Der \PName{Begriff} ist immer ein Makro. Die Arbeitsweise der Anweisungen
 unterscheidet sich je nachdem, ob eine Sprache und ein \PName{Begriff}
-innerhalb dieser Sprache zum Zeitpunkt des Aufrufs bereits definiert ist.
+innerhalb der Sprache zum Zeitpunkt des Aufrufs bereits definiert ist.
 
-Ist eine Sprache nicht definiert, so tut \Macro{providecaptionname}
-nichts weiter, als dies in der \File{log}-Datei zu vermerken. Dabei wird für
-jede Sprache nur einmal eine entsprechende Information in die \File{log}-Datei
+Ist eine Sprache nicht definiert, so tut \Macro{providecaptionname} nichts
+weiter, als dies in der \File{log}-Datei zu vermerken. Dabei wird für jede
+Sprache nur einmal eine entsprechende Information in die \File{log}-Datei
 geschrieben. Ist die Sprache definiert, enthält aber bisher keinen
 entsprechenden \PName{Begriff}, so wird er mit dem angegebenen \PName{Inhalt}
-definiert. Ist der \PName{Begriff} hingegen in der Sprache bereits
-definiert, so wird er nicht umdefiniert, sondern ein entsprechender Hinweis in
+definiert. Ist der \PName{Begriff} hingegen in der Sprache bereits definiert,
+so wird er nicht umdefiniert, sondern ebenfalls ein entsprechender Hinweis in
 die \File{log}-Datei geschrieben.
 
-Die Anweisung \Macro{newcaptionname} verhält sich etwas anders. Ist bei ihr
+Ist dagegen bei \Macro{newcaptionname}
 eine Sprache nicht definiert, dann wird diese neu definiert, indem eine
 entsprechende Anweisung definiert wird. Für die Sprache
 \PValue{ngerman} wäre das beispielsweise \Macro{captionsngerman}. Außerdem
@@ -1560,7 +1674,9 @@ wie \Package{hyperref}, die dafür \Macro{extras\PName{Sprache}} verwenden.
 
 In \autoref{tab:scrbase.commonNames} ist ein Überblick über die üblicherweise
 von Klassen und Sprachpaketen definierten Begriffe und deren Verwendung zu
-finden.
+finden.\iffree{}{ \KOMAScript{} selbst definiert noch einige weitere
+  Begriffe. Siehe dazu \autoref{sec:scrlttr2-experts.languages} ab
+  \DescPageRef{scrlttr2-experts.cmd.yourrefname}.}
 
 \begin{desclist}
   \renewcommand*{\abovecaptionskipcorrection}{-\normalbaselineskip}%
@@ -1667,10 +1783,11 @@ finden.
 \section{Identifikation von \KOMAScript}
 \seclabel{identify}
 
-Obwohl \Package{scrbase} unabhängig von \KOMAScript{} auch für andere
-Pakete und Klassen verwendet werden kann, so ist es dennoch ein
-\KOMAScript-Paket. Als solches enthält es auch Anweisungen, die es als
-\KOMAScript-Paket identifizieren.
+Obwohl -- oder gerade weil -- \Package{scrbase} ganz allgemein als Paket für
+Klassen- und Paketautoren konzipiert ist, wird es natürlich von den
+\KOMAScript-Klassen und den meisten \KOMAScript-Paketen verwendet. Es enthält
+daher auch zwei Anweisungen, die in allen \KOMAScript-Klassen und allen
+grundlegenden \KOMAScript-Paketen vorhanden sind.
 
 
 \begin{Declaration}
@@ -1680,8 +1797,9 @@ Diese Anweisung setzt schlicht die Wortmarke »\KOMAScript« in serifenloser
 Schrift und mit leichter Sperrung des in Versalien gesetzten
 Teils. \Macro{KOMAScript} wird übrigens bei Bedarf von allen
 \KOMAScript-Klassen und "~Paketen definiert. Die Definition erfolgt mit
-\Macro{DeclareRobustCommand}.
-%
+\Macro{DeclareRobustCommand}. Da auch Pakete, die nicht zu \KOMAScript{}
+gehören, diese Wortmarke definieren können, sollte man die Anweisung jedoch
+nicht als Indiz für die Verwendung eines \KOMAScript-Pakets verstehen.%
 \EndIndexGroup
 
 
@@ -1694,8 +1812,8 @@ abgelegt. Diese Hauptversion ist für alle \KOMAScript-Klassen und alle
 \KOMAScript-Pakete, die von den Klassen verwendet werden, gleich. Daher kann
 sie auch nach dem Laden von \Package{scrbase} abgefragt werden. Diese
 Anleitung wurde beispielsweise mit der \KOMAScript-Version
-»\KOMAScriptVersion« erstellt.
-%
+»\KOMAScriptVersion« erstellt. Das Vorhandensein dieser Anweisung ist ein
+starkes Indiz dafür, dass zumindest ein \KOMAScript-Paket verwendet wird.%
 \EndIndexGroup
 
 
@@ -1773,8 +1891,8 @@ Zahlen und \textit{Rest} außerdem größer oder gleich 0 und kleiner als
 0).
 
 Der Wert kann jeweils zur Zuweisung an einen Zähler oder direkt innerhalb
-eines Ausdrucks mit \Macro{numexpr} verwendet werden. Zur Ausgabe als
-arabische Zahl ist \Macro{the} voran zu stellen.%
+eines Ausdrucks mit \Macro{numexpr}\IndexCmd{numexpr} verwendet werden. Zur
+Ausgabe als arabische Zahl ist \Macro{the} voran zu stellen.%
 %
 \EndIndexGroup
 %
@@ -1799,5 +1917,6 @@ arabische Zahl ist \Macro{the} voran zu stellen.%
 % LocalWords:  AtEndOfFamilyOptions FamilyBoolKey FamilySetBool Schaltername
 % LocalWords:  FamilyLengthKey FamilySetLength FamilyLengthMacroKey
 % LocalWords:  FamilySetLengthMacro Wertübergabe Gliederungsbefehlen
-% LocalWords:  Sternvariante Anwenderanweisungen Signalisierung
+% LocalWords:  Sternvariante Anwenderanweisungen Signalisierung Paketautoren
 %  LocalWords:  Familienschlüssel Mitgliederschlüssels Vergleichszustand
+%  LocalWords:  Benutzeräquivalent Dokumentpräambel
