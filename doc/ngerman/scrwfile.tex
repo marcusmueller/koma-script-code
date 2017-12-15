@@ -69,7 +69,12 @@ Im Endeffekt kann es daher geschehen, dass irgendwann die Meldung
   \ch@ck ...\else \errmessage {No room for a new #3}
                                                     \fi 
 \end{lstcode}
-erscheint.
+erscheint. Seit einiger Zeit ist die einfachste Lösung dieses Problems die
+Verwendung von Lua\LaTeX{} anstelle von PDF\LaTeX{} oder \XeLaTeX. Damit
+fällt die Beschränkung und die maximale Anzahl der gleichzeitig zum Schreiben
+geöffneten Dateien wird nur noch durch das Betriebssystem bestimmt. In der
+Realität braucht man sich darüber dann normalerweise keine Gedanken mehr zu
+machen.
 
 Dass \LaTeX{} bei Verzeichnissen wie dem Inhaltsverzeichnis, dem
 Tabellenverzeichnis und dem Abbildungsverzeichnis immer sofort eine neue Datei
@@ -79,7 +84,8 @@ auch kein weiteres Mal gesetzt werden, da die zugehörige Hilfsdatei nach dem
 jeweiligen Befehl bis zum Ende des Dokuments leer ist.
 
 Das Paket \Package{scrwfile} bietet hier eine grundsätzliche Änderung im
-\LaTeX-Kern, durch die beide Probleme gelöst werden können.
+\LaTeX-Kern, durch die beide Probleme nicht nur für Lua\LaTeX{} sondern auch bei
+Verwendung von PDF\LaTeX{} oder \XeLaTeX{} gelöst werden können.
 
 
 \section{Grundsätzliche Änderungen am \LaTeX-Kern}
@@ -109,11 +115,7 @@ Natürlich\textnote{Achtung!} besitzen Änderungen am \LaTeX-Kern immer das
 Potential, dass es zu Unverträglichkeiten mit anderen Paketen kommen
 kann. Betroffen können in erster Linie Pakete sein, die ebenfalls
 \Macro{@starttoc} oder \Macro{@writefile} umdefinieren. In einigen Fällen kann
-es helfen, die Reihenfolge der Pakete zu ändern.
-
-Tatsächlich sind bisher keine solchen Probleme im Zusammenhang mit
-\Package{scrwfile} bekannt, obwohl das Paket vor der Veröffentlichung von
-verschiedenen Anwendern über ein Jahr lang getestet wurde. Wenn Sie jedoch auf
+es helfen, die Reihenfolge der Pakete zu ändern. Wenn Sie auf
 ein solches Problem stoßen, sollten Sie sich an den \KOMAScript-Autor wenden.
 
 
@@ -131,9 +133,9 @@ geöffnet wird. Unmittelbar vor dem Schließen der \File{aux}-Datei in
 \Macro{end}\PParameter{document} wird dann \Macro{@writefile} so umdefiniert,
 dass diese Anweisung statt in die eigentlichen Hilfsdateien in eine neue
 Hilfsdatei mit der Endung \File{wrt} schreibt. Nach dem Einlesen der
-\File{aux}-Dateien wird dann noch die \File{wrt}-Datei abgearbeitet und zwar
+\File{aux}-Dateien wird schließlich die \File{wrt}-Datei abgearbeitet und zwar
 ein Mal für jede der Hilfsdateien, in die mit \Macro{@writefile} geschrieben
-wird. Dabei muss dann aber nicht jede dieser Hilfsdateien gleichzeitig
+wird. Dabei muss aber nicht jede dieser Hilfsdateien gleichzeitig
 geöffnet sein. Stattdessen ist immer nur eine zum Schreiben geöffnet und wird
 auch wieder explizit geschlossen. Da dabei eine interne Schreibdatei von
 \LaTeX{} wiederverwendet wird, benötigt \Package{scrwfile} keine einzige
@@ -169,23 +171,26 @@ kann man in dieses geklonte Verzeichnis auch zusätzliche Einträge
 schreiben.
 
 Die \PName{Zielendung} der Zieldatei wird mit Hilfe von
-\Package{tocbasic}\important{\Package{tocbasic}} (siehe
+\hyperref[cha:tocbasic]{\Package{tocbasic}}%
+\important{\hyperref[cha:tocbasic]{\Package{tocbasic}}} (siehe
 \autoref{cha:tocbasic}) verwaltet. Steht eine solche Datei bereits unter
-Kontrolle von \Package{tocbasic} wird eine Warnung ausgegeben. Anderenfalls
-wird mit Hilfe von \Package{tocbasic} ein neues Verzeichnis für diese Endung
-angelegt. Die Überschrift dieses Verzeichnisses kann man über das optionale
-Argument \PName{Verzeichnisüberschrift} bestimmen.
+Kontrolle von \hyperref[cha:tocbasic]{\Package{tocbasic}} wird eine Warnung
+ausgegeben. Anderenfalls wird mit Hilfe von
+\hyperref[cha:tocbasic]{\Package{tocbasic}} ein neues Verzeichnis für diese
+Endung angelegt. Die Überschrift dieses Verzeichnisses kann man über das
+optionale Argument \PName{Verzeichnisüberschrift} bestimmen.
 
 Ausgeben kann man dieses neue Verzeichnis dann beispielsweise über die
 Anweisung \Macro{listof\PName{Zielendung}}. Die
-Verzeichniseigenschaften\important{\Package{tocbasic}} \PValue{leveldown},
-\PValue{numbered}, \PValue{onecolumn} und \PValue{totoc} (siehe Anweisung
-\DescRef{tocbasic.cmd.setuptoc} in \autoref{sec:tocbasic.toc},
-\DescPageRef{tocbasic.cmd.setuptoc}) werden automatisch in das
-Zielverzeichnis übernommen, falls sie für das Quellverzeichnis bereits gesetzt
-waren. Die Eigenschaft \PValue{nobabel} wird für geklonte Verzeichnisse immer
-gesetzt, da die entsprechenden \Package{babel}-Einträge in das
-Quellverzeichnis ohnehin bereits kopiert werden.
+Verzeichniseigenschaften\important{\hyperref[cha:tocbasic]{\Package{tocbasic}}}
+\PValue{leveldown}, \PValue{numbered}, \PValue{onecolumn} und \PValue{totoc}
+(siehe Anweisung \DescRef{tocbasic.cmd.setuptoc} in
+\autoref{sec:tocbasic.toc}, \DescPageRef{tocbasic.cmd.setuptoc}) werden
+automatisch in das Zielverzeichnis übernommen, falls sie für das
+Quellverzeichnis bereits gesetzt waren. Die Eigenschaft \PValue{nobabel} wird
+für geklonte Verzeichnisse immer gesetzt, da die entsprechenden
+\Package{babel}-Einträge in das Quellverzeichnis ohnehin bereits kopiert
+werden.
 
 \begin{Example}
   Angenommen, Sie wollen zusätzlich zum normalen Inhaltsverzeichnis eine
@@ -222,29 +227,34 @@ Quellverzeichnis ohnehin bereits kopiert werden.
   Gliederungsübersicht angezeigt werden soll. Dies wäre zwar mit
 \begin{lstcode}
   \addtocontents{toc}{%
-    \protect\addcontentsline
+    \protect\addxcontentsline
       {stoc}{chapter}{\protect\contentsname}%
   }
 \end{lstcode}
   möglich. Da jedoch alle Einträge in \File{toc} auch nach \File{stoc} kopiert
   werden, würde so von der Gliederungsübersicht dieser Eintrag ebenfalls
   übernommen. Also darf der Eintrag nicht aus der Verzeichnisdatei heraus
-  erzeugt werden. Da das Paket \Package{tocbasic}\important{\Package{tocbasic}}
-  zum Einsatz kommt, kann aber
-  \phantomsection\xmpllabel{cmd.BeforeStartingTOC}
+  erzeugt werden. Da das Paket \hyperref[cha:tocbasic]{\Package{tocbasic}}%
+  \important{\hyperref[cha:tocbasic]{\Package{tocbasic}}} zum Einsatz kommt,
+  kann aber%
+  \phantomsection\xmpllabel{cmd.BeforeStartingTOC}%
 \begin{lstcode}
   \BeforeStartingTOC[toc]{%
-    \addcontentsline{stoc}{chapter}
-                    {\protect\contentsname}}
+    \addxcontentsline{stoc}{chapter}
+                     {\protect\contentsname}}
 \end{lstcode}
   verwendet werden. Natürlich\textnote{Achtung!} setzt dies voraus, dass die
-  Datei mit Endung \File{toc} auch unter der Kontrolle von \Package{tocbasic}
-  steht. Dies ist bei allen \KOMAScript-Klassen der Fall. Näheres zur
-  Anweisung \DescRef{tocbasic.cmd.BeforeStartingTOC} ist in
-  \autoref{sec:tocbasic.toc} auf \DescPageRef{tocbasic.cmd.BeforeStartingTOC}
-  zu finden.
-\end{Example}
+  Datei mit Endung \File{toc} auch unter der Kontrolle von
+  \hyperref[cha:tocbasic]{\Package{tocbasic}} steht. Dies ist bei allen
+  \KOMAScript-Klassen der Fall. Näheres zur Anweisung
+  \DescRef{tocbasic.cmd.BeforeStartingTOC} ist in \autoref{sec:tocbasic.toc}
+  auf \DescPageRef{tocbasic.cmd.BeforeStartingTOC} zu finden.%
+\end{Example}%
 %
+Die in den Beispielen verwendete Anweisung
+\DescRef{tocbasic.cmd.addxcontentsline} ist übrigens ebenfalls in
+\autoref{cha:tocbasic}, \DescPageRef{tocbasic.cmd.addxcontentsline}
+dokumentiert.%
 \EndIndexGroup
 
 
@@ -293,5 +303,5 @@ in \Package{titletoc} noch in \Package{scrwfile}.%
 % LocalWords:  Eindateiensystem Schreibdatei Zieldatei Zielendung Quellendung
 % LocalWords:  Verzeichnisüberschrift Dateiendung Zielendungen Verzeichnisdatei
 % LocalWords:  Benutzeranweisungen Dokumentpräambel Kapitelebene
-% LocalWords:  Paketunverträglichkeiten
+% LocalWords:  Paketunverträglichkeiten Verzeichniseigenschaften
 
