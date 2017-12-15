@@ -2145,6 +2145,9 @@ KOMAScript \endcsname
 \DeclareRobustCommand{\XeTeX}{%
   X\kern-.125em\lower.5ex\hbox{\reflectbox{E}}\kern-.10em\TeX%
 }%
+\DeclareRobustCommand{\XeLaTeX}{%
+  X\kern-.125em\lower.5ex\hbox{\reflectbox{E}}\kern-.10em\LaTeX%
+}%
 %    \end{macrocode}
 %
 % \section{Appendix}
