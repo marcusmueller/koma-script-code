@@ -1668,19 +1668,19 @@ Einlesen dieser Hilfsdatei führt \LaTeX{} dann für jedes \Macro{contentsline}
 eine Anweisung \Macro{l@\PName{Eintragsebene}} aus.
 
 Wird später einer \PName{Eintragsebene} über
-\DescRef{\LabelBase.cmd.DeclareTOCStyleEntry} der \PName{Stil} zugewiesen, so
-wird zunächst der optionale \PName{Initialisierungscode} ausgeführt und dann
-\Macro{l@\PName{Eintragsebene}} als \PName{Befehlscode}
-definiert. \PName{Befehlscode} ist also letztlich der Code, der bei
+\DescRef{\LabelBase.cmd.DeclareTOCStyleEntry} ein \PName{Stil} zugewiesen, so
+wird zunächst \PName{Initialisierungscode} ausgeführt falls angegeben und dann
+\PName{Befehlscode} für die Definition von \Macro{l@\PName{Eintragsebene}}
+verwendet. \PName{Befehlscode} ist also letztlich der Code, der bei
 \Macro{l@\PName{Eintragsebene}} ausgeführt wird. Dabei ist \texttt{\#1} der
 Name der Eintragsebene, während \texttt{\#\#1} und \texttt{\#\#2} Platzhalter
 für die beiden Argumente von \Macro{l@\PName{Eintragsebene}} sind.
 
-Der \PName{Initialisierungscode} dient einerseits dazu, alle Einstellungen zu
-initialisieren. Entwickler sollten darauf achten, dass wirklich alle
-Einstellungen hier bereits einen Wert erhalten, damit
-\DescRef{\LabelBase.cmd.DeclareTOCStyleEntry} auch ohne Angabe einer
-\PName{Optionenliste} fehlerfrei funktioniert. Darüber hinaus hat der
+Der \PName{Initialisierungscode} dient einerseits dazu, die Einstellungen
+eines Stils zu initialisieren. Entwickler\textnote{Empfehlung!} sollten darauf
+achten, dass wirklich alle Einstellungen hier bereits einen Wert erhalten. Nur
+dann funktioniert \DescRef{\LabelBase.cmd.DeclareTOCStyleEntry} auch ohne
+Angabe einer \PName{Optionenliste} fehlerfrei. Darüber hinaus hat der
 \PName{Initialisierungscode} auch alle Optionen, die der jeweilige Stil
 versteht, zu definieren. Zwingend vordefiniert wird lediglich
 \Option{level}. Der eingestellte Wert für \Option{level} kann in
@@ -1689,12 +1689,13 @@ versteht, zu definieren. Zwingend vordefiniert wird lediglich
 beispielsweise mit dem Wert des Zählers
 \DescRef{\LabelBase.counter.tocdepth}\IndexCounter{tocdepth} zu vergleichen.
 
-Zur Definition neuer Optionen zur Einstellung von Eigenschaften einer
-Eintragsebene stehen nur innerhalb von \PName{Initialisierungscode} die
-Anweisungen \Macro{DefineTOCEntryBooleanOption},
+Zur Definition neuer Optionen für die Eigenschaften einer
+Eintragsebene existieren nur innerhalb von \PName{Initialisierungscode} die
+Anweisungen \iffree{\Macro{DefineTOCEntryBooleanOption},
 \Macro{DefineTOCEntryCommandOption}, \Macro{DefineTOCEntryIfOption},
-\Macro{DefineTOCEntryLengthOption} und \Macro{DefineTOCEntryNumberOption}.
-All diese Anweisungen definieren jeweils eine \PName{Option}, die bei ihrem
+\Macro{DefineTOCEntryLengthOption} und
+\Macro{DefineTOCEntryNumberOption}}{\Macro{DefineTOCEntry\dots Options}}.
+Diese Anweisungen definieren jeweils eine \PName{Option}, die bei ihrem
 Aufruf eine Anweisung
 \Macro{\PName{Präfix}\PName{Eintragsebene}\PName{Postfix}} mit dem übergebenen
 Wert oder bei Fehlen einer Wertzuweisung mit dem \PName{Säumniswert}
@@ -1729,29 +1730,32 @@ entsprechen.
 
 Innerhalb von Stil \PValue{tocline} wird beispielsweise
 \begin{lstcode}
-  \DefineTOCEntryCommandOption{linefill}[\TOCLineLeaderFill]%
-  {scr@tso@}{@linefill}{filling between text and page number}%
+  \DefineTOCEntryCommandOption{linefill}%
+    [\TOCLineLeaderFill]{scr@tso@}{@linefill}%
+    {filling between text and page number}%
 \end{lstcode}
-verwendet, um Option \Option{linefill} mit dem \PName{Säumniswert}
-\DescRef{\LabelBase.cmd.TOCLineLeaderFill} zu definieren. Ein Aufruf wie
+verwendet, um Option \Option{linefill} zu definieren. Durch die Angabe von
+\DescRef{\LabelBase.cmd.TOCLineLeaderFill} als \PName{Säumniswert} würde ein
+Aufruf wie
 \begin{lstcode}
   \RedeclareTOCStyleEntry[linefill]{tocline}{part}
 \end{lstcode}
-würde daher unter anderem die Definition
+unter anderem die Definition
 \begin{lstcode}
   \def\scr@tso@part@linefill{\TOCLineLeaderFill}
 \end{lstcode}
 vornehmen.
 
-Wer sich selbst einen Stil definieren möchte, dem sei empfohlen, zunächst die
-Definition des Stils \PValue{dottedtocline} zu studieren. Nachdem dessen
-Definition verstanden wurde, gibt dann die deutlich komplexere Definition von
-Stil \PValue{tocline} viele Hinweise darauf, wie die Anweisungen sinnvoll zu
-verwenden sind.
+Wer\textnote{Tipp!} sich selbst einen Stil definieren möchte, dem sei
+empfohlen, zunächst die Definition des Stils \PValue{dottedtocline} zu
+studieren. Nachdem dessen Definition verstanden wurde, gibt dann die deutlich
+komplexere Definition von Stil \PValue{tocline} viele Hinweise darauf, wie die
+Anweisungen sinnvoll zu verwenden sind.
 
-In vielen Fällen wird es jedoch auch ausreichen, einen der vorhandenen Stile
-mit \DescRef{\LabelBase.cmd.CloneTOCEntryStyle} zu klonen und dann dessen
-Initialisierungscode mit \DescRef{\LabelBase.cmd.TOCEntryStyleInitCode} oder
+In\textnote{Tipp!} vielen Fällen wird es jedoch auch ausreichen, einen der
+vorhandenen Stile mit \DescRef{\LabelBase.cmd.CloneTOCEntryStyle} zu klonen
+und dann dessen Initialisierungscode mit Anweisung
+\DescRef{\LabelBase.cmd.TOCEntryStyleInitCode} oder
 \DescRef{\LabelBase.cmd.TOCEntryStyleStartInitCode} abzuändern.
 
 \Macro{DefineTOCEntryOption} dient eher der Definition der übrigen
@@ -1771,9 +1775,12 @@ mit denselben Eigenschaften und Voreinstellungen wie der existierende
 \Macro{CloneTOCEntryStyle}, um den Stil \PValue{default} als Klon von
 \PValue{dottedtocline} zu deklarieren. Die \KOMAScript-Klassen verwenden die
 Anweisung um die Stile \PValue{part}, \PValue{section} und \PValue{chapter}
-oder \PValue{subsection} als Klon von \PValue{tocline} zu deklarieren und den
-Stil \PValue{default} neu als Klon von \PValue{section} beziehungsweise
-\PValue{subsection} zu deklarieren.%
+oder \PValue{subsection} als Klon von \PValue{tocline} zu deklarieren und dann
+mit \DescRef{\LabelBase.cmd.TOCEntryStyleInitCode} und
+\DescRef{\LabelBase.cmd.TOCEntryStyleStartInitCode} abzuändern. Der Stil
+\PValue{default} wird von \Class{scrbook} und \Class{scrreprt} neu als Klon
+von \PValue{section} und von \Class{scrartcl} als Klon von \PValue{subsection}
+deklariert.%
 \EndIndexGroup
 
 
@@ -1787,14 +1794,15 @@ Jeder\ChangedAt[2016/03]{v3.20}{\Package{tocbasic}} Verzeichniseintragsstil
 verfügt über einen Initialisierungscode. Dieser wird immer dann aufgerufen,
 wenn einer Verzeichnisebene der entsprechende \PName{Stil} mit
 \DescRef{\LabelBase.cmd.DeclareTOCEntryStyle}\IndexCmd{DeclareTOCEntryStyle}
-zugewiesen wird. Dieser \PName{Initialisierungscode} sollte keine globalen
-Seiteneffekte aufweisen, da er auch für lokale Initialisierungen innerhalb
-anderer Anweisungen wie \DescRef{\LabelBase.cmd.DeclareNewTOC}\IndexCmd{DeclareNewTOC}
-verwendet wird. Der \PName{Initialisierungscode} dient einerseits dazu,
-Eigenschaften für den jeweiligen \PName{Stil} zu definieren. Er setzt aber
-auch die Standardeinstellungen für diese Eigenschaften.
+zugewiesen wird. Dieser\textnote{Achtung!} \PName{Initialisierungscode} sollte
+keine globalen Seiteneffekte aufweisen, da er auch für lokale
+Initialisierungen innerhalb anderer Anweisungen wie
+\DescRef{\LabelBase.cmd.DeclareNewTOC}\IndexCmd{DeclareNewTOC} verwendet
+wird. Der \PName{Initialisierungscode} dient einerseits dazu, Eigenschaften
+für den jeweiligen \PName{Stil} zu definieren. Er setzt aber auch die
+Standardeinstellungen für diese Eigenschaften.
 
-Mit Hilfe von \Macro{TOCEntryStyleStartInitCode} und
+Mit Hilfe der Anweisungen \Macro{TOCEntryStyleStartInitCode} und
 \Macro{TOCEntryStyleInitCode} kann der für einen \PName{Stil} bereits
 definierte Initialisierungscode um weiteren \PName{Initialisierungscode}
 erweitert werden. Dabei fügt \Macro{TOCEntryStyleStartInitCode} den neuen
@@ -1823,8 +1831,9 @@ definieren.%
   \Macro{LastTOCLevelWasLower}
 \end{Declaration}
 Bei\ChangedAt[2016/03]{v3.20}{\Package{tocbasic}} Einträgen im Stil
-\PValue{tocline} wird am Anfang abhängig von \Macro{lastpenalty} eine dieser
-drei Anweisungen ausgeführt. Dabei fügen \Macro{LastTOCLevelWasHigher} und
+\PValue{tocline} wird am Anfang abhängig vom Wert von
+\Macro{lastpenalty}\IndexCmd{lastpenalty} eine dieser drei Anweisungen
+ausgeführt. Dabei fügen \Macro{LastTOCLevelWasHigher} und
 \Macro{LastTOCLevelWasSame} im vertikalen Modus
 \Macro{addpenalty}\PParameter{\Macro{@lowpenalty}} ein und ermöglichen so
 einen Umbruch vor Einträgen gleicher oder übergeordneter
@@ -1833,8 +1842,8 @@ dass zwischen einem Eintrag und seinem ersten Untereintrag normalerweise ein
 Umbruch untersagt ist.
 
 Anwender sollten diese Anweisungen nicht umdefinieren. Stattdessen können und
-sollten Änderungen für die jeweiligen Eintragsebenen gezielt über die
-Eigenschaften \PValue{onstartlowerlevel}, \PValue{onstartsamelevel} und
+sollten Änderungen bei Zuweisung des Stils an eine Eintragsebene gezielt über
+die Eigenschaften \PValue{onstartlowerlevel}, \PValue{onstartsamelevel} und
 \PValue{onstarthigherlevel} vorgenommen werden.%
 \EndIndexGroup
 
@@ -1847,11 +1856,12 @@ als Wert für die Eigenschaft \Option{linefill} des Verzeichniseintragsstils
 \PName{tocline} verwendet zu werden. Sie erzeugt dann eine Verbindung zwischen
 dem Ende des Textes eines Eintrags und der zugehörigen Seitenzahl. Das
 \PName{Füllzeichen}, das dazu in regelmäßigem Abstand wiederholt wird, kann
-als optionales Argument angegeben werden. Voreinstellung ist ein Punkt.
+als optionales Argument angegeben werden. Voreinstellung ist ein
+Punkt.\textnote{Voreinstellung}
 
 Wie der Name schon vermuten lässt, werden die Füllzeichen mit Hilfe von
-\Macro{leaders} gesetzt. Als Abstand wird wie bei \Macro{@dottedtocline} aus
-dem \LaTeX-Kern vor und nach dem Füllzeichen
+\Macro{leaders} gesetzt. Als Abstand wird wie bei der \LaTeX-Kern-Anweisung
+\Macro{@dottedtocline} vor und nach dem Füllzeichen
 \Macro{mkern}\Macro{@dotsep}\Unit{\texttt{mu}} verwendet.%
 \EndIndexGroup
 %
@@ -1866,7 +1876,7 @@ Benutzung durch Klassen- und Paketautoren freigegeben ist. Diese Anweisungen
 beginnen alle mit \Macro{tocbasic@}. Aber\textnote{Achtung!} auch Klassen- und
 Paketautoren sollten diese Anweisungen nur verwenden und nicht etwa
 umdefinieren! Ihre interne Funktion kann jederzeit geändert oder erweitert
-werden, so dass Umdefinierung der Anweisungen die Funktion von
+werden, so dass jede Umdefinierung der Anweisungen die Funktion von
 \Package{tocbasic} erheblich beschädigen könnte!
 
 
@@ -1892,17 +1902,21 @@ die Eigenschaft \PValue{nobabel}\important{\PValue{nobabel}} (siehe
 \DescRef{\LabelBase.cmd.setuptoc}, \autoref{sec:tocbasic.toc},
 \DescPageRef{\LabelBase.cmd.setuptoc}) kann dies unterdrückt werden. Für die
 Dateinamenerweiterungen \File{toc}, \File{lof} und \File{lot} unterdrückt
-\Package{tocbasic} dies bereits selbst, damit die Umschaltung nicht mehrfach
-in die zugehörigen Dateien eingetragen wird.
+\Package{tocbasic} dies bereits selbst, %
+\iftrue% Umbruchvarianten
+da \Package{babel} sie von sich aus vornimmt.%
+\else%
+damit die Umschaltung nicht mehrfach in die zugehörigen Dateien
+eingetragen wird.%
+\fi
 
 Normalerweise gibt es keinen Grund, diese Anweisung selbst aufzurufen. Es sind
 allerdings Verzeichnisse denkbar, die nicht unter der Kontrolle von
 \Package{tocbasic} stehen, also nicht in der Liste der bekannten
 Dateierweiterungen geführt werden, aber trotzdem die Spracherweiterung für
-\Package{babel} nutzen sollen. Für diese ist die Anweisung explizit
-aufzurufen. Bitte achten Sie jedoch darauf, dass dies für jede Dateierweiterung
-nur einmal geschieht!
-%
+\Package{babel} nutzen sollen. Für derartige Verzeichnisse wäre die Anweisung
+explizit aufzurufen. Bitte\textnote{Achtung!} achten Sie jedoch darauf, dass
+dies für jede Dateierweiterung nur einmal geschieht!%
 \EndIndexGroup
 
 
@@ -1911,20 +1925,20 @@ nur einmal geschieht!
 \end{Declaration}
 Diese Anweisung ist der eigentlich Ersatz der Anweisung
 \Macro{@starttoc}\IndexCmd{@starttoc}\important{\Macro{@starttoc}} aus dem
-\LaTeX-Kern. Es ist die Anweisung, die sich hinter \DescRef{\LabelBase.cmd.listoftoc*} (siehe
-\autoref{sec:tocbasic.toc}, \DescPageRef{\LabelBase.cmd.listoftoc*})
-verbirgt. Klassen- oder Paketautoren, die Vorteile von \Package{tocbasic}
-nutzen wollen, sollten zumindest diese Anweisung, besser jedoch
-\DescRef{\LabelBase.cmd.listoftoc} verwenden. Die Anweisung baut selbst auf \Macro{@starttoc}
-auf, setzt allerdings zuvor
-\Length{parskip}\IndexLength{parskip}\important[i]{\Length{parskip}\\
-  \Length{parindent}\\
-  \Length{parfillskip}} und \Length{parindent}\IndexLength{parindent} auf 0
-und \Length{parfillskip}\IndexLength{parfillskip} auf 0 bis
-unendlich. Außerdem wird
-\Macro{@currext}\important{\Macro{@currext}}\IndexCmd{@currext} auf die
+\LaTeX-Kern. Es ist die Anweisung, die sich hinter
+\DescRef{\LabelBase.cmd.listoftoc*} (siehe \autoref{sec:tocbasic.toc},
+\DescPageRef{\LabelBase.cmd.listoftoc*}) verbirgt. Klassen- oder Paketautoren,
+die Vorteile von \Package{tocbasic} nutzen wollen, sollten zumindest diese
+Anweisung, besser jedoch \DescRef{\LabelBase.cmd.listoftoc} verwenden. Die
+Anweisung baut selbst auf \Macro{@starttoc} auf, setzt allerdings zuvor
+\Length{parskip}\IndexLength{parskip}\important[i]{\Length{parskip},
+  \Length{parindent}, \Length{parfillskip}} und
+\Length{parindent}\IndexLength{parindent} auf 0 und
+\Length{parfillskip}\IndexLength{parfillskip} auf 0 bis unendlich. Außerdem
+wird \Macro{@currext}\important{\Macro{@currext}}\IndexCmd{@currext} auf die
 aktuelle Dateierweiterung gesetzt, damit diese in den nachfolgend ausgeführten
-Haken ausgewertet werden kann.
+Haken ausgewertet werden kann. Die Erklärungen der Haken finden Sie im
+Anschluss.
 
 Da\textnote{Achtung!} \LaTeX{} bei der Ausgabe eines Verzeichnisses auch
 gleich eine neue Verzeichnisdatei zum Schreiben öffnet, kann der Aufruf dieser
@@ -1937,8 +1951,7 @@ Anweisung zu einer Fehlermeldung der Art
 führen, wenn keine Schreibdateien mehr zur Verfügung stehen. Abhilfe kann in
 diesem Fall das Laden des in \autoref{cha:scrwfile} beschriebenen Pakets
 \Package{scrwfile}\important{\Package{scrwfile}}\IndexPackage{scrwfile}
-bieten.
-%
+oder die Verwendung von Lua\LaTeX{} bieten.%
 \EndIndexGroup
 
 
@@ -1954,8 +1967,8 @@ definierten Anweisungen ausgeführt. Es ist erlaubt, diesen Haken mit Hilfe von
 Ebenso wird \Macro{tocbasic@@after@hook} unmittelbar nach der
 Verzeichnisdatei, aber noch vor den mit
 \DescRef{\LabelBase.cmd.AfterStartingTOC} definierten Anweisungen
-ausgeführt. Es ist erlaubt, diesen Haken mit Hilfe von \Macro{g@addto@macro}
-zu erweitern.
+ausgeführt. Es ist erlaubt, diesen Haken mit Hilfe von
+\Macro{g@addto@macro}\IndexCmd{g@addto@macro} zu erweitern.
 
 \KOMAScript{} nutzt diese Haken, um Verzeichnisse mit dynamischer Anpassung an
 die Breite der Gliederungsnummern zu ermöglichen. Ihre Verwendung ist Klassen
@@ -1968,9 +1981,8 @@ innerhalb der beiden Haken sind nicht gestattet!
 Wird keine\textnote{Achtung!} der Anweisungen
 \DescRef{\LabelBase.cmd.listofeachtoc}, \DescRef{\LabelBase.cmd.listoftoc} und
 \DescRef{\LabelBase.cmd.listoftoc*} für die Ausgabe der Verzeichnisse
-verwendet, sollten die beiden Anweisungen für die Haken trotzdem aufgerufen
-werden.
-%
+verwendet, sollten die Anweisungen für die Haken trotzdem aufgerufen
+werden.%
 \EndIndexGroup
 
 
@@ -1978,19 +1990,19 @@ werden.
   \Macro{tb@\PName{Dateierweiterung}@before@hook}
   \Macro{tb@\PName{Dateierweiterung}@after@hook}
 \end{Declaration}
-Diese Anweisungen werden direkt nach \DescRef{\LabelBase.cmd.tocbasic@@before@hook} bzw. vor
-\DescRef{\LabelBase.cmd.tocbasic@@after@hook} für das jeweilige Verzeichnis mit der
-entsprechenden \PName{Dateierweiterung} ausgeführt. Sie\textnote{Achtung!}
-dürfen keinesfalls von Klassen- und Paketautoren verändert werden. Werden für
-die Ausgabe der Verzeichnisse die Anweisungen
-\DescRef{\LabelBase.cmd.listoftoc}, \DescRef{\LabelBase.cmd.listoftoc*} und
-\DescRef{\LabelBase.cmd.listofeachtoc} nicht verwendet, sollten die beiden
-Anweisungen für die Haken trotzdem aufgerufen werden, soweit sie definiert
-sind. Die Anweisungen können auch undefiniert sein. Für einen entsprechenden
-Test siehe
+Diese Anweisungen werden direkt nach
+\DescRef{\LabelBase.cmd.tocbasic@@before@hook} bzw. vor
+\DescRef{\LabelBase.cmd.tocbasic@@after@hook} für das jeweilige Verzeichnis
+mit der entsprechenden \PName{Dateierweiterung}
+ausgeführt. Sie\textnote{Achtung!}  dürfen keinesfalls von Klassen- und
+Paketautoren verändert werden. Werden für die Ausgabe der Verzeichnisse die
+Anweisungen \DescRef{\LabelBase.cmd.listoftoc},
+\DescRef{\LabelBase.cmd.listoftoc*} und \DescRef{\LabelBase.cmd.listofeachtoc}
+nicht verwendet, sollten die beiden Anweisungen für die Haken trotzdem
+aufgerufen werden, soweit sie definiert sind. Die Anweisungen können auch
+undefiniert sein. Für einen entsprechenden Test siehe
 \DescRef{scrbase.cmd.scr@ifundefinedorrelax}\IndexCmd{scr@ifundefinedorrelax}
-in \autoref{sec:scrbase.if}, \DescPageRef{scrbase.cmd.scr@ifundefinedorrelax}.
-%
+in \autoref{sec:scrbase.if}, \DescPageRef{scrbase.cmd.scr@ifundefinedorrelax}.%
 \EndIndexGroup
 
 
@@ -2005,8 +2017,7 @@ Anweisung sein. Wenn Sie Ihre eigene Anweisung für die Überschrift definieren,
 können Sie ebenfalls \Macro{tocbasic@listhead} verwenden. In diesem Fall
 sollte vor dem Aufruf von \Macro{tocbasic@listhead} die Anweisung
 \Macro{@currext}\important{\Macro{@currext}}\IndexCmd{@currext} auf die
-Dateinamenerweiterung, die zu diesem Verzeichnis gehört, gesetzt werden.
-%
+Dateinamenerweiterung, die zu diesem Verzeichnis gehört, gesetzt werden.%
 \EndIndexGroup
 
 
@@ -2014,9 +2025,9 @@ Dateinamenerweiterung, die zu diesem Verzeichnis gehört, gesetzt werden.
   \Macro{tocbasic@listhead@\PName{Dateierweiterung}}\Parameter{Titel}
 \end{Declaration}
 Ist diese individuelle Anweisung für das Setzen einer Verzeichnisüberschrift
-definiert, so verwendet \DescRef{\LabelBase.cmd.tocbasic@listhead} diese. Anderenfalls
-definiert \DescRef{\LabelBase.cmd.tocbasic@listhead} diese und ruft sie dann auf.
-%
+definiert, so verwendet \DescRef{\LabelBase.cmd.tocbasic@listhead}
+sie. Anderenfalls definiert \DescRef{\LabelBase.cmd.tocbasic@listhead} diese
+vor der Verwendung.%
 \EndIndexGroup
 
 
@@ -2030,19 +2041,22 @@ definiert \DescRef{\LabelBase.cmd.tocbasic@listhead} diese und ruft sie dann auf
 Anweisung\ChangedAt{v3.12}{\Package{tocbasic}}
 \Macro{tocbasic@addxcontentsline} nimmt einen \PName{Eintrag} der angegebenen
 \PName{Ebene} in das über die \PName{Dateierweiterung} spezifizierte
-Verzeichnis vor. Ob der Eintrag nummeriert wird oder nicht, hängt davon ab, ob
-das Argument \PName{Gliederungsnummer} leer ist oder nicht. Im Falle eines
-leeren Argument wird dem \PName{Eintrag} ein \Macro{nonumberline} ohne
-Argument vorangestellt. Anderenfalls wird wie gewohnt
-\DescRef{\LabelBase.cmd.numberline} mit \PName{Gliederungsnummer} als Argument
-verwendet.
+Verzeichnis vor. Ob der Eintrag nummeriert wird\iffree{ oder
+  nicht}{}% Umbruchvarianten
+, hängt davon ab, ob das Argument \PName{Gliederungsnummer} leer ist oder
+nicht. Im Falle eines leeren Argument wird dem \PName{Eintrag} ein
+\Macro{nonumberline} ohne Argument vorangestellt. Anderenfalls wird wie
+gewohnt \DescRef{\LabelBase.cmd.numberline} mit \PName{Gliederungsnummer} als
+Argument verwendet.
 
 Die Anweisung \Macro{nonumberline} wird innerhalb
 \DescRef{\LabelBase.cmd.listoftoc} (siehe \autoref{sec:tocbasic.toc},
 \DescPageRef{\LabelBase.cmd.listoftoc}) entsprechend der Eigenschaft
 \PValue{numberline} (siehe \autoref{sec:tocbasic.toc},
 \DescPageRef{\LabelBase.cmd.setuptoc}) umdefiniert. Dadurch wirkt sich das
-Setzen oder Löschen dieser Eigenschaft bereits beim nächsten \LaTeX-Lauf aus.%
+Setzen oder Löschen dieser Eigenschaft \iffree{bereits beim nächsten
+  \LaTeX-Lauf}{unmittelbar} % Umbruchvarianten
+aus.%
 %
 \EndIndexGroup
 
@@ -2631,3 +2645,4 @@ zu wandeln.%
 %  LocalWords:  Verzeichniseintrags Säumniswert Überschriftenanweisung
 %  LocalWords:  Eintragstext Dateierweiterung Dateierweiterungen Paketautoren
 %  LocalWords:  Verzeichnisbefehle Verzeichnisdaten Schrifteinstellungen
+%  LocalWords:  Eintragsebenen
