@@ -2067,21 +2067,24 @@ aus.%
 \end{Declaration}
 Der\ChangedAt[2016/03]{v3.20}{\Package{tocbasic}} Verzeichniseintragsstil
 \PValue{tocline} (siehe \autoref{sec:tocbasic.tocstyle}) setzt am Ende jedes
-Eintrags \Macro{penalty} so, dass nach einem Eintrag kein Seitenumbruch
-erfolgen darf. Dabei wird der genaue Wert abhängig von der
-\PName{Eintragsebene} gewählt. Dies erledigt
-\Macro{tocbasic@SetPenaltyByTOCLevel}. Am Anfang eines Eintrags wird dann über
-\Macro{tocbasic@DependOnPenaltyAndTOCLevel} abhängig von \Macro{lastpenalty}
-und der aktuellen \PName{Eintragsebene} die über die Eigenschaften
-\Option{onstartlowerlevel}, \Option{onstartsamelevel} oder
-\Option{onstarthigherlevel} festgelegte Aktion eines der internen Makros
-\Macro{scr@tso@\PName{Eintragsebene}@LastTOCLevelWasHigher},
-\Macro{scr@tso@\PName{Eintragsebene}@LastTOCLevelWasSame} oder
-\Macro{scr@tso@\PName{Eintragsebene}@LastTOCLevelWasLower} ausgeführt. In der
-Voreinstellung erlauben die ersten beiden einen Umbruch, wenn sie im
-vertikalen Modus ausgeführt werden. 
+Eintrags über \Macro{tocbasic@SetPenaltyByTOCLevel} \Macro{penalty} so, dass
+nach einem Eintrag kein Seitenumbruch erfolgen darf. Der genaue Wert wird
+dabei abhängig von der \PName{Eintragsebene} gewählt.
 
-Entwickler, die eigene Stile kompatibel mit Stil \PValue{tocline} erstellen
+%\begin{sloppypar}
+Über \Macro{tocbasic@DependOnPenaltyAndTOCLevel} wird am Anfang eines
+Eintrags, abhängig von \Macro{lastpenalty} und der \PName{Eintragsebene} die
+über die Eigenschaft \Option{onstartlowerlevel} im internen Makro
+\Macro{scr@tso@\PName{Eintragsebene}@LastTOCLevelWasHigher}, über die
+Eigenschaft \Option{onstartsamelevel} im zugehörigen, internen Makro\linebreak
+\Macro{scr@tso@\PName{Eintragsebene}@LastTOCLevelWasSame} oder über die
+Eigenschaft \Option{onstarthigherlevel} im zugehörigen, internen Makro
+\Macro{scr@tso@\PName{Eintragsebene}@LastTOCLevelWasLower} gespeicherte Aktion
+ausgeführt. In der Voreinstellung\textnote{Voreinstellung} erlauben die ersten
+beiden einen Umbruch, wenn sie im vertikalen Modus ausgeführt werden.
+%\end{sloppypar}
+
+Entwickler, die eigene Stile kompatibel mit \PValue{tocline} erstellen
 wollen, sei empfohlen, dieses Verhalten zu kopieren. Zu diesem Zweck dürfen
 sie auf diese eigentlich internen Makros zurückgreifen.%
 \EndIndexGroup
@@ -2102,19 +2105,16 @@ verwendet werden müssen.
 
 Als\textnote{Umgebung} erstes wird eine Umgebung benötigt, die diese neue
 Gleitumgebung bereitstellt. Das geht ganz einfach mit:
-% Umbruchkorrektur: listings korrigiert!
 \begin{lstcode}
-  \newenvironment{remarkbox}{%
-    \@float{remarkbox}%
-  }{%
-    \end@float
-  }
+  \newenvironment{remarkbox}%
+    {\@float{remarkbox}}%
+    {\end@float}
 \end{lstcode}
 Die neue Umgebung heißt also \Environment{remarkbox}. 
 
 Jede\textnote{Platzierung} Gleitumgebung hat eine Standardplatzierung. Diese
-setzt sich aus den bekannten Platzierungsoptionen zusammen:
-% Umbruchkorrektur: listings korrigiert!
+setzt sich aus einer oder mehreren der bekannten Platzierungsoptionen
+\PValue{b}, \PValue{h}, \PValue{p} und \PValue{t} zusammen:
 \begin{lstcode}
   \newcommand*{\fps@remarkbox}{tbp}
 \end{lstcode}
@@ -2124,8 +2124,8 @@ auf einer eigenen Seite platziert werden dürfen.
 Gleitumgebungen\textnote{Gleittyp} haben außerdem einen nummerischen
 Gleittyp. Umgebungen, bei denen das gleiche Bit im Gleittyp gesetzt ist,
 dürfen sich nicht gegenseitig überholen. Abbildungen und Tabellen haben
-normalerweise den Typ~1 und 2. Sie dürfen sich also gegenseitig überholen.
-% Umbruchkorrektur: listings korrigiert!
+normalerweise den Typ~1 und 2. Abbildungen dürfen also Tabellen überholen und
+umgekehrt.
 \begin{lstcode}
   \newcommand*{\ftype@remarkbox}{4}
 \end{lstcode}
@@ -2133,11 +2133,11 @@ Die neue Umgebung hat den Typ~4, darf also Tabellen und Abbildungen überholen
 und von diesen überholt werden.
 
 Gleitumgebungen\textnote{Nummer} haben außerdem eine Nummer.
-% Umbruchkorrektur: listings korrigiert!
 \begin{lstcode}
   \newcounter{remarkbox}
   \newcommand*{\remarkboxformat}{%
-    Merksatz~\theremarkbox\csname autodot\endcsname}
+    Merksatz~\theremarkbox\csname autodot\endcsname
+  }
   \newcommand*{\fnum@remarkbox}{\remarkboxformat}
 \end{lstcode}
 Hier wird zunächst ein neuer Zähler definiert, der unabhängig von Kapiteln
@@ -2149,7 +2149,6 @@ Ausgabe wird wiederum als Gleitumgebungsnummer für die Verwendung in
 
 Gleitumgebungen\textnote{Dateierweiterung} haben Verzeichnisse und diese haben
 eine Datei mit dem Namen \Macro{jobname} und einer Dateierweiterung.
-% Umbruchkorrektur: listings korrigiert!
 \begin{lstcode}
   \newcommand*{\ext@remarkbox}{lor}
 \end{lstcode}
@@ -2159,12 +2158,10 @@ Die\important{\Package{tocbasic}} Umgebung selbst steht damit. Es fehlt
 allerdings das Verzeichnis. Damit wir dabei möglichst wenig selbst machen
 müssen, verwenden wir das Paket \Package{tocbasic}. Dieses wird in Dokumenten
 mit
-% Umbruchkorrektur: listings korrigiert!
 \begin{lstcode}
   \usepackage{tocbasic}
 \end{lstcode}
 geladen. Ein Klassen- oder Paketautor würde hingegen
-% Umbruchkorrektur: listings korrigiert!
 \begin{lstcode}
   \RequirePackage{tocbasic}
 \end{lstcode}
@@ -2172,7 +2169,6 @@ verwenden.
 
 Nun\textnote{Dateierweiterung} machen wir die neue Dateierweiterung dem Paket
 \Package{tocbasic} bekannt.
-% Umbruchkorrektur: listings korrigiert!
 \begin{lstcode}
   \addtotoclist[float]{lor}
 \end{lstcode}
@@ -2182,7 +2178,6 @@ von Gleitumgebungen beziehen, auch auf das neue Verzeichnis beziehen.
 
 Jetzt\textnote{Verzeichnistitel} definieren wir noch einen Titel für dieses
 Verzeichnis:
-% Umbruchkorrektur: listings korrigiert!
 \begin{lstcode}
   \newcommand*{\listoflorname}{Verzeichnis der Merksätze}
 \end{lstcode}
@@ -2194,14 +2189,12 @@ will. Siehe dazu \autoref{sec:scrbase.languageSupport}, ab
 
 Jetzt\textnote{Verzeichniseintrag}\index{Verzeichnis>Eintrag} müssen wir nur
 noch definieren, wie ein einzelner Eintrag in dem Verzeichnis aussehen soll:
-% Umbruchkorrektur: listings korrigiert!
 \begin{lstcode}
   \newcommand*{\l@remarkbox}{\l@figure}
 \end{lstcode}
 Weil das die einfachste Lösung ist, wurde hier festgelegt, dass Einträge in
 das Verzeichnis der Merksätze genau wie Einträge in das Abbildungsverzeichnis
 aussehen sollen. Man hätte auch eine explizite Festlegung wie
-% Umbruchkorrektur: listings korrigiert!
 \begin{lstcode}
   \newcommand*{\l@remarkbox}{\@dottedtocline{1}{1em}{1.5em}}
 \end{lstcode}
@@ -2209,7 +2202,6 @@ verwenden können.
 
 Außerdem\textnote{Kapiteleintrag} wollen Sie, das Kapiteleinträge sich auf das
 Verzeichnis auswirken.
-% Umbruchkorrektur: listings korrigiert!
 \begin{lstcode}
   \setuptoc{lor}{chapteratlist}
 \end{lstcode}
@@ -2224,7 +2216,6 @@ Inhaltsverzeichniseintrag, mit Inhaltsverzeichniseintrag, mit Nummerierung)
 wählen und das Verzeichnis mit
 \DescRef{\LabelBase.cmd.listoftoc}\PParameter{lor} ausgeben. Mit einem
 schlichten
-% Umbruchkorrektur: listings korrigiert!
 \begin{lstcode}
   \newcommand*{\listofremarkboxes}{\listoftoc{lor}}
 \end{lstcode}
@@ -2250,12 +2241,16 @@ dass der Anwender automatisch von etwaigen zukünftigen Erweiterungen von
 \Package{tocbasic} profitiert. Soll der Anwender aber nicht mit der Tatsache
 belastet werden, dass für die Merksätze die Dateierweiterung \File{lor}
 verwendet wird, so genügt
-% Umbruchkorrektur: listings korrigiert!
 \begin{lstcode}
   \newcommand*{\setupremarkboxes}{\setuptoc{lor}}
 \end{lstcode}
+\iffalse%
 um eine als Argument an \Macro{setupremarkboxes} übergebene Liste von
-Eigenschaften direkt als Liste von Eigenschaften für \File{lor} zu setzen.
+Eigenschaften direkt als Liste von %
+\else%
+um über \Macro{setupremarkboxes}
+\fi
+Eigenschaften für \File{lor} zu setzen.
 
 
 \section{Alles mit einer Anweisung}
@@ -2286,8 +2281,9 @@ können dann verwendet werden.
 
 \PName{Dateierweiterung} definiert dabei die Dateiendung der Hilfsdatei, die
 das Verzeichnis repräsentiert, wie dies in \autoref{sec:tocbasic.basics}, ab
-\autopageref{sec:tocbasic.basics} bereits erläutert wurde. Dieser Parameter
-muss angegeben werden und darf nicht leer sein!
+\autopageref{sec:tocbasic.basics} bereits erläutert
+wurde. Dieser\textnote{Achtung!} Parameter muss angegeben werden und darf
+nicht leer sein!
 
 \PName{Optionenliste} ist eine durch Komma getrennte Liste, wie dies auch von
 \DescRef{maincls.cmd.KOMAoptions} (siehe \autoref{sec:typearea.options},
@@ -2295,18 +2291,16 @@ muss angegeben werden und darf nicht leer sein!
 Optionen\textnote{Achtung!} können jedoch \emph{nicht} mit
 \DescRef{maincls.cmd.KOMAoptions}\IndexCmd{KOMAoptions} gesetzt werden! Eine
 Übersicht über die möglichen Optionen bietet
-\autoref{tab:tocbasic.DeclareNewTOC-options} ab
-\autopageref{tab:tocbasic.DeclareNewTOC-options}.
+\autoref{tab:tocbasic.DeclareNewTOC-options}\iffalse ab
+\autopageref{tab:tocbasic.DeclareNewTOC-options}\fi.
 
 Wird\ChangedAt[2015/12]{v3.20}{\Package{tocbasic}} Option
 \Option{tocentrystyle} nicht gesetzt, so wird bei Bedarf der Stil
 \PValue{default} verwendet. Näheres zu diesem Stil ist
 \autoref{sec:tocbasic.tocstyle} zu entnehmen. Soll kein Befehl für
 Verzeichniseinträge definiert werden, so kann ein leeres Argument, also
-wahlweise \OptionValue{tocentrystyle}{} oder
-\OptionValue{tocentrystyle}{\PParameter{}} verwendet werden. Dies birgt
-allerdings das Risiko, dass bei Ausgabe des entsprechenden Verzeichnisses
-diverse Fehler gemeldet werden.
+wahlweise \OptionValue{tocentrystyle}{}\iffree{}{\unskip} oder
+\OptionValue{tocentrystyle}{\PParameter{}} verwendet werden.
 
 Abhängig\ChangedAt[2016/06]{v3.21}{\Package{tocbasic}} vom Stil der
 Verzeichniseinträge können auch alle für diesen Stil gültigen Eigenschaften
@@ -2320,7 +2314,186 @@ werden. Nachträgliche Änderungen am Stil sind mit
 \important{\DescRef{\LabelBase.cmd.DeclareTOCStyleEntry}} jederzeit
 möglich. Siehe dazu \autoref{sec:tocbasic.tocstyle},
 \DescPageRef{\LabelBase.cmd.DeclareTOCStyleEntry}.
-%
+
+% Umbruchoptimierung: Tabelle verschoben.
+\begin{desclist}
+  \renewcommand*{\abovecaptionskipcorrection}{-\normalbaselineskip}%
+  \desccaption[{%
+    Optionen für die Anweisung \Macro{DeclareNewTOC}%
+    }]{%
+    Optionen für die Anweisung
+    \Macro{DeclareNewTOC}\ChangedAt{v3.06}{\Package{tocbasic}}%
+    \label{tab:tocbasic.DeclareNewTOC-options}%
+  }{%
+    Optionen für die Anweisung \Macro{DeclareNewTOC} (\emph{Fortsetzung})%
+  }%
+  \entry{\OptionVName{atbegin}{Code}\ChangedAt{v3.09}{\Package{tocbasic}}}{%
+    Falls eine neue Gleitumgebung oder nicht gleitende Umgebung definiert
+    wird, so wird \PName{Code} jeweils am Anfang dieser Umgebung ausgeführt.%
+  }%
+  \entry{\OptionVName{atend}{Code}\ChangedAt{v3.09}{\Package{tocbasic}}}{%
+    Falls eine neue Gleitumgebung oder nicht gleitende Umgebung definiert
+    wird, so wird \PName{Code} jeweils am Ende dieser Umgebung ausgeführt.%
+  }%
+  \entry{\OptionVName{counterwithin}{\LaTeX-Zähler}}{%
+    Falls eine neue Gleitumgebung oder eine nicht gleitende Umgebung definiert
+    wird, so wird für diese auch ein neuer Zähler
+    \Counter{\PName{Eintragstyp}} (siehe Option \Option{type})
+    angelegt. Dieser Zähler kann in gleicher Weise wie beispielsweise der
+    Zähler \Counter{figure} bei \Class{book}-Klassen von Zähler
+    \Counter{chapter} abhängt von einem \LaTeX-Zähler ahängig gemacht
+    werden.}%
+  \entry{\Option{float}}{%
+    Es wird nicht nur ein neuer Verzeichnistyp definiert, sondern auch
+    Gleitumgebungen \Environment{\PName{Eintragstyp}} (siehe Option
+    \Option{type}) und \Environment{\PName{Eintragstyp}*}
+    (vgl. \Environment{figure} und \Environment{figure*}).}%
+  \entry{\OptionVName{floatpos}{Gleitverhalten}}{%
+    Jede Gleitumgebung hat ein voreingestelltes \PName{Gleitverhalten}, das
+    über das optionale Argument der Gleitumgebung geändert werden kann. Mit
+    dieser Option wird das \PName{Gleitverhalten} für die optional erstellbare
+    Gleitumgebung (siehe Option \Option{float}) festgelegt. Die Syntax und
+    Semantik ist dabei mit der des optionalen Arguments für die Gleitumgebung
+    identisch. Wird die Option nicht verwendet, so ist das voreingestellte
+    Gleitverhalten \texttt{tbp}, also \emph{top}, \emph{bottom},
+    \emph{page}.}%
+  \entry{\OptionVName{floattype}{Gleittyp}}{%
+    Jede Gleitumgebung hat einen nummerischen Typ. Gleitumgebungen, bei denen
+    in diesem \PName{Gleittyp} nur unterschiedliche Bits gesetzt sind, können
+    sich gegenseitig überholen. Die Gleitumgebungen \Environment{figure} und
+    \Environment{table} haben normalerweise die Typen 1 und 2, können sich
+    also gegenseitig überholen. Es sind Typen von 1 bis 31 (alle Bits gesetzt,
+    kann also keinen anderen Typ überholen und von keinem anderen Typen
+    überholt werden) zulässig. Wird kein Typ angegeben, so wird mit 16 der
+    höchst mögliche Ein-Bit-Typ verwendet.}%
+  \entry{\Option{forcenames}}{%
+    Siehe Option \Option{name} und \Option{listname}.}%
+  \entry{\OptionVName{hang}{Einzug}}{%
+    \ChangedAt[2015/12]{v3.20}{\Package{tocbasic}}%
+    \ChangedAt[2015/12]{v3.21}{\Package{tocbasic}}%
+    Diese Option gilt seit \KOMAScript~3.20 als überholt. Die Breite der
+    Nummer des Verzeichniseintrags\index{Verzeichnis>Eintrag} ist nun
+    stattdessen als Eigenschaft in Abhängigkeit des Verzeichniseintragsstils
+    von Option \Option{tocentrystyle} anzugeben. Bei den Stilen von
+    \KOMAScript{} wäre das beispielsweise die Eigenschaft \PValue{numwidth}
+    und damit Option \Option{tocentrynumwidth}. Besitzt ein Stil diese
+    Eigenschaft, so wird sie von \Macro{DeclareNewTOC} mit 1,5\Unit{em}
+    voreingestellt. Diese Voreinstellung kann durch explizite Angabe von
+    \OptionVName{tocentrynumwidth}{Wert} leicht mit einem anderen
+    \PName{Wert} überschrieben werden. Für Abbildungen verwenden die
+    \KOMAScript-Klassen beispielsweise den \PName{Wert} \PValue{2.3em}.}%
+  \entry{\OptionVName{indent}{Einzug}}{%
+    \ChangedAt[2015/12]{v3.20}{\Package{tocbasic}}%
+    \ChangedAt[2015/12]{v3.21}{\Package{tocbasic}}%
+    Diese Option gilt seit \KOMAScript~3.20 als überholt. Der Einzug des
+    Verzeichniseintrags\index{Verzeichnis>Eintrag} von links ist nun
+    stattdessen als Eigenschaft in Abhängigkeit des Verzeichniseintragsstils
+    von Option \Option{tocentrystyle} anzugeben. Bei den Stilen von
+    \KOMAScript{} wäre das beispielsweise die Eigenschaft \PValue{indent} und
+    damit Option \Option{tocentryindent}. Besitzt ein Stil diese Eigenschaft,
+    so wird sie von \Macro{DeclareNewTOC} mit 1\Unit{em} voreingestellt. Diese
+    Voreinstellung kann durch explizite Angabe von
+    \OptionVName{tocentryindent}{Wert} leicht mit einem anderen \PName{Wert}
+    überschrieben werden. Für Abbildungen verwenden die \KOMAScript-Klassen
+    beispielsweise den \PName{Wert} \PValue{1.5em}.}%
+  \entry{\OptionVName{level}{Gliederungsebene}}{%
+    \ChangedAt[2015/12]{v3.20}{\Package{tocbasic}}%
+    \ChangedAt[2015/12]{v3.21}{\Package{tocbasic}}%
+    Diese Option gilt seit \KOMAScript~3.20 als überholt. Der nummerische Wert
+    der Ebene des Verzeichniseintrags\index{Verzeichnis>Eintrag} ist nun
+    stattdessen als Eigenschaft in Abhängigkeit des Verzeichniseintragsstils
+    von Option \Option{tocentrystyle} anzugeben. Nichts desto trotz haben alle
+    Stile die Eigenschaft \PValue{level} und damit Option
+    \Option{tocentrylevel}. Die Eigenschaft wird von \Macro{DeclareNewTOC} mit
+    1 voreingestellt. Diese Voreinstellung kann durch explizite Angabe von
+    \OptionVName{tocentrylevel}{Wert} leicht mit einem anderen \PName{Wert}
+    überschrieben werden.}%
+  \entry{\OptionVName{listname}{Verzeichnistitel}}{%
+    Jedes Verzeichnis hat eine Überschrift, die durch diese Option bestimmt
+    werden kann. Ist die Option nicht angegeben, so wird als Verzeichnistitel
+    »\texttt{List of \PName{Mehrzahl des Eintragstyps}}« (siehe Option
+    \Option{types}) verwendet, wobei das erste Zeichen der \PName{Mehrzahl des
+      Eintragstyps} in einen Großbuchstaben gewandelt wird. Es wird auch ein
+    Makro \Macro{list\PName{Eintragstyp}name} mit diesem Wert definiert, der
+    jederzeit geändert werden kann. Dieses Makro wird jedoch nur definiert,
+    wenn es nicht bereits definiert ist oder zusätzlich Option
+    \Option{forcenames} gesetzt ist.}%
+  \entry{\OptionVName{name}{Eintragsname}}{%
+    Sowohl als optionaler Präfix für die Einträge im Verzeichnis als auch für
+    die Beschriftung in einer Gleitumgebung (siehe Option \Option{float}) oder
+    einer nicht gleitenden Umgebung (siehe Option \Option{nonfloat}) wird ein
+    Name für einen Eintrag in das Verzeichnis benötigt. Ohne diese Option wird
+    als \PName{Eintragsname} der \PName{Eintragstyp} (siehe Option
+    \Option{type}) verwendet, bei dem das erste Zeichen in einen
+    Großbuchstaben gewandelt wird. Es wird auch ein Makro
+    \Macro{\PName{Eintragstyp}name} mit diesem Wert definiert, der jederzeit
+    geändert werden kann. Dieses Makro wird jedoch nur definiert, wenn es
+    nicht bereits definiert ist oder zusätzlich Option \Option{forcenames}
+    gesetzt ist.}%
+  \entry{\Option{nonfloat}}{%
+    Es wird nicht nur ein neuer Verzeichnistyp definiert, sondern auch eine
+    nicht gleitende Umgebungen \Environment{\PName{Eintragstyp}-} (siehe
+    Option \Option{type}), die ähnlich wie eine Gleitumgebung verwendet werden
+    kann, jedoch nicht gleitet und auch nicht die Grenzen der aktuell gültigen
+    Umgebung durchbricht.}%
+  \entry{\OptionVName{owner}{Besitzer}}{%
+    Jedes neue Verzeichnis hat bei \Package{tocbasic} einen Besitzer (siehe
+    \autoref{sec:tocbasic.basics}). Dieser kann hier angegeben werden. Ist
+    kein Besitzer angegeben, so wird der Besitzer »\PValue{float}« verwendet,
+    den auch die \KOMAScript-Klassen für das Abbildungs- und das
+    Tabellenverzeichnis verwenden.}%
+  \entry{\OptionVName{setup}{Liste von Eigenschaften}}{%
+    \ChangedAt{v3.25}{\Package{tocbasic}}%
+    Die \PName{Liste von Eigenschaften} wird via
+    \DescRef{\LabelBase.cmd.setuptoc} gesetzt. Es wird darauf hingewiesen,
+    dass für die Angabe mehrerer durch Komma getrennter Eigenschaften die
+    \PName{Liste von Eigenschaften} in geschweifte Klammern gesetzt werden
+    muss.%
+  }%
+  \entry{\OptionVName{tocentrystyle}{Eintragsstil}}{%
+    \ChangedAt{v3.20}{\Package{tocbasic}}%
+    \PName{Eintragsstil} gibt den Stil an, den Einträge in das entsprechende
+    Verzeichnis haben sollen. Der Name der Eintragsebene wird dabei über
+    Option \Option{type} bestimmt. Zusätzlich zu den Optionen dieser Tabelle
+    können auch alle Eigenschaften des Stils als Optionen angegeben werden,
+    indem die Namen der Eigenschaften mit dem Präfix \PValue{toc} ergänzt
+    werden. So kann der nummerische Wert der Ebene beispielsweise als
+    \Option{tocentrylevel} angegeben werden. Näheres zu den Stilen ist
+    \autoref{sec:tocbasic.tocstyle} ab \autopageref{sec:tocbasic.tocstyle} zu
+    entnehmen.}%
+  \entry{\OptionVName{tocentry\PName{Stiloption}}{Wert}}{%
+    \ChangedAt[2015/12]{v3.20}{\Package{tocbasic}}%
+    Weitere Optionen in Abhängigkeit vom via \Option{tocentrystyle} gewählten
+    \PName{Eintragsstil}. Siehe dazu \autoref{sec:tocbasic.tocstyle} ab
+    \autopageref{sec:tocbasic.tocstyle}. Für die von \Package{tocbasic}
+    vordefinierten Verzeichniseintragsstile finden sich die als
+    \PName{Stiloption} verwendbaren Attribute in
+    \autoref{tab:tocbasic.tocstyle.attributes}, ab
+    \autopageref{tab:tocbasic.tocstyle.attributes}.%
+  }%
+  \entry{\OptionVName{type}{Eintragstyp}}{%
+    \PName{Eintragstyp} gibt den Typ der Einträge in das entsprechende
+    Verzeichnis an. Der Typ wird auch als Basisname für verschiedene Makros
+    und gegebenenfalls Umgebungen und Zähler verwendet. Er sollte daher nur
+    aus Buchstaben bestehen. Wird diese Option nicht verwendet, so wird für
+    \PName{Eintragstyp} die \PName{Dateierweiterung} aus dem obligatorischen
+    Argument verwendet.}%
+  \entry{\OptionVName{types}{Mehrzahl des Eintragstyps}}{%
+    An verschiedenen Stellen wird auch die Mehrzahlform des Eintragstyps
+    verwendet, beispielsweise um eine Anweisung \Macro{listof\PName{Mehrzahl
+        des Eintragstyps}} zu definieren. Wird diese Option nicht verwendet,
+    so wird als \PName{Mehrzahl des Eintragstyps} einfach
+    »\PName{Eintragstyp}s« verwendet.}%
+  \entry{\OptionVName{unset}{Liste von Eigenschaften}}{%
+    \ChangedAt{v3.25}{\Package{tocbasic}}%
+    Die \PName{Liste von Eigenschaften} wird via
+    \DescRef{\LabelBase.cmd.unsettoc} aufgehoben. Es wird darauf hingewiesen,
+    dass für die Angabe mehrerer durch Komma getrennter Eigenschaften die
+    \PName{Liste von Eigenschaften} in geschweifte Klammern gesetzt werden
+    muss.%
+  }%
+\end{desclist}
+
 \begin{Example}
   Das Beispiel aus \autoref{sec:tocbasic.example} kann mit Hilfe der neuen
   Anweisung deutlich verkürzt werden:
@@ -2428,197 +2601,21 @@ möglich. Siehe dazu \autoref{sec:tocbasic.tocstyle},
         \usekomafont{caption}\footnotesize
         \begin{tabularx}{\hsize}[t]{@{}l@{ }X@{}}
           \usekomafont{captionlabel}{Merksatz 1:} &
-          Erster Hauptsatz der Typografie \\
-        \end{tabularx}
-      }\\
+          Erster Hauptsatz der Typografie%\\
+        \end{tabularx}%
+      }%
+      \\
     \end{tabular}%
   \end{center}%
 \end{Example}%
-% Umbruchoptimierung: Tabelle verschoben.
-\begin{desclist}
-  \renewcommand*{\abovecaptionskipcorrection}{-\normalbaselineskip}%
-  \desccaption[{%
-    Optionen für die Anweisung \Macro{DeclareNewTOC}%
-    }]{%
-    Optionen für die Anweisung
-    \Macro{DeclareNewTOC}\ChangedAt{v3.06}{\Package{tocbasic}}%
-    \label{tab:tocbasic.DeclareNewTOC-options}%
-  }{%
-    Optionen für die Anweisung \Macro{DeclareNewTOC} (\emph{Fortsetzung})%
-  }%
-  \entry{\OptionVName{atbegin}{Code}\ChangedAt{v3.09}{\Package{tocbasic}}}{%
-    Falls eine neue Gleitumgebung oder nicht gleitende Umgebung definiert
-    wird, so wird \PName{Code} jeweils am Anfang dieser Umgebung ausgeführt.%
-  }%
-  \entry{\OptionVName{atend}{Code}\ChangedAt{v3.09}{\Package{tocbasic}}}{%
-    Falls eine neue Gleitumgebung oder nicht gleitende Umgebung definiert
-    wird, so wird \PName{Code} jeweils am Ende dieser Umgebung ausgeführt.%
-  }%
-  \entry{\OptionVName{counterwithin}{\LaTeX-Zähler}}{%
-    Falls eine neue Gleitumgebung oder eine nicht gleitende Umgebung definiert
-    wird, so wird für diese auch ein neuer Zähler
-    \Counter{\PName{Eintragstyp}} (siehe Option \Option{type})
-    angelegt. Dieser Zähler kann in gleicher Weise wie beispielsweise der
-    Zähler \Counter{figure} bei \Class{book}-Klassen von Zähler
-    \Counter{chapter} abhängt von einem \LaTeX-Zähler ahängig gemacht
-    werden.}%
-  \entry{\Option{float}}{%
-    Es wird nicht nur ein neuer Verzeichnistyp definiert, sondern auch
-    Gleitumgebungen \Environment{\PName{Eintragstyp}} (siehe Option
-    \Option{type}) und \Environment{\PName{Eintragstyp}*}
-    (vgl. \Environment{figure} und \Environment{figure*}).}%
-  \entry{\OptionVName{floatpos}{Gleitverhalten}}{%
-    Jede Gleitumgebung hat ein voreingestelltes \PName{Gleitverhalten}, das
-    über das optionale Argument der Gleitumgebung geändert werden kann. Mit
-    dieser Option wird das \PName{Gleitverhalten} für die optional erstellbare
-    Gleitumgebung (siehe Option \Option{float}) festgelegt. Die Syntax und
-    Semantik ist dabei mit der des optionalen Arguments für die Gleitumgebung
-    identisch. Wird die Option nicht verwendet, so ist das voreingestellte
-    Gleitverhalten \texttt{tbp}, also \emph{top}, \emph{bottom},
-    \emph{page}.}%
-  \entry{\OptionVName{floattype}{Gleittyp}}{%
-    Jede Gleitumgebung hat einen nummerischen Typ. Gleitumgebungen, bei denen
-    in diesem \PName{Gleittyp} nur unterschiedliche Bits gesetzt sind, können
-    sich gegenseitig überholen. Die Gleitumgebungen \Environment{figure} und
-    \Environment{table} haben normalerweise die Typen 1 und 2, können sich
-    also gegenseitig überholen. Es sind Typen von 1 bis 31 (alle Bits gesetzt,
-    kann also keinen anderen Typ überholen und von keinem anderen Typen
-    überholt werden) zulässig. Wird kein Typ angegeben, so wird mit 16 der
-    höchst mögliche Ein-Bit-Typ verwendet.}%
-  \entry{\Option{forcenames}}{%
-    Siehe Option \Option{name} und \Option{listname}.}%
-  \entry{\OptionVName{hang}{Einzug}}{%
-    \ChangedAt[2015/12]{v3.20}{\Package{tocbasic}}%
-    \ChangedAt[2015/12]{v3.21}{\Package{tocbasic}}%
-    Diese Option gilt seit \KOMAScript~3.20 als überholt. Die Breite der
-    Nummer des Verzeichniseintrags\index{Verzeichnis>Eintrag} ist nun
-    stattdessen als Eigenschaft in Abhängigkeit des Verzeichniseintragsstils
-    von Option \Option{tocentrystyle} anzugeben. Bei den Stilen von
-    \KOMAScript{} wäre das beispielsweise die Eigenschaft \PValue{numwidth}
-    und damit Option \Option{tocentrynumwidth}. Besitzt ein Stil diese
-    Eigenschaft, so wird sie von \Macro{DeclareNewTOC} mit 1,5\Unit{em}
-    voreingestellt. Diese Voreinstellung kann durch explizite Angabe von
-    \OptionVName{tocentrynumwidth}{Wert} leicht mit einem anderen
-    \PName{Wert} überschrieben werden. Für Abbildungen verwenden die
-    \KOMAScript-Klassen beispielsweise den \PName{Wert} \PValue{2.3em}.}%
-  \entry{\OptionVName{indent}{Einzug}}{%
-    \ChangedAt[2015/12]{v3.20}{\Package{tocbasic}}%
-    \ChangedAt[2015/12]{v3.21}{\Package{tocbasic}}%
-    Diese Option gilt seit \KOMAScript~3.20 als überholt. Der Einzug des
-    Verzeichniseintrags\index{Verzeichnis>Eintrag} von links ist nun
-    stattdessen als Eigenschaft in Abhängigkeit des Verzeichniseintragsstils
-    von Option \Option{tocentrystyle} anzugeben. Bei den Stilen von
-    \KOMAScript{} wäre das beispielsweise die Eigenschaft \PValue{indent} und
-    damit Option \Option{tocentryindent}. Besitzt ein Stil diese Eigenschaft,
-    so wird sie von \Macro{DeclareNewTOC} mit 1\Unit{em} voreingestellt. Diese
-    Voreinstellung kann durch explizite Angabe von
-    \OptionVName{tocentryindent}{Wert} leicht mit einem anderen \PName{Wert}
-    überschrieben werden. Für Abbildungen verwenden die \KOMAScript-Klassen
-    beispielsweise den \PName{Wert} \PValue{1.5em}.}%
-  \entry{\OptionVName{level}{Gliederungsebene}}{%
-    \ChangedAt[2015/12]{v3.20}{\Package{tocbasic}}%
-    \ChangedAt[2015/12]{v3.21}{\Package{tocbasic}}%
-    Diese Option gilt seit \KOMAScript~3.20 als überholt. Der nummerische Wert
-    der Ebene des Verzeichniseintrags\index{Verzeichnis>Eintrag} ist nun
-    stattdessen als Eigenschaft in Abhängigkeit des Verzeichniseintragsstils
-    von Option \Option{tocentrystyle} anzugeben. Nichts desto trotz haben alle
-    Stile die Eigenschaft \PValue{level} und damit Option
-    \Option{tocentrylevel}. Die Eigenschaft wird von \Macro{DeclareNewTOC} mit
-    1 voreingestellt. Diese Voreinstellung kann durch explizite Angabe von
-    \OptionVName{tocentrylevel}{Wert} leicht mit einem anderen \PName{Wert}
-    überschrieben werden.}%
-  \entry{\OptionVName{listname}{Verzeichnistitel}}{%
-    Jedes Verzeichnis hat eine Überschrift, die durch diese Option bestimmt
-    werden kann. Ist die Option nicht angegeben, so wird als Verzeichnistitel
-    »\texttt{List of \PName{Mehrzahl des Eintragstyps}}« (siehe Option
-    \PName{types}) verwendet, wobei das erste Zeichen der \PName{Mehrzahl des
-      Eintragstyps} in einen Großbuchstaben gewandelt wird. Es wird auch ein
-    Makro \Macro{list\PName{Eintragstyp}name} mit diesem Wert definiert, der
-    jederzeit geändert werden kann. Dieses Makro wird jedoch nur definiert,
-    wenn es nicht bereits definiert ist oder zusätzlich Option
-    \Option{forcenames} gesetzt ist.}%
-  \entry{\OptionVName{name}{Eintragsname}}{%
-    Sowohl als optionaler Präfix für die Einträge im Verzeichnis als auch für
-    die Beschriftung in einer Gleitumgebung (siehe Option \Option{float}) oder
-    einer nicht gleitenden Umgebung (siehe Option \Option{nonfloat}) wird ein
-    Name für einen Eintrag in das Verzeichnis benötigt. Ohne diese Option wird
-    als \PName{Eintragsname} der \PName{Eintragstyp} (siehe Option
-    \Option{type}) verwendet, bei dem das erste Zeichen in einen
-    Großbuchstaben gewandelt wird. Es wird auch ein Makro
-    \Macro{\PName{Eintragstyp}name} mit diesem Wert definiert, der jederzeit
-    geändert werden kann. Dieses Makro wird jedoch nur definiert, wenn es
-    nicht bereits definiert ist oder zusätzlich Option \Option{forcenames}
-    gesetzt ist.}%
-  \entry{\Option{nonfloat}}{%
-    Es wird nicht nur ein neuer Verzeichnistyp definiert, sondern auch eine
-    nicht gleitende Umgebungen \Environment{\PName{Eintragstyp}-} (siehe
-    Option \Option{type}), die ähnlich wie eine Gleitumgebung verwendet werden
-    kann, jedoch nicht gleitet und auch nicht die Grenzen der aktuell gültigen
-    Umgebung durchbricht.}%
-  \entry{\OptionVName{owner}{Besitzer}}{%
-    Jedes neue Verzeichnis hat bei \Package{tocbasic} einen Besitzer (siehe
-    \autoref{sec:tocbasic.basics}). Dieser kann hier angegeben werden. Ist
-    kein Besitzer angegeben, so wird der Besitzer »\PValue{float}« verwendet,
-    den auch die \KOMAScript-Klassen für das Abbildungs- und das
-    Tabellenverzeichnis verwenden.}%
-  \entry{\OptionVName{setup}{Liste von Eigenschaften}}{%
-    \ChangedAt{v3.25}{\Package{tocbasic}}%
-    Die \PName{Liste von Eigenschaften} wird via
-    \DescRef{\LabelBase.cmd.setuptoc} gesetzt. Es wird darauf hingewiesen,
-    dass für die Angabe mehrerer durch Komma getrennter Eigenschaften die
-    \PName{Liste von Eigenschaften} in geschweifte Klammern gesetzt werden
-    muss.%
-  }%
-  \entry{\OptionVName{tocentrystyle}{Eintragsstil}}{%
-    \ChangedAt{v3.20}{\Package{tocbasic}}%
-    \PName{Eintragsstil} gibt den Stil an, den Einträge in das entsprechende
-    Verzeichnis haben sollen. Der Name der Eintragsebene wird dabei über
-    Option \Option{type} bestimmt. Zusätzlich zu den Optionen dieser Tabelle
-    können auch alle Eigenschaften des Stils als Optionen angegeben werden,
-    indem die Namen der Eigenschaften mit dem Präfix \PValue{toc} ergänzt
-    werden. So kann der nummerische Wert der Ebene beispielsweise als
-    \Option{tocentrylevel} angegeben werden. Näheres zu den Stilen ist
-    \autoref{sec:tocbasic.tocstyle} ab \autopageref{sec:tocbasic.tocstyle} zu
-    entnehmen.}%
-  \entry{\OptionVName{tocentry\PName{Stiloption}}{Wert}}{%
-    \ChangedAt[2015/12]{v3.20}{\Package{tocbasic}}%
-    Weitere Optionen in Abhängigkeit vom via \Option{tocentrystyle} gewählten
-    \PName{Eintragsstil}. Siehe dazu \autoref{sec:tocbasic.tocstyle} ab
-    \autopageref{sec:tocbasic.tocstyle}. Für die von \Package{tocbasic}
-    vordefinierten Verzeichniseintragsstile finden sich die als
-    \PName{Stiloption} verwendbaren Attribute in
-    \autoref{tab:tocbasic.tocstyle.attributes}, ab
-    \autopageref{tab:tocbasic.tocstyle.attributes}.%
-  }%
-  \entry{\OptionVName{type}{Eintragstyp}}{%
-    \PName{Eintragstyp} gibt den Typ der Einträge in das entsprechende
-    Verzeichnis an. Der Typ wird auch als Basisname für verschiedene Makros
-    und gegebenenfalls Umgebungen und Zähler verwendet. Er sollte daher nur
-    aus Buchstaben bestehen. Wird diese Option nicht verwendet, so wird für
-    \PName{Eintragstyp} die \PName{Dateierweiterung} aus dem obligatorischen
-    Argument verwendet.}%
-  \entry{\OptionVName{types}{Mehrzahl des Eintragstyps}}{%
-    An verschiedenen Stellen wird auch die Mehrzahlform des Eintragstyps
-    verwendet, beispielsweise um eine Anweisung \Macro{listof\PName{Mehrzahl
-        des Eintragstyps}} zu definieren. Wird diese Option nicht verwendet,
-    so wird als \PName{Mehrzahl des Eintragstyps} einfach
-    »\PName{Eintragstyp}s« verwendet.}%
-  \entry{\OptionVName{unset}{Liste von Eigenschaften}}{%
-    \ChangedAt{v3.25}{\Package{tocbasic}}%
-    Die \PName{Liste von Eigenschaften} wird via
-    \DescRef{\LabelBase.cmd.unsettoc} aufgehoben. Es wird darauf hingewiesen,
-    dass für die Angabe mehrerer durch Komma getrennter Eigenschaften die
-    \PName{Liste von Eigenschaften} in geschweifte Klammern gesetzt werden
-    muss.%
-  }%
-\end{desclist}
 
-Benutzer von \Package{hyperref}\IndexPackage{hyperref} sollten Option
-\Option{listname} übrigens immer angeben. Anderenfalls kommt es in der Regel
-zu einer Fehlermeldung, weil \Package{hyperref} nicht mit dem
-\Macro{MakeUppercase} im Namen des Verzeichnisses zurecht kommt, das benötigt
-wird, um den ersten Buchstaben des Wert von \Option{types} in Großbuchstaben
-zu wandeln.%
+Benutzer von
+\Package{hyperref}\IndexPackage{hyperref}\important{\Package{hyperref}}
+sollten Option \Option{listname} übrigens immer angeben. Anderenfalls kommt es
+in der Regel zu einer Fehlermeldung, weil \Package{hyperref} nicht mit dem
+\Macro{MakeUppercase}\IndexCmd{MakeUppercase} im Namen des Verzeichnisses
+zurecht kommt, das benötigt wird, um den ersten Buchstaben des Wert von
+\Option{types} in Großbuchstaben zu wandeln.%
 \EndIndexGroup
 %
 \EndIndexGroup
@@ -2645,4 +2642,4 @@ zu wandeln.%
 %  LocalWords:  Verzeichniseintrags Säumniswert Überschriftenanweisung
 %  LocalWords:  Eintragstext Dateierweiterung Dateierweiterungen Paketautoren
 %  LocalWords:  Verzeichnisbefehle Verzeichnisdaten Schrifteinstellungen
-%  LocalWords:  Eintragsebenen
+%  LocalWords:  Eintragsebenen Platzierungsoptionen
