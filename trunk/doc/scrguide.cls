@@ -1979,7 +1979,7 @@
     refSentence,refSentenceL,refSentenceS,refSentenceN,rehead,
     RelaxFamilyKey,
     removereffields,renewcaptionname,
-    RedeclarePageStyleAlias,
+    RedeclarePageStyleAlias,RedeclareTOCStyleEntry,
     ReplaceInput,ReplacePackage,ResetPreventPackageFromLoading,
     rightbotmark,righttopmark,rightfirstmark,
     rohead,
