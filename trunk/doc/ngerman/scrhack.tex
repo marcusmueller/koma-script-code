@@ -60,13 +60,14 @@ mühsam, die Autoren der jeweiligen Pakete von einer Verbesserung zu
 überzeugen. Das betrifft auch Pakete, deren Entwicklung eingestellt
 wurde. Deshalb wurde das Paket \Package{scrhack} begonnen. Dieses Paket ändert
 Anweisungen und Definitionen anderer Pakete, damit sie besser mit
-\KOMAScript{} zusammenarbeiten.
+\KOMAScript{} zusammenarbeiten. Einige Änderungen sind auch bei
+Verwendung anderer Klassen nützlich.
 
 \section{Entwicklungsstand}
 \seclabel{draft}
 
 Obwohl das Paket bereits seit längerer Zeit Teil von \KOMAScript{} ist und
-auch bereits von vielen Anwendern genutzt wird, hat es auch ein Problem. Bei
+von vielen Anwendern genutzt wird, hat es auch ein Problem: Bei
 der Umdefinierung von Makros fremder Pakete ist es von der genauen Definition
 und Verwendung dieser Makros abhängig. Damit ist es gleichzeitig auch von
 bestimmten Versionen dieser Pakete abhängig. Wird eine unbekannte Version
@@ -155,10 +156,10 @@ Schriftgrößen erlaubt, kann dabei \Macro{@ptsize} natürlich auch zu einem
 Dezimalbruch expandieren.
 
 Eines\ChangedAt{v3.17}{\Package{scrhack}} der Pakete, die damit nicht zurecht
-kommen, ist das Paket
-\Package{setspace}\IndexPackage[indexmain]{setspace}. Darüber hinaus sind die
-von diesem Paket eingestellten Werte immer von der Grundschriftgröße abhängig,
-auch wenn die Einstellung im Kontext einer anderen Schriftgröße erfolgt. Paket
+kommen, ist das Paket \Package{setspace}\IndexPackage[indexmain]{setspace}%
+\important{\Package{setspace}}. Darüber hinaus sind die von diesem Paket
+eingestellten Werte immer von der Grundschriftgröße abhängig, auch wenn die
+Einstellung im Kontext einer anderen Schriftgröße erfolgt. Paket
 \Package{scrhack} löst beide Probleme, indem es die Einstellungen von
 \Macro{onehalfspacing} und \Macro{doublespacing} immer relativ zur aktuellen,
 tatsächlichen Schriftgröße vornimmt.
@@ -193,7 +194,8 @@ diesem Fall wird die Änderung durch \Package{scrhack} automatisch verhindert.
 \seclabel{lscape}
 
 Das\ChangedAt{v3.18}{\Package{scrhack}} Paket
-\Package{lscape}\IndexPackage[indexmain]{lscape} definiert eine Umgebung
+\Package{lscape}\IndexPackage[indexmain]{lscape}%
+\important{\Package{lscape}} definiert eine Umgebung
 \Environment{landscape}\IndexEnv{landscape}, um den Inhalt einer Seite aber
 nicht deren Kopf und Fuß quer zu setzen. Innerhalb dieser Umgebung wird
 \Length{textheight}\IndexLength{textheight} auf den Wert von
@@ -219,33 +221,54 @@ nachträgliche Zuweisung an Option \Option{lscape} mit
 hat, wenn sie während des Ladens von \Package{lscape} nicht \PValue{false}
 war.
 
-Im übrigens\textnote{Achtung!} wird \Package{lscape} auch von dem Paket
-\Package{pdflscape}\IndexPackage[indexmain]{pdflscape} verwendet, so dass
-\Package{scrhack} sich auch auf die Funktion dieses Pakets auswirkt.%
+Im übrigens wird \Package{lscape} auch von dem Paket
+\Package{pdflscape}\IndexPackage[indexmain]{pdflscape}%
+\important{\Package{pdflscape}} verwendet, so dass \Package{scrhack} sich auch
+auf die Funktion dieses Pakets auswirkt.%
 
 
 \section{Sonderfall \Package{nomencl}}
 \seclabel{nomencl}
 
 Eine\ChangedAt{v3.23}{\Package{scrhack}} Besonderheit stellt der Hack für das
-Paket \Package{nomencl}\IndexPackage[indexmain]{nomencl} dar. Dieser rüstet
-einerseits nach, dass der optionale Inhaltsverzeichniseintrag für die
-Nomenklatur Option \OptionValueRef{maincls}{toc}{indentunnumbered}
-beachtet. Quasi nebenbei werden aber auch gleich die Endungen \File{nlo} und
-\File{nls} über das Paket \Package{tocbasic} reserviert (siehe
+Paket
+\Package{nomencl}\IndexPackage[indexmain]{nomencl}\important{\Package{nomencl}}
+dar. Dieser rüstet einerseits nach, dass der optionale
+Inhaltsverzeichniseintrag für die Nomenklatur Option
+\OptionValueRef{maincls}{toc}{indentunnumbered} beachtet. Quasi nebenbei
+werden über das Paket \Package{tocbasic} auch gleich die Endungen \File{nlo}
+und \File{nls} für den Besitzer \PValue{nomencl} reserviert (siehe
 \DescRef{tocbasic.cmd.addtotoclist}, \autoref{sec:tocbasic.basics},
-\DescPageRef{tocbasic.cmd.addtotoclist}). Darüber hinaus können mit dem Hack
+\DescPageRef{tocbasic.cmd.addtotoclist}).
+
+Außerdem wird die Umgebung
+\Environment{thenomenclature}\IndexEnv{thenomenclature} so geändert,
+dass \DescRef{tocbasic.cmd.tocbasic@listhead}\IndexCmd{tocbasic@listhead} für
+die Überschrift verwendet wird (siehe \autoref{sec:tocbasic.internals},
+\DescPageRef{tocbasic.cmd.tocbasic@listhead}). Dadurch können mit dem Hack
 diverse Attribute für die Endung \File{nls} über
-\DescRef{tocbasic.cmd.setuptoc} gesetzt werden. So ist es beispielsweise
-möglich, mit
+\DescRef{tocbasic.cmd.setuptoc}\IndexCmd{setuptoc}%
+\important{\DescRef{tocbasic.cmd.setuptoc}} gesetzt werden. So ist es
+beispielsweise möglich, mit
 \DescRef{tocbasic.cmd.setuptoc}\PParameter{nls}\PParameter{numbered} die
 Nomenklatur nicht nur ins Inhaltsverzeichnis einzutragen sondern auch gleich
-zu nummerieren. Als weiterer Nebeneffekt erhält die Nomenklatur mit diesem
-Hack außerdem einen passenden Kolumnentitel, falls lebende Kolumnentitel
-beispielsweise durch Verwendung von Seitenstil
-\DescRef{maincls.pagestyle.headings} aktiviert wurden. All dies wird mit einem
-kleinen Patch der Umgebung \Environment{thenomenclature} erreicht.%
-%
+zu nummerieren. Näheres zu \DescRef{tocbasic.cmd.setuptoc} und den damit
+möglichen Einstellungen ist in \autoref{sec:tocbasic.toc}, ab
+\DescPageRef{tocbasic.cmd.setuptoc} zu finden.  Als kleiner aber wichtiger
+Nebeneffekt erhält die Nomenklatur mit diesem Patch außerdem einen passenden
+Kolumnentitel, falls lebende Kolumnentitel beispielsweise durch Verwendung von
+Seitenstil \DescRef{maincls.pagestyle.headings} aktiviert wurden.
+
+Dieser eher simple Patch ist damit ein Beispiel dafür, wie auch Pakete, die
+keine Gleitumgebungen definieren, Nutzen aus der Verwendung von
+\Package{tocbasic} ziehen könnten.  Falls diese Änderung jedoch nicht
+gewünscht wird oder Probleme verursacht, kann sie mit Option
+\OptionValue{nomencl}{false}\IndexOption[indexmain]{nomencl~=\PValue{false}}
+deaktiviert werden. Entscheidend\textnote{Achtung!} ist dabei die Einstellung
+der Option zum Zeitpunkt, zu dem \Package{nomencl} geladen wird! Spätere
+Änderungen der Option mit \DescRef{\LabelBase.cmd.KOMAoption} oder
+\DescRef{\LabelBase.cmd.KOMAoptions} haben also keinen Einfluss und führen zu
+einer entsprechenen Warnung.%
 \EndIndexGroup
 
 
