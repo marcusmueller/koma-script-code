@@ -227,7 +227,7 @@
     \addtolength{\@tempdimc}{1in}%
     \setheadwidth[-\@tempdimc]{paper}%
     % Entweder:
-    \hypersetup{colorlinks}% 
+    \hypersetup{colorlinks,citecolor=Green,linkcolor=Crimson,urlcolor=Blue}% 
     % oder:
 %    \hypersetup{pdfborderstyle={/S/U/W 1}}%
     \let\orig@maketitle\maketitle
