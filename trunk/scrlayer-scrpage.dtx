@@ -1,4 +1,4 @@
-% \CheckSum{2569}
+% \CheckSum{2584}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlayer-scrpage.dtx
@@ -1637,8 +1637,12 @@
           \string#1 to low.\MessageBreak
           At least \the\dimexpr \ht\z@+\dp\z@\relax\space needed,\MessageBreak
           but only \the#1 found.\MessageBreak
-          I'll enlarge \string#1, for further\MessageBreak
-          processing, but you should do this yourself,\MessageBreak
+          \ifsls@autoenlarge
+            I'll enlarge \string#1, for further\MessageBreak
+            processing, but you should do this yourself,\MessageBreak
+          \else
+            You should enlarge \string#1,\MessageBreak
+          \fi
           e.g.,
           \scr@ifundefinedorrelax{geometry}{%
             \scr@ifundefinedorrelax{typearea}{%
@@ -1661,19 +1665,23 @@
               in your preamble%
             \fi
           }%
-          .\MessageBreak
-          I'll also
-          \ifx #1\headheight decrease \string\topmargin
-          \else increase \string\footskip\fi
+          \ifsls@autoenlarge
+            .\MessageBreak
+            I'll also
+            \ifx #1\headheight decrease \string\topmargin
+            \else increase \string\footskip\fi
+          \fi
         }%
-        \@tempdima\dimexpr \ht\z@+\dp\z@\relax
-        \ifx #1\headheight
-          \global\advance\topmargin by \dimexpr #1-(\ht\z@+\dp\z@)\relax
-          \dp\z@\dimexpr \dp\z@+\ht\z@+\dp\z@-\headheight\relax
-        \else
-          \global\advance\footskip by \dimexpr \ht\z@+\dp\z@-#1\relax
+        \ifsls@autoenlarge
+          \@tempdima\dimexpr \ht\z@+\dp\z@\relax
+          \ifx #1\headheight
+            \global\advance\topmargin by \dimexpr #1-(\ht\z@+\dp\z@)\relax
+            \dp\z@\dimexpr \dp\z@+\ht\z@+\dp\z@-\headheight\relax
+          \else
+            \global\advance\footskip by \dimexpr \ht\z@+\dp\z@-#1\relax
+          \fi
+          \global#1\@tempdima
         \fi
-        \global#1\@tempdima
       \fi
       \usebox\z@
     \endgroup
@@ -1683,17 +1691,33 @@
 %    \end{macrocode}
 % \begin{option}{hmode}
 % Switch automatically to the horizontal mode before setting a page head or
-% page footer element
+% page footer element.
 %    \begin{macrocode}
 %<*options>
 \KOMA@ifkey{hmode}{sls@leavevmode}
-\scrlayer@AddCsToInterface{KV@KOMA.scrlayer-scrpage.sty@hmode}%
-\scrlayer@AddCsToInterface{KV@KOMA.scrlayer-scrpage.sty@hmode@default}%
+\scrlayer@AddCsToInterface{KV@KOMA.scrlayer-scrpage.sty@hmode}
+\scrlayer@AddCsToInterface{KV@KOMA.scrlayer-scrpage.sty@hmode@default}
 \scrlayer@AddCsToInterface{sls@leavevmode@linetrue}
 \scrlayer@AddCsToInterface{sls@leavevmode@linefalse}
 %</options>
 %    \end{macrocode}
-% \end{option}
+% \end{option}^^A hmode
+% \begin{option}{autoenlargeheadfoot}
+% \changes{v3.25}{2018/01/14}{new option}^^A
+% Automaticly enlarge vertical size of head or foot if the contents is to
+% large. This is the default.
+%    \begin{macrocode}
+%<*options>
+\KOMA@ifkey{autoenlargeheadfoot}{sls@autoenlarge}
+\KOMAExecuteOptions{autoenlargeheadfoot=true}
+\scrlayer@AddCsToInterface{KV@KOMA.scrlayer-scrpage.sty@autoenlargeheadfoot}
+\scrlayer@AddCsToInterface{%
+  KV@KOMA.scrlayer-scrpage.sty@autoenlargeheadfoot@default}
+\scrlayer@AddCsToInterface{sls@autoenlargetrue}
+\scrlayer@AddCsToInterface{sls@autoenlargefalse}
+%</options>
+%    \end{macrocode}
+% \end{option}^^A autoenlargeheadfoot
 % \end{macro}^^A \sls@secure@box
 % \end{macro}^^A \sls@@@deffoot
 % \end{macro}^^A \sls@@deffoot
