@@ -274,7 +274,8 @@
   \Option{manualmark}\important{\Option{manualmark}\\\Option{automark}} und
   \Option{automark} zwischen automatischen und manuellen Kolumnentiteln hin-
   und hergeschaltet werden. Dabei verwendet \Option{automark} bei Klassen mit
-  \DescRef{maincls.cmd.chapter}-Anweisung immer die Voreinstellung
+  \DescRef{maincls.cmd.chapter}-Anweisung immer die
+  Voreinstellung\textnote{Voreinstellung}
 \begin{lstcode}
   \automark[section]{chapter}
 \end{lstcode}
@@ -351,9 +352,12 @@
   \end{Declaration}
   Die \KOMAScript-Option versteht die Standardwerte für einfache Schalter, die
   in \autoref{tab:truefalseswitch} auf \autopageref{tab:truefalseswitch}
-  angegeben sind. Ist die Option aktiviert, so werden alle Elemente der
-  Seitenstile zusätzlich mit Maßlinien\Index{Masslinien=Maßlinien}
-  versehen. Dies kann während der Entwurfsphase manchmal nützlich sein.%
+  angegeben sind. Ist die Option aktiviert, so werden
+  \IfThisCommonLabelBase{scrlayer}{für die Entwurfsphase}{\unskip} alle
+  Elemente der Seitenstile zusätzlich mit
+  Maßlinien\Index{Masslinien=Maßlinien}
+  versehen. \IfThisCommonLabelBase{scrlayer}{\unskip}{Dies kann während der
+    Entwurfsphase manchmal nützlich sein.}%
   \IfThisCommonLabelBase{scrlayer-scrpage}{ %
     Falls diese Option global gesetzt wurde, die Maßlinien aber nicht
     gewünscht sind, kann die Option auch nur für das Paket deaktiviert werden,
@@ -412,14 +416,22 @@
     \hyperref[cha:scrlayer]{\Package{scrlayer}}%
   } beim Setzen von automatischen Kolumnentiteln verwendet wird.
 
-  Leider führt die von \LaTeX{} für derartigen Versalsatz\Index{Versalsatz}
-  vorgesehene Anweisung \Macro{MakeUppercase}\IndexCmd{MakeUppercase} zu einem
-  sehr unzureichenden Satz, da weder gesperrt noch ausgeglichen wird. Dies
-  liegt teilweise sicher daran, dass für typografisch korrekten Versalsatz
-  eine Glyphenanalyse notwendig ist, um die konkrete Form der Buchstaben und
-  ihrer Kombinationen in den Ausgleich der Sperrung einfließen zu lassen. Der
-  \KOMAScript-Autor empfiehlt daher, auf Versalsatz für die Kolumnentitel zu
-  verzichten. Dies ist normalerweise mit
+  \IfThisCommonLabelBase{scrlayer}{%
+    Aufgrund der mangelnden typografischen Qualität der primitiven Umwandlung
+    in Großbuchstaben (siehe die Erklärung zu
+    \DescRef{scrlayer-scrpage.option.markcase} auf
+    \DescPageRef{scrlayer-scrpage.option.markcase}) empfiehlt der
+    \KOMAScript-Autor den Verzicht auf Versalsatz.%
+  }{%
+    Leider führt die von \LaTeX{} für derartigen Versalsatz\Index{Versalsatz}
+    vorgesehene Anweisung \Macro{MakeUppercase}\IndexCmd{MakeUppercase} zu
+    einem sehr unzureichenden Satz, da weder gesperrt noch ausgeglichen
+    wird. Dies liegt teilweise sicher daran, dass für typografisch korrekten
+    Versalsatz eine Glyphenanalyse notwendig ist, um die konkrete Form der
+    Buchstaben und ihrer Kombinationen in den Ausgleich der Sperrung
+    einfließen zu lassen. Der \KOMAScript-Autor empfiehlt daher, auf
+    Versalsatz für die Kolumnentitel zu verzichten.%
+  } Dies ist normalerweise mit
   \OptionValue{markcase}{used}\important{\OptionValue{markcase}{used}}%
   \IndexOption[indexmain]{markcase~=used} möglich. Allerdings fügen einige
   Klassen selbst beispielsweise bei den Kolumnentitel für Verzeichnisse ein
@@ -663,15 +675,15 @@
 
   Allerdings\textnote{Achtung!} verwenden nicht alle Klassen in allen
   Gliederungsebenen eine solche Anweisung. %
-  \iftrue% Umbruchvarianten
-  Beispielsweise rufen die Standardklassen\textnote{\KOMAScript{}
-    vs. Standardklassen} \Macro{partmark} bei \Macro{part} nicht auf.%
-  \else%
-  So wird beispielsweise \Macro{partmark} von den
-  Standardklassen\textnote{\KOMAScript{} vs. Standardklassen} nie aufgerufen,
-  während die \KOMAScript-Klassen selbstverständlich auch \Macro{partmark}
-  unterstützen.%
-  \fi
+  \IfThisCommonLabelBase{scrlayer-scrpage}{% Umbruchvarianten
+    Beispielsweise rufen die Standardklassen\textnote{\KOMAScript{}
+      vs. Standardklassen} \Macro{partmark} bei \Macro{part} nicht auf.%
+  }{%
+    So wird beispielsweise \Macro{partmark} von den
+    Standardklassen\textnote{\KOMAScript{} vs. Standardklassen} nie
+    aufgerufen, während die \KOMAScript-Klassen selbstverständlich auch
+    \Macro{partmark} unterstützen.%
+  }
 
   Falls diese Anweisungen vom Anwender umdefiniert werden, sollte
   er\textnote{Achtung!} unbedingt darauf achten, vor dem Setzen der Nummer
@@ -976,32 +988,37 @@
   Standardklassen den linken Teil der Marke hingegen gar nicht erst.
 
   \TeX{} selbst kennt drei Möglichkeiten auf eine Marke zuzugreifen. Die
-  \Macro{botmark} ist die auf der zuletzt zusammengestellten Seite zuletzt
-  gültige Marke. Das entspricht der zuletzt gesetzten Marke der Seite. Wurde
-  auf der Seite keine Marke gesetzt, so entspricht es der zuletzt gesetzten
-  Marke auf den bereits ausgegebenen Seiten. Die \LaTeX-Anweisung
-  \DescRef{scrlayer.cmd.leftmark} verwendet genau diese Marke, gibt also den
-  linken Teil der letzten Marke der Seite aus. Dies entspricht auch genau
-  \Macro{leftbotmark}. Im Vergleich dazu gibt \Macro{rightbotmark} den rechten
-  Teil dieser Marke aus.
+  \Macro{botmark}\IndexCmd{botmark}\important{\Macro{botmark}} ist die auf der
+  zuletzt zusammengestellten Seite zuletzt gültige Marke. Das entspricht der
+  zuletzt gesetzten Marke der Seite. Wurde auf der Seite keine Marke gesetzt,
+  so entspricht es der zuletzt gesetzten Marke auf den bereits ausgegebenen
+  Seiten. Die \LaTeX-Anweisung \DescRef{scrlayer.cmd.leftmark} verwendet genau
+  diese Marke, gibt also den linken Teil der letzten Marke der Seite aus. Dies
+  entspricht auch genau \Macro{leftbotmark}\important{\Macro{leftbotmark}}. Im
+  Vergleich dazu gibt \Macro{rightbotmark}\important{\Macro{rightbotmark}} den
+  rechten Teil dieser Marke aus.
 
-  \Macro{firstmark} ist die erste Marke der zuletzt zusammengestellten
-  Seite. Das entspricht der ersten Marke, die auf der Seite gesetzt
-  wurde. Wurde auf der Seite keine Marke gesetzt, so entspricht es der zuletzt
-  gesetzten Marke auf den bereits ausgegebenen Seiten. Die \LaTeX-Anweisung
-  \DescRef{scrlayer.cmd.rightmark} verwendet genau diese Marke, gibt also den
-  rechten Teil der ersten Marke der Seite aus. Dies entspricht auch genau
-  \Macro{rightfirstmark}. Im Vergleich dazu gibt \Macro{leftfirstmark} den
-  linken Teil dieser Marke aus.
+  \Macro{firstmark}\IndexCmd{firstmark}\important{\Macro{firstmark}} ist die
+  erste Marke der zuletzt zusammengestellten Seite. Das entspricht der ersten
+  Marke, die auf der Seite gesetzt wurde. Wurde auf der Seite keine Marke
+  gesetzt, so entspricht es der zuletzt gesetzten Marke auf den bereits
+  ausgegebenen Seiten. Die \LaTeX-Anweisung \DescRef{scrlayer.cmd.rightmark}
+  verwendet genau diese Marke, gibt also den rechten Teil der ersten Marke der
+  Seite aus. Dies entspricht auch genau
+  \Macro{rightfirstmark}\important{\Macro{rightfirstmark}}. Im Vergleich dazu
+  gibt \Macro{leftfirstmark}\important{\Macro{leftfirstmark}} den linken Teil
+  dieser Marke aus.
 
-  \Macro{topmark} ist der Inhalt den \Macro{botmark} hatte, bevor die aktuelle
-  Seite zusammengestellt wurde. \LaTeX{} verwendet dies selbst nie. Trotzdem
-  bietet \IfThisCommonLabelBase{scrlayer}{%
+  \Macro{topmark}\IndexCmd{topmark}\important{\Macro{topmark}} ist der Inhalt
+  den \Macro{botmark} hatte, bevor die aktuelle Seite zusammengestellt
+  wurde. \LaTeX{} verwendet dies selbst nie. Trotzdem bietet
+  \IfThisCommonLabelBase{scrlayer}{%
     \Package{scrlayer}%
   }{%
     \hyperref[cha:scrlayer]{\Package{scrlayer}}%
-  } die Möglichkeit mit \Macro{lefttopmark} auf den
-  linken Teil dieser Marke und mit \Macro{righttopmark} auf den rechten Teil
+  } die Möglichkeit mit \Macro{lefttopmark}\important{\Macro{lefttopmark}} auf
+  den linken Teil dieser Marke und mit
+  \Macro{righttopmark}\important{\Macro{righttopmark}} auf den rechten Teil
   zuzugreifen.
 
   Es\textnote{Achtung!} ist zu beachten, dass der linke und rechte Teil der
@@ -1018,7 +1035,8 @@
   \Macro{rightfirstmark} auf der Seite einer Kapitelüberschrift immer einen
   leeren Wert zurück gibt, selbst wenn danach beispielsweise über
   \DescRef{scrlayer.cmd.sectionmark} oder indirekt über
-  \DescRef{maincls.cmd.section} ein neuer rechter Teil der Marke gesetzt
+  \DescRef{maincls.cmd.section} ein neuer rechter Teil
+  \IfThisCommonLabelBase{scrlayer-scrpage}{der Marke}{\unskip} gesetzt
   wurde.
 
   Bitte\textnote{Achtung!} beachten Sie, dass die Verwendung einer der hier
@@ -1034,10 +1052,12 @@
   oder den Vordergrund beschränkt werden, da alle Ebenen erst nach der
   Zusammenstellung der aktuellen Seite ausgegeben werden.
 
-  Näheres zum Mark-Mechanismus von \TeX{} ist beispielsweise
+  Näheres zum Mark-Mechanismus \iffree{von \TeX{}}{\unskip} ist beispielsweise
   \cite[Kapitel~23]{knuth:texbook} zu entnehmen. Das Thema ist dort als
-  absolutes Expertenwissen markiert. Sollte Sie obige Erklärung also eher
-  verwirrt haben, machen Sie sich bitte nichts daraus.%
+  absolutes Expertenwissen markiert.\IfThisCommonLabelBase{scrlayer}{
+    % Umbruchkorrektur
+    Sollte Sie obige Erklärung also eher
+  verwirrt haben, machen Sie sich bitte nichts daraus.}{}%
   \EndIndexGroup
 
 
