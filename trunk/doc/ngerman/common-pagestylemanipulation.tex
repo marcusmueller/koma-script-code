@@ -1,6 +1,6 @@
 % ======================================================================
 % common-pagestylemanipulation.tex
-% Copyright (c) Markus Kohm, 2013-2017
+% Copyright (c) Markus Kohm, 2013-2018
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -18,7 +18,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % common-pagestylemanipulation.tex
-% Copyright (c) Markus Kohm, 2013-2017
+% Copyright (c) Markus Kohm, 2013-2018
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -189,19 +189,20 @@
   \Macro{automark*}\important{\Macro{automark*}} liegt darin, dass
   \Macro{automark} alle vorherigen Befehle zum automatischen Setzen der Marken
   aufhebt, während die Stern-Version \Macro{automark*} lediglich die Aktionen
-  für die angegebenen Gliederungsebenen ändert. Man kann so auch relativ
-  komplexe Fälle abdecken.%
+  für die angegebenen Gliederungsebenen ändert.%
+  \IfThisCommonLabelBase{scrlayer-scrpage}{}{ Man kann so auch relativ
+    komplexe Fälle abdecken.}% Umbruchoptimierung
   \IfThisCommonLabelBase{scrlayer-scrpage}{\iftrue}{\csname
     iffalse\endcsname}%
-    \iffalse% Umbruchkorrekturtext
-    \iffree{}{\par
-      Das veraltete Paket
-      \Package{scrpage2}\IndexPackage{scrpage2}\important{\Package{scrpage2}}
-      kennt sowohl \Macro{manualmark} als auch \Macro{automark}, jedoch nicht
-      \Macro{automark*}. Daher sind die nachfolgenden Beispielen nicht
-      vollständig auf die Verwendung von \Package{scrpage2} übertragbar.%
-    }%
-    \fi
+  \iffalse% Umbruchkorrekturtext
+  \iffree{}{\par
+    Das veraltete Paket
+    \Package{scrpage2}\IndexPackage{scrpage2}\important{\Package{scrpage2}}
+    kennt sowohl \Macro{manualmark} als auch \Macro{automark}, jedoch nicht
+    \Macro{automark*}. Daher sind die nachfolgenden Beispielen nicht
+    vollständig auf die Verwendung von \Package{scrpage2} übertragbar.%
+  }%
+  \fi
     % 
     \begin{Example}
       \phantomsection\xmpllabel{mark}%
@@ -276,20 +277,31 @@
   und hergeschaltet werden. Dabei verwendet \Option{automark} bei Klassen mit
   \DescRef{maincls.cmd.chapter}-Anweisung immer die
   Voreinstellung\textnote{Voreinstellung}
+  \IfThisCommonLabelBase{scrlayer-scrpage}{\iftrue}{\csname
+    iffalse\endcsname}%
+    \lstinline|\automark[section]{chapter}| und bei anderen Klassen
+    \lstinline|\automark[subsection]{section}|.
+  \else
 \begin{lstcode}
   \automark[section]{chapter}
 \end{lstcode}
-  und bei anderen Klassen
+  und bei anderen Klassen:
 \begin{lstcode}
   \automark[subsection]{section}
 \end{lstcode}
+  \fi
 
-  Im einseitigen Modus\textnote{einseitiger Satz} will man in der Regel nicht,
-  dass die untergeordnete Ebene die rechte Marke beeinflusst. Stattdessen soll
-  auch mit der Voreinstellung nur die höhere Ebene, die beispielsweise im
-  doppelseitigen Modus in der Voreinstellung alleine die linke Marke
-  beeinflusst, den Kolumnentitel aller Seiten vorgeben. Diese Voreinstellung
-  entspricht einer aktiven Option
+  \IfThisCommonLabelBase{scrlayer-scrpage}{%
+    Im einseitigen Modus\textnote{einseitiger Satz} will man in der Regel,
+    dass nur die höheren Ebenen den Kolumnentitel vorgeben.%
+  }{%
+    Im einseitigen Modus\textnote{einseitiger Satz} will man in der Regel
+    nicht, dass die untergeordnete Ebene die rechte Marke
+    beeinflusst. Stattdessen soll auch mit der Voreinstellung nur die höhere
+    Ebene, die beispielsweise im doppelseitigen Modus in der Voreinstellung
+    alleine die linke Marke beeinflusst, den Kolumnentitel aller Seiten
+    vorgeben.%
+  } Diese Voreinstellung entspricht einer aktiven Option
   \Option{autooneside}\important{\Option{autooneside}}. Die Option versteht
   die Werte für einfache Schalter, die in \autoref{tab:truefalseswitch} auf
   \autopageref{tab:truefalseswitch} angegeben sind. Wird die Option
@@ -409,28 +421,26 @@
   \OptionValue{markcase}{upper}\important{\OptionValue{markcase}{upper}}%
   \IndexOption[indexmain]{markcase~=upper} an. Im Endeffekt führt das zu einer
   Umdefinierung von
-  \DescRef{scrlayer.cmd.MakeMarkcase}\IndexCmd[indexmain]{MakeMarkcase}, einer
-  Anweisung, die von \IfThisCommonLabelBase{scrlayer}{%
-    \Package{scrlayer}%
-  }{%
-    \hyperref[cha:scrlayer]{\Package{scrlayer}}%
-  } beim Setzen von automatischen Kolumnentiteln verwendet wird.
+  \DescRef{\ThisCommonLabelBase.cmd.MakeMarkcase}%
+  \IndexCmd[indexmain]{MakeMarkcase}.
 
   \IfThisCommonLabelBase{scrlayer}{%
     Aufgrund der mangelnden typografischen Qualität der primitiven Umwandlung
     in Großbuchstaben (siehe die Erklärung zu
-    \DescRef{scrlayer-scrpage.option.markcase} auf
-    \DescPageRef{scrlayer-scrpage.option.markcase}) empfiehlt der
+    \DescRef{scrlayer-scrpage.option.markcase} in
+    \autoref{sec:scrlayer-scrpage.pagestyle.content} auf
+    \autopageref{expl:scrlayer-scrpage.MakeUppercase}) empfiehlt der
     \KOMAScript-Autor den Verzicht auf Versalsatz.%
   }{%
-    Leider führt die von \LaTeX{} für derartigen Versalsatz\Index{Versalsatz}
-    vorgesehene Anweisung \Macro{MakeUppercase}\IndexCmd{MakeUppercase} zu
-    einem sehr unzureichenden Satz, da weder gesperrt noch ausgeglichen
-    wird. Dies liegt teilweise sicher daran, dass für typografisch korrekten
-    Versalsatz eine Glyphenanalyse notwendig ist, um die konkrete Form der
-    Buchstaben und ihrer Kombinationen in den Ausgleich der Sperrung
-    einfließen zu lassen. Der \KOMAScript-Autor empfiehlt daher, auf
-    Versalsatz für die Kolumnentitel zu verzichten.%
+    Leider\phantomsection\label{expl:\ThisCommonLabelBase.MakeUppercase}
+    führt die von \LaTeX{} für Versalsatz\Index{Versalsatz} vorgesehene
+    Anweisung \Macro{MakeUppercase}\IndexCmd{MakeUppercase} zu keinem guten
+    Ergebnis, da weder gesperrt noch ausgeglichen wird. Dies liegt teilweise
+    sicher daran, dass für typografisch korrekten Versalsatz eine
+    Glyphenanalyse notwendig ist, um die konkrete Form der Buchstaben\iffree{
+      und ihrer Kombinationen}{} in den Ausgleich der Sperrung einfließen zu
+    lassen. Der \KOMAScript-Autor empfiehlt daher, auf Versalsatz für die
+    Kolumnentitel zu verzichten.%
   } Dies ist normalerweise mit
   \OptionValue{markcase}{used}\important{\OptionValue{markcase}{used}}%
   \IndexOption[indexmain]{markcase~=used} möglich. Allerdings fügen einige
@@ -599,18 +609,25 @@
     selbst ausprobieren und dabei den Fuß der ersten Seite beobachten.%
   \fi
 
-  Sollten die hier vorgestellten Möglichkeiten für Marken einmal nicht
-  ausreichen, so sind für fortgeschrittene Anwender ab
-  \IfThisCommonLabelBase{scrlayer-scrpage}{%
-    \DescPageRef{scrlayer-scrpage-experts.cmd.righttopmark}}{%
-    \DescPageRef{\ThisCommonLabelBase.cmd.righttopmark}} weitere
-  Anweisungen dokumentiert.%
+  \IfThisCommonLabelBase{scrlayer-scrpage}{% Umbruchvarianten
+    Fortgeschrittene Anwender finden ab
+    \IfThisCommonLabelBase{scrlayer-scrpage}{%
+      \DescPageRef{scrlayer-scrpage-experts.cmd.righttopmark}}{%
+      \DescPageRef{\ThisCommonLabelBase.cmd.righttopmark}} weitere
+    Marken-Anweisungen.%
+  }{%
+    Sollten die hier vorgestellten Möglichkeiten für Marken einmal nicht
+    ausreichen, so sind für fortgeschrittene Anwender ab
+    \IfThisCommonLabelBase{scrlayer-scrpage}{%
+      \DescPageRef{scrlayer-scrpage-experts.cmd.righttopmark}}{%
+      \DescPageRef{\ThisCommonLabelBase.cmd.righttopmark}} weitere Anweisungen
+    dokumentiert.%
+  }%
   \iffalse% Umbruchkorrektur
-  \ Beispielsweise ist für lexikonartige Dokumente das
-  dort erklärte \DescRef{scrlayer-scrpage-experts.cmd.leftfirstmark} und
+  \ Beispielsweise ist für lexikonartige Dokumente das dort erklärte
+  \DescRef{scrlayer-scrpage-experts.cmd.leftfirstmark} und
   \DescRef{scrlayer-scrpage-experts.cmd.rightbotmark} recht nützlich.%
-  \fi
-  \EndIndexGroup
+  \fi \EndIndexGroup
 
 
   \begin{Declaration}
