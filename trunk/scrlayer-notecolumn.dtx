@@ -1,4 +1,4 @@
-% \CheckSum{1715}
+% \CheckSum{1740}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlayer-notecolumn.dtx
@@ -720,21 +720,36 @@
     \immediate\openout\tf@slnc\jobname.slnc
   }%
 }
+%    \end{macrocode}
+% After reading the main \File{aux}-file at |\end{document}|, we again
+% calculate the md5 checksum of the \File{slnc}-file. If it has been changed
+% we set |\if@tempswa| to |\iftrue| to provocate a rerun message.
+% \changes{v0.1.2872}{2018/01/17}{usage of Lua function
+%   \texttt{slncmdfivesum}}^^A
+%    \begin{macrocode}
 \AfterReadingMainAux{%
   \immediate\closeout\tf@slnc
-  \scr@ifundefinedorrelax{pdfmdfivesum}{%
-    \PackageWarningNoLine{scrlayer-notecolumn}{%
-      \string\pdfmdfivesum\space unavailable.\MessageBreak
-      The package needs \string\pdfmdfivesum\space to test\MessageBreak
-      whether or not one more LaTeX run will\MessageBreak
-      be needed to make the note columns\MessageBreak
-      right. If this command is unavailable\MessageBreak
-      you have to do the decision without\MessageBreak
-      this help of the package.%
-    }%
-  }{%
-    \begingroup
+  \begingroup
+    \scr@ifundefinedorrelax{pdfmdfivesum}{%
+      \ifdefined\directlua
+        \edef\reserved@a{\directlua{slncmdfivesum("\jobname.slnc")}}%
+      \else
+        \let\reserved@a\relax  
+      \fi
+    }{%
       \edef\reserved@a{\pdfmdfivesum file {\jobname.slnc}}%
+    }%
+    \ifx\reserved@a\relax
+      \PackageWarningNoLine{scrlayer-notecolumn}{%
+        \string\pdfmdfivesum\space unavailable.\MessageBreak
+        The package needs \string\pdfmdfivesum\space or LuaTeX\MessageBreak
+        to test whether or not one more LaTeX run\MessageBreak
+        will be needed to make the note columns\MessageBreak
+        right. If this command is unavailable\MessageBreak
+        you have to do the decision without\MessageBreak
+        this help of the package%
+      }%
+    \else
       \ifx \slnc@mdfivesum\reserved@a
 %<*trace>
         \PackageInfo{scrlayer-notecolumn}{%
@@ -747,14 +762,14 @@
           MD5 of slnc-file changed.\MessageBreak
           Last: \slnc@mdfivesum\MessageBreak
           New: \space \reserved@a\MessageBreak
-          At least one more LaTeX rerun need to\MessageBreak
+          At least one more LaTeX rerun needed to\MessageBreak
           make note columns right%
         }%
 %</trace>
         \aftergroup\@tempswatrue
       \fi
-    \endgroup
-  }%
+    \fi
+  \endgroup
 }
 %</body>
 %    \end{macrocode}
@@ -873,7 +888,7 @@
           }%
         \else
           \ifnum ##2<\value{slncpage}\relax
-            \PackageWarning{scrlayer-notecolumn}{note of type `#1' delayed.}%
+            \PackageWarning{scrlayer-notecolumn}{note of type `#1' delayed}%
           \fi
           \boxmaxdepth\maxdepth
           \expandafter\setbox\csname slnc@#1@box\endcsname\vbox{%
@@ -1104,7 +1119,7 @@
               \PackageWarning{scrlayer-notecolumn}{%
                 column `\reserved@b' undefined.\MessageBreak
                 You should declare the column before the usage.\MessageBreak
-                Notes will be lost
+                Notes will be lost%
               }%
             }{%
               \expandafter\g@addto@macro
@@ -1161,6 +1176,8 @@
 % \begin{macro}{\slnc@file}
 % The input file with the unprocessed notes.
 % \begin{macro}{\slnc@mdfivesum}
+% \changes{v0.1.2872}{2018/01/17}{definition and usage of Lua function
+%   \texttt{slncmdfivesum}}^^A
 % The MD5 sum of the file before opening it for reading.
 %    \begin{macrocode}
 %<*body>
@@ -1168,14 +1185,30 @@
   \let\slnc@mdfivesum\@empty
 }
 \scrlayerAddToInterface\slnc@file{%
-  \scr@ifundefinedorrelax{pdfmdfivesum}{}{%
+  \scr@ifundefinedorrelax{pdfmdfivesum}{%
+    \ifdefined\directlua
+      \directlua{%
+        function slncmdfivesum(filename)
+          local fh = io.open(filename,"rb")
+          if fh then
+            local sum=md5.sumhexa(fh:read("*a"))
+            tex.sprint(sum)
+            fh:close()
+          end
+        end
+      }%
+      \xdef\slnc@mdfivesum{\directlua{slncmdfivesum("\jobname.slnc")}}%
+    \fi
+  }{%
     \xdef\slnc@mdfivesum{\pdfmdfivesum file {\jobname.slnc}}%
+  }%
 %<*trace>
+  \scr@ifundefinedorrelax{slnc@mdfivesum}{}{%
     \PackageInfo{scrlayer-notecolumn}{%
       MD5 of last `\jobname.slnc':\MessageBreak
       \slnc@mdfivesum}%
-%</trace>
   }%
+%</trace>
   \newread\slnc@file
   \immediate\openin\slnc@file \jobname.slnc
   \scrlayerOnAutoRemoveInterface{\immediate\closeout\slnc@file}%
