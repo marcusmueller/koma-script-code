@@ -1,6 +1,6 @@
 % ======================================================================
 % scrguide.cls
-% Copyright (c) Markus Kohm, 2005-2017
+% Copyright (c) Markus Kohm, 2005-2018
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -18,7 +18,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrguide.cls
-% Copyright (c) Markus Kohm, 2005-2017
+% Copyright (c) Markus Kohm, 2005-2018
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -1879,9 +1879,11 @@
 \lstdefinestyle{code}{%
   language=[LaTeX]TeX,%
   moretexcs={%
-    @auxout, @currext, @dottedtocline, @empty, @float, @ifpackagelater,
+    @auxout,@currext,@dottedtocline,@empty,@float,@hangfrom,@ifpackagelater,
     @ifundefined,
-    @rightmark, @secondoftwo, @tempswafalse,@tempswatrue, @undefined,
+    @rightmark,@secondoftwo,
+    @tempskipa,@tempdima,@tempswafalse,@tempswatrue,
+    @undefined,
     AtBeginDocument,AtEndDocument, appendix, ClassWarningNoLine,CurrentOption,
     color,colorbox,
     DeclareOption,DeclareRobustCommand,dimexpr,end@float,ExecuteOptions,
@@ -1920,6 +1922,7 @@
     blinddocument,blindtext,Blinddocument,Blindtext,
     cc,captionabove,captionaboveof,captionbelow,captionbelowof,captionformat,
     captionof,cefoot,cfoot,chapapp, chapappifchapterprefix,
+    chapterheadstartvskip,chapterheadmidvskip,chapterheadendvskip,
     chapter,chapterlinesformat,chapterlineswithprefixformat,
     chapterformat,chaptermarkformat,chapternumdepth,chaptertocdepth,
     chapterpagestyle,chead,
@@ -1969,11 +1972,14 @@
     paragraphnumdepth,paragraphtocdepth,
     subparagraphnumdepth,subparagraphtocdepth,
     parellipsis,parformat,parname,parshortname,
-    part,partformat,partname,partnumdepth,partpagestyle,partnumdepth,
+    part,partformat,partlineswithprefixformat,
+    partname,partnumdepth,partpagestyle,partnumdepth,
+    partheadstartvskip,partheadmidvskip,partheadendvskip,
     pnumfont,
     PreventPackageFromLoading,providecaptionname,publishers,ps,
     putLL,putLR,putUL,putUR,putC,
-    raggedcaption,raggedfootnote,raggedsection,raggedpart,raggedsignature,
+    raggedcaption,raggedchapter,raggedfootnote,raggedsection,raggedpart,
+    raggedsignature,
     recalctypearea,
     refL,refS,refN,refoot,
     refParagraph,refParagraphN,refPar,refParL,refParS,refParN,
