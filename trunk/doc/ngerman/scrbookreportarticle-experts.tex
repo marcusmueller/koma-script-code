@@ -546,7 +546,7 @@ die folgenden Stile zur Verfügung:
 Bei der Definition eines Gliederungsbefehls wird ein gleichnamiges Element
 angelegt, falls es noch nicht existiert. Bei \PValue{chapter} und
 \PValue{part} werden ebenso Elemente für die Präfixzeile erzeugt. Die
-Schrifteinstellung der Elemente kan mit \DescRef{maincls.cmd.setkomafont} und
+Schrifteinstellung der Elemente kann mit \DescRef{maincls.cmd.setkomafont} und
 \DescRef{maincls.cmd.addtokomafont} (siehe \autoref{sec:maincls.textmarkup},
 \DescPageRef{maincls.cmd.setkomafont}) geändert werden.
 
@@ -875,7 +875,7 @@ Zu jeder Gliederungsanweisung gehört außerdem ein Zähler: \PName{Name}, der
 bei Bedarf von allen vier Befehlen mit \Macro{newcounter} neu angelegt
 wird. Dasselbe gilt für die Ausgabe des Zählers: \Macro{the\PName{Name}}, die
 Formatierung des Zählers: \Macro{\PName{Name}format}, die Anweisung zur
-Erstellung eines Kolumnentitels: \Macro{\PName{Name}mark}: die dabei
+Erstellung eines Kolumnentitels: \Macro{\PName{Name}mark}, die dabei
 verwendete Formatierung des Zählers: \Macro{\PName{Name}markformat}, die oben
 erwähnten Elemente: \FontElement{\PName{Name}} und gegebenenfalls
 \FontElement{\PName{Name}prefix}, die nummerische Gliederungsebene:
@@ -1652,7 +1652,6 @@ verhindern. \KOMAScript{} hilft hier lediglich mit entsprechend gesetztem
 \begin{lstcode}
   \makeatletter
   \renewcommand{\sectionlinesformat}[4]{%
-    \@tempswafalse
     \ifstr{#1}{section}{%
       \hspace*{#2}%
       \colorbox{yellow}{%
@@ -1673,13 +1672,17 @@ verhindern. \KOMAScript{} hilft hier lediglich mit entsprechend gesetztem
   linken Rand gestellt, so wird dieser Bereich des Randes ebenfalls farbig
   hinterlegt. Durch Verschiebung der \Macro{hspace*}-Anweisung in die
   \Macro{colorbox} kann dieses Verhalten verändert werden.%
-  \iffalse% Umbruchkorrekturtext
+  \iffalse Umbruchkorrekturtext
   
   Erneut sei daran erinnert, dass \Macro{makeatletter} und \Macro{makeatother}
   nur in der Dokumentpräambel zu verwenden sind. In einer eigenen
   Wrapper-Klasse oder einem Paket haben sie zu entfallen. Sie werden auch nur
   wegen \Macro{@hangfrom} in der Definition von \Macro{sectionlinesformat}
   benötigt.%
+  \else%
+
+  \Macro{makeatletter} und \Macro{makeatother} werden in der Dokumentpräambel
+  erneut wegen \Macro{@hangfrom} benötigt.%
   \fi%
 \end{Example}
 
@@ -1723,7 +1726,7 @@ entnehmen.
 Da diese Anweisungen jedoch auch häufig von Paketen komplett neu definiert
 werden und dadurch die Funktion von \KOMAScript{} teilweise stark
 beeinträchtigt werden kann, wurden die genannten \LaTeX-Kern-Anweisungen nicht
-einfach nur umdefiniert, sondern es wurden zusätzliche die alternativen
+einfach nur umdefiniert, sondern es wurden zusätzlich die alternativen
 Anweisungen \Macro{SecDef} und \Macro{scr@startsection} definiert. Diese
 können von Paketautoren genau wie die \LaTeX-Kern-Anweisungen verwendet
 werden, bieten dann aber automatisch die erweiterte Funktionalität von
@@ -1782,18 +1785,18 @@ freigegeben.%
 Bei den {\KOMAScript}-Klassen gibt es innerhalb der Anweisung
 \DescRef{maincls.cmd.appendix}%
 \IndexCmd{appendix}\important{\DescRef{maincls.cmd.appendix}} eine
-Besonderheit. Ist nämlich \Macro{appendixmore} definiert, so wird diese
-Anweisung von \DescRef{maincls.cmd.appendix} ebenfalls ausgeführt. Intern wird
-das von den {\KOMAScript}-Klassen \Class{scrbook}\OnlyAt{\Class{scrbook}\and
+Besonderheit. Ist \Macro{appendixmore} definiert, so wird diese Anweisung von
+\DescRef{maincls.cmd.appendix} ebenfalls ausgeführt. Intern wird das von den
+{\KOMAScript}-Klassen \Class{scrbook}\OnlyAt{\Class{scrbook}\and
   \Class{scrreprt}} und \Class{scrreprt} für die Realisierung der Layoutoption
 \DescRef{maincls.option.appendixprefix} genutzt (siehe
 \autoref{sec:maincls.structure},
 \DescPageRef{maincls.option.appendixprefix}). Dies\textnote{Achtung!}  sollten
 Sie unbedingt beachten, falls Sie selbst das Makro \Macro{appendixmore}
-definieren oder umdefinieren wollen. Ist diese Option verwendet, so erhalten
-Sie bei \verb|\newcommand{\appendixmore}{|\dots\verb|}| eine Fehlermeldung.
-Dadurch soll verhindert werden, dass Sie die Optionen außer Kraft setzen, ohne
-es zu merken.
+definieren oder umdefinieren wollen. Ist diese Option bereits verwendet, so
+erhalten Sie bei \verb|\newcommand{\appendixmore}{|\dots\verb|}| eine
+Fehlermeldung.  Dadurch wird verhindert, dass Sie die Optionen außer
+Kraft setzen, ohne es zu merken.
 
 \begin{Example}
   Sie wollen nicht, dass bei Verwendung der Klasse \Class{scrbook} oder
@@ -1814,12 +1817,12 @@ es zu merken.
     \renewcommand*{\chaptermarkformat}{%
       \appendixname~\thechapter\autodot\enskip}}
 \end{lstcode}
-  Sollten Sie später dann doch noch entscheiden, dass Sie die Option
-  \DescRef{maincls.option.appendixprefix} verwenden wollen, so erhalten Sie
-  aufgrund der dann bereits definierten Anweisung \Macro{appendixmore} eine
-  Fehlermeldung. Damit wird verhindert, dass obige Definition
-  unbemerkt die Einstellungen überschreibt, die Sie per Option
-  getroffen haben.
+  Sollten Sie doch noch entscheiden, dass Sie die Option
+  \DescRef{maincls.option.appendixprefix} bei
+  \DescRef{maincls.cmd.documentclass} setzen wollen, so erhalten Sie aufgrund
+  der dann bereits definierten Anweisung \Macro{appendixmore} eine
+  Fehlermeldung. Damit wird verhindert, dass obige Definition unbemerkt die
+  Einstellungen überschreibt, die Sie per Option getroffen haben.
 
   Wenn Sie ein vergleichbares Verhalten des Anhangs für die Klasse
   \Class{scrartcl} erreichen wollen, so ist dies ebenfalls möglich. Schreiben
@@ -1899,7 +1902,7 @@ Definition des neuen Stils angegeben wurden. Daraus ergibt sich auch, dass
 jede der vier Anweisungen innerhalb von \PName{Anweisung} bei Bedarf
 keinesfalls mit \Macro{newcommand}, sondern mit
 \Macro{renewcommand}\IndexCmd{renewcommand}\important{\Macro{renewcommand}}
-definiert werden sollten.
+definiert werden sollte.
 
 Setzt der Anwender mit den Anweisungen
 \DescRef{maincls.cmd.AtEndBibliography}%\important[i]{\DescRef{maincls.cmd.AtEndBibliography}\\
@@ -1929,7 +1932,7 @@ Möglichkeiten der Vererbung verwenden und bei der Definition einen Elternstil
 mit angeben:
 % Umbruchkorrektur: listings korrigiert
 \begin{lstcode}
-  \newbibstyle{twocolumopenstyle}[openstyle]{%
+  \newbibstyle[openstyle]{twocolumopenstyle}{%
     \renewcommand*{\bib@beginhook}{\begin{multicols}{2}}%
     \renewcommand*{\bib@endhook}{\end{multicols}}}%
 \end{lstcode}
@@ -1973,4 +1976,4 @@ umdefiniert wird.%
 % LocalWords:  Kapitelüberschriften Gliederungsebenen Verzeichniseinträge
 % LocalWords:  Verzeichniseintragsstile Gliederungsbefehl Verzeichniseintrag
 % LocalWords:  Verzeichniseintrags Verzeichniseintragsstilen Gliederungsstil
-% LocalWords:  Gliederungsebene Eintragsebenen Absatzeinzug
+% LocalWords:  Gliederungsebene Eintragsebenen Absatzeinzug Dokumentpräambel
