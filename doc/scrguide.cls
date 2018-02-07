@@ -145,14 +145,8 @@
 \RequirePackage{multicol}
 \RequirePackage{marginnote}
 \RequirePackage{tabularx}
-\RequirePackage[svgnames]{xcolor}
-\RequirePackage{tocstyle}% hyperref needs xcolor with tocstyle
-\RequirePackage{tikz}
-\usetikzlibrary{calc}
-\RequirePackage[\uselanguage]{hyperref}
-\RequirePackage[open,openlevel=0]{bookmark}% improved pdf bookmarks
-\RequirePackage{scrhack}
-\RequirePackage{mparhack}
+\RequirePackage{scrhack}%
+\RequirePackage{mparhack}%
 %    \end{macrocode}
 %
 % \section{Dependence from \KOMAScript{} Version}
@@ -169,84 +163,88 @@
 %
 %    \begin{macrocode}
 \newif\ifshortversion\shortversionfalse
-\AtEndOfClass{%
-  \InputIfFileExists{scrnonfree.tex}{}{%
-    \typeout{^^J
-      ----------------------------------------------------------------------^^J
-      FREE VERSION OF THE KOMA-SCRIPT GUIDE.^^J
-      NOTE THAT THIS VERSION MAY BE FULL OF UGLY PARAGRAPH AND PAGE BREAKS.^^J
-      THIS IS BECAUSE THIS VERSION OF THE KOMA-SCRIPT GUIDE IS UNDER^^J
-      CONSTRUCTION FOREVER.^^J
-      ----------------------------------------------------------------------^^J
-      ^^J%
-    }%
-    \newcommand*{\iffree}{\@firstoftwo}%
-    \newcommand*{\important}[2][]{}%
-    \newcommand*{\textnote}[2][]{}%
-    \shortversiontrue
-    \newcommand*{\LoadNonFree}[2]{\par\GuideLoadNonFree\par}%
-    \AtBeginDocument{\InputIfFileExists{linkalias.tex}{}{}}%
-    \usepackage{lmodern}%
-    \@twosidefalse\@openrightfalse\@mparswitchfalse
-    \RequirePackage{geometry}%
-    \geometry{papersize={180mm,210mm},%
-      includehead,includemp,reversemp,marginparwidth=4em,%
-      vmargin={1.5mm,3mm},hmargin=1.75mm}%
-    \RequirePackage{scrlayer-scrpage}%
-    \clearpairofpagestyles
-    \ihead{%
-      \smash{%
-        \hspace*{.5em}\rule[-\dp\strutbox]{0pt}{\headheight}\headmark
-      }%
-    }%
-    \ohead*{\smash{\pagemark\hspace{2mm}}}%
-    \colorlet{headbackground}{DarkBlue}%
-    \colorlet{headline}{white}%
-    \setkomafont{pageheadfoot}{\small\sffamily\bfseries\color{headline}}%
-    \setkomafont{pagenumber}{}%
-    \DeclareNewLayer[head,background,
-      hoffset=0pt,
-      width=\paperwidth,
-      addheight=\dimexpr \topmargin+1in+\dp\strutbox\relax,
-      addvoffset=2\dp\strutbox,
-      contents={%
-        \color{headbackground}\rule{\layerwidth}{\layerheight}}]
-    {headbackground}%
-    \AddLayersAtBeginOfPageStyle{scrheadings}{headbackground}%
-    \renewcommand*{\chaptermark}[1]{%
-      \@mkdouble{\ifnumbered{chapter}{\chaptermarkformat}{}##1}%
-    }%
-    \renewcommand*{\chaptermarkformat}{%
-      \makebox[\dimexpr \oddsidemargin+1in-.5em][r]{%
-        \chapapp~\thechapter:~%
-      }%
-    }%
-    \renewcommand*{\chapterformat}{}%
-    \renewcommand*{\chapterpagestyle}{scrheadings}%
-    \setlength{\@tempdimc}{\oddsidemargin}%
-    \addtolength{\@tempdimc}{1in}%
-    \setheadwidth[-\@tempdimc]{paper}%
-    % Entweder:
-    \hypersetup{colorlinks,citecolor=Green,linkcolor=Crimson,urlcolor=Blue}% 
-    % oder:
-%    \hypersetup{pdfborderstyle={/S/U/W 1}}%
-    \let\orig@maketitle\maketitle
-    \def\maketitle{%
-      \begingroup
-        \@twosidetrue
-        \let\cleardoublepage\clearpage
-        \addtolength{\oddsidemargin}{\evensidemargin}%
-        \setlength{\evensidemargin}{.5\oddsidemargin}%
-        \setlength{\oddsidemargin}{\evensidemargin}%
-        \orig@maketitle\relax
-      \endgroup
-    }%
-    \renewcommand*{\chapterheadstartvskip}{}%
-    \raggedbottom
-    \sloppy
-    \lstset{breaklines,prebreak=\mbox{$\hookleftarrow$}}%
+\InputIfFileExists{scrnonfree.tex}{}{%
+  \RequirePackage[svgnames]{xcolor}%
+  \RequirePackage{tocstyle}% hyperref needs xcolor with tocstyle
+  \RequirePackage{tikz}%
+  \usetikzlibrary{calc}%
+  \RequirePackage[\uselanguage]{hyperref}%
+  \RequirePackage[open,openlevel=0]{bookmark}% improved pdf bookmarks
+  \typeout{^^J
+    ----------------------------------------------------------------------^^J
+    FREE VERSION OF THE KOMA-SCRIPT GUIDE.^^J
+    NOTE THAT THIS VERSION MAY BE FULL OF UGLY PARAGRAPH AND PAGE BREAKS.^^J
+    THIS IS BECAUSE THIS VERSION OF THE KOMA-SCRIPT GUIDE IS UNDER^^J
+    CONSTRUCTION FOREVER.^^J
+    ----------------------------------------------------------------------^^J
+    ^^J%
   }%
-}
+  \newcommand*{\iffree}{\@firstoftwo}%
+  \newcommand*{\important}[2][]{}%
+  \newcommand*{\textnote}[2][]{}%
+  \shortversiontrue
+  \newcommand*{\LoadNonFree}[2]{\par\GuideLoadNonFree\par}%
+  \AtBeginDocument{\InputIfFileExists{linkalias.tex}{}{}}%
+  \usepackage{lmodern}%
+  \@twosidefalse\@openrightfalse\@mparswitchfalse
+  \RequirePackage{geometry}%
+  \geometry{papersize={180mm,210mm},%
+    includehead,includemp,reversemp,marginparwidth=4em,%
+    vmargin={1.5mm,3mm},hmargin=1.75mm}%
+  \RequirePackage{scrlayer-scrpage}%
+  \clearpairofpagestyles
+  \ihead{%
+    \smash{%
+      \hspace*{.5em}\rule[-\dp\strutbox]{0pt}{\headheight}\headmark
+    }%
+  }%
+  \ohead*{\smash{\pagemark\hspace{2mm}}}%
+  \colorlet{headbackground}{DarkBlue}%
+  \colorlet{headline}{white}%
+  \setkomafont{pageheadfoot}{\small\sffamily\bfseries\color{headline}}%
+  \setkomafont{pagenumber}{}%
+  \DeclareNewLayer[head,background,
+    hoffset=0pt,
+    width=\paperwidth,
+    addheight=\dimexpr \topmargin+1in+\dp\strutbox\relax,
+    addvoffset=2\dp\strutbox,
+    contents={%
+      \color{headbackground}\rule{\layerwidth}{\layerheight}}]
+  {headbackground}%
+  \AddLayersAtBeginOfPageStyle{scrheadings}{headbackground}%
+  \renewcommand*{\chaptermark}[1]{%
+    \@mkdouble{\ifnumbered{chapter}{\chaptermarkformat}{}##1}%
+  }%
+  \renewcommand*{\chaptermarkformat}{%
+    \makebox[\dimexpr \oddsidemargin+1in-.5em][r]{%
+      \chapapp~\thechapter:~%
+    }%
+  }%
+  \renewcommand*{\chapterformat}{}%
+  \renewcommand*{\chapterpagestyle}{scrheadings}%
+  \setlength{\@tempdimc}{\oddsidemargin}%
+  \addtolength{\@tempdimc}{1in}%
+  \setheadwidth[-\@tempdimc]{paper}%
+  % Entweder:
+  \hypersetup{colorlinks,citecolor=Green,linkcolor=Crimson,urlcolor=Blue}% 
+  % oder:
+%    \hypersetup{pdfborderstyle={/S/U/W 1}}%
+  \let\orig@maketitle\maketitle
+  \def\maketitle{%
+    \begingroup
+      \@twosidetrue
+      \let\cleardoublepage\clearpage
+      \addtolength{\oddsidemargin}{\evensidemargin}%
+      \setlength{\evensidemargin}{.5\oddsidemargin}%
+      \setlength{\oddsidemargin}{\evensidemargin}%
+      \orig@maketitle\relax
+    \endgroup
+  }%
+  \renewcommand*{\chapterheadstartvskip}{}%
+  \raggedbottom
+  \sloppy
+  \lstset{breaklines,prebreak=\mbox{$\hookleftarrow$}}%
+}%
 %    \end{macrocode}
 %
 % Now loading the last package (better do it late than never):
@@ -2060,16 +2058,18 @@ KOMAScript \endcsname
 % We have to setup \textsf{hyperref}:
 %    \begin{macrocode}
 \AtBeginDocument{%
-  \hypersetup{%
-    plainpages=false,
-    pdftitle={\GuideTitle},
-    pdfauthor={Markus Kohm, Jens-Uwe Morawski},
-    pdfsubject={\GuideSubject},
-    pdfkeywords={\KOMAScript, scrbook, scrreprt, scrartcl, 
-      typearea, scrlfile,
-      scrpage, scrpage2, scrlettr, scrlttr2, scraddr, scrtime, scrdate},
-    pdfcreator={\KOMAScript, hyperref}
-  }%
+  \iffree{%
+    \hypersetup{%
+      plainpages=false,
+      pdftitle={\GuideTitle},
+      pdfauthor={Markus Kohm},
+      pdfsubject={\GuideSubject},
+      pdfkeywords={\KOMAScript, scrbook, scrreprt, scrartcl, 
+        typearea, scrlfile, scrlayer, scrlayer-scrpage, scrlayer-notecolumn,
+        scrletter, scrlttr2, scraddr, scrtime, scrdate, scrwfile},
+      pdfcreator={\KOMAScript, hyperref}
+    }%
+  }{}%
 }
 %    \end{macrocode}
 %
