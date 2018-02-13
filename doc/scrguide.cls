@@ -574,6 +574,14 @@
 % The \KOMAScript{} guide uses a lot of emphasizations. Most of them are
 % declared robustly to avoid problems at index, change log etc.
 %
+% We need some colors for emphasizing in images:
+%    \begin{macrocode}
+\colorlet{ImageRed}{Crimson}%
+\colorlet{ImageBlue}{Blue}%
+\colorlet{ImageGreen}{Green}%
+\colorlet{ImageYellow}{Yellow}%
+%    \end{macrocode}
+%
 % \begin{macro}{\textsfrm}
 %   Something like |\emph| using |\textsf| and |\textrm| instead of |\textit|
 %   and |\textup|.
