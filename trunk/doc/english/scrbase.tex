@@ -1,6 +1,6 @@
 % ======================================================================
 % scrbase.tex
-% Copyright (c) Markus Kohm, 2002-2017
+% Copyright (c) Markus Kohm, 2002-2018
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -18,7 +18,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrbase.tex
-% Copyright (c) Markus Kohm, 2002-2017
+% Copyright (c) Markus Kohm, 2002-2018
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -50,7 +50,7 @@
                   KOMA-Script package scrbase]
 \translator{Markus Kohm\and Melvin Hendrix}
 
-% Date of the translated German file: 2017-04-13
+% Date of the translated German file: 2018-02-16
 
 \chapter{Basic Functions of Package \Package{scrbase}}
 \labelbase{scrbase}
@@ -785,27 +785,25 @@ but define a \Macro{macro} with this
   \Macro{FamilyStringKey}\OParameter{family member}\Parameter{family}%
                          \Parameter{key}%
                          \OParameter{default}\Parameter{command}
+  \Macro{FamilyCSKey}\OParameter{family member}\Parameter{family}%
+                         \Parameter{key}%
+                         \OParameter{default}\Parameter{command name}
 \end{Declaration}
 This defines\ChangedAt{v3.08}{\Package{scrbase}} a \PName{key} that accepts
 every value. The value will be stored into the given \Macro{command}. If there
 is no optional argument for the \PName{default}, \Macro{FamilyStringKey} is
 the same as:
-\begin{quote}
-\DescRef{\LabelBase.cmd.DefineFamilyKey}\OParameter{family member}\Parameter{family}%
-\Parameter{key}\\
-\hphantom{\DescRef{\LabelBase.cmd.DefineFamilyKey}}%
-\PParameter{\Macro{def}\PName{command}\string{\#1\string}%
-\DescRef{\LabelBase.cmd.FamilyKeyStateProcessed}}.
-\end{quote}
+\begin{lstcode}[escapeinside=`']
+  \DefineFamilyKey[`\PName{family member}']{`\PName{family}'}{`\PName{key}'}
+                  {\def`\PName{command}'{#1}}
+\end{lstcode}
 If an optional argument \PName{default} is used, \Macro{FamilyStringKey}
 is the same as:
-\begin{quote}
-\DescRef{\LabelBase.cmd.DefineFamilyKey}\OParameter{family member}\Parameter{family}%
-\Parameter{key}\\
-\hphantom{\DescRef{\LabelBase.cmd.DefineFamilyKey}}%
-\OParameter{default}%
-\PParameter{\Macro{def}\PName{command}\string{\#1\string}}.
-\end{quote}
+\begin{lstcode}[escapeinside=`']
+  \DefineFamilyKey[`\PName{family member}']{`\PName{family}'}{`\PName{key}'}
+                  [`\PName{default}']
+                  {\def`\PName{command}'{#1}\FamilyKeyStateProcessed}
+\end{lstcode}
 If \PName{command} is not been defined, an empty macro will be defined.
 \begin{Example}
   By default an amount of 250\Unit{g} sausage salad should be produced. The
@@ -828,6 +826,11 @@ If \PName{command} is not been defined, an empty macro will be defined.
 In this case there are not unknown values because all values are simply used
 for a macro definition. Nevertheless, you should note that paragraph breaks
 at the value assignment to the key are not allowed.
+
+In contrast\ChangedAt{v3.25}{\Package{scrbase}} to \Macro{FamilyStringKey},
+command \Macro{FamilyCSKey} does not expect a command as last argument but
+only the name of a command, e.\,g., \PParameter{saladweight} instead of
+\PParameter{\Macro{saladweight}}.%
 %
 \EndIndexGroup
 
