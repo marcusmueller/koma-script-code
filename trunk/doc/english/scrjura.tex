@@ -1,6 +1,6 @@
 % ======================================================================
 % scrjura.tex
-% Copyright (c) Markus Kohm, 2011-2017
+% Copyright (c) Markus Kohm, 2011-2018
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -18,7 +18,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrjura.tex
-% Copyright (c) Markus Kohm, 2011-2017
+% Copyright (c) Markus Kohm, 2011-2018
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -51,7 +51,7 @@
 
 \translator{Alexander Willand\and Markus Kohm}
 
-% Date of the translated German file: 2017-05-08
+% Date of the translated German file: 2018-02-06
 
 \chapter{Support for the Law Office by \Package{scrjura}}
 \labelbase{scrjura}
@@ -434,8 +434,30 @@ by one or more delimiter(s). These are provided by
 \Macro{parformatseparation}, which currently consists of
 \Macro{nonbreakspace}, the non-breakable inter word distance.
 
+\BeginIndex{FontElement}{parnumber}\LabelFontElement{parnumber}%
+As a default, the paragraph number will be printed using the currently active
+font. However, you can change this default of element \FontElement{parnumber}
+using \DescRef{\LabelBase.cmd.setkomafont}%
+\important[i]{\DescRef{\LabelBase.cmd.setkomafont},
+  \DescRef{\LabelBase.cmd.addtokomafont}} and
+\DescRef{\LabelBase.cmd.addtokomafont} (see
+\autoref{sec:\LabelBase.textmarkup},
+\DescPageRef{\LabelBase.cmd.setkomafont}).%
+\EndIndex{FontElement}{parnumber}%
+
 Package\textnote{Attention!} \Package{scrjura} assumes internally, that
 \Macro{thepar} is an arabic number. Don't redefine!%
+\EndIndexGroup
+
+
+\begin{Declaration}
+  \Macro{withoutparnumber}
+\end{Declaration}
+If the paragraph number is not printed, \Package{scrjura} executes command
+\Macro{withoutparnumber} at the beginning if the new paragraph. The initial
+definition of this command is empty. This means, it is a kind of dummy
+command, that does nothing. It has been implemented because of a user
+request. General users can ignore this command.%
 \EndIndexGroup
 
 
@@ -740,31 +762,65 @@ they were added directly after \Macro{begin}\Parameter{name}. Correspondingly
 added directly before \Macro{end}\Parameter{name}. Without any \PName{options}
 the new environment behaves similiar to the \DescRef{\LabelBase.env.contract}
 environment, but with its own counters. It is possible to set \PName{options}
-in a comma separated list. Currently the following \PName{options} are
-supported:
-\begin{description}
-\item[\OptionVName{Clause}{instruction}:] Defines on which \PName{instruction}
-  inside the environment the command \DescRef{\LabelBase.cmd.Clause} is being
-  mapped. The \PName{instruction} expects exactly one argument. To use it
-  correctly, a deeper knowledge and understanding of the internal functions of
-  \Package{scrjura} is needed. Furthermore the requirements for
-  \PName{instruction} may change in future versions. It is recommended not to
-  use this option.%
-\item[\OptionVName{SubClause}{instruction}:] See explanation for
-  \Option{Clause} above.
-\item[\OptionVName{Sentence}{instruction}:] Defines on which
-  \PName{instruction} inside the environment the command
-  \DescRef{\LabelBase.cmd.Sentence} is being mapped. The \PName{instruction}
-  must not have an argument. Typically it should add one to the counter
-  \Counter{sentence}\IndexCounter{sentence} (using
-  \Macro{refstepcounter}\IndexCmd{refstepcounter}) and display it
-  somehow. Please avoid undesirable spaces.
-\item[\OptionVName{ClauseNumberFormat}{instruction}:] Formats the numbers of
-  clauses. Expects exactly one argument, the number of the clause. If the
-  \PName{instruction} implements a series of instructions and the number is
-  the last argument of a that series, you may directly use the series of
-  instructions as \PName{instruction}.
-\end{description}
+in a comma separated list. See
+\autoref{tab:\LabelBase.DeclareNewJuraEnvironment} for the currently supported
+\PName{options}.
+
+\begin{desclist}
+  \desccaption{Options provided by \Macro{DeclareNewJuraEnvironment} for new
+    contract environments\label{tab:\LabelBase.DeclareNewJuraEnvironment}}%
+  {Options of \Macro{DeclareNewJuraEnvironmante} (\emph{continued})}%
+  \entry{\OptionVName{Clause}{instruction}}{%
+    Defines on which \PName{instruction} inside the environment the command
+    \DescRef{\LabelBase.cmd.Clause} is being mapped. The \PName{instruction}
+    expects exactly one argument. To use it correctly, a deeper knowledge and
+    understanding of the internal functions of \Package{scrjura} is
+    needed. Furthermore the requirements for \PName{instruction} may change in
+    future versions. It is recommended not to use this option!%
+  }%
+  \entry{\OptionVName{ClauseFont}{instructions}}{%
+    \leavevmode\BeginIndex{FontElement}{\PName{Name}.Clause}%
+    \LabelFontElement{\PName{Name}.Clause}%
+    If this option is used, a new element
+    \FontElement{\PName{Name}.Clause}\IndexFontElement{\PName{Name}.Clause} is
+    defined using
+    \DescRef{maincls-experts.cmd.newkomafont}\IndexCmd{newkomafont} and
+    \PName{instructions} as the initial settings of the new element. If the
+    element has been an alias (see \DescRef{maincls-experts.cmd.aliaskomafont}
+    in \autoref{sec:maincls-experts.experts},
+    \DescPageRef{maincls-experts.cmd.aliaskomafont}), is becomes a standalone
+    element now. If it already has been a standalone element,
+    \DescRef{\LabelBase.cmd.setkomafont} is used to setup \PName{instructions}
+    a new font settings. Please note the limitations for font setting in
+    \autoref{sec:\LabelBase.textmarkup},
+    \DescPageRef{\LabelBase.cmd.setkomafont}!
+    \EndIndex{FontElement}{\PName{Name}.Clause}%
+  }%
+  \entry{\OptionVName{SubClause}{instruction}}{%
+    Defines on which \PName{instruction} inside the environment the command
+    \DescRef{\LabelBase.cmd.SubClause} is being mapped. The
+    \PName{instruction} expects exactly one argument. To use it correctly, a
+    deeper knowledge and understanding of the internal functions of
+    \Package{scrjura} is needed. Furthermore the requirements for
+    \PName{instruction} may change in future versions. It is recommended not
+    to use this option!%
+  }%
+  \entry{\OptionVName{Sentence}{instruction}}{%
+    Defines on which \PName{instruction} inside the environment the command
+    \DescRef{\LabelBase.cmd.Sentence} is being mapped. The \PName{instruction}
+    must not have an argument. Typically it should add one to the counter
+    \Counter{sentence}\IndexCounter{sentence} (using
+    \Macro{refstepcounter}\IndexCmd{refstepcounter}) and display it
+    somehow. Please avoid undesirable spaces!%
+  }%
+  \entry{\OptionVName{ClauseNumberFormat}{instruction}}{%
+    Formats the numbers of clauses. The \PName{instruction} should expect
+    exactly one argument: the number of the clause. If the \PName{instruction}
+    implements a series of instructions and the number is the last argument of
+    a that series, you may directly use the series of instructions as
+    \PName{instruction}.%
+  }
+\end{desclist}
 \begin{Example}
   To define the environment we mentioned in the preface of this section,
   for articles, it is sufficient to write:
