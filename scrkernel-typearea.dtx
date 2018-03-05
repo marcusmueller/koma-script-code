@@ -1,4 +1,4 @@
-%\CheckSum{2811}
+%\CheckSum{2851}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-typearea.dtx
@@ -1468,13 +1468,28 @@
 % We also need a macro to get one of the values stored at \cs{ta@divlist}
 % depending on the font size given by the real number argument. The real
 % number will be rounded to the nearest integer.
-%   \changes{v2.4g}{1996/11/04}{usage of the default value list} 
-%   \changes{v2.6}{2000/01/04}{usage of the extended list}^^A
-%   \changes{v2.8q}{2002/03/28}{respect option \Option{mpinclude}}^^A
-%   \changes{v2.96}{2006/08/11}{font size does not need to be an integer}^^A
+% \changes{v2.4g}{1996/11/04}{usage of the default value list} 
+% \changes{v2.6}{2000/01/04}{usage of the extended list}^^A
+% \changes{v2.8q}{2002/03/28}{respect option \Option{mpinclude}}^^A
+% \changes{v2.96}{2006/08/11}{font size does not need to be an integer}^^A
+% \changes{v3.25}{2018/03/05}{paper size test added}^^A
 %    \begin{macrocode}
 %<*package&typearea&body>
 \newcommand*{\ta@divfor}[1]{%
+  \ta@div=\z@
+  \expandafter\ifnum\scr@ta@v@is@ge{3.25}\relax
+    \ifnum \z@=\ifdim \paperwidth<207mm \z@\else\ifdim \paperwidth>213mm \z@
+               \else\ifdim \paperheight<294mm \z@\else
+               \ifdim \paperheight>300mm \z@\else \@ne\fi\fi\fi\fi
+      \PackageInfo{typearea}{%
+        With paper sizes other than (almost) `A4` there are\MessageBreak
+        no predefined DIV values. Using DIV calculation for\MessageBreak
+        good line width (unless using `version=3.24` or\MessageBreak
+        prior)%
+      }%
+      \ta@div=\tw@
+    \fi
+  \fi
   \if@mincl
     \PackageInfo{typearea}{%
       With option `mpinclude' there are no predefined\MessageBreak
@@ -1482,7 +1497,8 @@
       width%
     }%
     \ta@div=\tw@
-  \else
+  \fi
+  \ifnum \ta@div=\z@
     \xdef\@tempa{\ta@divlist{}}%
     \@tempdima=#1pt
     \addtolength{\@tempdima}{.5\p@}%
