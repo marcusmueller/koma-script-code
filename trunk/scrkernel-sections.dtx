@@ -1,4 +1,4 @@
-% \CheckSum{3954}
+% \CheckSum{3999}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -2172,26 +2172,54 @@
 % \end{macro}^^A \DeclareSectionCommand
 %
 % \begin{macro}{\DeclareNewSectionCommand}
-%   \changes{v3.15}{2014/11/21}{neue Anweisung}^^A
+% \changes{v3.15}{2014/11/21}{neue Anweisung}^^A
+% \changes{v3.25}{2018/03/10}{zusätzliche Tests und Fehlermeldungen bei
+%   \cs{the\dots}, \cs{\dots mark}, \cs{\dots format},
+%   \cs{\dots markformat}}^^A
 % Basierend auf |\DeclareSectionCommand| wird eine Gliederungsanweisung
 % definiert, die zuvor noch nicht existierte. Wichtig zu bemerken ist, dass
 % die ganzen Hilfsanweisungen bereits existieren dürfen.
 %    \begin{macrocode}
 \newcommand*{\DeclareNewSectionCommand}[2][]{%
   \@ifundefined{#2}{%
-    \DeclareSectionCommand[{#1}]{#2}%
+    \@tempswatrue
+    \let\reserved@b\@empty
+    \@for \reserved@a:=the#2,#2mark,#2format,#2markformat\do{%
+      \expandafter\scr@ifundefinedorrelax\expandafter{\reserved@a}{}{%
+        \@tempswafalse
+        \edef\reserved@b{\expandafter\string\csname \reserved@a\endcsname}%
+      }
+    }
+    \if@tempswa
+      \DeclareSectionCommand[{#1}]{#2}%
+    \else
+      \ClassError{\KOMAClassName}{%
+        command `\reserved@b` already defined%
+      }{%
+        You've tried to define the section command `\expandafter\string\csname
+        #2\endcsname` newly.\MessageBreak
+        Such a section command needs an additional new command
+        `\reserved@b`,\MessageBreak
+        but this already exists. So you cannot define
+        `\expandafter\string\csname #2\endcsname` newly.\MessageBreak
+        Maybe you should use one of \string\DeclareSectionCommand,
+        \string\RedeclareSectionCommand,\MessageBreak
+        or \string\ProvideSectionCommand.\MessageBreak
+        If you'll continue, the command will be ignored.%
+      }%
+    \fi
   }{%
     \ClassError{\KOMAClassName}{%
-      command `\expandafter\string\csname #1\endcsname` already defined%
+      command `\expandafter\string\csname #2\endcsname` already defined%
     }{%
       You've tried to define the section command `\expandafter\string\csname
-      #1\endcsname` newly,\MessageBreak
-      but a command, token, box or length with this name already
+      #2\endcsname` newly,\MessageBreak
+      but a command or something else with this name already
       exists.\MessageBreak
       Maybe you should use one of \string\DeclareSectionCommand,
       \string\RedeclareSectionCommand,\MessageBreak
       or \string\ProvideSectionCommand.\MessageBreak
-      If you'll continue, the command will be irgnored.%
+      If you'll continue, the command will be ignored.%
     }%
   }%
 }
@@ -2207,10 +2235,10 @@
 \newcommand*{\RedeclareSectionCommand}[2][]{%
   \@ifundefined{#2}{%
     \ClassError{\KOMAClassName}{%
-      command `\expandafter\string\csname #1\endcsname` not defined%
+      command `\expandafter\string\csname #2\endcsname` not defined%
     }{%
       You've tried to re-define the section command `\expandafter\string\csname
-      #1\endcsname`,\MessageBreak
+      #2\endcsname`,\MessageBreak
       but a command with this name does not exists.\MessageBreak
       Maybe you should use one of \string\DeclareSectionCommand,
       \string\DeclareNewSectionCommand,\MessageBreak
