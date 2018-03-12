@@ -5,8 +5,8 @@ E-Mail:         komascript at gmx info
 Abstract:       scrdoc is an internal LaTeX class of the KOMA-Script bundle.
                 It is an extension of ltxdoc.  KOMA-Script uses scrdoc for
                 the implementation documentation and the documentation of
-                packages, that aren't KOMA-Script core packages.  Currently
-                there isn't any user manual for this class, because the
+                packages that aren't KOMA-Script core packages.  Currently
+                there is no user manual for this class because the
                 only user is the KOMA-Script maintainer.
 Requires:       ltxdoc   - the LaTeX2e source documentation class
                 scrartcl - the KOMA-Script article class

@@ -3,26 +3,26 @@ scrlttr2 - versatile letter class with separation of text area and note paper
 Maintainer:     Markus Kohm
 E-Mail:         komascript at gmx info
 Abstract:       scrlttr2 is a letter class for LaTeX2e that allows
-                definition of several note papers and text area settings,
-                that are independent from the note paper.  So you may not
-                only use KOMA-Script package typearea to define the text
-                area and the margins of the text area, but even packages
-                like geometry.
+                definition of several letterheads and text area settings
+                that are independent from the letterhead. So you can use
+                not only the KOMA-Script package typearea but even packages
+                like geometry to define the text area and the margins.
 
-                The positions of the elements of the note paper may be
-                changed by so called pseudo lengths. This makes it not only
-                possible to adjust scrlttr2 to local conventions, norms and
-                paper sizes but also to a wanted corporate identity.
+                The positions of the elements of the letterhead can be
+                changed by so called pseudo-lengths. This makes it possible
+                to adjust scrlttr2 not only to local conventions and paper
+                sizes but also to a corporate brand identity.
 
-                Several predefined parameter sets, called letter class
-                option or lco-files, are for two German letters, Swiss
-                letters, US letters, Japanese letters, and French letters
-                are part of the KOMA-Script bundle.  More may be found on
-                CTAN or the KOMA-Script homepage as separate packages.
+                Several predefined sets of parameters, called
+                letter-class-option or lco files are part of the
+                KOMA-Script bundle: two German letters, Swiss letters, US
+                letters, Japanese letters, and French letters.  More can be
+                found on CTAN or the KOMA-Script homepage as separate
+                packages.
 
-                Additional lco-files for different note papers may be found
-                on the KOMA-Script homepage, e.g. one demonstration file
-                for a note paper similar to the one of the Washington State
+                Additional lco-files for different letterheads can be found
+                on the KOMA-Script homepage, e.g., one demonstration file
+                for a letterhead similar to that of Washington State
                 University.
 Requires:       scrkbase - internal KOMA-Script package
                 typearea - KOMA-Script package
