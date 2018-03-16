@@ -1,8 +1,8 @@
-% \CheckSum{881}
+% \CheckSum{878}
 % \iffalse meta-comment
 % ======================================================================
 % scrhack.dtx
-% Copyright (c) Markus Kohm, 2008-2017
+% Copyright (c) Markus Kohm, 2008-2018
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -23,7 +23,7 @@
 % of TeX would generate the implementation documentation.
 % ----------------------------------------------------------------------
 % scrhack.dtx
-% Copyright (c) Markus Kohm, 2008-2017
+% Copyright (c) Markus Kohm, 2008-2018
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -837,7 +837,19 @@ Note: If you want to use \Package{setspace} with package option
       \@ifundefined{ext@#1}{\float@error{#1}}{%
         \@ifundefined{l@#1}{\expandafter\let\csname l@#1\endcsname\l@figure
           \@ifundefined{l@#1}{%
-            \@namedef{l@#1}{\@dottedtocline{1}{1.5em}{2.3em}}}{}%
+%    \end{macrocode}
+% \changes{v3.25}{2018/03/16}{Verwendung von \cs{DeclareTOCStyleEntry}}^^A
+% Bis Version 3.24 wurde hier nun wie üblich |\l@#1| unter Verwendung von
+% \cs{@dottedtocline} definiert:
+% \begin{verbatim}
+%   \@namedef{l@#1}{\@dottedtocline{1}{1.5em}{2.3em}}%
+% \end{verbatim}
+% Da aber \Package{tocbasic} inzwischen diese schöne Schnittstelle für die
+% Verzeichniseinträge bietet, verwenden wir die hier nun auch:
+%    \begin{macrocode}
+            \DeclareTOCStyleEntry[level=1,numwidth=2.3em,indent=1.5em]
+            {default}{#1}%
+          }{}%
         }{}%
         \listoftoc[{#2}]{\csname ext@#1\endcsname}%
       }%
@@ -961,7 +973,17 @@ Note: If you want to use \Package{setspace} with package option
       {\expandafter\noexpand\csname #1name\endcsname\nobreakspace
         \expandafter\noexpand\csname the#1\endcsname}%
       \@namedef{the#1}{\arabic{#1}}\flnew@ext{lo#1}\@namedef{fps@#1}{tbp}%
-      \@namedef{l@#1}{\@dottedtocline{1}{1.5em}{2.3em}}%
+%    \end{macrocode}
+% \changes{v3.25}{2018/03/16}{Verwendung von \cs{DeclareTOCStyleEntry}}^^A
+% Bis Version 3.24 wurde hier nun wie üblich |\l@#1| unter Verwendung von
+% \cs{@dottedtocline} definiert:
+% \begin{verbatim}
+%   \@namedef{l@#1}{\@dottedtocline{1}{1.5em}{2.3em}}%
+% \end{verbatim}
+% Da aber \Package{tocbasic} inzwischen diese schöne Schnittstelle für die
+% Verzeichniseinträge bietet, verwenden wir die hier nun auch:
+%    \begin{macrocode}
+      \DeclareTOCStyleEntry[level=1,numwidth=2.3em,indent=1.5em]{default}{#1}%
       \caption@setkeys[floatrow]{newfloat}{#2}\let\FR@tmp=\relax
       \xdef\@tempa{\noexpand\flrow@types{\the\flrow@types \FR@tmp{#1}}}%
       \@tempa
@@ -975,7 +997,12 @@ Note: If you want to use \Package{setspace} with package option
       \@ifundefined{ext@#1}{\flrow@error{Unknown float style `#1'}}{%
         \@ifundefined{l@#1}{\expandafter\let\csname l@#1\endcsname\l@figure
           \@ifundefined{l@#1}{%
-            \@namedef{l@#1}{\@dottedtocline{1}{1.5em}{2.3em}}}{}%
+%    \end{macrocode}
+% Siehe die Anmerkung zur Verwendung von \cs{DeclareTOCStyleEntry} oben.
+%    \begin{macrocode}
+            \DeclareTOCStyleEntry[level=1,numwidth=2.3em,indent=1.5em]
+            {default}{#1}%
+          }{}%
         }{}%
         \listoftoc[{#2}]{\csname ext@#1\endcsname}%
       }%
