@@ -1,6 +1,6 @@
 % ======================================================================
 % scrlfile.tex
-% Copyright (c) Markus Kohm, 2001-2017
+% Copyright (c) Markus Kohm, 2001-2018
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -18,7 +18,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrlfile.tex
-% Copyright (c) Markus Kohm, 2001-2017
+% Copyright (c) Markus Kohm, 2001-2018
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -48,107 +48,103 @@
 \KOMAProvidesFile{scrlfile.tex}
                  [$Date$
                   KOMA-Script guide (chapter: scrlfile)]
-\translator{Gernot Hassenpflug\and Markus Kohm}
+\translator{Gernot Hassenpflug\and Markus Kohm\and Karl Hagen}
 
-% Date of the translated German file: 2017-01-02
+% Date of the translated German file: 2018-02-15
 
-\chapter{Control Package Dependencies with \Package{scrlfile}}
+\chapter{Controlling Package Dependencies with \Package{scrlfile}}
 \labelbase{scrlfile}
 \BeginIndexGroup
 \BeginIndex{Package}{scrlfile}
 
-The introduction of {\LaTeXe} in 1994 brought many changes in the
-handling of {\LaTeX} extensions.  Today the package author has many
-macros available to determine if another package or class is
-employed and whether specific options are used.  The author can load
-other packages or can specify options in the the case that the
-package is loaded later.  This has led to the expectation that the
-order in which package are loaded would not be important.  Sadly
-this hope has not been fulfilled.
+The introduction of \LaTeXe{} in 1994 brought many changes in the handling of
+\LaTeX{} extensions. The package author today has a whole series of macros
+available to determine if another package or class has been loaded and whether
+specific options are being used. The package author can even load other
+packages or specify certain options in case the package is loaded later. This
+has led to the expectation that the order in which package are loaded would
+not be important. Sadly, this hope has not been fulfilled.
 
 \section{About Package Dependencies}
 \seclabel{dependency}
+%\begin{Explain}
+More and more often, different packages either newly define or redefine the
+same macro. In such a case, the order in which a package is loaded becomes
+very important. Sometimes, users find it very difficult to understand the
+resulting behaviour. Sometimes it is necessary to react in a specific way when
+another package is loaded.
 
-More and more frequently, different packages either newly define or
-redefine the same macro again.  In such a case the order in which a
-package is loaded becomes very important.  For the user it sometimes
-becomes very difficult to understand the behaviour, and in some
-cases the user wants only to react to the loading of a package. This
-too is not really a simple matter.
+As a simple example, consider loading the \Package{longtable} package with a
+\KOMAScript{} document class. The \Package{longtable} package defines its own
+table captions. These are perfectly suited to the standard classes, but they
+do not match the default settings for \KOMAScript{} captions, nor do they
+react to the relevant configuration options. To solve this problem, the
+\Package{longtable} package commands which are responsible for the table
+captions need to be redefined. However, by the time the \Package{longtable}
+package is loaded, the \KOMAScript{} class has already been processed.
 
-Let us take the simple example of loading the package \Package{longtable} with
-a {\KOMAScript} document class.  The \Package{longtable} package defines table
-captions very well suited to the standard classes, but the captions are
-totally unsuitable for documents using {\KOMAScript} and also do not react to
-the options of the provided configuration commands.  In order to solve this
-problem, the \Package{longtable} package commands which are responsible for
-the table captions need to be redefined. However, by the time the
-\Package{longtable} package is loaded, the {\KOMAScript} class has already
-been processed.
+Previously, the only way to solve this problem was to delay the redefinition
+until the beginning of the document using \Macro{AtBeginDocument}. However, if
+users want to change the relevant commands themselves, they should do so in
+the preamble of the document. But this is impossible because \KOMAScript{}
+will overwrite the users' definitions at \Macro{begin}\PParameter{document}.
+They would also need to perform the redefinition with \Macro{AtBeginDocument}.
 
-Until the present, the only way for {\KOMAScript} to solve this problem was to
-delay the redefinition until the beginning of the document with help of the
-macro \Macro{AtBeginDocument}.  If the user wants to change the definitions
-too, it is recommended to do this in the preamble of the document.  However,
-this is impossible since later at \Macro{begin}\PParameter{document}
-{\KOMAScript} will again overwrite the user definition with its own.
-Therefore, the user too has to delay his definition with
-\Macro{AtBeginDocument}.
-  
-Actually, {\KOMAScript} should not need to delay the redefinition until
-\Macro{begin}\PParameter{document}.  It would be enough to delay exactly until
-the package \Package{longtable} has been loaded. Unfortunately, the {\LaTeX}
-kernel does not define appropriate commands. The package \Package{scrlfile}
-provides redress here.
-  
-Likewise, it might be conceivable that before a package is loaded one would
-like to save the definition of a macro in a help-macro, in order to restore
-its meaning after the package has been loaded. The package \Package{scrlfile}
-allows this, too.
-  
-The employment of \Package{scrlfile} is not limited to package dependencies
-only.  Even dependencies on any other file can be considered.  For example,
-the user can be warned if the not uncritical file \File{french.ldf} has been
-loaded.
-  
+But \KOMAScript{} does not actually need to wait for
+\Macro{begin}\PParameter{document} to redefine the macros. It would be
+sufficient to postpone the redefinition until after the \Package{longtable}
+package has been loaded. Unfortunately, the \LaTeX{} kernel does not define
+necessary commands. The \Package{scrlfile} package provides a remedy for this
+problem.
+
+It is also conceivable that you would like to save the definition of a macro
+in a temporary macro before a package is loaded and restore it after the
+package has been loaded. The \Package{scrlfile} package allows this, too.
+
+The use of \Package{scrlfile} is not limited to package dependencies.
+Dependencies can also be considered for any other file.  For example, you can
+ensure that loading the not unimportant file \File{french.ldf} automatically
+leads to a warning.
+
 Although the package is particularly of interest for package authors, there
-are of course applications for normal {\LaTeX} users, too.  Therefore, this
-chapter gives and explains examples for both groups of users.
+are also applications for normal \LaTeX{} users.  Therefore, this chapter
+gives examples for both groups.
+%\end{Explain}
 
 
-\section{Actions Prior to and After Loading}
+\section{Actions Before and After Loading}
 \seclabel{macros}
 
-\Package{scrlfile} can execute actions both before and after the
-loading of files. In the commands used to do this, distinctions are
-made made between general files, classes, and packages.
+The \Package{scrlfile} package can execute actions both before and after
+loading files. The commands used to do so distinguish between ordinary files,
+classes, and packages.
 
 \begin{Declaration}
-  \Macro{BeforeFile}\Parameter{file}\Parameter{instructions}%
-  \Macro{AfterFile}\Parameter{file}\Parameter{instructions}
+  \Macro{BeforeFile}\Parameter{file}\Parameter{commands}%
+  \Macro{AfterFile}\Parameter{file}\Parameter{commands}
 \end{Declaration}%
-The macro \Macro{BeforeFile} ensures that \PName{instructions} are
-only executed before the next time \PName{file} is loaded.
-\Macro{AfterFile} works in a similar fashion, and the
-\PName{instructions} will be executed only after the \PName{file} has
-been loaded.  If \PName{file} is never loaded then the
-\PName{instructions} will never be executed.
+\Macro{BeforeFile} ensures that the \PName{commands} are executed before the
+next time \PName{file} is loaded. \Macro{AfterFile} works in a similar
+fashion, and the \PName{commands} will be executed after the \PName{file} has
+been loaded. Of course, if \PName{file} is never loaded, the \PName{commands}
+will never be executed. For \PName{file}, you should specify any extensions as
+part of the file name, as you would with \Macro{input}.
 
-In order to implement those features \Package{scrlfile} redefines the well
-known {\LaTeX} command \Macro{InputIfFileExists}. If this macro does not have
-the expected definition then \Package{scrlfile} issues a warning.  This is for
-the case that in future {\LaTeX} versions the macro can have a different
-definition, or that another package has already redefined it.
-  
-The command \Macro{InputIfFileExists} is used by {\LaTeX} every time a file is
-to be loaded.  This is independent of whether the actual load command is
+To implement those features, \Package{scrlfile} redefines the well-known
+\LaTeX{} command \Macro{InputIfFileExists}. If this command does not have the
+expected definition, \Package{scrlfile} issues a warning. This occurs in case
+the command is changed in future \LaTeX{} versions or has already been
+redefined by another package.
+
+\LaTeX{} uses the \Macro{InputIfFileExists} command every time it loads a
+file. This occurs regardless of whether the file is loaded with
 \Macro{include}, \Macro{LoadClass}, \Macro{documentclass}, \Macro{usepackage},
-\Macro{RequirePackage}, or similar. Exceptionally, the command
+\Macro{RequirePackage}, or similar commands. Only
 \begin{lstcode}
   \input foo
 \end{lstcode}
-loads the file \texttt{foo} without utilizing
-\Macro{InputIfFileExists}. Therefore, one should always use
+loads the file \texttt{foo} without using
+\Macro{InputIfFileExists}. You should therefore always use
 \begin{lstcode}
   \input{foo}
 \end{lstcode}
@@ -158,70 +154,76 @@ instead. Notice the parentheses surrounding the file name!%
 
 
 \begin{Declaration}
-  \Macro{BeforeClass}\Parameter{class}\Parameter{instructions}%
-  \Macro{BeforePackage}\Parameter{package}\Parameter{instructions}
+  \Macro{BeforeClass}\Parameter{class}\Parameter{commands}%
+  \Macro{BeforePackage}\Parameter{package}\Parameter{commands}
 \end{Declaration}%
-These two commands work in the same way as \DescRef{\LabelBase.cmd.BeforeFile}.  The only
-difference is that the document class \PName{class} and the {\LaTeX} package
-\PName{package} are specified with their names and not with their file names.
-That means that the file extensions \File{.cls} and \File{.sty} can be
-omitted.%
+These two commands work the same way as \DescRef{\LabelBase.cmd.BeforeFile}.
+The only difference is that the \PName{class} or \PName{package} is specified
+with its class or package name and not with its file name. That means you
+should omit the file extensions \File{.cls} or \File{.sty}.%
 %
 \EndIndexGroup
 
 
 \begin{Declaration}
-  \Macro{AfterClass}\Parameter{class}\Parameter{instructions}%
-  \Macro{AfterClass*}\Parameter{class}\Parameter{instructions}%
-  \Macro{AfterClass+}\Parameter{class}\Parameter{instructions}%
-  \Macro{AfterClass!}\Parameter{class}\Parameter{instructions}%
-  \Macro{AfterAtEndOfClass}\Parameter{class}\Parameter{instructions}%
-  \Macro{AfterPackage}\Parameter{package}\Parameter{instructions}%
-  \Macro{AfterPackage*}\Parameter{package}\Parameter{instructions}%
-  \Macro{AfterPackage+}\Parameter{package}\Parameter{instructions}%
-  \Macro{AfterPackage!}\Parameter{package}\Parameter{instructions}%
-  \Macro{AfterAtEndOfPackage}\Parameter{package}\Parameter{instructions}
+  \Macro{AfterClass}\Parameter{class}\Parameter{commands}%
+  \Macro{AfterClass*}\Parameter{class}\Parameter{commands}%
+  \Macro{AfterClass+}\Parameter{class}\Parameter{commands}%
+  \Macro{AfterClass!}\Parameter{class}\Parameter{commands}%
+  \Macro{AfterAtEndOfClass}\Parameter{class}\Parameter{commands}%
+  \Macro{AfterPackage}\Parameter{package}\Parameter{commands}%
+  \Macro{AfterPackage*}\Parameter{package}\Parameter{commands}%
+  \Macro{AfterPackage+}\Parameter{package}\Parameter{commands}%
+  \Macro{AfterPackage!}\Parameter{package}\Parameter{commands}%
+  \Macro{AfterAtEndOfPackage}\Parameter{package}\Parameter{commands}
 \end{Declaration}%
-The commands \Macro{AfterClass} and \Macro{AfterPackage} work in the
-same way as \DescRef{\LabelBase.cmd.AfterFile}.  The only difference is that the
-document class \PName{class} and the {\LaTeX} package \PName{package}
-are specified with their names and not with their file names.  That
-means that the file extensions \File{.cls} and \File{.sty} can be
-omitted.  
+The \Macro{AfterClass} and \Macro{AfterPackage} commands work much like
+\DescRef{\LabelBase.cmd.AfterFile}. The only difference is that the
+\PName{class} or \PName{package} is specified with its class or package name
+and not with its file name. That means you should omit the file extensions
+\File{.cls} or \File{.sty}.
 
 The\important[i]{\Macro{AfterClass*}\\\Macro{AfterPackage*}} starred versions
-are a little bit different. They execute the \PName{instructions} not only at
-next time that the class or package is loaded, but also immediately if the
-class or package has been loaded already.
+function somewhat differently. If the class or package has already been
+loaded, they execute the \PName{commands} immediately rather than waiting
+until the next time the class or package is loaded.
 
 The\important[i]{\Macro{AfterClass+}\\\Macro{AfterPackage+}}
-plussed\ChangedAt{v3.09}{\Package{scrlfile}} version executes the
-\PName{instructions} after loading of the class or package has been
-finished. The difference to the starred version is only valid, if loading of
-the class or package already started but has not been finished
-yet. Nevertheless, \PName{instructions} will be executed before the
-instructions of \Macro{AtEndOfClass} or \Macro{AtEndOfPackage} when loading of
-the class or package has not been finished already.
+plus\ChangedAt{v3.09}{\Package{scrlfile}} version executes the
+\PName{commands} after the class or package has been completely loaded. This
+behaviour differs from that of the starred version only if you use the command
+when the class or package has begun loading but has not yet finished. If the
+class or package has not finished loading, the \PName{commands} will always be
+executed before the commands in \Macro{AtEndOfClass} or
+\Macro{AtEndOfPackage}.
 
 If\important[i]{\Macro{AfterClass!}\\\Macro{AfterPackage!}} a class uses
 \Macro{AtEndOfClass} or a package uses \Macro{AtEndOfPackage} to execute
-instructions after the class of package file has been loaded completely, and
-if you want to execute \PName{instructions} after the instructions of these
-commands, you may use the exclamation mark version,
-\Macro{AfterClass!}\ChangedAt{v3.09}{\Package{scrlfile}} respectively
+commands after the class of package file has been loaded completely, and
+if you want to execute \PName{commands} after these deferred
+commands have been executed, you can use the exclamation-mark versions
+\Macro{AfterClass!}\ChangedAt{v3.09}{\Package{scrlfile}} or
 \Macro{AfterPackage!}.
 
 If\important[i]{\Macro{AfterAtEndOfClass}\\\Macro{AfterAtEndOfPackage}} you
-want to do this only in the case the class or package will be loaded later,
-and if you want to execute \PName{instructions} outside the context of the
-class or package, that will be loaded, you may use
+want to execute the \PName{commands} only when the class or package is loaded
+later and outside the context of that class or package, you can use
 \Macro{AfterAtEndOfClass}\ChangedAt{v3.09}{\Package{scrlfile}} for classes and
 \Macro{AfterAtEndOfPackage} for packages.
 
 \begin{Example}
-  In the following, an example for class and package authors shall be
-  given.  It shows how {\KOMAScript} itself employs the new commands.
-  The class \Class{scrbook} contains:
+  The following example for class and package authors shows how \KOMAScript{}
+  itself makes use of the new commands. The class \Class{scrbook} contains the
+  following:
+% CORRECTED MESSAGE:
+%        You are using an old version of the hyperref 
+%        package!\MessageBreak%
+%        This version has a buggy hack in many 
+%        drivers,\MessageBreak%
+%        causing \string\addchap\space to behave 
+%        strangely.\MessageBreak%
+%        Please update hyperref to at least version
+%        6.71b}%
 \begin{lstcode}
   \AfterPackage{hyperref}{%
     \@ifpackagelater{hyperref}{2001/02/19}{}{%
@@ -236,48 +238,40 @@ class or package, that will be loaded, you may use
         6.71b}}}
 \end{lstcode}
   Old versions of the \Package{hyperref} package redefine a macro of the
-  \Class{scrbook} class in such a way that does not work with newer
-  {\KOMAScript} versions.  New versions of \Package{hyperref} desist
-  from making these changes if a new {\KOMAScript} version is detected.
-  For the case that \Package{hyperref} is loaded at a later stage,
-  therefore, the code in \Class{scrbook} verifies that a acceptable
-  \Package{hyperref} version is used.  If not, the command issues a
-  warning.
+  \Class{scrbook} class in a way that is incompatible with newer \KOMAScript{}
+  versions. Newer versions of \Package{hyperref} refrain from making this
+  change if a newer version of \KOMAScript{} is detected. In case
+  \Package{hyperref} is loaded at a later stage, \Class{scrbook} ensures that
+  a check for an acceptable version of \Package{hyperref} is performed
+  immediately after the package is loaded. If this is not the case, a warning
+  is issued.
 
-  At other places in three {\KOMAScript} classes the following can be
-  found:
+  Elsewhere in three of the \KOMAScript{} classes, you can find the following:
 \begin{lstcode}
   \AfterPackage{caption2}{%
     \renewcommand*{\setcapindent}{%
 \end{lstcode}
-  After the package \Package{caption2} has been loaded, and only if it
-  has been loaded, {\KOMAScript} redefines its own command
-  \DescRef{maincls.cmd.setcapindent}.  The exact code of the redefinition is
-  not important.  It should only be noted that \Package{caption2} takes
-  control of the \DescRef{maincls.cmd.caption} macro and that therefore the
-  normal definition of the \DescRef{maincls.cmd.setcapindent} macro would
-  become ineffective. The redefinition improves the collaboration with
-  \Package{caption2}.
+  After loading \Package{caption2}, and only if it has been loaded,
+  \KOMAScript{} redefines its own \DescRef{maincls.cmd.setcapindent} command.
+  The exact code of the redefinition is irrelevant. The important thing to
+  note is that \Package{caption2} takes control of the
+  \DescRef{maincls.cmd.caption} macro and that therefore the normal definition
+  of the \DescRef{maincls.cmd.setcapindent} command would have no effect. The
+  redefinition thus improves interoperability with \Package{caption2}.
 
-  There are however also useful examples for normal {\LaTeX} user.  Suppose a
-  document that should be available as a PS file, using {\LaTeX} and dvips, as
-  well as a PDF file, using pdf{\LaTeX}.  In addition, the document should
-  contain hyperlinks.  In the list of tables there are entries longer than one
-  line.  This is not a problem for the pdf{\LaTeX} method, since here
-  hyperlinks can be broken across multiple lines.  However, if a
-  \Package{hyperref} driver for dvips or hyper{\TeX} is used then this is not
-  possible.  In this case one desires that for the \Package{hyperref} setup
-  \Option{linktocpage} is used. The decision which \Package{hyperref} driver
-  to use happens automatically via \File{hyperref.cfg}. The file has, for
-  example, the following content:
-\begin{lstcode}
-  \ProvidesFile{hyperref.cfg}
-  \@ifundefined{pdfoutput}{\ExecuteOptions{dvips}}
-                          {\ExecuteOptions{pdftex}}
-  \endinput
-\end{lstcode}
-
-  All the rest can now be left to \DescRef{\LabelBase.cmd.AfterFile}.
+  There are also, however, instances where these commands are useful to normal
+  \LaTeX{} users. For example, suppose you create a document from which you
+  want to generate both a PostScript file, using \LaTeX{} and dvips, and a PDF
+  file, using \mbox{pdf{\LaTeX}}. The document should also contain hyperlinks.
+  In the table of contents, you have entries that span several lines. This is
+  not a problem for the \mbox{pdf{\LaTeX}} method, since here hyperlinks can
+  be broken across multiple lines.  However, this is not possible with the
+  \Package{hyperref} driver for dvips or \mbox{hyper{\TeX}}. In this case, you
+  would like \Package{hyperref} to use the \Option{linktocpage} option. The
+  decision as to which driver is loaded is made automatically by
+  \File{hyperref}.
+  
+  Everything else can now be left to \DescRef{\LabelBase.cmd.AfterFile}:
 \begin{lstcode}
   \documentclass{article}
   \usepackage{scrlfile}
@@ -288,37 +282,45 @@ class or package, that will be loaded, you may use
   \listoffigures
   \clearpage
   \begin{figure}
-    \caption{This is an example for a fairly long figure caption, but
-      which does not employ the optional caption argument that would
-      allow one to write a short caption in the list of figures.}
+    \caption{This is an example of a fairly long figure caption, but
+      one that does not use the optional caption argument that would
+      allow you to write a short caption in the list of figures.}
   \end{figure}
   \end{document}
 \end{lstcode}
-  If now the \Package{hyperref} drivers \Option{hypertex} or
-  \Option{dvips} are used, then the useful \Package{hyperref} option
-  \Option{linktocpage} will be set. In the pdf{\LaTeX} case, the option
-  will not be set, since in that case another \Package{hyperref} driver,
-  \File{hpdftex.def}, will be used. That means neither \File{hdvips.def}
+  If either of the \Package{hyperref} drivers \Option{hypertex} or
+  \Option{dvips} is used, the useful \Package{hyperref} option
+  \Option{linktocpage} will be set. However, if you create a PDF file
+  with \mbox{pdf{\LaTeX}}, the option
+  will not be set because then the \Package{hyperref} driver
+  \File{hpdftex.def} will be used. This means that neither \File{hdvips.def}
   nor \File{hypertex.def} will be loaded.
 \end{Example}
-
-Furthermore\textnote{Hint!}, the loading of package \Package{scrlfile} and
-the \DescRef{\LabelBase.cmd.AfterFile} statement can be written in a private
-\File{hyperref.cfg}. If you do so, then instead of \Macro{usepackage} the
-macro \Macro{RequirePackage} ought be used (see \cite{latex:clsguide}).  The
-new lines have to be inserted directly after the \Macro{ProvidesFile} line,
-thus immediately prior to the execution of the options \Option{dvips} or
-\Option{pdftex}.%
-%
+\iffalse% Umbruchkorrekturtext (der besser nicht mehr verwendet wird!)
+  Furthermore\textnote{Hint!}, you can also load \Package{scrlfile} and the
+  \DescRef{\LabelBase.cmd.AfterFile} command into a private
+  \File{hyperref.cfg}. In this case, however, you should use
+  \Macro{RequirePackage} instead of \Macro{usepackage} to load the package
+  (see \cite{latex:clsguide}). In the example above, the new lines have to be
+  inserted directly after the \Macro{ProvidesFile} line, that is, immediately
+  before the \Option{dvips} or \Option{pdftex} options are executed.%
+\fi
+Incidentally\textnote{Hint!}, you can also load \Package{scrlfile} before
+\DescRef{maincls.cmd.documentclass}\IndexCmd{documentclass}. In this case,
+however, you should use \Macro{RequirePackage}\IndexCmd{RequirePackage}
+instead of \DescRef{maincls.cmd.usepackage}  (see \cite{latex:clsguide}).%
 \EndIndexGroup
 
 
 \begin{Declaration}
-  \Macro{BeforeClosingMainAux}\Parameter{instructions}%
-  \Macro{AfterReadingMainAux}\Parameter{instructions}%
+  \Macro{BeforeClosingMainAux}\Parameter{commands}%
+  \Macro{AfterReadingMainAux}\Parameter{commands}%
 \end{Declaration}%
-Package authors often want to write something into the \File{aux}-file after
-the last document page have been shipped out. To do so, often
+These commands differ in one detail from the commands explained previously.
+Those commands enable actions before or after loading files. That is not the
+case here. Package authors often want to write something to the \File{aux}
+file after the last document page has been shipped out. To do so, ignoring the
+resulting problems they create, they often use code such as the following:
 \begin{lstcode}
   \AtEndDocument{%
     \if@filesw
@@ -328,15 +330,14 @@ the last document page have been shipped out. To do so, often
     \fi
   } 
 \end{lstcode}
-is used. Nevertheless this is not a real solution of the problem. If the last
-page of the document already have been shipped out before
-\Macro{end}\PParameter{document}, the code above will not result in any
-writing into the \File{aux}-file. If someone would try to fix this new problem
-using \Macro{immediate} just before \Macro{write}, the inverse problem would
-occur: If the last page was not shipped out before
-\Macro{end}\PParameter{document} the \Macro{writethistoaux} would be written
-into \File{aux}-file before ship-out the last page. Another often seen
-suggestion for this problem therefore is:
+However, this does not really solve the problem. If the last page of the
+document has already been shipped out before \Macro{end}\PParameter{document},
+the code above will not result in any output to the \File{aux} file. If you
+try to fix this new problem using \Macro{immediate} just before \Macro{write},
+you would have the opposite problem: if the last page has not yet been shipped
+out before \Macro{end}\PParameter{document}, \Macro{writethistoaux} would be
+written to the \File{aux} file too early. Therefore you often see solutions
+like:
 \begin{lstcode}
   \AtEndDocument{%
     \if@filesw
@@ -347,23 +348,23 @@ suggestion for this problem therefore is:
     \fi
   } 
 \end{lstcode}
-This suggestion has a disadvantage again: The ship-out of the last page has
-been enforced by the \DescRef{maincls.cmd.clearpage}. After that, instructions
-like
+However, this solution has the disadvantage that it forces the last page to be
+shipped out. A command such as
 \begin{lstcode}
   \AtEndDocument{%
     \par\vspace*{\fill}%
     Note at the end of the document.\par
   }
 \end{lstcode}
-would not any longer output the note at the end of the last page of the
-document but at the end of one more page. Additionally \Macro{writethistoaux}
-would be written one page to early into the \File{aux}-file again.
+will no longer cause the note to appear beneath the text of the last real page
+of the document but at the end of one additional page. Furthermore,
+\Macro{writethistoaux} will again be written to the \File{aux} file one page
+too early.
 
-The best solution for this problem would be, to write to the \File{aux}-file
-immediately after the final \DescRef{maincls.cmd.clearpage}, that is part of
-\Macro{end}\PParameter{document}, but just before closing the
-\File{aux}-file. This is the purpose of \Macro{BeforeClosingMainAux}:
+The best solution for this problem would be if you could write directly to the
+\File{aux} file immediately after the final \DescRef{maincls.cmd.clearpage}
+that is part of \Macro{end}\PParameter{document} but before closing the
+\File{aux} file. This is the purpose of \Macro{BeforeClosingMainAux}:
 \begin{lstcode}
   \BeforeClosingMainAux{%
     \if@filesw
@@ -373,25 +374,24 @@ immediately after the final \DescRef{maincls.cmd.clearpage}, that is part of
     \fi
   }
 \end{lstcode}
-This would be successful even if the final \DescRef{maincls.cmd.clearpage}
-inside of \Macro{end}\PParameter{document} would not really ship-out any page
-or if someone have had used \DescRef{maincls.cmd.clearpage} in the argument of
-\Macro{AtEndDocument}.
+This will be successful even if the final \DescRef{maincls.cmd.clearpage}
+inside of \Macro{end}\PParameter{document} does not actually ship out any page
+or if \DescRef{maincls.cmd.clearpage} is used within an \Macro{AtEndDocument}
+command.
 
-Nevertheless there one important limitation using
-\Macro{BeforeClosingMainAux}: You should not use a typeset instruction inside
-the \PName{instructions} of \Macro{BeforeClosingMainAux}! If you miss this
-limitation the result would be as unpredictable as the results of the
-problematic suggestions using \Macro{AtEndDocument} upward.
+However, there one important limitation using \Macro{BeforeClosingMainAux}:
+you should not use any typesetting commands inside the \PName{commands} of
+\Macro{BeforeClosingMainAux}! If you ignore this restriction, the result is
+just as unpredictable as the results of the problematic suggestions above that
+use \Macro{AtEndDocument}.
 
-Command \Macro{AfterReadingMainAux}\ChangedAt{v3.03}{\Package{scrlfile}}
-actually executes the \PName{instructions} just after closing and input of the
-\File{aux}-file inside of \Macro{end}\PParameter{document}. This will make
-sense only in some cases, e.\,g., to show statistic information, that will be
-valid only after input of the \File{aux}-file, or to write such information
-into the \File{log}-file, or to implement additional \emph{rerun}
-requests. Typeset instructions are even more critical inside these
-\PName{instructions} that inside the argument of
+The \Macro{AfterReadingMainAux}\ChangedAt{v3.03}{\Package{scrlfile}} command
+actually executes the \PName{commands} after closing and reading the
+\File{aux} file inside \Macro{end}\PParameter{document}. This is only useful
+in a few very rare cases, for example to write statistical information to the
+\File{log} file which is valid only after reading the \File{aux} file, or to
+implement additional \emph{rerun} requests. Typesetting commands are even more
+dangerous inside these \PName{commands} than inside the argument of
 \Macro{BeforeClosingMainAux}.%
 %
 \EndIndexGroup
@@ -400,114 +400,107 @@ requests. Typeset instructions are even more critical inside these
 \section{Replacing Files at Input}
 \seclabel{replace}
 
-All previous sections in this chapter describe commands to execute
-instructions before or after input of a file, class, or package. Package
-\Package{scrlfile} also provides commands to input another file, class, or
-package instead of the one, that has been declared.
+The previous sections in this chapter have explained commands to perform
+actions before or after loading a particular file, package, or class. You can
+also use \Package{scrlfile} to input a completely different file than the one
+that was requested.
 
 
 \begin{Declaration}
-  \Macro{ReplaceInput}\Parameter{source file name}%
-                      \Parameter{replacement file name}%
+  \Macro{ReplaceInput}\Parameter{original file}%
+                      \Parameter{replacement file}%
 \end{Declaration}%
 This\ChangedAt{v2.96}{\Package{scrlfile}} command defines a replacement for
-the file of the first argument: \PName{source file name}, by the file of the
-second argument: \PName{replacement file name}. If \LaTeX{} will be instructed
-to input the file with \PName{source file name} at any time afterward, the
-file with the \PName{replacement file name} will be input instead. The
-replacement definition will be valid for all files, that the user will input
-with \Macro{InputIfFileExists} and for all files, that will be input with a
-command, that uses \Macro{InputIfFileExists} internally. To do so,
-\Package{scrlfile} redefined \Macro{InputIfFileExists}.
+the file specified in the first argument, \PName{original file}. If \LaTeX{}
+is instructed to load this file, the \PName{replacement file} will be loaded
+instead. The replacement-file definition affects all files loaded using
+\Macro{InputIfFileExists}, whether they are loaded by the user or internally
+by \LaTeX{}. To do so, \Package{scrlfile} redefines \Macro{InputIfFileExists}.
 
 \begin{Example}
-  You want \LaTeX{} to input file \File{\Macro{jobname}.xua} instead of file
-  \File{\Macro{jobname.aux}}. This may be done using
+  You want to input the \File{\Macro{jobname}.xua} file instead of the
+  \File{\Macro{jobname.aux}} file. To do this, you use
 \begin{lstcode}
   \ReplaceInput{\jobname.aux}{\jobname.xua}
 \end{lstcode}
-  Additionally you may replace \File{\Macro{jobname}.xua} by
-  \File{\Macro{jobname}.uxa} using:
+  If additionally you replace \File{\Macro{jobname}.xua} by
+  \File{\Macro{jobname}.uxa} using
 \begin{lstcode}
   \ReplaceInput{\jobname.xua}{\jobname.uxa}
 \end{lstcode}
-  This will also replace input of \File{\Macro{jobname}.aux}, i.\,e., while
-  \Macro{end}\PParameter{document}, by \File{\Macro{jobname}.uxa}. As you see,
-  the whole replacement chain will be executed.
+  then \File{\Macro{jobname}.aux} will also be replaced by
+  \File{\Macro{jobname}.uxa}. In this way, you can process the whole
+  replacement chain.
 
-  Nevertheless a round robin replacement like
+  However, a replacement that results in a loop such as
 \begin{lstcode}
   \ReplaceInput{\jobname.aux}{\jobname.xua}
   \ReplaceInput{\jobname.xua}{\jobname.aux}
 \end{lstcode}
-  would result in a \emph{stack size error}. So it is not possible to define a
-  replacement of a file by itself directly or indirectly.
+  will cause a \emph{stack size error}. So it is not possible to replace
+  a file that has already been replaced once by itself again.
 \end{Example}
 
-In theory is would also be possible to replace a package or class by another
-one. But \LaTeX{} would recognize the usage of the wrong file name in this
-case. A solution for this problem will be shown next.%
-%
+In theory, it would also be possible to use this command to replace one
+package or class with another. But \LaTeX{} would recognize that the requested
+file name does not match the name of the package or class. You can find a
+solution for this problem below.%
 \EndIndexGroup
 
 
 \begin{Declaration}
-  \Macro{ReplaceClass}\Parameter{source class}%
-                      \Parameter{replacement package}%
-  \Macro{ReplacePackage}\Parameter{source package}%
+  \Macro{ReplaceClass}\Parameter{original class}%
+                      \Parameter{replacement class}%
+  \Macro{ReplacePackage}\Parameter{original package}%
                         \Parameter{replacement package}%
 \end{Declaration}%
-Classes\ChangedAt{v2.96}{\Package{scrlfile}}\textnote{Attention!} or packages
-should never be replaced using previously described command
-\DescRef{\LabelBase.cmd.ReplaceInput}. Using this command would result in a \LaTeX{} warning
-because of class or package name not according the file name.
+You\ChangedAt{v2.96}{\Package{scrlfile}}\textnote{Attention!} should never
+replace a class or package using the \DescRef{\LabelBase.cmd.ReplaceInput}
+command described above. Doing so would result in a \LaTeX{} warning about
+mismatched class or package names. Real errors are also possible if a class or
+package is loaded under an incorrect file name.
 \begin{Example}
-  You replace package \Package{fancyhdr} by package \Package{scrpage2}
-  inconsiderately using
-\begin{lstcode}
-  \ReplaceInput{fancyhdr.sty}{scrpage2.sty}
+  You replace the \Package{scrpage2} package with its official successor,
+  \Package{scrlayer-scrpage}, by using
+\begin{lstcode}[escapechar=\$]
+  \ReplaceInput{scrpage2.sty}{scrlayer-scrpage.sty}$\textnote{Do not try this!}$
 \end{lstcode}
-  Loading \Package{fancyhdr}, would result in
+  Loading \Package{scrpage2} will then lead to the following warning:
 \begin{lstcode}
   LaTeX warning: You have requested `scrpage2',
-                 but the package provides `fancyhdr'.
+                 but the package provides `scrlayer-scrpage'.
 \end{lstcode}
-  after this. Users may be confused by such a warning, because they've used,
-  e.\,g., \Macro{usepackage}\PParameter{fancyhdr} and never requested package
-  \Package{scrpage2} on their own. But \Package{scrlfile} replaced the input
-  of \File{fancyhdr.sty} by \File{scrpage2.sty} because of your replacement
-  definition.
+  Users may be greatly confused by such a warning because they requested not
+  \Package{scrlayer-scrpage} but \Package{scrpage2}, which was replaced by
+  \Package{scrlayer-scrpage}.
 \end{Example}
-A solution for this problem would be, to use \Macro{ReplaceClass} or
-\Macro{ReplacePackage} instead of
-\DescRef{\LabelBase.cmd.ReplaceInput}. Please note, that in this case you have
-to use the names of the classes or packages only instead of the whole file
-name. This is similar to usage of \Macro{documentclass} and
-\Macro{usepackage}.
+One solution to this problem is to use \Macro{ReplaceClass} or
+\Macro{ReplacePackage} instead of \DescRef{\LabelBase.cmd.ReplaceInput}. Note
+that in this case, as with \Macro{documentclass} and \Macro{usepackage}, you
+should give the name of the class or package and not the complete file name.
 
-The class replacement would perform for all classes, that will be loaded using
+The replacement class works for all classes loaded with
 \Macro{documentclass}, \Macro{LoadClassWithOptions}, or \Macro{LoadClass}. The
-package replacement would perform for all packages, that will be loaded using
+replacement package works for all packages loaded with
 \Macro{usepackage}, \Macro{RequirePackageWithOptions}, or
 \Macro{RequirePackage}.
 
-Please\textnote{Attention!} note, that the \PName{replacement class} or the
-\PName{replacement package} will be loaded with the same options, the
-\PName{source class} or \PName{replacement class} would until it has been
-replaced. Replacement of a class or package by a class or package, that does
-not support a requested option, would result in a warning or even an error
-message. But you may declare such missing options using
-\DescRef{\LabelBase.cmd.BeforeClass} or
+Please\textnote{Attention!} note that the \PName{replacement class} or the
+\PName{replacement package} will be loaded with the same options that would
+have been passed to the \PName{original class} or \PName{original package}. If
+you replace a class or package with one that does not support a requested
+option, you will receive the usual warnings and errors. However, you can
+declare such missing options using \DescRef{\LabelBase.cmd.BeforeClass} or
 \DescRef{\LabelBase.cmd.BeforePackage}.
 
 \begin{Example}
-  Assumed, package \Package{oldfoo} should be replaced by
-  \Package{newfoo}. This may be done using:
+  Suppose you want to replace the \Package{oldfoo} package with the
+  \Package{newfoo} package when the former package is loaded. You can do this with
 \begin{lstcode}
   \ReplacePackage{oldfoo}{newfoo}
 \end{lstcode}
-  Assumed the old package provides an option \Option{oldopt}, but the new
-  package does not. Using
+  Suppose the old package provides an \Option{oldopt} option, but the new
+  package does not. With
 \begin{lstcode}
   \BeforePackage{newfoo}{%
     \DeclareOption{oldopt}{%
@@ -515,21 +508,21 @@ message. But you may declare such missing options using
                   {option `oldopt' not supported}%
     }}%
 \end{lstcode}
-  additionally, would declare this missing option for package
-  \Package{newfoo}. This would avoid warning message about unsupported
-  options.
+  you can declare this missing option for the \Package{newfoo} package. This
+  avoids an error message when the \Package{oldfoo} package is loaded with the
+  option that is unsupported by \Package{newfoo}.
 
-  However, if package \Package{newfoo} supports an option \Option{newopt},
-  that should be used instead of option \Option{oldopt} of old package
-  \Package{oldfoo}, this may achieved using:
+  If, on the other hand, the \Package{newfoo} package supports a
+  \Option{newopt} option that should be used instead of the \Option{oldopt}
+  option, you can also achieved this:
 \begin{lstcode}
   \BeforePackage{newfoo}{%
     \DeclareOption{oldopt}{%
       \ExecuteOptions{newopt}%
     }}%
 \end{lstcode}
-  Last but not least different default options may be selected, that should be
-  valid while package replacement:
+  You can even specify different default options that apply when loading the
+  new package:
 \begin{lstcode}
   \BeforePackage{newfoo}{%
     \DeclareOption{oldopt}{%
@@ -539,7 +532,7 @@ message. But you may declare such missing options using
                          {newfoo}%
   }
 \end{lstcode}
-  or somehow more directly:
+  or directly:
 \begin{lstcode}
   \BeforePackage{newfoo}{%
     \DeclareOption{oldopt}{%
@@ -549,9 +542,11 @@ message. But you may declare such missing options using
   \PassOptionsToPackage{newdefoptA,newdefoptB}%
                        {newfoo}%
 \end{lstcode}
+  Note that in the last example, the call to \Macro{PassOptionsToPackage}
+  occurs not within but after \Macro{BeforePackage}
 \end{Example}
 
-To replace classes package \Package{scrlfile} has to be loaded before the
+Of course, to replace classes, you must load \Package{scrlfile} before the
 class using \Macro{RequirePackage} instead of \Macro{usepackage}.
 %
 \EndIndexGroup
@@ -562,74 +557,71 @@ class using \Macro{RequirePackage} instead of \Macro{usepackage}.
   \Macro{UnReplacePackage}\Parameter{package}%
   \Macro{UnReplaceClass}\Parameter{class}%
 \end{Declaration}
-A\ChangedAt{v3.12}{\Package{scrlfile}} replacement definition can be removed
-using one of these commands. The replacement definition of a input file should
-be removed using \Macro{UnReplaceInput}, the replacement definition of a
-package should be removed using \Macro{UnReplacePackage}, and the replacement
-definition of a class should be removed using \Macro{UnReplaceClass}.%
+You\ChangedAt{v3.12}{\Package{scrlfile}} can also remove a replacement. You
+should remove the replacement definition for an input file using
+\Macro{UnReplaceInput}, for a package using \Macro{UnReplacePackage}, and for
+a class using \Macro{UnReplaceClass}.%
 \EndIndexGroup
 
 
 \section{Prevent File Loading}
 \seclabel{prevent}
 
-Especially\ChangedAt{v3.08}{\Package{scrlfile}} classes or packages, that have
-been made for companies or institutes, often load a lot of packages not needed
-by the classes or packages itself but only because the users often use
-them. Now, if such a not essential package causes any kind of problem, loading
-of that package has to prevented. For this purpose \Package{scrlfile} again
-provides a solution.
+Classes\ChangedAt{v3.08}{\Package{scrlfile}} and packages written for use
+within companies or academic institutions often load many packages only
+because users need them frequently, not because they are required by the class
+or package itself. If a problem occurs with one of these automatically loaded
+packages, you somehow have to keep the problematic package from being loaded.
+Once again, \Package{scrlfile} provides a simple solution.
 
 \begin{Declaration}
-  \Macro{PreventPackageFromLoading}\OParameter{instead code}%
+  \Macro{PreventPackageFromLoading}\OParameter{alternate code}%
   \Parameter{package list}%
-  \Macro{PreventPackageFromLoading*}\OParameter{instead code}%
+  \Macro{PreventPackageFromLoading*}\OParameter{alternate code}%
   \Parameter{package list}
 \end{Declaration}
 Calling this command\ChangedAt{v3.08}{\Package{scrlfile}} before loading a
-package using \Macro{usepackage}\IndexCmd{usepackage},
+package with \Macro{usepackage}\IndexCmd{usepackage},
 \Macro{RequirePackage}\IndexCmd{RequirePackage}, or
-\Macro{RequirePackageWithOptions}\IndexCmd{RequirePackageWithOptions} will
-prevent the package from being loaded effectively if the package is part of
-the \PName{package list}.
+\Macro{RequirePackageWithOptions}\IndexCmd{RequirePackageWithOptions}
+effectively prevents the package from being loaded if it is found in the the
+\PName{package list}.
 %
 \begin{Example}
-  Assumed you're working in a company, that uses font Latin-Modern for all
-  kind of documents. Because of this the company class, \Class{compycls}
-  contains the lines:
+  Suppose you work at a company where all documents are created using Latin
+  Modern. The company class, \Class{compycls}, therefore contains these lines:
 \begin{lstcode}
   \RequirePackage[T1]{fontenc}
   \RequirePackage{lmodern}
 \end{lstcode}
-  But now, you want to use
-  X\kern-.125em\lower.5ex\hbox{\reflectbox{E}}\LaTeX{} oder Lua\LaTeX{} the
-  first time. In this case loading of \Package{fontenc} would not be a good
-  suggestion and Latin-Modern would be the default font of the recommended
-  package \Package{fontspec}. Because of this you want to prevent both
-  packages from being loaded. This may be done, loading the class like this:
+  But now, for the first time, you want to use \XeLaTeX{} or Lua\LaTeX{}.
+  Since the recommended \Package{fontspec} package uses Latin Modern as the
+  default font anyway, and loading \Package{fontenc} would not be a good idea,
+  you want to prevent both packages from being loaded. Therefore, you load the
+  class in your own document as follows:
 \begin{lstcode}
   \RequirePackage{scrlfile}
   \PreventPackageFromLoading{fontenc,lmodern}
   \documentclass{firmenci}
 \end{lstcode}
 \end{Example}
-The example above also shows, that package \Package{scrlfile} may be loaded
-before the class. In this case \Macro{RequirePackage}\IndexCmd{RequirePackage}
-has to be used, because \Macro{usepackage} before \Macro{documentclass} is not
-permitted.
+The example above also shows that you can load \Package{scrlfile} before the
+class. In this case, you must use
+\Macro{RequirePackage}\IndexCmd{RequirePackage} because \Macro{usepackage}
+before \Macro{documentclass} is not permitted.
 
-If \PName{package list} is empty or contains a package, that already has been
-loaded, \Macro{PreventPackageFromLoading} will warn. If you'd prefer an
-info\ChangedAt{v3.12}{\Package{scrlfile}} at the log-file only, you may use
-\Macro{PreventPackageFromLoading*} instead.
+If you specify an empty \PName{package list} or if it contains a package that
+has already been loaded, \Macro{PreventPackageFromLoading} issues a warning,
+while\ChangedAt{v3.12}{\Package{scrlfile}} \Macro{PreventPackageFromLoading*}
+merely writes a note to the log file only.
 
-The optional argument\ChangedAt{v3.12}{\Package{scrlfile}} may be used to
-execute code instead of loading the package. But you must not load another
-packages or files inside \PName{instead code}. See
+You\ChangedAt{v3.12}{\Package{scrlfile}} can use the optional argument to
+execute code instead of loading the package. But you cannot load any other
+packages or files inside \PName{alternate code}. To load another package, see
 \DescRef{\LabelBase.cmd.ReplacePackage} in \autoref{sec:scrlfile.macros} on
-\DescPageRef{\LabelBase.cmd.ReplacePackage} for information about replacing a
-package by another one. Note also, that the \PName{instead code} will be
-executed several times, if you try to load the package more than once!%
+\DescPageRef{\LabelBase.cmd.ReplacePackage}. Note also that the
+\PName{alternate code} will be executed several times if you try to load the
+package more than once!%
 \EndIndexGroup
 
 
@@ -638,23 +630,23 @@ executed several times, if you try to load the package more than once!%
   \Macro{ResetPreventPackageFromLoading}
 \end{Declaration}
 \Macro{StorePreventPackageFromLoad}\ChangedAt{v3.08}{\Package{scrlfile}}
-defines \Macro{command} to be the current list of packages, that should be
-prevented from being loaded. In opposite to this,
+defines \Macro{command} to be the current list of packages that should not be
+loaded. In contrast,
 \Macro{ResetPreventPackageFromLoading}\ChangedAt{v3.08}{\Package{scrlfile}}
-resets the list of packages, that should be prevented from being loaded. After
-\Macro{ResetPreventPackageFromLoading} all packages may be loaded again.
+resets the list of packages that should not be loaded. After
+\Macro{ResetPreventPackageFromLoading}, you can load all packages again.
 \begin{Example}
-  Assumed, you really need a package inside your own package and you want the
-  user inhibit to prevent loading of that package with
+  Suppose you need to load a package inside another package and you do not
+  want the user to be able to prevent that package from being loaded with
   \DescRef{\LabelBase.cmd.PreventPackageFromLoading}%
-  \IndexCmd{PreventPackageFromLoading}. Because of this, you reset the package
-  preventing list before loading the package:
+  \IndexCmd{PreventPackageFromLoading}. So you reset the do-not-load list
+  before you load this package:
 \begin{lstcode}
   \ResetPreventPackageFromLoading
   \RequirePackage{foo}
 \end{lstcode}
-  Unfortunately the complete prevention list of the user would be lost after
-  that. To avoid this, you first store the list and restore it at the end:
+  Unfortunately, from this point on the user's entire do-not-load list would
+  be lost. To avoid this, you first store the list and then restore it later:
 \begin{lstcode}
   \newcommand*{\Users@PreventList}{}%
   \StorePreventPackageFromLoading\Users@PreventList
@@ -662,23 +654,22 @@ resets the list of packages, that should be prevented from being loaded. After
   \RequirePackage{foo}
   \PreventPackageFromLoading{\Users@PreventList}
 \end{lstcode}
-  Please\textnote{Attention!} note, that
-  \Macro{StorePreventPackageFromLoading} would define
-  \Macro{Users@PreventList} even if it already has been defined before. In other
-  words: \Macro{StorePreventPackageFromLoading} overwrites existing
-  \Macro{command} definitions without care. Because of this,
-  \Macro{newcommand*} has been used in the example to get an error message, if
+  Note\textnote{Attention!} that \Macro{StorePreventPackageFromLoading}
+  defines the \Macro{Users@PreventList} macro even if it has already been
+  defined. In other words, calling \Macro{StorePreventPackageFromLoading}
+  overwrites existing \Macro{command} definitions without checking. Therefore
+  this example uses \Macro{newcommand*} to get an error message if
   \Macro{Users@PreventList} has already been defined.
 \end{Example}
-At this point please note, that everybody who manipulates the list, that has
-been stored using \Macro{StorePreventPackageFromLoading} is responsible for
-the correct restorability. For example the list elements must be separated by
-comma, must not contain white space or group braces, and must be fully
-expandable.
+Note that when you manipulate the list stored by
+\Macro{StorePreventPackageFromLoading}, you are responsible for making sure it
+can be restored. For example, the list elements must be separated by comma,
+must not contain white space or group braces, and must be fully expandable.
 
-Please note\textnote{Attention!}, that \Macro{ResetPreventPackageFromLoading}
-does not clean the \PName{instead code} of a package. Only the execution is not
-done as long as the prevention is not reactivated.%
+Also note\textnote{Attention!}, that \Macro{ResetPreventPackageFromLoading}
+does not clear the \PName{alternate code} for a package. But this code 
+will not be executed so long as the package is not added again to the
+do-not-load list.%
 \EndIndexGroup
 
 
@@ -686,35 +677,35 @@ done as long as the prevention is not reactivated.%
   \Macro{UnPreventPackageFromLoading}\Parameter{package list}%
   \Macro{UnPreventPackageFromLoading*}\Parameter{package list}
 \end{Declaration}
-Instead\ChangedAt{v3.12}{\Package{scrlfile}} of resetting the whole list of
-packages, that should prevented from being loaded, you may also remove some
-packages from that list. The star version of the command does also clean the
-\PName{instead code}. So reactivation of the prevent package list, e.\,g.,
-from a stored one, will not reactivate the \PName{instead code} of the
-packages.%
+Instead\ChangedAt{v3.12}{\Package{scrlfile}} of completely resetting the list
+of packages that should not be loaded, you can also specify individual
+packages to remove from the list. The starred version of the command also
+deletes the \PName{alternate code}. For example, restoring packages to the
+do-not-load list from a stored list will not reactivate their \PName{alternate
+code} in this case.%
 %
 \begin{Example}
-  Assuming, you want to prevent a package \Package{foo} from being loaded, but
-  you do not want an already stored \PName{instead code} to be
-  executed. Instead of that code, you're own \PName{instead code} should be
-  executed. You can do this:
+  Suppose you want to prevent a \Package{foo} package from being loaded, but
+  you do not want to execute any outdated \PName{alternate code} that may
+  exist. Instead, only your new \PName{alternate code} should be executed. You
+  can do this as follows:
 \begin{lstcode}
   \UnPreventPackageFromLoading*{foo}
-  \PreventPackageFromLoading[\typeout{Stattdessencode}]{foo}
+  \PreventPackageFromLoading[\typeout{alternate code}]{foo}
 \end{lstcode}
-  For \Macro{UnPreventPackageFromLoading} it does not matter whether or not
-  the package has been prevented from being loaded before.
+  For the \Macro{UnPreventPackageFromLoading} command, it does not matter
+  whether or not the package has been prevented from being loaded before.
 
-  Surely you can use the command also to remove only the \PName{instead code}
-  of all packages:
+  Of course you can also use the command to indirectly delete the
+  \PName{alternate code} of all packages:
 \begin{lstcode}
   \StorePreventPackageFromLoading\TheWholePreventList
   \UnPreventPackageFromLoading*{\TheWholePreventList}
   \PreventPackageFromLoading{\TheWholePreventList}
 \end{lstcode}
-  In this case the packages, that has been prevented from being loaded, are
-  still prevented from being loaded, but their \PName{instead code} has been
-  cleaned and will not be executed any longer.%
+  In this case the packages that have been prevented from being loaded are
+  still prevented from being loaded, but their \PName{alternate code} has been
+  deleted and will no longer be executed.%
 \end{Example}%
 \EndIndexGroup
 %
@@ -729,5 +720,3 @@ packages.%
 %%% coding: us-ascii
 %%% TeX-master: "../guide"
 %%% End: 
-
-% LocalWords:  restorability
