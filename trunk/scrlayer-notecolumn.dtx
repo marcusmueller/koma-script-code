@@ -1,8 +1,8 @@
-% \CheckSum{1740}
+% \CheckSum{1751}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlayer-notecolumn.dtx
-% Copyright (c) Markus Kohm, 2013-2017
+% Copyright (c) Markus Kohm, 2013-2018
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrlayer-notecolumn.dtx
-% Copyright (c) Markus Kohm, 2013-2017
+% Copyright (c) Markus Kohm, 2013-2018
 %
 % Diese Datei ist Teil der LaTeX2e KOMA-Script-Sammlung.
 %
@@ -728,28 +728,34 @@
 % we set |\if@tempswa| to |\iftrue| to provocate a rerun message.
 % \changes{v0.1.2872}{2018/01/17}{usage of Lua function
 %   \texttt{slncmdfivesum}}^^A
+% \changes{v0.1.2971}{2018/04/01}{usage of not yet documented Xe\TeX{}
+%   primitive \cs{mdfivesum}}^^A
 %    \begin{macrocode}
 \AfterReadingMainAux{%
   \immediate\closeout\tf@slnc
   \begingroup
     \scr@ifundefinedorrelax{pdfmdfivesum}{%
-      \ifdefined\directlua
-        \edef\reserved@a{\directlua{slncmdfivesum("\jobname.slnc")}}%
-      \else
-        \let\reserved@a\relax  
-      \fi
+      \scr@ifundefinedorrelax{mdfivesum}{%
+        \ifdefined\directlua
+          \edef\reserved@a{\directlua{slncmdfivesum("\jobname.slnc")}}%
+        \else
+          \let\reserved@a\relax
+        \fi
+      }{%
+        \edef\reserved@a{\mdfivesum file {\jobname.slnc}}%
+      }%
     }{%
       \edef\reserved@a{\pdfmdfivesum file {\jobname.slnc}}%
     }%
     \ifx\reserved@a\relax
       \PackageWarningNoLine{scrlayer-notecolumn}{%
         \string\pdfmdfivesum\space unavailable.\MessageBreak
-        The package needs \string\pdfmdfivesum\space or LuaTeX\MessageBreak
-        to test whether or not one more LaTeX run\MessageBreak
-        will be needed to make the note columns\MessageBreak
-        right. If this command is unavailable\MessageBreak
-        you have to do the decision without\MessageBreak
-        this help of the package%
+        The package needs \string\pdfmdfivesum,\MessageBreak
+        \string\mdfivesum, or LuaTeX to test whether\MessageBreak
+        or not one more LaTeX run is needed to place the\MessageBreak
+        note columns correctly. If these are unavailable\MessageBreak
+        you have to do the decision without the help\MessageBreak
+        of the package%
       }%
     \else
       \ifx \slnc@mdfivesum\reserved@a
@@ -1182,6 +1188,8 @@
 % \begin{macro}{\slnc@mdfivesum}
 % \changes{v0.1.2872}{2018/01/17}{definition and usage of Lua function
 %   \texttt{slncmdfivesum}}^^A
+% \changes{v0.1.2971}{2018/04/01}{usage of not yet documented Xe\TeX{}
+%   primitive \cs{mdfivesum}}^^A
 % The MD5 sum of the file before opening it for reading.
 %    \begin{macrocode}
 %<*body>
@@ -1190,19 +1198,23 @@
 }
 \scrlayerAddToInterface\slnc@file{%
   \scr@ifundefinedorrelax{pdfmdfivesum}{%
-    \ifdefined\directlua
-      \directlua{%
-        function slncmdfivesum(filename)
-          local fh = io.open(filename,"rb")
-          if fh then
-            local sum=md5.sumhexa(fh:read("*a"))
-            tex.sprint(sum)
-            fh:close()
+    \scr@ifundefinedorrelax{mdfivesum}{%
+      \ifdefined\directlua
+        \directlua{%
+          function slncmdfivesum(filename)
+            local fh = io.open(filename,"rb")
+            if fh then
+              local sum=md5.sumhexa(fh:read("*a"))
+              tex.sprint(sum)
+              fh:close()
+            end
           end
-        end
-      }%
-      \xdef\slnc@mdfivesum{\directlua{slncmdfivesum("\jobname.slnc")}}%
-    \fi
+        }%
+        \xdef\slnc@mdfivesum{\directlua{slncmdfivesum("\jobname.slnc")}}%
+      \fi
+    }{%
+      \xdef\slnc@mdfivesum{\mdfivesum file {\jobname.slnc}}%
+    }%
   }{%
     \xdef\slnc@mdfivesum{\pdfmdfivesum file {\jobname.slnc}}%
   }%
