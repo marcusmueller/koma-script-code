@@ -1,8 +1,8 @@
-% \CheckSum{3999}
+% \CheckSum{4076}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
-% Copyright (c) Markus Kohm, 2002-2017
+% Copyright (c) Markus Kohm, 2002-2018
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrkernel-sections.dtx
-% Copyright (c) Markus Kohm, 2002-2017
+% Copyright (c) Markus Kohm, 2002-2018
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -569,6 +569,33 @@
 % dass dann trotzdem noch die Warnungen funktionieren und nebenbei der Code
 % mit etwas Glück sogar ebenfalls. Dazu ist es notwendig, dass die Version von
 % \cs{@startsection} gespeichert wird, die \cs{kernel@ifstar} verwendet.
+% \begin{macro}{\startsection@sectionname}
+% \changes{v3.26}{2018/05/14}{Neue Anweisung für Paketautoren}^^A
+% \begin{macro}{\startsection@secnumdepth}
+% \changes{v3.26}{2018/05/14}{Neue Anweisung für Paketautoren}^^A
+% \begin{macro}{\startsection@indent}
+% \changes{v3.26}{2018/05/14}{Neue Anweisung für Paketautoren}^^A
+% \begin{macro}{\startsection@beforeskip}
+% \changes{v3.26}{2018/05/14}{Neue Anweisung für Paketautoren}^^A
+% \begin{macro}{\startsection@afterskip}
+% \changes{v3.26}{2018/05/14}{Neue Anweisung für Paketautoren}^^A
+% \begin{macro}{\if@startsection@runin}
+% \changes{v3.26}{2018/05/14}{Neue Anweisung für Paketautoren}^^A
+% Ab dem Zeitpunkt des Aufrufs des Hooks \cs{scr@startsection@hook} sind die
+% Makros \cs{startsection@sectionname}, \cs{startsection@secnumdepth},
+% \cs{startsection@indent}, \cs{startsection@beforeskip},
+% \cs{if@startsection@indentafter}, \cs{startsection@afterskip} und
+% \cs{if@startsection@runin} gültig. Die \cs{\dots indent}- und \cs{\dots
+% skip}-Makros sind dabei skips (oder \cs{glueexpr}) und somit wie Längen
+% verwendbar. Bei den beiden \cs{\dots skip}-Makros handelt es sich bereits um
+% effektive Abstände, es wurden also etwaige Fallunterscheidungen bezüglich
+% des Vorzeichens des Arguments für \cs{scr@startsection} bereits
+% aufgelöst. Das \cs{if\dots}-Makro ist entweder \cs{iftrue} oder
+% \cs{iffalse}. Ein \cs{if@startsection@afterindent} existiert nicht, weil
+% \cs{if@afterindent} zu dem Zeitpunkt bereits gültig ist. Außerhalb von
+% \cs{scr@startsection} ist die Verwendung dieser Macros unzulässig, bzw. das
+% Ergebnis unspezifiziert. Ebenso sind diese Macros als \emph{read-only} zu
+% betrachten!
 %    \begin{macrocode}
 %<*body>
 \newcommand*{\scr@saved@startsection}[6]{%
@@ -619,6 +646,19 @@
     \ifdim \@tempskipa <\z@
       \@tempskipa -\@tempskipa \@afterindentfalse
     \fi
+    \def\startsection@sectionname{#1}%
+    \def\startsection@secnumdepth{\numexpr #2\relax}%
+    \def\startsection@indent{\glueexpr #3\relax}%
+    \let\startsection@beforeskip\@tempskipa
+    \ifdim \glueexpr #5\relax <\z@
+      \def\startsection@afterskip{\glueexpr (#3)*\m@ne\relax}%
+      \expandafter\let\csname if@startsection@runin\expandafter\endcsname
+      \csname iftrue\endcsname
+    \else
+      \def\startsection@afterskip{\glueexpr #3\relax}%
+      \expandafter\let\csname if@startsection@runin\expandafter\endcsname
+      \csname iffalse\endcsname
+    \fi
     \csname scr@startsection@hook\endcsname
     \if@nobreak
       \everypar{}%
@@ -667,6 +707,44 @@
   }
 \fi
 %    \end{macrocode}
+% \begin{macro}{\scr@startsection@ulm@error}
+% \changes{v3.26}{2018/05/14}{Neue interne Anweisung}
+% Ich bin mir bewusst, dass die Fehlerausgabe, die hier definiert wird,
+% vermutlich nie aufgerufen wird, da ein Paketautor hierzu eines der Makros
+% bereits vor dem ersten \cs{scr@startsection}-Befehl verwendet werden
+% müsste. Trotzdem verwende ich es quasi zwecks Initialisierung.
+%    \begin{macrocode}
+\newcommand*{\scr@startsection@ulm@error}[1]{%
+  \ClassError{\KOMAClassName}{%
+    \string#1 undefined outside of \string\scr@startsection
+  }{%
+    A KOMA-Script macro for package authors have been used outside
+    the\MessageBreak
+    specified definition scope.\MessageBreak
+    See `scrkernel-sections.dtx' for more information.%
+  }%
+}
+\newcommand*\startsection@sectionname{%
+  \scr@startsection@ulm@error\startsection@sectionname}
+\newcommand*\startsection@secnumdepth{%
+  \scr@startsection@ulm@error\startsection@secnumdepth}
+\newcommand*\startsection@indent{%
+  \scr@startsection@ulm@error\startsection@indent}
+\newcommand*\startsection@beforeskip{%
+  \scr@startsection@ulm@error\startsection@beforeskip}
+\newcommand*\startsection@afterskip{%
+  \scr@startsection@ulm@error\startsection@afterskip}
+\newcommand*{\if@startsection@runin}{%
+  \scr@startsection@ulm@error\if@startsection@runin}
+\newif\if@startsection@runin
+%    \end{macrocode}
+% \end{macro}^^A \scr@startsection@ulm@error
+% \end{macro}^^A \if@startsection@runin
+% \end{macro}^^A \startsection@afterskip
+% \end{macro}^^A \startsection@beforeskip
+% \end{macro}^^A \startsection@indent
+% \end{macro}^^A \startsection@secnumdepth
+% \end{macro}^^A \startsection@sectionname
 % \begin{macro}{\At@startsection}
 %   \changes{v3.14}{2014/09/11}{Neue Anweisung für Paketautoren}^^A
 % Mit Hilfe dieser Anweisung kann Code in die Ausführung von \KOMAScript's
