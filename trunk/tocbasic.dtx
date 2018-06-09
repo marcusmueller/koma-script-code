@@ -1,8 +1,8 @@
-% \CheckSum{1612}
+% \CheckSum{1617}
 % \iffalse meta-comment
 % ======================================================================
 % tocbasic.dtx
-% Copyright (c) Markus Kohm, 2008-2017
+% Copyright (c) Markus Kohm, 2008-2018
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % tocbasic.dtx
-% Copyright (c) Markus Kohm, 2008-2017
+% Copyright (c) Markus Kohm, 2008-2018
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -1256,7 +1256,7 @@
             }%
           }{}%
         }%
-        \kernel@ifnextchar[%]
+        \kernel@ifnexchar[%]
           {\@dodefault}%
           {}%
       }%
@@ -1310,6 +1310,16 @@
     }%
 %    \end{macrocode}
 % \end{macro}
+% \begin{macro}{\tb@nt@owner}
+%   \changes{v3.20}{2015/12/16}{local valid only}^^A
+%   \changes{v3.26}{2018/06/09}{moved to pass 1}^^A
+%   The owner of the new list extension.
+%    \begin{macrocode}
+    \DefineFamilyKey[.toc]{KOMAarg}{owner}{%
+      \tb@ifvalueisnotempty{##1}{\edef\tb@nt@owner{##1}}%
+    }%
+%    \end{macrocode}
+% \end{macro}
 %   After this we define pseudo option \texttt{@else@} to ignore all currently
 %   not needed options. After this we do the first option execution run.
 %    \begin{macrocode}
@@ -1317,12 +1327,24 @@
     \FamilyExecuteOptions[.toc]{KOMAarg}{#1}%
     \RelaxFamilyKey[.toc]{KOMAarg}{@else@}%
 %    \end{macrocode}
-%   For the second run we do not need to set up these options again. So define
-%   it as no-opt.
+% \changes{v3.26}{2018/06/09}{add extension already after first pass}^^A
+% First of all, every TOC needs an extension, that should be added to the
+% list of known extensions. This has to be done also, if no options has been
+% given!
+%    \begin{macrocode}
+  }%
+  \expandafter\newcommand\csname ext@\tb@nt@type\endcsname{}%
+  \expandafter\let\csname ext@\tb@nt@type\endcsname\tb@nt@ext
+  \addtotoclist[\tb@nt@owner]{\csname ext@\tb@nt@type\endcsname}%
+  \IfArgIsEmpty{#1}{}{%
+%    \end{macrocode}
+%   For the second option pass we do not need to set up these options
+%   again. So define it as no-opt.
 %    \begin{macrocode}
     \DefineFamilyKey[.toc]{KOMAarg}{type}{\FamilyKeyStateProcessed}%
     \DefineFamilyKey[.toc]{KOMAarg}{tocentrystyle}{\FamilyKeyStateProcessed}%
     \DefineFamilyKey[.toc]{KOMAarg}{extension}{\FamilyKeyStateProcessed}%
+    \DefineFamilyKey[.toc]{KOMAarg}{owner}{\FamilyKeyStateProcessed}%
 %    \end{macrocode}
 %   \changes{v3.20}{2015/12/16}{defining toc style depending options}^^A
 %   \changes{v3.20}{2016/06/12}{using prefix \texttt{tocentry} instead of
@@ -1560,15 +1582,6 @@
     \FamilyBoolKey[.toc]{KOMAarg}{nonfloat}{tb@nt@nonfloat}%
 %    \end{macrocode}
 % \end{macro}
-% \begin{macro}{\tb@nt@owner}
-%   \changes{v3.20}{2015/12/16}{local valid only}^^A
-%   The owner of the new list extension.
-%    \begin{macrocode}
-    \DefineFamilyKey[.toc]{KOMAarg}{owner}{%
-      \tb@ifvalueisnotempty{##1}{\edef\tb@nt@owner{##1}}%
-    }%
-%    \end{macrocode}
-% \end{macro}
 % \begin{macro}{\tb@nt@types}
 %   \changes{v3.20}{2015/12/16}{local valid only}^^A
 %   Sometimes the plural of the type is needed and may be defined by a
@@ -1579,19 +1592,19 @@
     }%
 %    \end{macrocode}
 % \end{macro}
-% \changes{v3.25}{2017/11/20}{new (internal)}
-% The new option \texttt{setup} allowes to setup ToC features provided by
-% \cs{setuptoc}. Note, currently there is no test whether or not a feature
-% does exist!
+%   \changes{v3.25}{2017/11/20}{new (internal)}
+%   The new option \texttt{setup} allowes to setup ToC features provided by
+%   \cs{setuptoc}. Note, currently there is no test whether or not a feature
+%   does exist!
 %    \begin{macrocode}
     \DefineFamilyKey[.toc]{KOMAarg}{setup}{%
       \setuptoc\tb@nt@ext{##1}%
     }%
 %    \end{macrocode}
-% \changes{v3.25}{2017/11/20}{new (internal)}
-% The new option \texttt{unset} allowes to unset ToC features provided
-% by \cs{unsettoc}. Note, currently there is no test whether or not a feature
-% does exist!
+%   \changes{v3.25}{2017/11/20}{new (internal)}
+%   The new option \texttt{unset} allowes to unset ToC features provided
+%   by \cs{unsettoc}. Note, currently there is no test whether or not a
+%   feature does exist!
 %    \begin{macrocode}
     \DefineFamilyKey[.toc]{KOMAarg}{unset}{%
       \unsettoc\tb@nt@ext{##1}%
@@ -1599,11 +1612,14 @@
 %    \end{macrocode}
 %   Last but not least we have to execute the options and reset the option
 %   definitions.
-%   \changes{v3.25}{2017/09/27}{\texttt{nonfloat} fixed}^^A
+% \changes{v3.25}{2017/09/27}{\texttt{nonfloat} fixed}^^A
+% \changes{v3.26}{2018/06/09}{added missing reset of \texttt{unset} and
+%   \texttt{setup}}^^A
 %    \begin{macrocode}
     \FamilyExecuteOptions[.toc]{KOMAarg}{#1}%
+    \RelaxFamilyKey[.toc]{KOMAarg}{unset}%
+    \RelaxFamilyKey[.toc]{KOMAarg}{setup}%
     \RelaxFamilyKey[.toc]{KOMAarg}{types}%
-    \RelaxFamilyKey[.toc]{KOMAarg}{owner}%
     \RelaxFamilyKey[.toc]{KOMAarg}{nonfloat}%
     \RelaxFamilyKey[.toc]{KOMAarg}{name}%
     \RelaxFamilyKey[.toc]{KOMAarg}{listname}%
@@ -1613,23 +1629,17 @@
     \RelaxFamilyKey[.toc]{KOMAarg}{forcenames}%
     \RelaxFamilyKey[.toc]{KOMAarg}{floatpos}%
     \RelaxFamilyKey[.toc]{KOMAarg}{float}%
-    \RelaxFamilyKey[.toc]{KOMAarg}{extension}%
     \RelaxFamilyKey[.toc]{KOMAarg}{counterwithin}%
     \RelaxFamilyKey[.toc]{KOMAarg}{atend}%
     \RelaxFamilyKey[.toc]{KOMAarg}{atbegin}%
     \tb@nt@extra@relax@opts
+    \RelaxFamilyKey[.toc]{KOMAarg}{owner}%
+    \RelaxFamilyKey[.toc]{KOMAarg}{extension}%
     \RelaxFamilyKey[.toc]{KOMAarg}{tocentrystyle}%
     \RelaxFamilyKey[.toc]{KOMAarg}{type}%
   }%
 %    \end{macrocode}
-%   First of all, every TOC needs an extension, that should be added to the
-%   list of known extensions.
-%    \begin{macrocode}
-  \expandafter\newcommand\csname ext@\tb@nt@type\endcsname{}%
-  \expandafter\let\csname ext@\tb@nt@type\endcsname\tb@nt@ext
-  \addtotoclist[\tb@nt@owner]{\csname ext@\tb@nt@type\endcsname}%
-%    \end{macrocode}
-% And we save the type of the extension at \cs{tb@nt@type@\meta{extension}}
+% We save the type of the extension at \cs{tb@nt@type@\meta{extension}}
 % for later usage.
 %    \begin{macrocode}
   \expandafter\let\csname tb@nt@type@\tb@nt@ext\endcsname\tb@nt@type
