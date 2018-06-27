@@ -1,4 +1,4 @@
-% \CheckSum{4078}
+% \CheckSum{4211}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -2193,12 +2193,81 @@
         \DeclareTOCStyleEntry[\scr@dsc@tocstyle@options]{default}{#2}%
       }{}%
 %    \end{macrocode}
-%   \changes{v3.20}{2015/0/07}{\textsf{hyperref} bei den Ebenen der
-%     Verzeichniseinträge berücksichtigen}^^A
+% \changes{v3.20}{2015/0/07}{\textsf{hyperref} bei den Ebenen der
+%   Verzeichniseinträge berücksichtigen}^^A
+% \changes{v3.26}{2018/06/27}{Einstellungen von \textsl{hyperref}
+%   überschreiben}^^A
+% \changes{v3.26}{2018/06/27}{Notfallbehandlung für Lücken in den
+%   Bookmark-Ebenen}^^A
 %    \begin{macrocode}
-      \scr@ifundefinedorrelax{toclevel@part}{}{%
+      \if@atdocument
+        \let\reserved@a\@firstofone
+      \else
+        \@ifpackageloaded{hyperref}{%
+          \let\reserved@a\@firstofone
+        }{%
+          \def\reserved@a##1{%
+            \AfterAtEndOfPackage{hyperref}{\AtBeginDocument{##1}}%
+          }%
+        }%
+      \fi
+      \reserved@a{%
         \expandafter\let\csname toclevel@#2\expandafter\endcsname
         \csname #2tocdepth\endcsname
+        \scr@ifundefinedorrelax{bookmarksetup}{%
+          \scr@ifundefinedorrelax{scr@min@toclevel}{%
+            \expandafter\let\expandafter\scr@min@toclevel
+            \csname toclevel@#2\endcsname
+          }{%
+            \expandafter\ifnum \csname toclevel@#2\endcsname
+            < \numexpr \scr@min@toclevel-1\relax
+              \ClassWarning{\KOMAClassName}{%
+                Trying emergency fix for bookmark level gap,\MessageBreak
+                because toclevel of `#2'
+                (\csname toclevel@#2\endcsname)\MessageBreak
+                is more than 1 lower than currently lowest\MessageBreak
+                known level (\scr@min@toclevel).\MessageBreak
+                Note: This fix can fail and you should load\MessageBreak
+                package `bookmark' to avoid usage of this\MessageBreak
+                fix%
+              }%
+              \expandafter\edef\csname toclevel@#2\endcsname{%
+                \the\numexpr \scr@min@toclevel-1\relax
+              }%
+            \fi
+            \expandafter\ifnum \csname toclevel@#2\endcsname
+            < \scr@min@toclevel\relax
+              \expandafter\let\expandafter\scr@min@toclevel
+              \csname toclevel@#2\endcsname
+            \fi
+          }%
+          \scr@ifundefinedorrelax{scr@max@toclevel}{%
+            \expandafter\let\expandafter\scr@max@toclevel
+            \csname toclevel@#2\endcsname
+          }{%
+            \expandafter\ifnum \csname toclevel@#2\endcsname
+            > \numexpr \scr@max@toclevel+1\relax
+              \ClassWarning{\KOMAClassName}{%
+                Trying emergency fix for bookmark level gap,\MessageBreak
+                because toclevel of `#2'
+                (\csname toclevel@#2\endcsname)\MessageBreak
+                is more than 1 greater than currently highest\MessageBreak
+                known level (\scr@max@toclevel).\MessageBreak
+                Note: This fix can fail and you should load\MessageBreak
+                package `bookmark' to avoid usage of this\MessageBreak
+                fix%
+              }%
+              \expandafter\edef\csname toclevel@#2\endcsname{%
+                \the\numexpr \scr@max@toclevel+1\relax
+              }%
+            \fi
+            \expandafter\ifnum \csname toclevel@#2\endcsname
+            > \scr@max@toclevel\relax
+              \expandafter\let\expandafter\scr@max@toclevel
+              \csname toclevel@#2\endcsname
+            \fi
+          }%
+        }{}%
       }%
     }%
   }%
@@ -2507,9 +2576,53 @@
   \let\scr@local@tocleveloffset\relax
 }
 %</body>
-%</class>
 %    \end{macrocode}
 % \end{macro}^^A \ProvideSectionCommands
+%
+% \begin{option}{bookmarkpackage}
+% \selectlanguage{english}^^A
+% \changes{v3.26}{2018/06/27}{new option}^^A
+% Package \textsl{hyperref} has problems with bookmark level gaps. So if
+% either the users omits a heading level or defines a heading with a level
+% that distinguish more than one from the previous or following level, there
+% would be a problem. One recommended solution for this would be to use
+% package \textsl{bookmark}. So if we load this package, we can use the same
+% value for bookmark levels and TOC levels even within
+% \textsl{scrartcl}. Nevertheless we allow the user to decide not to use
+% \textsl{bookmark}, but then it is not my fault, if something strange
+% happens.
+%    \begin{macrocode}
+%<*option>
+\KOMA@ifkey{bookmarkpackage}{@scr@autoloadbookmarkpackage}
+\@scr@autoloadbookmarkpackagetrue
+\KOMA@kav@add{.\KOMAClassFileName}{bookmarkpackage}{true}
+\AfterAtEndOfPackage{hyperref}{%
+  \AtBeginDocument{%
+    \@ifpackageloaded{bookmark}{}{%
+      \if@scr@autoloadbookmarkpackage
+        \ClassInfo{\KOMAClassName}{%
+          loading recommended package `bookmark'.\MessageBreak
+          Using `bookmark' together with `hyperref' is
+          recommended,\MessageBreak
+          because of handling of possible bookmark level gaps.\MessageBreak
+          You can avoid loading `bookmark' with KOMA-Script
+          option\MessageBreak
+          `bookmarkpackage=false' before \string\begin{document}
+          and\MessageBreak
+          you can avoid this message with
+          `\string\usepackage{bookmark}'\MessageBreak
+          before \string\begin{document}%
+        }%
+        \RequirePackage{bookmark}%
+      \fi  
+    }%
+  }%
+}
+%</option>
+%</class>
+%    \end{macrocode}
+% \selectlanguage{ngerman}^^A
+% \end{option}^^A bookmarkpackage
 %
 %
 % \subsection{Definitionen für Präambeln}
@@ -5281,120 +5394,112 @@
 %
 %
 % \begin{macro}{\partnumdepth}
-%   \changes{v3.12}{2013/12/16}{new read only command}^^A
-%   \changes{v3.18}{2015/05/24}{indirekt über \cs{DeclareSectionCommand}}^^A
+% \changes{v3.12}{2013/12/16}{new read only command}^^A
+% \changes{v3.18}{2015/05/24}{indirekt über \cs{DeclareSectionCommand}}^^A
 % \begin{macro}{\chapternumdepth}
-%   \changes{v3.12}{2013/12/16}{new read only command}^^A
-%   \changes{v3.18}{2015/05/20}{indirekt über \cs{DeclareSectionCommand}}^^A
+% \changes{v3.12}{2013/12/16}{new read only command}^^A
+% \changes{v3.18}{2015/05/20}{indirekt über \cs{DeclareSectionCommand}}^^A
 % \begin{macro}{\sectionnumdepth}
-%   \changes{v3.12}{2013/12/16}{new read only command}^^A
-%   \changes{v3.15}{2014/12/09}{indirekt über \cs{DeclareSectionCommand}}^^A
+% \changes{v3.12}{2013/12/16}{new read only command}^^A
+% \changes{v3.15}{2014/12/09}{indirekt über \cs{DeclareSectionCommand}}^^A
 % \begin{macro}{\subsectionnumdepth}
-%   \changes{v3.12}{2013/12/16}{new read only command}^^A
-%   \changes{v3.15}{2014/12/09}{indirekt über \cs{DeclareSectionCommand}}^^A
+% \changes{v3.12}{2013/12/16}{new read only command}^^A
+% \changes{v3.15}{2014/12/09}{indirekt über \cs{DeclareSectionCommand}}^^A
 % \begin{macro}{\subsubsectionnumdepth}
-%   \changes{v3.12}{2013/12/16}{new read only command}^^A
-%   \changes{v3.15}{2014/12/09}{indirekt über \cs{DeclareSectionCommand}}^^A
+% \changes{v3.12}{2013/12/16}{new read only command}^^A
+% \changes{v3.15}{2014/12/09}{indirekt über \cs{DeclareSectionCommand}}^^A
 % \begin{macro}{\paragraphnumdepth}
-%   \changes{v3.12}{2013/12/16}{new read only command}^^A
-%   \changes{v3.15}{2014/12/09}{indirekt über \cs{DeclareSectionCommand}}^^A
+% \changes{v3.12}{2013/12/16}{new read only command}^^A
+% \changes{v3.15}{2014/12/09}{indirekt über \cs{DeclareSectionCommand}}^^A
 % \begin{macro}{\subparagraphnumdepth}
-%   \changes{v3.12}{2013/12/16}{new read only command}^^A
-%   \changes{v3.15}{2014/12/09}{indirekt über \cs{DeclareSectionCommand}}^^A
+% \changes{v3.12}{2013/12/16}{new read only command}^^A
+% \changes{v3.15}{2014/12/09}{indirekt über \cs{DeclareSectionCommand}}^^A
 % Diese dürfen nur gelesen, sollten aber nie umdefiniert werden und geben die
 % Nummerierungsebene der Gliederungsanweisungen an (nicht zu verwechseln mit
 % der Verzeichnisebene der Gliederungsanweisungen).
 % \begin{macro}{\parttocdepth}
-%   \changes{v3.15}{2014/12/22}{neue Anweisung}^^A
-%   \changes{v3.18}{2015/05/25}{indirekt über \cs{DeclareSectionCommand}}^^A
+% \changes{v3.15}{2014/12/22}{neue Anweisung}^^A
+% \changes{v3.18}{2015/05/25}{indirekt über \cs{DeclareSectionCommand}}^^A
 % \begin{macro}{\chaptertocdepth}
-%   \changes{v3.15}{2014/12/22}{neue Anweisung}^^A
-%   \changes{v3.18}{2015/05/20}{indirekt über \cs{DeclareSectionCommand}}^^A
+% \changes{v3.15}{2014/12/22}{neue Anweisung}^^A
+% \changes{v3.18}{2015/05/20}{indirekt über \cs{DeclareSectionCommand}}^^A
 % \begin{macro}{\sectiontocdepth}
-%   \changes{v3.15}{2014/12/09}{indirekt über \cs{DeclareSectionCommand}}^^A
+% \changes{v3.15}{2014/12/09}{indirekt über \cs{DeclareSectionCommand}}^^A
 % \begin{macro}{\subsectiontocdepth}
-%   \changes{v3.15}{2014/12/09}{indirekt über \cs{DeclareSectionCommand}}^^A
+% \changes{v3.15}{2014/12/09}{indirekt über \cs{DeclareSectionCommand}}^^A
 % \begin{macro}{\subsubsectiontocdepth}
-%   \changes{v3.15}{2014/12/09}{indirekt über \cs{DeclareSectionCommand}}^^A
+% \changes{v3.15}{2014/12/09}{indirekt über \cs{DeclareSectionCommand}}^^A
 % \begin{macro}{\paragraphtocdepth}
-%   \changes{v3.15}{2014/12/09}{indirekt über \cs{DeclareSectionCommand}}^^A
+% \changes{v3.15}{2014/12/09}{indirekt über \cs{DeclareSectionCommand}}^^A
 % \begin{macro}{\subparagraphtocdepth}
-%   \changes{v3.15}{2014/12/09}{indirekt über \cs{DeclareSectionCommand}}^^A
+% \changes{v3.15}{2014/12/09}{indirekt über \cs{DeclareSectionCommand}}^^A
 % Diese dürfen nur gelesen, sollten aber nie umdefiniert werden und geben die
 % Verzeichnisebene der Gliederungsanweisungen an.
 % \begin{macro}{\part}
-%   \changes{v3.18}{2015/05/25}{Verwendung von \cs{DeclareSectionCommand}}^^A
+% \changes{v3.18}{2015/05/25}{Verwendung von \cs{DeclareSectionCommand}}^^A
+% \changes{v3.26}{2018/06/27}{Definition nach \cs{section} verschoben (wegen
+%   bookmark level fix)}^^A
 % \begin{macro}{\chapter}
-%   \changes{v2.8d}{2001/07/05}{\cs{chapterpagestyle} statt
-%     \texttt{plain}}^^A
-%   \changes{v3.18}{2015/05/20}{Verwendung von \cs{DeclareSectionCommand}}^^A
+% \changes{v2.8d}{2001/07/05}{\cs{chapterpagestyle} statt
+%   \texttt{plain}}^^A
+% \changes{v3.18}{2015/05/20}{Verwendung von \cs{DeclareSectionCommand}}^^A
 % Als Besonderheit werden für \cs{chapter} nur diejenigen Werte gesetzt, die
 % nicht über Optionen eingestellt werden können und daher vorab deklariert
 % werden  müssen. Bei den Anweisungen der unteren Ebenen werden hingegen alle
 % Einstellungen über \cs{DeclareSectionCommand} vorgenommen.
 % \begin{macro}{\section}
-%   \changes{v2.8p}{2001/09/22}{\cs{sectfont} wird nun vor
-%     \cs{size@section} aufgerufen}^^A
-%   \changes{v2.8q}{2002/02/28}{\cs{nobreak} nach \cs{sectfont}
-%     behebt einen Bug im color Paket}^^A
-%   \changes{v2.96a}{2006/11/30}{Standardwert für \cs{parfillskip} (abhängig
-%     von Option \texttt{version})}^^A
-%   \changes{v2.96a}{2006/12/03}{alle nicht benötigten \cs{nobreak} entfernt}^^A
-%   \changes{v3.13a}{2014/09/11}{Verwendung von \cs{scr@startsection}}^^A
-%   \changes{v3.15}{2014/11/24}{Verwendung von \cs{DeclareSectionCommand}}^^A
+% \changes{v2.8p}{2001/09/22}{\cs{sectfont} wird nun vor
+%   \cs{size@section} aufgerufen}^^A
+% \changes{v2.8q}{2002/02/28}{\cs{nobreak} nach \cs{sectfont}
+%   behebt einen Bug im color Paket}^^A
+% \changes{v2.96a}{2006/11/30}{Standardwert für \cs{parfillskip} (abhängig
+%   von Option \texttt{version})}^^A
+% \changes{v2.96a}{2006/12/03}{alle nicht benötigten \cs{nobreak} entfernt}^^A
+% \changes{v3.13a}{2014/09/11}{Verwendung von \cs{scr@startsection}}^^A
+% \changes{v3.15}{2014/11/24}{Verwendung von \cs{DeclareSectionCommand}}^^A
 % \begin{macro}{\subsection}
-%   \changes{v2.8p}{2001/09/22}{\cs{sectfont} wird nun vor
-%     \cs{size@subsection} aufgerufen}^^A
-%   \changes{v2.8q}{2002/02/28}{\cs{nobreak} nach \cs{sectfont}
-%     behebt einen Bug im color Paket}^^A
-%   \changes{v2.96a}{2006/11/30}{Standardwert für \cs{parfillskip} (abhängig
-%     von Option \texttt{version})}^^A
-%   \changes{v2.96a}{2006/12/03}{alle nicht benötigten \cs{nobreak} entfernt}^^A
-%   \changes{v3.13a}{2014/09/11}{Verwendung von \cs{scr@startsection}}^^A
-%   \changes{v3.15}{2014/11/24}{Verwendung von \cs{DeclareSectionCommand}}^^A
+% \changes{v2.8p}{2001/09/22}{\cs{sectfont} wird nun vor
+%   \cs{size@subsection} aufgerufen}^^A
+% \changes{v2.8q}{2002/02/28}{\cs{nobreak} nach \cs{sectfont}
+%   behebt einen Bug im color Paket}^^A
+% \changes{v2.96a}{2006/11/30}{Standardwert für \cs{parfillskip} (abhängig
+%   von Option \texttt{version})}^^A
+% \changes{v2.96a}{2006/12/03}{alle nicht benötigten \cs{nobreak} entfernt}^^A
+% \changes{v3.13a}{2014/09/11}{Verwendung von \cs{scr@startsection}}^^A
+% \changes{v3.15}{2014/11/24}{Verwendung von \cs{DeclareSectionCommand}}^^A
 % \begin{macro}{\subsubsection}
-%   \changes{v2.3d}{1995/08/19}{wird bei \texttt{scrartcl} nun
-%     ebenfalls numeriert und ins Inhaltsverzeichnis geschrieben}^^A
-%   \changes{v2.8p}{2001/09/22}{\cs{sectfont} wird nun vor
-%     \cs{size@subsubsection} aufgerufen}^^A
-%   \changes{v2.8q}{2002/02/28}{\cs{nobreak} nach \cs{sectfont}
-%     behebt einen Bug im color Paket}^^A
-%   \changes{v2.96a}{2006/11/30}{Standardwert für \cs{parfillskip} (abhängig
-%     von Option \texttt{version})}^^A
-%   \changes{v2.96a}{2006/12/03}{alle nicht benötigten \cs{nobreak} entfernt}^^A
-%   \changes{v3.13a}{2014/09/11}{Verwendung von \cs{scr@startsection}}^^A
-%   \changes{v3.15}{2014/11/24}{Verwendung von \cs{DeclareSectionCommand}}^^A
+% \changes{v2.3d}{1995/08/19}{wird bei \texttt{scrartcl} nun
+%   ebenfalls numeriert und ins Inhaltsverzeichnis geschrieben}^^A
+% \changes{v2.8p}{2001/09/22}{\cs{sectfont} wird nun vor
+%   \cs{size@subsubsection} aufgerufen}^^A
+% \changes{v2.8q}{2002/02/28}{\cs{nobreak} nach \cs{sectfont}
+%   behebt einen Bug im color Paket}^^A
+% \changes{v2.96a}{2006/11/30}{Standardwert für \cs{parfillskip} (abhängig
+%   von Option \texttt{version})}^^A
+% \changes{v2.96a}{2006/12/03}{alle nicht benötigten \cs{nobreak} entfernt}^^A
+% \changes{v3.13a}{2014/09/11}{Verwendung von \cs{scr@startsection}}^^A
+% \changes{v3.15}{2014/11/24}{Verwendung von \cs{DeclareSectionCommand}}^^A
 % \begin{macro}{\paragraph}
-%   \changes{v2.8p}{2001/09/22}{\cs{sectfont} wird nun vor
-%     \cs{size@paragraph} aufgerufen}^^A
-%   \changes{v2.8q}{2002/02/28}{\cs{nobreak} nach \cs{sectfont}
-%     behebt einen Bug im color Paket}^^A
-%   \changes{v2.96a}{2006/12/03}{alle nicht benötigten \cs{nobreak} entfernt}^^A
-%   \changes{v3.15}{2014/11/24}{Verwendung von \cs{DeclareSectionCommand}}^^A
+% \changes{v2.8p}{2001/09/22}{\cs{sectfont} wird nun vor
+%   \cs{size@paragraph} aufgerufen}^^A
+% \changes{v2.8q}{2002/02/28}{\cs{nobreak} nach \cs{sectfont}
+%   behebt einen Bug im color Paket}^^A
+% \changes{v2.96a}{2006/12/03}{alle nicht benötigten \cs{nobreak} entfernt}^^A
+% \changes{v3.15}{2014/11/24}{Verwendung von \cs{DeclareSectionCommand}}^^A
 % \begin{macro}{\subparagraph}
-%   \changes{v2.8p}{2001/09/22}{\cs{sectfont} wird nun vor
-%     \cs{size@subparagraph} aufgerufen}^^A
-%   \changes{v2.8q}{2002/02/28}{\cs{nobreak} nach \cs{sectfont}
-%     behebt einen Bug im color Paket}^^A
-%   \changes{v2.96a}{2006/12/03}{alle nicht benötigten \cs{nobreak} entfernt}^^A
-%   \changes{v3.13a}{2014/09/11}{Verwendung von \cs{scr@startsection}}^^A
-%   \changes{v3.15}{2014/11/24}{Verwendung von \cs{DeclareSectionCommand}}^^A
-%   \changes{v3.15}{2014/11/24}{\cs{parindent} durch \cs{scr@parindent}
-%     ersetzt}^^A
+% \changes{v2.8p}{2001/09/22}{\cs{sectfont} wird nun vor
+%   \cs{size@subparagraph} aufgerufen}^^A
+% \changes{v2.8q}{2002/02/28}{\cs{nobreak} nach \cs{sectfont}
+%   behebt einen Bug im color Paket}^^A
+% \changes{v2.96a}{2006/12/03}{alle nicht benötigten \cs{nobreak} entfernt}^^A
+% \changes{v3.13a}{2014/09/11}{Verwendung von \cs{scr@startsection}}^^A
+% \changes{v3.15}{2014/11/24}{Verwendung von \cs{DeclareSectionCommand}}^^A
+% \changes{v3.15}{2014/11/24}{\cs{parindent} durch \cs{scr@parindent}
+%   ersetzt}^^A
 % Die Standardgliederungsbefehle \cs{section} bis \cs{subparagraph}
 % sind seit \KOMAScript{} v3.15 über die von \KOMAScript{} bereitgestellte
 % Schnittstelle \cs{DeclareSectionCommand} definiert.
 %    \begin{macrocode}
-\DeclareSectionCommand[%
-  style=part,%
-%<article>  level=\z@,%
-%<report|book>  level=\m@ne,%
-%<report|book>  pagestyle=plain,%
-  tocstyle=part,%
-  toclevel=\m@ne,%
-  tocindent=\z@,%
-  tocnumwidth=2em%
-]{part}
 %<*book|report>
 \DeclareSectionCommand[%
   style=chapter,%
@@ -5417,6 +5522,16 @@
 %<article>  tocnumwidth=1.5em%
 %<book|report>  tocnumwidth=2.3em%
 ]{section}
+\DeclareSectionCommand[%
+  style=part,%
+%<article>  level=\z@,%
+%<report|book>  level=\m@ne,%
+%<report|book>  pagestyle=plain,%
+  tocstyle=part,%
+  toclevel=\m@ne,%
+  tocindent=\z@,%
+  tocnumwidth=2em%
+]{part}
 \DeclareSectionCommand[%
   style=section,%
   level=2,%
