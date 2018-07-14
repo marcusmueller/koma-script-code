@@ -1,8 +1,8 @@
-% \CheckSum{3933}
+% \CheckSum{3955}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlayer.dtx
-% Copyright (c) Markus Kohm, 2012-2017
+% Copyright (c) Markus Kohm, 2012-2018
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrlayer.dtx
-% Copyright (c) Markus Kohm, 2012-2017
+% Copyright (c) Markus Kohm, 2012-2018
 %
 % Diese Datei ist Teil der LaTeX2e KOMA-Script-Sammlung.
 %
@@ -1921,6 +1921,29 @@
 % \end{macro}^^A \ProvideLayer
 % \end{macro}^^A \DeclareNewLayer
 %
+% \begin{macro}{\ModifyLayers}
+% \changes{v3.26}{2018/07/14}{new}^^A
+% Like \cs{ModifyLayer} but allows a list of layers instead of only one layer.
+% For the commands \cs{DeclareLayer}, \cs{ProvideLayer} and
+% \cs{RedeclareLayer} this does not make any sense, so there are not similar
+% list commands for these commands.
+%    \begin{macrocode}
+%<*package&body>
+\newcommand{\ModifyLayers}[2][]{%
+  \edef\scr@current@layer{#2}%
+  \@for\scr@current@layer:=\scr@current@layer\do{%
+    \ifx\scr@current@layer\@emtpy\else
+      \edef\scr@current@layer{%
+        \unexpanded{\ModifyLayer[{#1}]}{\scr@current@layer}%
+      }%
+      \scr@current@layer
+    \fi
+  }%
+  \let\scr@current@layer\@empty
+}
+%</package&body>
+%    \end{macrocode}
+% \end{macro}^^A \ModifyLayers
 %
 % \begin{macro}{\GetLayerContents}
 %   \changes{v3.16}{2015/01/26}{new}
