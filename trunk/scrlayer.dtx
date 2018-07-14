@@ -1,4 +1,4 @@
-% \CheckSum{4118}
+% \CheckSum{4116}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlayer.dtx
@@ -3645,27 +3645,29 @@
 %<*package&body>
 \RequirePackage{scrlfile}
 \BeforePackage{tagpdf}{%
+%    \end{macrocode}
+% Deactivation of the two commands before loading \textsf{tagpdf}, so that
+% after loading the package \cs{providecommand} can be used to do a new
+% default definition.
+%    \begin{macrocode}
   \let\scrlayer@beginartifact\relax
   \let\scrlayer@endartifact\relax
 }
 \AfterPackage*{tagpdf}{%
-  \scr@ifundefinedorrelax{scrlayer@beginartifact}{%
-    \newcommand*{\scrlayer@beginartifact}[1]{%
-      \ifstr{#1}{}{%
-        \tagmcbegin{artifact}%
-      }{%
-        \tagmcbegin{artifact=#1}%
-      }%
-    }
-  }{}%
-  \scr@ifundefinedorrelax{scrlayer@endartifact}{%
-    \newcommand*{\scrlayer@endartifact}[1]{%
-      \tagmcend
+  \providecommand*{\scrlayer@beginartifact}[1]{%
+    \ifstr{#1}{}{%
+      \tagmcbegin{artifact}%
+    }{%
+      \tagmcbegin{artifact=#1}%
     }%
-  }{}%
+  }%
+  \providecommand*{\scrlayer@endartifact}[1]{%
+    \tagmcend
+  }%
 }
 %    \end{macrocode}
-% But the default definition are a simple dummies:
+% But the default definition (if \textsf{tagpdf} has not already been loaded)
+% are simple dummies:
 %    \begin{macrocode}
 \providecommand*{\scrlayer@beginartifact}[1]{}
 \providecommand*{\scrlayer@endartifact}[1]{}
