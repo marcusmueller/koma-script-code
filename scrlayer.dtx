@@ -1,4 +1,4 @@
-% \CheckSum{3955}
+% \CheckSum{4118}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlayer.dtx
@@ -1411,6 +1411,44 @@
   \csname @scr@l@\scr@current@layer @onesidetrue\endcsname
 }
 %    \end{macrocode}
+% \changes{v3.26}{2018/07/14}{new attribute \texttt{beforecontents}}^^A
+% \item[\Option{beforecontents}:] code to be executed immediately before
+%   setting the contents. See also modification attribute
+%   \texttt{addbeforecontents}.
+%    \begin{macrocode}
+\FamilyCSKey[.definelayer]{KOMAarg}{beforecontents}
+            {scr@l@\scr@current@layer @precontents@hook}
+%    \end{macrocode}
+% \changes{v3.26}{2018/07/14}{new attribute \texttt{aftercontents}}^^A
+% \item[\Option{beforecontents}:] code to be executed immediately before
+%   setting the contents. See also modification attribute
+%   \texttt{addaftercontents}.
+%    \begin{macrocode}
+\FamilyCSKey[.definelayer]{KOMAarg}{aftercontents}
+            {scr@l@\scr@current@layer @postcontents@hook}
+%    \end{macrocode}
+% \changes{v3.26}{2018/07/14}{new attribute \texttt{artifact}}^^A
+% \item[\Option{artifact}:] reserved for tagging packages. The artifact can
+%   either be a boolean or a general value. Boolean false will unset the
+%   attribute. Boolean true is the same like empty. All other values will be
+%   stored.
+%    \begin{macrocode}
+\DefineFamilyKey[.definelayer]{KOMAarg}{artifact}[true]{%
+  \FamilySetBool{KOMAarg}{artifact}{@tempswa}{#1}%
+  \ifx\FamilyKeyState\FamilyKeyStateProcessed
+    \if@tempswa
+      \expandafter\let\csname scr@l@\scr@current@layer @artifact\endcsname
+      \@empty
+    \else
+      \expandafter\let\csname scr@l@\scr@current@layer @artifact\endcsname
+      \relax
+    \fi
+  \else
+    \FamilyKeyStateProcessed
+    \@namedef{scr@l@\scr@current@layer @artifact}{#1}%
+  \fi
+}
+%    \end{macrocode}
 % \end{description}
 %
 % Attribute modifications are attributes, that modify existing basic
@@ -1481,6 +1519,44 @@
   \expandafter\edef\csname scr@l@\scr@current@layer @contents\endcsname{%
     \unexpanded{#1}\unexpanded\expandafter\expandafter\expandafter{%
       \csname scr@l@\scr@current@layer @contents\endcsname}}%
+  \FamilyKeyStateProcessed
+}
+%    \end{macrocode}
+% \changes{v3.26}{2018/07/14}{new attribute \texttt{addbeforecontents}}^^A
+% \item[\Option{addbeforecontents}:] code to be executed immediately before
+%   setting the contents. The new code will be added before the old code.
+%    \begin{macrocode}
+\DefineFamilyKey[.definelayer]{KOMAarg}{addbeforecontents}{%
+  \scr@ifundefinedorrelax{scr@l@\scr@current@layer @precontents@hook}{%
+    \expandafter\def
+    \csname scr@l@\scr@current@layer @precontents@hook\endcsname{#1}%
+  }{%
+    \expandafter\edef
+    \csname scr@l@\scr@current@layer @precontents@hook\endcsname{%
+      \unexpanded\expandafter\expandafter\expandafter{%
+        \csname scr@l@\scr@current@layer @precontents@hook\endcsname}%
+      \unexpanded{#1}
+    }%
+  }%
+  \FamilyKeyStateProcessed
+}
+%    \end{macrocode}
+% \changes{v3.26}{2018/07/14}{new attribute \texttt{addaftercontents}}^^A
+% \item[\Option{addbeforecontents}:] code to be executed immediately before
+%   setting the contents. The new code will be added after the old code.
+%    \begin{macrocode}
+\DefineFamilyKey[.definelayer]{KOMAarg}{addaftercontents}{%
+  \scr@ifundefinedorrelax{scr@l@\scr@current@layer @postcontents@hook}{%
+    \expandafter\def
+    \csname scr@l@\scr@current@layer @postcontents@hook\endcsname{#1}%
+  }{%
+    \expandafter\edef
+    \csname scr@l@\scr@current@layer @postcontents@hook\endcsname{%
+      \unexpanded{#1}%
+      \unexpanded\expandafter\expandafter\expandafter{%
+        \csname scr@l@\scr@current@layer @precontents@hook\endcsname}%
+    }%
+  }%
   \FamilyKeyStateProcessed
 }
 %    \end{macrocode}
@@ -1729,6 +1805,8 @@
   \FamilyKeyStateProcessed
 }
 %    \end{macrocode}
+% \changes{v3.26}{2018/07/14}{clone code for \texttt{precontents@hook},
+%   \texttt{postcontents@hook} and \texttt{artifact} added}^^A
 % \item[\texttt{clone=\meta{layer}}:] set up the new layer by the settings
 %   of the given \meta{layer}.
 %   \begin{macrocode}
@@ -1756,6 +1834,9 @@
     \scrlayer@clone@switch{\scr@current@layer}{#1}{twoside}%
     \scrlayer@clone@switch{\scr@current@layer}{#1}{floatpage}%
     \scrlayer@clone@switch{\scr@current@layer}{#1}{nonfloatpage}%
+    \scrlayer@clone@attribute{\scr@current@layer}{#1}{precontents@hook}%
+    \scrlayer@clone@attribute{\scr@current@layer}{#1}{postcontents@hook}%
+    \scrlayer@clone@attribute{\scr@current@layer}{#1}{artifact}%
   }%
 }
 %    \end{macrocode}
@@ -1965,6 +2046,8 @@
 %
 %
 % \begin{macro}{\DestroyLayer}
+% \changes{v3.26}{2018/07/14}{destroy pre-contents hook, post-contents hook
+%   and artifact}^^A
 %   \begin{description}
 %   \item[\Parameter{string}:] the name of the layer, that should be
 %     destroyed
@@ -2012,6 +2095,9 @@
     \expandafter\let\csname if@scr@l@#1@nonfloatpage\endcsname\relax
     \expandafter\let\csname @scr@l@#1@nonfloatpagefalse\endcsname\relax
     \expandafter\let\csname @scr@l@#1@nonfloatpagetrue\endcsname\relax
+    \expandafter\let\csname scr@l@#1@precontents@hook\relax
+    \expandafter\let\csname scr@l@#1@postcontents@hook\relax
+    \expandafter\let\csname scr@l@#1@artifact\relax
   }{%
 %<*trace>    
     \PackageInfo{scrlayer}{\string\DestroyLayer{#1} ignored,\MessageBreak
@@ -2870,6 +2956,7 @@
 % \end{macro}^^A \ForEachLayerOfPageStyle
 %
 % \begin{macro}{\scrlayer@do@page@style@element@layer}
+% \changes{v3.26}{2018/07/14}{added hooks and artifact code}^^A
 % Helper macro to show one layer. First argument is either ``background'' or
 % ``foreground'', second argument is either ``odd'' or ``even'', and third
 % argument is the name of the layer. Note, that in draft mode for every layer
@@ -2894,7 +2981,13 @@
                            (\csname scr@l@#3@w\endcsname,%
                             \csname scr@l@#3@h\endcsname)%
                            [\csname scr@l@#3@align\endcsname]%
-                           {\layercontentsmeasure}%
+                           {%
+                             \scrlayer@predraftmeasure@hook
+                             \scrlayer@beginartifact{}%
+                             \layercontentsmeasure
+                             \scrlayer@endartifact{}%
+                             \scrlayer@postdraftmeasure@hook
+                           }%
             \fi
             \scr@layerbox(\csname scr@l@#3@x\endcsname,%
                           \csname scr@l@#3@y\endcsname)%
@@ -2902,8 +2995,26 @@
                           \csname scr@l@#3@h\endcsname)%
                          [\csname scr@l@#3@align\endcsname]%
                          {\csname layer\csname scr@l@#3@mode\endcsname 
-                                  mode\expandafter\endcsname
-                          \csname scr@l@#3@contents\endcsname}%
+                                  mode\expandafter\endcsname{%
+                             \csname scr@l@#3@precontents@hook\endcsname
+                             \scr@ifundefinedorrelax{scr@l@#3@artifact}{}{%
+                               \expandafter\expandafter\expandafter
+                               \scrlayer@beginartifact
+                               \expandafter\expandafter\expandafter{%
+                                 \csname scr@l@#3@artifact\endcsname
+                               }%
+                               \csname scr@l@#3@contents\endcsname
+                               \expandafter\expandafter\expandafter
+                               \scrlayer@endartifact
+                               \expandafter\expandafter\expandafter{%
+                                 \csname scr@l@#3@artifact\endcsname
+                               }%
+                             }{%
+                               \csname scr@l@#3@contents\endcsname
+                             }%
+                             \csname scr@l@#3@postcontents@hook\endcsname
+                           }%
+                         }%     
           \fi
         \fi
       \fi
@@ -2911,6 +3022,42 @@
   \endgroup
 }
 %    \end{macrocode}
+% \begin{macro}{\scrlayer@predraftmeasure@hook}
+% \changes{v3.26}{2018/07/14}{new (internal)}^^A
+% The hooks that will be executed before setting the draft measuring.
+%    \begin{macrocode}
+\newcommand*{\scrlayer@predraftmeasure@hook}{}
+%    \end{macrocode}
+% \begin{macro}{\BeforeDraftMeasuringLayer}
+% \changes{v3.26}{2018/07/14}{new}^^A
+% New code will be added in front of the hook.
+%    \begin{macrocode}
+\newcommand*{\BeforeDraftMeasuringLayer}[1]{%
+  \edef\scrlayer@predraftmeasure@hook{%
+    \unexpanded{#1}\unexpanded\expandafter{\scrlayer@predraftmeasure@hook}%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}^^A \BeforeDraftMeasuringLayer
+% \end{macro}^^A \scrlayer@predraftmeasure@hook
+% \begin{macro}{\scrlayer@postdraftmeasure@hook}
+% \changes{v3.26}{2018/07/14}{new (internal)}^^A
+% The hook that will be executed after setting the draft measuring.
+%    \begin{macrocode}
+\newcommand*{\scrlayer@postdraftmeasure@hook}{}
+%    \end{macrocode}
+% \begin{macro}{\AfterDraftMeasuringLayer}
+% \changes{v3.26}{2018/07/14}{new}^^A
+% New code will be added at the end of the hook.
+%    \begin{macrocode}
+\newcommand*{\AfterDraftMeasuringLayer}[1]{%
+  \expandafter\def\expandafter\scrlayer@postdraftmeasure@hook\expandafter{%
+    \scrlayer@postdraftmeasure@hook #1%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}^^A \AfterDraftMeasuringLayer
+% \end{macro}^^A \scrlayer@postdraftmeasure@hook
 % \begin{macro}{\scr@layerbox}
 %   \changes{v3.20}{2016/04/12}{\cs{@ifnextchar} replaced by
 %     \cs{kernel@ifnextchar}}^^A
@@ -3479,6 +3626,53 @@
 %    \end{macrocode}
 % \end{macro}^^A \AddToLayerPageStyleOptions
 % \end{macro}^^A \ModifyLayerPageStyleOptions
+%
+% \begin{macro}{\scrlayer@beginartifact}
+% \changes{v3.26}{2018/07/14}{new (semi internal)}^^A
+% \begin{macro}{\scrlayer@endartifact}
+% \changes{v3.26}{2018/07/14}{new (semi internal)}^^A
+% These macros are reserved for tagging packages. The first one is executed
+% after the initial contents hook, the last one is executed after the final
+% contents hook. Both executions are done only, if the \texttt{artifact}
+% option of the layer has been used an was not boolean false. With boolean
+% true the argument will be empty. All other values will be passed as
+% argument.
+%
+% In case of package \textsf{tagpdf} the following definition would be
+% usefull (here automatically done after loading the package, if the package
+% does not do its own definitions):
+%    \begin{macrocode}
+%<*package&body>
+\RequirePackage{scrlfile}
+\BeforePackage{tagpdf}{%
+  \let\scrlayer@beginartifact\relax
+  \let\scrlayer@endartifact\relax
+}
+\AfterPackage*{tagpdf}{%
+  \scr@ifundefinedorrelax{scrlayer@beginartifact}{%
+    \newcommand*{\scrlayer@beginartifact}[1]{%
+      \ifstr{#1}{}{%
+        \tagmcbegin{artifact}%
+      }{%
+        \tagmcbegin{artifact=#1}%
+      }%
+    }
+  }{}%
+  \scr@ifundefinedorrelax{scrlayer@endartifact}{%
+    \newcommand*{\scrlayer@endartifact}[1]{%
+      \tagmcend
+    }%
+  }{}%
+}
+%    \end{macrocode}
+% But the default definition are a simple dummies:
+%    \begin{macrocode}
+\providecommand*{\scrlayer@beginartifact}[1]{}
+\providecommand*{\scrlayer@endartifact}[1]{}
+%</package&body>
+%    \end{macrocode}
+% \end{macro}^^A \scrlayer@endartifact
+% \end{macro}^^A \scrlayer@beginartifact
 %
 % \begin{macro}{\DeclarePageStyleAlias}
 % \begin{macro}{\DeclareNewPageStyleAlias}
