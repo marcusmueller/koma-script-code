@@ -1,6 +1,6 @@
 % ======================================================================
 % linkalias.tex
-% Copyright (c) Markus Kohm, 2008-2016
+% Copyright (c) Markus Kohm, 2008-2018
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -18,7 +18,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % linkalias.tex
-% Copyright (c) Markus Kohm, 2008-2016
+% Copyright (c) Markus Kohm, 2008-2018
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -43,13 +43,21 @@
                   link aliases for the free version]
 
 \makeatletter
-\newcommand*{\lalias}[2]{%
-  \scr@ifundefinedorrelax{r@#1}{%
-    \expandafter\let\csname r@#1\expandafter\endcsname\csname r@#2\endcsname
+\newcommand*{\lalias}[3][]{%
+  \scr@ifundefinedorrelax{r@#2}{%
+    \IfArgIsEmpty{#1}{%
+      \expandafter\let\csname r@#2\expandafter\endcsname\csname r@#3\endcsname
+    }{%
+      \expandafter\let\expandafter\reserved@a\csname r@#3\endcsname
+      \expandafter\expandafter\expandafter\def\expandafter\expandafter\expandafter\reserved@a\expandafter\expandafter\expandafter{\expandafter\@gobble\reserved@a}%
+      \expandafter\edef\csname r@#2\endcsname{%
+        {\unexpanded{#1}}\unexpanded\expandafter{\reserved@a}%
+      }%
+    }%
   }{%
     \ClassWarning{scrguide}{%
-      Label alias `#1'\MessageBreak
-      to `#2' ignored,\MessageBreak
+      Label alias `#2'\MessageBreak
+      to `#3' ignored,\MessageBreak
       because of multiply definition%
     }%
     \gdef \@multiplelabels {%
@@ -70,3 +78,4 @@
 \lalias{desc:maincls-experts.cmd.thepage}{sec:maincls-experts.addInfos}
 \lalias{desc:maincls-experts.cmd.pagemark}{sec:maincls-experts.addInfos}
 \lalias{desc:maincls-experts.cmd.the/Zaehler/}{sec:maincls-experts.addInfos}
+\lalias[\OptionValue{parskip}{relative}]{desc:maincls-experts.option.parskip.relative}{desc:maincls.option.parskip=Methode}
