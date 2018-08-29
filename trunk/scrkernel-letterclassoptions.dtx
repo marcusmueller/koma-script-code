@@ -1,4 +1,4 @@
-% \CheckSum{1753}
+% \CheckSum{1748}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-letterclassoptions.dtx
@@ -159,8 +159,10 @@
 % \subsection{Makros für Letter-Class-Options}
 %
 % \begin{macro}{\LoadLetterOption}
-%   \changes{v2.8q}{2001/10/08}{Neu}^^A
-%   \changes{v3.14}{2014/10/04}{Leerzeichen werden ignoriert}^^A
+% \changes{v2.8q}{2001/10/08}{Neu}^^A
+% \changes{v3.14}{2014/10/04}{Leerzeichen werden ignoriert}^^A
+% \changes{v3.26}{2018/08/29}{Verwendung von \cs{scr@sp@def} statt
+%   \cs{KV@@sp@def}}^^A
 % Bei der neuen Briefklasse existiert eine Anweisung, mit der eine
 % \emph{\textbf{l}etter-\texttt{c}lass-\texttt{o}ption}-Datei geladen
 % werden kann. Das Laden wird mit entsprechender Information in der
@@ -189,7 +191,7 @@
   \@tempcnta=\@restore@catcode@level\relax
   \advance\@tempcnta by \@ne\relax
   \edef\@restore@catcode@level{\the\@tempcnta}%
-  \KV@@sp@def\reserved@a{#1}%
+  \scr@sp@def\reserved@a{#1}%
   \edef\reserved@a{%
     \noexpand\edef\noexpand\scr@currentlco{\reserved@a}%
     \noexpand\InputIfFileExists{\reserved@a.lco}{%
@@ -248,7 +250,9 @@
 }
 %    \end{macrocode}
 % \begin{macro}{\lco@RequirePackage}
-%   \changes{v3.18}{2015/06/03}{neue Anweisung (intern)}
+% \changes{v3.18}{2015/06/03}{neue Anweisung (intern)}^^A
+% \changes{v3.26}{2018/08/29}{Verwendung von \cs{scr@trim@spaces} statt
+%   \cs{KV@@sp@def}}^^A
 % Da \texttt{lco}-Dateien auch noch nach \cs{begin\{document\}} geladen werden
 % können, wird hier sinnvoll auf die Anforderung von Paketen in diesem Fall
 % reagiert. In der ersten Ausbaustufe wird eine sinnvolle Fehlermeldung
@@ -262,7 +266,7 @@
 \newcommand*{\lco@RequirePackage}[2][]{%
   \begingroup
     \@for\reserved@a:=#2\do{%
-      \expandafter\KV@@sp@def\expandafter\reserved@a\expandafter{\reserved@a}%
+      \scr@trim@spaces\reserved@a
       \scr@ifundefinedorrelax{ver@\reserved@a.\scr@pkgextension}{%
 %<class>        \ClassError{\KOMAClassName}{%
 %<package>        \PackageError{scrletter}{%
@@ -283,7 +287,11 @@
 % \end{macro}^^A \lco@RequirePackage
 % \end{macro}^^A \LoadLetterOption
 % \begin{macro}{\LoadLetterOptions}
-%   \changes{v3.14}{2014/10/04}{Neue Anweisung}^^A
+% \changes{v3.14}{2014/10/04}{Neue Anweisung}^^A
+% \changes{v3.26}{2018/08/29}{\cs{scr@trim@spaces} eingefügt und damit
+%   Leerzeichen zwischen den Einträgen erlaubt}^^A
+% \changes{v3.26}{2018/08/29}{Behandlung für (nicht mehr mögliche)
+%   Leerzeicheneinträge entfernt}^^A
 % Funktioniert prinzipiell wie \cs{LoadLetterOption}, aber es werden mehrere,
 % durch Komma getrennte Optionen unterstützt.
 %    \begin{macrocode}
@@ -291,11 +299,10 @@
   \begingroup
     \def\reserved@a{\endgroup}%
     \@for\reserved@b:=#1\do{%
+      \scr@trim@spaces\reserved@b
       \ifx\reserved@b\@empty\else
-        \ifx\reserved@b\space\else
-          \edef\reserved@a{\expandafter\unexpanded\expandafter{\reserved@a
-              \LoadLetterOption}{\reserved@b}\relax}%
-        \fi
+        \edef\reserved@a{\expandafter\unexpanded\expandafter{\reserved@a
+            \LoadLetterOption}{\reserved@b}\relax}%
       \fi
     }%
   \reserved@a
@@ -953,6 +960,7 @@
 %    \end{macrocode}
 %
 % \begin{macro}{\showfields}
+% \changes{v3.26}{2018/08/29}{\cs{scr@trim@spaces} eingefügt}^^A
 % Diese Anweisung erlaubt es, eine Reihe von Felder zu visualisieren. Dazu
 % gibt man die gewünschten Felder als Komma separierte Liste im ersten und
 % einzigen Argument der Anweisung an. Gibt man ein unbekanntes Feld an, so
@@ -965,6 +973,7 @@
   \AtBeginLetter{%
     \begingroup
       \@for \@tempa:=#1\do{%
+        \scr@trim@spaces\@tempa
         \ifx\@tempa\@empty\else
           \@ifundefined{showfield@\@tempa}{%
             \LCOWarning{visualize}{Unknown field `\@tempa' ignored}%
