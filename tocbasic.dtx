@@ -1,4 +1,4 @@
-% \CheckSum{1615}
+% \CheckSum{1571}
 % \iffalse meta-comment
 % ======================================================================
 % tocbasic.dtx
@@ -1095,7 +1095,11 @@
 % \end{macro}
 %
 % \begin{macro}{\setuptoc}
+% \changes{v3.26}{2018/08/29}{Verwendung von \cs{scr@trim@spaces} statt
+%   \cs{tb@@sp@def}}^^A
 % \begin{macro}{\unsettoc}
+% \changes{v3.26}{2018/08/29}{Verwendung von \cs{scr@trim@spaces} statt
+%   \cs{tb@@sp@def}}^^A
 %   Known features are:
 %   \begin{description}
 %   \item[\texttt{totoc}] writes the title of the list of to the table of
@@ -1122,29 +1126,16 @@
 %    \begin{macrocode}
 \newcommand*{\setuptoc}[2]{%
   \@for\@tempa:=#2\do{%
-    \expandafter\tb@@sp@def\expandafter\@tempa\expandafter{\@tempa}%
+    \scr@trim@spaces\@tempa
     \@namedef{tocbasic@#1@feature@\@tempa}{}%
   }%
 }
 \newcommand*{\unsettoc}[2]{%
   \@for\@tempa:=#2\do{%
-    \expandafter\tb@@sp@def\expandafter\@tempa\expandafter{\@tempa}%
+    \scr@trim@spaces\@tempa
     \expandafter\let\csname tocbasic@#1@feature@\@tempa\endcsname\relax
   }%
 }
-\def\@tempa#1{%
-  \def\tb@@sp@def##1##2{%
-    \futurelet\tb@sp@tempa\tb@@sp@d##2\@nil\@nil#1\@nil\relax##1}%
-  \def\tb@@sp@d{%
-    \ifx\tb@sp@tempa\@sptoken
-      \expandafter\tb@@sp@b
-    \else
-      \expandafter\tb@@sp@b\expandafter#1%
-    \fi}%
-  \def\tb@@sp@b#1##1 \@nil{\tb@@sp@c##1}%
-}
-\@tempa{ }
-\def\tb@@sp@c#1\@nil#2\relax#3{\@temptokena{#1}\edef#3{\the\@temptokena}}
 %    \end{macrocode}
 %   Do not add the files, that babel handles by default.
 %    \begin{macrocode}

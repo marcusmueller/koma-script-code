@@ -1,8 +1,8 @@
-% \CheckSum{3730}
+% \CheckSum{3772}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
-% Copyright (c) Markus Kohm, 2002-2017
+% Copyright (c) Markus Kohm, 2002-2018
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrkernel-basics.dtx
-% Copyright (c) Markus Kohm, 2002-2017
+% Copyright (c) Markus Kohm, 2002-2018
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -1236,6 +1236,58 @@
 % \end{macro}
 %
 % \subsection{Häufig benötigte Befehle}
+%
+% \begin{macro}{\scr@trim@spaces}
+% \changes{v3.12}{2013/11/06}{neu (intern)}^^A
+% \changes{v3.26}{2018/08/29}{von \texttt{scrkernel-language.dtx} nach
+%   \texttt{scrkernel-basics.dtx} verschoben}^^A
+% Diese Hilfsanweisung entfernt führende und abschließende
+% Leerzeichen. Argument ist die Anweisung, deren Inhalt von den Leerzeichen
+% befreit werden soll. Gedacht ist das ganze für die Listenverarbeitung mit
+% Hilfe von \cs{@for}. Als Argument wird ein Makro übergeben, in dessen
+% Definition führende und abschließende space-Tokens entfernt werden sollen.
+% \begin{macro}{\scr@sp@def}
+% \changes{v3.26}{2018/08/29}{von \texttt{tocbasic.dtx} nach
+%   \texttt{scrkernel-basics.dtx} verschoben und umbenannt}^^A
+% \begin{macro}{\scr@sp@d}
+% \changes{v3.26}{2018/08/29}{von \texttt{tocbasic.dtx} nach
+%   \texttt{scrkernel-basics.dtx} verschoben und umbenannt}^^A
+% \begin{macro}{\scr@sp@b}
+% \changes{v3.26}{2018/08/29}{von \texttt{tocbasic.dtx} nach
+%   \texttt{scrkernel-basics.dtx} verschoben und umbenannt}^^A
+% \begin{macro}{\scr@sp@c}
+% \changes{v3.26}{2018/08/29}{von \texttt{tocbasic.dtx} nach
+%   \texttt{scrkernel-basics.dtx} verschoben und umbenannt}^^A
+% Die Hilfsanweisung \cs{scr@sp@def} definiert eine Anweisung (erstes
+% Argument) mit einer Tokenliste (zweites Argument) und entfernt dabei
+% führende und abschließende Leerzeichen. Die Anweisung stammt ursprünglich
+% aus \textsf{keyval}. Der Rest sind Hilfsanweisungen für die Implementierung
+% der Hilfsanweisung.
+%    \begin{macrocode}
+%<*base>
+\newcommand\scr@trim@spaces[1]{%
+  \expandafter\scr@sp@def\expandafter#1\expandafter{#1}%
+}
+\def\@tempa#1{%
+  \def\scr@sp@def##1##2{%
+    \futurelet\scr@sp@tempa\scr@sp@d##2\@nil\@nil#1\@nil\relax##1}%
+  \def\scr@sp@d{%
+    \ifx\scr@sp@tempa\@sptoken
+      \expandafter\scr@sp@b
+    \else
+      \expandafter\scr@sp@b\expandafter#1%
+    \fi}%
+  \def\scr@sp@b#1##1 \@nil{\scr@sp@c##1}%
+}
+\@tempa{ }
+\def\scr@sp@c#1\@nil#2\relax#3{\@temptokena{#1}\edef#3{\the\@temptokena}}
+%</base>
+%    \end{macrocode}
+% \end{macro}^^A \scr@sp@c
+% \end{macro}^^A \scr@sp@b
+% \end{macro}^^A \scr@sp@d
+% \end{macro}^^A \scr@sp@def
+% \end{macro}^^A \scr@trim@space
 %
 % \begin{macro}{\if@atdocument}
 %   \changes{v2.95}{2002/12/05}{neuer Schalter}^^A
@@ -3234,23 +3286,25 @@
 %    \end{macrocode}
 % \end{macro}^^A \scr@execute@elseoption
 % \begin{macro}{\ifscr@key@found@}
-%   \changes{v2.97c}{2007/04/19}{Neuer Schalter (intern)}^^A
-%   \changes{v3.00}{2008/04/30}{umbenannt von \cs{ifKOMA@key@found}}
+% \changes{v2.97c}{2007/04/19}{Neuer Schalter (intern)}^^A
+% \changes{v3.00}{2008/04/30}{umbenannt von \cs{ifKOMA@key@found}}^^A
 % \begin{macro}{\scr@key@atlist}
-%   \changes{v2.97c}{2007/04/19}{Neues Makro (intern)}^^A
-%   \changes{v3.00}{2008/04/30}{umbenannt von \cs{KOMA@key@atlist}}
+% \changes{v2.97c}{2007/04/19}{Neues Makro (intern)}^^A
+% \changes{v3.00}{2008/04/30}{umbenannt von \cs{KOMA@key@atlist}}^^A
 % \begin{macro}{\scr@key@name}
-%   \changes{v2.97c}{2007/04/19}{Neues Makro (intern)}^^A
-%   \changes{v3.00}{2008/04/30}{umbenannt von \cs{KOMA@key@name}}
+% \changes{v2.97c}{2007/04/19}{Neues Makro (intern)}^^A
+% \changes{v3.00}{2008/04/30}{umbenannt von \cs{KOMA@key@name}}^^A
 % \begin{macro}{\scr@key@value}
-%   \changes{v2.97c}{2007/04/19}{Neues Makro (intern)}^^A
-%   \changes{v3.00}{2008/04/30}{umbenannt von \cs{KOMA@key@value}}
+% \changes{v2.97c}{2007/04/19}{Neues Makro (intern)}^^A
+% \changes{v3.00}{2008/04/30}{umbenannt von \cs{KOMA@key@value}}^^A
 % \begin{macro}{\scr@key@split@name@value}
-%   \changes{v2.97c}{2007/04/19}{Neues Makro (intern)}^^A
-%   \changes{v2.97e}{2007/11/10}{verwendet \cs{KV@@sp@def} zur Entsorgung von
-%     Leerzeichen}
-%   \changes{v3.00}{2008/04/30}{umbenannt von \cs{KOMA@key@split@name@value}}
-%   \changes{v3.13}{2014/10/17}{\cs{long}}
+% \changes{v2.97c}{2007/04/19}{Neues Makro (intern)}^^A
+% \changes{v2.97e}{2007/11/10}{verwendet \cs{KV@@sp@def} zur Entsorgung von
+%   Leerzeichen}^^A
+% \changes{v3.00}{2008/04/30}{umbenannt von \cs{KOMA@key@split@name@value}}^^A
+% \changes{v3.13}{2014/10/17}{\cs{long}}^^A
+% \changes{v3.26}{2018/08/29}{Verwendung von \cs{scr@sp@def} statt
+%   \cs{KV@@sp@def}}^^A
 %    \begin{macrocode}
 \newif\ifscr@key@found@
 \newcommand*{\scr@key@atlist}{}
@@ -3258,8 +3312,8 @@
 \newcommand*{\scr@key@value}{}
 \newcommand*{\scr@key@split@name@value}{}
 \long\def\scr@key@split@name@value#1=#2=#3\@nil{%
-  \KV@@sp@def\scr@key@name{#1}%
-  \KV@@sp@def\scr@key@value{#2}%
+  \scr@sp@def\scr@key@name{#1}%
+  \scr@sp@def\scr@key@value{#2}%
 }
 %</base>
 %    \end{macrocode}
@@ -3271,12 +3325,14 @@
 % \end{macro}^^A \FamilyOptions
 %
 % \begin{macro}{\FamilyOption}
-%   \changes{v3.00}{2008/04/30}{Neue Anweisung}^^A
+% \changes{v3.00}{2008/04/30}{Neue Anweisung}^^A
 % \begin{macro}{\@FamilyOptions}
-%   \changes{v3.14}[2014/10/17]{Neue streng interne Anweisung}^^A
+% \changes{v3.14}[2014/10/17]{Neue streng interne Anweisung}^^A
+% \changes{v3.26}{2018/08/29}{Verwendung von \cs{scr@sp@def} statt
+%   \cs{KV@@sp@def}}^^A
 % \begin{macro}{\Family@Option}
-%   \changes{v3.00}{2008/04/30}{Neu (intern)}^^A
-%   \changes{v3.12}{2013/03/04}{entfernt}^^A
+% \changes{v3.00}{2008/04/30}{Neu (intern)}^^A
+% \changes{v3.12}{2013/03/04}{entfernt}^^A
 % \end{macro}
 %   \changes{v3.04b}{2010/01/29}{\cs{edef} durch \cs{protected@edef} ersetzt}
 % Im Gegensatz zu \cs{FamilyOptions} kann man mit dieser Anweisung nur eine
@@ -3288,7 +3344,7 @@
 %<*base>
 \newcommand*{\FamilyOption}[2]{\@FamilyOption{#1}{#2}}
 \newcommand{\@FamilyOption}[3]{%
-  \expandafter\KV@@sp@def\expandafter\scr@key@name\expandafter{#2}%
+  \expandafter\scr@sp@def\expandafter\scr@key@name\expandafter{#2}%
 %    \end{macrocode}
 % Der einfachste Weg ist nun schlicht, die Liste der Werte durchzugehen und so
 % nach und nach eine Liste von Werten für \cs{FamilyOptions} zu erzeugen.
