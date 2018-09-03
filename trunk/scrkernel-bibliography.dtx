@@ -1,8 +1,8 @@
-% \CheckSum{417}
+% \CheckSum{421}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-bibliography.dtx
-% Copyright (c) Markus Kohm, 2002-2017
+% Copyright (c) Markus Kohm, 2002-2018
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrkernel-bibliography.dtx
-% Copyright (c) Markus Kohm, 2002-2017
+% Copyright (c) Markus Kohm, 2002-2018
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -274,6 +274,8 @@
 % \changes{v3.25}{2017/10/13}{using \cs{bibliography@heading}}^^A
 % \begin{macro}{\bibliography@heading}
 % \changes{v3.25}{2017/10/13}{neu (intern)}
+% \changes{v3.26}{2018/09/03}{Verwendung von \cs{addsecmark}
+%   oder \cs{subsectionmark} statt \cs{@mkright}}^^A
 % Befehl zum Setzen der Überschrift des Literaturverzeichnisses.
 %    \begin{macrocode}
 \newcommand*{\bib@heading}{%
@@ -284,7 +286,13 @@
   \ifbib@leveldown
 %<article>    \subsection*{#1}%
 %<book|report>    \section*{#1}%
-    \@mkright{\MakeMarkcase{#1}}%
+%<book|report>    \addsecmark{#1}%
+%<*article>
+    \begingroup
+      \c@secnumdepth=-\maxdimen
+      \subsectionmark{#1}%
+    \endgroup
+%</article>  
   \else
 %<article>    \section*{#1}%
 %<book|report>    \chapter*{#1}%

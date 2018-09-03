@@ -1,4 +1,4 @@
-% \CheckSum{1608}
+% \CheckSum{1592}
 % \iffalse meta-comment
 % ======================================================================
 % tocbasic.dtx
@@ -961,6 +961,8 @@
 % \changes{v3.17}{2015/03/25}{penalty and skip reconstruction after
 %   \cs{@mkright}, \cs{@mkboth}, or \cs{@mkdouble}}^^A
 % \changes{v3.26}{2018/06/22}{removed spurious group}^^A
+% \changes{v3.26}{2018/09/03}{usage of \cs{addsecmark} or \cs{sectionmark}
+%   instead of \cs{@mkright} or \cs{markright}}^^A
 % Setting the headings of a list of something. The heading is the only
 % argument.
 %    \begin{macrocode}
@@ -979,11 +981,8 @@
                 \expandafter\addxcontentsline\expandafter{\ext@toc}%
                 {subsection}{##1}%
               }{}%
-              \@ifundefined{@mkright}{%
-                \ifx\@mkboth\@gobbletwo\else\markright{\MakeMarkcase{##1}}\fi
-              }{%
-                \@mkright{\MakeMarkcase{##1}}%
-              }%
+              \c@secnumdepth=-\maxdimen
+              \subsectionmark{##1}%
             \endgroup
             \ifvmode\penalty\@tempcnta\vskip\@tempskipa\fi
           }%
@@ -1020,8 +1019,7 @@
                 \ifvmode\@tempcnta\lastpenalty\@tempskipa\lastskip\unskip\fi
                 \begingroup
                   \@ifundefined{@mkright}{%
-                    \ifx\@mkboth\@gobbletwo
-                    \else\markright{\MakeMarkcase{##1}}\fi
+                    \IfActiveMkBoth{\markright{\MakeMarkcase{##1}}}{}%
                   }{%
                     \@mkright{\MakeMarkcase{##1}}%
                   }%
@@ -1036,11 +1034,11 @@
               \section*{##1}%
               \ifvmode\@tempcnta\lastpenalty\@tempskipa\lastskip\unskip\fi
               \begingroup
-                \@ifundefined{@mkright}{%
-                  \ifx\@mkboth\@gobbletwo
-                  \else\markright{\MakeMarkcase{##1}}\fi
+                \@ifundefined{addsecmark}{%
+                  \c@secnumdepth=-\maxdimen
+                  \sectionmark{##1}%
                 }{%
-                  \@mkright{\MakeMarkcase{##1}}%
+                  \addsecmark{##1}%
                 }%
               \endgroup
               \ifvmode\penalty\@tempcnta\vskip\@tempskipa\fi
