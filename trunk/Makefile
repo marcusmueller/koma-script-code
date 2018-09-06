@@ -1,6 +1,6 @@
 # ======================================================================
 # Makefile
-# Copyright (c) Markus Kohm, 2002-2017
+# Copyright (c) Markus Kohm, 2002-2018
 #
 # This file is part of the LaTeX2e KOMA-Script bundle.
 #
@@ -18,7 +18,7 @@
 # This work consists of all files listed in manifest.txt.
 # ----------------------------------------------------------------------
 # Makefile
-# Copyright (c) Markus Kohm, 2002-2017
+# Copyright (c) Markus Kohm, 2002-2018
 #
 # Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 # Version 1.3c, verteilt und/oder veraendert werden.
@@ -184,9 +184,9 @@ CLS_MAIN_INS	= scrmain.ins
 
 CLS_MAIN_SUBINS	= scrstrip.inc scrstrop.inc scrdocstrip.tex
 
-ALPHA_INS       = tocstyle.dtx scrjura.dtx scrwfile.dtx
+ALPHA_INS       = tocstyle.dtx
 
-ALPHA_DOC       = tocstyle.pdf scrhack.pdf
+ALPHA_DOC       = tocstyle.pdf
 
 ALPHA_DTX       = $(subst .pdf,.dtx,$(ALPHA_DOC))
 
@@ -221,10 +221,9 @@ NODIST_GENERATED = $(CLS_DVIS) $(CLS_FILES) $(ALPHA_DOC)
 
 GENERATED	= $(NODIST_GENERATED) ChangeLog \
 		  scrjura.ins \
-		  scrwfile.ins scrwfile.tex scrwfile.drv \
+		  scrwfile.ins \
 		  tocbasic.ins \
-	 	  tocstyle.ins tocstyle.tex tocstyle.dvi tocstyle.drv \
-		  scrlayer.tex scrlayer-scrpage.tex scrlayer-notecolumn.tex
+	 	  tocstyle.ins tocstyle.tex tocstyle.dvi tocstyle.drv
 
 MISC_SRC	= $(MAKE_FILES) \
                   scrdoc.dtx ChangeLog ChangeLog.2
