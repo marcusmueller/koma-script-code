@@ -1,4 +1,4 @@
-% \CheckSum{4378}
+% \CheckSum{4529}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -662,15 +662,31 @@
     \def\startsection@secnumdepth{\numexpr #2\relax}%
     \def\startsection@indent{\glueexpr #3\relax}%
     \let\startsection@beforeskip\@tempskipa
-    \ifdim \glueexpr #5\relax <\z@
-      \def\startsection@afterskip{\glueexpr (#3)*\m@ne\relax}%
+    \@ifundefined{scr@#1@runin}{%
+      \def\scr@sect@runin##1##2##3{##3}%
+    }{%
+      \expandafter\let\expandafter\scr@sect@runin
+      \csname scr@#1@runin\endcsname
+    }%
+    \scr@sect@runin{%
+      \def\startsection@afterskip{\glueexpr #3\relax}%
       \expandafter\let\csname if@startsection@runin\expandafter\endcsname
       \csname iftrue\endcsname
-    \else
+    }{%
       \def\startsection@afterskip{\glueexpr #3\relax}%
       \expandafter\let\csname if@startsection@runin\expandafter\endcsname
       \csname iffalse\endcsname
-    \fi
+    }{%
+      \ifdim \glueexpr #5\relax <\z@
+        \def\startsection@afterskip{\glueexpr (#3)*\m@ne\relax}%
+        \expandafter\let\csname if@startsection@runin\expandafter\endcsname
+        \csname iftrue\endcsname
+      \else
+        \def\startsection@afterskip{\glueexpr #3\relax}%
+        \expandafter\let\csname if@startsection@runin\expandafter\endcsname
+        \csname iffalse\endcsname
+      \fi
+    }%
     \csname scr@startsection@hook\endcsname
     \if@nobreak
       \everypar{}%
@@ -722,6 +738,18 @@
   }
 \fi
 %    \end{macrocode}
+% \begin{macro}{\scr@sect@runin}
+% \changes{v3.26}{2018/09/18}{neu (intern)}
+% Diese Hilfsanweisung nimmt die Fallunterscheidung vor, ob eine Spitzmarke
+% oder eine freistehende Überschrift oder abhängig vom Vorzeichen des
+% Abstandes danach eine Spitzmarke oder eine freistehende Überschrift gesetzt
+% werden soll. Die Voreinstellung ist sicherheitshalber letzteres. Diese
+% Voreinstellung wird auch bei jedem Aufruf von \cs{@xsect} erneut
+% erzwungen. Auch in \cs{scr@startsection} wird die Anweisung angepasst.
+%    \begin{macrocode}
+\newcommand*{\scr@sect@runin}[3]{#3}
+%    \end{macrocode}
+% \end{macro}^^A \scr@sect@runin
 % \begin{macro}{\scr@startsection@ulm@error}
 % \changes{v3.26}{2018/05/14}{Neue interne Anweisung}
 % Ich bin mir bewusst, dass die Fehlerausgabe, die hier definiert wird,
@@ -961,8 +989,14 @@
     \expandafter\@maybeautodot\csname the#1\endcsname
     \protected@edef\@svsec{\@seccntformat{#1}\relax}%
   \fi
-  \@tempskipa \glueexpr #5\relax\relax
-  \ifdim \@tempskipa>\z@
+%    \end{macrocode}
+% \changes{v3.26}{2018/09/18}{\cs{scr@sect@runin} beachten}^^A
+% Falls \cs{scr@sect@runin} nicht definiert ist, wird es jetzt höchste Zeit
+% dafür. Und natürlich nutzen wir es dann für die Entscheidung Spitzmarke oder
+% nicht.
+%    \begin{macrocode}
+  \ifdim
+    \scr@sect@runin{\z@}{\p@}{\glueexpr #5\relax}>\z@
     \begingroup
 %    \end{macrocode}
 %   \changes{v3.21}{2016/06/12}{fehlendes \cs{nobreak} ergänzt}^^A
@@ -1140,8 +1174,8 @@
 % \end{macro}^^A \scr@sect
 %
 % \begin{macro}{\@ssect}
-%   \changes{v3.19}{2015/07/17}{Vollständige Neudefinition zur Realisierung
-%     der Erweiterung für die Formatieurng der Überschrift}^^A
+% \changes{v3.19}{2015/07/17}{Vollständige Neudefinition zur Realisierung
+%   der Erweiterung für die Formatieurng der Überschrift}^^A
 % Das wird für Überschriften ohne Nummer verwendet. Im Prinzip machen wir hier
 % dasselbe wie zuvor.
 %    \begin{macrocode}
@@ -1178,8 +1212,14 @@
       This could result in several error messages}%
     \def\scr@s@ct@@nn@m@{\string\scr@s@ct@@nn@m@}%
   }{}%
-  \@tempskipa #3\relax
-  \ifdim \@tempskipa>\z@
+%    \end{macrocode}
+% \changes{v3.26}{2018/09/18}{\cs{scr@sect@runin} beachten}^^A
+% Falls \cs{scr@sect@runin} nicht definiert ist, wird es jetzt höchste Zeit
+% dafür. Und natürlich nutzen wir es dann für die Entscheidung Spitzmarke oder
+% nicht.
+%    \begin{macrocode}
+  \ifdim
+    \scr@sect@runin{\z@}{\p@}{\glueexpr #3\relax}>\z@
     \begingroup
 %    \end{macrocode}
 %   \changes{v3.21}{2016/06/12}{fehlendes \cs{nobreak} ergänzt}^^A
@@ -1212,6 +1252,84 @@
 %</body>
 %    \end{macrocode}
 % \end{macro}^^A \@ssect
+% \begin{macro}{\@xsect}
+% \changes{v3.26}{2018/09/18}{wird umdefiniert}^^A
+% Wir brauchen zum Einen in \cs{@xsect} einen Fallunterscheidung nach
+% \cs{scr@sect@runin} und zum Anderen muss diese Fallunterscheidung am Ende
+% wieder zurückgesetzt werden.
+%    \begin{macrocode}
+%<*body>
+\def\@tempa#1{%
+  \@tempskipa #1\relax
+  \ifdim \@tempskipa>\z@
+    \par \nobreak
+    \vskip \@tempskipa
+    \@afterheading
+  \else
+    \@nobreakfalse
+    \global\@noskipsectrue
+    \everypar{%
+      \if@noskipsec
+        \global\@noskipsecfalse
+       {\setbox\z@\lastbox}%
+        \clubpenalty\@M
+        \begingroup \@svsechd \endgroup
+        \unskip
+        \@tempskipa #1\relax
+        \hskip -\@tempskipa
+      \else
+        \clubpenalty \@clubpenalty
+        \everypar{}%
+      \fi}%
+  \fi
+  \ignorespaces
+}
+\ifx\@xsect\@tempa\else
+  \ClassWarning{\KOMAClassName}{%
+    Unexpected definition of \string\@xsect!\MessageBreak
+    Please send information about this to\MessageBreak
+    the KOMA-Script maintainer!\MessageBreak
+    Maybe LaTeX will be broken by the redefinition\MessageBreak
+    of \string\@xsect\space}%
+\fi
+%<trace>\ClassInfo{\KOMAClassName}{redefining LaTeX kernel macro
+%<trace> \string\@xsect}
+\def\@xsect#1{%
+  \@ifundefined{scr@sect@runin}{%
+    \def\scr@sect@runin##1##2##3{##3}%
+  }%
+  \@tempskipa #1\relax
+  \ifdim \scr@sect@runin{\z@}{\p@}{\@tempskipa}>\z@
+    \par \nobreak
+    \vskip \@tempskipa
+    \@afterheading
+  \else
+    \@nobreakfalse
+    \global\@noskipsectrue
+    \everypar{%
+      \if@noskipsec
+        \global\@noskipsecfalse
+       {\setbox\z@\lastbox}%
+        \clubpenalty\@M
+        \begingroup \@svsechd \endgroup
+        \unskip
+        \@tempskipa #1\relax
+        \ifdim \@tempskipa<\z@
+          \hskip -\@tempskipa
+        \else
+          \hskip \@tempskipa
+        \fi
+      \else
+        \clubpenalty \@clubpenalty
+        \everypar{}%
+      \fi}%
+  \fi
+  \def\scr@sect@runin##1##2##3{##3}%
+  \ignorespaces
+}
+%</body>
+%    \end{macrocode}
+% \end{macro}^^A \@xsect
 %
 % \begin{macro}{\IfUsePrefixLine}
 %   \changes{v3.18}{2015/06/09}{außerhalb von Gliederungsbefehlsstilen
