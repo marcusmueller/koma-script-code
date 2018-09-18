@@ -1,4 +1,4 @@
-% \CheckSum{4219}
+% \CheckSum{4378}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -545,18 +545,20 @@
 %
 %
 % \begin{macro}{\@startsection}
-%   \changes{v3.13a}{2014/09/11}{Vollständige Neudefinition zur Optimierung
-%     der Erweiterung für das optionale Argument}^^A
+% \changes{v3.13a}{2014/09/11}{Vollständige Neudefinition zur Optimierung
+%   der Erweiterung für das optionale Argument}^^A
 % \begin{macro}{\scr@startsection}
-%   \changes{v3.13a}{2014/09/11}{Neue interne Anweisung}^^A
-%   \changes{v3.18}{2015/05/22}{verwende \cs{numexpr} für Argument 2}
-%   \changes{v3.18}{2015/05/22}{verwende \cs{glueexpr} für Argument 3--5}
-%   \changes{v3.20}{2016/04/12}{\cs{@ifstar} durch \cs{kernel@ifstar}
-%     ersetzt}^^A
+% \changes{v3.13a}{2014/09/11}{Neue interne Anweisung}^^A
+% \changes{v3.18}{2015/05/22}{verwende \cs{numexpr} für Argument 2}
+% \changes{v3.18}{2015/05/22}{verwende \cs{glueexpr} für Argument 3--5}
+% \changes{v3.20}{2016/04/12}{\cs{@ifstar} durch \cs{kernel@ifstar}
+%   ersetzt}^^A
+% \changes{v3.26}{2018/09/18}{\texttt{afterindent}-Einstellung wird
+%   beachtet}^^A
 % \begin{macro}{\scr@saved@startsection}
-%   \changes{v3.13a}{2014/09/11}{Neue interne Anweisung}^^A
-%   \changes{v3.20}{2016/04/12}{Tests funktionieren jetzt auch mit
-%     \textsf{amsgen}}^^A
+% \changes{v3.13a}{2014/09/11}{Neue interne Anweisung}^^A
+% \changes{v3.20}{2016/04/12}{Tests funktionieren jetzt auch mit
+%   \textsf{amsgen}}^^A
 % \KOMAScript{} benötigt ein eigenes \cs{@startsection}, weil die
 % Funktionalität des \cs{@startsection} aus dem \LaTeX-Kern nicht
 % genügt. Bevor allerdings die eigene Definition in Angriff genommen wird,
@@ -581,21 +583,23 @@
 % \changes{v3.26}{2018/05/14}{Neue Anweisung für Paketautoren}^^A
 % \begin{macro}{\if@startsection@runin}
 % \changes{v3.26}{2018/05/14}{Neue Anweisung für Paketautoren}^^A
+% \begin{macro}{\startsection@afterindent}
+% \changes{v3.26}{2018/09/18}{Neue Anweisung für Paketautoren}^^A
 % Ab dem Zeitpunkt des Aufrufs des Hooks \cs{scr@startsection@hook} sind die
 % Makros \cs{startsection@sectionname}, \cs{startsection@secnumdepth},
 % \cs{startsection@indent}, \cs{startsection@beforeskip},
-% \cs{if@startsection@indentafter}, \cs{startsection@afterskip} und
-% \cs{if@startsection@runin} gültig. Die \cs{\dots indent}- und \cs{\dots
-% skip}-Makros sind dabei skips (oder \cs{glueexpr}) und somit wie Längen
-% verwendbar. Bei den beiden \cs{\dots skip}-Makros handelt es sich bereits um
-% effektive Abstände, es wurden also etwaige Fallunterscheidungen bezüglich
-% des Vorzeichens des Arguments für \cs{scr@startsection} bereits
-% aufgelöst. Das \cs{if\dots}-Makro ist entweder \cs{iftrue} oder
-% \cs{iffalse}. Ein \cs{if@startsection@afterindent} existiert nicht, weil
-% \cs{if@afterindent} zu dem Zeitpunkt bereits gültig ist. Außerhalb von
-% \cs{scr@startsection} ist die Verwendung dieser Macros unzulässig, bzw. das
-% Ergebnis unspezifiziert. Ebenso sind diese Macros als \emph{read-only} zu
-% betrachten!
+% \cs{if@startsection@indentafter}, \cs{startsection@afterskip},
+% \cs{if@startsection@runin} und \cs{startsection@afterindent} gültig. Die
+% \cs{\dots indent}- und \cs{\dots skip}-Makros sind dabei skips (oder
+% \cs{glueexpr}) und somit wie Längen verwendbar. Bei den beiden \cs{\dots
+% skip}-Makros handelt es sich bereits um effektive Abstände, es wurden also
+% etwaige Fallunterscheidungen bezüglich des Vorzeichens des Arguments für
+% \cs{scr@startsection} bereits aufgelöst. Das \cs{if\dots}-Makro ist entweder
+% \cs{iftrue} oder \cs{iffalse}. Ein \cs{if@startsection@afterindent}
+% existiert nicht, weil \cs{if@afterindent} zu dem Zeitpunkt bereits gültig
+% ist. Außerhalb von \cs{scr@startsection} ist die Verwendung dieser Macros
+% unzulässig, bzw. das Ergebnis unspezifiziert. Ebenso sind diese Macros als
+% \emph{read-only} zu betrachten!
 %    \begin{macrocode}
 %<*body>
 \newcommand*{\scr@saved@startsection}[6]{%
@@ -642,10 +646,18 @@
     \if@noskipsec \leavevmode \fi
     \par
     \@tempskipa \glueexpr #4\relax
-    \@afterindenttrue
-    \ifdim \@tempskipa <\z@
-      \@tempskipa -\@tempskipa \@afterindentfalse
-    \fi
+    \@ifundefined{scr@#1@afterindent}{%
+      \def\startsection@afterindent##1##2##3{##3}%
+    }{%
+      \expandafter\let\expandafter\startsection@afterindent
+      \csname scr@#1@afterindent\endcsname
+    }%
+    \startsection@afterindent{\@afterindenttrue}{\@afterindentfalse}{%
+      \@afterindenttrue
+      \ifdim \@tempskipa <\z@
+        \@tempskipa -\@tempskipa \@afterindentfalse
+      \fi
+    }%  
     \def\startsection@sectionname{#1}%
     \def\startsection@secnumdepth{\numexpr #2\relax}%
     \def\startsection@indent{\glueexpr #3\relax}%
@@ -691,8 +703,11 @@
     KOMA-Scriptt that fixes the problem, please\MessageBreak
     send a report to the KOMA-Script author.\MessageBreak
     Note, that this alternative approach does not\MessageBreak
-    execute `\string\scr@startsection@hook', \MessageBreak
-    `\string\scr@preto@ssect@hook', or `\string\scr@preto@sect@hook'%
+    execute `\string\scr@startsection@hook',\MessageBreak
+    `\string\scr@preto@ssect@hook', or
+    `\string\scr@preto@sect@hook'\MessageBreak
+    and does always use `runin=bysign' and\MessageBreak
+    `afterindent=bysign'%
   }%
   \let\scr@saved@startsection\@startsection
   \newcommand*{\scr@startsection}[6]{%
@@ -711,7 +726,7 @@
 % \changes{v3.26}{2018/05/14}{Neue interne Anweisung}
 % Ich bin mir bewusst, dass die Fehlerausgabe, die hier definiert wird,
 % vermutlich nie aufgerufen wird, da ein Paketautor hierzu eines der Makros
-% bereits vor dem ersten \cs{scr@startsection}-Befehl verwendet werden
+% bereits vor dem ersten \cs{scr@startsection}-Befehl verwenden
 % müsste. Trotzdem verwende ich es quasi zwecks Initialisierung.
 %    \begin{macrocode}
 \newcommand*{\scr@startsection@ulm@error}[1]{%
@@ -737,8 +752,11 @@
 \newcommand*{\if@startsection@runin}{%
   \scr@startsection@ulm@error\if@startsection@runin}
 \newif\if@startsection@runin
+\newcommand*\startsection@afterindent{%
+  \scr@startsection@ulm@error\startsection@afterindent}
 %    \end{macrocode}
 % \end{macro}^^A \scr@startsection@ulm@error
+% \end{macro}^^A \scr@startsection@afterindent
 % \end{macro}^^A \if@startsection@runin
 % \end{macro}^^A \startsection@afterskip
 % \end{macro}^^A \startsection@beforeskip
@@ -979,7 +997,7 @@
   \else
 %    \end{macrocode}
 %   \changes{v3.21}{2016/06/12}{fehlendes \cs{nobreak} ergänzt}^^A
-% Das Farbänderungen im Schriftargument erlaubt sein sollen und diese aktuelle
+% Da Farbänderungen im Schriftargument erlaubt sein sollen und diese aktuelle
 % \cs{penalty}-Werte wieder aufheben, verbiete ich hier einen Umbruch nach
 % der Fontänderung.
 %    \begin{macrocode}
@@ -1367,7 +1385,7 @@
       \noexpand\FamilySetCounterMacro{KOMAarg}{#2}{\noexpand\reserved@a}{##1}
     }\reserved@a
     \ifx\FamilyKeyState\FamilyKeyStateProcessed
-      \expandafter\let\csname #3\scr@dsc@current#4 \endcsname\reserved@a
+      \expandafter\let\csname #3\scr@dsc@current#4\endcsname\reserved@a
     \fi
   }%
 }
@@ -1375,7 +1393,7 @@
 % \end{macro}^^A \DeclareSectionCommandStyleNumberOption
 % \begin{macro}{\DeclareSectionCommandStyleFontOption}
 %   \changes{v3.17}{2015/03/23}{neue Anweisung}^^A
-% Definiert eine für die aktuelle Ebene \cs{scr@dsc@current} eine neue
+% Definiert für die aktuelle Ebene \cs{scr@dsc@current} eine neue
 % Schrift und speichert das Ergebnis in einem Element, das sich aus
 % Argument 3 gefolgt von der aktuellen Ebene gefolgt von Argument 4 ergibt.
 %    \begin{macrocode}
@@ -1391,31 +1409,92 @@
 }
 %    \end{macrocode}
 % \end{macro}^^A \DeclareSectionCommandStyleFontOption
+% \begin{macro}{\DeclareSectionCommandStyleFuzzyOption}
+% \changes{v3.26}{2018/09/18}{neue Anweisung}^^A
+% Definiert für die aktuelle Ebene \cs{scr@dsc@current} eine neue
+% Fuzzy-Auswahl. Eine Fuzzy-Auswahl akzeptiert neben den Werten für
+% boolsche-Schalter noch einen weiteren Wert. Es wird davon eine Anweisung
+% mit drei Argumenten definiert. Abhängig vom Wert wird das erste
+% (\texttt{true}), zweite (\texttt{false}) oder dritte (\emph{sonst}) Argument
+% ausgeführt. Der erlaubte weitere Wert wird als 5. Argument angegeben.
+%    \begin{macrocode}
+\newcommand*{\DeclareSectionCommandStyleFuzzyOption}[5]{%
+  \DeclareSectionCommandStyleOption{#1}{#2}{%
+    \FamilySetBool{KOMAarg}{#2}{@tempswa}{##1}%
+    \ifx\FamilyKeyState\FamilyKeyStateProcessed
+      \if@tempswa
+        \expandafter\def\csname #3\scr@dsc@current#4\endcsname
+        ####1####2####3{####1}%
+      \else
+        \expandafter\def\csname #3\scr@dsc@current#4\endcsname
+        ####1####2####3{####2}%
+      \fi
+    \else
+      \ifstr{##1}{#5}{%
+        \expandafter\def\csname #3\scr@dsc@current#4\endcsname
+        ####1####2####3{####3}%
+        \FamilyKeyStateProcessed
+      }{}%
+    \fi
+  }%
+}
+%    \end{macrocode}
+% \end{macro}^^A \DeclareSectionCommandStyleFuzzyOptions
 %
 % \begin{macro}{\scr@dsc@style@section@options}
-%   \changes{v3.17}{2015/03/23}{neue Anweisung (intern)}^^A
+% \changes{v3.17}{2015/03/23}{neue Anweisung (intern)}^^A
 % Dann für die Optionen des Stils \texttt{section}:
 %    \begin{macrocode}
 \newcommand*{\scr@dsc@style@section@options}{}
 %    \end{macrocode}
-% \begin{description}\item[\texttt{indent}] Linker Einzug der
-% Überschrift\end{description}
+% \begin{description}\item[\texttt{indent}]
+%   Linker Einzug der Überschrift
+% \end{description}
 %    \begin{macrocode}
 \DeclareSectionCommandStyleLengthOption{section}
                                        {indent}{scr@}{@sectionindent}
 %    \end{macrocode}
-% \begin{description}\item[\texttt{beforeskip}] Der Absolutwert gibt den
-% vertikalen Abstand vor der Überschrift an. Negative Werte bedeuten, dass
-% der Absatzeinzug nach der Überschrift unterdrückt werden
-% soll.\end{description}
+% \begin{description}
+% \item[\texttt{afterindent}]
+%   \changes{v3.26}{2018/09/18}{neue Option \texttt{afterindent}}^^A
+%   Fuzzy-Logik. Ein boolcher Wert gibt an, ob die erste Zeile nach der
+%   Überschrift eingezogen werden soll. Als dritter Wert ist \texttt{bysign}
+%   möglich. Dann hängt die Entscheidung für den Einzug vom Vorzeichen von
+%   \texttt{beforeskip} ab. Ein negativer Wert bedeutet dann, dass der
+%   Absatzeinzug nach der Überschrift unterdrückt werden soll.
+% \end{description}
+%    \begin{macrocode}
+\DeclareSectionCommandStyleFuzzyOption{section}
+                                      {afterindent}{scr@}{@afterindent}
+                                      {bysign}
+%    \end{macrocode}
+% \begin{description}\item[\texttt{beforeskip}]
+%   Gibt den vertikalen Abstand vor der Übeschrift an. Im Fall von
+%   \texttt{afterindent=bysign} wird der Absolutwert verwendet.
+% \end{description}
 %    \begin{macrocode}
 \DeclareSectionCommandStyleLengthOption{section}
                                        {beforeskip}{scr@}{@beforeskip}
 %    \end{macrocode}
-% \begin{description}\item[\texttt{afterskip}] Wenn der Wert positiv ist,
-% dann ist es der verikale Abstand nach der Überschrift. Ein negativer Wert
-% signalisiert hingegen eine Spitzmarke. Der Absolutwert ist dann der
-% horizontale Abstand nach der Spitzmarke.\end{description}
+% \begin{description}\item[\texttt{runin}]
+%   \changes{v3.26}{2018/09/18}{neue Option \texttt{runin}}^^A
+%   Fuzzy-Logik. Ein boolscher Wert gibt an, dass die Überschrift als
+%   Spitzmarke (\texttt{true}) oder als eigene Zeile (\texttt{false}) gesetzt
+%   werden soll. Als dritter Wert ist \texttt{bysign} möglich. Dann hängt
+%   Spitzmarke oder nicht vom Vorzeichen von \texttt{afterskip} ab. Spitzmarke
+%   gibt es dann bei einem negativen Wert von \texttt{afterskip}.
+% \end{description}
+%    \begin{macrocode}
+\DeclareSectionCommandStyleFuzzyOption{section}
+                                      {runin}{scr@}{@runin}
+                                      {bysign}
+%    \end{macrocode}
+% \begin{description}\item[\texttt{afterskip}] Im Fall einer Spitzmarke (siehe
+% \texttt{runin}) der horizontale Abstand nach der Überschrift. Im Fall einer
+% freistehenden Überschrift der vertikale Abstand nach der Überschrift. Falls
+% die Spitzmarke über das Vorzeichen aktiviert wird, wird immer der Betrag des
+% Wertes verwendet!
+% \end{description}
 %    \begin{macrocode}
 \DeclareSectionCommandStyleLengthOption{section}
                                        {afterskip}{scr@}{@afterskip}
@@ -1475,9 +1554,22 @@
 }%
 %    \end{macrocode}
 % \begin{description}
-% \item[\texttt{beforeskip}] Der Absolutwert gibt den vertikalen Abstand vor
-%   der Überschrift an. Negative Werte bedeuten, dass der Absatzeinzug nach
-%   der Überschrift unterdrückt werden soll.
+% \item[\texttt{afterindent}]
+%   \changes{v3.26}{2018/09/18}{neue Option \texttt{afterindent}}^^A
+%   Fuzzy-Logik. Ein boolcher Wert gibt an, ob die erste Zeile nach der
+%   Überschrift eingezogen werden soll. Als dritter Wert ist \texttt{bysign}
+%   möglich. Dann hängt die Entscheidung für den Einzug vom Vorzeichen von
+%   \texttt{beforeskip} ab. Ein negativer Wert bedeutet dann, dass der
+%   Absatzeinzug nach der Überschrift unterdrückt werden soll.
+% \end{description}
+%    \begin{macrocode}
+\DeclareSectionCommandStyleFuzzyOption{chapter}
+                                      {afterindent}{scr@}{@afterindent}
+                                      {bysign}
+%    \end{macrocode}
+% \begin{description}\item[\texttt{beforeskip}]
+%   Gibt den vertikalen Abstand vor der Übeschrift an. Im Fall von
+%   \texttt{afterindent=bysign} wird der Absolutwert verwendet.
 % \end{description}
 %    \begin{macrocode}
 \DeclareSectionCommandStyleLengthOption{chapter}
@@ -1555,9 +1647,24 @@
 %</report|book>
 %    \end{macrocode}
 % \begin{description}
-% \item[\texttt{beforeskip}] Der Absolutwert gibt den vertikalen Abstand vor
-%   der Überschrift an. Negative Werte bedeuten, dass der Absatzeinzug nach
-%   der Überschrift unterdrückt werden soll.
+% \item[\texttt{afterindent}]
+%   \changes{v3.26}{2018/09/18}{neue Option \texttt{afterindent}}^^A
+%   Fuzzy-Logik. Ein boolcher Wert gibt an, ob die erste Zeile nach der
+%   Überschrift eingezogen werden soll. Als dritter Wert ist \texttt{bysign}
+%   möglich. Dann hängt die Entscheidung für den Einzug vom Vorzeichen von
+%   \texttt{beforeskip} ab. Ein negativer Wert bedeutet dann, dass der
+%   Absatzeinzug nach der Überschrift unterdrückt werden soll.
+% \end{description}
+%    \begin{macrocode}
+%<*article>
+\DeclareSectionCommandStyleFuzzyOption{part}
+                                      {afterindent}{scr@}{@afterindent}
+                                      {bysign}
+%</article>
+%    \end{macrocode}
+% \begin{description}\item[\texttt{beforeskip}]
+%   Gibt den vertikalen Abstand vor der Übeschrift an. Im Fall von
+%   \texttt{afterindent=bysign} wird der Absolutwert verwendet.
 % \end{description}
 %    \begin{macrocode}
 \DeclareSectionCommandStyleLengthOption{part}
@@ -1612,9 +1719,11 @@
 % \end{macro}^^A \scr@dsc@def@style@part@command
 %
 % \begin{macro}{\scr@dsc@style@section@neededoptionstest}
-%   \changes{v3.17}{2015/03/24}{Neu (intern)}^^A
-%   \changes{v3.24}{2017/04/25}{Voreinstellungen für \texttt{indent} und
-%     \texttt{font}}^^A
+% \changes{v3.17}{2015/03/24}{Neu (intern)}^^A
+% \changes{v3.24}{2017/04/25}{Voreinstellungen für \texttt{indent} und
+%   \texttt{font}}^^A
+% \changes{v3.26}{2018/09/18}{\texttt{runin} und \texttt{afterindent}
+%   beachten}^^A
 % Dieses Anweisung überprüft, ob alle notwendigen Eigenschaften für die
 % Definition der spezifischen Gliederungsebene im section-Stil bekannt
 % sind. Sollte das nicht der Fall sein, meldet sie einen Fehler und sorgt sie
@@ -1639,6 +1748,24 @@
                                      {font}{font}{\normalsize}%
     {\newkomafont{\scr@dsc@current}{\normalsize}}%
   }%
+  \scr@ifundefinedorrelax{scr@\scr@dsc@current @runin}{%
+    \l@addto@macro\local@endgroup{%
+      \ClassInfo{\KOMAClassName}
+                {using compatibility default `runin=bysign'\MessageBreak
+                  for `\expandafter\string\csname \scr@dsc@current\endcsname}%
+      \expandafter\gdef\csname scr@\scr@dsc@current @runin\endcsname
+      ##1##2##3{##3}%
+    }%
+  }{}%
+  \scr@ifundefinedorrelax{scr@\scr@dsc@current @afterindent}{%
+    \l@addto@macro\local@endgroup{%
+      \ClassInfo{\KOMAClassName}
+                {using compatibility default `afterindent=bysign'\MessageBreak
+                  for `\expandafter\string\csname \scr@dsc@current\endcsname}%
+      \expandafter\gdef\csname scr@\scr@dsc@current @afterindent\endcsname
+      ##1##2##3{##3}%
+    }%
+  }{}%
 }
 %    \end{macrocode}
 % \end{macro}^^A \scr@dsc@style@section@neededoptionstest
@@ -1717,6 +1844,15 @@
                                        {prefix line font}{prefixfont}%
                                        {\usekomafont{chapterprefix}}%
       {\newkomafont{\scr@dsc@current prefix}{\usekomafont{chapterprefix}}}%
+    }%
+  }{}%
+  \scr@ifundefinedorrelax{scr@\scr@dsc@current @afterindent}{%
+    \l@addto@macro\local@endgroup{%
+      \ClassInfo{\KOMAClassName}
+                {using compatibility default `afterindent=false'\MessageBreak
+                  for `\expandafter\string\csname \scr@dsc@current\endcsname}%
+      \expandafter\gdef\csname scr@\scr@dsc@current @afterindent\endcsname
+      ##1##2##3{##2}%
     }%
   }{}%
 }
@@ -1800,6 +1936,17 @@
       {\newkomafont{\scr@dsc@current prefix}{\usekomafont{partprefix}}}%
     }%
   }{}%
+%<*article>
+  \scr@ifundefinedorrelax{scr@\scr@dsc@current @afterindent}{%
+    \l@addto@macro\local@endgroup{%
+      \ClassInfo{\KOMAClassName}
+                {using compatibility default `afterindent=false'\MessageBreak
+                  for `\expandafter\string\csname \scr@dsc@current\endcsname}%
+      \expandafter\gdef\csname scr@\scr@dsc@current @afterindent\endcsname
+      ##1##2##3{##2}%
+    }%
+  }{}%
+%</article>
 }
 %    \end{macrocode}
 % \end{macro}^^A \scr@dsc@style@part@neededoptionstest
@@ -3182,7 +3329,19 @@
   \@tempskipa=\glueexpr\@nameuse{scr@#1@beforeskip}\relax\relax
   \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
   \partheadstartvskip
-%<article>  \@afterindentfalse
+%<*article>
+  \@ifundefined{scr@#1@afterindent}{\@afterindentfalse}{%
+    \csname scr@#1@afterindent\endcsname
+    {\@afterindenttrue}{\@afterindentfalse}{%
+      \@afterindenttrue
+      \@ifundefined{scr@#1@beforeskip}{\@afterindentfalse}{%
+        \ifdim\glueexpr\@nameuse{scr@#1@beforeskip}\relax\relax<\@z
+          \@afterindentfalse
+        \fi
+      }%
+    }%
+  }%
+%</article>
 %<*book|report>
   \vbox to\z@{\vss\use@preamble{#1@o}\strut\par}%
   \vskip-\baselineskip\nobreak
@@ -3989,7 +4148,17 @@
     }%
   }%
   \global\@topnum\z@
-  \@afterindentfalse
+  \@ifundefined{scr@#1@afterindent}{\@afterindentfalse}{%
+    \csname scr@#1@afterindent\endcsname
+    {\@afterindenttrue}{\@afterindentfalse}{%
+      \@afterindenttrue
+      \@ifundefined{scr@#1@beforeskip}{\@afterindentfalse}{%
+        \ifdim\glueexpr\@nameuse{scr@#1@beforeskip}\relax\relax<\@z
+          \@afterindentfalse
+        \fi
+      }%  
+    }%
+  }%
   \expandafter\SecDef\csname @#1\expandafter\endcsname\csname @s#1\endcsname
 }
 %    \end{macrocode}
@@ -4238,31 +4407,36 @@
 % \end{macro}^^A \scr@makeschapterhead
 %
 % \begin{macro}{\scr@@makechapterhead}
-%   \changes{v3.18}{2015/05/22}{neue Anweisung (intern)}
+% \changes{v3.18}{2015/05/22}{neue Anweisung (intern)}
 % Diese Anweisung nimmt die Rolle des ursprüngliche \cs{@@makechapterhead}
 % ein. Daher übernimmt sie auch die ChangeLog-Einträge der alten Anweisung.
-%   \changes{v2.8q}{2002/04/18}{\cs{raggedsection} wird bei Option
-%     \texttt{chapterprefix} auch auf den Präfix angewendet}^^A
-%   \changes{v2.9p}{2003/06/28}{\cs{parfillskip} auf \cs{fill} gesetzt}^^A
-%   \changes{v2.96a}{2006/12/02}{Abstand nach der Präfixzeile nur, wenn eines
-%     Präfixzeile ausgegeben wurde}^^A
-%   \changes{v2.97b}{2007/03/09}{\cs{endgraf} korrigiert}^^A
-%   \changes{v3.15}{2014/11/20}{Generalumbau}^^A
-%   \changes{v3.15}{2014/12/09}{\cs{raggedchapter} ersetzt
-%     \cs{raggedsection}}^^A
-%   \changes{v3.17}{2015/04/03}{Verwendung von \cs{usefontofkomafont} für die
-%     initiale Fontumstellung}^^A
+% \changes{v2.8q}{2002/04/18}{\cs{raggedsection} wird bei Option
+%   \texttt{chapterprefix} auch auf den Präfix angewendet}^^A
+% \changes{v2.9p}{2003/06/28}{\cs{parfillskip} auf \cs{fill} gesetzt}^^A
+% \changes{v2.96a}{2006/12/02}{Abstand nach der Präfixzeile nur, wenn eines
+%   Präfixzeile ausgegeben wurde}^^A
+% \changes{v2.97b}{2007/03/09}{\cs{endgraf} korrigiert}^^A
+% \changes{v3.15}{2014/11/20}{Generalumbau}^^A
+% \changes{v3.15}{2014/12/09}{\cs{raggedchapter} ersetzt
+%   \cs{raggedsection}}^^A
+% \changes{v3.17}{2015/04/03}{Verwendung von \cs{usefontofkomafont} für die
+%   initiale Fontumstellung}^^A
 %    \begin{macrocode}
 \newcommand*{\scr@@makechapterhead}[2]{%
 %    \end{macrocode}
 % Der Absolutwert des Abstandes davor wird eingefügt.
 %   \changes{v3.22}{2016/12/21}{\cs{@afterindentrue} wird bei positivem
 %     \texttt{beforeskip} gesetzt}^^A
+% \changes{v3.26}{2018/09/18}{Beachtung von Einstellung
+%   \texttt{afterindent}}^^A
 %    \begin{macrocode}
   \@tempskipa=\glueexpr \csname scr@#1@beforeskip\endcsname\relax\relax
-  \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\else
-    \expandafter\ifnum\scr@v@is@ge{3.22}\@afterindenttrue\fi
-  \fi
+  \csname scr@#1@afterindent\endcsname
+  {\@afterindenttrue}{\@afterindentfalse}{%
+    \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\else
+      \expandafter\ifnum\scr@v@is@ge{3.22}\@afterindenttrue\fi
+    \fi
+  }%
   \chapterheadstartvskip
 %    \end{macrocode}
 % Dann die eigentliche Überschrift innerhalb einer Gruppe.
@@ -4342,24 +4516,29 @@
 % Diese Anweisung nimmt die Rolle des ursprüngliche \cs{@@makechapterhead}
 % ein. Sie ist um einiges einfacher als \cs{scr@@makechapterhead} orientiert
 % sich aber prinzipiell daran.
-%   \changes{v2.9p}{2003/06/28}{\cs{parfillskip} auf \cs{fill} gesetzt}^^A
-%   \changes{v2.9q}{2004/03/24}{Klammerung an \cs{@@makechapterhead}^^A
-%     angepasst}^^A
-%  \changes{v3.15}{2014/12/09}{\cs{raggedchapter} ersetzt
-%    \cs{raggedsection}}^^A
-%  \changes{v3.19}{2015/08/02}{an die Änderungen bei \cs{scr@@makechapterhead}
-%    angepasst}^^A
-%   \changes{v3.20}{2015/12/23}{\cs{parfillskip} auf \texttt{\cs{z@} plus
-%     1fil} gesetzt}^^A
-%   \changes{v3.22}{2016/12/21}{\cs{@afterindentrue} wird bei positivem
-%     \texttt{beforeskip} gesetzt}^^A
-%   \changes{v3.25}{2017/09/07}{\cs{IfUseNumber} korrigiert}^^A
+% \changes{v2.9p}{2003/06/28}{\cs{parfillskip} auf \cs{fill} gesetzt}^^A
+% \changes{v2.9q}{2004/03/24}{Klammerung an \cs{@@makechapterhead}^^A
+%   angepasst}^^A
+%\changes{v3.15}{2014/12/09}{\cs{raggedchapter} ersetzt
+%  \cs{raggedsection}}^^A
+%\changes{v3.19}{2015/08/02}{an die Änderungen bei \cs{scr@@makechapterhead}
+%  angepasst}^^A
+% \changes{v3.20}{2015/12/23}{\cs{parfillskip} auf \texttt{\cs{z@} plus
+%   1fil} gesetzt}^^A
+% \changes{v3.22}{2016/12/21}{\cs{@afterindentrue} wird bei positivem
+%   \texttt{beforeskip} gesetzt}^^A
+% \changes{v3.25}{2017/09/07}{\cs{IfUseNumber} korrigiert}^^A
+% \changes{v3.26}{2018/09/18}{Beachtung von Einstellung
+%   \texttt{afterindent}}^^A
 %    \begin{macrocode}
 \newcommand*{\scr@@makeschapterhead}[2]{%
   \@tempskipa=\glueexpr \csname scr@#1@beforeskip\endcsname\relax\relax
-  \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\else
-    \expandafter\ifnum\scr@v@is@ge{3.22}\@afterindenttrue\fi
-  \fi
+  \csname scr@#1@afterindent\endcsname
+  {\@afterindenttrue}{\@afterindentfalse}{%
+    \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\else
+      \expandafter\ifnum\scr@v@is@ge{3.22}\@afterindenttrue\fi
+    \fi
+  }%
   \chapterheadstartvskip
   {%
     \setlength{\parindent}{\z@}\setlength{\parfillskip}{\z@ plus 1fil}%
