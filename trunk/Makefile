@@ -129,7 +129,8 @@ CLS_MAIN	= scrbook.cls \
 		  KakuLL.lco \
 		  scrlayer.sty \
 		  scrlayer-scrpage.sty \
-		  scrlayer-notecolumn.sty
+		  scrlayer-notecolumn.sty \
+		  scrlayer-fancyhdr.sty
 
 CLS_MAIN_DTX    = scrkernel-basics.dtx \
 		  scrkernel-bibliography.dtx \
@@ -168,7 +169,8 @@ CLS_MAIN_DTX    = scrkernel-basics.dtx \
 		  tocstyle.dtx \
 		  scrlayer.dtx \
 		  scrlayer-scrpage.dtx \
-		  scrlayer-notecolumn.dtx
+		  scrlayer-notecolumn.dtx \
+		  scrlayer-fancyhdr.dtx
 
 STATIC_DOC      = README \
 	          INSTALL.txt \
@@ -184,9 +186,9 @@ CLS_MAIN_INS	= scrmain.ins
 
 CLS_MAIN_SUBINS	= scrstrip.inc scrstrop.inc scrdocstrip.tex
 
-ALPHA_INS       = tocstyle.dtx
+ALPHA_INS       = tocstyle.dtx scrlayer-fancyhdr.dtx
 
-ALPHA_DOC       = tocstyle.pdf
+ALPHA_DOC       = tocstyle.pdf scrlayer-fancyhdr.pdf
 
 ALPHA_DTX       = $(subst .pdf,.dtx,$(ALPHA_DOC))
 
@@ -223,7 +225,7 @@ GENERATED	= $(NODIST_GENERATED) ChangeLog \
 		  scrjura.ins \
 		  scrwfile.ins \
 		  tocbasic.ins \
-	 	  tocstyle.ins tocstyle.tex tocstyle.dvi tocstyle.drv
+	 	  tocstyle.ins tocstyle.tex tocstyle.drv
 
 MISC_SRC	= $(MAKE_FILES) \
                   scrdoc.dtx ChangeLog ChangeLog.2
