@@ -1,4 +1,4 @@
-% \CheckSum{4515}
+% \CheckSum{4516}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -1774,11 +1774,9 @@
 %   Absatzeinzug nach der Überschrift unterdrückt werden soll.
 % \end{description}
 %    \begin{macrocode}
-%<*article>
 \DeclareSectionCommandStyleFuzzyOption{part}
                                       {afterindent}{scr@}{@afterindent}
                                       {bysign}
-%</article>
 %    \end{macrocode}
 % \begin{description}\item[\texttt{beforeskip}]
 %   Gibt den vertikalen Abstand vor der Übeschrift an. Im Fall von
@@ -2054,17 +2052,19 @@
       {\newkomafont{\scr@dsc@current prefix}{\usekomafont{partprefix}}}%
     }%
   }{}%
-%<*article>
   \scr@ifundefinedorrelax{scr@\scr@dsc@current @afterindent}{%
     \l@addto@macro\local@endgroup{%
-      \ClassInfo{\KOMAClassName}
-                {using compatibility default `afterindent=false'\MessageBreak
-                  for `\expandafter\string\csname \scr@dsc@current\endcsname}%
+      \ClassInfo{\KOMAClassName}{%
+        using compatibility default
+%<article>        `afterindent=false'\MessageBreak
+%<book|report>        `afterindent=true'\MessageBreak
+        for `\expandafter\string\csname \scr@dsc@current\endcsname}%
       \expandafter\gdef\csname scr@\scr@dsc@current @afterindent\endcsname
-      ##1##2##3{##2}%
+      ##1##2##3%
+%<article>      {##2}%
+%<book|report>      {##1}%
     }%
   }{}%
-%</article>
 }
 %    \end{macrocode}
 % \end{macro}^^A \scr@dsc@style@part@neededoptionstest
@@ -3411,14 +3411,15 @@
 %
 %
 % \begin{macro}{\scr@startpart}
-%   \changes{v3.18}{2015/05/23}{neue Anweisung (intern)}^^A
+% \changes{v3.18}{2015/05/23}{neue Anweisung (intern)}^^A
 % Diese Anweisung ist von der ursprünglichen Definition von \cs{part}
 % abgeleitet und erbt deren ChangeLog-Einträge. 
-%   \changes{v2.8d}{2001/07/05}{\cs{partpagestyle} statt \texttt{plain}}^^A
-%   \changes{v2.8p}{2001/09/27}{Präambel über der Überschrift hinzugefügt}^^A
-%   \changes{v3.13a}{2014/09/11}{Verwendung von \cs{SecDef}}^^A
-%   \changes{v3.19}{2015/08/25}{Seitenstil nur ändern wenn definiert und nicht
-%     leer}^^A
+% \changes{v2.8d}{2001/07/05}{\cs{partpagestyle} statt \texttt{plain}}^^A
+% \changes{v2.8p}{2001/09/27}{Präambel über der Überschrift hinzugefügt}^^A
+% \changes{v3.13a}{2014/09/11}{Verwendung von \cs{SecDef}}^^A
+% \changes{v3.19}{2015/08/25}{Seitenstil nur ändern wenn definiert und nicht
+%   leer}^^A
+% \changes{v3.26}{2018/10/14}{Option \texttt{afterindent} wird beachtet}^^A
 % Die Anweisung definiert den Gliederungsüberschriften-Stil
 % \texttt{part}. Dazu bekommt sie als einziges explizites Argument den
 % \meta{Namen} der Gliederungsüberschrift. Weitere Argumente wie ein
@@ -3447,7 +3448,6 @@
   \@tempskipa=\glueexpr\@nameuse{scr@#1@beforeskip}\relax\relax
   \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
   \partheadstartvskip
-%<*article>
   \@ifundefined{scr@#1@afterindent}{\@afterindentfalse}{%
     \csname scr@#1@afterindent\endcsname
     {\@afterindenttrue}{\@afterindentfalse}{%
@@ -3459,7 +3459,6 @@
       }%
     }%
   }%
-%</article>
 %<*book|report>
   \vbox to\z@{\vss\use@preamble{#1@o}\strut\par}%
   \vskip-\baselineskip\nobreak
@@ -3622,9 +3621,15 @@
   \@tempskipa=\glueexpr\@nameuse{scr@#1@afterskip}\relax\relax
   \ifdim\@tempskipa<\z@\@tempskipa-\@tempskipa\fi
   \partheadendvskip
-  \@afterheading
 %</article>
 %<book|report>  \@nameuse{@end#1}%
+%    \end{macrocode}
+% \changes{v3.26}{2018/10/14}{Verwendung von \@cs{@afterheading} für
+%   \textsf{scrbook} und \textsf{scrreprt}}^^A
+% Ab \KOMAScript{} 3.26 wird hier \cs{@afterheading} für alle Klassen
+% aufgerufen. Damit kann der Einzug nach der Überschrift eingestellt werden.
+%    \begin{macrocode}
+  \@afterheading
 }
 %    \end{macrocode}
 % \end{macro}^^A \scr@@startpart
