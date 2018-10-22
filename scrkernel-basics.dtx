@@ -1,4 +1,4 @@
-% \CheckSum{3820}
+% \CheckSum{3830}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -981,8 +981,23 @@
 % Liste der nicht benutzten globalen Optionen.
 %    \begin{macrocode}
   \@for\CurrentOption:=\@curroptions\do{%
-    \scr@ifundefinedorrelax{ds@\CurrentOption}{%
-      \@use@ption
+%    \end{macrocode}
+% \changes{v3.26}{2018/10/22}{Optionen werden für Tests etc. nicht mehr
+%   vollständig expandiert}^^A
+% \changes{v3.26}{2018/10/22}{\cs{@use@ption} wird für key-value-Optionen
+%   nicht mehr aufgerufen}^^A
+% Ab \KOMAScript~3.26 wird für den Test, ob eine Option als normale Option
+% existiert, die Option nicht mehr komplett expandiert. Da die wirklich
+% notwendige Expansion bereits erfolgt ist, verhindert das Fehler wegen
+% angeblich fehlendem \cs{endcsname}. Gleichzeitig wird für key-value-Optionen
+% \cs{@use@ption} nicht mehr aufgerufen, da das darin enthaltene
+% |\csname ds@\CurrentOption\endcsname| dasselbe Problem hat. Stattdessen wird
+% die Option nur noch aus der Liste der nicht verwendeten Optionen entfernt.
+%    \begin{macrocode}
+    \edef\reserved@a{\expandafter\detokenize\expandafter{\CurrentOption}}%
+    \scr@ifundefinedorrelax{ds@\reserved@a}{%
+      \@expandtwoargs\@removeelement\CurrentOption
+      \@unusedoptionlist\@unusedoptionlist
       \scr@ifprocess@curroption{#1}{#2}{}\default@ds
     }\@use@ption
   }%
