@@ -1060,8 +1060,8 @@
 % \end{macro}^^A \scr@AtEndOfFamilyOptions
 % \end{macro}^^A \AtEndOfFamilyOptions
 % \begin{macro}{\scr@ifprocess@curroption}
-%   \changes{v3.13}{2014/01/04}{\cs{CurrentOption} innerhalb von \cs{setkeys}
-%     in Klammern gesetzt}
+% \changes{v3.13}{2014/01/04}{\cs{CurrentOption} innerhalb von \cs{setkeys}
+%   in Klammern gesetzt}^^A
 % Dieses Makro führt eine aktuelle \textsf{keyval}-Option für das angegebene
 % Mitglied (\#1) der angegebenen Familie (\#2) aus. Falls die Option keinen
 % entsprechenden Wert hat, wird das vierte Argument ausgeführt, anderenfalls
@@ -1070,7 +1070,19 @@
 % entsprechende Option.
 %    \begin{macrocode}
 \newcommand*\scr@ifprocess@curroption[2]{%
-  \def\reserved@a##1=##2\@nil{\def\reserved@a{##1}}%
+%    \end{macrocode}
+% \changes{v3.26}{2018/10/22}{\cs{scr@sp@def} statt \cs{def} für das Abtrennen
+%   des Schlüssels}^^A
+% Da am 21. Oktober 2018 eine Diskussion begann, die darauf hindeutet, dass
+% das Entfernen der Leerzeichen in der Optionenliste sich jederzeit ändern
+% könnte, wird hier (und an einer weiteren Stelle) nun \cs{scr@sp@def}
+% verwendet, um den Schlüssel zu erhalten. Allerdings genügt dies nicht, falls
+% irgendwann tatsächlich gar keine Leerzeichen mehr entfernt werden. Dann
+% müsste nämlich der komplette Parser umgeschrieben werden. Ich bin alles
+% andere als begeistert von der Tatsache, dass hier im \LaTeX-Kern Jahrzehnte
+% altes Verhalten ohne Rücksicht auf Verluste zur Disposition gestellt wird.
+%    \begin{macrocode}
+  \def\reserved@a##1=##2\@nil{\scr@sp@def\reserved@a{##1}}%
   \expandafter\reserved@a\CurrentOption=\@nil
   \scr@ifundefinedorrelax{KV@#2@\reserved@a}{%
     \scr@ifundefinedorrelax{KV@#2#1@\reserved@a}{%
@@ -1106,7 +1118,7 @@
       }%
       \FamilyKeyStateProcessed
     \fi
-    \def\reserved@a##1=##2\@nil{\def\reserved@a{##1}}%
+    \def\reserved@a##1=##2\@nil{\scr@sp@def\reserved@a{##1}}%
     \expandafter\reserved@a\CurrentOption=\@nil
     \scr@ifundefinedorrelax{KV@#2#1@\reserved@a}{}{%
       \protected@edef\reserved@b{\noexpand\setkeys{#2#1}{{\CurrentOption}}%
@@ -1135,8 +1147,44 @@
     \expandafter\@secondoftwo
   \fi
 }
+%    \end{macrocode}
+% \begin{macro}{\scr@sp@def}
+% \changes{v3.26}{2018/08/29}{von \texttt{tocbasic.dtx} nach
+%   \texttt{scrkernel-basics.dtx} verschoben und umbenannt}^^A
+% \begin{macro}{\scr@sp@d}
+% \changes{v3.26}{2018/08/29}{von \texttt{tocbasic.dtx} nach
+%   \texttt{scrkernel-basics.dtx} verschoben und umbenannt}^^A
+% \begin{macro}{\scr@sp@b}
+% \changes{v3.26}{2018/08/29}{von \texttt{tocbasic.dtx} nach
+%   \texttt{scrkernel-basics.dtx} verschoben und umbenannt}^^A
+% \begin{macro}{\scr@sp@c}
+% \changes{v3.26}{2018/08/29}{von \texttt{tocbasic.dtx} nach
+%   \texttt{scrkernel-basics.dtx} verschoben und umbenannt}^^A
+% Die Hilfsanweisung \cs{scr@sp@def} definiert eine Anweisung (erstes
+% Argument) mit einer Tokenliste (zweites Argument) und entfernt dabei
+% führende und abschließende Leerzeichen. Die Anweisung stammt ursprünglich
+% aus \textsf{keyval}. Der Rest sind Hilfsanweisungen für die Implementierung
+% der Hilfsanweisung.
+%    \begin{macrocode}
+\def\@tempa#1{%
+  \def\scr@sp@def##1##2{%
+    \futurelet\scr@sp@tempa\scr@sp@d##2\@nil\@nil#1\@nil\relax##1}%
+  \def\scr@sp@d{%
+    \ifx\scr@sp@tempa\@sptoken
+      \expandafter\scr@sp@b
+    \else
+      \expandafter\scr@sp@b\expandafter#1%
+    \fi}%
+  \def\scr@sp@b#1##1 \@nil{\scr@sp@c##1}%
+}
+\@tempa{ }
+\def\scr@sp@c#1\@nil#2\relax#3{\@temptokena{#1}\edef#3{\the\@temptokena}}
 %</base>
 %    \end{macrocode}
+% \end{macro}^^A \scr@sp@c
+% \end{macro}^^A \scr@sp@b
+% \end{macro}^^A \scr@sp@d
+% \end{macro}^^A \scr@sp@def
 % \end{macro}^^A \scr@process@curroption
 % \end{macro}^^A \FamilyProcessOptions
 %
@@ -1246,47 +1294,13 @@
 % befreit werden soll. Gedacht ist das ganze für die Listenverarbeitung mit
 % Hilfe von \cs{@for}. Als Argument wird ein Makro übergeben, in dessen
 % Definition führende und abschließende space-Tokens entfernt werden sollen.
-% \begin{macro}{\scr@sp@def}
-% \changes{v3.26}{2018/08/29}{von \texttt{tocbasic.dtx} nach
-%   \texttt{scrkernel-basics.dtx} verschoben und umbenannt}^^A
-% \begin{macro}{\scr@sp@d}
-% \changes{v3.26}{2018/08/29}{von \texttt{tocbasic.dtx} nach
-%   \texttt{scrkernel-basics.dtx} verschoben und umbenannt}^^A
-% \begin{macro}{\scr@sp@b}
-% \changes{v3.26}{2018/08/29}{von \texttt{tocbasic.dtx} nach
-%   \texttt{scrkernel-basics.dtx} verschoben und umbenannt}^^A
-% \begin{macro}{\scr@sp@c}
-% \changes{v3.26}{2018/08/29}{von \texttt{tocbasic.dtx} nach
-%   \texttt{scrkernel-basics.dtx} verschoben und umbenannt}^^A
-% Die Hilfsanweisung \cs{scr@sp@def} definiert eine Anweisung (erstes
-% Argument) mit einer Tokenliste (zweites Argument) und entfernt dabei
-% führende und abschließende Leerzeichen. Die Anweisung stammt ursprünglich
-% aus \textsf{keyval}. Der Rest sind Hilfsanweisungen für die Implementierung
-% der Hilfsanweisung.
 %    \begin{macrocode}
 %<*base>
 \newcommand\scr@trim@spaces[1]{%
   \expandafter\scr@sp@def\expandafter#1\expandafter{#1}%
 }
-\def\@tempa#1{%
-  \def\scr@sp@def##1##2{%
-    \futurelet\scr@sp@tempa\scr@sp@d##2\@nil\@nil#1\@nil\relax##1}%
-  \def\scr@sp@d{%
-    \ifx\scr@sp@tempa\@sptoken
-      \expandafter\scr@sp@b
-    \else
-      \expandafter\scr@sp@b\expandafter#1%
-    \fi}%
-  \def\scr@sp@b#1##1 \@nil{\scr@sp@c##1}%
-}
-\@tempa{ }
-\def\scr@sp@c#1\@nil#2\relax#3{\@temptokena{#1}\edef#3{\the\@temptokena}}
 %</base>
 %    \end{macrocode}
-% \end{macro}^^A \scr@sp@c
-% \end{macro}^^A \scr@sp@b
-% \end{macro}^^A \scr@sp@d
-% \end{macro}^^A \scr@sp@def
 % \end{macro}^^A \scr@trim@space
 %
 % \begin{macro}{\if@atdocument}
