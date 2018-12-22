@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2017/03/31 v1.13b internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2018/12/22 v1.13c internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -122,14 +122,14 @@
 \LoadClassWithOptions{scrbook}
 \RequirePackage[latin1]{inputenc}
 \RequirePackage[TS1,T1]{fontenc}
-\def\languages{ngerman,english,}
-\g@addto@macro\languages{,\languagename}
+\newcommand*{\strngerman}{ngerman}
+\newcommand*{\strenglish}{english}
+\edef\languages{\ifx\languagename\strngerman main=\fi ngerman,%
+  \ifx\languagename\strenglish main=\fi english}
 \edef\uselanguage{\languagename}
-\edef\languages{\languages}
 \expandafter\RequirePackage\expandafter[\languages]{babel}%
 \AtBeginDocument{%
-  \expandafter\selectlanguage\expandafter{\uselanguage}%
-  \typeout{Current language is `\languagename`.}}%
+  \typeout{TRACE: Current language is `\languagename`.}}%
 \RequirePackage[fixlanguage]{babelbib}
 \expandafter\selectbiblanguage\expandafter{\uselanguage}
 \RequirePackage{afterpage}
