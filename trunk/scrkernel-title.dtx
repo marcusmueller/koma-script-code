@@ -1,8 +1,8 @@
-% \CheckSum{917}
+% \CheckSum{974}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-title.dtx
-% Copyright (c) Markus Kohm, 2002-2018
+% Copyright (c) Markus Kohm, 2002-2019
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrkernel-title.dtx
-% Copyright (c) Markus Kohm, 2002-2018
+% Copyright (c) Markus Kohm, 2002-2019
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -549,7 +549,7 @@
       \vfill\null
       \if@twoside
 %    \end{macrocode}
-%   \changes{v3.12}{2013/11/21}{Rückseite wird nur bei Bedarf ausgegeben.}^^A
+% \changes{v3.12}{2013/11/21}{Rückseite wird nur bei Bedarf ausgegeben.}^^A
 % Ab Version~3.12 wird die Rückseite der Titelseite nur noch bei Bedarf
 % ausgegeben. Das gilt aber nur, wenn keine Kompatibilität mit früheren
 % Versionen verlangt ist.
@@ -572,6 +572,29 @@
           \end{minipage}\par
           \@thanks\let\@thanks\@empty
         \fi
+%    \end{macrocode}
+% \changes{v3.27}{2019/01/01}{Warnung für nicht leere Titelrückseite bei
+%   einseitigen Dokumenten}^^A
+% Bei einseitigen Dokumenten werden eventuell gesetzte Inhalte von
+% \cs{uppertitleback} oder \cs{lowertitleback} nicht ausgegeben.
+%    \begin{macrocode}
+      \else
+        \ifx\@uppertitleback\@empty\else
+%<package>          \PackageWarning{scrextend}{%
+%<class>          \ClassWarning{\KOMAClassName}{%
+            non empty \string\uppertitleback\space ignored
+            by \string\maketitle\MessageBreak
+            in `twoside=false' mode%
+          }%
+        \fi
+        \ifx\@lowertitleback\@empty\else
+%<package>          \PackageWarning{scrextend}{%
+%<class>          \ClassWarning{\KOMAClassName}{%
+            non empty \string\lowertitleback\space ignored
+            by \string\maketitle\MessageBreak
+            in `twoside=false' mode%
+          }%
+        \fi          
       \fi
       \ifx\@dedication\@empty 
       \else
@@ -620,11 +643,26 @@
     \relax\ifnum\@tempcnta=1\else
 %<class>      \ClassWarning{\KOMAClassName}{%
 %<package>      \PackageWarning{scrextend}{%
-        Optional argument of \string\maketitle\space ignored
-        at\MessageBreak
-        notitlepage-mode%
+        Optional argument of \string\maketitle\space ignored\MessageBreak
+        in `titlepage=false' mode%
       }%
     \fi
+    \ifx\@uppertitleback\@empty\else
+%<package>     \PackageWarning{scrextend}{%
+%<class>      \ClassWarning{\KOMAClassName}{%
+        non empty \string\uppertitleback\space ignored
+        by \string\maketitle\MessageBreak
+        in `titlepage=false' mode%
+      }%
+    \fi
+    \ifx\@lowertitleback\@empty\else
+%<package>      \PackageWarning{scrextend}{%
+%<class>      \ClassWarning{\KOMAClassName}{%
+        non empty \string\lowertitleback\space ignored
+        by \string\maketitle\MessageBreak
+        in `titlepage=false' mode%
+      }%
+    \fi          
     \begingroup
       \let\titlepage@restore\relax
       \renewcommand*\thefootnote{\@fnsymbol\c@footnote}%
