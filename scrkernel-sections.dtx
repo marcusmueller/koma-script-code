@@ -1,4 +1,4 @@
-% \CheckSum{4507}
+% \CheckSum{4526}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -2855,14 +2855,14 @@
 % \begin{option}{bookmarkpackage}
 % \selectlanguage{english}^^A
 % \changes{v3.26}{2018/06/27}{new option}^^A
-% Package \textsl{hyperref} has problems with bookmark level gaps. So if
+% Package \textsf{hyperref} has problems with bookmark level gaps. So if
 % either the users omits a heading level or defines a heading with a level
 % that distinguish more than one from the previous or following level, there
 % would be a problem. One recommended solution for this would be to use
-% package \textsl{bookmark}. So if we load this package, we can use the same
+% package \textsf{bookmark}. So if we load this package, we can use the same
 % value for bookmark levels and TOC levels even within
-% \textsl{scrartcl}. Nevertheless we allow the user to decide not to use
-% \textsl{bookmark}, but then it is not my fault, if something strange
+% \textsf{scrartcl}. Nevertheless we allow the user to decide not to use
+% \textsf{bookmark}, but then it is not my fault, if something strange
 % happens.
 %    \begin{macrocode}
 %<*option>
@@ -2887,6 +2887,29 @@
           before \string\begin{document}%
         }%
         \RequirePackage{bookmark}%
+%    \end{macrocode}
+% \changes{v3.27}{2019/01/17}{workaround for \cs{@beginmainauxhook} added}^^A
+% Sometimes \textsf{auxhook} is not able to recognize that it cannot use a
+% patch of \cs{document} to execute \cs{@beginmainauxhook} if it is loaded via
+% \cs{AtBeginDocument}. In this case we do it here.
+%    \begin{macrocode}
+        \ifx\@beginmainauxhook\relax
+        \else
+          \if@filesw
+            \ClassWarning{\KOMAClassName}{%
+              seems someone has broken package auxhook.\MessageBreak
+              Usually this happens, if auxhook is loaded or used\MessageBreak
+              implicitly or explicitly by patching
+              `\string\document'%
+              \scr@ifundefinedorrelax{AtEndPreamble}{}{%
+                \MessageBreak
+                or via etoolbox command \string\AtEndPreamble
+              }.\MessageBreak
+              Trying an emergency workaround%
+            }%
+            \@beginmainauxhook
+          \fi
+        \fi
       \fi  
     }%
   }%
