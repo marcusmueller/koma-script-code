@@ -1,8 +1,8 @@
-% \CheckSum{878}
+% \CheckSum{937}
 % \iffalse meta-comment
 % ======================================================================
 % scrhack.dtx
-% Copyright (c) Markus Kohm, 2008-2018
+% Copyright (c) Markus Kohm, 2008-2019
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -23,7 +23,7 @@
 % of TeX would generate the implementation documentation.
 % ----------------------------------------------------------------------
 % scrhack.dtx
-% Copyright (c) Markus Kohm, 2008-2018
+% Copyright (c) Markus Kohm, 2008-2019
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -955,9 +955,76 @@
 }{%
   \PackageInfo{scrhack}{\string\thenomenclature\space successfully patched}%
 }{%
-  \PackageWarning{scrhack}{cannot patch \string\thenomenclature.\MessageBreak
-    This could happen if you are using an unknown\MessageBreak
-    release of package `nomencl'%
+%    \end{macrocode}
+% \changes{v3.27}{2019/01/23}{new \textsf{nomencl} 5.0}^^A
+% From \textsf{nomencl} 5.0 another code is used if the nomenclature is a
+% chapter. So we need another patch:
+%    \begin{macrocode}
+  \xpatchcmd{\thenomenclature}{%
+    \@ifundefined{chapter}%
+    {
+      \section*{\nomname}
+      \if@intoc\addcontentsline{toc}{section}{\nomname}\fi%
+    }%
+    {
+      \chapter*{\nomname}
+      \markboth{\nomname}{\nomname}%
+      \if@intoc\addcontentsline{toc}{chapter}{\nomname}\fi%
+    }%
+  }{%
+    \scr@hack@nomencl@head
+  }{%
+    \PackageInfo{scrhack}{\string\thenomenclature\space successfully patched}%
+  }{%
+%    \end{macrocode}
+% \changes{v3.27}{2019/01/23}{prepared for hoply comming \textsf{nomencl}}^^A
+% But this code is also wrong, because it breaks manual running heads, e.g.,
+% of page style \texttt{myheadings}. So I hope, there will be another code,
+% that needs a somehow different patch:
+%    \begin{macrocode}
+    \xpatchcmd{\thenomenclature}{%
+      \@ifundefined{chapter}%
+      {
+        \section*{\nomname}
+        \if@intoc\addcontentsline{toc}{section}{\nomname}\fi%
+      }%
+      {
+        \chapter*{\nomname}
+        \@mkboth{\nomname}{\nomname}%
+        \if@intoc\addcontentsline{toc}{chapter}{\nomname}\fi%
+      }%
+    }{%
+      \scr@hack@nomencl@head
+    }{%
+      \PackageInfo{scrhack}{\string\thenomenclature\space successfully patched}%
+    }{%
+%    \end{macrocode}
+% \changes{v3.25}{2019/01/23}{emergency patch added}^^A
+% If this also does not work, we try an emergency patch, that could break
+% things.
+%    \begin{macrocode}
+      \xpatchcmd{\thenomenclature}{%
+        \@ifundefined{chapter}%
+      }{%
+        \scr@hack@nomencl@head
+        \@gobbletwo
+      }{%
+        \PackageWarning{scrhack}{%
+          using emergency patch of \string\thenomenclature.\MessageBreak
+          This could happen if you are using an unknown\MessageBreak
+          release of package `nomencl'.\MessageBreak
+          Mostly this patch does work too, but it also could\MessageBreak
+          break `nomencl`. If this happens, please deactivate\MessageBreak
+          the `nomencl` hack of `scrhack`
+        }%
+      }{%
+        \PackageWarning{scrhack}{%
+          cannot patch \string\thenomenclature.\MessageBreak 
+          This could happen if you are using an unknown\MessageBreak
+          release of package `nomencl'%
+        }%
+      }%
+    }%
   }%
 }
 %</nomencl&body>
