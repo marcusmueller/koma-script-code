@@ -1,6 +1,6 @@
 % ======================================================================
 % scrguide.cls
-% Copyright (c) Markus Kohm, 2005-2018
+% Copyright (c) Markus Kohm, 2005-2019
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -18,7 +18,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrguide.cls
-% Copyright (c) Markus Kohm, 2005-2018
+% Copyright (c) Markus Kohm, 2005-2019
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2018/12/22 v1.13c internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2019/02/01 v1.13d internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -1636,6 +1636,7 @@
 % single topics.
 %
 % \begin{environment}{desctabular}
+%   \changes{v1.13d}{2019/02/01}{\cs{addlinespace} removed from end code}^^A
 %   This kind of tabluar has primary one column but uses two columns in
 %   declaration. It's something like a \texttt{description} environment with
 %   line break after the item. I've used a \texttt{tabular} at the definition
@@ -1659,8 +1660,8 @@
   \start@desctab{\descdefaultindent}%
   \tabular[#1]{lp{\descwidth}}
   \toprule
-}{
-  \addlinespace[-.5\normalbaselineskip]\bottomrule
+}{%
+  \bottomrule
   \endtabular
 }
 %    \end{macrocode}
