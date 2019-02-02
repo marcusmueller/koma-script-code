@@ -1,4 +1,4 @@
-% \CheckSum{4526}
+% \CheckSum{4602}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -863,6 +863,31 @@
 %    \end{macrocode}
 % \end{macro}%^^A \@startsection
 %
+% \begin{macro}{\UseNumberUsageError}
+% \changes{v3.27}{2019/02/02}{Neu}
+% \begin{macro}{\IfUseNumber}
+% \changes{v3.27}{2019/02/02}{Explizite Fehlermeldung bei Verwendung außerhalb
+%   von Überschriften}^^A
+% Diese Anweisung ist nur innerhalb von Überschriften definiert. Wird sie
+% außerhalb verwendet, so gibt sie einen entsprechenden Fehler aus.
+%    \begin{macrocode}
+%<*body>
+\newcommand*{\UseNumberUsageError}[2]{%
+  \ClassError{\KOMAClassName}{%
+    \string\IfUseNumber\space not allowed%
+  }{%
+    You cannot use \string\IfUseNumber\space outside a heading.\MessageBreak
+    If you'd continue, I'll ignore both arguments, because I do not
+    know\MessageBreak
+    whether to use the first or the second argument.%
+  }%
+}
+\newcommand*{\IfUseNumber}[2]{}%
+\let\IfUseNumber\UseNumberUsageError
+%</body>
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
 %
 % \begin{macro}{\SecDef}
 %   \changes{v3.13a}{2014/09/11}{neue Anweisung}^^A
@@ -994,18 +1019,27 @@
 % Falls \cs{scr@sect@runin} nicht definiert ist, wird es jetzt höchste Zeit
 % dafür. Und natürlich nutzen wir es dann für die Entscheidung Spitzmarke oder
 % nicht.
+% \changes{v3.27}{2019/02/02}{\cs{IfUseNumber} lokal definiert}^^A
 %    \begin{macrocode}
   \ifdim
     \scr@sect@runin{\z@}{\p@}{\glueexpr #5\relax}>\z@
     \begingroup
+      \ifx\@svsec\@empty
+        \let\IfUseNumber\@secondoftwo
+      \else
+        \let\IfUseNumber\@firstoftwo
+      \fi
 %    \end{macrocode}
-%   \changes{v3.21}{2016/06/12}{fehlendes \cs{nobreak} ergänzt}^^A
+% \changes{v3.21}{2016/06/12}{fehlendes \cs{nobreak} ergänzt}^^A
 % Das Farbänderungen im Schriftargument erlaubt sein sollen und diese aktuelle
 % \cs{penalty}-Werte wieder aufheben, verbiete ich hier einen Umbruch nach
 % der Fontänderung.
+% \changes{v3.27}{2019/02/02}{\cs{scr@do@at} hinzugefügt}^^A
 %    \begin{macrocode}
+      \ExecuteDoHook{heading/begingroup/#1}%
       #6{\nobreak\interlinepenalty \@M
         \sectionlinesformat{#1}{\glueexpr #3\relax}\@svsec{#8}\@@par}%
+      \ExecuteDoHook{heading/endgroup/#1}%
     \endgroup
 %<*trace>
     \ClassInfo{\KOMAClassName}{%
@@ -1030,12 +1064,19 @@
     \fi
   \else
 %    \end{macrocode}
-%   \changes{v3.21}{2016/06/12}{fehlendes \cs{nobreak} ergänzt}^^A
+% \changes{v3.21}{2016/06/12}{fehlendes \cs{nobreak} ergänzt}^^A
+% \changes{v3.27}{2019/02/02}{\cs{ExecuteDoHook} eingefügt}^^A
 % Da Farbänderungen im Schriftargument erlaubt sein sollen und diese aktuelle
 % \cs{penalty}-Werte wieder aufheben, verbiete ich hier einen Umbruch nach
 % der Fontänderung.
 %    \begin{macrocode}
     \def\@svsechd{%
+      \ifx\@svsec\@empty
+        \let\IfUseNumber\@secondoftwo
+      \else
+        \let\IfUseNumber\@firstoftwo
+      \fi
+      \ExecuteDoHook{heading/begingroup/#1}%
       #6{\nobreak\sectioncatchphraseformat{#1}{\glueexpr #3\relax}\@svsec{#8}}%
 %<*trace>
       \ClassInfo{\KOMAClassName}{%
@@ -1059,6 +1100,7 @@
             \@currenttocentry}%
         \fi
       \fi
+      \ExecuteDoHook{heading/endgroup/#1}%  
     }%
   \fi
   \let\IfUsePrefixLine\scr@IfUsePrefixLineWarning
@@ -1217,22 +1259,33 @@
 % Falls \cs{scr@sect@runin} nicht definiert ist, wird es jetzt höchste Zeit
 % dafür. Und natürlich nutzen wir es dann für die Entscheidung Spitzmarke oder
 % nicht.
+% \changes{v3.27}{2019/02/02}{\cs{IfUseNumber} lokal definiert}^^A
 %    \begin{macrocode}
   \ifdim
     \scr@sect@runin{\z@}{\p@}{\glueexpr #3\relax}>\z@
     \begingroup
+      \let\IfUseNumber\@secondoftwo
 %    \end{macrocode}
-%   \changes{v3.21}{2016/06/12}{fehlendes \cs{nobreak} ergänzt}^^A
+% \changes{v3.21}{2016/06/12}{fehlendes \cs{nobreak} ergänzt}^^A
+% \changes{v3.27}{2019/02/02}{\cs{ExecuteDoHook} eingefügt}^^A
 % Das Farbänderungen im Schriftargument erlaubt sein sollen und diese aktuelle
 % \cs{penalty}-Werte wieder aufheben, verbiete ich hier einen Umbruch nach
 % der Fontänderung.
 %    \begin{macrocode}
+      \edef\reserved@a{%
+        \noexpand\ExecuteDoHook{heading/begingroup/\scr@s@ct@@nn@m@}%
+      }\reserved@a
       #4{\nobreak\interlinepenalty \@M
         \expandafter\sectionlinesformat\expandafter{\scr@s@ct@@nn@m@}%
         {\glueexpr #1\relax}\@empty{#5}\@@par}%
+      \edef\reserved@a{%
+        \noexpand\ExecuteDoHook{heading/endgroup/\scr@s@ct@@nn@m@}%
+      }\reserved@a
     \endgroup
   \else
     \edef\@svsechd{%
+      \unexpanded{\let\IfUseNumber\@secondoftwo}%
+      \noexpand\ExecuteDoHook{heading/begingroup/\scr@s@ct@@nn@m@}%
       \unexpanded{#4}{%
 %    \end{macrocode}
 %   \changes{v3.21}{2016/06/12}{fehlendes \cs{nobreak} ergänzt}^^A
@@ -1244,6 +1297,7 @@
         \noexpand\sectioncatchphraseformat{\scr@s@ct@@nn@m@}%
         \unexpanded{{\glueexpr #1\relax}\@empty{#5}}%
       }%
+      \noexpand\ExecuteDoHook{heading/endgroup/\scr@s@ct@@nn@m@}%
     }%
   \fi
   \let\scr@s@ct@@nn@m@\relax
@@ -3605,8 +3659,9 @@
 %   \changes{v3.25}{2018/02/12}{Verwendung des korrekten Font-Elements}^^A
 %    \begin{macrocode}
   \begingroup
-    \setparsizes{\z@}{\z@}{\z@\@plus 1fil}\par@updaterelative
     \def\IfUseNumber{\ifnumbered{#1}}%
+    \ExecuteDoHook{heading/begingroup/#1}%
+    \setparsizes{\z@}{\z@}{\z@\@plus 1fil}\par@updaterelative
     \raggedpart
     \normalfont\usekomafont{disposition}{\nobreak
       \IfUseNumber{%
@@ -3633,6 +3688,7 @@
         \csname #1mark\expandafter\endcsname\expandafter{\@currentheadentry}%
       \fi
     }%
+    \ExecuteDoHook{heading/endgroup/#1}%
   \endgroup
 %    \end{macrocode}
 % Ganz zum Schluss muss noch einmal ein Abstand eingefügt werden.
@@ -3697,8 +3753,9 @@
 %     \cs{partlineswithprefixformat}}^^A
 %    \begin{macrocode}
   \begingroup
-    \setparsizes{\z@}{\z@}{\z@\@plus 1fil}\par@updaterelative
     \let\IfUseNumber\@secondoftwo
+    \ExecuteDoHook{heading/begingroup/#1}%
+    \setparsizes{\z@}{\z@}{\z@\@plus 1fil}\par@updaterelative
     \raggedpart
     \normalfont\usekomafont{disposition}{%
       \nobreak
@@ -3707,6 +3764,7 @@
       }%
       \@mkboth{}{}%
     }%
+    \ExecuteDoHook{heading/endgroup/#1}%
   \endgroup
 %<*article>
   \nobreak
@@ -4584,18 +4642,20 @@
   \chapterheadstartvskip
 %    \end{macrocode}
 % Dann die eigentliche Überschrift innerhalb einer Gruppe.
-%   \changes{v3.20}{2015/12/23}{\cs{parfillskip} auf \texttt{\cs{z@} plus
-%     1fil} gesetzt}^^A
+% \changes{v3.20}{2015/12/23}{\cs{parfillskip} auf \texttt{\cs{z@} plus
+%   1fil} gesetzt}^^A
+% \changes{v3.27}{2019/02/02}{Setzen von \cs{parindent} und \cs{parfillskip}
+%   verschoben}^^A
 %    \begin{macrocode}
   {%
-    \setlength{\parindent}{\z@}\setlength{\parfillskip}{\z@ plus 1fil}%
 %    \end{macrocode}
-%   \changes{v3.19}{2015/08/02}{Verwendung von \cs{chapterlinesformat} und
-%     \cs{chapterlineswithprefixformat}}^^A
-%   \changes{v3.19}{2015/08/02}{Verwendung von Element \texttt{disposition} an
-%     Stelle von Befehl \cs{sectfont}}^^A
-%   \changes{v3.19a}{2015/10/03}{Bug durch vergessene Definition von
-%     \cs{IfUseNumber} behoben}^^A
+% \changes{v3.19}{2015/08/02}{Verwendung von \cs{chapterlinesformat} und
+%   \cs{chapterlineswithprefixformat}}^^A
+% \changes{v3.19}{2015/08/02}{Verwendung von Element \texttt{disposition} an
+%   Stelle von Befehl \cs{sectfont}}^^A
+% \changes{v3.19a}{2015/10/03}{Bug durch vergessene Definition von
+%   \cs{IfUseNumber} behoben}^^A
+% \changes{v3.27}{2019/02/02}{\cs{ExecuteDoHook} eingefügt}^^A
 % Ab Version~3.19 wurde der Code weitgehend umgebaut, um die Befehle
 % \cs{chapterlinesformat} für die hängende Version und
 % \cs{chapterlinesandprefixformat} für die Version mit Präfixzeile zu
@@ -4606,11 +4666,13 @@
 %    \begin{macrocode}
     \def\IfUseNumber{\ifnumbered{#1}}%
 %<book>    \if@mainmatter\else\let\IfUseNumber\@secondoftwo\fi
+    \ExecuteDoHook{heading/begingroup/#1}%  
     \if@chapterprefix
       \let\IfUsePrefixLine\@firstoftwo
     \else
       \let\IfUsePrefixLine\@secondoftwo
     \fi
+    \setlength{\parindent}{\z@}\setlength{\parfillskip}{\z@ plus 1fil}%
     \normalfont\usekomafont{disposition}{%
       \usekomafont{#1}{%
         \settoheight{\@tempskipa}{%
@@ -4643,6 +4705,7 @@
         }%
       }%
     }%
+    \ExecuteDoHook{heading/endgroup/#1}%
   }%
   \nobreak\par\nobreak
 %    \end{macrocode}
@@ -4687,13 +4750,14 @@
   }%
   \chapterheadstartvskip
   {%
-    \setlength{\parindent}{\z@}\setlength{\parfillskip}{\z@ plus 1fil}%
     \let\IfUseNumber\@secondoftwo
+    \ExecuteDoHook{heading/begingroup/#1}%  
     \if@chapterprefix
       \let\IfUsePrefixLine\@firstoftwo
     \else
       \let\IfUsePrefixLine\@secondoftwo
     \fi
+    \setlength{\parindent}{\z@}\setlength{\parfillskip}{\z@ plus 1fil}%
     \normalfont\usekomafont{disposition}{%
       \usekomafont{#1}{%
         \raggedchapter
@@ -4708,6 +4772,7 @@
         }%
       }%
     }%
+    \ExecuteDoHook{heading/endgroup/#1}%
   }%
   \nobreak\par\nobreak
   \@tempskipa=\glueexpr \csname scr@#1@afterskip\endcsname\relax\relax

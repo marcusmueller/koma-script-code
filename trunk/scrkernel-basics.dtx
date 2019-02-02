@@ -1,4 +1,4 @@
-% \CheckSum{3893}
+% \CheckSum{3988}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -4661,6 +4661,138 @@
 % \end{macro}^^A \KOMA@UseDeprecatedCommand
 % \end{macro}^^A \KOMA@newdeprecatedcommand
 %
+%
+% \selectlanguage{english}
+% \section{Do Hook Mechanism}
+% \label{sec:dohook}
+%
+% \changes{v3.27}{2019/02/02}{Do hook mechanism added}^^A
+% From \KOMAScript~v3.27 there is a new general hook mechanism called ``do
+% hook mechanism''. This mechanism is mentioned to provide extended hooks for
+% package authors. All hooks newly implemented in \KOMAScript{} \emph{should}
+% use this new mechanism.
+%
+% \begin{macro}{\ExecuteDoHook}
+% \changes{v3.27}{2019/02/02}{New}^^A
+% Arguments:
+% \begin{description}
+% \item[\meta{specificator}:]
+%   \meta{string} or \meta{string}\texttt{/}\meta{specificator}
+% \end{description}
+% Each string of the \meta{specificator} defines a hook subgroup. The
+% execution is done in a loop, first all hook elements of the first
+% \meta{string} of the \meta{specificator} are executed with the rest of the
+% \meta{specificator} as an argument. Then the hook elements of the
+% composition of the first and the second \meta{string} are executed again
+% with the rest of the \meta{specificator} as an agument and so on until the
+% hook elements of the whole \meta{specificator} has been executed with an
+% empty argument. So every hook element has to expect an argument that is
+% itself a \meta{specificator}. At each loop level the one-time hooks
+% are executed after the permanent hooks.
+%    \begin{macrocode}
+%<*base>
+\newcommand*{\ExecuteDoHook}[1]{%
+  \let\scr@hookname\relax
+  \edef\scr@hookargument{#1}%
+  \loop
+    \scr@hooksplit@specificator\scr@hookargument
+    \edef\scr@hook@do####1{%
+      ####1{\scr@hookargument}%
+    }%
+    \@nameuse{scr@dohook@\scr@hookname}%
+    \@nameuse{scr@otdohook@\scr@hookname}%
+    \expandafter\global\expandafter\let
+    \csname scr@ot@otdohook@\scr@hookname\endcsname\@empty
+  \ifx\scr@hookargument\@empty\else
+  \repeat
+  \let\scr@hook@do\relax
+}
+%    \end{macrocode}
+% \begin{macro}{\scr@hooksplit@specificator}
+% \changes{v3.27}{2019/02/02}{New internal}^^A
+% Split of the first string of the specificator argument, append it to
+% \cs{scr@hookname} and store the rest in \cs{scr@hookargument}. The argument
+% must not be empty!
+% \begin{macro}{\scr@@hooksplit@specificator}
+% \changes{v3.27}{2019/02/02}{New internal}^^A
+%    \begin{macrocode}
+\newcommand*{\scr@hooksplit@specificator}[1]{%
+  \expandafter\scr@@hooksplit@specificator#1/\@nil
+}
+\newcommand*{\scr@@hooksplit@specificator}{}
+\def\scr@@hooksplit@specificator#1/#2\@nil{%
+  \scr@ifundefinedorrelax{scr@hookname}{\def\scr@hookname{#1}}{%
+    \edef\scr@hookname{\scr@hookname/#1}%
+  }%
+  \def\scr@hookargument{#2}%
+  \ifx\scr@hookargument\@empty\else \scr@@hookargument#2\@nil\fi
+}
+\newcommand*{\scr@@hookargument}{}
+\def\scr@@hookargument#1/\@nil{\def\scr@hookargument{#1}}%
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\AddtoDoHook}
+% \changes{v3.27}{2019/02/02}{New}^^A
+% Arguments:
+% \begin{description}
+% \item[\meta{specificator}:]
+%   \meta{string} or \meta{string}\texttt{/}\meta{specificator}
+% \item[\meta{element}:]
+%   a \LaTeX command, that expects exactly one argument.
+% \end{description}
+% For the \meta{specificator} see \cs{ExecuteDoHook}. Here you can add an
+% \meta{element} to a hook defined by the \meta{specificator}. Adding a hook
+% is local to the current group.
+%    \begin{macrocode}
+\newcommand*{\AddtoDoHook}[2]{%
+  \ifstr{#1}{}{%
+    \PackageError{scrbase}{empty hook specificator}{%
+      As hook specificators can never be empty, the first argument\MessageBreak
+      of \string\AddtoDoHook\space must expand to an not empty string.%
+    }%
+  }{%
+    \scr@ifundefinedorrelax{scr@dohook@#1}{\@namedef{scr@dohook@#1}{}}{}%
+    \expandafter\l@addto@macro\csname scr@dohook@#1\endcsname{%
+      \scr@hook@do{#2}%
+    }%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\AddtoOneTimeDoHook}
+% \changes{v3.27}{2019/02/02}{New}^^A
+% Arguments:
+% \begin{description}
+% \item[\meta{specificator}:]
+%   \meta{string} or \meta{string}\texttt{/}\meta{specificator}
+% \item[\meta{element}:]
+%   a \LaTeX command, that expects exactly one argument.
+% \end{description}
+% This is almost the same as \cs{AddtoDoHook} but a hook added by this command
+% is executed only once.
+%    \begin{macrocode}
+\newcommand*{\AddtoOneTimeDoHook}[2]{%
+  \ifstr{#1}{}{%
+    \PackageError{scrbase}{empty hook specificator}{%
+      As hook specificators can never be empty, the first argument\MessageBreak
+      of \string\AddtoDoHook\space must expand to an not empty string.%
+    }%
+  }{%
+    \scr@ifundefinedorrelax{scr@otdohook@#1}{\@namedef{scr@otdohook@#1}{}}{}%
+    \expandafter\l@addto@macro\csname scr@otdohook@#1\endcsname{%
+      \scr@hook@do{#2}%
+    }%
+  }%
+}
+%</base>
+%    \end{macrocode}
+% \end{macro}
+%
+% \selectlanguage{ngerman}
 %
 % \iffalse
 %</body>
