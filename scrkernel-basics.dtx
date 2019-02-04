@@ -1,4 +1,4 @@
-% \CheckSum{3988}
+% \CheckSum{4011}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -4672,6 +4672,93 @@
 % package authors. All hooks newly implemented in \KOMAScript{} \emph{should}
 % use this new mechanism.
 %
+% 
+% \begin{macro}{\ForDoHook}
+% \changes{v3.27}{2019/02/04}{New}^^A
+% Arguments:
+% \begin{description}
+% \item[\meta{specificator}:]
+%   \meta{string} or \meta{string}\texttt{/}\meta{specificator}
+% \item[\meta{code}:] \LaTeX{} code
+% \end{description}
+% Executes \meta{code} for earch level of a do-hook. This is a helper command
+% normally not interesting for users or package authors. However, I define it
+% in the user context to be consistent with the other do-hook commands. Inside
+% \meta{name} \cs{scr@hookname} and \cs{scr@hookargument} are valid to specify
+% the hook. Note: Argument numbers in \meta{code} start with level 2 (four
+% hashes). See \cs{ExecuteDoHook} as an example.
+%    \begin{macrocode}
+%<*base>
+\newcommand*{\ForDoHook}[2]{%
+  \ifstr{#1}{}{%
+    \PackageError{scrbase}{empty do-hook specificator}{%
+      You've tried to use an empty do-hook specificator,\MessageBreak
+      but do-hook specificators must not be empty.%
+    }%
+  }{%
+    \let\scr@hookname\relax
+    \edef\scr@hookargument{#1}%
+    \loop
+      \scr@hooksplit@specificator\scr@hookname\scr@hookargument\scr@hookargument
+      #2%
+    \ifx\scr@hookargument\@empty\else
+    \repeat
+    \let\scr@hookname\relax
+    \let\scr@hookargument\relax
+  }%
+}
+%    \end{macrocode}
+% \begin{macro}{SplitDoHook}
+% \changes{v3.27}{2019/02/04}{New}^^A
+% Arguments:
+% \begin{description}
+% \item[\meta{specificator}:]
+%   \meta{string} or \meta{string}\texttt{/}\meta{specificator}
+% \item[\meta{prefix command}:] \LaTeX{} macro
+% \item[\meta{postfix command}:] \LaTeX{} macro 
+% \end{description}
+% Splits of the \emph{last} element of the \meta{specificator}. The
+% \meta{postfix command} is defined to be that last element, the \meta{prefix
+% command} is defined to be the rest.
+%    \begin{macrocode}
+\newcommand*{\SplitDoHook}[3]{%
+  \ifstr{#1}{}{%
+    \PackageWarning{scrbase}{empty do-hook specificator}%
+    \let#2\@empty\let#3\@empty
+  }{%
+    \edef\reserved@a{%
+      \unexpanded{\scr@hooksplit@specificator{#2}{#3}}{#1}%
+    }\reserved@a
+  }%
+}
+%    \end{macrocode}
+% \begin{macro}{\scr@hooksplit@specificator}
+% \changes{v3.27}{2019/02/02}{New internal}^^A
+% Split of the first string of the specificator argument, append it to
+% \cs{scr@hookname} and store the rest in \cs{scr@hookargument}. The argument
+% must not be empty!
+% \begin{macro}{\scr@@hooksplit@specificator}
+% \changes{v3.27}{2019/02/02}{New internal}^^A
+%    \begin{macrocode}
+\newcommand*{\scr@hooksplit@specificator}[3]{%
+  \expandafter\scr@@hooksplit@specificator\expandafter#1\expandafter#2#3/\@nil
+}
+\newcommand*{\scr@@hooksplit@specificator}{}
+\def\scr@@hooksplit@specificator#1#2#3/#4\@nil{%
+  \scr@ifundefinedorrelax{scr@hookname}{\def#1{#3}}{%
+    \edef#1{#1/#3}%
+  }%
+  \def#2{#4}%
+  \ifx#2\@empty\else \scr@@hookargument#2#4\@nil\fi
+}
+\newcommand*{\scr@@hookargument}{}
+\def\scr@@hookargument#1#2/\@nil{\def#1{#2}}%
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
 % \begin{macro}{\ExecuteDoHook}
 % \changes{v3.27}{2019/02/02}{New}^^A
 % Arguments:
@@ -4690,48 +4777,19 @@
 % itself a \meta{specificator}. At each loop level the one-time hooks
 % are executed after the permanent hooks.
 %    \begin{macrocode}
-%<*base>
 \newcommand*{\ExecuteDoHook}[1]{%
-  \let\scr@hookname\relax
-  \edef\scr@hookargument{#1}%
-  \loop
-    \scr@hooksplit@specificator\scr@hookargument
+  \ForDoHook{#1}{%
     \edef\scr@hook@do####1{%
       ####1{\scr@hookargument}%
     }%
     \@nameuse{scr@dohook@\scr@hookname}%
-    \@nameuse{scr@otdohook@\scr@hookname}%
+    \@nameuse{scr@itdohook@\scr@hookname}%
     \expandafter\global\expandafter\let
-    \csname scr@ot@otdohook@\scr@hookname\endcsname\@empty
-  \ifx\scr@hookargument\@empty\else
-  \repeat
-  \let\scr@hook@do\relax
-}
-%    \end{macrocode}
-% \begin{macro}{\scr@hooksplit@specificator}
-% \changes{v3.27}{2019/02/02}{New internal}^^A
-% Split of the first string of the specificator argument, append it to
-% \cs{scr@hookname} and store the rest in \cs{scr@hookargument}. The argument
-% must not be empty!
-% \begin{macro}{\scr@@hooksplit@specificator}
-% \changes{v3.27}{2019/02/02}{New internal}^^A
-%    \begin{macrocode}
-\newcommand*{\scr@hooksplit@specificator}[1]{%
-  \expandafter\scr@@hooksplit@specificator#1/\@nil
-}
-\newcommand*{\scr@@hooksplit@specificator}{}
-\def\scr@@hooksplit@specificator#1/#2\@nil{%
-  \scr@ifundefinedorrelax{scr@hookname}{\def\scr@hookname{#1}}{%
-    \edef\scr@hookname{\scr@hookname/#1}%
+    \csname scr@otdohook@\scr@hookname\endcsname\@empty
+    \let\scr@hook@do\relax
   }%
-  \def\scr@hookargument{#2}%
-  \ifx\scr@hookargument\@empty\else \scr@@hookargument#2\@nil\fi
 }
-\newcommand*{\scr@@hookargument}{}
-\def\scr@@hookargument#1/\@nil{\def\scr@hookargument{#1}}%
 %    \end{macrocode}
-% \end{macro}
-% \end{macro}
 % \end{macro}
 %
 % \begin{macro}{\AddtoDoHook}
