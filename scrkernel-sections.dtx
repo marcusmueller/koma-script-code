@@ -1,4 +1,4 @@
-% \CheckSum{4602}
+% \CheckSum{4653}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -585,8 +585,9 @@
 % \changes{v3.26}{2018/05/14}{Neue Anweisung für Paketautoren}^^A
 % \begin{macro}{\startsection@afterindent}
 % \changes{v3.26}{2018/09/18}{Neue Anweisung für Paketautoren}^^A
-% Ab dem Zeitpunkt des Aufrufs des Hooks \cs{scr@startsection@hook} sind die
-% Makros \cs{startsection@sectionname}, \cs{startsection@secnumdepth},
+% Ab dem Zeitpunkt des Aufrufs des Do-Hooks
+% \texttt{heading/postinit} sind die Makros
+% \cs{startsection@sectionname}, \cs{startsection@secnumdepth},
 % \cs{startsection@indent}, \cs{startsection@beforeskip},
 % \cs{if@startsection@indentafter}, \cs{startsection@afterskip},
 % \cs{if@startsection@runin} und \cs{startsection@afterindent} gültig. Die
@@ -643,6 +644,7 @@
           \fi
         \fi
   \newcommand*{\scr@startsection}[6]{%
+    \ExecuteDoHook{heading/preinit/#1}%
     \if@noskipsec \leavevmode \fi
     \par
     \@tempskipa \glueexpr #4\relax
@@ -687,18 +689,18 @@
         \csname iffalse\endcsname
       \fi
     }%
-    \csname scr@startsection@hook\endcsname
+    \ExecuteDoHook{heading/postinit/#1}%
     \if@nobreak
       \everypar{}%
     \else
       \addpenalty\@secpenalty\addvspace\@tempskipa
     \fi
     \kernel@ifstar {%
-      \csname scr@preto@ssect@hook\endcsname
+      \ExecuteDoHook{heading/branch/star/#1}%
       \def\scr@s@ct@@nn@m@{#1}%
       \@ssect{\glueexpr #3\relax}{\glueexpr #4\relax}{\glueexpr #5\relax}{#6}%
     }{%
-      \csname scr@preto@sect@hook\endcsname
+      \ExecuteDoHook{heading/branch/nostar/#1}%
       \scr@section@dblarg{%
         \@sect{#1}{\numexpr #2\relax}{\glueexpr #3\relax}{\glueexpr #4\relax}%
         {\glueexpr #5\relax}{#6}%
@@ -719,14 +721,16 @@
     KOMA-Script that fixes the problem, please\MessageBreak
     send a report to the KOMA-Script author.\MessageBreak
     Note, that this alternative approach does not\MessageBreak
-    execute `\string\scr@startsection@hook',\MessageBreak
-    `\string\scr@preto@ssect@hook', or
-    `\string\scr@preto@sect@hook'\MessageBreak
+    execute the elements of do-hooks:\MessageBreak
+    \space\space- `heading/postinit`,\MessageBreak
+    \space\space- `heading/branch/star`,\MessageBreak
+    \space\space- `heading/branch/nostar`,\MessageBreak
     and does always use `runin=bysign' and\MessageBreak
     `afterindent=bysign'%
   }%
   \let\scr@saved@startsection\@startsection
   \newcommand*{\scr@startsection}[6]{%
+    \ExecuteDoHook{heading/preinit/#1}%
     \kernel@ifstar {%
       \scr@saved@startsection{#1}{\numexpr #2\relax}{\glueexpr #3\relax}%
       {\glueexpr #4\relax}{\glueexpr #5\relax}{#6}*%
@@ -792,7 +796,9 @@
 % \end{macro}^^A \startsection@secnumdepth
 % \end{macro}^^A \startsection@sectionname
 % \begin{macro}{\At@startsection}
-%   \changes{v3.14}{2014/09/11}{Neue Anweisung für Paketautoren}^^A
+% \changes{v3.14}{2014/09/11}{Neue Anweisung für Paketautoren}^^A
+% \changes{v3.27}{2019/02/04}{Umgestellt auf \cs{AddtoDoHook}}^^A
+% \changes{v3.27}{2019/02/04}{deprecated}^^A
 % Mit Hilfe dieser Anweisung kann Code in die Ausführung von \KOMAScript's
 % eigenem \cs{scr@startsection} an der Stelle eingefügt werden, an der
 % \cs{if@afterindent} und \cs{@tempskipa} bereits korrekt eingestellt sind,
@@ -800,32 +806,60 @@
 % gelöscht wurde.
 %    \begin{macrocode}
 \newcommand*{\At@startsection}[1]{%
-  \@ifundefined{scr@startsection@hook}{\let\scr@startsection@hook\@empty}{}%
-  \l@addto@macro{\scr@startsection@hook}{#1}%
+  \ClassInfo{\KOMAClassName}{%
+    Usage of deprecated command `\string\At@startsection'
+    mapped to\MessageBreak
+    `\string\AddtoDoHook{heading/postinit}
+                        {...\string\@gobble}'%
+  }%
+  \AddtoDoHook{heading/postinit}{\scr@doonlyifstyleofargis{#1}{section}}%
 }
 %    \end{macrocode}
+% \begin{macro}{\scr@doonlyifstyleofargis}
+% \changes{v3.27}{2019/02/04}{neu (intern)}
+% Hilfsmakro für \cs{At@startsection}, \cs{Before@sect} und \cs{Before@@sect}.
+%    \begin{macrocode}
+\newcommand*{\scr@doonlyifstyleofargis}[3]{%
+  \IfSectionCommandStyleIs{#3}{#2}{#1}{}%
+}
+%    \end{macrocode}
+% \end{macro}^^A \scr@doonlyifstyleofargis
 % \end{macro}^^A \At@startsection
 % \begin{macro}{\Before@ssect}
-%   \changes{v3.14}{2014/09/11}{Neue Anweisung für Paketautoren}^^A
+% \changes{v3.14}{2014/09/11}{Neue Anweisung für Paketautoren}^^A
+% \changes{v3.27}{2019/02/04}{Umgestellt auf \cs{AddtoDoHook}}^^A
+% \changes{v3.27}{2019/02/04}{deprecated}^^A
 % Mit Hilfe dieser Anweisung kann Code in die Ausführung von \KOMAScript's
 % eigenem \cs{scr@startsection} unmittelbar vor dem Aufruf von \cs{@ssect}
 % eingefügt werden.
 %    \begin{macrocode}
 \newcommand*{\Before@ssect}[1]{%
-  \@ifundefined{scr@preto@ssect@hook}{\let\scr@preto@ssect@hook\@empty}{}%
-  \l@addto@macro{\scr@preto@ssect@hook}{#1}%
+  \ClassInfo{\KOMAClassName}{%
+    Usage of deprecated command `\string\Before@ssect'
+    mapped to\MessageBreak
+    `\string\AddtoDoHook{heading/branch/star}%
+                        {...\string\@gobble}'%
+  }%
+  \AddtoDoHook{heading/branch/star}{\scr@onlyifstyleofargis{#1}{section}}%
 }
 %    \end{macrocode}
 % \end{macro}^^A \Before@ssect
 % \begin{macro}{\Before@sect}
-%   \changes{v3.14}{2014/09/11}{Neue Anweisung für Paketautoren}^^A
+% \changes{v3.14}{2014/09/11}{Neue Anweisung für Paketautoren}^^A
+% \changes{v3.27}{2019/02/04}{Umgestellt auf \cs{AddtoDoHook}}^^A
+% \changes{v3.27}{2019/02/04}{deprecated}^^A
 % Mit Hilfe dieser Anweisung kann Code in die Ausführung von \KOMAScript's
 % eigenem \cs{scr@startsection} unmittelbar vor dem Aufruf von \cs{@sect}
 % eingefügt werden.
 %    \begin{macrocode}
 \newcommand*{\Before@sect}[1]{%
-  \@ifundefined{scr@preto@sect@hook}{\let\scr@preto@sect@hook\@empty}{}%
-  \l@addto@macro{\scr@preto@sect@hook}{#1}%
+  \ClassInfo{\KOMAClassName}{%
+    Usage of deprecated command `\string\Before@sect'
+    mapped to\MessageBreak
+    `\string\AddtoDoHook{heading/branch/nostar}%
+                        {...\string\@gobble}'%
+  }%
+  \AddtoDoHook{heading/branch/nostar}{\scr@onlyifstyleofargis{#1}{section}}%
 }
 %    \end{macrocode}
 % \end{macro}^^A \Before@sect
@@ -1448,11 +1482,11 @@
 %     definiert alle Stil abhängigen Anweisungen}^^A
 %   \changes{v3.20}{2015/10/03}{\cs{DeclareTOCStyleEntry}
 %     definiert die Verzeichnisstil abhängigen Anweisungen}^^A
-% Definition neuer oder Umdefinition existierender Gliederungsbefehle, die auf
-% \cs{scr@startsection} basieren. Ebenso wird ein Verzeichniseintrag erzeugt,
-% falls ein solcher noch nicht existiert. Die Deklaration geschieht über
-% diverse Optionen (Achtung: Unbedingt daran denken, diese in
-% \cs{ProvideSectionCommands} ebenfalls zu definieren!!!):
+% Definition neuer oder Umdefinition existierender Gliederungsbefehle. Ebenso
+% wird ein Verzeichniseintrag erzeugt, falls ein solcher noch nicht
+% existiert. Die Deklaration geschieht über diverse Optionen:
+%^^A (Achtung: Unbedingt daran denken, die Optionen in
+%^^A  \cs{ProvideSectionCommands} ebenfalls zu definieren!!!)
 %    \begin{macrocode}
 %<*body>
 \DefineFamily{KOMAarg}
@@ -2906,6 +2940,41 @@
 %    \end{macrocode}
 % \end{macro}^^A \ProvideSectionCommands
 %
+% \begin{macro}{\IfSectionCommandStyleIs}
+% \selectlanguage{english}^^A
+% \changes{v3.27}{2019/02/04}{new}^^A
+% Test whether ot not the section command of argument 1 has the style of
+% argument 2. If so: use argument 3, of not: use argument 4.
+%    \begin{macrocode}
+%<*body>
+\newcommand*{\IfSectionCommandStyleIs}[2]{%
+  \scr@ifundefinedorrelax{#1}{%
+    \ClassError{\KOMAClassName}{%
+      \expandafter\string\csname #1\endcsname\space not defined}{%
+      You cannot compare the section command style of an undefined command.}%
+  }{%
+    \scr@ifundefinedorrelax{scr@#1@style}{%
+      \ClassError{\KOMAClassName}{%
+        \expandafter\string\csname #1\endcsname\space not a valid section
+        command%
+      }{%
+        You cannot detect the section command style of a command, that
+        has\MessageBreak
+        never been defined as a section command by KOMA-Script.%
+      }%
+    }%
+  }%
+  \scr@ifundefinedorrelax{scr@dsc@def@style@#2@command}{%
+    \ClassError{\KOMAClassName}{%
+      unknown section command style `#2'%
+    }{}%
+  }%
+  \ifstr{\@nameuse{scr@#1@style}}{#2}%
+}
+%</body>
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{option}{bookmarkpackage}
 % \selectlanguage{english}^^A
 % \changes{v3.26}{2018/06/27}{new option}^^A
@@ -3507,6 +3576,7 @@
 %    \begin{macrocode}
 %<*body>
 \newcommand*{\scr@startpart}[1]{%
+  \ExecuteDoHook{heading/preinit/#1}%
 %<article>  \par
 %<*book|report>
   \if@openright\cleardoublepage\else\clearpage\fi
@@ -3533,6 +3603,7 @@
       \fi
     }%
   }%
+  \ExecuteDoHook{heading/postinit/#1}%
   \partheadstartvskip
 %<*book|report>
   \vbox to\z@{\vss\use@preamble{#1@o}\strut\par}%
@@ -3560,6 +3631,7 @@
 %    \begin{macrocode}
 \newcommand{\scr@@startpart}{}
 \long\def\scr@@startpart#1[#2]#3{%
+  \ExecuteDoHook{heading/branch/nostar/#1}%
 %    \end{macrocode}
 %   \changes{v3.10}{2011/08/30}{Integration der Erweiterung für das optionale
 %     Argument der Gliederungsbefehle}^^A
@@ -3731,6 +3803,7 @@
 % ist der \meta{Text} für die Überschrift.
 %    \begin{macrocode}
 \newcommand{\scr@@startspart}[2]{%
+  \ExecuteDoHook{heading/branch/star/#1}%
 %    \end{macrocode}
 % Für Leute, die unbedingt nach der Sternversion noch ein \cs{addcontentsline}
 % anfügen wollen, muss hier ebenfalls der \textsf{hyperref}-Hook ausgeführt
@@ -4343,6 +4416,7 @@
 %    \begin{macrocode}
 %<*body>
 \newcommand*{\scr@startchapter}[1]{%
+  \ExecuteDoHook{heading/preinit/#1}%
   \if@openright\cleardoublepage\else\clearpage\fi
   \scr@ifundefinedorrelax{#1pagestyle}{}{%
     \ifstr{#1pagestyle}{}{}{%
@@ -4361,6 +4435,7 @@
       }%  
     }%
   }%
+  \ExecuteDoHook{heading/postinit/#1}%
   \expandafter\SecDef\csname @#1\expandafter\endcsname\csname @s#1\endcsname
 }
 %    \end{macrocode}
@@ -4373,6 +4448,7 @@
 %    \begin{macrocode}
 \newcommand*{\scr@@startchapter}{}
 \def\scr@@startchapter#1[#2]#3{%
+  \ExecuteDoHook{heading/branch/nostar/#1}%
 %    \end{macrocode}
 %   \changes{v3.10}{2011/08/30}{Integration der Erweiterung für das optionale
 %     Argument der Gliederungsbefehle}^^A
@@ -4503,6 +4579,7 @@
 % sehr viel einfacher gestrickt als \cs{scr@@startchapter}.
 %    \begin{macrocode}
 \newcommand*{\scr@@startschapter}[2]{%
+  \ExecuteDoHook{heading/branch/star/#1}%
 %    \end{macrocode}
 % Für Leute, die unbedingt nach der Sternversion noch ein \cs{addcontentsline}
 % anfügen wollen, muss hier ebenfalls der \textsf{hyperref}-Hook ausgeführt
