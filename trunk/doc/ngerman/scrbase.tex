@@ -1,6 +1,6 @@
 % ======================================================================
 % scrbase.tex
-% Copyright (c) Markus Kohm, 2002-2018
+% Copyright (c) Markus Kohm, 2002-2019
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -18,7 +18,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrbase.tex
-% Copyright (c) Markus Kohm, 2002-2018
+% Copyright (c) Markus Kohm, 2002-2019
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -1910,7 +1910,247 @@ eines Ausdrucks mit \Macro{numexpr}\IndexCmd{numexpr} verwendet werden. Zur
 Ausgabe als arabische Zahl ist \Macro{the} voranzustellen.%
 %
 \EndIndexGroup
+
+
+\section[{Allgemeiner Mechanismus für mehrstufige Haken}]
+{Allgemeiner Mechanismus für mehrstufige
+  Haken\ChangedAt[2019/01]{v3.27}{\Package{scrbase}}}
+\seclabel{hooks}
+
+\BeginIndexGroup
+\BeginIndex{}{Haken}
+Der \LaTeX-Kern bietet selbst bereits einige wenige Stellen in der
+Verarbeitung eines Dokuments, an denen die Ausführung zusätzlichen Codes
+\emph{eingehakt} werden kann. Klassen- und Paketautoren dürften
+\Macro{AtBeginDocument} und \Macro{AtEndDocument} bestens bekannt
+sein. \KOMAScript{} bietet an einigen Stellen vergleichbares, beispielsweise
+um Code in die Ausführung von
+\hyperref[sec:maincls.structure]{Gliederungsbefehlen} einzuhaken. Über die
+Jahre zeigten sich dabei zwei Probleme:
+\begin{itemize}
+\item Es gibt nie genug Haken.
+\item Es gibt sowohl Code, der nur einmal ausgeführt werden soll, also quasi
+  bei seiner Ausführung wieder vom Haken fällt, als auch Code, der bei jedem
+  Durchlaufen des Hakens auszuführen ist, also dauerhaft auf dem Haken bleibt.
+\end{itemize}
+Üblicherweise muss man zur Definition eines einzelnen Hakens eine Anweisung
+definieren, mit der Code für den jeweiligen Haken aufgesammelt wird. Dieser
+Code wird dann in einem weiteren internen Makro abgelegt, das man an der
+Stelle einfügen muss, an der der aufgesammelte Code auszuführen ist. Je mehr
+Haken man einfügt, desto mehr solcher Anweisungen gibt es. Um sowohl
+Einmalcode als auch dauerhaften Code zu ermöglichen, benötigt es gegebenfalls
+sogar zwei Haken und damit die doppelte Anzahl an zu definierenden
+Anweisungen.
+
+Das Beispiel der Gliederungsbefehle zeigt, dass sich das erste Problem
+teilweise an einem einzigen Codeausführungspunkt noch verschärfen kann. Hier
+benötigt der eine Paketautor lediglich eine Möglichkeit für alle
+Gliederungsbefehle denselben Code auszuführen. Ein anderer Paketautor hätte
+lieber, dass er nur bei bestimmten Gliederungsbefehlen unterschiedlichen Code
+ausführen kann. Es würde also sowohl ein allgemeiner Haken als auch ein Haken
+je Gliederungsbefehl benötigt. Das ganze dann wieder wegen des zweiten
+Problems verdoppelt.
+
+\KOMAScript{} bietet in \Package{scrbase} daher einen verallgemeinerten
+Hakenmechanismus, der mehrstufige Haken sowohl für Einmalcode als auch für
+dauerhaften Code bereitstellt. Diese Haken haben aufgrund der Implementierung
+den Namen \emph{do-hook} erhalten. Davon leitet sich auch der Name der
+Anweisungen ab, mit denen sie gesteuert werden.
+
+\begin{Declaration}
+  \Macro{ExecuteDoHook}\Parameter{Spezifikator}
+\end{Declaration}
+Über\ChangedAt[2019/01]{v3.27}{\Package{scrbase}} diese Anweisung werden Haken
+implementiert. Dabei bestimmt der \PName{Spezifikator} den Namen des oder
+genauer der Haken. Der \PName{Spezifikator} wird zur Analyse immer vollständig
+expandiert.
+
+Der \PName{Spezifikator} besteht allgemein aus durch Querstrichen,
+»\texttt{/}«, voneinander getrennten Zeichenfolgen. Von \Macro{ExecuteDoHook}
+wird dann zunächst die Zeichenfolge vor dem ersten Querstrich
+abgetrennt. Diese ist der Name. Der verbleibende Rest (ohne den Querstrich)
+ist das Argument. Dann wird der Code für den Haken mit diesem Namen
+ausgeführt. Anschließend wird erneut die fordere Zeichenfolge vom Rest
+abgetrennt und mit einem Querstrich hinten an den Namen angefügt und der Code
+für den so neu gebildeten Namen ausgeführt. Das geht so lange, bis der Code
+für den Haken mit dem Namen \PName{Spezifikator} und leerem Argument
+ausgeführt wurde.
+
+Im einfachsten Fall besteht der \PName{Spezifikator} aus einem einzelnen
+Namen. In diesem Fall wird zunächst der dauerhafte Code für genau einen durch
+diesen Namen festgelegten Haken mit leerem Argument ausgeführt.
+
+In jeder Stufe der Ausführung wird nach dem dauerhaften Code für einen Haken
+zusätzlich Einmalcode ausgeführt, bevor der Einmalcode global vom Haken
+genommen wird.
+
+\begin{Example}
+  Durch Einfügen von \DescRef{\LabelBase.cmd.ExecuteDoHook}%
+  \PParameter{heading/begingroup/\PName{Name}} in die Ausführung eines jeden
+  mit \DescRef{maincls-experts.cmd.DeclareSectionCommand} definierten
+  Gliederungbefehls wurden in den \KOMAScript-Klassen letztlich sechs Haken an
+  diesem Codepunkt eingefügt, die in dieser Reihenfolge ausgeführt werden:
+  \begin{enumerate}
+  \item \PValue{heading} mit Argument \PValue{begingroup/}\PName{Name} für
+    dauerhaften Code,
+  \item \PValue{heading} mit Argument \PValue{begingroup/}\PName{Name} für
+    Einmalcode,
+  \item \PValue{heading/begingroup} mit Argument \PName{Name} für
+    dauerhaften Code,
+  \item \PValue{heading/begingroup} mit Argument \PName{Name} für
+    Einmalcode,
+  \item \PValue{heading/begingroup/}\PName{Name} mit leerem Argument für
+    dauerhaften Code,
+  \item \PValue{heading/begingroup/}\PName{Name} mit leerem Argument für
+    Einmalcode.
+  \end{enumerate}
+  \PName{Name} ist dabei der bei
+  \DescRef{maincls-experts.cmd.DeclareSectionCommand},
+  \DescRef{maincls-experts.cmd.DeclareNewSectionCommand} oder
+  \DescRef{maincls-experts.cmd.ProvideSectionCommand} angegebe \PName{Name}
+  der Gliederungsebene beziehungsweise des dadurch bestimmten
+  Gliederungsbefehls, also beispielsweise \PValue{chapter} oder
+  \PValue{subparagraph}. Betrachtet man obige Auflistung unter
+  Berücksichtigung der Tatsache, dass es diverse Gliederungsbefehle gibt,
+  wird klar, dass die Haken \PValue{heading} und \PValue{heading/begingroup}
+  mehrfach, nämlich für jeden Gliederungsbefehl existieren.%
+\end{Example}%
 %
+\EndIndexGroup
+
+\begin{Declaration}
+  \Macro{AddtoDoHook}\Parameter{Name}\Parameter{Befehl}
+  \Macro{AddtoOneTimeDoHook}\Parameter{Name}\Parameter{Befehl}
+\end{Declaration}
+Mit\ChangedAt[2019/01]{v3.27}{\Package{scrbase}} \Macro{AddtoDoHook} wird an
+dem Haken mit dem Namen \PName{Name} dauerhafter Code aufgehängt. Als Code
+dient dabei der \PName{Befehl}, dem das in der Erklärung zu
+\DescRef{\LabelBase.cmd.ExecuteDoHook} erwähnte Argument als Parameter
+angehängt wird.
+\begin{Example}
+  Angenommen, es soll innerhalb von \Macro{section} mitgezählt werden, wie oft
+  diese Anweisung ausgeführt wird. Dies wäre in Fortführung des obigen
+  Beispiels mit
+\begin{lstcode}
+  \newcounter{sectionZaehler}
+  \AddtoDoHook{heading/begingroup/section}
+              {\stepcounter{sectionZaehler}}
+\end{lstcode}
+  sehr einfach möglich. Allerdings würde dann in Wirklichkeit
+  \Macro{setcounter}\PParameter{sectionZaehler}\PParameter{} ausgeführt. Wir
+  erinnern uns daran, dass immer ein Argument als Parameter angehängt wird.
+  Im Falle des Hakens mit dem Namen \PValue{heading/begingroup/section} ist
+  dieses Argument leer. Da ein solcher leerer Parameter hier zur einer leeren
+  Gruppe wird, ist es besser, diesen leeren Parameter quasi aufzubrauchen:
+\begin{lstcode}
+  \newcommand*{\stepcountergobble}[2]{%
+    \stepcounter{#1}%
+  }
+  \AddtoDoHook{heading/begingroup/section}
+              {\stepcountergobble{sectionZaehler}}
+\end{lstcode}
+  Hier wird der angehängte, leere Parameter von \Macro{stepcountergobble}
+  gelesen aber nicht verwendet.
+
+  Sollen nun statt \Macro{section} alle Gliederungsbefehle gezählt werden, so
+  muss nur ein anderer Hakenname eingesetzt werden:
+\begin{lstcode}
+  \AddtoDoHook{heading/begingroup}
+              {\stepcountergobble{sectionZaehler}}
+\end{lstcode}
+  Hier ist übrigens der angehängte Parameter nicht leer, sondern enthält den
+  Namen der Gliederungsebene oder des Gliederungsbefehls. Wollte man die
+  Gliederungsbefehle einzeln zählen, so könnte man genau dies ausnützen:
+\begin{lstcode}
+  \newcommand*{\stepZaehler}[1]{%
+    \stepcounter{#1Zaehler}%
+  }
+  \AddtoDoHook{heading/begingroup}
+              {\stepZaehler}
+\end{lstcode}
+  Natürlich müssten dann auch die Zähler \Counter{partZaehler},
+  \Counter{chapterZaehler} bis hinunter zu \Counter{subparagraphZaehler}
+  definiert werden.
+\end{Example}
+
+Die Anweisung \Macro{AddtoOneTimeDoHook} arbeitet vergleichbar, fügt den
+\PName{Befehl} aber dem Einmalcode hinzu. Dieser Code wird dann nach der
+ersten Ausführung global vom Haken genommen.%
+\EndIndexGroup
+
+\begin{Declaration}
+  \Macro{ForDoHook}\Parameter{Spezifikator}\Parameter{Befehl}
+\end{Declaration}
+Während\ChangedAt[2019/01]{v3.27}{\Package{scrbase}}
+\DescRef{\LabelBase.cmd.ExecuteDoHook} dazu gedacht ist, die Befehle
+auszuführen, die zuvor mit \DescRef{\LabelBase.cmd.AddtoDoHook} oder
+\DescRef{\LabelBase.cmd.AddtoOneTimeDoHook} für die durch den
+\PName{Spezifiktor} bestimmten Haken gespeichert wurden, führt diese Anweisung
+den unmittelbar angegebenen \PName{Befehl} aus. Dabei werden an \PName{Befehl}
+sogar zwei Parameter angefügt. Der erste Parameter ist der Name des Haken, der
+zweite das Argument des Hakens.
+
+Diese Anweisung ist ein Abfallprodukt der Implementierung von
+\DescRef{\LabelBase.cmd.ExecuteDoHook}. Normalerweise sollten weder Anwender
+noch Paketautoren diese Anweisung benötigen.%
+\EndIndexGroup
+
+\begin{Declaration}
+  \Macro{SplitDoHook}\Parameter{Spezifikator}\Parameter{Kopf-Makro}
+                     \Parameter{Rest-Makro}
+\end{Declaration}
+Wie\ChangedAt[2019/01]{v3.27}{\Package{scrbase}} aus den vorangegangen
+Erklärungen deutlich wird, kann der Parameter eines mit
+\DescRef{\LabelBase.cmd.AddtoDoHook} oder
+\DescRef{\LabelBase.cmd.AddtoOneTimeDoHook} hinzugefügten \PName{Befehls}
+ebenfalls ein mehrteiliger \PName{Spezifikator} sein. Mit \Macro{SplitDoHook}
+kann so ein \PName{Spezifikator} in das vordere Element und den Rest
+aufgeteilt werden. Das \PName{Kopf-Makro} wird dabei als das vordere Element
+definiert. Das \PName{Rest-Makro} wird als der Rest definiert. Im Falle, dass
+kein Rest bleibt, wird das \PName{Rest-Makro} leer definiert. Falls bereits der
+\PName{Spezifikator} leer war, wird eine Warnung ausgegeben und sowohl
+\PName{Kopf-Makro} als auch \PName{Rest-Makro} leer definiert.
+
+\begin{Example}
+  Wollte man am Anfang der Gruppe, in der die Überschrift ausgegeben wird,
+  einen Zähler erhöhen, diesen am Ende aber wieder verringern, so könnte man
+  dies über zwei Haken tun:
+\begin{lstcode}
+  \AddtoDoHook{heading/begingroup}
+              {\stepZaehler}
+  \newcommand*{\restepZaehler}[1]{%
+    \addtocounter{#1Zaehler}{-1}%
+  }
+  \AddtoDoHook{heading/endgroup}
+              {\restepcounter}
+\end{lstcode}
+  Man könnte aber auch mit einem einzigen Haken arbeiten und dessen Parameter
+  zerlegen:
+\begin{lstcode}
+  \newcommand*{\changeZaehler}[1]{%
+    \SplitDoHook{#1}{\Gruppe}{\Ebene}%
+    \ifstr{\Gruppe}{begingroup}{%
+      \stepcounter{\Ebene Zaehler}%
+    }{%
+      \ifstr{\Gruppe}{endgroup}{%
+        \addtocounter{\Ebene Zaehler}{-1}%
+      }{}%
+    }%
+  }
+  \AddtoDoHook{heading}
+              {\changeZaehler}
+\end{lstcode}
+  Wie zu sehen ist, ist die erste Lösung um einiges einfacher. Dazu kommt,
+  dass man die zweite Fallunterscheidung in der zweiten Lösung gerne
+  vergisst. Das wäre allerdings fatal, da es weitere Haken mit Namen
+  \PValue{heading} aber abweichendem Argument geben kann.
+\end{Example}
+
+Genau genommen ist diese Anweisung ein Abfallprodukt aus der Implementierung
+von \DescRef{\LabelBase.cmd.ForDoHook}.%
+\EndIndexGroup
+%
+\EndIndexGroup
 \EndIndexGroup
 
 \endinput
