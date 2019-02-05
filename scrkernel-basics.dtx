@@ -1,4 +1,4 @@
-% \CheckSum{4013}
+% \CheckSum{4021}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -4674,7 +4674,7 @@
 %
 % 
 % \begin{macro}{\ForDoHook}
-% \changes{v3.27}{2019/02/04}{New}^^A
+% \changes{v3.27}{2019/02/05}{New}^^A
 % Arguments:
 % \begin{description}
 % \item[\meta{specificator}:]
@@ -4683,10 +4683,10 @@
 % \end{description}
 % Executes \meta{code} for earch level of a do-hook. This is a helper command
 % normally not interesting for users or package authors. However, I define it
-% in the user context to be consistent with the other do-hook commands. Inside
-% \meta{name} \cs{scr@hookname} and \cs{scr@hookargument} are valid to specify
-% the hook. Note: Argument numbers in \meta{code} start with level 2 (four
-% hashes). See \cs{ExecuteDoHook} as an example.
+% in the user context to be consistent with the other do-hook commands. Note,
+% there will be two arguments appended to the \meta{code}. The first one is
+% the name of the hook, the second one the hook argument.
+% See \cs{ExecuteDoHook} as an example.
 %    \begin{macrocode}
 %<*base>
 \newcommand*{\ForDoHook}[2]{%
@@ -4699,8 +4699,11 @@
     \let\scr@hookname\relax
     \edef\scr@hookargument{#1}%
     \loop
-      \scr@hooksplit@specificator\scr@hookname\scr@hookargument\scr@hookargument
-      #2%
+      \scr@hooksplit@specificator\scr@hookname\scr@hookargument
+                                 \scr@hookargument
+      \edef\reserved@a{%
+        \unexpanded{#2}{\scr@hookname}{\scr@hookargument}%
+      }\reserved@a
     \ifx\scr@hookargument\@empty\else
     \repeat
     \let\scr@hookname\relax
@@ -4779,16 +4782,16 @@
 % are executed after the permanent hooks.
 %    \begin{macrocode}
 \newcommand*{\ExecuteDoHook}[1]{%
-  \ForDoHook{#1}{%
-    \edef\scr@hook@do####1{%
-      ####1{\scr@hookargument}%
-    }%
-    \@nameuse{scr@dohook@\scr@hookname}%
-    \@nameuse{scr@itdohook@\scr@hookname}%
+  \def\scr@execute@dohook##1##2{%
+    \def\scr@hook@do####1{####1{##2}}%
+    \@nameuse{scr@dohook@##1}%
+    \@nameuse{scr@otdohook@##1}%
     \expandafter\global\expandafter\let
-    \csname scr@otdohook@\scr@hookname\endcsname\@empty
+    \csname scr@otdohook@##1\endcsname\@empty
     \let\scr@hook@do\relax
   }%
+  \ForDoHook{#1}{\scr@execute@dohook}%
+  \let\scr@execute@dohook\relax
 }
 %    \end{macrocode}
 % \end{macro}
