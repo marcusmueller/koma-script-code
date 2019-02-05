@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2019/02/01 v1.13d internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2019/02/01 v1.13e internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -1920,10 +1920,12 @@
     addtokomafont,addtolengthplength,addtoreffields,addtotoclist,
     adrchar,adrentry,
     AddLayersAtBeginOfPageStyle,AddLayersToPageStyle,
+    AddtoDoHook,AddtoOneTimeDoHook,
     AfterBibliographyPreamble,AfterCalculatingTypearea,
     AfterFile,AfterPackage,AfterStartingTOC,AfterTOCHead,
     appendixmore,appendixname,areaset,autodot,automark,AtAddToTocList,
-    AtBeginLetter,
+    AtBeginLetter,At@startsection,
+    Before@sect,Before@ssect,
     BeforeFamilyProcessOptions,
     BeforeClosingMainAux,BeforePackage,bib@beginhook,bib@endhook,
     blinddocument,blindtext,Blinddocument,Blindtext,
@@ -1952,14 +1954,14 @@
     DestroyLayer,defpagestyle,deftripstyle,
     dictum,dictumauthorformat,dictumrule,dictumwidth,doforeachtocfile,
     ellipsispar,
-    encl,extratitle,FamilyBoolKey,FamilyExecuteOptions,
+    encl,ExecuteDoHook,extratitle,FamilyBoolKey,FamilyExecuteOptions,
     FamilyKeyState,FamilyKeyStateUnknown,FamilyKeyStateProcessed,
     FamilyKeyStateUnknownValue,FamilyKeyStateNeedValue,
     FamilyNumericalKey,%
     FamilyOption,FamilyOptions,FamilyProcessOptions,FamilySetBool,
     FamilyStringKey,FamilyUnknownKeyValue,
     figureformat,figurename,firstfoot,firsthead,FirstName,footfont,footref,
-    ForEachLayerOfPageStyle,
+    ForDoHook,ForEachLayerOfPageStyle,
     FreeI,FreeII,FreeIII,FreeIV,
     GenericMarkFormat,
     headfont,headmark,
@@ -2008,6 +2010,7 @@
     setheadsepline,setheadtopline,setheadwidth,setindexpreamble,setkomafont,
     setkomavar,setlengthtoplength,setparsizes,setpartpreamble,setuptoc,
     showfields,showenvelope,showISOenvelope,showUScommercial,showUScheck,
+    SplitDoHook,
     storeareas,StorePreventPackageFromLoading,
     subject,SubClause,subsectionmarkformat,subtitle,syncwithnotecolumn,
     tableformat,tablename,tableofcontents,textsubscript,thechapter,thefigure,
