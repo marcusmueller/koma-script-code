@@ -1,4 +1,4 @@
-% \CheckSum{4653}
+% \CheckSum{4684}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -2446,16 +2446,35 @@
     \RelaxFamilyKey[.dsc]{KOMAarg}{counterwithin}%
 %    \end{macrocode}
 % Testen, ob alle benötigten Optionen für die (Um-)Definierung des
-% Gliederungsbefehls gesetzt sind:
+% Gliederungsbefehls gesetzt sind,
+% \changes{v3.27}{2019/02/07}{\texttt{level} darf nicht -\cs{maxdimen}
+%   sein}^^A
+% wobei \texttt{level} nicht -\cs{maxdimen} ist:
 %    \begin{macrocode}
     \begingroup
       \def\local@endgroup{\endgroup}%
       \scr@ifundefinedorrelax{\scr@dsc@current numdepth}{%
         \scr@declaresectioncommanderror{\scr@dsc@current}{section level}{level}%
-      }{}%
-      \@nameuse{scr@dsc@style@%
-        \@nameuse{scr@\scr@dsc@current @style}%
-        @neededoptionstest}%
+      }{%
+        \expandafter\ifnum \csname #2numdepth\endcsname>-\maxdimen
+          \@nameuse{scr@dsc@style@%
+            \@nameuse{scr@\scr@dsc@current @style}%
+            @neededoptionstest}%
+        \else
+          \ClassError{\KOMAClassName}{%
+            `level' must be > -\the\numexpr\maxdimen\relax
+          }{%
+            KOMA-Script internally sets `secnumdepth' to
+            -\the\numexpr\maxdimen\relax\space
+            to locally switch of\MessageBreak
+            the numbering, i.e., inside running heads.\MessageBreak
+            Because of this, you can define section commands with\MessageBreak
+            `level' greater than -\the\numexpr\maxdimen\relax\space only.%
+          }%
+          \let\local@endgroup\endgroup
+          \aftergroup\@gobbletwo
+        \fi
+      }%
     \local@endgroup
 %    \end{macrocode}
 % Wenn alle Informationen für die (Um-)Definierung des Gliederungsbefehls
