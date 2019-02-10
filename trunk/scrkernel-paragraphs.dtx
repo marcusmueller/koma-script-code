@@ -1,4 +1,4 @@
-% \CheckSum{704}
+% \CheckSum{721}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-paragraphs.dtx
@@ -688,6 +688,33 @@
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
+%
+% \selectlanguage{english}
+% \begin{macro}{\deferred@thm@head}^^A
+% \changes{v3.27}{2019/02/10}{new patch of \textsf{amsthm}}^^A
+% Unfortunatly \Package{amsthm} has a problem if a class handles \cs{topsep}
+% this way, because it is only prepared for the case, that \cs{parskip} and
+% \cs{parsep} are changed manually without influence to \cs{topsep}. So the
+% initial distance is missing. To avoid this problem, we need to patch the
+% package's internal command \cs{deferred@thm@head}. This is not nice, but
+% unfortunaltly needed.
+%    \begin{macrocode}
+\AfterPackage{amsthm}{%
+  \RequirePackage{xpatch}%
+  \xpatchcmd{\deferred@thm@head}{\addvspace{-\parskip}}{}{%
+    \ClassInfoNoLine{\KOMAClassName}{%
+      amsthm's \string\deferred@thm@head\space patched}%
+  }{%
+    \ClassWarningNoLine{\KOMAClassName}{%
+      cannot patch amsthm's \string\deferred@thm@head.\MessageBreak
+      This could result in wrong spacing before theorem\MessageBreak
+      environments defined by package `amsthm'%
+    }%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
+% \selectlanguage{ngerman}
 % \iffalse
 %</body>
 %</class>
