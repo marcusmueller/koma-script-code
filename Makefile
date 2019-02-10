@@ -1,6 +1,6 @@
 # ======================================================================
 # Makefile
-# Copyright (c) Markus Kohm, 2002-2018
+# Copyright (c) Markus Kohm, 2002-2019
 #
 # This file is part of the LaTeX2e KOMA-Script bundle.
 #
@@ -18,7 +18,7 @@
 # This work consists of all files listed in manifest.txt.
 # ----------------------------------------------------------------------
 # Makefile
-# Copyright (c) Markus Kohm, 2002-2018
+# Copyright (c) Markus Kohm, 2002-2019
 #
 # Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 # Version 1.3c, verteilt und/oder veraendert werden.
@@ -115,6 +115,8 @@ CLS_MAIN	= scrbook.cls \
 		  visualize.lco \
 	          DIN.lco \
 		  DINmtext.lco \
+		  DIN5008A.lco \
+		  DIN5008B.lco \
 		  SN.lco \
 	 	  SNleft.lco \
 		  KOMAold.lco \
