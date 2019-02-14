@@ -50,7 +50,7 @@
                   KOMA-Script package scrbase]
 \translator{Markus Kohm\and Melvin Hendrix\and Karl Hagen}
 
-% Date of the translated German file: 2018-08-27
+% Date of the translated German file: 2019-02-07
 
 \chapter{Basic Functions in the \Package{scrbase} Package}
 \labelbase{scrbase}
@@ -763,13 +763,19 @@ is called applies.%
                               \OParameter{default}\Parameter{macro}
   \Macro{FamilySetLengthMacro}\Parameter{family}
                               \Parameter{key}\Parameter{macro}
-                              \Parameter{value}%
+                              \Parameter{value}
   \Macro{FamilyUseLengthMacroKey}\OParameter{member}\Parameter{family}
                                  \Parameter{key}
                                  \OParameter{default}\Parameter{macro}
   \Macro{FamilySetUseLengthMacro}\Parameter{family}
                                  \Parameter{key}\Parameter{macro}
-                                 \Parameter{value}%
+                                 \Parameter{value}
+  \Macro{FamilyUseLengthMacroKey}\OParameter{member}\Parameter{family}
+                                 \Parameter{key}
+                                 \OParameter{default}\Parameter{macro}
+  \Macro{FamilySetUseLengthMacro}\Parameter{family}
+                                 \Parameter{key}\Parameter{macro}
+                                 \Parameter{value}
 \end{Declaration}
 With\ChangedAt{v3.12}{\Package{scrbase}} \Macro{FamilyLengthKey}, you can
 define a \PName{key} that represents a \PName{length}. It does not matter
@@ -1628,10 +1634,9 @@ correctly. Sometimes additional operators would be useful.
   \Macro{XdivY}\Parameter{dividend}\Parameter{divisor}%
   \Macro{XmodY}\Parameter{dividend}\Parameter{divisor}%
 \end{Declaration}%
-The command\ChangedAt{v3.05a}{\Package{scrbase}}
-\Macro{XdivY} returns the value of the integer quotient, with command
-\Macro{XmodY} giving the value of the remainder. This type of of division is
-defined by the equation
+The\ChangedAt{v3.05a}{\Package{scrbase}} \Macro{XdivY} command returns the
+value of the integer quotient, with the \Macro{XmodY} command giving the value
+of the remainder. This type of of division is defined by the equation
 \[
 \textit{dividend} = \textit{divisor} \cdot
 \textit{integer quotient} + \textit{remainder}
@@ -1645,7 +1650,234 @@ using \Macro{numexpr}. To output the value as an Arabic number, you must
 prefix it with \Macro{the}.%
 %
 \EndIndexGroup
+
+
+\section[{General Mechanism for Multi-Level Hooks}]
+{General Mechanism for Multi-Level
+  Hooks\ChangedAt[2019/01]{v3.27}{\Package{scrbase}}}
+\seclabel{hooks}
+
+\BeginIndexGroup
+\BeginIndex{}{Hooks}
+The \LaTeX{} kernel provides a few \emph{hooks} in the processing of
+a document where additional code can be inserted. Class and package authors
+should be very familiar with \Macro{AtBeginDocument} and \Macro{AtEndDocument}.
+\KOMAScript{} offers similar features in some places, for example to hook code
+into the execution of 
+\hyperref[sec:maincls.structure]{sectioning commands}. Over the years, there
+have been two problems:
+\begin{itemize}
+  \item There are never enough hooks.
+  \item There is some code that should only be executed once, as if it almost
+  drops off the hook, as well as code that must be executed each time the
+  hook is encountered, thus remaining permanently on the hook.
+\end{itemize}
+Usually, to define a single hook you must define a command that collects the
+code for each hook. This code is then stored in another internal macro, which
+must be inserted at the point where the collected code is executed. The more
+hooks you insert, the more such commands there are. To allow for both
+single-use code and permanent code may even require two hooks, and therefore
+twice the number of commands to be defined.
+
+The example of sectioning commands shows that the first problem can sometimes
+be exacerbated by having only a single point for code execution. One package
+author may need only one way to execute the same code for all sectioning
+commands. Another package author would prefer to execute different code for
+certain sectioning commands only. Meeting both these demands would require a
+general hook as well as a hook for each sectioning command. These requirements
+are doubled again because of the second problem.
+
+\KOMAScript{} therefore offers a generalized hook mechanism in
+\Package{scrbase} that provides multi-level hooks for both single-use and
+persistent code. These hooks are named \emph{do-hooks} because of their
+implementation. From this also comes the names of the instructions by which
+they are controlled.
+
+\begin{Declaration}
+  \Macro{ExecuteDoHook}\Parameter{specifier}
+\end{Declaration}
+Hooks\ChangedAt[2019/01]{v3.27}{\Package{scrbase}} are implemented with this
+command. The \PName{specifier} determines the name or names of the hook. The
+\PName{specifier} is always completely expanded for analysis.
+
+The \PName{specifier} generally consists of strings separated by forward
+slashes (``/''). Initially, \Macro{ExecuteDoHook} divides the string at the
+first slash. The first part is the name. The remainder (without the slash) is
+the argument. Then the code for the hook with this name is executed. Next the
+first part of the remaining string is divided again from the remainder,
+combined with a slash after the name to form a new name, and the code with this
+name is executed. This process continues until the code for the hook with the
+name \PName{specifier} has been executed and the argument is empty.
+
+In the simplest case, the \PName{specifier} consists of a single name. In this
+case, the persistent code is executed first, with an empty argument, for
+exactly one hook specified by this name.
+
+At each stage of execution, single-use code is also executed after the hook's
+persistent code, and then the single-use code is globally removed from the
+hook.
+
+\begin{Example}
+  By inserting \DescRef{\LabelBase.cmd.ExecuteDoHook}%
+  \PParameter{heading/begingroup/\PName{name}} into the execution of each
+  sectioning command defined with
+  \DescRef{maincls-experts.cmd.DeclareSectionCommand}, the \KOMAScript{}
+  classes ultimately have six hooks inserted at that code-point, executed in
+  this order:
+  \begin{enumerate}
+    \item \PValue{heading} with the argument \PValue{begingroup/}\PName{name}
+    for persistent code,
+    \item \PValue{heading} with the argument \PValue{begingroup/}\PName{name}
+    for single-use code,
+    \item \PValue{heading/begingroup} with the argument \PName{name} for
+    persistent code,
+    \item \PValue{heading/begingroup} with the argument \PName{name} for
+    single-use code,
+    \item \PValue{heading/begingroup/}\PName{name} with an empty argument for
+    persistent code,
+    \item \PValue{heading/begingroup/}\PName{name} with an empty argument for
+    single-use code.
+  \end{enumerate}
+  The \PName{name} is the name of section level specified in
+  \DescRef{maincls-experts.cmd.DeclareSectionCommand},
+  \DescRef{maincls-experts.cmd.DeclareNewSectionCommand} or
+  \DescRef{maincls-experts.cmd.ProvideSectionCommand}, or the sectioning
+  command specified by it, for example \PValue{chapter} or
+  \PValue{subparagraph}. Looking at the list above, and considering that there
+  are various sectioning commands, it becomes clear that the \PValue{heading}
+  and \PValue{heading/begingroup} hooks will be called multiple times for each
+  sectioning command.%
+\end{Example}%
 %
+\EndIndexGroup
+
+\begin{Declaration}
+  \Macro{AddtoDoHook}\Parameter{name}\Parameter{command}
+  \Macro{AddtoOneTimeDoHook}\Parameter{name}\Parameter{command}
+\end{Declaration}
+\Macro{AddtoDoHook}\ChangedAt[2019/01]{v3.27}{\Package{scrbase}} appends
+persistent code to the hook named \PName{name}. The code to be added is the
+\PName{command}, to which the argument mentioned in the description of
+\DescRef{\LabelBase.cmd.ExecuteDoHook} is appended as a parameter.
+\begin{Example}
+  Suppose you want to count how many times the \Macro{section} command is
+  executed. This would be simple, continuing the previous example:
+\begin{lstcode}
+  \newcounter{sectionCounter}
+  \AddtoDoHook{heading/begingroup/section}
+              {\stepcounter{sectionCounter}}
+\end{lstcode}
+  However, in reality, \Macro{setcounter}\PParameter{sectionCounter}%
+  \PParameter{} would be executed. Remember that an argument is always appended
+  as a parameter. In the case of the hook named
+  \PValue{heading/begingroup/section}, this argument is empty. Since an empty
+  parameter becomes an empty group here, it is better to consume this empty
+  parameter:
+\begin{lstcode}
+  \newcommand*{\stepcountergobble}[2]{%
+    \stepcounter{#1}%
+  }
+  \AddtoDoHook{heading/begingroup/section}
+              {\stepcountergobble{sectionCounter}}
+\end{lstcode}
+  Here, the appended, empty parameter of \Macro{stepcountergobble} is read but
+  not used.
+  
+  If instead of \Macro{section}, you want to count all sectioning commands, you
+  only need to change the hook name:
+\begin{lstcode}
+  \AddtoDoHook{heading/begingroup}
+              {\stepcountergobble{sectionCounter}}
+\end{lstcode}
+  By the way, the appended parameter is not empty in this case but contains the
+  name of the sectioning level or sectioning command. If you wanted to count
+  the sectioning commands individually, you could just use this:
+\begin{lstcode}
+  \newcommand*{\stepCounter}[1]{%
+    \stepcounter{#1Counter}%
+  }
+  \AddtoDoHook{heading/begingroup}
+              {\stepCounter}
+\end{lstcode}
+  Of course, you must also define the counters \Counter{partCounter},
+  \Counter{chapterCounter} down to \Counter{subparagraphCounter}.
+\end{Example}
+
+The \Macro{AddtoOneTimeDoHook} command works similarly but adds the
+\PName{command} to the single-use code. This code will be globally removed
+after the first execution.%
+\EndIndexGroup
+
+\begin{Declaration}
+  \Macro{ForDoHook}\Parameter{specification}\Parameter{command}
+\end{Declaration}
+While\ChangedAt[2019/01]{v3.27}{\Package{scrbase}}
+\DescRef{\LabelBase.cmd.ExecuteDoHook} executes the commands previously stored
+with \DescRef{\LabelBase.cmd.AddtoDoHook} or
+\DescRef{\LabelBase.cmd.AddtoOneTimeDoHook} for the hook given by the
+\PName{specifier}, this macro executes the \PName{command} immediately. There
+are two parameters added to the \PName{command}. The first is the hook's name;
+the second, the hook's argument.
+
+This command is a byproduct of the implementation of 
+\DescRef{\LabelBase.cmd.ExecuteDoHook}. Normally, neither end users nor package
+authors should need this command.%
+\EndIndexGroup
+
+\begin{Declaration}
+  \Macro{SplitDoHook}\Parameter{specifier}\Parameter{head macro}
+                     \Parameter{remainder macro}
+\end{Declaration}
+As\ChangedAt[2019/01]{v3.27}{\Package{scrbase}} can be seen from the preceding
+explanations, the parameter of a \PName{command} added with
+\DescRef{\LabelBase.cmd.AddtoDoHook} or
+\DescRef{\LabelBase.cmd.AddtoOneTimeDoHook} can also be a multi-part
+\PName{specifier}. You can use \Macro{SplitDoHook} to divide a
+\PName{specifier} into the front element and the remainder. The
+\PName{head macro} will be set to the front element. The \PName{remainder
+macro} will be set to the rest. If there is no remainder left, the
+\PName{remainder macro} is set to empty. If the \PName{specifier} was already
+empty, a warning is issued and both the \PName{head macro} and the
+\PName{remainder macro} are set to empty.
+
+\begin{Example}
+  If you want to increase a counter at the start of a group in which a heading
+  is issued but decrease it at the end, you can do this with two hooks:
+\begin{lstcode}
+  \AddtoDoHook{heading/begingroup}
+              {\stepCounter}
+  \newcommand*{\restepCounter}[1]{%
+    \addtocounter{#1Counter}{-1}%
+  }
+  \AddtoDoHook{heading/endgroup}
+              {\restepCounter}
+\end{lstcode}
+  But you could also use a single hook and split its parameters:
+\begin{lstcode}
+  \newcommand*{\changeCounter}[1]{%
+    \SplitDoHook{#1}{\Group}{\Level}%
+    \ifstr{\Group}{begingroup}{%
+      \stepcounter{\Level Counter}%
+    }{%
+      \ifstr{\Group}{endgroup}{%
+        \addtocounter{\Level Counter}{-1}%
+      }{}%
+    }%
+  }
+  \AddtoDoHook{heading}
+              {\changeCounter}
+\end{lstcode}
+  As you can see, the first solution is much simpler. In addition, it would
+  be easy to overlook including the empty group for the second false-case in
+  the second example. That would be fatal, however, as there make be other
+  hooks with named \PValue{heading} but with different arguments.
+\end{Example}
+
+Strictly speaking, this command is a byproduct of the implementation of
+\DescRef{\LabelBase.cmd.ForDoHook}.%
+\EndIndexGroup
+%
+\EndIndexGroup
 \EndIndexGroup
 
 \endinput
