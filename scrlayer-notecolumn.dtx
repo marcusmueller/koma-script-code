@@ -1,8 +1,8 @@
-% \CheckSum{1747}
+% \CheckSum{1843}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlayer-notecolumn.dtx
-% Copyright (c) Markus Kohm, 2013-2018
+% Copyright (c) Markus Kohm, 2013-2019
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrlayer-notecolumn.dtx
-% Copyright (c) Markus Kohm, 2013-2018
+% Copyright (c) Markus Kohm, 2013-2019
 %
 % Diese Datei ist Teil der LaTeX2e KOMA-Script-Sammlung.
 %
@@ -68,7 +68,7 @@
 \begingroup
   \def\filedate$#1: #2-#3-#4 #5${\gdef\filedate{#2/#3/#4}}
   \filedate$Date$
-  \def\filerevision$#1: #2 ${\gdef\filerevision{v0.1.#2}}
+  \def\filerevision$#1: #2 ${\gdef\filerevision{v0.2.#2}}
   \filerevision$Revision$
   \edef\reserved@a{%
     \noexpand\endgroup
@@ -328,6 +328,29 @@
       }%
     }{}%
 %    \end{macrocode}
+% \changes{3.27}{2019/02/14}{initialization of one colour stack per note
+%   column}^^A
+% For colour support we also need one colour stack per note column. A colour
+% stack is a feature only available for pdf\TeX{} and lua\TeX{}.
+%    \begin{macrocode}
+    \@ifundefined{slnc@#2@colorstack}{%
+      \scr@ifundefinedorrelax{pdfcolorstackinit}{%
+        \scr@ifundefinedorrelax{pdffeedback}{}{%
+          \expandafter\chardef\csname slnc@#2@colorstack\endcsname=
+          \pdffeedback colorstackinit direct {\slnc@initial@black}%
+          \scrlayerOnAutoRemoveInterface[scrlayer-notecolumn.sty]{%
+            \expandafter\let\csname slnc@#2@colorstack\endcsname\relax
+          }%
+        }%
+      }{%
+        \expandafter\chardef\csname slnc@#2@colorstack\endcsname=
+          \pdfcolorstackinit direct {\slnc@initial@black}%
+        \scrlayerOnAutoRemoveInterface[scrlayer-notecolumn.sty]{%
+          \expandafter\let\csname slnc@#2@colorstack\endcsname\relax
+        }%
+      }%
+    }{}%
+%    \end{macrocode}
 % If there isn't a font element for the (new) note column, we define a new one
 % and add it to the auto-remove code:
 %    \begin{macrocode}
@@ -398,6 +421,27 @@
   }%
 }
 %    \end{macrocode}
+% \begin{macro}{\slnc@initial@black}
+% \changes{v0.2.3085}{2019/02/14}{new internal}^^A
+% The initial black is the colour used to initialize the colour stacks. As long
+% as only pdf\TeX{} and lua\TeX{} provide colour stacks, we can initialize it
+% with \texttt{0 g 0 G}. However it may be better to use the initial
+% \cs{current@color} of the used colour package. Using \cs{default@color} would
+% be even better, but this is not available until \cs{begin\{document\}}.
+%    \begin{macrocode}
+\scrlayerAddToInterface\slnc@initial@black{%
+  \newcommand*{\slnc@initial@black}{0 g 0 G}%
+  \AfterPackage*{color}{%
+    \let\slnc@initial@black\current@color
+    \AtBeginDocument{\let\slnc@initial@black\default@color}%
+  }%
+  \AfterPackage*{xcolor}{%
+    \let\slnc@initial@black\current@color
+    \AtBeginDocument{\let\slnc@initial@black\default@color}%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}^^A \slnc@initial@black
 % \begin{macro}{\slnc@processnotecolumns}
 % This is a list of all declared note columns in \LaTeX{} syntax (using
 % \Macro{@cons} and \Macro{@elt} etc.).
@@ -902,11 +946,15 @@
           \expandafter\setbox\csname slnc@#1@box\endcsname\vbox{%
             \expandafter\hsize\csname slnc@#1@width\endcsname
             \normalfont\normalsize
-            {%
 %    \end{macrocode}
-% Question: Why is it not allowed to set a colour here?
+% \changes{v0.2.3085}{2019/02/14}{using colour stack if available}^^A
+% If a color stack is available we switch to it before changing the font. So a
+% color definition inside the font would overwrite every color change inside
+% the column! But if we don't have a color stack, color switching is not
+% permitted!
 %    \begin{macrocode}
-              \let\color\@gobble
+            \slnc@switchcolorstack{#1}%
+            {%
               \usekomafont{notecolumn.#1}{%
                 \slnc@notesyncfonttest{#1}%
                 \expandafter\ifvoid\csname slnc@#1@box\endcsname
@@ -1019,6 +1067,7 @@
           \splitmaxdepth\baselineskip
 %    \end{macrocode}
 % Bring back the colours:
+% \changes{v0.2.3085}{2019/02/14}{\cs{slnc@switchcolorstack} added}^^A
 %    \begin{macrocode}
           \usekomafont{notecolumn.#1}{%
             \expandafter\vsplit\csname slnc@#1@box\endcsname to
@@ -1027,7 +1076,8 @@
           \expandafter\ifvoid\csname slnc@#1@box\endcsname
           \else
             \expandafter\setbox\csname slnc@#1@box\endcsname\vbox{%
-                  \expandafter\unvbox\csname slnc@#1@box\endcsname
+              \slnc@switchcolorstack{#1}%
+              \expandafter\unvbox\csname slnc@#1@box\endcsname
             }%
           \fi
         \else
@@ -1036,8 +1086,10 @@
 %</trace>
 %    \end{macrocode}
 % Bring back the colours:
+% \changes{v0.2.3085}{2019/02/14}{\cs{slnc@switchcolorstack} added}^^A
 %    \begin{macrocode}
           \usekomafont{notecolumn.#1}{%
+            \slnc@switchcolorstack{#1}%
             \expandafter\box\csname slnc@#1@box\endcsname%
           }%
         \fi
@@ -1049,6 +1101,57 @@
   }
 }
 %    \end{macrocode}
+% \begin{macro}{\slnc@switchcolorstack}
+% \changes{v0.2.3085}{2019/02/14}{new internal}^^A
+% This either redefines \cs{color} or switches to the colour stack of the
+% note column given by the argument.
+%    \begin{macrocode}
+\scrlayerAddToInterface{\slnc@switchcolorstack}{%
+  \newcommand*{\slnc@switchcolorstack}[1]{%
+    \scr@ifundefinedorrelax{slnc@#1@colorstack}{%
+      \def\color##1{%
+        \PackageWarningNoLine{scrlayer-notecolumn}{%
+          unsupported change of colour!\MessageBreak
+          It seems you are using a TeX engine,\MessageBreak
+          that does not support switching the\MessageBreak
+          colour stack like pdfTeX or luaTeX do.\MessageBreak
+          Because of this, usage of \string\color,\MessageBreak
+          \string\textcolor\space etc. inside a note
+          column\MessageBreak
+          is not supported%
+        }%
+      }%
+    }{%
+      \scr@ifundefinedorrelax{@pdfcolorstack}{%
+      }{%
+        \expandafter\let\expandafter\@pdfcolorstack
+        \csname slnc@#1@colorstack\endcsname
+      }%
+      \scr@ifundefinedorrelax{pdfcolorstack}{%
+        \scr@ifundefinedorrelax{pdfextension}{%
+          \PackageError{scrlayer-notecolumm}{%
+            colour stack defined but not usable%
+          }{%
+            \expandafter\string
+            \csname slnc@#1@colorstack\endcsname\space defined
+            \MessageBreak
+            but neither \string\pdfcolorstack\space nor
+            \string\pdfextension.\MessageBreak
+            This should never happen!%
+          }%
+        }{%
+          \pdfextension colorstack
+          \csname slnc@#1@colorstack\endcsname current\relax
+        }%
+      }{%
+        \pdfcolorstack
+        \csname slnc@#1@colorstack\endcsname current\relax
+      }%
+    }%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}^^A \slnc@switchcolorstack
 % \begin{macro}{\restoreinnote}
 %   \changes{0.1.2582}{2017/02/08}{new command}^^A
 % \begin{macro}{\slnc@restoreinnote}
