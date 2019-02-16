@@ -86,6 +86,9 @@ CLS_MAIN	= scrbook.cls \
 		  scrreprt.cls \
 		  scrartcl.cls \
 		  scrlttr2.cls \
+		  scrreport.cls \
+		  scrarticle.cls \
+		  scrletter.cls \
 		  scrletter.sty \
 		  typearea.sty \
 		  scrsize10pt.clo \
