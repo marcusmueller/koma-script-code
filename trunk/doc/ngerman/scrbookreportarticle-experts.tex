@@ -1220,7 +1220,7 @@ sind \autoref{sec:tocbasic.tocstyle}%
 Das in den Einstellungen für \DescRef{maincls.cmd.subparagraph} verwendete
 interne Makro \Macro{scr@parindent} ist übrigens, der per Option
 \DescRef{maincls.option.parskip} oder Befehl
-\DescRef{maincls-experts.cmd.setparsizes} eingestellte Absatzeinzug.
+\DescRef{maincls-experts.cmd.setparsizes} eingestellte Absatzeinzug.%
 \EndIndexGroup
 
 
@@ -1706,6 +1706,71 @@ Das erste Argument, \PName{Ebene}, wird von den Anweisungen in der
 Voreinstellung nicht verwendet. Wie das Beispiel zeigt, kann es aber sehr gut
 dazu verwendet werden, nach unterschiedlichen Gliederungsebenen im gemeinsamen
 Stil \PValue{section} zu unterscheiden.%
+\EndIndexGroup
+
+
+\begin{Declaration}
+\DoHook{headings/preinit/\PName{Name}}%
+\DoHook{headings/postinit/\PName{Name}}%
+\DoHook{headings/branch/nostar/\PName{Name}}%
+\DoHook{headings/begingroup/\PName{Name}}%
+\DoHook{headings/endgroup/\PName{Name}}%
+\end{Declaration}
+\BeginIndex{}{Haken}%
+Neben\ChangedAt[2019/01]{v3.27}{\Class{scrbook}\and \Class{scrreprt}\and
+  \Class{scrartcl}} den übrigen Einstellmöglichkeiten bieten sämtliche mit
+\DescRef{\LabelBase.cmd.DeclareSectionCommand},
+\DescRef{\LabelBase.cmd.DeclareNewSectionCommand} und
+\DescRef{\LabelBase.cmd.ProvideSectionCommand} definierten oder mit
+\DescRef{\LabelBase.cmd.RedeclareSectionCommand} umdefinierten
+Gliederungsanweisungen eine ganze Reihe an Haken, die per
+\DescRef{scrbase.cmd.AddtoDoHook} manipuliert werden können. Zur
+Funktionsweise dieser \emph{do-hook} genannten Haken sei auf
+\autoref{sec:scrbase.hooks} ab \autopageref{sec:scrbase.hooks}
+verwiesen. Der letzte Teil des Spezifikators ist dabei der \PName{Name} der
+Gliederungsanweisung, wie er auch bei den oben genannten Befehlen als letztes
+Argument anzugeben ist.
+
+Wichtig\important{Achtung!} ist, das keiner dieser Haken für Anweisungen
+verwendet werden sollte, die Auswirkungen auf den Seitenumbruch oder die
+Positionierung der Überschriften haben. Daher sollten nur wirklich erfahrene
+Anwender Gebrauch von diesen Haken machen. Im Zweifelsfall ist außerdem der
+Quellcode der Klasse bezüglich des genauen Ausführungszeitpunktes des
+jeweiligen Haken zu konsultieren. Diese Haken dienen als letzter Notanker vor
+einer tatsächlichen Umdefinierung von Gliederungsbefehlen außerhalb der von
+\KOMAScript{} gebotenen Mittel.
+
+Der\textnote{\DoHook{\dots/preinit/\dots}} Haken
+\DoHook{headings/preinit/\PName{Name}} wird unmittelbar vor der
+Initialisierung der Anweisungen ausgeführt. Zu diesem Zeitpunkt wurden noch
+keine Einstellungen vorgenommen. Selbst der Absatz, der einer Überschrift
+voraus geht, ist noch nicht zwingend beendet.
+
+Der\textnote{\DoHook{\dots/postinit/\dots}} Haken
+\DoHook{headings/postinit/\PName{Name}} wird etwas später ausgeführt. Zu
+diesen Zeitpunkt wurden einige Einstellungen bereits vorgenommen und auch ein
+vorausgehender Absatz wurde bereits beendet.
+
+Von\textnote{\DoHook{\dots/branch/\dots}} den Haken
+\DoHook{headings/branch/nostar/\PName{Name}} oder
+\DoHook{headings/branch/star/\PName{Name}} wird jeweils nur einer ausgeführt,
+sobald feststeht, ob die Sternform oder die Normalform der
+Gliederungsanweisung ausgeführt wird. Zu diesem Zeitpunkt sind auch bereits
+vertikale Abstände über der jeweiligen Überschrift ausgeführt.
+
+Der\textnote{\DoHook{\dots/begingroup/\dots}} Haken
+\DoHook{headings/begingroup/\PName{Name}} wird am Anfang der Gruppe
+ausgeführt, in der schließlich die Überschrift gesetzt wird. Das ist also die
+letzte Eingriffsmöglichkeit vor der Ausgabe der Überschrift.
+
+Entsprechend\textnote{\DoHook{\dots/\begingroup/\dots}} wird
+\DoHook{headings/endgroup/\PName{Name}} vor dem Ende der Gruppe ausgeführt, in
+der die Überschrift gesetzt wurde. Derzeit ist das auch der letzte Haken
+innerhalb einer Gliederungsanweisung.
+
+Zu beachten\textnote{\DescRef{maincls.cmd.minisec}} ist, dass
+\DescRef{maincls.cmd.minisec} keine echte Gliederungsanweisung ist und die
+genannten Haken daher auf diese Anweisung keine Anwendung finden.%
 \EndIndexGroup
 
 

@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2019/02/01 v1.13e internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2019/02/20 v1.14 internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -659,6 +659,8 @@
 % \begin{macro}{\PageStyle}
 % \begin{macro}{\Variable}
 % \begin{macro}{\FontElement}
+% \begin{macro}{\DoHook}
+% \changes{v1.14}{2019/02/20}{neu}^^A
 % \begin{macro}{\PName}
 % \begin{macro}{\PValue}
 % \begin{macro}{\Parameter}
@@ -1003,12 +1005,12 @@
   \BeginIndex{PLength}{#1}%
   \LabelPLength{#1}%
   \scr@ifundefinedorrelax{%
-    r@\label@desc@prefix scrlttr2-experts.cmd.@setplength}{%
-    \textMacro{@setplength}%
+    r@\label@desc@prefix scrlttr2-experts.cmd.setplength}{%
+    \textMacro{setplength}%
   }{%
     \begingroup
       \let\Macro\textMacro
-      \DescRef{scrlttr2-experts.cmd.@setplength}%
+      \DescRef{scrlttr2-experts.cmd.setplength}%
     \endgroup
   }%
   \PParameter{#1}\Parameter{\lengthname}%
@@ -1050,7 +1052,7 @@
   \endgroup
 }
 \DeclareSpecialMarkup{\FontElement}{\mbox{\texttt{#1}}}{%
- \par
+  \par
   \leftskip\z@
   \BeginIndex{FontElement}{#1}%
   \LabelFontElement{#1}%
@@ -1070,6 +1072,31 @@
     \endgroup
   }%
   \PParameter{#1}\OParameter{\fontsettingname}%
+}
+\newcommand*{\LabelDoHook}[2][\label@suffix]{%
+  \begingroup
+    \protected@edef\@currentlabel{\DoHook{#2}}%
+    \label@sanitize
+    \Hy@MakeCurrentHref{\label@desc@prefix\label@base.dohook.#2#1}%
+    \ClassInfo{scrguide}{Anchor: `\@currentHref'}%
+    \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
+    \label{\label@desc@prefix\label@base.dokook.#2#1}%
+  \endgroup
+}  
+\DeclareSpecialMarkup{\DoHook}{\mbox{\texttt{#1}}}{%
+  \par
+  \leftskip\z@
+  \BeginIndex{DoHook}{#1}%
+  \LabelDoHook{#1}%
+  \scr@ifundefinedorrelax{r@scrbase.cmd.ExecuteDoHook}{%
+    \textMacro{ExecuteDoHook}%
+  }{%
+    \begingroup
+      \let\Macro\textMacro
+      \DescRef{scrbase.cmd.ExecuteDoHook}%
+    \endgroup
+  }%
+  \PParameter{#1}%
 }
 \DeclareRobustCommand*{\PName}[1]{\texttt{\textit{#1}}}
 \DeclareRobustCommand*{\PValue}[1]{\texttt{#1}}
@@ -1314,6 +1341,7 @@
   \scr@Desc@let\PLength
   \scr@Desc@let\FontElement
   \scr@Desc@let\FloatStyle
+  \scr@Desc@let\DoHook
   % Todo: Replace the following by the correct definitions:
   \let\XMacro\textMacro
   \let\XEnvironment\textEnvironment
@@ -2334,6 +2362,9 @@ KOMAScript \endcsname
     \printmultiindex[%
       \CrossIndex{\GuideOption}{gen}{\GuideoptIndexShort}%
     ]{\GuideoptIndex}{opt}%
+    \printmultiindex[%
+      \CrossIndex{\GuideHook}{gen}{\GuidehokIndexShort}%
+    ]{\GuidehokIndex}{hok}
   }
 \fi
 %    \end{macrocode}
@@ -2620,7 +2651,7 @@ KOMAScript \endcsname
 % Now we have to define different kinds of index entries. We have entries that
 % will be added to only one index. We have entries that will be added to one
 % index with reference to that index at another index. And there are even
-% entries that will be added to one index with reference to to that index from
+% entries that will be added to one index with reference to that index from
 % another index and from the main index.
 % \begin{macro}{\DefineSingeIndex}
 %   This defines a single index entry, e.g. of commands. A macro will be
@@ -2735,6 +2766,7 @@ KOMAScript \endcsname
   \DefineSingleIndex[\GuideVariable]{Variable}{cmd}{\Variable}
   \DefineSingleIndex{FontElement}{elm}{\FontElement}
   \DefineSingleIndex{PLength}{len}{\PLength}
+  \DefineSingleIndex{DoHook}{hok}{\DoHook}
 \else
   \DefineDoubleIndex[\GuideEnvironment]{Env}{cmd}{\Environment}
   \DefineDoubleIndex{Option}{opt}{\Option}
@@ -2744,6 +2776,7 @@ KOMAScript \endcsname
   \DefineDoubleIndex[\GuideVariable]{Variable}{cmd}{\Variable}
   \DefineDoubleIndex{FontElement}{elm}{\FontElement}
   \DefineDoubleIndex{PLength}{len}{\PLength}
+  \DefineDoubleIndex{DoHook}{hok}{\DoHook}
 \fi
 %    \end{macrocode}
 %
