@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2019/02/20 v1.14 internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2019/02/20 v1.14a internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -1075,13 +1075,27 @@
 }
 \newcommand*{\LabelDoHook}[2][\label@suffix]{%
   \begingroup
+    \renewcommand*{\PName}[1]{=##1=}%
+    \ForDoHook{#2}{\Label@DoHook{#1}}%
+  \endgroup
+}
+\newcommand*{\Label@DoHook}[3]{%
+  \IfArgIsEmpty{#3}{\@firstofone}{%
+    \scr@ifundefinedorrelax{dhr@\label@desc@prefix\label@base.dohook.#2#1}{%
+      \@firstofone
+    }{%
+      \@gobble
+    }%
+  }{%
     \protected@edef\@currentlabel{\DoHook{#2}}%
     \label@sanitize
     \Hy@MakeCurrentHref{\label@desc@prefix\label@base.dohook.#2#1}%
     \ClassInfo{scrguide}{Anchor: `\@currentHref'}%
     \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
-    \label{\label@desc@prefix\label@base.dokook.#2#1}%
-  \endgroup
+    \label{\label@desc@prefix\label@base.dohook.#2#1}%
+    \expandafter\gdef
+    \csname dhr@\label@desc@prefix\label@base.dohook.#2#1\endcsname{#3}%
+  }%
 }  
 \DeclareSpecialMarkup{\DoHook}{\mbox{\texttt{#1}}}{%
   \par
