@@ -1710,11 +1710,12 @@ Stil \PValue{section} zu unterscheiden.%
 
 
 \begin{Declaration}
-\DoHook{headings/preinit/\PName{Name}}%
-\DoHook{headings/postinit/\PName{Name}}%
-\DoHook{headings/branch/nostar/\PName{Name}}%
-\DoHook{headings/begingroup/\PName{Name}}%
-\DoHook{headings/endgroup/\PName{Name}}%
+\DoHook{heading/preinit/\PName{Name}}%
+\DoHook{heading/postinit/\PName{Name}}%
+\DoHook{heading/branch/star/\PName{Name}}%
+\DoHook{heading/branch/nostar/\PName{Name}}%
+\DoHook{heading/begingroup/\PName{Name}}%
+\DoHook{heading/endgroup/\PName{Name}}%
 \end{Declaration}
 \BeginIndex{}{Haken}%
 Neben\ChangedAt[2019/01]{v3.27}{\Class{scrbook}\and \Class{scrreprt}\and
@@ -1741,30 +1742,30 @@ einer tatsächlichen Umdefinierung von Gliederungsbefehlen außerhalb der von
 \KOMAScript{} gebotenen Mittel.
 
 Der\textnote{\DoHook{\dots/preinit/\dots}} Haken
-\DoHook{headings/preinit/\PName{Name}} wird unmittelbar vor der
+\DoHook{heading/preinit/\PName{Name}} wird unmittelbar vor der
 Initialisierung der Anweisungen ausgeführt. Zu diesem Zeitpunkt wurden noch
 keine Einstellungen vorgenommen. Selbst der Absatz, der einer Überschrift
 voraus geht, ist noch nicht zwingend beendet.
 
 Der\textnote{\DoHook{\dots/postinit/\dots}} Haken
-\DoHook{headings/postinit/\PName{Name}} wird etwas später ausgeführt. Zu
+\DoHook{heading/postinit/\PName{Name}} wird etwas später ausgeführt. Zu
 diesem Zeitpunkt wurden einige Einstellungen bereits vorgenommen und auch ein
 vorausgehender Absatz wurde bereits beendet.
 
 Von\textnote{\DoHook{\dots/branch/\dots}} den Haken
-\DoHook{headings/branch/nostar/\PName{Name}} oder
-\DoHook{headings/branch/star/\PName{Name}} wird jeweils nur einer ausgeführt,
+\DoHook{heading/branch/nostar/\PName{Name}} oder
+\DoHook{heading/branch/star/\PName{Name}} wird jeweils nur einer ausgeführt,
 sobald feststeht, ob die Sternform oder die Normalform der
 Gliederungsanweisung ausgeführt wird. Zu diesem Zeitpunkt sind auch bereits
 vertikale Abstände über der jeweiligen Überschrift ausgeführt.
 
 Der\textnote{\DoHook{\dots/begingroup/\dots}} Haken
-\DoHook{headings/begingroup/\PName{Name}} wird am Anfang der Gruppe
+\DoHook{heading/begingroup/\PName{Name}} wird am Anfang der Gruppe
 ausgeführt, in der schließlich die Überschrift gesetzt wird. Das ist also die
 letzte Eingriffsmöglichkeit vor der Ausgabe der Überschrift.
 
 Entsprechend\textnote{\DoHook{\dots/\begingroup/\dots}} wird
-\DoHook{headings/endgroup/\PName{Name}} vor dem Ende der Gruppe ausgeführt, in
+\DoHook{heading/endgroup/\PName{Name}} vor dem Ende der Gruppe ausgeführt, in
 der die Überschrift gesetzt wurde. Derzeit ist das auch der letzte Haken
 innerhalb einer Gliederungsanweisung.
 
@@ -1787,82 +1788,82 @@ genannten Haken daher auf diese Anweisung keine Anwendung finden.%
                           \Parameter{Stilanweisungen}%
                           \nobreak\texttt{*}\Parameter{Überschrift}
   \labelsuffix
-  \Macro{At@startsection}\Parameter{Code}
-  \Macro{Before@ssect}\Parameter{Code}
-  \Macro{Before@sect}\Parameter{Code}
 \end{Declaration}
-Wie\ChangedAt[2014/09]{v3.15}{\Class{scrbook}\and \Class{scrreprt}\and
+Wie\ChangedAt{v3.15}{\Class{scrbook}\and \Class{scrreprt}\and
   \Class{scrartcl}} bereits in \autoref{sec:maincls.structure} bei der
 Beschreibung zu den Gliederungsbefehlen ab
 \DescPageRef{maincls.cmd.chapter} erklärt, verfügt \KOMAScript{}
 bezüglich des optionalen Arguments der Gliederungsbefehle über erweiterte
 Möglichkeiten. Um dies zu erreichen, war es notwendig, einige Anweisungen
-des \LaTeX-Kerns zu ersetzen. Dazu gehören auch die Anweisungen
-\Macro{secdef}\IndexCmd{secdef}\important{\Macro{secdef}} und
-\Macro{@startsection}\IndexCmd{@startsection}%
-\important{\Macro{@startsection}}. Die Bedeutung der Parameter dieser
-Anweisungen ist der Anleitung zum \LaTeX-Kern \cite{latex:source2e} zu
-entnehmen.
+des \LaTeX-Kerns zu ersetzen:
+\begin{itemize}
+\item Statt
+  \Macro{@startsection}\IndexCmd{@startsection}\important{\Macro{@startsection}}
+  wird von \KOMAScript{} \Macro{scr@startsection} verwendet. Die Definition
+  von \Macro{@startsection} wird jedoch geprüft. Entspricht diese beim Laden
+  der Klasse nicht den Erwartungen, so wird eine Warnung ausgegeben, diverse
+  Möglichkeiten von \KOMAScript{} werden deaktiviert und
+  \Macro{scr@startsection} stützt sich auf eine Kopie von
+  \Macro{@startsection}, während \Macro{@startsection} selbst dann
+  \Macro{scr@startsection} aufruft.
+\item Statt \Macro{@dblarg}\IndexCmd{@dblarg}\important{\Macro{@dblarg}} wird
+  in \KOMAScript{} von den Gliederungsbefehlen eine eigene, interne Anweisung
+  verwendet.
+\item Statt \Macro{secdef}\IndexCmd{secdef}\important{\Macro{secdef}} wird
+  von \KOMAScript{} \Macro{SecDef} verwendet, um die erwähnte Änderung
+  bezüglich \Macro{@dblarg} zu erreichen. Sollte die Definition von
+  \Macro{secdef} nicht den Erwartungen entsprechen, wird eine Warnung
+  ausgegeben.
+\item \Macro{@sect}\IndexCmd{@sect}\important{\Macro{@sect}} wird umdefiniert,
+  um diverse Erweiterungen von \KOMAScript{} zu realisieren.
+\item \Macro{@ssect}\IndexCmd{@ssect}\important{\Macro{@ssect}} wird
+  umdefiniert, um diverse Erweiterungen von \KOMAScript{} zu realisieren.
+\item \Macro{@xsect}\IndexCmd{@xsect}\important{\Macro{@xsect}} wird
+  umdefiniert, um diverse Erweiterungen von \KOMAScript{} zu realisieren.
+\end{itemize}
+Es gibt Überlegungen, in künftigen Versionen von \KOMAScript{} die erwähnten
+Anweisungen aus dem \LaTeX-Kern nicht mehr anzutasten, sondern intern komplett
+durch Eigenentwicklungen zu ersetzen. Bei Verwendung eigentlich inkompatibler
+Pakete würden dadurch automatisch Ereiterungen von \KOMAScript{} deaktiviert
+und Gliederungsbefehle in die Hände jener Pakete gelegt. Gleichzeitig müssten
+aber zum Erhalt der Kompatibilität mit anderen Paketen zusätzliche Maßnahmen
+ergriffen werden.
 
-Da diese Anweisungen jedoch auch häufig von Paketen komplett neu definiert
-werden und dadurch die Funktion von \KOMAScript{} teilweise stark
-beeinträchtigt werden kann, wurden die genannten \LaTeX-Kern-Anweisungen nicht
-einfach nur umdefiniert, sondern es wurden zusätzlich die alternativen
-Anweisungen \Macro{SecDef} und \Macro{scr@startsection} definiert. Diese
-können von Paketautoren genau wie die \LaTeX-Kern-Anweisungen verwendet
-werden, bieten dann aber automatisch die erweiterte Funktionalität von
-\KOMAScript{}. Die beiden Anweisungen sollten jedoch nicht umdefiniert werden,
-da sie sich jederzeit ändern können und dann die Funktionalität von
-\KOMAScript{} durch diese Umdefinierung erneut beeinträchtigt werden
-könnte.
-
-\KOMAScript{} selbst verwendet intern die Anweisungen
-\Macro{SecDef}\important{\Macro{SecDef}\\\Macro{scr@startsection}} und
-\Macro{scr@startsection} anstelle von \Macro{secdef} und \Macro{@startsection}
-beispielsweise bei den mit \DescRef{\LabelBase.cmd.DeclareSectionCommand}
-definierten Gliederungsbefehlen. Eine nachträgliche Umdefinierung von
-\Macro{secdef} und \Macro{@startsection} hat daher keine Auswirkungen auf
-diese Gliederungsbefehle.
-
-Als Ersatz für die Umdefinierung der Anweisungen bietet \KOMAScript{} die
-Möglichkeit, zusätzlichen \PName{Code} in die Ausführung der
-\KOMAScript-eigenen Erweiterungen einzufügen. Der \PName{Code} aller Aufrufe
-der Anweisungen \Macro{At@startsection}\important{\Macro{At@startsection}\\
-  \Macro{Before@sect}\\
-  \Macro{Before@@sect}}, \Macro{Before@sect} und
-\Macro{Before@@sect} wird für die einzelnen Anweisungen getrennt aufgesammelt.
-Es ist nicht vorgesehen, einmal eingefügten Code wieder zu entfernen.
-
-Der \PName{Code} von Makro
-\Macro{At@startsection}\important{\Macro{At@startsection}\\
-  \Macro{scr@startsection}} wird dabei in Anweisung \Macro{scr@startsection}
-unmittelbar nach der Auswertung von Parameter \PName{Abstand davor} und der
-zugehörigen Berechnung des resultierenden \Length{@tempskipa} aber noch vor
-Einfügen des Abstandes angewendet. Es ist damit also noch möglich, diesen
-Abstand über \Length{@tempskipa} zu verändern.
-
-Der \PName{Code} von \Macro{Before@sect}\important{\Macro{Before@sect}\\
-  \Macro{@sect}} beziehungsweise
-\Macro{Before@ssect}\important{\Macro{Before@ssect}\\
-  \Macro{@ssect}} wird unmittelbar vor dem Aufruf von \Macro{@sect} respektive
-\Macro{@ssect} innerhalb von
-\Macro{scr@startsection}\important{\Macro{scr@startsection}} ausgeführt. Zu
-diesem Zeitpunkt ist gegebenenfalls der vertikale Abstand vor der Überschrift
-bereits über \Macro{addvspace} eingefügt.
-
-Die drei Anweisungen \Macro{At@startsection}\important{\Macro{At@startsection}\\
-  \Macro{Before@sect}\\
-  \Macro{Before@ssect}}, \Macro{Before@sect} und \Macro{Before@ssect} sind als
-Schnittstelle für Paketautoren entworfen und für diese zur Verwendung
-freigegeben.
-
-Zusätzlich zu den hier dokumentierten Anweisungen, müssen die
-\KOMAScript-Klassen auch
-\Macro{@ssect}\IndexCmd{@ssect}\important{\Macro{@ssect}} und
-\Macro{@xsect}\IndexCmd{@xsect}\important{\Macro{@xsect}} umdefinieren. Auch
-hier sind Inkompatibilitäten mit Paketen, die an derselben Stelle ansetzen,
-leider nicht auszuschließen.%
+Die erwähnten Ersatzanweisungen können von Paketautoren genau wie die
+\LaTeX-Kern-Anweisungen verwendet werden, bieten dann aber automatisch die
+erweiterte Funktionalität von \KOMAScript{}. Jedoch sollten sie nicht
+umdefiniert werden, da sie sich jederzeit ändern können und dann die
+Funktionalität von \KOMAScript{} durch diese Umdefinierung erneut
+beeinträchtigt werden könnte. Die Bedeutung der Parameter der ist der
+Anleitung zum \LaTeX-Kern \cite{latex:source2e} zu entnehmen.
+Als\ChangedAt[01/2019]{v3.27}{\Class{scrbook}\and \Class{scrreprt}\and
+  \Class{scrartcl}} Ersatz für die Umdefinierung von Anweisungen bietet
+\KOMAScript{} die zuvor dokumentierten Haken.%
 \EndIndexGroup
+
+\begin{Explain}
+  \begin{Declaration}
+    \Macro{At@startsection}\Parameter{Code}
+    \Macro{Before@ssect}\Parameter{Code}
+    \Macro{Before@sect}\Parameter{Code}
+  \end{Declaration}
+  Bis\ChangedAt[01/2019]{v3.27}{\Class{scrbook}\and \Class{scrreprt}\and
+    \Class{scrartcl}} \KOMAScript{}~v3.26b dienten diese Anweisungen ebenfalls
+  als Ersatz für die Umdefinierung von
+  \DescRef{\LabelBase.cmd.scr@startsection} und
+  \DescRef{\LabelBase.cmd.SecDef}. Seit \KOMAScript~v3.27 gelten sie jedoch
+  als veraltet.
+
+  Intern wird \Macro{At@startsection} nun über den Haken
+  \DescRef{\LabelBase.dohook.heading/postinit}
+  realisiert. \Macro{Before@ssect} ist mit Hilfe von
+  \DescRef{\LabelBase.dohook.heading/branch/star} und \Macro{Before@sect} über
+  \DescRef{\LabelBase.dohook.heading/branch/nostar} implementiert. Der
+  \PName{Code} wird den Haken per \DescRef{scrbase.cmd.AddtoDoHook}
+  hinzugefügt. Es ist nicht vorgesehen, einmal eingefügten Code wieder zu
+  entfernen.%
+  \EndIndexGroup
+\end{Explain}
 
 % \section{Anhang}
 % \seclabel{appendix}
