@@ -1,4 +1,4 @@
-% \CheckSum{1943}
+% \CheckSum{1937}
 % \iffalse meta-comment
 % ======================================================================
 % scrjura.dtx
@@ -59,8 +59,14 @@
 %   Grave accent  \`     Left brace    \{     Vertical bar  \|
 %   Right brace   \}     Tilde         \~}
 %
-% \iffalse
+% \iffalse^^A meta-comment
 %%% From File: $Id$
+%<identify>%%%            (run: identify)
+%<init>%%%            (run: init)
+%<options>%%%            (run: options)
+%<postoptions>%%%            (run: postoptions)
+%<body>%%%            (run: body)
+%<final>%%%            (run: final)
 %<*dtx>
 \begingroup
   \def\filedate$#1: #2-#3-#4 #5${\gdef\filedate{#2/#3/#4}}
@@ -72,9 +78,9 @@
 \ifx\fmtname\LaTeXformat\def\MainBodyWork{%
 \ProvidesFile{scrjura.dtx}[\filedate\space\filerevision\space
 %</dtx>
-%<package>\NeedsTeXFormat{LaTeX2e}[1995/06/01]
-%<package>\ProvidesPackage{scrjura}[%
-%<*dtx|package>
+%<package&identify>\NeedsTeXFormat{LaTeX2e}[1995/06/01]
+%<package&identify>\ProvidesPackage{scrjura}[%
+%<*dtx|(package&identify)>
 %!KOMAScriptVersion
   package
 %<*dtx>
@@ -82,7 +88,7 @@
 %</dtx>
   (for jurists)
 ]
-%</dtx|package>
+%</dtx|(package&identify)>
 %<*dtx>
 \IfFileExists{scrdoc.cls}{%
   \documentclass[parskip=half-]{scrdoc}
@@ -125,7 +131,12 @@
     \from{scrjura.dtx}{ins}%
   }%
   \file{scrjura.sty}{%
-    \from{scrjura.dtx}{package}%
+    \from{scrjura.dtx}{package,identify}%
+    \from{scrjura.dtx}{package,init}%
+    \from{scrjura.dtx}{package,options}%
+    \from{scrjura.dtx}{package,postoptions}%
+    \from{scrjura.dtx}{package,body}%
+    \from{scrjura.dtx}{package,final}%
     \from{scrlogo.dtx}{logo}%
   }%
 }%
@@ -170,6 +181,7 @@
 %   "`Clause"' für alle Befehle, Zähler und Optionen}^^A
 %
 %    \begin{macrocode}
+%<*init>
 \@ifpackageloaded{hyperref}{%
   \PackageError{scrjura}{Package hyperref already loaded}{%
     If you want to use package scrjura with package hyperref, you have to
@@ -179,18 +191,23 @@
     hyperref\MessageBreak
     behind the loading of package scrjura.}%
 }
+%</init>
 %    \end{macrocode}
 %
 % Es wird das Paket \textsf{scrkbase} benötigt, weil alles weitere darauf
 % aufbaut.
 %    \begin{macrocode}
+%<*init>
 \RequirePackage{scrkbase}[2013/03/26]
+%</init>
 %    \end{macrocode}
 %
 % Außerdem wird \textsf{tocbasic} benötigt, weil einige wenige Befehle davon
 % verwendet werden.
 %    \begin{macrocode}
+%<*init>
 \RequirePackage{tocbasic}
+%</init>
 %    \end{macrocode}
 %
 % \begin{option}{contract}
@@ -199,46 +216,45 @@
 %   innerhalb des Dokuments verwenden! Realisiert wird dies, indem ganz am
 %   Ende von |\begin{document}| noch |\contract| ausgeführt wird.
 %    \begin{macrocode}
+%<*options>
 \DeclareOption{contract}{%
   \g@addto@macro\document\contract%
 }
+%</options>
 %    \end{macrocode}
 % \end{option}
 %
 % \begin{option}{juratotoc}
-%   Mit dieser Option wird der Zähler \Counter{juratoclevel} auf einen
-%   gewünschten Wert oder 2 oder 10000 gesetzt.
-%   \changes{v0.7}{2013/11/04}{Verwendung der renovierten Schnittstelle mit
-%     \cs{FamilyKeyState}}^^A
-%   \changes{v0.9a}{2015/03/09}{Wert wird in der internen Liste erfasst}^^A
+% Mit dieser Option wird die Verzeichnisebene für Inhaltsverzeichniseinträge
+% auf einen gewünschten Wert oder 2 oder 10000 gesetzt.
+% \changes{v0.7}{2013/11/04}{Verwendung der renovierten Schnittstelle mit
+%   \cs{FamilyKeyState}}^^A
+% \changes{v0.9a}{2015/03/09}{Wert wird in der internen Liste erfasst}^^A
 % \begin{macro}{\if@juratotoc}
-%   \changes{v0.6}{2011/09/29}{Schalter durch Zähler überflüssig}
+% \changes{v0.6}{2011/09/29}{Schalter durch Zähler überflüssig}
 % \begin{Counter}{juratoclevel}
-%   \changes{v0.6}{2011/09/29}{Zählerdefinition verschoben}
-%   Mit dem Zähler wiederum wird erreicht, dass Paragraphen in das
-%   Inhaltsverzeichnis aufgenommen werden.
+% \changes{v0.6}{2011/09/29}{Zählerdefinition verschoben}^^A
+% \changes{v3.27}{2019/02/25}{Zähler entfernt}^^A
 % \begin{macro}{\toclevel@cpar}
-%   \changes{v0.7}{2013/06/09}{neue für \textsf{hyperref}}
+% \changes{v0.7}{2013/06/09}{neue für \textsf{hyperref}}^^A
+% \changes{v3.27}{2019/02/25}{wird von \textsf{tocbasic} erledigt}^^A
 %    \begin{macrocode}
-\newcounter{juratoclevel}\setcounter{juratoclevel}{\@M}
+%<*options>
 \KOMA@key{juratotoc}[true]{%
-  \begingroup
-    \KOMA@set@ifkey{juratoclevel}{@tempswa}{#1}%
-    \ifx\FamilyKeyState\FamilyKeyStateProcessed
-      \if@tempswa
-        \setcounter{juratoclevel}{2}%
-      \else
-        \setcounter{juratoclevel}{\@M}%
-      \fi
+  \KOMA@set@ifkey{juratotoc}{@tempswa}{#1}%
+  \ifx\FamilyKeyState\FamilyKeyStateProcessed
+    \if@tempswa
+      \DeclareTOCStyleEntry[level=2]{default}{cpar}%
     \else
-      \setcounter{juratoclevel}{#1}%
+      \DeclareTOCStyleEntry[level=\maxdimen]{default}{cpar}%
     \fi
-  \endgroup
-  \FamilyKeyStateProcessed
-  \KOMA@kav@xreplacevalue{.scrjura.sty}{juratotoc}{\value{juratoclevel}}%
+  \else
+    \DeclareTOCStyleEntry[level=#1]{default}{cpar}%
+  \fi
+  \KOMA@kav@xreplacevalue{.scrjura.sty}{juratotoc}{\cpartocdepth}%
 }
-\KOMA@kav@xadd{.scrjura.sty}{juratotoc}{\value{juratoclevel}}%
-\providecommand*{\toclevel@cpar}{\arabic{juratoclevel}}
+\KOMA@kav@xadd{.scrjura.sty}{juratotoc}{\cpartocdepth}%
+%</options>
 %    \end{macrocode}
 % \end{macro}
 % \end{Counter}
@@ -256,28 +272,30 @@
 %     \cs{FamilyKeyStateProcessed}}%^^A
 %   \changes{v0.9a}{2015/03/09}{Wert wird in der internen Liste erfasst}^^A
 % \begin{macro}{\cpar@numberwidth}
-%   \changes{v0.6}{2011/09/29}{neu (intern)}
+% \changes{v0.6}{2011/09/29}{neu (intern)}^^A
+% \changes{v3.27}{2019/02/25}{ersetzt durch Verwendung von
+%   \cs{DeclareTOCStyleEntry}}^^A
 % \begin{macro}{\cpar@indent}
 %   \changes{v0.6}{2011/09/29}{neu (intern)}
+% \changes{v3.27}{2019/02/25}{ersetzt durch Verwendung von
+%   \cs{DeclareTOCStyleEntry}}^^A
 % Der Einzug und die Breite der Nummer für Inhaltsverzeichniseinträge kann
-% über diese beiden Optionen bzw. Makros bestimmt werden.
+% über diese beiden Optionen bestimmt werden.
 %    \begin{macrocode}
-\newcommand*{\cpar@numberwidth}{2em}
-\newcommand*{\cpar@indent}{1.5em}
+%<*options>
 \KOMA@key{juratocnumberwidth}{%
-  \begingroup\setlength{\@tempdima}{#1}\endgroup
-  \renewcommand*{\cpar@numberwidth}{#1}%
+  \DeclareTOCStyleEntry[numwidth=#1]{default}{cpar}%
   \FamilyKeyStateProcessed
-  \KOMA@kav@replacevalue{.scrjura.sty}{juratocnumberwidth}{\cpar@numberwidth}%
+  \KOMA@kav@replacevalue{.scrjura.sty}{juratocnumberwidth}{#1}%
 }
-\KOMA@kav@add{.scrjura.sty}{juratocnumberwidth}{\cpar@numberwidth}
+\KOMA@kav@add{.scrjura.sty}{juratocnumberwidth}{2em}
 \KOMA@key{juratocindent}{%
-  \begingroup\setlength{\@tempdima}{#1}\endgroup
-  \renewcommand*{\cpar@indent}{#1}%
+  \DeclareTOCStyleEntry[indent=#1]{default}{cpar}%
   \FamilyKeyStateProcessed
-  \KOMA@kav@replacevalue{.scrjura.sty}{juratocindent}{\cpar@indent}%
+  \KOMA@kav@replacevalue{.scrjura.sty}{juratocindent}{#1}%
 }
-\KOMA@kav@add{.scrjura.sty}{juratocindent}{\cpar@indent}%
+\KOMA@kav@add{.scrjura.sty}{juratocindent}{1.5em}%
+%</options>
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -292,7 +310,9 @@
 %   Mit diesem Schalter wiederum wird erreicht, dass in den Überschriften von
 %   Paragraphen ein Seitenumbruch erlaubt wird.
 %    \begin{macrocode}
+%<*options>
 \KOMA@ifkey{juratitlepagebreak}{@juratitlepagebreak}
+%</options>
 %    \end{macrocode}
 % \end{macro}
 % \end{option}
@@ -306,6 +326,7 @@
 % Die (automatische) Absatznummerierung lässt sich nun auch per Option ein-
 % und ausschalten.
 %    \begin{macrocode}
+%<*options>
 \newif\ifparnumber
 \KOMA@key{parnumber}[true]{%
   \ifstr{#1}{auto}{%
@@ -329,6 +350,7 @@
 }
 \KOMA@kav@add{.scrjura.sty}{parnumber}{true}
 \KOMA@kav@add{.scrjura.sty}{parnumber}{auto}
+%</options>
 %    \end{macrocode}
 % \end{option}
 %
@@ -348,6 +370,7 @@
 % |\chaptermark| etc. erwartet |\Clausemark| neben dem Titel auch noch
 % die zu verwendende Nummer (das könnte bei Bedarf noch geändert werden!)
 %    \begin{macrocode}
+%<*options>
 \newcommand*{\Clausemark}[1]{}
 \KOMA@key{clausemark}{%
   \begingroup
@@ -406,6 +429,7 @@
   }%
   \KOMAExecuteOptions[.scrjura.sty]{clausemark=#1}%
 }
+%</options>
 %    \end{macrocode}
 % \end{macro}
 % \end{option}
@@ -429,6 +453,7 @@
 % In der Voreinstellung wird das lange Format verwendet. Es gilt:
 % 0 = lang, 1 = kurz, 2 = numerisch, -1 = gar nicht
 %    \begin{macrocode}
+%<*options>
 \newcommand*{\parcite@format}{0}
 \newcommand*{\sentencecite@format}{0}
 %    \end{macrocode}
@@ -520,6 +545,7 @@
 \KOMA@kav@add{.scrjura.sty}{ref}{sentencelong}%
 \KOMA@DeclareDeprecatedOption[scrjura]{parcitename}{ref=parlong}
 \KOMA@DeclareDeprecatedOption[scrjura]{sentencecitename}{ref=sentencelong}
+%</options>
 %    \end{macrocode}
 % \end{option}
 % \end{option}
@@ -527,7 +553,9 @@
 %
 % Optionen ausführen.
 %    \begin{macrocode}
+%<*postoptions>
 \KOMAProcessOptions\relax
+%</postoptions>
 %    \end{macrocode}
 %
 % \begin{macro}{\Paragraph}
@@ -548,6 +576,7 @@
 % \begin{macro}{\ParagraphCompatibilityHacks}
 %   \changes{1.0}{2014/11/22}{wird noch ein paar Versionen verbleiben}^^A
 %    \begin{macrocode}
+%<*body>
 \providecommand*{\DeprecatedParagraph}{%
   \PackageError{scrjura}{modification of old document needed}{%
     It seem that this document was made for scrjura up to version
@@ -595,6 +624,7 @@
 \providecommand*{\SubParagraph}{\DeprecatedParagraph\SubParagraph}
 \providecommand*{\refParagraph}{\DeprecatedParagraph\refParagraph}
 \providecommand*{\refParagraphN}{\DeprecatedParagraph\refParagraphN}
+%</body>
 %    \end{macrocode}
 % \end{macro}^^A \ParagraphCompatibilityHacks
 % \end{macro}^^A \DeprecatedParagraph
@@ -609,7 +639,9 @@
 % Dieses Makro wird in Abhängigkeit der gerade aktiven
 % \textsf{scrjura}-Umgebung definiert.
 %    \begin{macrocode}
+%<*body>
 \newcommand*{\scrjura@env@type}{}
+%</body>
 %    \end{macrocode}
 % \end{macro}
 %
@@ -623,6 +655,7 @@
 %     \cs{if@filesw} schreiben}^^A
 % Paragraphen auslassen aber mit zählen.
 %    \begin{macrocode}
+%<*body>
 \newcommand*{\ellipsispar}[1][1]{%
   \begingroup
     \KOMAoptions{parnumber=manual}\parellipsis\par
@@ -642,6 +675,7 @@
 \newcommand*{\parellipsis}{%
   \scr@ifundefinedorrelax{textellipsis}{\dots}{\textellipsis}%
 }
+%</body>
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -674,6 +708,7 @@
 % hinweg nummeriert. Das Ende eines Vertrags ist also genau genommen nur eine
 % Unterbrechung.
 %    \begin{macrocode}
+%<*body>
 \newcommand*{\contract}{%
   \ifx\scrjura@env@type\@empty
     \let\@doendpe\scrjura@doendpe
@@ -706,6 +741,7 @@
 \renewcommand*{\thecontractSubClause}{%
   {\theClause\alph{SubClause}}}
 \newcounter{contractAbsoluteClause}
+%</body>
 %    \end{macrocode}
 % \end{Counter}
 % \end{macro}
@@ -724,6 +760,7 @@
 % Verwendet \cs{@defjuraenvironment} um eine neue juristische Umgebung zu
 % definieren.
 %    \begin{macrocode}
+%<*body>
 \newcommand*{\DeclareNewJuraEnvironment}[1]{%
   \@ifundefined{#1}{\expandafter\let\csname #1\expandafter\endcsname
     \csname end#1\endcsname}{}%
@@ -864,6 +901,7 @@
     \par
   }%
 }
+%</body>
 %    \end{macrocode}
 % \end{macro}^^A \@dewjuraenvironment
 % \end{macro}^^A \DeclareNewJuraEnvironment
@@ -889,6 +927,7 @@
 %   kann die beiden aber auf leer setzen. Insbesondere aber kann man sie mit
 %   den |no|-Optionen auch abschalten.
 %    \begin{macrocode}
+%<*body>
 \define@key{contract}{title}{%
   \def\contract@title{#1}%
   \ifx\contract@entry\relax\def\contract@entry{\contract@title}\fi
@@ -1088,6 +1127,7 @@
     \scrjura@afterheading
   \fi
 }
+%</body>
 %    \end{macrocode}
 % \end{macro}
 %
@@ -1101,6 +1141,7 @@
 % Das entspricht bis auf wenige Kleinigkeiten, die Unterparagraphen betreffen,
 % |\contract@paragraph|
 %    \begin{macrocode}
+%<*body>
 \newcommand*{\contract@subparagraph}[1]{%
   \stepcounter{\scrjura@env@type AbsoluteClause}%
   \ManualPar\parnumbertrue
@@ -1159,6 +1200,7 @@
     \scrjura@afterheading
   \fi
 }
+%</body>
 %    \end{macrocode}
 % \end{macro}
 %
@@ -1166,6 +1208,7 @@
 % \begin{macro}{\ManualPar}
 % Automatische oder manuelle Absatznummern für alle Umgebungen aktivieren.
 %    \begin{macrocode}
+%<*body>
 \newcommand*{\AutoPar}{%
   \expandafter\let\expandafter\scrjura@everypar
   \csname \scrjura@env@type @everypar\endcsname
@@ -1173,16 +1216,33 @@
 \newcommand*{\ManualPar}{%
   \let\scrjura@everypar\relax
 }
+%</body>
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
 %
 % \begin{macro}{\scrjura@afterheading}
-%   \changes{v0.7b}{2014/11/03}{\cs{jura@afterheading} umbenannt}^^A
-%   \changes{v0.7b}{2014/11/03}{benötigt kein Argument mehr}^^A
+% \changes{v0.7b}{2014/11/03}{\cs{jura@afterheading} umbenannt}^^A
+% \changes{v0.7b}{2014/11/03}{benötigt kein Argument mehr}^^A
+% \changes{v3.27}{2019/02/25}{\cs{CheckCommand} für \cs{@afterheading}}^^A
 % Entspricht |\afterheading| mit Erweiterungen für automatischen
 % Absatznummern.
 %    \begin{macrocode}
+%<*body>
+\CheckCommand*{\@afterheading}{%
+  \@nobreaktrue
+  \everypar{%
+    \if@nobreak
+      \@nobreakfalse
+      \clubpenalty \@M
+      \if@afterindent \else
+        {\setbox\z@\lastbox}%
+      \fi
+    \else
+      \clubpenalty \@clubpenalty
+      \everypar{}%
+    \fi}%
+}
 \newcommand*{\scrjura@afterheading}{%
   \@nobreaktrue
   \everypar{%
@@ -1288,6 +1348,7 @@
   }%
 }
 \EndIncludeInRelease
+%</body>
 %    \end{macrocode}
 % \end{macro}^^A \EndIncludeInRelease
 % \end{macro}^^A \@gobble@IncludeInRelease
@@ -1298,16 +1359,20 @@
 %
 % \begin{macro}{\l@cpar}
 % Verzeichnis-Eintrag für einen Vertrags-Paragraphen.
+% \changes{v3.27}{2019/02/25}{Verwendung von \textsf{tocbasic}}^^A
+% Da der Zähler \texttt{juratoclevel} bisher nicht dokumentiert war und auch
+% bisher syntaktisch falsche Werte zu Fehlermeldungen geführt haben, können
+% wir uns voll auf \textsf{tocbasic} stützen.
+% Die Definition muss in den init-Teil, damit die Optionen die Einstellungen
+% ändern können:
 %    \begin{macrocode}
-\newcommand*{\l@cpar}[2]{%
-  \ifnum\value{juratoclevel}>\value{tocdepth}\else
-    \scr@ifundefinedorrelax{bprot@dottedtocline}{%
-      \@dottedtocline
-    }{%
-      \bprot@dottedtocline
-    }{\value{juratoclevel}}{\cpar@indent}{\cpar@numberwidth}{#1}{#2}%
-  \fi
-}
+%<*init>
+\DeclareTOCStyleEntry[%
+  indent=1.5em,
+  numwidth=2em,
+  level=\maxdimen
+]{default}{cpar}
+%</init>
 %    \end{macrocode}
 % \end{macro}
 %
@@ -1315,7 +1380,9 @@
 %   \changes{v0.7b}{2014/11/03}{\cs{jura@separator} umbenannt}^^A
 % Wird verwendet, damit Leerzeichen am Anfang oder Ende entfernt werden können.
 %    \begin{macrocode}
+%<*body>
 \DeclareRobustCommand*{\scrjura@separator}[1]{#1}
+%</body>
 %    \end{macrocode}
 % \end{macro}
 %
@@ -1331,8 +1398,10 @@
 % werden. In der Voreinstellung macht das dann wirklich nichts, außer das
 % Argument zu fressen.
 %    \begin{macrocode}
+%<*body>
 \DeclareRobustCommand*{\scrjura@usetype}[1]{\scrjura@@usetype{#1}}
 \newcommand*{\scrjura@@usetype}[1]{}
+%</body>
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -1362,6 +1431,7 @@
 % wird. Außerdem muss beim Zitieren als Elternobjekt der Paragraph mit
 % ausgegeben werden.
 %    \begin{macrocode}
+%<*body>
 \newcounter{par}
 \renewcommand*{\thepar}{\arabic{par}}
 \newcommand*{\theHpar}{\theH@AbsClause-\Roman{par}}
@@ -1372,6 +1442,7 @@
 \@addtoreset{par}{Clause}
 \@addtoreset{par}{SubClause}
 \newcommand*{\withoutparnumber}{}
+%</body>
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -1401,6 +1472,7 @@
 %   \changes{v0.9g}{2016/03/25}{in die \texttt{aux}-Datei nur bei
 %     \cs{if@filesw} schreiben}^^A
 %    \begin{macrocode}
+%<*body>
 \newcommand*{\contract@everypar}{%
   \ifparnumber
     \ifx\scrjura@special@par\relax
@@ -1451,6 +1523,7 @@
     \setcounter{sentence}{-1}\refstepcounter{sentence}%
   \fi
 }
+%</body>
 %    \end{macrocode}
 % \end{macro}
 %
@@ -1463,6 +1536,7 @@
 % Mit dieser Anweisung kann man eine Absatznummer manuell vergeben. Allerdings
 % muss die Nummer voll expandierbar sein!
 %    \begin{macrocode}
+%<*body>
 \newcommand*{\thisparnumber}[1]{%
   \def\scrjura@special@par{#1}%
 }
@@ -1470,6 +1544,7 @@
 \let\scrjura@special@par\relax
 \newcommand*{\scrjura@special@reset@par}{}
 \let\scrjura@special@reset@par\relax
+%</body>
 %    \end{macrocode}
 % \end{macro}^^A \scrjura@special@reset@par
 % \end{macro}^^A \scrjura@special@par
@@ -1482,6 +1557,7 @@
 % \begin{macro}{\ref@L}
 % Das gleiche wie |\ref| aber zwingend mit der Langform.
 %    \begin{macrocode}
+%<*body>
 \newcommand*{\refL}{\kernel@ifstar {\ref@L*}{\ref@L{}}}
 \newcommand*{\ref@L}[2]{%
   \begingroup
@@ -1814,6 +1890,7 @@
 \newcommand*{\refSentenceN}{%
   \kernel@ifstar {\ref@SentenceX2*}{\ref@SentenceX2{}}
 }
+%</body>
 %    \end{macrocode}
 % \end{macro}
 %
@@ -1828,7 +1905,8 @@
 % \begin{macro}{\p@sentence}
 % Der Zähler wird für die Nummerierung der Sätze verwendet. Dabei ist wichtig,
 % dass beim Zitieren der Sätze als Elternobjekt der Absatz mit ausgegeben wird.
-% \begin{macrocode}
+%    \begin{macrocode}
+%<*body>
 \newcounter{sentence}[par]
 \renewcommand*{\thesentence}{\arabic{sentence}}
 \newcommand*{\theHsentence}{\theHpar-\arabic{sentence}}
@@ -1869,6 +1947,7 @@
 %    \begin{macrocode}
 \newkomafont{sentencenumber}{}
 \newcommand*{\sentencenumberformat}{\textsuperscript{\thesentence}}
+%</body>
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -1881,6 +1960,7 @@
 %   \changes{v0.5d}{2010/04/28}{Argument verschoben}
 % Zitierstil für Absätze.
 %    \begin{macrocode}
+%<*body>
 \DeclareRobustCommand*{\par@cite}[1]{\parciteformat{#1}}
 \newcommand*{\parciteformat}[1]{%
   \ifcase \parcite@format
@@ -1931,6 +2011,7 @@
 \newcommand*{\sentencelongformat}[1]{\sentencename~#1}
 \newcommand*{\sentenceshortformat}[1]{\sentenceshortname~#1}
 \newcommand*{\sentencenumericformat}[1]{\@arabic{\number #1\relax}.}
+%</body>
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -1952,6 +2033,7 @@
 % Der Name eines Absatzes und eines Satzes. Die englischen Namen wurden von
 % »m.eik« beigesteuert.
 %    \begin{macrocode}
+%<*body>
 \newcommand*{\parname}{Paragraph}
 \AtBeginDocument{%
   \providecaptionname{german,ngerman,austrian,naustrian}\parname{Absatz}%
@@ -1988,6 +2070,7 @@
   }%
   \textbf{??}%
 }
+%</body>
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -2008,6 +2091,7 @@
 % Noch zwei Hilfsmakros, um Zähler in der aux-Datei zwischenzuspeichern und
 % auch dann Werte zu holen, wenn sie nicht in der aux-Datei stehen.
 %    \begin{macrocode}
+%<*body>
 \newcommand*{\newmaxpar}[3]{%
   \begingroup
     \expandafter\let\csname #1@Clauseformat\endcsname\@firstofone
@@ -2043,6 +2127,7 @@
     }%
   \fi
 }
+%</body>
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
