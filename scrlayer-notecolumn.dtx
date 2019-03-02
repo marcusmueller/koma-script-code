@@ -1,4 +1,4 @@
-% \CheckSum{1843}
+% \CheckSum{1866}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlayer-notecolumn.dtx
@@ -68,7 +68,7 @@
 \begingroup
   \def\filedate$#1: #2-#3-#4 #5${\gdef\filedate{#2/#3/#4}}
   \filedate$Date$
-  \def\filerevision$#1: #2 ${\gdef\filerevision{v0.2.#2}}
+  \def\filerevision$#1: #2 ${\gdef\filerevision{v0.3.#2}}
   \filerevision$Revision$
   \edef\reserved@a{%
     \noexpand\endgroup
@@ -1186,6 +1186,28 @@
 % Read as long notes from the notes file until the number at \#2 of
 % \Macro{slnc@note} or \Macro{slnc@sync} in the file is greater than
 % \Counter{slncpage}. Put all these to the corresponding unprocessed list.
+% \begin{macro}{\slnc@catcodes}
+% \changes{v0.3}{2019/03/02}{new internal}^^A
+% We need a helper macro \cs{slnc@catcodes} to restore (some of) the catcodes
+% before reading from file.
+%    \begin{macrocode}
+\scrlayerAddToInterface\slnc@catcodes{%
+  \newcommand*{\slnc@catcodes}{}%
+}
+\AtBeginDocument{%
+  \begingroup
+    \def\do#1{%
+      \protected@xdef\slnc@catcodes{\slnc@catcodes
+        \catcode`\protect#1=\the\catcode`#1\relax
+      }
+    }%
+    \dospecials
+    \let\protect\noexpand
+    \xdef\slnc@catcodes{\slnc@catcodes\catcode`\protect\@=11\relax}%
+  \endgroup
+}
+%    \end{macrocode}
+% \end{macro}^^A \slnc@catcodes
 %    \begin{macrocode}
 \scrlayerAddToInterface\slnc@readnotes{%
   \newcommand*\slnc@readnotes[1]{%
@@ -1196,13 +1218,16 @@
         \@tempswatrue
       \fi
       \@whilesw\if@tempswa\fi{%
-        \edef\reserved@a{%
-          \noexpand\makeatletter
+        \begingroup
+          \slnc@catcodes
           \endlinechar\m@ne
-          \read\noexpand\slnc@file to\noexpand\reserved@a
-          \endlinechar\the\endlinechar\relax
-          \catcode`\noexpand\@=\the\catcode`\@\relax
-        }%
+          \read\slnc@file to\reserved@a
+          \edef\reserved@a{%
+            \endgroup
+            \noexpand\def\noexpand\reserved@a{%
+              \unexpanded\expandafter{\reserved@a}%
+            }%
+          }
         \reserved@a
         \expandafter\slnc@iofv\expandafter\reserved@b\reserved@a
         \@empty\@empty\@empty\@empty\@empty
