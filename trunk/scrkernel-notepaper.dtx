@@ -1,4 +1,4 @@
-% \CheckSum{3388}
+% \CheckSum{3408}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-notepaper.dtx
@@ -3383,6 +3383,29 @@
 %    \begin{macrocode}
 \newenvironment{letter}[2][]{%
 %    \end{macrocode}
+% \changes{v3.27}{2019/03/05}{zweipaltige Briefe werden nicht unterstützt}^^A
+% Falls wir uns im zweispaltigen Modus befinden, ist es jetzt höchste Zeit,
+% eine Warnung auszugeben und auf einspaltig umzuschalten. Zwar wäre es
+% theoretisch noch möglich, alles innerhalb von \cs{opening} in das optionale
+% Argument von \cs{twocolumn} zu packen, aber spätestens beim Schlussgruß
+% scheitert das dann. Also besser gleich gar nicht unterstützen.
+%    \begin{macrocode}
+  \if@twocolumn
+%<class>    \ClassWarning{\KOMAClassName}{%
+%<package>    \PackageWarning{scrletter}{%
+      twocolumn mode not supported.\MessageBreak
+      If you really want a twocolumned letter, you should\MessageBreak
+      use package `multicol' and add a `multicols'\MessageBreak
+      environment inside your letter.\MessageBreak
+      Switching back to oneside%
+    }%
+    \letter@restonecoltrue
+    \raggedbottom
+    \expandafter\onecolumn
+  \else
+    \letter@restonecolfalse
+  \fi
+%    \end{macrocode}
 % Als erstes wird eine neue Seite begonnen. Dies kann ggf. auch eine neue
 % rechte Seite sein. Dabei wird auch auf den korrekten Seitenstil
 % geachtet. Danach werden alle relevanten Zähler und Strafpunkte
@@ -3417,8 +3440,17 @@
   \let\@currentlabel\thisletter
   \label{\thisletter.lastpage}%
   \@@par\pagebreak\@@par%
+  \ifletter@restonecol\twocolumn\fi
 }
 %    \end{macrocode}
+% \begin{macro}{\ifletter@restonecol}
+% \changes{v3.27}{2019/03/05}{neu intern}
+% Dieser Schalter bestimmt, ob am Ende der \texttt{letter}-Umgebung auf
+% zweispaltig zurückgeschaltet werden muss.
+%    \begin{macrocode}
+\newif\ifletter@restonecol
+%    \end{macrocode}
+% \end{macro}
 % \begin{macro}{\thisletter}
 %   \changes{v3.19}{2015/07/15}{neue Anweisung}^^A
 % Gibt den Wert des aktuellen Labels wieder. Man benötigt dies beispielsweise,
@@ -3546,11 +3578,11 @@
 % \end{macro}
 %
 % \begin{macro}{\opening}
-%   \changes{v2.8n}{2001/09/08}{Komplett überarbeitet}^^A
-%   \changes{v2.8q}{2001/11/13}{\cs{@parskipfalse}\cs{@parskip@indent}}
-%   \changes{v2.8q}{2002/03/25}{\cs{@PapersizeWarning}}
-%   \changes{v2.95}{2003/03/23}{Absatzformatierung mit \cs{setparsizes}^^A
-%     einstellen}
+% \changes{v2.8n}{2001/09/08}{Komplett überarbeitet}^^A
+% \changes{v2.8q}{2001/11/13}{\cs{@parskipfalse}\cs{@parskip@indent}}
+% \changes{v2.8q}{2002/03/25}{\cs{@PapersizeWarning}}
+% \changes{v2.95}{2003/03/23}{Absatzformatierung mit \cs{setparsizes}^^A
+%   einstellen}
 % Denn beim Eröffnungsgruß mit |\opening| wird neben sämtlichen Feldern auch
 % der Titel und der Betreff gesetzt.
 %    \begin{macrocode}
