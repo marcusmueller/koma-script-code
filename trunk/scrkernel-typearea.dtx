@@ -1033,8 +1033,10 @@
     \def\FamilyElseValue{, `semi'}%
     \KOMA@set@ifkey{twoside}{%
 %    \end{macrocode}
-%   \changes{v3.20}{2015/11/02}{not existing order dependency of
-%     \Option{twocolumn} and \Option{twoside} fixed}^^A
+% \changes{v3.20}{2015/11/02}{not existing order dependency of
+%   \Option{twocolumn} and \Option{twoside} fixed}^^A
+% \changes{v3.27}{2019/03/05}{no \emph{Extrawurst} for letters}^^A
+% \changes{v3.27}{2019/03/05}{mising \cs{sloppy} in twocolumn mode added}^^A
 % From v3.17 until 3.19a the classes used a local switch
 % \Macro{if@tempswa}. As a result of this option \Option{twocolumn} was not
 % able to recognize double sided layout. Because of this it was essential to
@@ -1050,11 +1052,10 @@
   \ifx\FamilyKeyState\FamilyKeyStateProcessed
 %<*class>
     \expandafter\ifnum\scr@v@is@ge{3.17}%
-%<*!letter>
       \if@twoside\flushbottom
-      \else\if@twocolumn\flushbottom\else\raggedbottom\fi\fi
-%</!letter>
-%<letter>    \raggedbottom
+      \else
+        \if@twocolumn\sloppy\flushbottom\else\raggedbottom\fi
+      \fi
     \fi
 %</class>
     \KOMA@kav@xreplacevalue{.%
@@ -1109,6 +1110,7 @@
 %     \cs{FamilyKeyStateProcessed}}^^A
 %   \changes{v3.20}{2016/02/16}{\cs{sloppy}, \cs{raggedbottom} and
 %     \cs{flushbottom} delayed}^^A
+%   \changes{v3.27}{2019/03/05}{no \emph{Extrawurst} for letters}^^A
 % Do we have a single column or two columns layout?
 %    \begin{macrocode}
 %<*(class|(package&typearea))&options>
@@ -1130,7 +1132,12 @@
                                     {\expandafter\AtEndOfClass}\fi
     {\expandafter\ifnum\scr@v@is@ge{3.17}%
       \if@twocolumn\twocolumn\sloppy\flushbottom
-      \else\onecolumn\if@twoside\flushbottom\else\raggedbottom\fi\fi
+      \else
+        \onecolumn
+        \if@twoside\flushbottom\else
+          \raggedbottom
+        \fi
+      \fi
     \fi}%
 %</class>
   \fi
