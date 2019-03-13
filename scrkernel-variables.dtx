@@ -1,8 +1,8 @@
-% \CheckSum{160}
+% \CheckSum{243}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-variables.dtx
-% Copyright (c) Markus Kohm, 2008-2017
+% Copyright (c) Markus Kohm, 2008-2019
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrkernel-variables.dtx
-% Copyright (c) Markus Kohm, 2008-2017
+% Copyright (c) Markus Kohm, 2008-2019
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -379,6 +379,80 @@
 % \end{macro}
 % \end{macro}
 %
+% \selectlanguage{english}
+% \begin{macro}{\foreachkomavar}
+% \changes{v3.27}{2019/03/13}{new}^^A
+% Executes \texttt{\#2} for each variable in the comma separated list
+% \texttt{\#1}. An argument is appended to \texttt{\#2} which is the current
+% varaible to be processed. This command is short. So if you want so execute
+% long code you should define a command for it. Sideeffect: \cs{reserved@a} is
+% changed.
+%    \begin{macrocode}
+\newcommand*{\foreachkomavar}[2]{%
+  \@for \reserved@a:=#1\do{%
+    \scr@trim@spaces\reserved@a
+    \ifx\reserved@a\@empty\else
+      \edef\reserved@a{\unexpanded{#2}{\reserved@a}}\expandafter\reserved@a
+    \fi
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\foreachkomavarifempty}
+% \changes{v3.27}{2019/03/13}{new}^^A
+% Same like \cs{foreachkomavar} but \texttt{\#2} is called only for empty
+% variables and \texttt{\#3} is called for non empty.
+%    \begin{macrocode}
+\newcommand*{\foreachkomavarifempty}[3]{%
+  \@for \reserved@a:=#1\do{%
+    \scr@trim@spaces\reserved@a
+    \ifx\reserved@a\@empty\else
+      \edef\reserved@a{%
+        \noexpand\ifkomavarempty{\reserved@a}%
+        {\unexpanded{#2}{\reserved@a}}%
+        {\unexpanded{#3}{\reserved@a}}%
+      }\expandafter\reserved@a
+    \fi
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\foreachemptykomavar}
+% \changes{v3.27}{2019/03/13}{new}^^A
+% Similar to \cs{foreachemptykomavar} with \texttt{\#3}=\cs{@gobble}.
+%    \begin{macrocode}
+\newcommand*{\foreachemptykomavar}[2]{%
+  \@for \reserved@a:=#1\do{%
+    \scr@trim@spaces\reserved@a
+    \ifx\reserved@a\@empty\else
+      \edef\reserved@a{%
+        \noexpand\ifkomavarempty{\reserved@a}{\unexpanded{#2}{\reserved@a}}{}%
+      }\expandafter\reserved@a
+    \fi
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\foreachnonemptykomavar}
+% \changes{v3.27}{2019/03/13}{new}^^A
+% Similar to \cs{foreachemptykomavar} with \texttt{\#2}=\cs{@gobble}.
+%    \begin{macrocode}
+\newcommand*{\foreachnonemptykomavar}[2]{%
+  \@for \reserved@a:=#1\do{%
+    \scr@trim@spaces\reserved@a
+    \ifx\reserved@a\@empty\else
+      \edef\reserved@a{%
+        \noexpand\ifkomavarempty{\reserved@a}{}{\unexpanded{#2}{\reserved@a}}%
+      }\expandafter\reserved@a
+    \fi
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
+% \selectlanguage{ngerman}
 %
 % \iffalse
 %</body>
