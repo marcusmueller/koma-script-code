@@ -1,8 +1,8 @@
-% \CheckSum{3408}
+% \CheckSum{3510}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-notepaper.dtx
-% Copyright (c) Markus Kohm, 2006-2018
+% Copyright (c) Markus Kohm, 2006-2019
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrkernel-notepaper.dtx
-% Copyright (c) Markus Kohm, 2006-2018
+% Copyright (c) Markus Kohm, 2006-2019
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -3819,6 +3819,8 @@
 \newkomavar{PPcode}
 \newkomavar{PPdatamatrix}
 \newkomavar{addresseeimage}
+%</letter>
+%</body>
 %    \end{macrocode}
 % \end{KOMAvar}
 % \end{KOMAvar}
@@ -3833,82 +3835,112 @@
 % \end{KOMAvar}
 %
 % \begin{option}{symbolicnames}
-%   \changes{v3.12}{2013/05/13}{neue Option}^^A
-%   \changes{v3.17}{2015/03/16}{interne Speicherung der Werte}^^A
+% \changes{v3.12}{2013/05/13}{neue Option}^^A
+% \changes{v3.17}{2015/03/16}{interne Speicherung der Werte}^^A
 % \begin{macro}{\if@scrsymbols}
-%   \changes{v3.12}{2013/05/13}{neu (intern)}^^A
+% \changes{v3.12}{2013/05/13}{neu (intern)}^^A
 % \begin{macro}{\@scrsymbolstrue}
-%   \changes{v3.12}{2013/05/13}{neu (intern)}^^A
+% \changes{v3.12}{2013/05/13}{neu (intern)}^^A
 % \begin{macro}{\@scrsymbolsfalse}
-%   \changes{v3.12}{2013/05/13}{neu (intern)}^^A
+% \changes{v3.12}{2013/05/13}{neu (intern)}^^A
+% \changes{v3.27}{2019/03/21}{neue Werte}^^A
 % Über diese Option kann eingestellt werden, dass an Stelle von
 % sprachabhängigen Bezeichnern für einige Variablen Symbole verwendet
-% werden. Dazu wird das Paket \textsf{macrosym} benötigt.
+% werden. Statt nur boolsche Werte, sind ab \KOMAScript~3.27 auch die Werte
+% \texttt{marvosym} oder \texttt{fontawesome} möglich. \texttt{marvosym}
+% entspricht dabei dem bisherigen \texttt{true}.
 %    \begin{macrocode}
-%</letter>
-%</body>
 %<*option&letter>
 \newif\if@scrsymbols
 \KOMA@key{symbolicnames}[true]{%
   \KOMA@set@ifkey{symbolicnames}{@scrsymbols}{#1}%
-  \KOMA@kav@replacebool{.%
-%<class>    \KOMAClassFileName
-%<package>    scrletter.\scr@pkgextension
-  }{symbolicnames}{@scrsymbols}%
-  \if@scrsymbols
-    \if@atdocument
-      \begingroup
-        \@tempswafalse
-        \scr@ifundefinedorrelax{Telefon}{\@tempswatrue}{%
-          \scr@ifundefinedorrelax{FAX}{\@tempswatrue}{%
-            \scr@ifundefinedorrelax{Email}{\@tempswatrue}{%
-              \scr@ifundefinedorrelax{Mobilefone}{\@tempswatrue}{%
-              }%
+  \ifx\FamilyKeyState\FamilyKeyStateProcessed
+    \def\scr@symbols@font{marvosym}%
+  \else
+    \KOMA@set@ncmdkey{symbolicnames}{reserved@a}{%
+      {marvosym}{0},%
+      {fontawesome}{1},{awesome}{1},%
+    }{#1}%
+    \ifx \FamilyKeyState\FamilyKeyStateProcessed
+      \@scrsymbolstrue
+      \ifcase \number\reserved@a
+        \def\scr@symbols@font{marvosym}%
+      \else
+        \def\scr@symbols@font{fontawesome}%
+      \fi
+    \fi
+  \fi
+  \ifx \FamilyKeyState\FamilyKeyStateProcessed
+    \KOMA@kav@xreplacevalue{.%
+%<class>      \KOMAClassFileName    
+%<package>      scrletter.\scr@pkgextension
+    }{symbolicnames}{#1}%
+    \if@scrsymbols
+      \ifstr{\scr@symbols@font}{marvosym}{%
+        \def\scr@symbol@phone{\Telefon}%
+        \def\scr@symbol@fax{\FAX}%
+        \def\scr@symbol@email{\Email}%
+        \def\scr@symbol@mobilephone{\Mobilefone}%
+        \def\scr@symbol@www{\@empty}%
+      }{%
+        \def\scr@symbol@phone{\faPhone}%
+        \def\scr@symbol@fax{\faFax}%
+        \def\scr@symbol@email{\faEnvelopeO}%
+        \def\scr@symbol@mobilephone{\faMobilePhone}%
+        \def\scr@symbol@www{\faGlobe}%
+      }%
+      \if@atdocument
+        \begingroup
+          \@tempswafalse
+          \expandafter\ifdefined\scr@symbol@phone\else\@tempswatrue\fi
+          \expandafter\ifdefined\scr@symbol@fax\else\@tempswatrue\fi
+          \expandafter\ifdefined\scr@symbol@email\else\@tempswatrue\fi
+          \expandafter\ifdefined\scr@symbol@mobilephone\else\@tempswatrue\fi
+          \expandafter\ifdefined\scr@symbol@www\else\@tempswatrue\fi
+          \if@tempswa
+            \aftergroup\@scrsymbolsfalse
+%<class>            \ClassWarning{\KOMAClassName}{%
+%<package>            \PackageWarning{scrletter2}{%
+              Option `symbolicnames=#1'
+              ignorred.\MessageBreak
+              You've tried to set option `symbolicnames'\MessageBreak
+              after \string\begin{document}, but without\MessageBreak
+              loading package `\scr@symbols@font' before.\MessageBreak
+              You should either switch on option\MessageBreak
+              `symbolicnames' before \string\begin{document}\MessageBreak
+              or load package `\scr@letter@symbols@font' in the
+              document\MessageBreak
+              preamble to avoid this warning%
             }%
-          }%
-        }%
-        \if@tempswa
-          \aftergroup\@scrsymbolsfalse
-%<class>          \ClassWarning{scrlttr2}{%
-%<package>          \PackageWarning{scrletter}{%
-            Option `symbolicnames'
-            ignorred.\MessageBreak
-            You've tried to set option `symbolicnames'\MessageBreak
-            after \string\begin{document}, but without\MessageBreak
-            loading package `marvosym' before.\MessageBreak
-            You should either switch on option\MessageBreak
-            `symbolicnames' before \string\begin{document}\MessageBreak
-            or load package `marvosym' in the document\MessageBreak
-            preamble to avoid this warning%
-          }%
-        \fi
-      \endgroup
-    \else
+          \fi
+        \endgroup
+      \else
 %    \end{macrocode}
-%   \changes{v3.20}{2016/04/01}{Name der Klasse oder des Pakets ist für die
-%     Ladeverzögerung von \textsf{marvosym} egal}^^A
-%   \changes{v3.20}{2016/04/01}{Ladeverzögerung für das Paket
-%     \textsf{marvosym} nur, wenn erforderlich und möglich}^^A
+% \changes{v3.20}{2016/04/01}{Name der Klasse oder des Pakets ist für die
+%   Ladeverzögerung von \textsf{marvosym} egal}^^A
+% \changes{v3.20}{2016/04/01}{Ladeverzögerung für das Font-Paket
+%   nur, wenn erforderlich und möglich}^^A
 % In der Dokumentpräambel kann das Paket \textsf{marvosym} selbst geladen
 % werden. Allerdings funktioniert das nicht, solange wir im Optionen-Abschnitt
 % sind. Also muss es ggf. verzögert werden. Wie lange es zu verzögern ist,
 % hängt davon ab, ob wir uns in einer Klasse, einem Paket oder sonst einer
 % Datei mit Optionen-Abschnitt befinden.
 %    \begin{macrocode}
-      \ifx\@fileswith@pti@ns\@badrequireerror
-        \ifstr{\@currext}{\@clsextension}{%
-          \expandafter\AtEndOfClass
-        }{%
-          \ifstr{\@currext}{\@pksextension}{%
-            \expandafter\AtEndOfPackage
+        \ifx\@fileswith@pti@ns\@badrequireerror
+          \ifstr{\@currext}{\@clsextension}{%
+            \expandafter\AtEndOfClass
           }{%
-            \expandafter\AtBeginDocument
+            \ifstr{\@currext}{\@pkgextension}{%
+              \expandafter\AtEndOfPackage
+            }{%
+              \expandafter\AtBeginDocument
+            }%
           }%
-        }%
-      \else
-        \expandafter\@firstofone
+        \else
+          \expandafter\@firstofone
+        \fi
+        {\RequirePackage{\scr@symbols@font}}%
       \fi
-      {\RequirePackage{marvosym}}%
     \fi
   \fi
 }
@@ -3916,45 +3948,85 @@
 %<class>  \KOMAClassFileName
 %<package>  scrletter.\scr@pkgextension
 }{symbolicnames}{false}%
-%</option&letter>
-%<*body>
-%<*letter>
 %    \end{macrocode}
+% \selectlanguage{english}
+% \begin{macro}{\scr@symbols@font}
+% \changes{v3.27}{2019/03/21}{new (internal)}
+% The name of the font packages used for the symbols if symbols instead of
+% names are activated.
+% \begin{macro}{\scr@symbol@phone}
+% \changes{v3.27}{2019/03/21}{new (internal)}
+% The phone symbole.
+% \begin{macro}{\scr@symbol@fax}
+% \changes{v3.27}{2019/03/21}{new (internal)}
+% The fax symbole.
+% \begin{macro}{\scr@symbol@email}
+% \changes{v3.27}{2019/03/21}{new (internal)}
+% The e-mail symbol.
+% \begin{macro}{\scr@symbol@mobilephone}
+% \changes{v3.27}{2019/03/21}{new (internal)}
+% The mobile-phone symbol.
+% \begin{macro}{\scr@symbol@www}
+% \changes{v3.27}{2019/03/21}{new (internal)}
+% The world-wide-web symbol.
+%    \begin{macrocode}
+\newcommand*{\scr@symbols@font}{}
+\newcommand*{\scr@symbol@phone}{\undefined}
+\newcommand*{\scr@symbol@fax}{\undefined}
+\newcommand*{\scr@symbol@email}{\undefined}
+\newcommand*{\scr@symbol@mobilephone}{\undefined}
+\newcommand*{\scr@symbol@www}{\undefined}
+%</option&letter>
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \selectlanguage{ngerman}
 % \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{option}
 %
 % \begin{KOMAvar}{placeseparator}
-%   \changes{v2.8q}{2002/01/16}{Neu}^^A
+% \changes{v2.8q}{2002/01/16}{Neu}^^A
 % \begin{KOMAvar}{subjectseparator}
-%   \changes{v2.8q}{2002/01/16}{Neu}^^A
+% \changes{v2.8q}{2002/01/16}{Neu}^^A
 % \begin{KOMAvar}{ccseparator}
-%   \changes{v2.8q}{2002/01/16}{Neu}^^A
+% \changes{v2.8q}{2002/01/16}{Neu}^^A
 % \begin{KOMAvar}{enclseparator}
-%   \changes{v2.8q}{2002/01/16}{Neu}^^A
+% \changes{v2.8q}{2002/01/16}{Neu}^^A
 % \begin{KOMAvar}{backaddressseparator}
-%   \changes{v2.8q}{2002/01/22}{Neu}^^A
+% \changes{v2.8q}{2002/01/22}{Neu}^^A
 % \begin{KOMAvar}{phoneseparator}
-%   \changes{v2.8q}{2002/03/25}{Neu}^^A
-%   \changes{v3.12}{2013/05/29}{Option \texttt{symbolicnames} wird beachtet}
+% \changes{v2.8q}{2002/03/25}{Neu}^^A
+% \changes{v3.12}{2013/05/29}{Option \texttt{symbolicnames} wird beachtet}^^A
+% \changes{v3.27}{2019/03/21}{Symbole sind indirekt gespeichert}^^A
 % \begin{KOMAvar}{faxseparator}
-%   \changes{v2.8q}{2002/03/25}{Neu}^^A
-%   \changes{v3.12}{2013/05/29}{Option \texttt{symbolicnames} wird beachtet}
+% \changes{v2.8q}{2002/03/25}{Neu}^^A
+% \changes{v3.12}{2013/05/29}{Option \texttt{symbolicnames} wird beachtet}^^A
+% \changes{v3.27}{2019/03/21}{Symbole sind indirekt gespeichert}^^A
 % \begin{KOMAvar}{emailseparator}
-%   \changes{v2.8q}{2002/03/25}{Neu}^^A
-%   \changes{v3.12}{2013/05/29}{Option \texttt{symbolicnames} wird beachtet}
+% \changes{v2.8q}{2002/03/25}{Neu}^^A
+% \changes{v3.12}{2013/05/29}{Option \texttt{symbolicnames} wird beachtet}^^A
+% \changes{v3.27}{2019/03/21}{Symbole sind indirekt gespeichert}^^A
 % \begin{KOMAvar}{urlseparator}
-%   \changes{v2.8q}{2002/03/25}{Neu}^^A
-%   \changes{v3.12}{2013/05/29}{Option \texttt{symbolicnames} wird beachtet}
+% \changes{v2.8q}{2002/03/25}{Neu}^^A
+% \changes{v3.12}{2013/05/29}{Option \texttt{symbolicnames} wird beachtet}^^A
+% \changes{v3.27}{2019/03/21}{Symbole sind indirekt gespeichert}^^A
 % \begin{KOMAvar}{mobilephoneseparator}
-%   \changes{v3.12}{2013/05/29}{Neu}^^A
+% \changes{v3.12}{2013/05/29}{Neu}^^A
+% \changes{v3.27}{2019/03/21}{Symbole sind indirekt gespeichert}^^A
 % \begin{KOMAvar}{zipcodeseparator}
-%   \changes{v3.03}{2009/03/04}{Neu}^^A
+% \changes{v3.03}{2009/03/04}{Neu}^^A
 % Daneben gibt es einige Trennzeichen. Diese haben ggf. als Ausgabenamen das
 % Feld, für das sie als Trennzeichen dienen. Die Trennzeichen sind
 % vordefiniert.
 %    \begin{macrocode}
+%<*body>
+%<*letter>
 \newkomavar[\usekomavar{place}]{placeseparator}
 \setkomavar{placeseparator}{,\nobreakspace}
 \newkomavar[\subjectname]{subjectseparator}
@@ -3965,17 +4037,17 @@
 \setkomavar{enclseparator}{: }
 \newkomavar{backaddressseparator}
 \setkomavar{backaddressseparator}{,\nobreakspace}
-\newkomavar[\if@scrsymbols\Telefon\else\phonename\fi]{phoneseparator}
+\newkomavar[\if@scrsymbols\scr@symbol@phone\else\phonename\fi]{phoneseparator}
 \setkomavar{phoneseparator}{\if@scrsymbols\else:\fi\nobreakspace}
 \newkomavar[%
-  \if@scrsymbols\Mobilefone\else\mobilephonename\fi
+  \if@scrsymbols\scr@symbol@mobilephone\else\mobilephonename\fi
 ]{mobilephoneseparator}
 \setkomavar{mobilephoneseparator}{\usekomavar{phoneseparator}}
-\newkomavar[\if@scrsymbols\FAX\else\faxname\fi]{faxseparator}
+\newkomavar[\if@scrsymbols\scr@symbol@fax\else\faxname\fi]{faxseparator}
 \setkomavar{faxseparator}{\if@scrsymbols\else:\fi\nobreakspace}
-\newkomavar[\if@scrsymbols\Email\else\emailname\fi]{emailseparator}
+\newkomavar[\if@scrsymbols\scr@symbol@email\else\emailname\fi]{emailseparator}
 \setkomavar{emailseparator}{\if@scrsymbols\else:\fi\nobreakspace}
-\newkomavar[\if@scrsymbols\else\wwwname\fi]{urlseparator}
+\newkomavar[\if@scrsymbols\scr@symbol@www\else\wwwname\fi]{urlseparator}
 \setkomavar{urlseparator}{\if@scrsymbols\else:\nobreakspace\fi}
 \newkomavar{zipcodeseparator}
 \setkomavar{zipcodeseparator}{\,--\,}
