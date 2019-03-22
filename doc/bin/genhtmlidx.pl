@@ -4,7 +4,7 @@ eval 'exec perl -S $0 ${1+"$@"}'
 
 # ======================================================================
 # genhtmlidx.pl
-# Copyright (c) Markus Kohm, 2002-2016
+# Copyright (c) Markus Kohm, 2002-2019
 #
 # This file is part of the LaTeX2e KOMA-Script bundle.
 #
@@ -22,7 +22,7 @@ eval 'exec perl -S $0 ${1+"$@"}'
 # This work consists of all files listed in manifest.txt.
 # ----------------------------------------------------------------------
 # genhtmlidx.pl
-# Copyright (c) Markus Kohm, 2002-2016
+# Copyright (c) Markus Kohm, 2002-2019
 #
 # Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 # Version 1.3c, verteilt und/oder veraendert werden.
@@ -63,6 +63,7 @@ my @floatstyle;
 my @fontelement;
 my @file;
 my @length;
+my @dohook;
 
 my $baselink;
 my $htmlhead;
@@ -122,6 +123,8 @@ while ( $auxfile=shift ) {
 			    push @file,$entry;
 			} elsif ( "$2" eq "length" ) {
 			    push @length,$entry;
+			} elsif ( "$2" eq "dohook" ) {
+			    push @dohook,$entry;
 			} else {
 			    print STDERR "Unknown type $2!\n";
 			}
@@ -143,8 +146,8 @@ sub process {
     my $lastlink="";
     my $pageprefix="";
     if ( @entries > 0 ) {
-	print "<h2><a name=\"$group\">$titles{$group}</a></h2>\n";
-	print "<ul>\n";
+	print "  <h2><a name=\"$group\">$titles{$group}</a></h2>\n";
+	print "  <ul>\n";
 	map {
 	    $_ =~ /^([^.]+)\.([^.]+)\.([^.]+)\.([^.]+)$/;
 	    if ( $entry ne $1 ) {
@@ -153,7 +156,7 @@ sub process {
 		$lastpage="";
 		$lastlink="";
 		$pageprefix="";
-		print "<li><a name=\"$4.$entry\"></a><a href=\"\#$4.$entry\">$prefix$entry</a> --&gt; ";
+		print "    <li><a name=\"$4.$entry\"></a><a href=\"\#$4.$entry\">$prefix$entry</a> &rarr;&nbsp;";
 	    }
 	    if ( ( $lastlink ne "$3.$4.$1" ) || ( $lastpage ne "$2" ) ) {
 		print "$pageprefix<a href=\"$baselink\#desc:$3.$4.$1\">$2</a>";
@@ -163,25 +166,26 @@ sub process {
 	    }
 	} @entries;
 	print "</li>\n" if ( $entry ne "" );
-	print "</ul>\n";
+	print "  </ul>\n";
     }
 }
 
 print $htmlhead;
 
-print "<ul>\n";
-print "<li><a href=\"#option\">$titles{option}</a></li>" if ( @option );
-print "<li><a href=\"#macro\">$titles{macro}</a></li>" if ( @macro );
-print "<li><a href=\"#environment\">$titles{environment}</a></li>" if ( @environment );
-print "<li><a href=\"#length\">$titles{length}</a></li>" if ( @length );
-print "<li><a href=\"#plength\">$titles{plength}</a></li>" if ( @plength );
-print "<li><a href=\"#variable\">$titles{variable}</a></li>" if ( @variable );
-print "<li><a href=\"#pagestyle\">$titles{pagestyle}</a></li>" if ( @pagestyle );
-print "<li><a href=\"#counter\">$titles{counter}</a></li>" if ( @counter );
-print "<li><a href=\"#floatstyle\">$titles{floatstyle}</a></li>" if ( @floatstyle );
-#print "<li><a href=\"#fontelement\">$titles{fontelement}</a></li>" if ( @fontelement );
-#print "<li><a href=\"#file\">$titles{file}</a></li>" if ( @fontelement );
-print "</ul>\n";
+print "  <ul>\n";
+print "    <li><a href=\"#option\">$titles{option}</a></li>\n" if ( @option );
+print "    <li><a href=\"#macro\">$titles{macro}</a></li>\n" if ( @macro );
+print "    <li><a href=\"#environment\">$titles{environment}</a></li>\n" if ( @environment );
+print "    <li><a href=\"#length\">$titles{length}</a></li>\n" if ( @length );
+print "    <li><a href=\"#plength\">$titles{plength}</a></li>\n" if ( @plength );
+print "    <li><a href=\"#variable\">$titles{variable}</a></li>\n" if ( @variable );
+print "    <li><a href=\"#pagestyle\">$titles{pagestyle}</a></li>\n" if ( @pagestyle );
+print "    <li><a href=\"#counter\">$titles{counter}</a></li>\n" if ( @counter );
+print "    <li><a href=\"#floatstyle\">$titles{floatstyle}</a></li>\n" if ( @floatstyle );
+#print "    <li><a href=\"#fontelement\">$titles{fontelement}</a></li>\n" if ( @fontelement );
+#print "    <li><a href=\"#file\">$titles{file}</a></li>\n" if ( @file );
+#print "    <li><a href=\"#dohook\">$titles{dohook}</a></li>\n" if ( @dohook );
+print "  </ul>\n";
 
 process "option","",\@option;
 process "macro","\\",\@macro;
@@ -193,5 +197,9 @@ process "pagestyle","",\@pagestyle;
 process "counter","",\@counter;
 process "floatstyle","",\@floatstyle;
 #process "fontelement","",\@fontelement;
+print STDERR "Ignoring index: $titles{fontelement}\n" if ( @fontelement );
 #process "file","",\@file;
+print STDERR "Ignoring index: $titles{files}\n" if ( @file );
+#process "dohook","",\@dohook;
+print STDERR "Ignoring index: $titles{dohook}\n" if ( @dohook );
 print $htmlend;
