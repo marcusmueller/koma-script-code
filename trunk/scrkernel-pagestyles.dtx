@@ -1,8 +1,8 @@
-% \CheckSum{678}
+% \CheckSum{698}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-pagestyles.dtx
-% Copyright (c) Markus Kohm, 2002-2017
+% Copyright (c) Markus Kohm, 2002-2019
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrkernel-pagestyles.dtx
-% Copyright (c) Markus Kohm, 2002-2017
+% Copyright (c) Markus Kohm, 2002-2019
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -832,17 +832,58 @@
          {}%
 }
 %</package&letter>
-%<*class>
 %    \end{macrocode}
 % \end{macro}^^A \ps@headings
 % \end{macro}^^A \ps@myheadings
 % \end{macro}^^A \ps@plain
+%
+% \selectlanguage{english}%^^A
+% \begin{macro}{\ps@notepaper}
+% \changes{v3.27}{2019/03/22}{new layer page style\texttt{notepaper}}^^A
+% \changes{v3.27}{2019/03/22}{new layer \texttt{notepaper}}^^A
+% From \KOMAScript~3.27 the \textsf{scrletter} package uses the layer
+% \texttt{notepaper} to define the note-paper. With this layer it is possible
+% to add several separated information blocks everywhere on the first
+% page. A \texttt{picture} mode layer is used, because this makes the
+% placement easier. It's a background layer, so the page contents are printed
+% above. We could also use an odd-side layer, but who knows \dots
+%    \begin{macrocode}
+%<*package&letter&body>
+\DeclareNewLayer[%
+  background,
+  mode=picture,
+  page,align=b,
+  contents={%
+    \@for \reserved@a:=\scr@notepaper@elements\do{%
+      \scr@trim@spaces\reserved@a
+      \ifx \reserved@a\@empty\else
+        \@ifundefined{scr@notepaper@element@\reserved@a}{%
+          \PackageWarning{scrletter2}{%
+            Unknown note paper element `\reserved@a'\MessageBreak
+            will be ignored%
+          }%
+        }{%
+          \@nameuse{scr@notepaper@element@\reserved@a}%
+        }%
+      \fi
+    }%
+  }%
+]{notepaper}
+%    \end{macrocode}
+% For \cs{scr@notepaper@elements} see \texttt{scrkernel-notepaper}.
+%    \begin{macrocode}
+\DeclareNewPageStyleByLayers{notepaper}{notepaper}  
+%</package&letter&body>
+%    \end{macrocode}
+% \end{macro}^^A \ps@notepaper
+% \selectlanguage{ngerman}%^^A
 %
 %
 % \subsection{Festlegung des Seitenstils auf besonderen Seiten}
 %
 % So etwas gibt es derzeit nicht für Briefe.
 % \iffalse
+%<*class>
 %<*!letter>
 % \fi
 %
