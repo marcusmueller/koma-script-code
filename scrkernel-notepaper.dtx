@@ -1,4 +1,4 @@
-% \CheckSum{3510}
+% \CheckSum{4460}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-notepaper.dtx
@@ -1962,8 +1962,649 @@
 %
 % \subsubsection{Ausgabe des Briefbogens}
 %
-% Die Ausgabe selbst erfolgt derzeit über die |\opening|-Anweisung, die in
-% einem späteren Abschnitt implementiert ist.
+% Die Ausgabe selbst erfolgt bei \textsf{scrlttr2} über die
+% |\opening|-Anweisung, die in einem späteren Abschnitt implementiert ist. Bei
+% \textsf{scrletter} erfolgt sie dagegen ab Version 3.27 über den Seitenstil
+% \texttt{notepaper} (siehe \texttt{scrkernel-pagestyle.dtx}).
+%
+% \selectlanguage{english}%
+% \begin{macro}{\scr@notepaper@elements}
+% \changes{v3.27}{2019/03/22}{new (internal)}^^A
+% This is a comma-separated list of elements (aka blocks) to be printed on the
+% notepaper. It is used by the page style layer \texttt{notepaper} to set all
+% elements (see \texttt{scrkernel-pagestyle.dtx}). There are exactly four
+% defaults (but you can add more):
+%    \begin{macrocode}
+%<*package&body>
+\newcommand*{\scr@notepaper@elements}{%
+  firsthead,addressee,location,firstfoot%
+}
+%    \end{macrocode}
+% \begin{macro}{\scr@notepaper@element@firsthead}
+% \changes{v3.27}{2019/03/22}{new (internal)}^^A
+% How to print the notepaper element \texttt{firsthead}:
+%    \begin{macrocode}
+\newcommand*{\scr@notepaper@element@firsthead}{%
+  \if@firsthead
+%    \end{macrocode}
+% The calculation of the real horizontal position could be done as part of the
+% layer contents or while selection of the layer or while initialization of
+% the layer. The in-contents code is used, so the layer can be used with
+% different page styles. The position depends on \texttt{firstheadhpos} this
+% way:
+% \begin{itemize}
+% \item If \texttt{firstheadhpos} is positive but less than the paper width,
+%   \texttt{firstheadhpos} is the distance if the head from the left edge.
+% \item If \texttt{firstheadhpos} is negative but the absolute value is less
+%   then the paper width, the absolute value of \texttt{firstheadhpos} is the
+%   distance from the right edge.
+% \item If \texttt{firstheadhpos} is greater than the paper width, the head
+%   will be centered.
+% \item If \texttt{firstheadhpos} is less than the negative paper width, the
+%   head will be left aligned to the text area.
+% \end{itemize}
+%    \begin{macrocode}
+    \ifdim\useplength{firstheadhpos}<\paperwidth
+      \ifdim \useplength{firstheadhpos}>-\paperwidth
+        \ifdim \useplength{firstheadhpos}<\z@
+          \def\reserved@a{%
+            \paperwidth + \useplength{firstheadhpos}
+            - \useplength{firstheadwidth}%
+          }%
+        \else
+          \def\reserved@a{\useplength{firstheadhpos}}%
+        \fi
+      \else
+        \def\reserved@a{\oddsidemargin + 1in}%
+      \fi
+    \else
+      \def\reserved@a{(\paperwidth-\useplength{firstheadwidth})/2}%
+    \fi
+    \put@notepaper@element(\reserved@a,\useplength{firstheadvpos})%
+                          (\useplength{firstheadwidth},
+                           \useplength{toaddrvpos}
+                           -\useplength{firstheadvpos})%
+      {Element `firsthead'}{\usekomavar{firsthead}}%
+  \fi
+}
+%    \end{macrocode}
+% \end{macro}^^A \scr@notepaper@element@firsthead
+% \begin{macro}{\scr@notepaper@element@firstfoot}
+% \changes{v3.27}{2019/03/22}{new (internal)}^^A
+% Element \texttt{firstfoot} is very similar to \texttt{firsthead}. The
+% differences are using of pseudo lengths for the foot instead the head and
+% the calculation of the available height.
+%    \begin{macrocode}
+\newcommand*{\scr@notepaper@element@firstfoot}{%
+  \if@firstfoot
+    \ifdim\useplength{firstfoothpos}<\paperwidth
+      \ifdim \useplength{firstfoothpos}>-\paperwidth
+        \ifdim \useplength{firstfoothpos}<\z@
+          \def\reserved@a{%
+            \paperwidth + \useplength{firstfoothpos}
+            - \useplength{firstfootwidth}%
+          }%
+        \else
+          \def\reserved@a{\useplength{firstfoothpos}}%
+        \fi
+      \else
+        \def\reserved@a{\oddsidemargin + 1in}%
+      \fi
+    \else
+      \def\reserved@a{(\paperwidth-\useplength{firstfootwidth})/2}%
+    \fi
+    \put@notepaper@element(\reserved@a,\useplength{firstfootvpos})%
+                          (\useplength{firstfootwidth},
+                           \paperheight-\useplength{firstfootvpos})%
+      {Element `firstfoot'}{\usekomavar{firstfoot}}%
+  \fi
+}
+% \end{macro}^^A \scr@notepaper@element@firstfoot
+% \begin{macro}{\scr@notepaper@element@addressee}
+% Element \texttt{addressee} is very complex and therefore split into several
+% different sub-elements.
+%    \begin{macrocode}
+\newcommand*{\scr@notepaper@element@addressee}{%
+  \setlengthtoplength{\@tempdima}{toaddrhpos}%
+  \ifdim \@tempdima<\z@
+    \addtolength{\@tempdima}{%
+      \dimexpr \paperwidth-\useplength{toaddrwidth}\relax
+    }%
+  \fi
+  \put@notepaper@element(\@tempdima,\useplength{toaddrvpos})%
+                        (\useplength{toaddrwidth},\useplength{toaddrheight})%
+    {address field}{%
+      \setparsizes{\z@}{\z@}{\z@ plus 1fil}\par@updaterelative
+      \ifcase \@afieldmode\relax
+      \or
+        \scr@notepaper@subelement@addressee@default
+      \or
+        \scr@notepaper@subelement@addressee@PP
+      \or
+        \scr@notepaper@subelement@addressee@PPbackgroundimage
+      \or
+        \scr@notepaper@subelement@addressee@image
+      \else
+        \scr@notepaper@subelement@addressee@default
+      \fi
+    }%
+}
+%    \end{macrocode}
+% \begin{macro}{\scr@notepaper@subelement@addressee@default}
+% \changes{v3.27}{2019/03/22}{new (internal)}^^A
+% Still missing!
+%    \begin{macrocode}
+\newcommand*{\scr@notepaper@subelement@addressee@default}{%
+  \setbox\@tempboxa\vbox {%
+    \hsize=\useplength{toaddrwidth}\linewidth=\hsize
+    \if@baddr
+      \ifkomavarempty{backaddress}{}{%
+        \def\\{\usekomavar{backaddressseparator}\@ogobble}%
+        \backaddr@format{\scriptsize\usekomafont{backaddress}%
+          \usekomavar{backaddress}}%
+      }%
+    \fi
+  }%
+  \ifdim \dimexpr\ht\@tempboxa+\dp\@tempboxa>\useplength{backaddrheight}\relax
+    \PackageWarning{scrletter2}{Element `backaddress' to high.\MessageBreak
+      The content of `backaddress' could exceed\MessageBreak
+      the address field%
+    }%
+  \fi
+  \vbox to \useplength{backaddrheight}{\vss\usebox\@tempboxa}%
+  \ifcase \ltr@priority
+  \or
+    \setkomavar{specialmail}{%
+      {\usekomafont{priority}{%
+          {\usekomafont{prioritykey}{B}}%
+          -ECONOMY}}%
+    }%
+  \or
+    \setkomavar{specialmail}{%
+      {\usekomafont{priority}{%
+          {\usekomafont{prioritykey}{A}}%
+          -PRIORITY}}%
+    }%
+  \fi  
+  \ifkomavarempty{specialmail}{%
+    \@tempdima=\z@
+  }{%
+    \setbox\@tempboxa\vbox{\hsize\useplength{toaddrwidth}%
+      \noindent\hspace*{\useplength{specialmailindent}}%
+      \specialmail@format{%
+        \usekomafont{specialmail}\usekomavar{specialmail}}%
+      \hspace*{\useplength{specialmailrightindent}}}%
+    \copy\@tempboxa
+    \@tempdima=\dimexpr\ht\@tempboxa+\dp\@tempboxa\relax
+  }%
+  \setbox\@tempboxa\vbox{%
+    \hsize\dimexpr \useplength{toaddrwidth}-2\useplength{toaddrindent}\relax
+    \raggedright
+    \usekomafont{addressee}{%
+%<*package>
+      \usekomavar{addressee}\par%
+%</package>
+%<class>      {\usekomafont{toname}{\usekomavar{toname}\\}}%
+%<class>      {\usekomafont{toaddress}{\usekomavar{toaddress}\par}}%
+    }%
+  }%
+  \ifnum\@afieldmode=\@ne
+%    \end{macrocode}
+% In opposite to the class, the package rounds the distance to lines.
+%    \begin{macrocode}
+    \vskip \dimexpr ((\useplength{toaddrheight}-\useplength{backaddrheight}
+             -\@tempdima -\ht\@tempboxa -\dp\@tempboxa
+             -\ht\strutbox)/(2*\baselineskip))
+             *\baselineskip\relax
+  \fi
+  \hskip\useplength{toaddrindent}%
+  \usebox\@tempboxa
+}
+%    \end{macrocode}
+% \end{macro}^^A \scr@notepaper@subelement@addressee@default
+% \begin{macro}{\scr@notepaper@subelement@addressee@PP}
+% \changes{v3.27}{2019/03/22}{new (internal)}^^A
+%    \begin{macrocode}
+\newcommand*{\scr@notepaper@subelement@addressee@PP}{%
+  \ifdim \useplength{toaddrindent}=\z@
+    \setplength{toaddrindent}{8mm}%
+  \fi
+  \ifdim \useplength{PPheadheight}=\z@
+    \setplength{PPheadheight}{20.74pt}%
+  \fi
+  \ifdim \useplength{PPheadwidth}=\z@
+    \setplength{PPheadwidth}{42mm}%
+  \fi
+  \ifdim \useplength{PPdatamatrixvskip}=\z@
+    \setplength{PPdatamatrixvskip}{3mm}%
+  \fi
+  \vskip 2pt\relax
+  \hskip \useplength{toaddrindent}\relax
+  \fbox{%
+    \vbox to \dimexpr \useplength{PPheadheight}-2\fboxsep\relax{%
+      \setlength{\parindent}{0pt}%
+      \hsize \dimexpr \useplength{PPheadwidth}-2\fboxsep\relax
+%    \end{macrocode}
+% \changes{v3.17}{2015/04/17}{\cs{setbox} durch \cs{sbox} ersetzt}^^A
+% \changes{v3.25}{2017/11/15}{Verwendung von \cs{scr@endstrut} statt
+%   \cs{unskip}\cs{strut}}^^A
+%    \begin{macrocode}
+      \sbox\@tempboxa{%
+        {\fontsize{20.74pt}{20.74pt}\selectfont
+          \usekomafont{PPlogo}{P.P.}}\hskip 2mm%
+      }%
+      \dp\@tempboxa\z@
+      \setlength{\@tempdima}{\hsize}%
+      \addtolength{\@tempdima}{-\wd\@tempboxa}%
+      \hbox{\box\@tempboxa
+        \vbox to \dimexpr
+        \useplength{PPheadheight}-2\fboxsep\relax{%
+          \vss\hsize\@tempdima
+          \raggedright
+          \fontsize{8pt}{9pt}\selectfont\usekomafont{PPdata}%
+          \usekomavar*{fromzipcode}\usekomavar{zipcodeseparator}%
+          \usekomavar{fromzipcode}\scr@endstrut\\
+          \usekomavar{place}\scr@endstrut
+          \hfill
+        }%
+      }%
+      \vss
+    }%
+  }%
+  \hskip 1mm
+  \mbox{%
+    \vbox to \useplength{PPheadheight}{%
+      \addtolengthplength[-]{\hsize}{PPheadwidth}%
+      \addtolength{\hsize}{-1mm}%
+      \addtolengthplength[-2]{\hsize}{toaddrindent}%
+      \setlength{\parindent}{0pt}%
+      \fontsize{8pt}{9pt}\selectfont\usekomafont{PPdata}%
+      \hfill\usekomavar{PPcode}
+      \vss
+      \ifcase \ltr@priority
+      \or
+        \usekomafont{priority}{%
+          {\usekomafont{prioritykey}{B}}%
+          -ECONOMY\hss\vskip-\dp\strutbox
+        }%
+      \or
+        \usekomafont{priority}{%
+          {\usekomafont{prioritykey}{A}}%
+          -PRIORITY\hss\vskip-\dp\strutbox
+        }%
+      \fi
+      \vss
+    }%
+  }%
+  \vskip 1mm
+  \vskip-\ht\strutbox
+  \noindent\hskip\useplength{toaddrindent}%
+  \hrulefill%
+  \hskip\useplength{toaddrindent}%
+  \vbox to\z@{\hsize\z@
+    \vskip \useplength{PPdatamatrixvskip}\relax
+    \llap{\usekomavar{PPdatamatrix}\hskip\useplength{toaddrindent}}%
+    \vss
+  }%
+  \vskip 3mm
+  \noindent\hskip\useplength{toaddrindent}%
+  \setlength{\@tempdima}{\useplength{toaddrwidth}}%
+  \addtolengthplength[-2]{\@tempdima}{toaddrindent}%
+  \vbox{\hsize\@tempdima
+    \ifkomavarempty{PPdatamatrix}{}{%
+      \addtolength{\hsize}{-2mm}%
+      \settowidth\@tempdima{\usekomavar{PPdatamatrix}}%
+      \addtolength{\hsize}{-\@tempdima}%
+    }%
+    \raggedright
+    \usekomafont{addressee}{%
+%<*package>
+      \usekomavar{addressee}\par%
+%</package>
+%<class>      {\usekomafont{toname}{\usekomavar{toname}\\}}%
+%<class>      {\usekomafont{toaddress}{\usekomavar{toaddress}\par}}%
+    }%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}^^A \scr@notepaper@subelement@addressee@PP
+% \begin{macro}{\scr@notepaper@subelement@addressee@PPimage}
+% \changes{v3.27}{2019/03/22}{new (internal)}^^A
+% TODO: Need to be tested!
+%    \begin{macrocode}
+\newcommand*{\scr@notepaper@subelement@addressee@PPimage}{%
+  \ifdim \useplength{toaddrindent}=\z@
+    \setplength{toaddrindent}{8mm}%
+  \fi
+  \vskip 1mm
+  \noindent\expandafter\hskip\useplength{toaddrindent}%
+  \vbox to \useplength{PPheadheight}{%
+    \addtolengthplength[-2]{\hsize}{toaddrindent}%
+    \setlength{\parindent}{0pt}%
+    \usekomavar{addresseeimage}%
+    \vss
+  }%
+}
+%    \end{macrocode}
+% \end{macro}^^A \scr@notepaper@subelement@addressee@PPimage
+% \begin{macro}{\scr@notepaper@subelement@addressee@backgroundimage}
+% \changes{v3.27}{2019/03/22}{new (internal)}^^A
+% TODO: Need to be tested!
+%    \begin{macrocode}
+\newcommand*{\scr@notepaper@subelement@addressee@backgroundimage}{%
+  \vskip 1mm
+  \noindent\expandafter\hskip\useplength{toaddrindent}%
+  \vbox to \useplength{PPheadheight}{%
+    \addtolengthplength[-2]{\hsize}{toaddrindent}%
+    \setlength{\parindent}{0pt}%
+    \usekomavar{addresseeimage}%
+    \vss
+  }%
+  \vskip 1mm
+  \vskip\dp\strutbox
+  \vfil%
+  \noindent\hskip\useplength{toaddrindent}%
+  \setlength{\@tempdima}{\useplength{toaddrwidth}}%
+  \addtolengthplength[-2]{\@tempdima}{toaddrindent}%
+  \vbox{\hsize\@tempdima
+    \ifkomavarempty{PPdatamatrix}{}{%
+      \addtolength{\hsize}{-2mm}%
+      \settowidth\@tempdima{\usekomavar{PPdatamatrix}}%
+      \addtolength{\hsize}{-\@tempdima}%
+    }%
+    \raggedright
+    \usekomafont{addressee}{%
+%<*package>
+      \usekomavar{addressee}\par%
+%</package>
+%<class>      {\usekomafont{toname}{\usekomavar{toname}\\}}%
+%<class>      {\usekomafont{toaddress}{\usekomavar{toaddress}\par}}%
+    }%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}^^A \scr@notepaper@subelement@addressee@backgroundimage
+% \end{macro}^^A \scr@notepaper@element@addressee
+% \begin{macro}{\scr@notepaper@element@location}
+% Still missing!
+%    \begin{macrocode}
+\newcommand*{\scr@notepaper@element@location}{%
+%    \end{macrocode}
+% \selectlanguage{ngerman}^^A
+% \changes{v2.97e}{2007/11/13}{Der Absender kann nun ebenfalls in der
+%   Absenderergänzung stehen}^^A
+% \changes{v2.98b}{2008/01/30}{Absenderergänzung immer setzen, wenn
+%   verwendet}^^A
+% Je nach Absenderanordnung muss hier nun ebenfalls etwas getan werden.
+% Der Fall 0, also linksbündiger Absender im Kopf spielt hier keine Rolle.
+%    \begin{macrocode}
+  \ifcase\@alignfrom
+%    \end{macrocode}
+% Im Fall 1, also zentrierter Absender im Kopf wird jedoch das Logo hier
+% platziert, also darf die Absenderergänzung nicht leer sein.
+%    \begin{macrocode}
+  \or
+    \if@logo
+      \ifkomavarempty{location}{\setkomavar{location}{\null}}{}%
+    \fi
+%    \end{macrocode}
+% Im Fall 2, also rechtsbündiger Absender im Kopf, ist auch nichts zu tun.
+%    \begin{macrocode}
+  \or
+%    \end{macrocode}
+% Im Fall 3, also linksbündiger Absender in der Absenderergänzung wird hier
+% eine Menge ausgegeben, also darf die Absenderergänzung nicht leer sein.
+%    \begin{macrocode}
+  \or
+    \ifkomavarempty{location}{\setkomavar{location}{\null}}{}%
+%    \end{macrocode}
+% Im Fall 3, also linksbündiger Absender in der Absenderergänzung wird hier
+% eine Menge ausgegeben, also darf die Absenderergänzung nicht leer sein.
+%    \begin{macrocode}
+  \or
+    \ifkomavarempty{location}{\setkomavar{location}{\null}}{}%
+%    \end{macrocode}
+% Alle anderen Fälle sind wie hier ebenfalls ohne Bedeutung.
+%    \begin{macrocode}
+  \fi
+%    \end{macrocode}
+% \selectlanguage{english}^^A
+% Everything else only, if the field is not empty.
+%    \begin{macrocode}
+  \ifkomavarempty{location}{}{%
+%    \end{macrocode}  
+% Calculation of height and vertical possition.
+%    \begin{macrocode}
+    \ifdim \useplength{locheight}=\z@%
+      \setplength{locheight}{\useplength{toaddrheight}}%
+    \fi
+    \ifdim \useplength{locvpos}=\z@%
+      \setplength{locvpos}{\useplength{toaddrvpos}}%
+    \fi
+%    \end{macrocode}
+% Calculation of width and horizontal possition.
+%    \begin{macrocode}
+    \ifdim \useplength{locwidth}=\z@%
+      \setplength{locwidth}{\paperwidth}%
+      \ifdim \useplength{toaddrhpos}>\z@
+        \addtoplength[-2]{locwidth}{\useplength{toaddrhpos}}%
+      \else
+        \addtoplength[2]{locwidth}{\useplength{toaddrhpos}}%
+      \fi
+      \addtoplength[-1]{locwidth}{\useplength{toaddrwidth}}%
+      \if@bigloc
+        \setplength[.66667]{locwidth}{\useplength{locwidth}}%
+      \else
+        \setplength[.5]{locwidth}{\useplength{locwidth}}%
+      \fi
+    \fi
+    \ifdim \useplength{lochpos}=\z@%
+      \setplength{lochpos}{\useplength{toaddrhpos}}%
+    \fi
+    \ifdim \useplength{lochpos}<\z@
+      \def\reserved@a{-\useplength{lochpos}}%
+    \else
+      \def\reserved@a{\dimexpr \paperwidth
+                              -\useplength{lochpos}
+                              -\useplength{locwidth}\relax}%
+    \fi
+    \put@notepaper@element(\reserved@a,\useplength{locvpos})%
+                          (\useplength{locwidth},\useplength{locheight})%
+    {element location}%
+    {%
+%    \end{macrocode}
+% \selectlanguage{ngerman}%^^A
+% In einigen Fällen der Absenderanordnung muss hier nun eine ganze Menge getan
+% werden. In anderen ist hingegen nur wenig zu tun.  Im Fall 0, also
+% linksbündiger Absender im Kopf wird nur die Absenderergänzung ausgegeben
+% (das erfolgt nach der Fallunterscheidung).
+%    \begin{macrocode}
+      \ifcase\@alignfrom
+%    \end{macrocode}
+% Im Fall 1, also zentrierter Absender im Kopf wird jedoch das Logo hier
+% platziert, die Absenderergänzung wird ggf. danach ausgegeben (das erfolgt
+% nach der Fallunterscheidung).%^^A
+% \changes{v2.98a}{2008/01/10}{bei zentriertem Absender wird die
+%   Absenderergänzung ggf. unter dem Logo ausgegeben}%^^A
+%    \begin{macrocode}
+      \or
+        \if@logo
+          \ifkomavarempty{fromlogo}{\null}{%
+            {\raggedleft\noindent\usekomavar{fromlogo}\\
+              \vskip\parskip}\noindent}%
+        \fi
+%    \end{macrocode}
+% Im Fall 2, also rechtsbündiger Absender im Kopf, wird auch nur die
+% Absenderergänzung ausgegeben (das erfolgt nach der Fallunterscheidung).
+%    \begin{macrocode}
+      \or
+%    \end{macrocode}
+% Im Fall 3, also linksbündiger Absender in der Absenderergänzung wird hier
+% sozusagen der linksbündige Kopf nachgebaut. Das Logo steht dabei
+% ggf. rechtsbündig oben.
+%    \begin{macrocode}
+      \or
+        \if@logo
+          \ifkomavarempty{fromlogo}{}{%
+            \raggedleft\usekomavar{fromlogo}\par}%
+        \fi
+        \raggedright
+%    \end{macrocode}
+% Zuerst wird der Name gesetzt. Dabei soll eine eigene Schriftart für den
+% Namen verwendet werden.
+%    \begin{macrocode}
+        {\usekomafont{fromname}\strut\ignorespaces
+          \usekomavar{fromname}%
+%    \end{macrocode}
+% Hat \verb|\@rulefrom| den nummerischen Wert 1, so soll direkt auf den
+% Absender eine Linie folgen. Die Länge dieser Linie kann vom Anwender
+% bestimmt oder automatisch gewählt werden. Es werden dabei die Pseudo-Längen
+% \texttt{fromrulewidth} und \texttt{fromrulethickness} verwendet. Ist
+% \texttt{fromrulewidth} 0, so wird sie automatisch bestimmt. Bei der
+% automatischen Längenbestimmung wird einfach eine Linie über die Gesamtbreite
+% der Absenderergänzung gesetzt.
+%    \begin{macrocode}
+          {%
+            \ifnum\@rulefrom=1\\[-.5\baselineskip]%
+              \usekomafont{fromrule}{%
+                \setlength{\@tempdima}{\useplength{fromrulewidth}}%
+                \ifdim\@tempdima=\z@
+                  \setlength{\@tempdima}{\useplength{locwidth}}%
+                \fi
+                \expandafter\rule\expandafter{\the\@tempdima}{%
+                  \useplength{fromrulethickness}}%
+              }%
+            \fi
+          }%
+          \\
+        }%
+%    \end{macrocode}
+% Als Nächstes wird die Absenderadresse einschließlich aller optionalen Felder
+% gesetzt. Dabei werden optionale Felder nur gesetzt, wenn der entsprechende
+% Schalter \emph{true} ist. Die Adresse wird ebenfalls innerhalb einer Gruppe
+% in einer eigenen Schriftart gesetzt.%
+% \changes{v3.12}{2013/05/29}{Variable \texttt{frommobilephone} wird
+% berücksichtigt}^^A
+%    \begin{macrocode}
+        {\usekomafont{fromaddress}\strut\ignorespaces
+          \usekomavar{fromaddress}%
+          \if@phone\\\usekomavar*{fromphone}\usekomavar{fromphone}\fi%
+          \if@mobilephone
+            \\\usekomavar*{frommobilephone}\usekomavar{frommobilephone}%
+          \fi%
+          \if@fax\\\usekomavar*{fromfax}\usekomavar{fromfax}\fi%
+          \if@email\\\usekomavar*{fromemail}\usekomavar{fromemail}\fi%
+          \if@www\\\usekomavar*{fromurl}\usekomavar{fromurl}\fi%
+%    \end{macrocode}
+% Wie weiter oben erwähnt, kann auch an dieser Stelle eine Linie gesetzt
+% werden.
+%    \begin{macrocode}
+          \ifnum\@rulefrom=2\\[-.5\baselineskip]%
+            \usekomafont{fromrule}{%
+              \setlength{\@tempdima}{\useplength{fromrulewidth}}%
+              \ifdim\@tempdima=\z@
+                \setlength{\@tempdima}{\useplength{locwidth}}%
+              \fi
+              \expandafter\rule\expandafter{\the\@tempdima}{%
+                \useplength{fromrulethickness}}}%
+          \fi
+          \\
+        }%
+%    \end{macrocode}
+% Damit ist die Definition des linksbündigen Absenders in der
+% Absenderergänzung abgeschlossen. Im Fall 4, also rechtsbündiger Absender in
+% der Absenderergänzung wird hier exakt wie für Fall 3 verfahren. Nur ist
+% jetzt alles rechtsbündig.^^A%
+% \changes{v3.12}{2013/05/29}{Variable \texttt{frommobilephone} wird
+% berücksichtigt}^^A%
+%    \begin{macrocode}
+      \or
+        \raggedleft
+        \if@logo
+          \ifkomavarempty{fromlogo}{}{\usekomavar{fromlogo}\par}%
+        \fi
+        {\usekomafont{fromname}\strut\ignorespaces
+          \usekomavar{fromname}%
+          {%
+            \ifnum\@rulefrom=1\\[-.5\baselineskip]%
+              \usekomafont{fromrule}{%
+                \setlength{\@tempdima}{\useplength{fromrulewidth}}%
+                \ifdim\@tempdima=\z@
+                  \setlength{\@tempdima}{\useplength{locwidth}}%
+                \fi
+                \expandafter\rule\expandafter{\the\@tempdima}{%
+                  \useplength{fromrulethickness}}%
+              }%
+            \fi
+          }%
+          \\
+        }%
+        {\usekomafont{fromaddress}\strut\ignorespaces
+          \usekomavar{fromaddress}%
+          \if@phone\\\usekomavar*{fromphone}\usekomavar{fromphone}\fi%
+          \if@mobilephone%
+            \\\usekomavar*{frommobilephone}\usekomavar{frommobilephone}%
+          \fi%
+          \if@fax\\\usekomavar*{fromfax}\usekomavar{fromfax}\fi%
+          \if@email\\\usekomavar*{fromemail}\usekomavar{fromemail}\fi%
+          \if@www\\\usekomavar*{fromurl}\usekomavar{fromurl}\fi%
+          \ifnum\@rulefrom=2\\[-.5\baselineskip]%
+            \usekomafont{fromrule}{%
+              \setlength{\@tempdima}{\useplength{fromrulewidth}}%
+              \ifdim\@tempdima=\z@
+                \setlength{\@tempdima}{\useplength{locwidth}}%
+              \fi
+              \expandafter\rule\expandafter{\the\@tempdima}{%
+                \useplength{fromrulethickness}}}%
+          \fi
+          \\
+        }%
+%    \end{macrocode}
+% In allen anderen Fällen wird ebenfalls die Absenderergänzung gesetzt.
+%    \begin{macrocode}
+      \fi
+      \usekomavar{location}%
+%    \end{macrocode}
+% \selectlanguage{english}%^^A
+% That's it.
+%    \begin{macrocode}
+    }%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}^^A \scr@notepaper@element@location
+% \end{macro}^^A \scr@notepaper@elements
+% \begin{macro}{\put@notepager@element}
+% \changes{v3.27}{2019/03/22}{new (internal)}^^A
+% A helper macro to output the
+%    \begin{macrocode}
+\newcommand{\put@notepaper@element}{}
+\long\def\put@notepaper@element(#1,#2)(#3,#4)#5#6{%
+  \put(\LenToUnit{\dimexpr #1\relax},\LenToUnit{-\dimexpr #2\relax}){%
+    \setbox\@tempboxa \vtop{\vskip \z@
+      \hsize=\dimexpr #3\relax
+      \linewidth=\hsize
+      \columnwidth=\linewidth
+      \textwidth=\columnwidth
+      \parfillskip=\z@ \@plus 1fil\relax
+      #6%
+    }%
+    \usebox\@tempboxa
+    \ifdim \dimexpr\ht\@tempboxa+\dp\@tempboxa\relax > \dimexpr #4\relax
+      \PackageWarning{scrletter2}{#5
+        \the\dimexpr \ht\@tempboxa+\dp\@tempboxa-(#4)\relax\space
+        to high.\MessageBreak
+        The content could collide with other page contents\MessageBreak
+        or break the page edges. You should reduce the\MessageBreak
+        size before usage%
+      }%
+    \fi
+  }%
+}
+%</package&body>
+%    \end{macrocode}
+% \end{macro}^^A \put@notepaper@element
+% \selectlanguage{ngerman}%^^A 
 %
 % \begin{macro}{\move@topt}
 %   \changes{v2.8n}{2001/09/07}{Neu}^^A
@@ -2208,23 +2849,29 @@
 % \end{macro}
 %
 % \begin{macro}{\@firstheadfootfield}
-%   \changes{v2.8n}{2001/09/08}{Neu}^^A
-%   \changes{v2.8q}{2001/10/30}{\cs{parfillskip} lokal auf 0 gesetzt}
-%   \changes{v2.8q}{2001/10/30}{Fuß explizit in eine Box gesetzt}^^A
-%   \changes{v2.9l}{2003/01/23}{Positionierung verbessert}^^A
-%   \changes{v2.97e}{2007/11/22}{Optionen \texttt{firsthead} und
-%     \texttt{firstfoot} beachten}
-%   \changes{v3.05}{2009/11/09}{neue Pseudo-Länge \texttt{firstheadhpos}^^A
-%     beachtet}
-%   \changes{v3.05}{2009/11/09}{neue Pseudo-Länge \texttt{firstfoothpos}^^A
-%     beachtet}
+% \changes{v2.8n}{2001/09/08}{Neu}^^A
+% \changes{v2.8q}{2001/10/30}{\cs{parfillskip} lokal auf 0 gesetzt}
+% \changes{v2.8q}{2001/10/30}{Fuß explizit in eine Box gesetzt}^^A
+% \changes{v2.9l}{2003/01/23}{Positionierung verbessert}^^A
+% \changes{v2.97e}{2007/11/22}{Optionen \texttt{firsthead} und
+%   \texttt{firstfoot} beachten}^^A
+% \changes{v3.05}{2009/11/09}{neue Pseudo-Länge \texttt{firstheadhpos}
+%   beachtet}^^A
+% \changes{v3.05}{2009/11/09}{neue Pseudo-Länge \texttt{firstfoothpos}
+%   beachtet}^^A
 % Ab Version 2.8n werden Kopf und Fuß der ersten Seite nicht mehr per
 % Seitenstil \texttt{firstpage} gesetzt, sondern mit einem speziellen
 % Feld. Dabei wird auch beachtet, dass dieses Feld im Kopf eine bestimmte aber
 % beschränkte Höhe hat. Diese Höhe ist unabhängig von der normalen Kopfhöhe
 % und richtet sich stattdessen nach der Position des Adressfeldes.
+% \selectlanguage{english}^^A
+% \changes{v3.27}{2019/03/22}{package only enlarges page}^^A
+% From \KOMAScript~3.27 the \textsf{scrlayer} package does not print the page
+% head or foot here. It only enlarges or shrinks the first page.
+% \selectlanguage{ngerman}^^A
 %    \begin{macrocode}
 \newcommand*{\@firstheadfootfield}{%
+%<*class>
   \if@firsthead
     \typeout{Head of first page}%
     \move@topt\vskip\useplength{firstheadvpos}%
@@ -2332,6 +2979,7 @@
     \typeout{No foot at first page}%
   \fi
   \move@frompt%
+%</class>
   {%
     \setlength{\@tempdima}{1in}\addtolength{\@tempdima}{\topmargin}%
     \addtolength{\@tempdima}{\headheight}%
@@ -2366,10 +3014,12 @@
 %   ergänzt}^^A
 % \changes{v3.22}{2016/12/21}{zweimal fehlende Klammern und \cs{endgraf} bei
 %   \texttt{toaddress} ergänzt}^^A
+% \changes{v3.27}{2019/03/27}{only at \textsf{scrlttr2}}%^^A
 % Dasselbe gilt auch für das Adressfeld für Fensterumschläge. Die
 % Rücksendeadresse und die Briefart werden dabei mit eigenen
 % Formatieranweisungen gesetzt.
 %    \begin{macrocode}
+%<*class>
 \newcommand*{\@addrfield}{%
   \ifcase \ifnum\@afieldmode=5 \@ne\else\@afieldmode\fi\relax
     \typeout{Address: No}%
@@ -2616,6 +3266,7 @@
     \vskip-\useplength{toaddrvpos}\move@frompt
   \fi
 }
+%</class>
 %    \end{macrocode}
 % \begin{macro}{\specialmail@format}
 %   \changes{v2.97c}{2007/07/06}{neu (intern)}^^A
@@ -2641,8 +3292,10 @@
 % \changes{v2.8q}{2002/02/07}{\cs{noindent} nach dem Logo}
 % \changes{v2.8q}{2002/07/23}{Berechnung der Breite hierher verschoben}^^A
 % \changes{v2.8q}{2002/06/03}{Sonderbehandlung für Adressfeld rechts}^^A
+% \changes{v3.27}{2019/03/27}{only at \textsf{scrlttr2}}^^A
 % Das "`locfield"' wird unabhängig von der Adresse gesetzt.
 %    \begin{macrocode}
+%<*class>
 \newcommand*{\@locfield}{%
   \ifdim \useplength{locwidth}=\z@%
     \@setplength{locwidth}{\paperwidth}%
@@ -2884,6 +3537,7 @@
     \vskip-\useplength{locvpos}\move@frompt
   }%
 }
+%</class>
 %    \end{macrocode}
 % \end{macro}
 %
@@ -3431,6 +4085,15 @@
 %    \begin{macrocode}
   \KOMAoptions{#1}%
 %    \end{macrocode}
+% \selectlanguage{english}^^A
+% \changes{v3.27}{2019/03/22}{\textsf{scrletter} package sets the page
+%   style}^^A
+% From \KOMAScript~3.27 the \textsf{scrletter} package set page style
+% \texttt{notepaper} for the first page before executing the begin hook.
+% \selectlanguage{ngerman}^^A
+%    \begin{macrocode}
+%<package>\thispagestyle{notepaper}%
+%    \end{macrocode}
 % Zum Schluss werden die per \cs{AtBeginLetter} angegeben Anweisungen
 % ausgeführt und noch danach ein Label gesetzt.
 %   \changes{v3.19}{2015/07/15}{ein Label wird gesetzt}^^A
@@ -3469,26 +4132,123 @@
 % \end{macro}
 % \begin{macro}{\stopletter}
 % Damit man Material am Ende des Briefes einschleusen kann.
+%    \begin{macrocode}
+\newcommand*{\stopletter}{}
+%    \end{macrocode}
+% \end{macro}^^A \stopletter
 % \begin{macro}{\@processto}
-%   \changes{v2.9r}{2004/06/16}{robust gegen leeren Empfänger}^^A
+% \changes{v2.9r}{2004/06/16}{robust gegen leeren Empfänger}^^A
+% \changes{v3.27}{2019/03/24}{extended setting of variables}^^A
 % \begin{macro}{\@xproc}
 % Die Adresse, die als Argument der Briefumgebung übergeben wird, muss in Name
 % und Adresse zerlegt werden.
 %    \begin{macrocode}
-\newcommand*{\stopletter}{}
+%    \begin{macrocode}
 \newcommand{\@processto}[1]{%
-  \ifx\relax#1\relax\else
-    \expandafter\@xproc#1\\\@nil\ifkomavarempty{toaddress}{}{%
-    \expandafter\@xproc#1\@nil}%
-  \fi
+%    \end{macrocode}
+% If \cs{@processto} argument (\texttt{letter} mandatory argument) is empty:
+%    \begin{macrocode}
+  \IfArgIsEmpty{#1}{%
+%    \end{macrocode}
+% try to build it from \texttt{toname} and \texttt{toaddress}.
+%    \begin{macrocode}
+%<*package>
+    \ifkomavarempty{toname}{%
+      \ifkomavarempty{tofamilyname}{}{%
+        \ifkomavarempty{togivenname}{%
+          \usekomavar[\setkomavar{toname}]{tofamilyname}%
+        }{%
+          \usekomavar[\protected@edef\reserved@a]{togivenname}%
+          \usekomavar[\protected@edef\reserved@b]{tofamilyname}%
+          \protected@edef\reserved@a{%
+            \noexpand\setkomavar{toname}{\reserved@a\ \reserved@b}%
+          }\reserved@a
+        }%
+      }%
+    }{}%
+    \ifkomavarempty{toaddress}{%
+      \usekomavar[\protected@edef\reserved@a]{toname}%
+      \protected@edef\reserved@a{%
+        \noexpand\usekomafont{toname}{\reserved@a}%
+      }\reserved@a
+    }{%
+      \ifkomavarempty{toname}{%
+        \usekomavar[\protected@edef\reserved@a]{toaddress}%
+        \protected@edef\reserved@a{%
+          \noexpand\usekomafont{toaddress}{\reserved@a}%
+        }\reserved@a
+      }{%
+        \typeout{TRACEA}%
+        \usekomavar[\protected@edef\scr@local@toname]{toname}%
+        \show\scr@local@toname
+        \usekomavar[\protected@edef\reserved@b]{toaddress}%
+        \show\scr@local@toname
+        \show\reserved@b
+        \protected@edef\reserved@a{%
+          \noexpand\setkomavar{addressee}{%
+            {\noexpand\usekomafont{toname}{\scr@local@toname}}\\
+            \noexpand\usekomafont{toaddress}{\reserved@b}%
+          }%
+        }\reserved@a
+      }%
+    }%
+%</package>
+  }{%
+%    \end{macrocode}
+% Split into part before first \cmd\\ and it:
+%    \begin{macrocode}
+    \expandafter\@xproc#1\\\@nil
+    \ifx\reserved@b\@empty\else\expandafter\@xproc#1\@nil\fi
+%    \end{macrocode}
+% For the package set variable \texttt{addressee}:
+%    \begin{macrocode}
+%<*package>
+    \protected@edef\reserved@c{%
+      \noexpand\setkomavar{addressee}{%
+        {\noexpand\usekomafont{toname}{\reserved@a}}%
+        \ifx\reserved@b\@empty\else
+          \\\noexpand\usekomafont{toaddress}{\reserved@b}%
+        \fi
+      }%
+    }%
+%    \end{macrocode}
+% If \texttt{toname} is empty, set it:
+%    \begin{macrocode}
+    \ifkomavarempty{toname}{%
+      \protected@edef\reserved@a{%
+        \noexpand\reserved@c{\noexpand\setkomavar{toname}{\reserved@a}}}%
+    }{\let\reserved@a\reserved@c}%
+%    \end{macrocode}
+% If \texttt{toaddress} is empty, set it:
+%    \begin{macrocode}
+    \ifkomavarempty{toaddress}{%
+      \protected@edef\reserved@b{\noexpand\reserved@a
+        \noexpand\setkomavar{toaddress}{\reserved@b}}%
+      \reserved@b
+    }{\reserved@a}%
+%</package>
+%    \end{macrocode}
+% For the class simply set \texttt{toname} und \texttt{toaddress}:
+%    \begin{macrocode}
+%<*class>
+    \protected@edef\reserved@a{%
+      \noexpand\setkomavar{toname}{\reserved@a}%
+      \noexpand\setkomavar{toaddress}{\reserved@a}%
+    }\reserved@a
+%</class>
+  }%
 }
 \newcommand*{\@xproc}{}
 \long\def\@xproc#1\\#2\@nil{%
-  \setkomavar{toname}{#1}\setkomavar{toaddress}{#2}}
+%    \end{macrocode}
+% \changes{v3.27}{2019/03/24}{do not directly set variables but
+%   \cs{reserved@a} and \cs{reserved@b}}^^A
+%    \begin{macrocode}
+  \def\reserved@a{#1}\def\reserved@b{#2}%
+}
 %    \end{macrocode}
 % \end{macro}^^A \@xproc
 % \end{macro}^^A \@processto
-% \end{macro}^^A \stopletter
 % \begin{macro}{\flushbottom}
 % \changes{v2.97c}{2007/05/17}{neue Erweiterung}^^A
 % Das Verhalten muss auf der letzten Briefseite wieder \cs{raggedbottom}
@@ -3580,10 +4340,13 @@
 %
 % \begin{macro}{\opening}
 % \changes{v2.8n}{2001/09/08}{Komplett überarbeitet}^^A
-% \changes{v2.8q}{2001/11/13}{\cs{@parskipfalse}\cs{@parskip@indent}}
-% \changes{v2.8q}{2002/03/25}{\cs{@PapersizeWarning}}
-% \changes{v2.95}{2003/03/23}{Absatzformatierung mit \cs{setparsizes}^^A
-%   einstellen}
+% \changes{v2.8q}{2001/11/13}{\cs{@parskipfalse}\cs{@parskip@indent}}^^A
+% \changes{v2.8q}{2002/03/25}{\cs{@PapersizeWarning}}^^A
+% \changes{v2.95}{2003/03/23}{Absatzformatierung mit \cs{setparsizes}
+%   einstellen}^^A
+% \changes{v3.27}{2019/03/27}{Only \textsf{scrlttr2} uses \cs{@addrfield} and
+%   \cs{locfield}}^^A
+% \changes{v3.27}{2019/03/27}{Only \textsf{scrlttr2} sets pagestyle}^^A
 % Denn beim Eröffnungsgruß mit |\opening| wird neben sämtlichen Feldern auch
 % der Titel und der Betreff gesetzt.
 %    \begin{macrocode}
@@ -3591,8 +4354,10 @@
   \@PapersizeWarning
   \@gen@firsthead
   \@mkboth{\scr@fromname@var}{\scr@subject@var}%
-  \thispagestyle{empty}\noindent
-  \@foldmarks\@firstheadfootfield\@addrfield\@locfield
+%<class>  \thispagestyle{empty}%
+  \noindent
+  \@foldmarks\@firstheadfootfield
+%<class>  \@addrfield\@locfield
   \ifdim\useplength{subjectvpos}=\z@\else\@subjfield\fi
   \@datefield
   \@makelettertitle
@@ -3951,23 +4716,23 @@
 %    \end{macrocode}
 % \selectlanguage{english}
 % \begin{macro}{\scr@symbols@font}
-% \changes{v3.27}{2019/03/21}{new (internal)}
+% \changes{v3.27}{2019/03/21}{new (internal)}^^A
 % The name of the font packages used for the symbols if symbols instead of
 % names are activated.
 % \begin{macro}{\scr@symbol@phone}
-% \changes{v3.27}{2019/03/21}{new (internal)}
+% \changes{v3.27}{2019/03/21}{new (internal)}^^A
 % The phone symbole.
 % \begin{macro}{\scr@symbol@fax}
-% \changes{v3.27}{2019/03/21}{new (internal)}
+% \changes{v3.27}{2019/03/21}{new (internal)}^^A
 % The fax symbole.
 % \begin{macro}{\scr@symbol@email}
-% \changes{v3.27}{2019/03/21}{new (internal)}
+% \changes{v3.27}{2019/03/21}{new (internal)}^^A
 % The e-mail symbol.
 % \begin{macro}{\scr@symbol@mobilephone}
-% \changes{v3.27}{2019/03/21}{new (internal)}
+% \changes{v3.27}{2019/03/21}{new (internal)}^^A
 % The mobile-phone symbol.
 % \begin{macro}{\scr@symbol@www}
-% \changes{v3.27}{2019/03/21}{new (internal)}
+% \changes{v3.27}{2019/03/21}{new (internal)}^^A
 % The world-wide-web symbol.
 %    \begin{macrocode}
 \newcommand*{\scr@symbols@font}{}
@@ -4063,6 +4828,28 @@
 % \end{KOMAvar}
 % \end{KOMAvar}
 % \end{KOMAvar}
+%
+% \selectlanguage{english}%^^A
+% \begin{KOMAvar}{addressee}
+% \changes{v3.27}{2019/03/24}{new variable}^^A
+% The package needs a variable for the addressee (used for the address field).
+% \begin{KOMAvar}{togivenname}
+% \changes{v3.27}{2019/03/24}{new variable}^^A
+% \begin{KOMAvar}{tofamilyname}
+% \changes{v3.27}{2019/03/24}{new variable}^^A
+% The package allows to build \texttt{toname} by \texttt{togivenname} and
+% \texttt{tofamilyname}.
+%    \begin{macrocode}
+%<*package>
+\newkomavar{addressee}
+\newkomavar{togivenname}
+\newkomavar{tofamilyname}
+%</package>
+%    \end{macrocode}
+% \end{KOMAvar}^^A tofamilyname
+% \end{KOMAvar}^^A togivenname
+% \end{KOMAvar}^^A addressee
+% \selectlanguage{ngerman}%^^A
 %
 % \begin{KOMAvar}{fromname}
 %   \changes{v2.8q}{2002/01/16}{Neu}^^A
