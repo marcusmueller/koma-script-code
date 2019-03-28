@@ -1,8 +1,8 @@
-% \CheckSum{772}
+% \CheckSum{792}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlfile.dtx
-% Copyright (c) Markus Kohm, 2002-2018
+% Copyright (c) Markus Kohm, 2002-2019
 %
 % This file is part of the work `scrlfile' which is part of the LaTeX2e
 % KOMA-Script bundle.
@@ -21,7 +21,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrlfile.dtx
-% Copyright (c) Markus Kohm, 2002-2018
+% Copyright (c) Markus Kohm, 2002-2019
 %
 % Diese Datei ist Teil des Werks `scrlfile', das wiederum Teil des
 % LaTeX2e KOMA-Script Pakets ist.
@@ -155,8 +155,8 @@
 %
 % \subsection{The macros}
 %
-%  \begin{macro}{\InputIfFileExists}
-%    \changes{v2.96}{2006/07/19}{replacement code added}
+% \begin{macro}{\InputIfFileExists}
+% \changes{v2.96}{2006/07/19}{replacement code added}%^^A
 % \LaTeX{} uses this macro for loading files with
 % \cs{input}\marg{filename}, \cs{include}, \cs{LoadClass},
 % \cs{LoadClassWithOptions}, \cs{documentclass}, \cs{documentstyle},
@@ -169,10 +169,18 @@
 % macros\,---\,one before loading the file and one after loading the
 % file. But before we redefine the macro, we test, if the macro was
 % defined like we expected. \LaTeX{} will warn, if not.
+% \changes{v3.27}{2019/03/28}{\LaTeX{} 2019-04-01 changes the definition}%^^A
 %    \begin{macrocode}
-\CheckCommand{\InputIfFileExists}[2]{%
+\long\def\reserved@a#1#2{%
   \IfFileExists{#1}%
-    {#2\@addtofilelist{#1}\@@input \@filef@und}}
+    {#2\@addtofilelist{#1}\@@input \@filef@und}}%
+\ifx\reserved@a\InputIfFileExists\else
+  \CheckCommand{\InputIfFileExists}[2]{%
+    \IfFileExists{#1}%
+    {%
+      \expandafter\swap@args\expandafter
+      {\@filef@und}{#2\@addtofilelist{#1}\@@input}}}%
+\fi
 %    \end{macrocode}
 % Now we can redefine the macro like described above:
 %    \begin{macrocode}
@@ -189,14 +197,24 @@
       #1-@alias\endcsname}{#2}%
   }%
   {\IfFileExists{#1}{%
-      \scr@load@hook{before}{#1}%
-      #2\@addtofilelist{#1}%
-      \@@input \@filef@und
-      \scr@load@hook{after}{#1}%
+      \expandafter\scr@input@withhook\expandafter{\@filef@und}{#1}{#2}%
     }}%
 }
 %    \end{macrocode}
-%  \end{macro}
+% \begin{macro}{\scr@input@withhook}
+% \changes{v3.27}{2019/03/28}{new (internal)}%^^A
+% We need a new internal, because of expanding \cs{@file@und} before inputting
+% the file.
+%    \begin{macrocode}
+\newcommand{\scr@input@withhook}[3]{%
+  \scr@load@hook{before}{#2}%
+  #3\@addtofilelist{#2}%
+  \@@input #1
+  \scr@load@hook{after}{#2}%
+}%
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
 %
 %  \begin{macro}{\@loadwithoptions}
 %    \changes{v2.96}{2006/07/19}{new redefinition}
