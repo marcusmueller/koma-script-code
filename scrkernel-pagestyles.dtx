@@ -871,8 +871,46 @@
 ]{notepaper}
 %    \end{macrocode}
 % For \cs{scr@notepaper@elements} see \texttt{scrkernel-notepaper}.
+%
+% A second layer is used for the foldmarks. Again it is a picture layer. But
+% this time it is an odd-sides-only layer.
 %    \begin{macrocode}
-\DeclareNewPageStyleByLayers{notepaper}{notepaper}  
+\DeclareNewLayer[%
+  background,
+  mode=picture,
+  page,align=b,
+  contents={%
+    \if@fold
+      \ifdim \useplength{pfoldmarklength}=\z@
+        \@setplength{pfoldmarklength}{4mm}%
+      \fi
+      \ifdim \useplength{tfoldmarklength}=\z@
+        \@setplength{tfoldmarklength}{2mm}%
+      \fi
+      \ifdim \useplength{mfoldmarklength}=\z@
+        \@setplength{mfoldmarklength}{2mm}%
+      \fi
+      \ifdim \useplength{bfoldmarklength}=\z@
+        \@setplength{bfoldmarklength}{2mm}%
+      \fi
+      \ifdim \useplength{lfoldmarklength}=\z@
+        \@setplength{lfoldmarklength}{4mm}%
+      \fi
+      \@hfoldmark{P}%  
+      \@hfoldmark{T}%
+      \@hfoldmark{M}%
+      \@hfoldmark{B}%
+      \@vfoldmark{L}%
+    \fi
+  }
+]{foldmarks}
+%    \end{macrocode}
+% For \cs{@hfoldmark} and \cs{@vfoldmark} see
+% \texttt{scrkernel-notepaper.dtx}.
+%
+% Last but not least the page style. The foldmarks are below the notepaper.
+%    \begin{macrocode}
+\DeclareNewPageStyleByLayers{notepaper}{foldmarks,notepaper}  
 %</package&letter&body>
 %    \end{macrocode}
 % \end{macro}^^A \ps@notepaper
