@@ -1,8 +1,8 @@
-% \CheckSum{212}
+% \CheckSum{223}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-pseudolengths.dtx
-% Copyright (c) Markus Kohm, 2006-2018
+% Copyright (c) Markus Kohm, 2006-2019
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrkernel-pseudolengths.dtx
-% Copyright (c) Markus Kohm, 2006-2017
+% Copyright (c) Markus Kohm, 2006-2019
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -133,10 +133,31 @@
 % benötigt. Um jedoch nicht unnötig viele Längenregister zu verbrauchen, wird
 % hier mit einer Pseudo-Längen-Arithmetik gearbeitet.
 %
+% \selectlanguage{english}%^^A
+% \begin{macro}{\Ifplength}
+% \changes{v3.27}{2019/03/29}{new}%^^A
+% \begin{macro}{\if@plength}
+% \changes{v3.27}{2019/03/29}{new (internal)}%^^A
+% Test whether or not a given pseudo-length (\texttt{\#1}) already exists. If
+% so execute the second argument, otherwise the third. It's somehow
+% inconsistent to use \cs{Ifplength} instead of \cs{ifplength}, but as it does
+% not act as a \TeX{} switch but a \LaTeX{} command it is better not to use
+% \cs{if\dots}.
+%    \begin{macrocode}
+\newcommand*{\if@plength}[1]{%
+  \@ifundefined{ltr@len@#1}{\@secondoftwo}{\@firstoftwo}%
+}
+\newcommand*{\Ifpength}{\if@plength}
+%    \end{macrocode}
+% \end{macro}^^A\Ifplength
+% \end{macro}^^A\if@plength
+% \selectlanguage{ngerman}%^^A
+%
 % \begin{macro}{\@newplength}
-%   \changes{v2.8q}{2001/10/06}{Neu}^^A
-%   \changes{v2.8q}{2001/10/06}{Kompatibilität zu \texttt{scrlettr.cls}^^A
-%     aufgegeben} 
+% \changes{v2.8q}{2001/10/06}{Neu}^^A
+% \changes{v2.8q}{2001/10/06}{Kompatibilität zu \texttt{scrlettr.cls}^^A
+%   aufgegeben}
+% \changes{v3.27}{2019/03/29}{Fehlermeldung angepasst}^^A
 % Dieses Makro definiert eine neue Pseude-Länge und setzt sie auf den
 % Wert 0. Eine Pseudo-Länge ist ein Makro, das eine Länge enthält.
 %    \begin{macrocode}
@@ -150,11 +171,10 @@
       pseudo-length \expandafter\string\csname ltr@len@#1\endcsname
       already defined%
       }{%
-      You tried to define a new pseudo-length using
-      \string\@newplength\MessageBreak
-      which is already defined. Try another name or
-      better\MessageBreak
-      Don't use this KOMA-Script internal macro}%
+      You've tried to define a new pseudo-length using\MessageBreak
+      \string\@newplength\space
+      or \string\newplength.\MessageBreak
+      Please, try another name}%
     }%
   }
 %    \end{macrocode}
