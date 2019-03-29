@@ -1,4 +1,4 @@
-% \CheckSum{4460}
+% \CheckSum{4497}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-notepaper.dtx
@@ -2679,25 +2679,27 @@
 % \end{macro}
 %
 % \begin{macro}{\@foldmarks}
-%   \changes{v2.97e}{2007/11/08}{\texttt{mfoldmarkvpos} wird verwendet}
+% \changes{v2.97e}{2007/11/08}{\texttt{mfoldmarkvpos} wird verwendet}%^^A
 % Für die Faltmarken müssen nicht nur Abstände definiert werden, es wird auch
 % ein Befehl benötigt, um die Faltmarken zu setzen.
 % \begin{macro}{\@hfoldmark}
-%   \changes{v2.97e}{2007/11/08}{Neu (intern)}^^A
+% \changes{v2.97e}{2007/11/08}{Neu (intern)}%^^A
 % Dabei werden nur die horizontalen Faltmarken gesetzt, die tatsächlich
 % existieren.
 % \begin{macro}{\@foldmark}
-%   \changes{v2.8n}{2001/09/07}{Neu}^^A
-%   \changes{v2.95}{2006/06/06}{\cs{vskip} in \cs{vb@t@z} verschoben, damit es
-%     vom Satzspiegel unabhängig wird}
-%   \changes{v2.97c}{2007/05/08}{Dicke konfigurierbar}^^A
-%   \changes{v2.97c}{2007/05/08}{Schrift (Farbe) konfigurierbar}^^A
+% \changes{v2.8n}{2001/09/07}{Neu}%^^A
+% \changes{v2.95}{2006/06/06}{\cs{vskip} in \cs{vb@t@z} verschoben, damit es
+%   vom Satzspiegel unabhängig wird}%^^A
+% \changes{v2.97c}{2007/05/08}{Dicke konfigurierbar}%^^A
+% \changes{v2.97c}{2007/05/08}{Schrift (Farbe) konfigurierbar}%^^A
+% \changes{v3.27}{2019/03/29}{different versions for package and class}%^^A
 % Das geht am einfachsten, wenn wir auch einen Befehl haben, mit dem man eine
 % einzelne Faltmarke relativ zur aktuellen Position setzen kann. Dies
 % geschieht mit Hilfe von |\rlap|, damit die horizontale Position unverändert
 % bleibt. Als Parameter werden der vertikale Abstand zur aktuellen Position
 % und die Länder der Marke übergeben.
 %    \begin{macrocode}
+%<*class>
 \newcommand*{\@foldmark}[2]{%
   \vb@t@z{\setlength{\@tempdima}{#1}%
     \addtolengthplength[-.5]{\@tempdima}{foldmarkthickness}%
@@ -2707,12 +2709,29 @@
         \rule{#2}{\useplength{foldmarkthickness}}}}}%
   \ignorespaces
 }
+%</class>
+%    \end{macrocode}
+% \selectlanguage{english}%^^A
+% The package version uses \cs{put} to set the marks. It has a possition, a
+% direction and a length, so it can handle the horizontal and the vertical
+% foldmarks.
+%    \begin{macrocode}
+%<*package>
+\newcommand*{\@foldmark}{}
+\def\@foldmark(#1,#2)(#3,#4)#5{%
+  \put(\LenToUnit{#1},-\LenToUnit{#2}){%
+    \linethickness{\useplength{foldmarkthickness}}%
+    \line(#3,-#4){\LenToUnit{#5}}%
+  }%
+}
+%</package>
 \newcommand*{\@hfoldmark}[1]{%
   \begingroup
     \@expandtwoargs\in@{#1}{\@usefolds}%
     \ifin@
       \lowercase{%
         \edef\@tempa{%
+%<*class>
           \noexpand\ifdim \noexpand\useplength{#1foldmarkvpos}=\noexpand\z@
           \noexpand\else
             \noexpand\@foldmark{%
@@ -2721,6 +2740,34 @@
               \noexpand\useplength{#1foldmarklength}%
             }%
           \noexpand\fi
+%</class>
+%    \end{macrocode}
+% \changes{v3.27}{2019/03/29}{different handling of the package version}%^^A
+% The package version of \cs{@foldmark} has a new direction argument, because
+% it handles horizontal and vertical foldmarks. And if there is not a
+% pseudo-length for the vertical possition of the horizontal fold-mark the
+% possition is half of the paper height. This is for the ``P''-mark.
+% \selectlanguage{ngerman}%^^A
+%    \begin{macrocode}
+%<*package>
+          \Ifplength{#1foldmarkvpos}{%
+            \ifdim \useplength{#1foldmarkvpos}=\z@\else
+              \noexpand\@foldmark(\noexpand\useplength{foldmarkhpos},%
+                                    \noexpand\useplength{#1foldmarkvpos})%
+                                 (1,0)%
+              {%
+                \noexpand\useplength{#1foldmarklength}%
+              }%
+            \fi
+          }{%
+            \noexpand\@foldmark(\noexpand\useplength{foldmarkhpos},%
+                                  .5\noexpand\paperheight)%
+                               (1,0)%
+            {%
+              \noexpand\useplength{#1foldmarklength}%
+            }%
+          }%
+%</package>
         }%
       }%
       \@tempa
@@ -2729,7 +2776,7 @@
 }
 %    \end{macrocode}
 % \begin{macro}{\@vfoldmark}
-%   \changes{v2.97e}{2007/11/10}{Neu (intern)}^^A
+% \changes{v2.97e}{2007/11/10}{Neu (intern)}%^^A
 % Für die vertikale(n) Faltmarke(n) gilt prinzipiell das gleiche. Dabei ist
 % lediglich zu beachten, dass die Linie hier komplett oberhalb der Grundlinie
 % gesetzt wird, also die vertikale Position um die Länge nach unten zu
@@ -2737,9 +2784,15 @@
 %    \begin{macrocode}
 \newcommand*{\@vfoldmark}[1]{%
   \begingroup
-    \@expandtwoargs\in@{#1}{\@usefolds}%
-    \ifin@
-      \ifdim \useplength{lfoldmarkhpos}=\z@\else
+    \ifdim \useplength{lfoldmarkhpos}=\z@\else
+      \@expandtwoargs\in@{#1}{\@usefolds}%
+      \ifin@
+%    \end{macrocode}
+% \selectlanguage{english}%^^A
+% \changes{v3.27}{2019/03/29}{package version uses \cs{@foldmark}}%^^A
+% The class version is does still work using \cs{rule}.
+%    \begin{macrocode}
+%<*class>
         \vb@t@z{%
           \ifdim \useplength{foldmarkvpos}<\z@
             \nobreak\vskip \paperheight\nobreak
@@ -2757,10 +2810,24 @@
           }%
         }%
         \ignorespaces
+%</class>
+%    \end{macrocode}
+% But the package version uses \cs{@foldmark}.
+%    \begin{macrocode}
+%<*package>
+        \@foldmark(\useplength{lfoldmarkhpos},\useplength{foldmarkvpos})%
+                  (0,1)%
+                  {\useplength{lfoldmarklength}}%
+%</package> 
       \fi
     \fi
   \endgroup
 }
+%    \end{macrocode}
+% The main foldmark command is only needed by the class.
+% \selectlanguage{ngerman}%^^A
+%    \begin{macrocode}
+%<*class>
 \newcommand*{\@foldmarks}{%
   \if@fold%
     \typeout{Foldmarks: yes}%
@@ -2795,6 +2862,7 @@
     \typeout{Foldmarks: no}%
   \fi%
 }
+%</class>
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -4344,8 +4412,8 @@
 % \changes{v2.8q}{2002/03/25}{\cs{@PapersizeWarning}}^^A
 % \changes{v2.95}{2003/03/23}{Absatzformatierung mit \cs{setparsizes}
 %   einstellen}^^A
-% \changes{v3.27}{2019/03/27}{Only \textsf{scrlttr2} uses \cs{@addrfield} and
-%   \cs{locfield}}^^A
+% \changes{v3.27}{2019/03/27}{Only \textsf{scrlttr2} uses \cs{@addrfield},
+%   \cs{@locfield} and \cs{@foldmarks}}^^A
 % \changes{v3.27}{2019/03/27}{Only \textsf{scrlttr2} sets pagestyle}^^A
 % Denn beim Eröffnungsgruß mit |\opening| wird neben sämtlichen Feldern auch
 % der Titel und der Betreff gesetzt.
@@ -4356,7 +4424,7 @@
   \@mkboth{\scr@fromname@var}{\scr@subject@var}%
 %<class>  \thispagestyle{empty}%
   \noindent
-  \@foldmarks\@firstheadfootfield
+%<class>  \@foldmarks\@firstheadfootfield
 %<class>  \@addrfield\@locfield
   \ifdim\useplength{subjectvpos}=\z@\else\@subjfield\fi
   \@datefield
