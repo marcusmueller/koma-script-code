@@ -1,4 +1,4 @@
-% \CheckSum{4497}
+% \CheckSum{4500}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-notepaper.dtx
@@ -1167,6 +1167,10 @@
 % ist deren Verhalten etwas anders als gewohnt. Dies ist in den
 % Besonderheiten für Briefen begründet. Zunächst die Voreinstellung für
 % Briefbögen.
+%
+% TODO: Diese ganze Prozedur gehört (für \textsf{scrletter}) komplett
+% überabeitet, so dass \cs{@gen@firsthead} überflüssig wird und das Setzen von
+% \texttt{fromalign} auch gleich \texttt{firsthead} umdefiniert. 
 %    \begin{macrocode}
 %<*class>
 \newcommand*{\@firsthead}{%
@@ -4153,14 +4157,19 @@
 %    \begin{macrocode}
   \KOMAoptions{#1}%
 %    \end{macrocode}
-% \selectlanguage{english}^^A
-% \changes{v3.27}{2019/03/22}{\textsf{scrletter} package sets the page
-%   style}^^A
-% From \KOMAScript~3.27 the \textsf{scrletter} package set page style
-% \texttt{notepaper} for the first page before executing the begin hook.
-% \selectlanguage{ngerman}^^A
+% \selectlanguage{english}%^^A
+% \changes{v3.27}{2019/03/31}{first-page head generation moved}%^^A
+% From \KOMAScript~3.27 \textsf{scrletter} generates the first-page head in
+% the \texttt{letter}-environment instead of the command \cs{opening}.
 %    \begin{macrocode}
-%<package>\thispagestyle{notepaper}%
+%<package>  \@gen@firsthead
+%    \end{macrocode}
+% \changes{v3.27}{2019/03/22}{\textsf{scrletter} sets the page style}^^A
+% From \KOMAScript~3.27 \textsf{scrletter} sets page style
+% \texttt{notepaper} for the first page before executing the begin hook.
+% \selectlanguage{ngerman}%^^A
+%    \begin{macrocode}
+%<package>  \thispagestyle{notepaper}%
 %    \end{macrocode}
 % Zum Schluss werden die per \cs{AtBeginLetter} angegeben Anweisungen
 % ausgeführt und noch danach ein Label gesetzt.
@@ -4173,6 +4182,11 @@
   \label{\thisletter.lastpage}%
   \@@par\pagebreak\@@par%
   \ifletter@restonecol\twocolumn\fi
+%    \end{macrocode}
+% \changes{v3.27}{2019/03/31}{cleanup running head}%^^A
+% The package also cleans up the running head after the end of the letter.
+%    \begin{macrocode}
+%<package>  \@mkdouble\@empty
 }
 %    \end{macrocode}
 % \begin{macro}{\ifletter@restonecol}
@@ -4342,7 +4356,7 @@
 % Analog zu \cs{titlepagestyle}, \cs{indexpagestyle} etc. gibt es jetzt auch
 % ein \cs{letterpagestyle}. In der Voreinstellung ist dieser bei der Klasse
 % leer. Dagegen wird beim Paket \texttt{plain.letter} verwendet. Durch den
-% Unterschied wird faktisch die Kompatibilität mit des Pakets mit der Klasse
+% Unterschied wird faktisch die Kompatibilität des Pakets mit der Klasse
 % jedoch verbessert!
 %    \begin{macrocode}
 \newcommand*{\letterpagestyle}{%
@@ -4415,12 +4429,14 @@
 % \changes{v3.27}{2019/03/27}{Only \textsf{scrlttr2} uses \cs{@addrfield},
 %   \cs{@locfield} and \cs{@foldmarks}}^^A
 % \changes{v3.27}{2019/03/27}{Only \textsf{scrlttr2} sets pagestyle}^^A
+% \changes{v3.27}{2019/03/31}{Only \textsf{scrlttr2} generates the first-page
+%   head here}%^^A
 % Denn beim Eröffnungsgruß mit |\opening| wird neben sämtlichen Feldern auch
 % der Titel und der Betreff gesetzt.
 %    \begin{macrocode}
 \newcommand{\opening}[1]{%
   \@PapersizeWarning
-  \@gen@firsthead
+%<class>  \@gen@firsthead
   \@mkboth{\scr@fromname@var}{\scr@subject@var}%
 %<class>  \thispagestyle{empty}%
   \noindent
