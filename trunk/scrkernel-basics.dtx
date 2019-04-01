@@ -1,4 +1,4 @@
-% \CheckSum{4021}
+% \CheckSum{4029}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -4703,8 +4703,8 @@
     \loop
       \scr@hooksplit@specificator\scr@hookname\scr@hookargument
                                  \scr@hookargument
-      \edef\reserved@a{%
-        \unexpanded{#2}{\scr@hookname}{\scr@hookargument}%
+      \begingroup\edef\reserved@a{%
+        \unexpanded{\endgroup #2}{\scr@hookname}{\scr@hookargument}%
       }\reserved@a
     \ifx\scr@hookargument\@empty\else
     \repeat
@@ -4784,16 +4784,24 @@
 % are executed after the permanent hooks.
 %    \begin{macrocode}
 \newcommand*{\ExecuteDoHook}[1]{%
-  \def\scr@execute@dohook##1##2{%
-    \def\scr@hook@do####1{####1{##2}}%
-    \@nameuse{scr@dohook@##1}%
-    \@nameuse{scr@otdohook@##1}%
-    \expandafter\global\expandafter\let
-    \csname scr@otdohook@##1\endcsname\@empty
-    \let\scr@hook@do\relax
+  \@ifundefined{scr@execute@dohook}{%
+    \def\scr@execute@dohook##1##2{%
+      \def\scr@hook@do####1{####1{##2}}%
+      \@nameuse{scr@dohook@##1}%
+      \@nameuse{scr@otdohook@##1}%
+      \expandafter\global\expandafter\let
+      \csname scr@otdohook@##1\endcsname\@empty
+      \let\scr@hook@do\relax
+    }%
+    \ForDoHook{#1}{\scr@execute@dohook}%
+    \let\scr@execute@dohook\relax
+  }{%
+    \PackageWarning{scrbase}{cascaded do-hook detected.\MessageBreak}{%
+      It seems, that the do-hook `\detokenize{#1}'\MessageBreak
+      is be executed, while another do-hook is active.\MessageBreak
+      This is not allowed and therefore ignored%
+    }%
   }%
-  \ForDoHook{#1}{\scr@execute@dohook}%
-  \let\scr@execute@dohook\relax
 }
 %    \end{macrocode}
 % \end{macro}
