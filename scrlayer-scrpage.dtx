@@ -1,4 +1,4 @@
-% \CheckSum{2591}
+% \CheckSum{2603}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlayer-scrpage.dtx
@@ -256,7 +256,7 @@
 %
 % \section{Width of Header and Footer}
 %
-% \Package{scrpage2} provides to set the width of the page head or footer
+% \Package{scrpage2} provided to set the width of the page head or footer
 % different from the width of the text area of the page using
 % \Macro{setheadwidth} and \Macro{setfootwidth}. Optionally those commands
 % allow to setup an horizontal offset for the head or footer. This interface
@@ -1153,6 +1153,47 @@
 % \end{length}%^^A \footheight
 % \end{length}%^^A \headheight
 %
+%
+% \section{Usual \LaTeX{} Kernel Commands}
+%
+% \Package{scrlayer-scrpage} some usual \LaTeX{} kernel commands, that should
+% really behave like the original \LaTeX{} kernel commands do. But some
+% packages redefine them without restoring them in the output routine before
+% the page head and foot is build. Such a redefinition could break
+% \Package{scrlayer-scrpage} or even provoke errors. Here we try to make sure,
+% that \Package{scrlayer-scrpage} uses the correct definitions. Note: This
+% should not be needed, if other packages would be more careful.
+%
+% \begin{macro}{\LaTeXcentering}
+% \changes{v3.27}{2019/04/05}{added}%^^A
+% \begin{macro}{\raggedright}
+% \changes{v3.27}{2019/04/05}{added}%^^A
+% \begin{macro}{\raggedleft}
+% \changes{v3.27}{2019/04/05}{added}%^^A
+% \Package{scrlayer-scrpage} needs \cs{centering} to center, \cs{raggedright}
+% to left align and \cs{raggedleft} to right align the three elements of
+% three-part header and footer. \Package{ragged2e} optionally redefines
+% them. This is not perfect but does not break \Package{scrlayer-scrpage}
+% completely. But \Package{tabu} also redefines them an that breaks
+% \Package{scrlayer-scrpage} in a way, that even error messages can occur. So
+% from version 3.27 \Package{scrlayer-scrpage} does not longer use
+% \cs{centering}, \cs{raggedright} or \cs{raggedleft} but \cs{LaTeXcentering},
+% \cs{LaTeXraggedright} and \cs{LaTeXraggedleft}. With \Package{ragged2e} and
+% its option \texttt{newcommands}/\texttt{NewCommands} this would be already
+% defined and contain the original definition. On all other circumstances the
+% commands have to be defined. But these commands should not be defined as
+% part of the interface or removing the interface could break other packages
+% like \Package{ragged2e}.
+%    \begin{macrocode}
+%<*body>
+\@ifundefined{LaTeXcentering}{\let\LaTeXcentering\centering}{}
+\@ifundefined{LaTeXraggedleft}{\let\LaTeXraggedleft\raggedleft}{}
+\@ifundefined{LaTeXraggedright}{\let\LaTeXraggedright\raggedright}{}
+%</body>
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 %
 % \section{Style of Running Heads}
 %
@@ -2344,6 +2385,12 @@
 % \end{macro}%^^A \sls@init@pair@page@style
 % \begin{macro}{\sls@def@pair@page@style@member}
 % \changes{v3.24}{2017/05/04}{improved \textsf{bidi} compatibility}%^^A
+% \changes{v3.27}{2019/04/05}{\cs{centering} replaced by
+%   \cs{LaTeXcentering}}%^^A
+% \changes{v3.27}{2019/04/05}{\cs{raggedright} replaced by
+%   \cs{LaTeXraggedright}}%^^A
+% \changes{v3.27}{2019/04/05}{\cs{raggedleft} replaced by
+%   \cs{LaTeXraggedleft}}%^^A
 %   \begin{description}
 %   \item[\Parameter{string}:] name of the page style to be defined.
 %   \end{description}
@@ -2353,48 +2400,48 @@
   \newcommand*{\sls@def@pair@page@style@member}[1]{%
     \defpagestyle{#1}{%
       {%
-        \makebox[0pt][\IfRTL{r}{l}]{\parbox{\sls@headwidth}{\raggedright
+        \makebox[0pt][\IfRTL{r}{l}]{\parbox{\sls@headwidth}{\LaTeXraggedright
             \strut\@nameuse{sls@ps@#1@even@left@head}\strut}}%
-        \parbox{\sls@headwidth}{\centering
+        \parbox{\sls@headwidth}{\LaTeXcentering
           \strut\@nameuse{sls@ps@#1@even@middle@head}\strut}%
-        \makebox[0pt][\IfRTL{l}{r}]{\parbox{\sls@headwidth}{\raggedleft
+        \makebox[0pt][\IfRTL{l}{r}]{\parbox{\sls@headwidth}{\LaTeXraggedleft
             \strut\@nameuse{sls@ps@#1@even@right@head}\strut}}%
       }{%
-        \makebox[0pt][\IfRTL{r}{l}]{\parbox{\sls@headwidth}{\raggedright
+        \makebox[0pt][\IfRTL{r}{l}]{\parbox{\sls@headwidth}{\LaTeXraggedright
             \strut\@nameuse{sls@ps@#1@odd@left@head}\strut}}%
-        \parbox{\sls@headwidth}{\centering
+        \parbox{\sls@headwidth}{\LaTeXcentering
           \strut\@nameuse{sls@ps@#1@odd@middle@head}\strut}%
-        \makebox[0pt][\IfRTL{l}{r}]{\parbox{\sls@headwidth}{\raggedleft
+        \makebox[0pt][\IfRTL{l}{r}]{\parbox{\sls@headwidth}{\LaTeXraggedleft
             \strut\@nameuse{sls@ps@#1@odd@right@head}\strut}}%
       }{%
-        \makebox[0pt][\IfRTL{r}{l}]{\parbox{\sls@headwidth}{\raggedright
+        \makebox[0pt][\IfRTL{r}{l}]{\parbox{\sls@headwidth}{\LaTeXraggedright
             \strut\@nameuse{sls@ps@#1@odd@left@head}\strut}}%
-        \parbox{\sls@headwidth}{\centering
+        \parbox{\sls@headwidth}{\LaTeXcentering
           \strut\@nameuse{sls@ps@#1@odd@middle@head}\strut}%
-        \makebox[0pt][\IfRTL{l}{r}]{\parbox{\sls@headwidth}{\raggedleft
+        \makebox[0pt][\IfRTL{l}{r}]{\parbox{\sls@headwidth}{\LaTeXraggedleft
             \strut\@nameuse{sls@ps@#1@odd@right@head}\strut}}%
       }%
     }{%
       {%
-        \makebox[0pt][\IfRTL{r}{l}]{\parbox{\sls@footwidth}{\raggedright
+        \makebox[0pt][\IfRTL{r}{l}]{\parbox{\sls@footwidth}{\LaTeXraggedright
             \strut\@nameuse{sls@ps@#1@even@left@foot}\strut}}%
-        \parbox{\sls@footwidth}{\centering
+        \parbox{\sls@footwidth}{\LaTeXcentering
           \strut\@nameuse{sls@ps@#1@even@middle@foot}\strut}%
-        \makebox[0pt][\IfRTL{l}{r}]{\parbox{\sls@footwidth}{\raggedleft
+        \makebox[0pt][\IfRTL{l}{r}]{\parbox{\sls@footwidth}{\LaTeXraggedleft
             \strut\@nameuse{sls@ps@#1@even@right@foot}\strut}}%
       }{%
-        \makebox[0pt][\IfRTL{r}{l}]{\parbox{\sls@footwidth}{\raggedright
+        \makebox[0pt][\IfRTL{r}{l}]{\parbox{\sls@footwidth}{\LaTeXraggedright
             \strut\@nameuse{sls@ps@#1@odd@left@foot}\strut}}%
-        \parbox{\sls@footwidth}{\centering
+        \parbox{\sls@footwidth}{\LaTeXcentering
           \strut\@nameuse{sls@ps@#1@odd@middle@foot}\strut}%
-        \makebox[0pt][\IfRTL{l}{r}]{\parbox{\sls@footwidth}{\raggedleft
+        \makebox[0pt][\IfRTL{l}{r}]{\parbox{\sls@footwidth}{\LaTeXraggedleft
             \strut\@nameuse{sls@ps@#1@odd@right@foot}\strut}}%
       }{%
-        \makebox[0pt][\IfRTL{r}{l}]{\parbox{\sls@footwidth}{\raggedright
+        \makebox[0pt][\IfRTL{r}{l}]{\parbox{\sls@footwidth}{\LaTeXraggedright
             \strut\@nameuse{sls@ps@#1@odd@left@foot}\strut}}%
-        \parbox{\sls@footwidth}{\centering
+        \parbox{\sls@footwidth}{\LaTeXcentering
           \strut\@nameuse{sls@ps@#1@odd@middle@foot}\strut}%
-        \makebox[0pt][\IfRTL{l}{r}]{\parbox{\sls@footwidth}{\raggedleft
+        \makebox[0pt][\IfRTL{l}{r}]{\parbox{\sls@footwidth}{\LaTeXraggedleft
             \strut\@nameuse{sls@ps@#1@odd@right@foot}\strut}}%
       }%
     }%
