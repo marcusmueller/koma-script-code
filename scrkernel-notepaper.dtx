@@ -1,4 +1,4 @@
-% \CheckSum{4498}
+% \CheckSum{4548}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-notepaper.dtx
@@ -1972,6 +1972,71 @@
 % \texttt{notepaper} (siehe \texttt{scrkernel-pagestyle.dtx}).
 %
 % \selectlanguage{english}%
+% \begin{macro}{\scr@notepaper@printallelements}
+% \changes{v3.27}{2019/04/16}{new (internal)}%^^A
+% This is used by page style \texttt{notepaper} to print all elements.
+% \begin{macro}{\scr@notepaper@printelementsoflist}
+% \changes{v3.27}{2019/04/16}{new (internal)}%^^A
+% And this is used to print a given list of elements.
+% \begin{macro}{\scr@notepaper@printelement}
+% \changes{v3.27}{2019/04/16}{new (internal)}%^^A
+% Last but not least this prints one given element.
+%    \begin{macrocode}
+%<*package&body>
+\newcommand*{\scr@notepaper@printallelements}{%
+  \scr@notepaper@printelementsoflist\scr@notepaper@elements
+}
+\newcommand*{\scr@notepaper@printelementsoflist}[1]{%
+  \expandafter\scr@ForEachTrimmedListElement\expandafter{#1}{%
+    \scr@notepaper@printelement
+  }%
+}
+\newcommand*{\scr@notepaper@printelement}[1]{%
+  \@ifundefined{scr@notepaper@element@#1}{%
+    \PackageWarning{scrletter2}{%
+      Unknown note paper element `#1'\MessageBreak
+      will be ignored%
+    }%
+  }{%
+    \@nameuse{scr@notepaper@element@#1}%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}%^^A \scr@notepaper@printelement
+% \end{macro}%^^A \scr@notepaper@printelementsoflist
+% \end{macro}%^^A \scr@notepaper@printallelements
+%
+% \begin{macro}{\scr@foldmarks@printallelements}
+% \changes{v3.27}{2019/04/16}{new (internal)}%^^A
+% This is used by the page style \texttt{notepaper} to print all foldmarks.
+%    \begin{macrocode}
+\newcommand*{\scr@foldmarks@printallelements}{%
+  \if@fold
+    \ifdim \useplength{pfoldmarklength}=\z@
+      \@setplength{pfoldmarklength}{4mm}%
+    \fi
+    \ifdim \useplength{tfoldmarklength}=\z@
+      \@setplength{tfoldmarklength}{2mm}%
+    \fi
+    \ifdim \useplength{mfoldmarklength}=\z@
+      \@setplength{mfoldmarklength}{2mm}%
+    \fi
+    \ifdim \useplength{bfoldmarklength}=\z@
+      \@setplength{bfoldmarklength}{2mm}%
+    \fi
+    \ifdim \useplength{lfoldmarklength}=\z@
+      \@setplength{lfoldmarklength}{4mm}%
+    \fi
+    \@hfoldmark{P}%  
+    \@hfoldmark{T}%
+    \@hfoldmark{M}%
+    \@hfoldmark{B}%
+    \@vfoldmark{L}%
+  \fi
+}
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}{\scr@notepaper@elements}
 % \changes{v3.27}{2019/03/22}{new (internal)}%^^A
 % This is a comma-separated list of elements (aka blocks) to be printed on the
@@ -1979,7 +2044,6 @@
 % elements (see \texttt{scrkernel-pagestyle.dtx}). There are exactly four
 % defaults (but you can add more):
 %    \begin{macrocode}
-%<*package&body>
 \newcommand*{\scr@notepaper@elements}{%
   firsthead,addressee,location,firstfoot%
 }
