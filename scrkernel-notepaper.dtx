@@ -1,4 +1,4 @@
-% \CheckSum{4548}
+% \CheckSum{4798}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-notepaper.dtx
@@ -736,11 +736,21 @@
 % Gespeichert wird die Information in einem Schalter.
 % \begin{macro}{\@datepos}
 % \changes{v3.09}{2011/03/07}{Neu (intern)}%^^A
-%   Das Datum kann links oder rechts oder gar nicht gesetzt werden.
-%   Wo die Speicherung erfolgt wird in einem nummerischen Makro
-%   abglegt. Voreingestellt ist rechts.
+% Das Datum kann links oder rechts oder gar nicht gesetzt werden.
+% Wo die Speicherung erfolgt wird in einem nummerischen Makro
+% abglegt. Voreingestellt ist rechts.
+% \begin{macro}{\if@refline}
+% \selectlanguage{english}%
+% \changes{v3.27}{2019/05/03}{new (internal) boolean}%^^A
+% \changes{v3.27}{2019/05/03}{new option \texttt{refline=false}}%^^A
+% This boolean is used to switch of the whole reference
+% line. \texttt{refline=false} is a tri-state switch to
+% \texttt{refline=narrow} and \texttt{refline=wide}. But this is available
+% only for the package.%
+% \selectlanguage{ngerman}%
 %    \begin{macrocode}
 \newif\if@refwide
+%<package>\newif\if@refline\@reflinetrue
 \newcommand*{\@datepos}{1}
 \KOMA@key{refline}[wide]{%
   \begingroup
@@ -748,12 +758,17 @@
       {dateleft}{2},{leftdate}{2},%
       {dateright}{3},{rightdate}{3},%
       {nodate}{4}%
+%<package>      ,{no}{5},{off}{5},{false}{5}%
     }{#1}%
     \ifx\FamilyKeyState\FamilyKeyStateProcessed
       \aftergroup\FamilyKeyStateProcessed
-      \ifcase\@tempa
+      \ifcase\@tempa% wide
         \endgroup
         \@refwidetrue
+%<*package>
+        \@reflinetrue
+        \KOMA@kav@remove{.scrletter.\scr@pkgextension}{refline}{false}%
+%</package>
         \KOMA@kav@remove{.%
 %<class>          \KOMAClassFileName
 %<package>          scrletter.\scr@pkgextension
@@ -766,9 +781,13 @@
 %<class>          \KOMAClassFileName
 %<package>          scrletter.\scr@pkgextension
         }{refline}{wide}%
-      \or
+      \or% narrow
         \endgroup
         \@refwidefalse
+%<*package>
+        \@reflinetrue
+        \KOMA@kav@remove{.scrletter.\scr@pkgextension}{refline}{false}%
+%</package>
         \KOMA@kav@remove{.%
 %<class>          \KOMAClassFileName
 %<package>          scrletter.\scr@pkgextension
@@ -781,7 +800,7 @@
 %<class>          \KOMAClassFileName
 %<package>          scrletter.\scr@pkgextension
         }{refline}{narrow}%
-      \or
+      \or% dateleft
         \endgroup
         \def\@datepos{2}%
         \KOMA@kav@remove{.%
@@ -800,7 +819,7 @@
 %<class>          \KOMAClassFileName
 %<package>          scrletter.\scr@pkgextension
         }{refline}{dateleft}%
-      \or
+      \or% dateright
         \endgroup
         \def\@datepos{1}%
         \KOMA@kav@remove{.%
@@ -819,7 +838,7 @@
 %<class>          \KOMAClassFileName
 %<package>          scrletter.\scr@pkgextension
         }{refline}{dateright}%
-      \or
+      \or% nodate
         \endgroup
         \def\@datepos{0}%
         \KOMA@kav@remove{.%
@@ -838,6 +857,14 @@
 %<class>          \KOMAClassFileName
 %<package>          scrletter.\scr@pkgextension
         }{refline}{nodate}%
+%<*package>
+      \or% false
+        \endgroup
+        \@reflinefalse
+        \KOMA@kav@remove{.scrletter.\scr@pkgextension}{refline}{wide}%
+        \KOMA@kav@remove{.scrletter.\scr@pkgextension}{reline}{narrow}%
+        \KOMA@kav@add{.scrletter.\scr@pkgextension}{refline}{false}%
+%</package>
       \fi
     \else
       \endgroup
@@ -853,6 +880,7 @@
 %<package>  scrletter.\scr@pkgextension
 }{refline}{narrow}%
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -1826,6 +1854,17 @@
 \@newplength{refvpos}
 %    \end{macrocode}
 % \end{macro}
+% \begin{macro}{\ltr@len@refheight}
+% \selectlanguage{english}%^^A
+% \changes{v3.27}{2019/05/03}{new}%^^A
+% Height of the reference line (if used).
+%    \begin{macrocode}
+%<*package>
+\@newplength{refheight}
+%</package>
+%    \end{macrocode}
+% \selectlanguage{ngerman}%^^A
+% \end{macro}
 % \begin{macro}{\ltr@len@refwidth}
 % \changes{v2.8q}{2001/10/06}{Neu}%^^A
 % Breite der Geschäftszeile.
@@ -2045,7 +2084,7 @@
 % defaults (but you can add more):
 %    \begin{macrocode}
 \newcommand*{\scr@notepaper@elements}{%
-  firsthead,addressee,location,firstfoot%
+  firsthead,addressee,location,firstfoot,refline%
 }
 %    \end{macrocode}
 % \begin{macro}{\scr@notepaper@element@firsthead}
@@ -2075,24 +2114,26 @@
     \ifdim\useplength{firstheadhpos}<\paperwidth
       \ifdim \useplength{firstheadhpos}>-\paperwidth
         \ifdim \useplength{firstheadhpos}<\z@
-          \def\reserved@a{%
+          \setlength{\@tempdima}{\dimexpr
             \paperwidth + \useplength{firstheadhpos}
-            - \useplength{firstheadwidth}%
-          }%
+            - \useplength{firstheadwidth}
+            \relax}%
         \else
-          \def\reserved@a{\useplength{firstheadhpos}}%
+          \setlength{\@tempdima}{\useplength{firstheadhpos}}%
         \fi
       \else
-        \def\reserved@a{\oddsidemargin + 1in}%
+        \setlength{\@tempdima}{\dimexpr\oddsidemargin + 1in\relax}%
       \fi
     \else
-      \def\reserved@a{(\paperwidth-\useplength{firstheadwidth})/2}%
+      \setlength{\@tempdima}{\dimexpr
+        (\paperwidth-\useplength{firstheadwidth})/2
+        \relax}%
     \fi
-    \put@notepaper@element(\reserved@a,\useplength{firstheadvpos})%
-                          (\useplength{firstheadwidth},
-                           \useplength{toaddrvpos}
-                           -\useplength{firstheadvpos})%
-      {Element `firsthead'}{\usekomavar{firsthead}}%
+    \put@notepaper@element
+      (\@tempdima,\useplength{firstheadvpos})%
+      (\useplength{firstheadwidth},%
+        \useplength{toaddrvpos}-\useplength{firstheadvpos})%
+      {Element `firsthead'}{\usekomavar{firsthead}}\relax
   \fi
 }
 %    \end{macrocode}
@@ -2108,23 +2149,26 @@
     \ifdim\useplength{firstfoothpos}<\paperwidth
       \ifdim \useplength{firstfoothpos}>-\paperwidth
         \ifdim \useplength{firstfoothpos}<\z@
-          \def\reserved@a{%
+          \setlength{\@tempdima}{\dimexpr
             \paperwidth + \useplength{firstfoothpos}
             - \useplength{firstfootwidth}%
-          }%
+            \relax}%
         \else
-          \def\reserved@a{\useplength{firstfoothpos}}%
+          \setlength{\@tempdima}{\useplength{firstfoothpos}}%
         \fi
       \else
-        \def\reserved@a{\oddsidemargin + 1in}%
+        \setlength{\@tempdima}{\dimexpr\oddsidemargin + 1in\relax}%
       \fi
     \else
-      \def\reserved@a{(\paperwidth-\useplength{firstfootwidth})/2}%
+      \setlength{\@tempdima}{\dimexpr
+        (\paperwidth-\useplength{firstfootwidth})/2
+        \relax}%
     \fi
-    \put@notepaper@element(\reserved@a,\useplength{firstfootvpos})%
-                          (\useplength{firstfootwidth},
-                           \paperheight-\useplength{firstfootvpos})%
-      {Element `firstfoot'}{\usekomavar{firstfoot}}%
+    \put@notepaper@element
+      (\@tempdima,\useplength{firstfootvpos})%
+      (\useplength{firstfootwidth},
+        \paperheight-\useplength{firstfootvpos})%
+      {Element `firstfoot'}{\usekomavar{firstfoot}}\relax
   \fi
 }
 % \end{macro}%^^A \scr@notepaper@element@firstfoot
@@ -2155,7 +2199,7 @@
       \else
         \scr@notepaper@subelement@addressee@default
       \fi
-    }%
+    }\relax
 }
 %    \end{macrocode}
 % \begin{macro}{\scr@notepaper@subelement@addressee@default}
@@ -2394,7 +2438,7 @@
 % \end{macro}%^^A \scr@notepaper@subelement@addressee@backgroundimage
 % \end{macro}%^^A \scr@notepaper@element@addressee
 % \begin{macro}{\scr@notepaper@element@location}
-% Still missing!
+% \changes{v3.27}{2019/03/22}{new (internal)}%^^A
 %    \begin{macrocode}
 \newcommand*{\scr@notepaper@element@location}{%
 %    \end{macrocode}
@@ -2470,15 +2514,15 @@
       \setplength{lochpos}{\useplength{toaddrhpos}}%
     \fi
     \ifdim \useplength{lochpos}<\z@
-      \def\reserved@a{-\useplength{lochpos}}%
+      \setlength{\@tempdima}{-\useplength{lochpos}}%
     \else
-      \def\reserved@a{\dimexpr \paperwidth
-                              -\useplength{lochpos}
-                              -\useplength{locwidth}\relax}%
+      \setlength{\@tempdima}{\dimexpr
+        \paperwidth-\useplength{lochpos}-\useplength{locwidth}
+        \relax}%
     \fi
-    \put@notepaper@element(\reserved@a,\useplength{locvpos})%
+    \put@notepaper@element(\@tempdima,\useplength{locvpos})%
                           (\useplength{locwidth},\useplength{locheight})%
-    {element location}%
+    {Element `location'}%
     {%
 %    \end{macrocode}
 % \selectlanguage{ngerman}%^^A
@@ -2636,18 +2680,148 @@
 % \selectlanguage{english}%^^A
 % That's it.
 %    \begin{macrocode}
-    }%
+    }\relax
   }%
 }
 %    \end{macrocode}
 % \end{macro}%^^A \scr@notepaper@element@location
+% \begin{macro}{\scr@notepaper@element@refline}
+% \changes{v3.27}{2019/05/03}{new (internal)}%^^A
+% This notepaper element replaces the \cs{@datefield} of
+% \textsf{scrlttr2}. In opposite to \textsf{scrlttr2} this element has a
+% dedicated height \texttt{reflineheight}.
+% TODO: Still missing!
+%    \begin{macrocode}
+\newcommand*{\scr@notepaper@element@refline}{%
+%    \end{macrocode}
+% First of all test, whether or not their has to be set anything.
+%    \begin{macrocode}
+  \@tempswafalse
+  \if@refline
+    \let\do@set@reffield\@test@reffield
+%<trace>    \let\@tempa\@empty
+    \@set@reffields
+%    \end{macrocode}
+% Maybe we have to add the date:
+%    \begin{macrocode}
+    \ifcase \@datepos
+    \or
+      \if@tempswa\addtoreffields{date}\fi
+      \expandafter\let\csname if@refline\expandafter\endcsname
+      \csname if@tempswa\endcsname
+      \@test@reffield{date}%
+    \or
+      \if@tempswa
+        \edef\expandafter\@set@reffields{%
+          \unexpanded{\do@set@reffield{date}}%
+          \unexpanded\expandafter{\@set@reffields}%
+        }%
+      \fi
+      \expandafter\let\csname if@refline\expandafter\endcsname
+      \csname if@tempswa\endcsname
+      \@test@reffield{date}%
+    \fi
+  \fi  
+  \if@tempswa
+%    \end{macrocode}
+% We have to print something, so let's calculate the position and height.
+%    \begin{macrocode}
+    \ifdim\useplength{refwidth}=\z@
+%<trace>      \typeout{TRACE: refwidth by option}%
+      \if@refwide
+%<trace>        \typeout{TRACE: refline=wide}%
+        \ifdim \useplength{toaddrhpos}>\z@
+          \setplength{refhpos}{\useplength{toaddrhpos}}%
+        \else
+          \setplength[-]{refhpos}{\useplength{toaddrhpos}}%
+        \fi
+        \setplength{refwidth}{\paperwidth -2\useplength{refhpos}}%
+      \else
+%<trace>        \typeout{TRACE: refline=narrow}%
+        \setplength{refwidth}{\textwidth}%
+        \setplength{refhpos}{\oddsidemargin+1in}%
+      \fi
+    \else
+%<trace>      \typeout{TRACE: refwidth by pseudo-length}%
+      \ifdim\useplength{refhpos}=\z@
+        \setlength{\@tempdima}{\dimexpr
+          \textwidth-\useplength{refwidth}
+          \relax}%
+        \setlength{\@tempdimb}{\dimexpr \oddsidemarin+1in\relax}%
+        \setlength{\@tempdimc}{\dimexpr \paperwidth-\textwidth\relax}%
+        \divide\@tempdimb by 32768\relax
+        \divide\@tempdimc by 32768\relax
+        \ifdim\@tempdimc=\z@\else
+          \multiply\@tempdima by\@tempdimb
+          \divide\@tempdima by\@tempdimc
+        \fi
+        \setplength{refhpos}{\@tempdima}%
+      \fi
+    \fi
+%<*trace>
+    \typeout{TRACE: Reference line with \@tempa^^J
+      \space\space\space\space\space\space
+      at refhpos=\the\useplength{refhpos},^^J
+      \space\space\space\space\space\space\space\space\space
+      refvpos=\the\useplength{refvpos},^^J
+      \space\space\space\space\space\space\space\space\space
+      refwidth=\the\useplength{refwidth},^^J
+      \space\space\space\space\space\space\space\space\space
+      refheight=\the\useplength{refheight}}%
+%</trace>
+    \put@notepaper@element
+      (\useplength{refhpos},\useplength{refvpos})%
+      (\useplength{refwidth},\useplength{refheight})%
+      {Element `refline'}%
+      {%
+%    \end{macrocode}
+% Last but not least print it.
+%    \begin{macrocode}
+        \if@refline
+%    \end{macrocode}
+% Print a reference line.
+%    \begin{macrocode}
+          \let\do@set@reffield\@set@reffield\@tempswafalse\@set@reffields
+        \else
+%    \end{macrocode}
+% Print only place and date.
+%    \begin{macrocode}
+          \ifnum \@datepos=1 \hspace*{\fill}\fi
+          {%
+            \usekomafont{placeanddate}{%
+              \ifkomavarempty{place}{}{%
+                \usekomavar{place}\usekomavar{placeseparator}%
+              }%
+              \usekomavar{date}%
+            }%
+          }%
+        \fi
+      }%
+  \fi
+}
+%    \end{macrocode}
+% \end{macro}%^^A \scr@notepaper@element@refline
 % \end{macro}%^^A \scr@notepaper@elements
 % \begin{macro}{\put@notepager@element}
 % \changes{v3.27}{2019/03/22}{new (internal)}%^^A
-% A helper macro to output the
+% \begin{macro}{\put@@notepager@@element}
+% \changes{v3.27}{2019/05/03}{new (internal)}%^^A
+% A helper macro to output one element at a specific
+% position. \texttt{(\#1,\#2)} is the position, \texttt{(\#3,\#4)} the allowed
+% width and height, \texttt{\#5} is the name of the element (used for warning
+% messages only), \texttt{\#6} is the element content. The content is first
+% put into a temporary box of type \texttt{vtop}. Optional code can be
+% executed immediately before testing the total height of this box
+% \cs{@tempboxa} and before using it.
 %    \begin{macrocode}
 \newcommand{\put@notepaper@element}{}
 \long\def\put@notepaper@element(#1,#2)(#3,#4)#5#6{%
+  \kernel@ifnextchar [%]
+  {\put@@notepaper@@element({#1},{#2})({#3},{#4}){#5}{#6}}%
+  {\put@@notepaper@@element({#1},{#2})({#3},{#4}){#5}{#6}[]}%
+}
+\newcommand{\put@@notepaper@@element}{}
+\long\def\put@@notepaper@@element(#1,#2)(#3,#4)#5#6[#7]{%
   \put(\LenToUnit{\dimexpr #1\relax},\LenToUnit{-\dimexpr #2\relax}){%
     \setbox\@tempboxa \vtop{\vskip \z@
       \hsize=\dimexpr #3\relax
@@ -2657,7 +2831,7 @@
       \parfillskip=\z@ \@plus 1fil\relax
       #6%
     }%
-    \usebox\@tempboxa
+    #7%
     \ifdim \dimexpr\ht\@tempboxa+\dp\@tempboxa\relax > \dimexpr #4\relax
       \PackageWarning{scrletter2}{#5
         \the\dimexpr \ht\@tempboxa+\dp\@tempboxa-(#4)\relax\space
@@ -2667,10 +2841,12 @@
         size before usage%
       }%
     \fi
+    \usebox\@tempboxa
   }%
 }
 %</package&body>
 %    \end{macrocode}
+% \end{macro}%^^A \put@@notepaper@@element
 % \end{macro}%^^A \put@notepaper@element
 % \selectlanguage{ngerman}%^^A 
 %
@@ -3778,20 +3954,21 @@
 %
 % \changes{v2.3e}{1996/05/31}{Abstand zwischen Ort und Datum eingefügt}%^^A
 % \changes{v2.8o}{2001/09/18}{für den Brieftyp \texttt{KOMAold} anschließend
-%     einen zusätzlichen vertikalen Abstand eingefügt}
-% \changes{v2.8q}{2001/11/13}{\cs{rlap} eingefügt}
-% \changes{v2.8q}{2001/11/13}{\cs{@parskipfalse}\cs{@parskip@indent}}
-% \changes{v2.8q}{2002/01/14}{Leertests entfernt, da in \cs{@set@reffield}%^^A
-%     bereits enthalten}
+%   einen zusätzlichen vertikalen Abstand eingefügt}%^^A
+% \changes{v2.8q}{2001/11/13}{\cs{rlap} eingefügt}%^^A
+% \changes{v2.8q}{2001/11/13}{\cs{@parskipfalse}\cs{@parskip@indent}}%^^A
+% \changes{v2.8q}{2002/01/14}{Leertests entfernt, da in \cs{@set@reffield}
+%   bereits enthalten}%^^A
 % \changes{v2.9l}{2003/01/28}{Berechnung von \texttt{refwidth} an die
-%     Dokumentation angepasst}
-% \changes{v2.9l}{2003/01/28}{Berechnung von \texttt{refhpos} hinzugefügt}
-% \changes{v2.95}{2006/03/23}{Absatzeinzug mit \cs{setparsizes} abschalten}
+%   Dokumentation angepasst}%^^A
+% \changes{v2.9l}{2003/01/28}{Berechnung von \texttt{refhpos} hinzugefügt}%^^A
+% \changes{v2.95}{2006/03/23}{Absatzeinzug mit \cs{setparsizes} abschalten}%^^A
 % \changes{v2.97c}{2007/05/14}{Neue Font-Elemente}%^^A
 % \changes{v3.09}{2011/03/06}{\cs{do@set@reffield} muss initialisiert
-%     werden}
+%   werden}%^^A
 %    \begin{macrocode}
-\newcommand*{\@datefield}{{%
+\newcommand*{\@datefield}{%
+  {%
     \setparsizes{\z@}{\z@}{\z@ plus 1fil}\par@updaterelative
     \ifdim\useplength{refwidth}=\z@
       \if@refwide
@@ -3876,7 +4053,7 @@
 %    \end{macrocode}
 % Seit Version~2.97c wird hier auch noch getestet, ob die Geschäftszeile
 % möglicherweise mit zu großer Schrift gesetzt wird.
-% \changes{v3.17}{2015/04/17}{\cs{setbox} durch \cs{sbox} ersetzt}
+% \changes{v3.17}{2015/04/17}{\cs{setbox} durch \cs{sbox} ersetzt}%^^A
 %    \begin{macrocode}
             \sbox\z@{\usekomafont{refname}\strutbox}%
             \ifdim\ht\z@>\ht\strutbox
@@ -3897,7 +4074,7 @@
 % Hier landen wir schließlich, wenn gar keine Felder ausgegeben wurden, also
 % nur Ort und Datum zu setzen sind.
 % \changes{v3.12}{2013/07/31}{neues Element \texttt{placeanddate} wird
-%     verwendet}
+%   verwendet}%^^A
 %    \begin{macrocode}
             \ifcase \@datepos\else
               \ifnum \@datepos=1 \enskip\hfill\fi
@@ -4236,12 +4413,29 @@
 %<package>  \thispagestyle{notepaper}%
 %    \end{macrocode}
 % Zum Schluss werden die per \cs{AtBeginLetter} angegeben Anweisungen
-% ausgeführt und noch danach ein Label gesetzt.
-% \changes{v3.19}{2015/07/15}{ein Label wird gesetzt}%^^A
+% ausgeführt.
 %    \begin{macrocode}
+%<*package>
+  \ifdim\useplength{refheight}>\z@
+  \else
+    \begingroup
+      \newkomavar[\strut]{@internal@testvar@}%
+      \setkomavar{@internal@testvar@}{\strut}%
+      \setplengthtototalheight{refheight}{\@set@reffield{@internal@testvar@}}%
+      \edef\reserved@a{\noexpand\endgroup
+        \noexpand\setplength{refheight}{\useplength{refheight}}%
+      }%
+    \reserved@a
+  \fi
+%</package>
   \@beginletterhook
+%<package>\initial@letter@vskip
 }{%
   \stopletter
+%    \end{macrocode}
+% Danach wird noch ein Label gesetzt.
+% \changes{v3.19}{2015/07/15}{ein Label wird gesetzt}%^^A
+%    \begin{macrocode}
   \let\@currentlabel\thisletter
   \label{\thisletter.lastpage}%
   \@@par\pagebreak\@@par%
@@ -4253,6 +4447,18 @@
 %<package>  \@mkdouble\@empty
 }
 %    \end{macrocode}
+% \begin{macro}{\initial@letter@vskip}
+% \changes{v3.27}{2019/05/03}{new (internal)}%^^A
+% TODO: Add description.
+%    \begin{macrocode}
+\newcommand*{\initial@letter@vskip}{%
+  \move@topt
+  \vskip \dimexpr \useplength{refvpos}
+                  \if@refline +\useplength{refheight}\fi
+                  +\useplength{refaftervskip}\relax
+}
+%    \end{macrocode}
+% \end{macro}
 % \begin{macro}{\ifletter@restonecol}
 % \changes{v3.27}{2019/03/05}{neu intern}
 % Dieser Schalter bestimmt, ob am Ende der \texttt{letter}-Umgebung auf
@@ -4324,12 +4530,8 @@
           \noexpand\usekomafont{toaddress}{\reserved@a}%
         }\reserved@a
       }{%
-        \typeout{TRACEA}%
         \usekomavar[\protected@edef\scr@local@toname]{toname}%
-        \show\scr@local@toname
         \usekomavar[\protected@edef\reserved@b]{toaddress}%
-        \show\scr@local@toname
-        \show\reserved@b
         \protected@edef\reserved@a{%
           \noexpand\setkomavar{addressee}{%
             {\noexpand\usekomafont{toname}{\scr@local@toname}}\\
@@ -4507,7 +4709,7 @@
 %<class>  \@foldmarks\@firstheadfootfield
 %<class>  \@addrfield\@locfield
   \ifdim\useplength{subjectvpos}=\z@\else\@subjfield\fi
-  \@datefield
+%<class>  \@datefield
   \@makelettertitle
   \ifdim\useplength{subjectvpos}=\z@\if@subjafter\else\@subjfield\fi\fi
   {\setparsizes{\z@}{\z@}{\z@ plus 1fil}\par@updaterelative#1\par}%
