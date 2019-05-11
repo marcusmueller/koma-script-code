@@ -1,4 +1,4 @@
-% \CheckSum{649}
+% \CheckSum{673}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-listsof.dtx
@@ -56,6 +56,7 @@
 %
 % \iffalse
 %%% From File: $Id$
+%<prepare>%%%            (run: prepare)
 %<option>%%%            (run: option)
 %<body>%%%            (run: body)
 %<*dtx>
@@ -116,15 +117,211 @@
 %<*!letter>
 % \fi
 %
-% \iffalse
-%<*option>
-% \fi
+% \subsection{Gemeinsamer Code von Inhaltsverzeichnis und Verzeichnissen der
+%   Gleitumgebungen}
+%
+% \selectlanguage{english}%^^A
+% Before doing anything with the tocs we need package \Package{tocbasic}:
+%    \begin{macrocode}
+%<*prepare>
+\RequirePackage{tocbasic}[%
+%!KOMAScriptVersion
+]
+%</prepare>
+%    \end{macrocode}
+%
+% \begin{macro}{\numberline@numberpostfix}
+% \changes{v3.20}{2016/03/15}{\cs{autodot} wird darüber eingefügt}
+% Auch in den Verzeichnissen soll ggf. \cs{autodot} quasi als Bestandteil der
+% Nummer ausgegeben werden.
+%    \begin{macrocode}
+%<*body>
+\g@addto@macro{\numberline@numberpostfix}{\autodot}
+%</body>
+%    \end{macrocode}
+% \end{macro}%^^A \numberline@numberpostfix
+%
+% \begin{macro}{\numberline}
+% \changes{v3.20}{2016/03/15}{Definition von \textsf{tocbasic} verwenden}
+% Unabhängig vom Stil soll immer die Definition von \textsf{tocbasic}
+% verwendet werden.
+%    \begin{macrocode}
+%<*body>
+\usetocbasicnumberline[%
+  \ClassInfo{\KOMAClassName}{Redefining `\string\numberline'}%
+]
+%</body>  
+%    \end{macrocode}
+% \end{macro}%^^A \numberline
+%
+% \changes{v3.06}{2010/06/02}{einschalten des \texttt{tocbasic}-Features
+%   \texttt{chapteratlist} in die Datei \texttt{scrkernel-listsof.dtx} verschoben}
+% Bei Büchern wird für jedes Verzeichnis des Besitzers \texttt{float} das
+% Feature \texttt{chapteratlist} gesetzt. Das gilt auch für solche
+% Verzeichnisse, die noch gar nicht definiert sind.
+%    \begin{macrocode}
+%<*body&(book|report)>
+\doforeachtocfile[float]{%
+  \setuptoc{\@currext}{chapteratlist}%
+}
+\AtAddToTocList[float]{%
+  \setuptoc{\@currext}{chapteratlist}%
+}
+%</body&(book|report)>
+%    \end{macrocode}
+%
+% \begin{macro}{\before@starttoc}
+% \changes{v2.8q}{2001/11/14}{neu (intern)}%^^A
+% Dieses Makro führt im Falle von \texttt{tocleft} oder
+% \texttt{listsleft} am Anfang eines Verzeichnisses alle notwendigen
+% Änderungen durch, um das Verzeichnis entsprechend zu handhaben.
+% \begin{macro}{\scr@dottedtocline}
+% \changes{v2.9k}{2003/01/03}{auch das dritte Argument wird ge"andert}%^^A
+% \begin{macro}{\scr@numberline}
+% \changes{v3.06}{2010/05/18}{nicht länger benötigt}%^^A
+% \end{macro}
+% \begin{macro}{\last@l@number}
+% Dafür werden ein paar Hilfsmakros benötigt, die vorsichtshalber
+% global vordefiniert werden.
+%    \begin{macrocode}
+%<*body>
+\newcommand*{\scr@dottedtocline}{}
+\newcommand*{\last@l@number}{}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \begin{macro}{\@l@number}
+% \changes{v2.8q}{2001/11/14}{neu (intern)}%^^A
+% In diesem Makro wird während der Erstellung eines Verzeichnisses
+% Inhaltsverzeichnisses die aktuelle Breite der Nummer gespeichert.
+% \begin{macro}{\set@l@number}
+% \changes{v2.8q}{2001/11/14}{neu (intern)}%^^A
+% Dieses Makro ist dafür verantwortlich, dass zum einen \cs{@tempdima}
+% für den Aufruf von \cs{numberline@box} auf den richtigen Wert gesetzt
+% wird, zum anderen wird die aktuelle größte Breite der Nummer hier
+% angepasst.
+%    \begin{macrocode}
+\newcommand*{\@l@number}{}
+\newcommand*{\set@l@number}[1]{%
+  \settowidth{\@tempdima}{#1\enskip}%
+  \ifdim\@tempdima >\@l@number
+    \xdef\@l@number{\the\@tempdima}%
+  \fi%
+  \ifdim\@tempdima >\last@l@number \else
+    \setlength{\@tempdima}{\last@l@number}%
+  \fi%
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% Kommen wir endlich zu \cs{before@starttoc}:
+% \changes{v2.95a}{2006/07/12}{Initialisierung im \cs{@empty}-Fall}
+% \changes{v3.06}{2010/05/18}{statt \cs{numberline} wird \cs{numberline@box}
+%     umdefiniert} 
+%    \begin{macrocode}
+\newcommand*{\before@starttoc}[1]{%
+  \let\scr@dottedtocline=\@dottedtocline
+  \renewcommand*{\@dottedtocline}[3]{%
+    \scr@dottedtocline{##1}{\z@}{\last@l@number}}%
+  \renewcommand*{\numberline@box}[1]{%
+    \set@l@number{##1}\hb@xt@\@tempdima{##1}}%
+  \gdef\@l@number{\z@}%
+  \@ifundefined{#1@l@number}{%
+    \def\last@l@number{2em}%
+  }{%
+    \expandafter\ifx\csname #1@l@number\endcsname\@empty
+      \let\last@l@number\z@
+    \else
+      \expandafter\let\expandafter\last@l@number
+      \expandafter=\csname#1@l@number\endcsname
+    \fi
+  }%
+%    \end{macrocode}
+% \changes{v3.20}{2015/11/26}{Vorbereitungen für Verzeichniseintragsstile
+%     via \texttt{scrkernel-tocstyle}}%^^A
+%    \begin{macrocode}
+  \begingroup
+    \def\do@endgroup{\endgroup}%
+    \def\do##1{%
+      \scr@ifundefinedorrelax{scr@tso@##1@numwidth}{}{%
+%<*trace>
+        \ClassInfo{\KOMAClassName}{%
+          Setting numwidth of `##1' to \last@l@number}%
+%</trace>
+        \l@addto@macro\do@endgroup{%
+          \@namedef{scr@tso@##1@numwidth}{\last@l@number}%
+        }%
+      }%
+      \scr@ifundefinedorrelax{scr@tso@##1@indent}{}{%
+%<*trace>
+        \ClassInfo{\KOMAClassName}{%
+          Setting indent of `##1' to \string\z@}%
+%</trace>
+        \l@addto@macro\do@endgroup{%
+          \@namedef{scr@tso@##1@indent}{\z@}%
+        }%
+      }%
+    }%
+    \@nameuse{scr@dte@donumwidth}%
+  \do@endgroup
+}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\after@starttoc}
+% \changes{v2.8q}{2001/11/14}{neu (intern)}%^^A
+% Dieses Makro schreibt am Ende den entsprechenden Eintrag in die
+% \texttt{aux}-Datei.
+%    \begin{macrocode}
+\newcommand*{\after@starttoc}[1]{%
+  \protected@write\@auxout{}{%
+    \string\gdef\expandafter\string\csname#1@l@number\endcsname{%
+      \@l@number}}%
+}
+%</body>
+%    \end{macrocode}
+% \end{macro}
+%
+% Dafür sorgen, dass die Verzeichnisse von \textsf{tocbasic} so gesetzt
+% werden, wie wir das gerne hätten (wird über einen Trick auch für das
+% Inhaltsverzeichnis verwendet):
+%    \begin{macrocode}
+%<*body>
+\g@addto@macro\tocbasic@@before@hook{%
+  \if@dynlist\expandafter\before@starttoc\expandafter{\@currext}\fi
+}
+\g@addto@macro\tocbasic@@after@hook{%
+  \if@dynlist\expandafter\after@starttoc\expandafter{\@currext}\fi
+}
+%</body>
+%    \end{macrocode}
 %
 %
-% \subsection{Optionen für das Inhaltsverzeichnis}
+% \subsection{Das Inhaltsverzeichnis}
 %
-% Einige Anweisungen und Einstellungen werden bereits für die Optionen
-% benötigt und deshalb vorab definiert.
+% \selectlanguage{english}%^^A
+% \changes{v3.27}{2019/05/11}{init code moved from \texttt{tocbasic.dtx}}%^^A
+% \changes{v1.00}{auto-activation of feature \texttt{onecolumn}}
+% Set feature \texttt{onecolumn} for every ToC file.
+%    \begin{macrocode}
+%<*prepare&(book|report)>
+\AtAddToTocList[\@currname.\@currext]{\setuptoc{\@currext}{onecolumn}}%
+\AtAddToTocList[ToC]{\setuptoc{\@currext}{onecolumn}}%
+%</prepare&(book|report)>
+%    \end{macrocode}
+% Tell the package, what files are used:
+% \changes{v3.27}{2019/05/11}{use owner \texttt{ToC} for the table of
+%   contents}%^^A
+%    \begin{macrocode}
+%<*prepare>
+\addtotoclist[ToC]{toc}
+\ifstr{\ext@toc}{toc}{}{%
+  \expandafter\addtotoclist
+  \expandafter[\expandafter T\expandafter o\expandafter C\expandafter ]%
+  \expandafter{\ext@toc}%
+}
+%</prepare>
+%    \end{macrocode}
+% \selectlanguage{ngerman}%^^A
 %
 % \begin{macro}{\if@tocleft}
 % \changes{v2.8q}{2001/11/14}{neuer Schalter}%^^A
@@ -134,7 +331,9 @@
 % Die Wahl der Darstellungsart für das Inhaltsverzeichnis wird in einem
 % Schalter gespeichert.
 %    \begin{macrocode}
+%<*option>
 \newif\if@tocleft
+%</option>
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -143,14 +342,15 @@
 % \begin{option}{toc}
 % \changes{v2.98c}{2008/03/04}{Neue Option}%^^A
 % \changes{v3.12}{2013/03/05}{Nutzung der Status-Signalisierung mit
-%     \cs{FamilyKeyStateProcessed}}%^^A
+%   \cs{FamilyKeyStateProcessed}}%^^A
 % \changes{v3.12}{2013/08/26}{\cs{KOMA@options} durch
-%     \cs{KOMAExecuteOptions} ersetzt}%^^A
+%   \cs{KOMAExecuteOptions} ersetzt}%^^A
 % \changes{v3.12a}{2014/01/17}{\cs{KOMAExecuteOptions} durch
-%     \cs{KOMAoptions} ersetzt}%^^A
+%   \cs{KOMAoptions} ersetzt}%^^A
 % \changes{v3.18}{2015/06/15}{neuer Wert \texttt{indexnumbered}}%^^A
 % Dies ist die zentrale Option für Einstellungen des Inhaltsverzeichnisses.
 %    \begin{macrocode}
+%<*option>
 \KOMA@key{toc}{%
   \KOMA@set@ncmdkey{toc}{@tempa}{%
 %    \end{macrocode}
@@ -244,6 +444,7 @@
     \fi
   \fi
 }
+%</option>
 %    \end{macrocode}
 % \end{option}
 %
@@ -256,27 +457,167 @@
 % \changes{v2.98c}{2008/03/05}{obsolet}%^^A
 % \changes{v3.01a}{2008/11/20}{deprecated}%^^A
 %    \begin{macrocode}
+%<*option>
 \KOMA@DeclareDeprecatedOption{tocleft}{toc=flat}
 \KOMA@DeclareDeprecatedOption{tocindent}{toc=graduated}
+%</option>
 %    \end{macrocode}
 % \end{option}
 % \end{option}
 %
+% \subsection{Definitionen für das Inhaltsverzeichnis}
 %
-% \subsection{Optionen für die Gleitumgebungen}
+% \begin{macro}{\contentsname}
+% \begin{macro}{\listoftocname}
+% \changes{v3.00}{2008/07/03}{neu für Paket \textsf{tocbasic}}%^^A
+% \changes{v3.27}{2019/05/11}{auch als sprachabhängiger Bezeichner}%^^A
+% Der Name des Verzeichnisses.
+%    \begin{macrocode}
+%<*body>
+\newcommand*\contentsname{Contents}
+\newcommand*\listoftocname{\contentsname}
+\providecaptionname{american,australian.british,canadian,english,newzealand,%
+  UKenglish,ukenglish,USenglish,usenglish}\contentsname{Contents}%
+%</body>
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
 %
-% Einige Anweisungen und Einstellungen werden bereits für die Optionen
-% benötigt und deshalb vorab definiert.
+% \begin{Counter}{tocdepth}
+% Der Zähler gibt an, bis zu welcher Gliederungebene Einträge in das
+% Inhaltsverzeichnis aufgenommen werden. Da \textsf{scrartcl} eine
+% Ebene tiefer beginnt, wird auch eine Ebene tiefer eingetragen. Damit
+% finden sich -- abgesehen von \cs{part} -- immer drei Ebenen im
+% Inhaltsverzeichnis.
+%    \begin{macrocode}
+%<*body>
+%<book|report>\setcounter{tocdepth}{2}
+%<article>\setcounter{tocdepth}{3}
+%</body>
+%    \end{macrocode}
+% \end{Counter}
+%
+% \begin{macro}{\toc@heading}
+% \changes{v2.3h}{1995/01/21}{neu (intern)}%^^A
+% \changes{v2.95}{2002/06/28}{auch für \textsf{scrreprt} und
+%   \textsf{scrbook}}%^^A
+% \changes{v3.00}{2008/07/04}{Verwendung von \cs{toc@heading} ist nicht
+%   länger empfohlen}%^^A
+% \changes{v3.10}{2011/08/31}{\cs{MakeMarkcase} wird beachtet}%
+% Befehl, zum Setzen der Überschrift des Inhaltsverzeichnisses. Eigentlich
+% ist das überflüssig, weil es nur einmal verwendet wird. Aus Gründen der
+% Konsistenz mit den anderen Verzeichnissen machen wir das hier aber
+% genauso.
+%    \begin{macrocode}
+%<*body>
+\newcommand*\toc@heading{%
+  \ClassWarning{\KOMAClassName}{%
+    usage of deprecated \string\toc@heading!\MessageBreak
+    You should use the features of package `tocbasic'\MessageBreak
+    instead of \string\toc@heading.\MessageBreak
+    Definition of \string\toc@heading\space may be removed from\MessageBreak
+    KOMA-Script soon, so it should not be used
+  }%
+%<article>  \section*{\contentsname}%
+%<book|report>  \chapter*{\contentsname}%
+  \@mkboth{\MakeMarkcase{\contentsname}}{\MakeMarkcase{\contentsname}}%
+}
+%</body>
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\toc@l@number}
+% \changes{v2.8q}{2001/11/14}{neu}%^^A
+% Dieses Makro wird innerhalb von \cs{tableofcontents} über
+% \cs{before@starttoc} und \cs{after@starttoc} in der
+% \texttt{aux}-Datei global definiert. Aus Sicherheitsgründen wird es
+% hier global vordefiniert.
+%    \begin{macrocode}
+%<*body>
+\newcommand*{\toc@l@number}{}
+%</body>
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\tableofcontents}
+% \changes{v2.3h}{1995/01/21}{Verwendung von \cs{toc@heading}}
+% \changes{v2.8l}{2001/08/16}{Gruppe eingefügt und \cs{parskip} auf
+%     0 gesetzt}
+% \changes{v2.8q}{2001/11/13}{\cs{@parskipfalse}%
+%     \cs{@parskip@indent}}
+% \changes{v2.8q}{2001/11/14}{\cs{if@tocleft} bearbeiten}
+% \changes{v2.95}{2002/06/28}{\textsf{article} beachtet ebenfalls
+%     \texttt{tocleft}}
+% \changes{v2.95}{2004/11/05}{\cs{@parskipfalse} und \cs{@parskip@indent}
+%     ersetzt}
+% \changes{v3.00}{2008/07/04}{auf \textsf{tocbasic} umgestellt}
+% Die Ausgabe des Inhaltsverzeichnisses.
+%    \begin{macrocode}
+%<*body>
+\newcommand*{\tableofcontents}{%
+  \begingroup
+    \let\if@dynlist\if@tocleft
+    \expandafter\listoftoc\expandafter{\ext@toc}%
+  \endgroup
+}
+%</body>
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\addtocentrydefault}
+% \changes{v3.08}{2010/11/01}{Neu}%^^A
+% \changes{v3.12}{2013/09/24}{Verwendung der neuen
+%     \texttt{tocbasic}-Anweisung \cs{tocbasic@addxcontentsline}}
+% Seit Version~3.08 werden Einträge ins Inhaltsverzeichnis in der
+% Voreinstellung über diese Anweisung vorgenommen. Das erste Argument ist
+% dabei die Gliederungsebene. Das zweite Argument ist die (formatierte)
+% Gliederungsnummer oder leer, falls die Überschrift nicht nummeriert
+% wird. Das dritte Argument ist der Überschriftentext, der in das
+% Inhaltsverzeichnis soll.
+%    \begin{macrocode}
+%<*body>
+\newcommand{\addtocentrydefault}[3]{%
+  \expandafter\tocbasic@addxcontentsline\expandafter{\ext@toc}{#1}{#2}{#3}%
+}
+%</body>
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \subsection{Die Verzeichnisse der Gleitumgebungen}
+%
+% Die Verzeichnisse der Gleitumgebungen ähneln dem Inhaltsverzeichnis, stellen
+% jedoch eine eigene Klasse dar und werden daher auch über eigene Optionen
+% gesteuert.
+%
+% \selectlanguage{english}%^^A
+% \changes{v3.25}{2017/10/10}{extension \texttt{lof} not added explicitely}%^^A
+% \changes{v3.25}{2017/10/10}{extension \texttt{lot} not added explicitely}%^^A
+% Note: We must not add extensions \texttt{lof} and \texttt{lot} explicitely,
+% because these files will be prepared using \cs{DeclareNewTOC} that also
+% registers the extension.
+%
+% \changes{v1.00}{auto-activation of feature \texttt{onecolumn}}
+% Set feature \texttt{onecolumn} for every float list file.
+%    \begin{macrocode}
+%<*prepare&(book|report)>
+\AtAddToTocList[float]{\setuptoc{\@currext}{onecolumn}}%
+%</prepare&(book|report)>
+%    \end{macrocode}
+% \selectlanguage{ngerman}%^^A
 %
 % \begin{macro}{\float@@listhead}
 % \changes{v2.98c}{2008/03/05}{neu (intern)}%^^A
+% \changes{v3.01}{2008/11/14}{deprecated}%^^A
 % Setzt nur die Überschrift und sonst nichts. Dabei wird die Überschrift als
 % einziges Argument übergeben.
 %    \begin{macrocode}
+%<*option>
 \newcommand*{\float@@listhead}{%
 %<article>  \section*
 %<report|book>  \chapter*
 }
+%</option>
 %    \end{macrocode}
 % \end{macro}
 %
@@ -286,7 +627,9 @@
 % \begin{macro}{\@dynlistfalse}
 % Die Wahl der Darstellungsart wird in einem Schalter gespeichert.
 %    \begin{macrocode}
+%<*option>
 \newif\if@dynlist
+%</option>
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -306,6 +649,7 @@
 %     \cs{KOMAoptions} ersetzt}%^^A
 % Dies ist die zentrale Option für die Gleitumgebungsverzeichnisse.
 %    \begin{macrocode}
+%<*option>
 \KOMA@key{listof}{%
   \KOMA@set@ncmdkey{listof}{@tempa}{%
 %    \end{macrocode}
@@ -511,6 +855,7 @@
 \KOMA@kav@add{.\KOMAClassFileName}{listof}{notoc}
 \KOMA@kav@add{.\KOMAClassFileName}{listof}{graduated}
 \KOMA@kav@add{.\KOMAClassFileName}{listof}{leftaligntextentries}
+%</option>
 %    \end{macrocode}
 % \end{option}
 %
@@ -524,7 +869,9 @@
 % \changes{v2.98c}{2008/03/05}{obsolet}%^^A
 % \changes{v3.01a}{2008/11/20}{deprecated}%^^A
 %    \begin{macrocode}
+%<*option>
 \KOMA@DeclareDeprecatedOption{liststotoc}{listof=totoc}
+%</option>
 %    \end{macrocode}
 % \end{option}
 %
@@ -534,7 +881,9 @@
 % \changes{v2.98c}{2008/03/05}{obsolet}%^^A
 % \changes{v3.01a}{2008/11/20}{deprecated}%^^A
 %    \begin{macrocode}
+%<*option>
 \KOMA@DeclareDeprecatedOption{liststotocnumbered}{listof=numbered}
+%</option>
 %    \end{macrocode}
 % \end{option}
 %
@@ -548,8 +897,10 @@
 % \changes{v2.98c}{2008/03/05}{obsolet}%^^A
 % \changes{v3.01a}{2008/11/20}{deprecated}%^^A
 %    \begin{macrocode}
+%<*option>
 \KOMA@DeclareDeprecatedOption{listsleft}{listof=flat}
 \KOMA@DeclareDeprecatedOption{listsindent}{listof=graduated}
+%</option>
 %    \end{macrocode}
 % \end{option}
 % \end{option}
@@ -573,7 +924,7 @@
 % soll. Das interne Hilfsmakro \cs{@chapterlistsgap} enthält den gewünschten
 % Abstand.
 %    \begin{macrocode}
-%<*book|report>
+%<*option&(book|report)>
 \newcommand*{\@chapterlistsgap}{10\p@}
 \newif\if@chaptertolists\@chaptertolistsfalse
 \KOMA@key{chapteratlists}[entry]{%
@@ -609,324 +960,30 @@
 \BeforeTOCHead{\@chaptertolistsfalse}
 \KOMA@kav@add{.\KOMAClassFileName}{chapteratlists}{10\p@}%
 \KOMA@kav@add{.\KOMAClassFileName}{listof}{chaptergapsmall}%
-%</book|report>
+%</option&(book|report)>
 %    \end{macrocode}
 % \end{macro}  
 % \end{macro}  
 % \end{option}
 %
-% \iffalse
-%</option>
-%<*body>
-% \fi
-%
-% \subsection{Definitionen für alle Verzeichnisse}
-%
-% Einige Definitionen werden von unterschiedlichen Verzeichnissen
-% verwendet. Diese sind hier zu finden.
-%
-% \begin{macro}{\numberline@numberpostfix}
-% \changes{v3.20}{2016/03/15}{\cs{autodot} wird darüber eingefügt}
-% Auch in den Verzeichnissen soll ggf. \cs{autodot} quasi als Bestandteil der
-% Nummer ausgegeben werden.
-%    \begin{macrocode}
-\g@addto@macro{\numberline@numberpostfix}{\autodot}
-%    \end{macrocode}
-% \end{macro}%^^A \numberline@numberpostfix
-%
-% \begin{macro}{\numberline}
-% \changes{v3.20}{2016/03/15}{Definition von \textsf{tocbasic} verwenden}
-% Unabhängig vom Stil soll immer die Definition von \textsf{tocbasic}
-% verwendet werden.
-%    \begin{macrocode}
-\usetocbasicnumberline[%
-  \ClassInfo{\KOMAClassName}{Redefining `\string\numberline'}%
-]
-%    \end{macrocode}
-% \end{macro}%^^A \numberline
-%
-% \changes{v3.06}{2010/06/02}{einschalten des \texttt{tocbasic}-Features
-%   \texttt{chapteratlist} in die Datei \texttt{scrkernel-listsof.dtx} verschoben}
-% Bei Büchern wird für jedes Verzeichnis des Besitzers \texttt{float} das
-% Feature \texttt{chapteratlist} gesetzt. Das gilt auch für solche
-% Verzeichnisse, die noch gar nicht definiert sind.
-%    \begin{macrocode}
-%<*book|report>
-\doforeachtocfile[float]{%
-  \setuptoc{\@currext}{chapteratlist}%
-}
-\AtAddToTocList[float]{%
-  \setuptoc{\@currext}{chapteratlist}%
-}
-%</book|report>
-%    \end{macrocode}
-%
-% \begin{macro}{\@pnumwidth}
-% \begin{macro}{\@tocrmarg}
-% \begin{macro}{\@dotsep}
-% Einige Makros für die Formatierung der Verzeichniseinträge:
-% \begin{description}
-% \item[\cs{@pnumwidth}] ist der Platz für die Seitenzahl.
-% \item[\cs{@tocrmarg}] ist der rechte Rand bei mehrzeiligen
-%   Verzeichniseinträgen. Dieser wird hier größer als \cs{@pnumwidth}
-%   gewählt.
-% \item[\cs{\@dotsep}] ist der Abstand zwischen den einzelnen
-%   Punkten.
-% \end{description}
-%    \begin{macrocode}
-\newcommand*\@pnumwidth{1.55em}
-\newcommand*\@tocrmarg {2.55em}
-\newcommand*\@dotsep{4.5}
-%    \end{macrocode}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-%
-% \begin{macro}{\before@starttoc}
-% \changes{v2.8q}{2001/11/14}{neu (intern)}%^^A
-% Dieses Makro führt im Falle von \texttt{tocleft} oder
-% \texttt{listsleft} am Anfang eines Verzeichnisses alle notwendigen
-% Änderungen durch, um das Verzeichnis entsprechend zu handhaben.
-% \begin{macro}{\scr@dottedtocline}
-% \changes{v2.9k}{2003/01/03}{auch das dritte Argument wird ge"andert}%^^A
-% \begin{macro}{\scr@numberline}
-% \changes{v3.06}{2010/05/18}{nicht länger benötigt}%^^A
-% \begin{macro}{\last@l@number}
-% Dafür werden ein paar Hilfsmakros benötigt, die vorsichtshalber
-% global vordefiniert werden.
-%    \begin{macrocode}
-\newcommand*{\scr@dottedtocline}{}
-\newcommand*{\last@l@number}{}
-%    \end{macrocode}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-% \begin{macro}{\@l@number}
-% \changes{v2.8q}{2001/11/14}{neu (intern)}%^^A
-% In diesem Makro wird während der Erstellung eines Verzeichnisses
-% Inhaltsverzeichnisses die aktuelle Breite der Nummer gespeichert.
-% \begin{macro}{\set@l@number}
-% \changes{v2.8q}{2001/11/14}{neu (intern)}%^^A
-% Dieses Makro ist dafür verantwortlich, dass zum einen \cs{@tempdima}
-% für den Aufruf von \cs{numberline@box} auf den richtigen Wert gesetzt
-% wird, zum anderen wird die aktuelle größte Breite der Nummer hier
-% angepasst.
-%    \begin{macrocode}
-\newcommand*{\@l@number}{}
-\newcommand*{\set@l@number}[1]{%
-  \settowidth{\@tempdima}{#1\enskip}%
-  \ifdim\@tempdima >\@l@number
-    \xdef\@l@number{\the\@tempdima}%
-  \fi%
-  \ifdim\@tempdima >\last@l@number \else
-    \setlength{\@tempdima}{\last@l@number}%
-  \fi%
-}
-%    \end{macrocode}
-% \end{macro}
-% \end{macro}
-% Kommen wir endlich zu \cs{before@starttoc}:
-% \changes{v2.95a}{2006/07/12}{Initialisierung im \cs{@empty}-Fall}
-% \changes{v3.06}{2010/05/18}{statt \cs{numberline} wird \cs{numberline@box}
-%     umdefiniert} 
-%    \begin{macrocode}
-\newcommand*{\before@starttoc}[1]{%
-  \let\scr@dottedtocline=\@dottedtocline
-  \renewcommand*{\@dottedtocline}[3]{%
-    \scr@dottedtocline{##1}{\z@}{\last@l@number}}%
-  \renewcommand*{\numberline@box}[1]{%
-    \set@l@number{##1}\hb@xt@\@tempdima{##1}}%
-  \gdef\@l@number{\z@}%
-  \@ifundefined{#1@l@number}{%
-    \def\last@l@number{2em}%
-  }{%
-    \expandafter\ifx\csname #1@l@number\endcsname\@empty
-      \let\last@l@number\z@
-    \else
-      \expandafter\let\expandafter\last@l@number
-      \expandafter=\csname#1@l@number\endcsname
-    \fi
-  }%
-%    \end{macrocode}
-% \changes{v3.20}{2015/11/26}{Vorbereitungen für Verzeichniseintragsstile
-%     via \texttt{scrkernel-tocstyle}}%^^A
-%    \begin{macrocode}
-  \begingroup
-    \def\do@endgroup{\endgroup}%
-    \def\do##1{%
-      \scr@ifundefinedorrelax{scr@tso@##1@numwidth}{}{%
-%<*trace>
-        \ClassInfo{\KOMAClassName}{%
-          Setting numwidth of `##1' to \last@l@number}%
-%</trace>
-        \l@addto@macro\do@endgroup{%
-          \@namedef{scr@tso@##1@numwidth}{\last@l@number}%
-        }%
-      }%
-      \scr@ifundefinedorrelax{scr@tso@##1@indent}{}{%
-%<*trace>
-        \ClassInfo{\KOMAClassName}{%
-          Setting indent of `##1' to \string\z@}%
-%</trace>
-        \l@addto@macro\do@endgroup{%
-          \@namedef{scr@tso@##1@indent}{\z@}%
-        }%
-      }%
-    }%
-    \@nameuse{scr@dte@donumwidth}%
-  \do@endgroup
-}
-%    \end{macrocode}
-% \end{macro}
-% \begin{macro}{\after@starttoc}
-% \changes{v2.8q}{2001/11/14}{neu (intern)}%^^A
-% Dieses Makro schreibt am Ende den entsprechenden Eintrag in die
-% \texttt{aux}-Datei.
-%    \begin{macrocode}
-\newcommand*{\after@starttoc}[1]{%
-  \protected@write\@auxout{}{%
-    \string\gdef\expandafter\string\csname#1@l@number\endcsname{%
-      \@l@number}}%
-  }
-%    \end{macrocode}
-% \end{macro}
-%
-% Dafür sorgen, dass die Verzeichnisse von \textsf{tocbasic} so gesetzt
-% werden, wie wir das gerne hätten (wird über einen Trick auch für das
-% Inhaltsverzeichnis verwendet):
-%    \begin{macrocode}
-\g@addto@macro\tocbasic@@before@hook{%
-  \if@dynlist\expandafter\before@starttoc\expandafter{\@currext}\fi
-}
-\g@addto@macro\tocbasic@@after@hook{%
-  \if@dynlist\expandafter\after@starttoc\expandafter{\@currext}\fi
-}
-%    \end{macrocode}
-%
-%
-% \subsection{Definitionen für das Inhaltsverzeichnis}
-%
-% \begin{macro}{\contentsname}
-% \begin{macro}{\listoftocname}
-% \changes{v3.00}{2008/07/03}{neu für Paket \textsf{tocbasic}}
-% Der Name des Verzeichnisses.
-%    \begin{macrocode}
-\newcommand*\contentsname{Contents}
-\newcommand*\listoftocname{\contentsname}
-%    \end{macrocode}
-% \end{macro}
-% \end{macro}
-%
-% \begin{Counter}{tocdepth}
-% Der Zähler gibt an, bis zu welcher Gliederungebene Einträge in das
-% Inhaltsverzeichnis aufgenommen werden. Da \textsf{scrartcl} eine
-% Ebene tiefer beginnt, wird auch eine Ebene tiefer eingetragen. Damit
-% finden sich -- abgesehen von \cs{part} -- immer drei Ebenen im
-% Inhaltsverzeichnis.
-%    \begin{macrocode}
-%<book|report>\setcounter{tocdepth}{2}
-%<article>\setcounter{tocdepth}{3}
-%    \end{macrocode}
-% \end{Counter}
-%
-% \begin{macro}{\toc@heading}
-% \changes{v2.3h}{1995/01/21}{neu (intern)}%^^A
-% \changes{v2.95}{2002/06/28}{auch für \textsf{scrreprt} und
-%     \textsf{scrbook}}
-% \changes{v3.00}{2008/07/04}{Verwendung von \cs{toc@heading} ist nicht
-%     länger empfohlen}
-% \changes{v3.10}{2011/08/31}{\cs{MakeMarkcase} wird beachtet}%
-%   Befehl, zum Setzen der Überschrift des Inhaltsverzeichnisses. Eigentlich
-%   ist das überflüssig, weil es nur einmal verwendet wird. Aus Gründen der
-%   Konsistenz mit den anderen Verzeichnissen machen wir das hier aber
-%   genauso.
-%    \begin{macrocode}
-\newcommand*\toc@heading{%
-  \ClassWarning{\KOMAClassName}{%
-    usage of deprecated \string\toc@heading!\MessageBreak
-    You should use the features of package `tocbasic'\MessageBreak
-    instead of \string\toc@heading.\MessageBreak
-    Definition of \string\toc@heading\space may be removed from\MessageBreak
-    KOMA-Script soon, so it should not be used
-  }%
-%<article>  \section*{\contentsname}%
-%<book|report>  \chapter*{\contentsname}%
-  \@mkboth{\MakeMarkcase{\contentsname}}{\MakeMarkcase{\contentsname}}%
-}
-%    \end{macrocode}
-% \end{macro}
-%
-% \begin{macro}{\toc@l@number}
-% \changes{v2.8q}{2001/11/14}{neu}%^^A
-% Dieses Makro wird innerhalb von \cs{tableofcontents} über
-% \cs{before@starttoc} und \cs{after@starttoc} in der
-% \texttt{aux}-Datei global definiert. Aus Sicherheitsgründen wird es
-% hier global vordefiniert.
-%    \begin{macrocode}
-\newcommand*{\toc@l@number}{}
-%    \end{macrocode}
-% \end{macro}
-%
-% \begin{macro}{\tableofcontents}
-% \changes{v2.3h}{1995/01/21}{Verwendung von \cs{toc@heading}}
-% \changes{v2.8l}{2001/08/16}{Gruppe eingefügt und \cs{parskip} auf
-%     0 gesetzt}
-% \changes{v2.8q}{2001/11/13}{\cs{@parskipfalse}%
-%     \cs{@parskip@indent}}
-% \changes{v2.8q}{2001/11/14}{\cs{if@tocleft} bearbeiten}
-% \changes{v2.95}{2002/06/28}{\textsf{article} beachtet ebenfalls
-%     \texttt{tocleft}}
-% \changes{v2.95}{2004/11/05}{\cs{@parskipfalse} und \cs{@parskip@indent}
-%     ersetzt}
-% \changes{v3.00}{2008/07/04}{auf \textsf{tocbasic} umgestellt}
-% Die Ausgabe des Inhaltsverzeichnisses.
-%    \begin{macrocode}
-\newcommand*{\tableofcontents}{%
-  \begingroup
-    \let\if@dynlist\if@tocleft
-    \expandafter\listoftoc\expandafter{\ext@toc}%
-  \endgroup
-}
-%    \end{macrocode}
-% \end{macro}
-%
-% \begin{macro}{\addtocentrydefault}
-% \changes{v3.08}{2010/11/01}{Neu}%^^A
-% \changes{v3.12}{2013/09/24}{Verwendung der neuen
-%     \texttt{tocbasic}-Anweisung \cs{tocbasic@addxcontentsline}}
-% Seit Version~3.08 werden Einträge ins Inhaltsverzeichnis in der
-% Voreinstellung über diese Anweisung vorgenommen. Das erste Argument ist
-% dabei die Gliederungsebene. Das zweite Argument ist die (formatierte)
-% Gliederungsnummer oder leer, falls die Überschrift nicht nummeriert
-% wird. Das dritte Argument ist der Überschriftentext, der in das
-% Inhaltsverzeichnis soll.
-%    \begin{macrocode}
-\newcommand{\addtocentrydefault}[3]{%
-  \expandafter\tocbasic@addxcontentsline\expandafter{\ext@toc}{#1}{#2}{#3}%
-}
-%    \end{macrocode}
-% \end{macro}
-%
-%
-% \subsection{Definitionen für die Verzeichnisse der
-%   Gleitumgebungen}
 %
 % \begin{macro}{\float@listhead}
-% \changes{v2.8b}{2001/06/26}{neu (für alle Paketautoren)}%
+% \changes{v2.8b}{2001/06/26}{neu (für alle Paketautoren)}%^^A
 % \changes{v2.8g}{2001/07/18}{\cs{float@headings} umbenannt in
-%     \cs{float@listhead}}%
-% \changes{v2.98c}{2008/03/05}{\cs{float@@listhead} wird verwendet}%
+%   \cs{float@listhead}}%^^A
+% \changes{v2.98c}{2008/03/05}{\cs{float@@listhead} wird verwendet}%^^A
 % \changes{v3.00}{2008/07/04}{Verwendung von \cs{float@listhead} ist nicht
-%     länger empfohlen}%
-% \changes{v3.10}{2011/08/31}{\cs{MakeMarkcase} wird beachtet}%
-%   In Absprache mit Anselm Lingnau, dem Autor des Pakets \textsf{float}, wird
-%   ab Version 2.8b \cs{float@headings} zum Setzen des Kolumnentitels bei den
-%   Verzeichnissen verwendet, die \textsf{float} für neu definierte floats zur
-%   Verfügung stellt. Dabei definiert \textsf{float} die Anweisung nur, wenn
-%   sie nicht bereits existiert. Die Zusammenarbeit wird dadurch
-%   verbessert. Da Anselm sich in letzter Minute entschlossen hat, das Makro
+%   länger empfohlen}%^^A
+% \changes{v3.10}{2011/08/31}{\cs{MakeMarkcase} wird beachtet}%^^A
+% In Absprache mit Anselm Lingnau, dem Autor des Pakets \textsf{float}, wird
+% ab Version 2.8b \cs{float@headings} zum Setzen des Kolumnentitels bei den
+% Verzeichnissen verwendet, die \textsf{float} für neu definierte floats zur
+% Verfügung stellt. Dabei definiert \textsf{float} die Anweisung nur, wenn
+% sie nicht bereits existiert. Die Zusammenarbeit wird dadurch
+% verbessert. Da Anselm sich in letzter Minute entschlossen hat, das Makro
 % \cs{float@listhead} zu nennen, wurde dies in Version 2.8g angepasst.
 %    \begin{macrocode}
+%<*body>
 \newcommand*{\float@listhead}[1]{%
   \scr@float@listhead@warning
   \float@@listhead{#1}%
@@ -998,14 +1055,17 @@
   }%
   \global\let\scr@float@addtolists@warning\relax
 }
+%</body>
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
 %
 % \begin{macro}{\listfigurename}
 % \changes{v3.25}{2017/10/10}{\cs{renewcommand} statt \cs{newcommand}}%^^A
+% \changes{v3.27}{2019/05/11}{auch als sprachabhängiger Bezeichner}%^^A
 % \begin{macro}{\listtablename}
 % \changes{v3.25}{2017/10/10}{\cs{renewcommand} statt \cs{newcommand}}%^^A
+% \changes{v3.27}{2019/05/11}{auch als sprachabhängiger Bezeichner}%^^A
 % \begin{macro}{\listoflofname}
 % \changes{v3.00}{2008/07/03}{neu für Paket \textsf{tocbasic}}
 % \changes{v3.25}{2017/10/10}{\cs{renewcommand} statt \cs{newcommand}}%^^A
@@ -1020,12 +1080,18 @@
 % \changes{v3.25}{2017/10/10}{\cs{renewcommand} statt \cs{newcommand}}%^^A
 % Die Namen der Verzeichnisse auch für das Paket \textsf{tocbasic}.
 %    \begin{macrocode}
+%<*body>
 \renewcommand*\listfigurename{List of Figures}
+\providecaptionname{american,australian.british,canadian,english,newzealand,%
+  UKenglish,ukenglish,USenglish,usenglish}\listfigurename{List of Figures}
 \renewcommand*\listoflofname{\listfigurename}
 \renewcommand*\listoflofentryname{\figurename}
 \renewcommand*\listtablename{List of Tables}
+\providecaptionname{american,australian.british,canadian,english,newzealand,%
+  UKenglish,ukenglish,USenglish,usenglish}\listtablename{List of Tables}
 \renewcommand*\listoflotname{\listtablename}
 \renewcommand*\listoflotentryname{\tablename}
+%</body>
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -1080,10 +1146,6 @@
 %   im \texttt{default}-Stil definiert}%^^A
 % \end{macro}
 %
-%
-% \iffalse
-%</body>
-% \fi
 %
 % \iffalse
 %</!letter>
