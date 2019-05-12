@@ -1,4 +1,4 @@
-% \CheckSum{1386}
+% \CheckSum{1404}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-tocstyle.dtx
@@ -1609,13 +1609,20 @@
 %</tocline>
 }]{%
 %    \end{macrocode}
+% \changes{v3.27}{2019/05/12}{Berücksichtigun von Verzeichniseigenschaft
+%   \texttt{noindent}}%^^A
 % Damit ist die Initialisierung abgeschlossen und wir kommen zur
 % Eintragsanweisung selbst:
 %    \begin{macrocode}
 %<*dottedtocline>
-  \@dottedtocline{\@nameuse{#1tocdepth}}{\@nameuse{scr@tso@#1@indent}}%
-                 {\@nameuse{scr@tso@#1@numwidth}}{##1}{##2}%
-%</dottedtocline>
+  \iftocfeature{\@currext}{noindent}{%
+    \@dottedtocline{\@nameuse{#1tocdepth}}{\z@}%
+                   {\@nameuse{scr@tso@#1@numwidth}}{##1}{##2}%
+  }{%
+    \@dottedtocline{\@nameuse{#1tocdepth}}{\@nameuse{scr@tso@#1@indent}}%
+                   {\@nameuse{scr@tso@#1@numwidth}}{##1}{##2}%
+  }%
+%</dottedtocline> 
 %<*undottedtocline|largetocline>
   \ifnum \c@tocdepth >\numexpr \@nameuse{#1tocdepth}-\@ne\relax
 %    \end{macrocode}
@@ -1671,10 +1678,14 @@
 % beibehalten.
 %    \begin{macrocode}
 %<undottedtocline>      \advance\leftskip\@tempdima
-      \advance\leftskip\@nameuse{scr@tso@#1@indent}%
+      \iftocfeature{\@currext}{noindent}{%
+%<undottedtocline>        \hskip -\leftskip
+      }{%
+        \advance\leftskip\@nameuse{scr@tso@#1@indent}%
 %<*undottedtocline>
-      \hskip -\dimexpr \leftskip-\@nameuse{scr@tso@#1@indent}\relax
+        \hskip -\dimexpr \leftskip-\@nameuse{scr@tso@#1@indent}\relax
 %</undottedtocline>
+      }%
       ##1%
 %<undottedtocline>      \nobreak
 %    \end{macrocode}
@@ -1750,7 +1761,9 @@
 % \end{macro}%^^A \@scr@dte@nosub
 % \end{macro}%^^A \scr@dte@nosub
 % \begin{macro}{\scr@dte@tocline}
-% \changes{v3.20}{2015/11/22}{neu (intern)}
+% \changes{v3.20}{2015/11/22}{neu (intern)}%^^A
+% \changes{v3.27}{2019/05/12}{Berücksichtigun von Verzeichniseigenschaft
+%   \texttt{noindent}}%^^A
 % In gewisser Weise entspricht diese Anweisung der \LaTeX-Kern-Anweisung
 % \cs{dottedtocline}. Allerdings werden hier vielfältige
 % Eingriffsmöglichkeiten untersützt, die jeweils durch Optionen gesteuert
@@ -1772,13 +1785,21 @@
     \tocbasic@DependOnPenaltyAndTOCLevel{#1}%
     \addvspace{\@nameuse{scr@tso@#1@beforeskip}}\relax
     {%
-      \leftskip \@nameuse{scr@tso@#1@indent}\relax 
+      \iftocfeature{\@currext}{noindent}{%
+        \leftskip \z@
+      }{%
+        \leftskip \@nameuse{scr@tso@#1@indent}\relax
+      }%
       \rightskip \@tocrmarg
       \parfillskip -\rightskip
       \@nameuse{Ifscr@tso@#1@raggedpage}{%
         \addtolength{\parfillskip}{\z@ \@plus 1fil}%
       }{}%
-      \parindent \@nameuse{scr@tso@#1@indent}\relax
+      \iftocfeature{\@currext}{noindent}{%
+        \parindent \z@
+      }{%
+        \parindent \@nameuse{scr@tso@#1@indent}\relax
+      }%
       \@afterindenttrue
       \interlinepenalty\@M
 %    \end{macrocode}
