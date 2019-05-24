@@ -1,4 +1,4 @@
-% \CheckSum{1404}
+% \CheckSum{1439}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-tocstyle.dtx
@@ -1180,6 +1180,17 @@
   \DefineTOCEntryCommandOption{pagenumberformat}%
     {scr@tso@}{@pagenumberformat}[1]{page number format}%
 %    \end{macrocode}
+% \changes{v3.27}{2019/05/24}{neue Option \texttt{pagenumberwidth}}%^^A
+% \changes{v3.27}{2019/05/24}{neue Option \texttt{rightindent}}%^^A
+% Die Optionen \texttt{pagenumberwidth} und \texttt{rightindent} ersetzen
+% innerhalb des Stils \texttt{tocline} die Makros \cs{@pnumwidth} und
+% \cs{@tocrmarg}.
+%    \begin{macrocode}
+  \DefineTOCEntryLengthOption{pagenumberwidth}%
+    {scr@tso@}{@pagenumberwidth}{width of page number box}%
+  \DefineTOCEntryLengthOption{rightindent}%
+    {scr@tso@}{@rightindent}{entry's text right indent}%
+%    \end{macrocode}
 % \changes{v3.21}{2016/06/06}{neue Option \texttt{raggedentrytext}}%^^A
 % Die Option \texttt{raggedentrytext} muss leider etwas umständlich definiert
 % werden, damit sie mit der früheren Definition eines Makros
@@ -1288,6 +1299,39 @@
 % Kompatibilität mit älteren \KOMAScript-Klassen.
 %    \begin{macrocode}
       \@namedef{scr@tso@#1@indent}{\@nameuse{scr@#1@tocindent}}%
+    }%
+  }{}%
+%</tocline>
+%    \end{macrocode}
+% Die Breite der Seitenzahlbox und der rechte Einzug können ebenfalls aus den
+% Elternelementen gebildet werden, allerdings muss hier nur der Wert
+% übernommen werden.
+%    \begin{macrocode}
+%<*tocline>
+  \scr@ifundefinedorrelax{scr@tso@#1@pagenumberwidth}{%
+    \ifstrstart{#1}{sub}{%
+      \scr@ifundefinedorrelax{scr@tso@\scr@dte@nosub{#1}@pagenumberwidth}{%
+        \@namedef{scr@tso@#1@pagenumberwidth}{\@pnumwidth}%
+      }{%
+        \expandafter\let
+        \csname scr@tso@#1@pagenumberwidth\expandafter\endcsname
+        \csname scr@tso@\scr@dte@nosub{#1}@pagenumberwidth\endcsname
+      }%
+    }{%
+      \@namedef{scr@tso@#1@pagenumberwidth}{\@pnumwidth}%
+    }%
+  }{}%
+  \scr@ifundefinedorrelax{scr@tso@#1@rightindent}{%
+    \ifstrstart{#1}{sub}{%
+      \scr@ifundefinedorrelax{scr@tso@\scr@dte@nosub{#1}@rightindent}{%
+        \@namedef{scr@tso@#1@rightindent}{\@tocrmarg}%
+      }{%
+        \expandafter\let
+        \csname scr@tso@#1@rightindent\expandafter\endcsname
+        \csname scr@tso@\scr@dte@nosub{#1}@rightindent\endcsname
+      }%
+    }{%
+      \@namedef{scr@tso@#1@rightindent}{\@tocrmarg}%
     }%
   }{}%
 %</tocline>
@@ -1604,7 +1648,7 @@
 %    \begin{macrocode}
   \expandafter\providecommand%
   \csname scr@tso@#1@pagenumberbox\endcsname[1]{%
-    \hb@xt@\@pnumwidth{\hfil ##1}}%
+    \hb@xt@\@nameuse{scr@tso@#1@pagenumberwidth}{\hfil ##1}}%
   \expandafter\providecommand\csname Ifscr@tso@#1@dynnumwidth\endcsname[2]{##2}%
 %</tocline>
 }]{%
@@ -1790,7 +1834,7 @@
       }{%
         \leftskip \@nameuse{scr@tso@#1@indent}\relax
       }%
-      \rightskip \@tocrmarg
+      \rightskip \@nameuse{scr@tso@#1@rightindent}\relax
       \parfillskip -\rightskip
       \@nameuse{Ifscr@tso@#1@raggedpage}{%
         \addtolength{\parfillskip}{\z@ \@plus 1fil}%
