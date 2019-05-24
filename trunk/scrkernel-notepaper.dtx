@@ -1,4 +1,3 @@
-% \CheckSum{4798}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-notepaper.dtx
@@ -2210,6 +2209,7 @@
 \newcommand*{\scr@notepaper@subelement@addressee@default}{%
   \setbox\@tempboxa\vbox {%
     \hsize=\useplength{toaddrwidth}\linewidth=\hsize
+    \color@begingroup
     \if@baddr
       \ifkomavarempty{backaddress}{}{%
         \def\\{\usekomavar{backaddressseparator}\@ogobble}%
@@ -2217,6 +2217,7 @@
           \usekomavar{backaddress}}%
       }%
     \fi
+    \color@endgroup  
   }%
   \ifdim \dimexpr\ht\@tempboxa+\dp\@tempboxa>\useplength{backaddrheight}\relax
     \PackageWarning{scrletter}{Element `backaddress' to high.\MessageBreak
@@ -2243,15 +2244,19 @@
     \@tempdima=\z@
   }{%
     \setbox\@tempboxa\vbox{\hsize\useplength{toaddrwidth}%
+      \color@begingroup
       \noindent\hspace*{\useplength{specialmailindent}}%
       \specialmail@format{%
         \usekomafont{specialmail}\usekomavar{specialmail}}%
-      \hspace*{\useplength{specialmailrightindent}}}%
+      \hspace*{\useplength{specialmailrightindent}}%
+      \color@endgroup
+    }%
     \copy\@tempboxa
     \@tempdima=\dimexpr\ht\@tempboxa+\dp\@tempboxa\relax
   }%
   \setbox\@tempboxa\vbox{%
     \hsize\dimexpr \useplength{toaddrwidth}-2\useplength{toaddrindent}\relax
+    \color@begingroup
     \raggedright
     \usekomafont{addressee}{%
 %<*package>
@@ -2260,6 +2265,7 @@
 %<class>      {\usekomafont{toname}{\usekomavar{toname}\\}}%
 %<class>      {\usekomafont{toaddress}{\usekomavar{toaddress}\par}}%
     }%
+    \color@endgroup
   }%
   \ifnum\@afieldmode=\@ne
 %    \end{macrocode}
@@ -2824,13 +2830,16 @@
 \newcommand{\put@@notepaper@@element}{}
 \long\def\put@@notepaper@@element(#1,#2)(#3,#4)#5#6[#7]{%
   \put(\LenToUnit{\dimexpr #1\relax},\LenToUnit{-\dimexpr #2\relax}){%
-    \setbox\@tempboxa \vtop{\vskip \z@
+    \setbox\@tempboxa \vtop{%
+      \color@begingroup
+      \vskip \z@
       \hsize=\dimexpr #3\relax
       \linewidth=\hsize
       \columnwidth=\linewidth
       \textwidth=\columnwidth
       \parfillskip=\z@ \@plus 1fil\relax
-      #6%
+      #6
+      \color@endgroup
     }%
     #7%
     \ifdim \dimexpr\ht\@tempboxa+\dp\@tempboxa\relax > \dimexpr #4\relax
@@ -2913,7 +2922,7 @@
 % Ausserdem wird ein vertikales Äquivalent zu |\rlap| benötigt.
 %    \begin{macrocode}
 \newcommand{\vb@t@z}[1]{{%
-    \setbox\z@\vbox to\z@{#1\vss}%
+    \setbox\z@\vbox to\z@{\color@begingroup #1\color@endgroup\vss}%
     \setparsizes{\z@}{\z@}{\z@ plus 1fil}\par@updaterelative
     \setlength{\baselineskip}{\z@}%
     \setlength{\@tempdima}{\ht0}\addtolength{\@tempdima}{\dp0}%
@@ -3137,7 +3146,7 @@
   \begingroup%
     \vbox to #2{#1#3}%
     \if@savevbox@warning\@savevbox@warningfalse%
-      \setbox\z@\vbox{#3}%
+      \setbox\z@\vbox{\color@begingroup #3\color@endgroup}%
       \setlength{\@tempdima}{#2}%
       \setlength{\@tempdimb}{\ht0}\addtolength{\@tempdimb}{\dp0}%
       \ifdim \@tempdimb>\@tempdima%
