@@ -1,4 +1,4 @@
-% \CheckSum{4713}
+% \CheckSum{4750}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -3020,6 +3020,46 @@
   \AtBeginDocument{%
     \@ifpackageloaded{bookmark}{}{%
       \if@scr@autoloadbookmarkpackage
+%    \end{macrocode}
+% \changes{v3.27}{2019/06/26}{try to translate \textsf{hyperref} driver to
+%  \textsf{bookmark} driver option}%^^A
+% The name of the \textsf{hyperref} driver is in \cs{Hy@driver}. But
+% \textsf{bookmark} does not provide the same drivers, so we try to translate
+% the curreny known \textsf{hyperref} drivers to \textsf{bookmark}
+% drivers. Also we do not load \textsf{bookmark} with a driver option but
+% define \textsf{bookmark}'s \cs{BookmarkDriverDefault}.
+%    \begin{macrocode}
+        \scr@ifundefinedorrelax{Hy@driver}{%
+          \ClassWarning{\KOMAClassName}{%
+            `hyperref' loaded but `\string\Hy@driver' undefined.\MessageBreak
+            This should not happen!\MessageBreak
+            Maybe `hyperref' not loaded or unknown version?%
+          }%
+        }{%
+%    \end{macrocode}
+% Note: \texttt{hpdftex}, \texttt{hluatex}, \texttt{hxetex} and \texttt{hvtex}
+% do not need to be translated, because they are autodetected by
+% \textsf{bookmark} as well. \texttt{hypertex}, \texttt{hdviwindo},
+% \texttt{htex4ht} and \texttt{latex2html} are not known by \textsf{bookmark},
+% so we stay with the default (usually \texttt{dvips}).
+%    \begin{macrocode}
+          \ifstr{\Hy@driver}{hdvips}{%
+            \providecommand*{\BookmarkDriverDefault}{dvips}%
+          }{%
+            \ifstr{\Hy@driver}{hdvipdfm}{%
+              \providecommand*{\BookmarkDriverDefault}{dvipdfm}%
+            }{%
+              \ifstr{\Hy@driver}{hdvipson}{%
+                \providecommand*{\BookmarkDriverDefault}{dvipsone}%
+              }{%
+                \ifstr{\Hy@driver}{htexture}{%
+                  \providecommand*{\BookmarkDriverDefault}{textures}%
+                }{%
+                }%
+              }%
+            }%
+          }%
+        }%
         \ClassInfo{\KOMAClassName}{%
           loading recommended package `bookmark'.\MessageBreak
           Using `bookmark' together with `hyperref' is
@@ -3029,8 +3069,11 @@
           option\MessageBreak
           `bookmarkpackage=false' before \string\begin{document}
           and\MessageBreak
-          you can avoid this message with
-          `\string\usepackage{bookmark}'\MessageBreak
+          you can avoid this message adding:\MessageBreak
+          \space\space\string\usepackage
+          \scr@ifundefinedorrelax{BookmarkDriverDefault}{}{%
+            [\BookmarkDriverDefault]%
+          }{bookmark}\MessageBreak
           before \string\begin{document}%
         }%
         \RequirePackage{bookmark}%
@@ -3044,15 +3087,18 @@
         \else
           \if@filesw
             \ClassWarning{\KOMAClassName}{%
-              seems someone has broken package auxhook.\MessageBreak
-              Usually this happens, if auxhook is loaded or used\MessageBreak
+              seems someone has broken package `auxhook'.\MessageBreak
+              Usually this happens, if `auxhook' is loaded or used\MessageBreak
               implicitly or explicitly by patching
-              `\string\document'%
+              \string\document%
               \scr@ifundefinedorrelax{AtEndPreamble}{}{%
                 \MessageBreak
-                or via etoolbox command \string\AtEndPreamble
+                or via etoolbox command \string\AtEndPreamble%
               }.\MessageBreak
-              Trying an emergency workaround%
+              Trying an emergency workaround.\MessageBreak
+              You can avoid this warning adding:\MessageBreak
+              \space\space\string\usepackage{auxhook}\MessageBreak
+              before \string\begin{document}%
             }%
             \@beginmainauxhook
           \fi
