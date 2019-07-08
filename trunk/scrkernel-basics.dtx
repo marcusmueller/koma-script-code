@@ -1,4 +1,4 @@
-% \CheckSum{4054}
+% \CheckSum{4087}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -3820,19 +3820,22 @@
 % \begin{macro}{\FamilySetBool}
 % \changes{v3.00}{2008/04/30}{Neue Anweisung}%^^A
 % \changes{v3.11a}{2012/05/25}{Argument in Fehlermeldung korrigiert}%^^A
+% \changes{v3.27}{2019/07/08}{Leeres Argument ist \texttt{true}}%^^A
 % Über diese Anweisung wird der Wert dann gesetzt. Dabei ist das erste
 % Argument die Familie, das zweite der Name des Schlüssels, das dritte der
 % Schalter und das vierte schließlich der gewünschte Wert.
 %    \begin{macrocode}
 \newcommand*{\FamilySetBool}[4]{%
-  \ifstr{#4}{true}{\@nameuse{#3true}\FamilyKeyStateProcessed}{%
-    \ifstr{#4}{on}{\@nameuse{#3true}\FamilyKeyStateProcessed}{%
-      \ifstr{#4}{yes}{\@nameuse{#3true}\FamilyKeyStateProcessed}{%
-        \ifstr{#4}{false}{\@nameuse{#3false}\FamilyKeyStateProcessed}{%
-          \ifstr{#4}{off}{\@nameuse{#3false}\FamilyKeyStateProcessed}{%
-            \ifstr{#4}{no}{\@nameuse{#3false}\FamilyKeyStateProcessed}{%
-              \FamilyUnknownKeyValue{#1}{#2}{#4}{%
-                `true', `on', `yes', `false', `off', `no'%
+  \ifstr{#4}{}{\@nameuse{#3true}\FamilyKeyStateProcessed}{%
+    \ifstr{#4}{true}{\@nameuse{#3true}\FamilyKeyStateProcessed}{%
+      \ifstr{#4}{on}{\@nameuse{#3true}\FamilyKeyStateProcessed}{%
+        \ifstr{#4}{yes}{\@nameuse{#3true}\FamilyKeyStateProcessed}{%
+          \ifstr{#4}{false}{\@nameuse{#3false}\FamilyKeyStateProcessed}{%
+            \ifstr{#4}{off}{\@nameuse{#3false}\FamilyKeyStateProcessed}{%
+              \ifstr{#4}{no}{\@nameuse{#3false}\FamilyKeyStateProcessed}{%
+                \FamilyUnknownKeyValue{#1}{#2}{#4}{%
+                  `true', `on', `yes', `false', `off', `no'%
+                }%
               }%
             }%
           }%
@@ -3846,6 +3849,37 @@
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
+% \selectlanguage{english}
+% \begin{macro}{\FamilyInverseBoolKey}
+% \changes{3.27}{2019/07/08}{new}
+% \begin{macro}{\FamilySetInverseBool}
+% \changes{3.27}{2019/07/08}{new}
+% These are similar to \cs{FamilyBoolKey} and \cs{FamilySetBoolKey} but use
+% inverse logic (true sets false and false sets true).
+%    \begin{macrocode}
+%<*base>
+\newcommand*{\FamilyInverseBoolKey}[4][.\@currname.\@currext]{%
+  \@ifundefined{if#4}{%
+    \expandafter\newif\csname if#4\endcsname
+    \@nameuse{#4true}%
+  }{}%
+  \DefineFamilyKey[{#1}]{#2}{#3}[true]{\FamilySetInverseBool{#2}{#3}{#4}{##1}}%
+}
+\newcommand*{\FamilySetInverseBool}[4]{%
+  \FamilySetBool{#1}{#2}{#3}{#4}%
+  \ifx\FamilyKeyState\FamilyKeyStateProcessed
+    \expandafter\ifx\csname if#3\expandafter\endcsname\csname iftrue\endcsname
+      \@nameuse{#3false}%
+    \else
+      \@nameuse{#3true}%
+    \fi
+  \fi
+}
+%</base>
+%    \end{macrocode}
+% \end{macro}%^^A \FamilySetInverseBool
+% \end{macro}%^^A \FamilyInverseBoolKey
+% \selectlanguage{ngerman}
 %
 % \begin{macro}{\KOMA@unknown@keyval}
 % Dieses Makro berichtet über Fehler wegen unbekannter Wertübergabe an
