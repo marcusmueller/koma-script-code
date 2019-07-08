@@ -1,4 +1,4 @@
-% \CheckSum{1600}
+% \CheckSum{1610}
 % \iffalse meta-comment
 % ======================================================================
 % tocbasic.dtx
@@ -108,6 +108,7 @@
       \from{scrkernel-tocstyle.dtx}{package,style,undottedtocline}%
       \from{scrkernel-tocstyle.dtx}{package,style,largetocline}%
       \from{scrkernel-tocstyle.dtx}{package,style,tocline}%
+      \from{scrkernel-tocstyle.dtx}{package,style,toctext}%
       \from{scrkernel-tocstyle.dtx}{package,style,default}%
       \from{tocbasic.dtx}{package,exit}%
       \from{scrlogo.dtx}{logo}%
@@ -742,6 +743,7 @@
 %
 % \begin{macro}{\tocbasic@starttoc}
 % \changes{v3.17}{2015/03/23}{usage of feature \texttt{noparskipfake}}%^^A
+% \changes{v3.27}{2019/07/08}{hack to add \cs{par} at end of (main) file}%^^A
 % Some basics are done like setting up \cs{parskip}, \cs{parindent} and
 % \cs{parfillskip}, a general hook will be called, an individual hook will
 % be called, the toc will be started, an individual hook will be called, an
@@ -764,6 +766,10 @@
     \setlength{\parfillskip}{\z@\@plus 1fil}%
     \csname tocbasic@@before@hook\endcsname
     \csname tb@#1@before@hook\endcsname
+    \let\tocbasic@saved@input\@input
+    \def\@input##1{%
+      \let\@input\tocbasic@saved@input\@input{##1}\par
+    }%
     \@starttoc{#1}%
     \csname tb@#1@after@hook\endcsname
     \csname tocbasic@@after@hook\endcsname

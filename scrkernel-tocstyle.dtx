@@ -1,4 +1,4 @@
-% \CheckSum{1439}
+% \CheckSum{1568}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-tocstyle.dtx
@@ -1138,8 +1138,17 @@
 % Das hingegen wird der hochflexible Stil für Verzeichniseinträge, die aus
 % einer oder mehreren Zeilen bestehen. Dieser wird später über diverse
 % Hilfsmakros definiert.
+% \begin{macro}{\scr@dte@def@l@toctext}
+% \changes{3.27}{2019/07/08}{neuer Verzeichniseintragsstil
+%   \texttt{toctext}}%^^A
+% Während alle bisherigen Stile Zeilen oder eigentlich Absätze im Verzeichnis
+% erstellen, soll dieser Stil lediglich Text innerhalb eines Absatzes
+% erzeugen. Die einzelnen Einträge werden also hintereinander
+% ausgegeben. Dabei können auch Zeilenumbrüche innerhalb eines Eintrags
+% vorkommen. Dieser Stil teilt einige, wenige Optionen mit dem Stil
+% \texttt{tocline}. Die Stile haben aber auch eigene Optionen.
 %    \begin{macrocode}
-%<*dottedtocline|undottedtocline|largetocline|tocline>
+%<*dottedtocline|undottedtocline|largetocline|tocline|toctext>
 %<*dottedtocline>
 %%%            (run: style,dottedtocline)
 \DeclareTOCEntryStyle{dottedtocline}[{%
@@ -1152,6 +1161,10 @@
 %%%            (run: style, largetocline)
 \DeclareTOCEntryStyle{largetocline}[{%
 %</largetocline>
+%<*toctext>
+%%%            (run: style,toctext)
+\DeclareTOCEntryStyle{toctext}[{%
+%</toctext>
 %<*tocline>
 %%%            (run: style,tocline)
 \DeclareTOCEntryStyle{tocline}[{%
@@ -1161,24 +1174,51 @@
     {scr@tso@}{@breakafternumber}{line break after number flag}%
   \DefineTOCEntryIfOption{dynnumwidth}%
     {scr@tso@}{@dynnumwidth}{dynamic number width flag}%
+%</tocline>
+%<*tocline|toctext>
   \DefineTOCEntryCommandOption{entryformat}%
     {scr@tso@}{@entryformat}[1]{entry format}%
   \DefineTOCEntryCommandOption{entrynumberformat}%
     {scr@tso@}{@numberformat}[1]{entry number format}%
+%</tocline|toctext>
+%<*tocline>
   \DefineTOCEntryCommandOption{linefill}[\TOCLineLeaderFill]%
     {scr@tso@}{@linefill}{filling between text and page number}%
+%</tocline>
+%<*toctext>
+  \DefineTOCEntryCommandOption{prepagenumber}%
+    {scr@tso@}{@prepagenumber}{separator between text and page number}%
+%</toctext>
+%<*tocline|toctext>
   \DefineTOCEntryLengthOption{numsep}%
     {scr@tso@}{@numsep}{entry number separation}%
+%</tocline|toctext>
+%<*tocline>
   \DefineTOCEntryCommandOption{onstarthigherlevel}%
     {scr@tso@}{@LastTOCLevelWasLower}{start higher level entry hook}%
   \DefineTOCEntryCommandOption{onstartlowerlevel}%
     {scr@tso@}{@LastTOCLevelWasHigher}{start lower level entry hook}%
   \DefineTOCEntryCommandOption{onstartsamelevel}%
     {scr@tso@}{@LastTOCLevelWasSame}{start same level entry hook}%
+%</tocline>
+%<*toctext>
+  \DefineTOCEntryCommandOption{onstartfirstentry}%
+    {scr@tso@}{@onstartfirstentry}{output at start of paragraph}%
+  \DefineTOCEntryCommandOption{onstartentry}%
+    {scr@tso@}{@onstartentry}{output at start of all entries but the first}%
+  \DefineTOCEntryCommandOption{onendlastentry}%
+    {scr@tso@}{@onendlastentry}{output at end of paragraph}%
+  \DefineTOCEntryCommandOption{onendentry}%
+    {scr@tso@}{@onendentry}{output at end of all entries but the last}%
+%</toctext>
+%<*tocline>
   \DefineTOCEntryCommandOption{pagenumberbox}%
     {scr@tso@}{@pagenumberbox}[1]{page number box}%
+%</tocline>
+%<*tocline|toctext> 
   \DefineTOCEntryCommandOption{pagenumberformat}%
     {scr@tso@}{@pagenumberformat}[1]{page number format}%
+%</tocline|toctext>  
 %    \end{macrocode}
 % \changes{v3.27}{2019/05/24}{neue Option \texttt{pagenumberwidth}}%^^A
 % \changes{v3.27}{2019/05/24}{neue Option \texttt{rightindent}}%^^A
@@ -1186,16 +1226,21 @@
 % innerhalb des Stils \texttt{tocline} die Makros \cs{@pnumwidth} und
 % \cs{@tocrmarg}.
 %    \begin{macrocode}
+%<*tocline>
   \DefineTOCEntryLengthOption{pagenumberwidth}%
     {scr@tso@}{@pagenumberwidth}{width of page number box}%
+%</tocline>
+%<*tocline|toctext>
   \DefineTOCEntryLengthOption{rightindent}%
     {scr@tso@}{@rightindent}{entry's text right indent}%
+%</tocline|toctext>  
 %    \end{macrocode}
 % \changes{v3.21}{2016/06/06}{neue Option \texttt{raggedentrytext}}%^^A
 % Die Option \texttt{raggedentrytext} muss leider etwas umständlich definiert
 % werden, damit sie mit der früheren Definition eines Makros
 % \cs{raggedchapterentry} halbwegs kompatibel ist.
 %    \begin{macrocode}
+%<*tocline>
   \DefineTOCEntryOption{raggedentrytext}[true]{%
     \FamilySetBool{KOMAarg}{raggedentrytext}{@tempswa}{##1}%
     \ifx\FamilyKeyState\FamilyKeyStateProcessed
@@ -1211,6 +1256,10 @@
   \DefineTOCEntryIfOption{raggedpagenumber}%
     {scr@tso@}{@raggedpage}{page number ragged flag}%
 %</tocline>
+%<*toctext>
+  \DefineTOCEntryIfOption{raggedright}%
+    {scr@tso@}{@raggedright}{use raggedright for the whole paragraph}%
+%</toctext>
   \DefineTOCEntryLengthOption{indent}%
     {scr@tso@}{@indent}{entry indent}%
 %<*dottedtocline|undottedtocline|tocline>
@@ -1223,7 +1272,7 @@
 % um eins erhöht verwendet, falls die Elternebene bereits definiert ist.
 % \changes{v3.21}{2016/06/09}{\cs{the} eingefügt}%^^A
 %    \begin{macrocode}
-%<*tocline>
+%<*tocline|toctext>
   \scr@ifundefinedorrelax{#1tocdepth}{%
     \ifstrstart{#1}{sub}{%
       \scr@ifundefinedorrelax{\scr@dte@nosub{#1}tocdepth}{}{%
@@ -1233,7 +1282,7 @@
       }%
     }{}%
   }{}%
-%</tocline>
+%</tocline|toctext>
 %    \end{macrocode}
 % War der Weg über Elternebenen nicht erfolgreich oder wurde er nicht
 % verwendet, so werden Standardwerte angenommen, wie sie bei den
@@ -1268,7 +1317,7 @@
 %    \end{macrocode}
 % Der Einzug kann wie der Level aus der Elternebene gebildet werden
 %    \begin{macrocode}
-%<*tocline>
+%<*tocline|toctext>
   \scr@ifundefinedorrelax{scr@tso@#1@indent}{%
     \@ifundefined{scr@#1@tocindent}{%
       \ifstrstart{#1}{sub}{%
@@ -1301,7 +1350,7 @@
       \@namedef{scr@tso@#1@indent}{\@nameuse{scr@#1@tocindent}}%
     }%
   }{}%
-%</tocline>
+%</tocline|toctext>
 %    \end{macrocode}
 % Die Breite der Seitenzahlbox und der rechte Einzug können ebenfalls aus den
 % Elternelementen gebildet werden, allerdings muss hier nur der Wert
@@ -1321,6 +1370,8 @@
       \@namedef{scr@tso@#1@pagenumberwidth}{\@pnumwidth}%
     }%
   }{}%
+%</tocline>
+%<*tocline|toctext>
   \scr@ifundefinedorrelax{scr@tso@#1@rightindent}{%
     \ifstrstart{#1}{sub}{%
       \scr@ifundefinedorrelax{scr@tso@\scr@dte@nosub{#1}@rightindent}{%
@@ -1334,7 +1385,7 @@
       \@namedef{scr@tso@#1@rightindent}{\@tocrmarg}%
     }%
   }{}%
-%</tocline>
+%</tocline|toctext>
 %    \end{macrocode}
 % War das nicht erfolgreich oder wird es nicht genutzt, so werden
 % Standardwerte verwendet, die sowohl für die Standardklasse als auch die
@@ -1544,14 +1595,32 @@
 %    \begin{macrocode}
   \expandafter\providecommand\expandafter*%
   \csname scr@tso@#1@numsep\endcsname{.4em}%
+%</tocline>
+%    \end{macrocode}
+% Beim Absatzstil gibt es die Möglichkeit, am Anfang des Absatzes, zwischen
+% den Einträgen und am Ende der Einträge und nach dem letzten Eintrag einen
+% speziellen Text ausgeben zu lassen.
+%    \begin{macrocode}
+%<*toctext>
+  \expandafter\providecommand%
+  \csname scr@tso@#1@onstartfirstentry\endcsname{}%
+  \expandafter\providecommand%
+  \csname scr@tso@#1@onstartentry\endcsname{}%
+  \expandafter\providecommand%
+  \csname scr@tso@#1@onendlastentry\endcsname{}%
+  \expandafter\providecommand%
+  \csname scr@tso@#1@onendentry\endcsname{\quad}%
+%</toctext>
 %    \end{macrocode}
 % Jede Ebene kann ihre eigene Formatierungsanweisung für die Nummer haben.
 % Jede Ebene kann auch ihre eigene Formatierungsanweisung für Nummer und Text
 % haben. Für \texttt{part} wird hier die Voreinstellung der Standardklassen
 % verwendet.
 %    \begin{macrocode}
+%<*tocline|toctext>
   \expandafter\providecommand%
   \csname scr@tso@#1@numberformat\endcsname[1]{##1}%
+%<*tocline>
   \ifstr{#1}{part}{%
     \expandafter\providecommand%
     \csname scr@tso@#1@entryformat\endcsname[1]{\large\bfseries ##1}%
@@ -1566,16 +1635,21 @@
           \csname scr@tso@#1@entryformat\endcsname[1]{\bfseries ##1}%
         }{}%
       }{}%
+%</tocline>
       \expandafter\providecommand%
       \csname scr@tso@#1@entryformat\endcsname[1]{##1}%
+%<*tocline>      
     }%
   }%
+%</tocline>
+%</tocline|toctext>
 %    \end{macrocode}
 % Nach der Nummer kann wahlweise ein Zeilenumbruch erfolgen, wobei in diesem
 % Fall der Text wieder auf Höhe der Nummer und nicht erst danach
 % erfolgt. Gesteuert wird das über einen Schalter. In der Voreinstellung
 % machen wird das nicht.
 %    \begin{macrocode}
+%<*tocline>
   \expandafter\providecommand
   \csname Ifscr@tso@#1@breakafternumber\endcsname[2]{##2}%
 %    \end{macrocode}
@@ -1651,9 +1725,23 @@
     \hb@xt@\@nameuse{scr@tso@#1@pagenumberwidth}{\hfil ##1}}%
   \expandafter\providecommand\csname Ifscr@tso@#1@dynnumwidth\endcsname[2]{##2}%
 %</tocline>
+%    \end{macrocode}
+% \changes{v3.27}{2019/07/08}{Initialisierung von \texttt{raggedentry}}%^^A
+% \changes{v3.27}{2019/07/08}{Initialisierung von \texttt{prepagenumber}}%^^A
+% Im Stil \texttt{toctext} muss außerdem initialisiert werden, ob der Eintrag
+% im Flattersatz oder im Blocksatz gesetzt werden soll und was unmittelbar vor
+% der Seitenzahl auszugeben ist (\texttt{linefill} wäre dafür eine unpassende
+% Bezeichnung).
+%    \begin{macrocode}
+%<*toctext>
+  \expandafter\providecommand%
+  \csname Ifscr@tso@#1@raggedright\endcsname[2]{##2}%
+  \expandafter\providecommand%
+  \csname scr@tso@#1@prepagenumber\endcsname{\nobreakspace}%
+%</toctext>
 }]{%
 %    \end{macrocode}
-% \changes{v3.27}{2019/05/12}{Berücksichtigun von Verzeichniseigenschaft
+% \changes{v3.27}{2019/05/12}{Berücksichtigung von Verzeichniseigenschaft
 %   \texttt{noindent}}%^^A
 % Damit ist die Initialisierung abgeschlossen und wir kommen zur
 % Eintragsanweisung selbst:
@@ -1756,9 +1844,13 @@
 %<*tocline>
   \scr@dte@tocline{#1}{##1}{##2}%
 %</tocline>
+%<*toctext>
+  \scr@dte@toctext{#1}{##1}{##2}%
+%</toctext>
 }
-%</dottedtocline|undottedtocline|largetocline|tocline>
+%</dottedtocline|undottedtocline|largetocline|tocline|toctext>
 %    \end{macrocode}
+% \end{macro}%^^A \scr@dte@def@l@toctext
 % \end{macro}%^^A \scr@dte@def@l@tocline
 % \end{macro}%^^A \scr@dte@def@l@largetocline
 % \end{macro}%^^A \scr@dte@def@l@undottedtocline
@@ -2015,6 +2107,114 @@
 %    \end{macrocode}
 % \end{macro}%^^A \TOCLineLeaderFill
 % \end{macro}%^^A \scr@dte@tocline
+%
+% \selectlanguage{english}
+% \begin{macro}{\scr@dte@toctext}
+% \changes{v3.27}{2019/07/08}{new (internal)}%^^A
+% This is the command to format entries that will be accumalted into a single
+% paragraph. This is somehow special, because the settings of one entrie can
+% influence another one. The three arguments are:
+% \begin{description}
+% \item[\marg{level}:] The name \meta{string} of the entry level.
+% \item[\marg{entry}:] The ToC entry \meta{string}.
+% \item[\marg{pagenumber}:] The page number \meta{string} of the ToC entry.
+% \end{description}
+%    \begin{macrocode}
+%<*toctext>
+\newcommand*{\scr@dte@toctext}[3]{%
+  \ifnum \@nameuse{#1tocdepth}>\c@tocdepth
+  \else
+    \ifhmode
+%    \end{macrocode}
+% In h-mode their is already output of a previous text entry. So the end code
+% of that previous text entry has to be output before the initial output of
+% the new text entry has to be done.
+%    \begin{macrocode}
+      \scr@dte@toctext@lastend
+      \@nameuse{scr@tso@#1@onstartentry}%
+    \else
+%    \end{macrocode}
+% In v-mode it is a new text entry. So the initial code of a new entry has to
+% be output \dots
+%    \begin{macrocode}
+      \leavevmode
+      \@nameuse{scr@tso@#1@onstartfirstentry}%
+%    \end{macrocode}
+% \dots{} the paragraph end has to be prepared to eventually change the right
+% skip, to do the final output, and after all destroy these commands.
+%    \begin{macrocode}
+      \def\par{%
+        \scr@dte@toctext@raggedright
+        \scr@dte@toctext@parend
+        \@par
+        \global\let\scr@dte@toctext@parend\relax
+        \global\let\scr@dte@toctext@raggedright\relax
+      }%
+%    \end{macrocode}
+% Also the left skip and the right skip has to be setup (these are the
+% margins) and if any of the text entries has to be printed ragged right, all
+% of them should be ragged right.
+%    \begin{macrocode}
+      \iftocfeature{\@currext}{noindent}{%
+        \leftskip \z@
+      }{%
+        \leftskip \@nameuse{scr@tso@#1@indent}\relax
+      }%
+      \rightskip \@nameuse{scr@tso@#1@rightindent}\relax
+      \parfillskip \z@ \@plus 1fill\relax
+      \edef\@noitemerr{\unexpanded{\par\def\@noitemerr}%
+        {\unexpanded\expandafter{\@noitemerr}}}%
+    \fi
+    \@nameuse{Ifscr@tso@#1@raggedright}{%
+      \let\\\@centercr
+      \gdef\scr@dte@toctext@raggedright{%
+        \@rightskip\@flushglue
+        \addtolength\rightskip\@rightskip
+      }%
+    }{}%
+%    \end{macrocode}
+% The end codes have to be changed. These are used either at the start of the
+% next entry with this style or at the end of the paragraph.
+%    \begin{macrocode}
+    \expandafter\global\expandafter\let\expandafter\scr@dte@toctext@lastend
+    \csname scr@tso@#1@onendentry\endcsname
+    \expandafter\global\expandafter\let\expandafter\scr@det@toctext@parend
+    \csname scr@tso@#1@onendlastentry\endcsname
+%    \end{macrocode}
+% Last but not least, the output has to be done.
+%    \begin{macrocode}
+    {%
+      \usetocbasicnumberline
+      \def\numberline@box##1{%
+        \mbox{%
+          \@nameuse{scr@tso@#1@numberformat}##1%
+          \hskip\@nameuse{scr@tso@#1@numsep}\relax
+        }%
+      }%
+      \@nameuse{scr@tso@#1@entryformat}{%
+        #2%
+        \@nameuse{scr@tso@#1@prepagenumber}%
+        \@nameuse{scr@tso@#1@pagenumberformat}{#3}%
+      }%
+    }%
+  \fi
+}
+%    \end{macrocode}
+% \begin{macro}{\scr@dte@toctext@raggedright}
+% \begin{macro}{\scr@dte@toctext@parend}
+% \begin{macro}{\scr@dte@toctext@lastend}
+% Helper macros to store some information for later usage.
+%    \begin{macrocode}
+\newcommand*{\scr@dte@toctext@raggedright}{}
+\newcommand*{\scr@dte@toctext@parend}{}
+\newcommand*{\scr@dte@toctext@lastend}{}
+%</toctext>
+%    \end{macrocode}
+% \end{macro}%^^A \scr@dte@toctext@lastend
+% \end{macro}%^^A \scr@dte@toctext@parend
+% \end{macro}%^^A \scr@dte@toctext@raggedright
+% \end{macro}%^^A \scr@dte@toctext
+% \selectlanguage{ngerman}
 %
 % \begin{macro}{\scr@dte@def@l@default}
 % \changes{v3.20}{2015/12/16}{neu im Paket}%^^A
