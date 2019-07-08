@@ -1,4 +1,4 @@
-% \CheckSum{4748}
+% \CheckSum{4784}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -352,26 +352,25 @@
 %    \begin{macrocode}
 %<*body>
 \newcommand*{\ifnumbered}[1]{%
-  \scr@ifundefinedorrelax{#1numdepth}{%
-    \@secondoftwo
-  }{%
-    \expandafter\ifnum \@nameuse{#1numdepth}>\c@secnumdepth
+  \if@currentusenumber
+    \typeout{Use number of `#1'}%
+    \scr@ifundefinedorrelax{#1numdepth}{%
       \expandafter\@secondoftwo
-    \else
-      \expandafter\@firstoftwo
-    \fi
-  }%
+    }{%
+      \expandafter\ifnum \@nameuse{#1numdepth}>\c@secnumdepth
+        \expandafter\expandafter\expandafter\@secondoftwo
+      \else
+        \expandafter\expandafter\expandafter\@firstoftwo
+      \fi
+    }%
+  \else
+    \typeout{Don't use number of `#1'}%
+    \expandafter\@secondoftwo
+  \fi  
 }
 \newcommand*{\ifunnumbered}[1]{%
-  \scr@ifundefinedorrelax{#1numdepth}{%
-    \@firstoftwo
-  }{%
-    \expandafter\ifnum \@nameuse{#1numdepth}>\c@secnumdepth
-      \expandafter\@firstoftwo
-    \else
-      \expandafter\@secondoftwo
-    \fi
-  }%
+  \typeout{Reverse logic:}%
+  \ifnumbered{#1}{\@secondoftwo}{\@firstoftwo}%
 }
 %</body>
 %</class>
@@ -948,16 +947,17 @@
 % \changes{v3.10}{2011/08/30}{entfällt}%^^A
 % \begin{macro}{\@sect}
 % \changes{v3.10}{2011/08/30}{Vollständige Neudefinition zur Realisierung
-%     der Erweiterung für das optionale Argument}%^^A
+%   der Erweiterung für das optionale Argument}%^^A
 % \changes{v3.10}{2011/08/30}{Verwendung von
-%     \cs{csname}\texttt{add\#1tocentry}\cs{endcsname}
-%     bzw. \cs{addtocentrydefault}}%^^A
+%   \cs{csname}\texttt{add\#1tocentry}\cs{endcsname}
+%   bzw. \cs{addtocentrydefault}}%^^A
 % \changes{v3.18}{2015/05/20}{definiert \cs{IfUsePrefixLine} intern}%^^A
 % \changes{v3.18}{2015/05/22}{Verwendung von \cs{numexpr} für Argument 2}%^^A
 % \changes{v3.18}{2015/05/22}{Verwendung von \cs{gluexpr} für Argument
-%     3--5}%^^A
+%   3--5}%^^A
 % \changes{v3.19}{2015/07/17}{Verwendung von \cs{sectionlinesformat} und
-%     \cs{sectioncatchphraseformat}}%^^A
+%   \cs{sectioncatchphraseformat}}%^^A
+% \changes{v3.27}{2019/07/08}{neue Option \texttt{nonumber}}%^^A
 % Damit auch alle mit \cs{@startsection} definierten Gliederungsebenen
 % bei der Entscheidung berücksichtigt werden, muss ein internes Makro
 % des \LaTeX-Kerns erweitert werden. Für die Ebenen \cs{part} und
@@ -1012,6 +1012,7 @@
   \else
     \scr@istest#7=\@nil
   \fi
+  \@currentusenumbertrue  
   \if@scr@tempswa
     \setkeys{KOMAarg.section}{tocentry={#8},head={#8},reference={#8},#7}%
   \else
@@ -1046,7 +1047,13 @@
     \fi
   }%
   \let\IfUsePrefixLine\@secondoftwo
-  \ifnum \numexpr #2\relax>\c@secnumdepth
+  \ifcase
+    \if@currentusenumber
+      \ifnum \numexpr #2\relax>\c@secnumdepth \z@\else \@ne\fi
+    \else
+      \z@
+    \fi
+    \typeout{Don't use number of `#1'}%  
     \let\@svsec\@empty
   \else
     \refstepcounter{#1}%
@@ -1094,7 +1101,12 @@
           \addtocentrydefault{#1}{##1}{##2}%
         }%
       }{}%
-      \ifnum \numexpr #2\relax>\c@secnumdepth
+      \ifcase
+        \if@currentusenumber
+          \ifnum \numexpr #2\relax>\c@secnumdepth \z@\else \@ne\fi
+        \else
+          \z@
+        \fi
         \csname add#1tocentry\endcsname{}{\@currenttocentry}%
       \else
         \csname add#1tocentry\endcsname{\csname the#1\endcsname}{%
@@ -1132,7 +1144,12 @@
             \addtocentrydefault{#1}{####1}{####2}%
           }%
         }{}%
-        \ifnum \numexpr #2\relax>\c@secnumdepth
+        \ifcase
+          \if@currentusenumber
+            \ifnum \numexpr #2\relax>\c@secnumdepth \z@\else \@ne\fi
+          \else
+            \z@
+          \fi
           \csname add#1tocentry\endcsname{}{\@currenttocentry}%
         \else
           \csname add#1tocentry\endcsname{\csname the#1\endcsname}{%
@@ -1160,6 +1177,8 @@
 % \changes{v3.22}{2016/07/12}{neu (semi-intern)}
 % \begin{macro}{\if@scr@tempswa}
 % \changes{v3.10}{2011/08/30}{neu (intern)}%^^A
+% \begin{macro}{\if@currentusenumber}
+% \changes{v3.27}{2019/07/08}{neu (semi-intern)}%^^A
 % \begin{macro}{\scr@istest}
 % \changes{v3.10}{2011/08/30}{neu (intern)}%^^A
 % Für die Realisierung werden noch ein paar Key-Value-Definitionen und ein
@@ -1191,6 +1210,7 @@
   }%
   \FamilyKeyStateProcessed
 }
+\FamilyInverseBoolKey[.section]{KOMAarg}{nonumber}{@currentusenumber}
 \newcommand*{\scr@istest}{}
 \def\scr@istest#1=#2\@nil{%
   \ifx\relax#2\relax\@scr@tempswafalse\else\@scr@tempswatrue\fi
@@ -1198,6 +1218,7 @@
 \newif\if@scr@tempswa
 %    \end{macrocode}
 % \end{macro}%^^A \scr@istest
+% \end{macro}%^^A \if@currentusenumber
 % \end{macro}%^^A \if@scr@tempswa
 % \end{macro}%^^A \@currentlabelname
 % \end{macro}%^^A \@currentheadentry
@@ -3705,9 +3726,10 @@
 % abgeleitet und erbt deren ChangeLog-Einträge. 
 % \changes{v2.8q}{2001/11/13}{\cs{@parskipfalse}\cs{@parskip@indent}}%^^A
 % \changes{v2.95}{2002/08/13}{\cs{centering} und \cs{@parskipfalse}%
-%     \cs{@parskip@indent} vertauscht}%^^A
+%   \cs{@parskip@indent} vertauscht}%^^A
 % \changes{v2.95}{2004/11/05}{\cs{@parskipfalse} und \cs{@parskip@indent}
-%     ersetzt}%^^A
+%   ersetzt}%^^A
+% \changes{v3.27}{2019/07/08}{neue Option \texttt{nonumber}}%^^A
 % Die Anweisung macht die eigentliche Arbeit für den Fall einer
 % Gliederungsanweisung ohne Stern. Das erste obligatorische Argument ist der
 % \meta{Name} der Gliederungsanweisung. Das zweite eigentlich optionale
@@ -3729,6 +3751,7 @@
   \else
     \scr@istest#2=\@nil
   \fi
+  \@currentusenumbertrue  
   \if@scr@tempswa
     \setkeys{KOMAarg.section}{tocentry={#3},head={#3},reference={#3},#2}%
   \else
@@ -4537,7 +4560,8 @@
   \ExecuteDoHook{heading/branch/nostar/#1}%
 %    \end{macrocode}
 % \changes{v3.10}{2011/08/30}{Integration der Erweiterung für das optionale
-%     Argument der Gliederungsbefehle}%^^A
+%   Argument der Gliederungsbefehle}%^^A
+% \changes{v3.27}{2019/07/08}{neue Option \texttt{nonumber}}%^^A
 % Für das erweitere optionale Argument muss hier eine key-value-Auswertung
 % erfolgen, falls das erweitere optionale Argument aktiviert ist:
 %    \begin{macrocode}
@@ -4546,6 +4570,7 @@
   \else
     \scr@istest#2=\@nil
   \fi
+  \@currentusenumbertrue  
   \if@scr@tempswa
     \setkeys{KOMAarg.section}{tocentry={#3},head={#3},reference={#3},#2}%
   \else
