@@ -1,4 +1,4 @@
-% \CheckSum{1568}
+% \CheckSum{1591}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-tocstyle.dtx
@@ -1208,6 +1208,8 @@
     {scr@tso@}{@onstartentry}{output at start of all entries but the first}%
   \DefineTOCEntryCommandOption{onendlastentry}%
     {scr@tso@}{@onendlastentry}{output at end of paragraph}%
+  \DefineTOCEntryCommandOption{afterpar}%
+    {scr@tso@}{@afterpar}{settings after end of paragraph}%
   \DefineTOCEntryCommandOption{onendentry}%
     {scr@tso@}{@onendentry}{output at end of all entries but the last}%
 %</toctext>
@@ -1610,6 +1612,8 @@
   \csname scr@tso@#1@onendlastentry\endcsname{}%
   \expandafter\providecommand%
   \csname scr@tso@#1@onendentry\endcsname{\quad}%
+  \expandafter\providecommand%
+  \csname scr@tso@#1@afterpar\endcsname{}%
 %</toctext>
 %    \end{macrocode}
 % Jede Ebene kann ihre eigene Formatierungsanweisung für die Nummer haben.
@@ -2134,22 +2138,23 @@
       \@nameuse{scr@tso@#1@onstartentry}%
     \else
 %    \end{macrocode}
-% In v-mode it is a new text entry. So the initial code of a new entry has to
-% be output \dots
+% In v-mode it is a new text entry.
 %    \begin{macrocode}
       \leavevmode
-      \@nameuse{scr@tso@#1@onstartfirstentry}%
 %    \end{macrocode}
-% \dots{} the paragraph end has to be prepared to eventually change the right
+% The paragraph end has to be prepared to eventually change the right
 % skip, to do the final output, and after all destroy these commands.
 %    \begin{macrocode}
       \def\par{%
         \scr@dte@toctext@raggedright
         \scr@dte@toctext@parend
         \@par
+        \scr@dte@toctext@afterpar
+        \global\let\scr@dte@toctext@afterpar\relax
         \global\let\scr@dte@toctext@parend\relax
         \global\let\scr@dte@toctext@raggedright\relax
       }%
+      \global\let\scr@dte@toctext@afterpar\@empty
 %    \end{macrocode}
 % Also the left skip and the right skip has to be setup (these are the
 % margins) and if any of the text entries has to be printed ragged right, all
@@ -2164,7 +2169,15 @@
       \parfillskip \z@ \@plus 1fill\relax
       \edef\@noitemerr{\unexpanded{\par\def\@noitemerr}%
         {\unexpanded\expandafter{\@noitemerr}}}%
+%    \end{macrocode}
+% Finally the init code of the first entry has to be used.
+%    \begin{macrocode}
+      \@nameuse{scr@tso@#1@onstartfirstentry}%
     \fi
+%    \end{macrocode}
+% Also some settings are independend from beeing the first entry in the
+% paragraph or not.
+%    \begin{macrocode}
     \@nameuse{Ifscr@tso@#1@raggedright}{%
       \let\\\@centercr
       \gdef\scr@dte@toctext@raggedright{%
@@ -2172,6 +2185,7 @@
         \addtolength\rightskip\@rightskip
       }%
     }{}%
+    \l@addto@macro\scr@dte@toctext@afterpar{\@nameuse{scr@tso@#1@afterpar}}%
 %    \end{macrocode}
 % The end codes have to be changed. These are used either at the start of the
 % next entry with this style or at the end of the paragraph.
@@ -2187,14 +2201,14 @@
       \usetocbasicnumberline
       \def\numberline@box##1{%
         \mbox{%
-          \@nameuse{scr@tso@#1@numberformat}##1%
+          \@nameuse{scr@tso@#1@numberformat}{\ignorespaces ##1\unskip}%
           \hskip\@nameuse{scr@tso@#1@numsep}\relax
         }%
       }%
       \@nameuse{scr@tso@#1@entryformat}{%
-        #2%
+        \ignorespaces#2\unskip
         \@nameuse{scr@tso@#1@prepagenumber}%
-        \@nameuse{scr@tso@#1@pagenumberformat}{#3}%
+        \@nameuse{scr@tso@#1@pagenumberformat}{\ignorespaces #3\unskip}%
       }%
     }%
   \fi
