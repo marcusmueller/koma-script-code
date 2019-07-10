@@ -1,4 +1,4 @@
-% \CheckSum{2122}
+% \CheckSum{2225}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-language.dtx
@@ -211,8 +211,11 @@
 %    \end{macrocode}
 % Als erstes findet die Verzögerung bis \cs{begin{document}} statt.
 %    \begin{macrocode}
-  \if@atdocument \expandafter\@firstofone
-  \else \expandafter\AtBeginDocument
+  \if@atdocument
+    \expandafter\@firstofone
+  \else
+    \scr@ifactivelanguageisoneof{#1}{\def#2{#3}}{}%
+    \expandafter\AtBeginDocument
   \fi
   {%
 %    \end{macrocode}
@@ -254,6 +257,8 @@
 %    \end{macrocode}
 % \begin{macro}{\scr@def@activateactivelanguageaftergroup}
 % \changes{v3.12}{2013/07/30}{neu (intern)}%^^A
+% \changes{v3.27}{2019/07/10}{unmittelbare Aktivierung auch in der
+%   Dokumentpräambel}%^^A
 % Wenn die Sprache in \cs{reserved@a} die aktuelle Sprache \cs{languagename}
 % ist oder die Sprachnummer zur Sprache \cs{reserved@a} die aktuelle
 % Sprachnummer \cs{language} ist, dann wird \cs{reserved@b} so umdefiniert,
@@ -306,18 +311,70 @@
   \fi
 } 
 %    \end{macrocode}
+% \begin{macro}{\scr@ifactivelanguageisoneof}
+% \changes{v3.27}{2019/07/10}{neu (intern)}
+% Ist die aktuelle Sprache eine aus der Liste im ersten Argument, so wird das
+% zweite Argument ausgeführt, sonst das ersten.
+%    \begin{macrocode}
+\newcommand*{\scr@ifactivelanguageisoneof}[1]{%
+  \begingroup
+    \@tempswafalse
+    \@onelevel@sanitize\languagename
+    \edef\reserved@a{#1}%
+    \@for \reserved@a:=\reserved@a\do{%
+      \scr@trim@spaces\reserved@a
+      \@onelevel@sanitize\reserved@a
+      \ifx\languagename\reserved@a
+        \@tempswatrue
+      \else
+        \edef\reserved@b{\detokenize{german}}%
+        \ifx\languagename\reserved@b
+          \edef\reserved@b{%
+            \expandafter\ifx\csname if@german@oldspelling\expandafter\endcsname
+            \csname iffalse\endcsname n\fi
+            \expandafter\ifx \csname if@austrian@locale\expandafter\endcsname
+            \csname iftrue\endcsname austrian\else
+              \expandafter\ifx\csname if@swiss@locale\expandafter\endcsname
+              \csname iftrue\endcsname swiss\else german\fi\fi
+          }%
+          \@onelevel@sanitize\reserved@b
+          \ifx\reserved@a\reserved@b \@tempswatrue\fi
+        \fi
+        \if@tempswa\else
+          \ifcsname l@\reserved@a\endcsname
+            \expandafter\ifnum \csname l@\reserved@a\endcsname=\language
+              \@tempswatrue
+            \fi
+          \fi
+        \fi
+      \fi  
+    }%
+    \if@tempswa
+      \aftergroup\@firstoftwo
+    \else
+      \aftergroup\@secondoftwo
+    \fi
+  \endgroup
+}
+%    \end{macrocode}
+% \end{macro}%^^A \scr@ifactivelanguageisoneof
 % \end{macro}%^^A \scr@def@activateactivelanguageaftergroup
 % \end{macro}%^^A \scr@def@scaptionname
 % \begin{macro}{\scr@def@captionname}
 % \changes{v3.12}{2013/07/30}{neu (intern)}%^^A
+% \changes{v3.27}{2019/07/10}{unmittelbare Aktivierung auch in der
+%   Dokumentpräambel}%^^A
 % Die Normalvariante von \cs{defcaptionname}, mit denselben Argumenten.
 %    \begin{macrocode}
 \newcommand*{\scr@def@captionname}[3]{%
 %    \end{macrocode}
 % Als erstes findet die Verzögerung bis \cs{begin{document}} statt.
 %    \begin{macrocode}
-  \if@atdocument \expandafter\@firstofone
-  \else \expandafter\AtBeginDocument
+  \if@atdocument
+    \expandafter\@firstofone
+  \else
+    \scr@ifactivelanguageisoneof{#1}{\def#2{#3}}{}%
+    \expandafter\AtBeginDocument
   \fi
   {%
 %    \end{macrocode}
@@ -404,7 +461,7 @@
 % Bei Verwendung von \textsf{polyglossia} haben wir nun bei den Sprachen
 % \texttt{austrian}, \texttt{swiss}, \texttt{ngerman}, \texttt{naustrian} und
 % \texttt{nswiss} das Problem, dass diese dort alle in \cs{captionsgerman}
-% vermischt sind. Es werden also also beim Umschalten eventuell gar nicht die
+% vermischt sind. Es werden also beim Umschalten eventuell gar nicht die
 % richtigen Befehle ausgeführt. Das lässt sich beispielsweise beheben, indem
 % in \cs{init@extra@german} dafür gesorgt wid, dass eben diese doch noch
 % ausgeführt werden:
@@ -464,10 +521,15 @@
 % \begin{macro}{\scr@provide@scaptionname}
 % \changes{v3.12}{2013/07/30}{neu (intern)}%^^A
 % \changes{v3.26}{2018/08/29}{diverse \cs{expandafter} eingespart}%^^A
+% \changes{v3.27}{2019/07/10}{unmittelbare Aktivierung auch in der
+%   Dokumentpräambel}%^^A
 %    \begin{macrocode}
 \newcommand*{\scr@provide@scaptionname}[3]{%
-  \if@atdocument \expandafter\@firstofone
-  \else \expandafter\AtBeginDocument
+  \if@atdocument
+    \expandafter\@firstofone
+  \else
+    \scr@ifactivelanguageisoneof{#1}{\providecommand*{#2}{#3}}{}%
+    \expandafter\AtBeginDocument
   \fi
   {%
     \begingroup
@@ -540,11 +602,16 @@
 % \begin{macro}{\scr@provide@captionname}
 % \changes{v3.12}{2013/07/30}{neu (intern)}%^^A
 % \changes{v3.26}{2018/08/29}{diverse \cs{expandafter} eingespart}%^^A
+% \changes{v3.27}{2019/07/10}{unmittelbare Aktivierung auch in der
+%   Dokumentpräambel}%^^A
 % Die Normalvariante von \cs{providecaptionname}, mit denselben Argumenten.
 %    \begin{macrocode}
 \newcommand*{\scr@provide@captionname}[3]{%
-  \if@atdocument \expandafter\@firstofone
-  \else \expandafter\AtBeginDocument
+  \if@atdocument
+    \expandafter\@firstofone
+  \else
+    \scr@ifactivelanguageisoneof{#1}{\providecommand*{#2}{#3}}{}%
+    \expandafter\AtBeginDocument
   \fi
   {%
     \begingroup
@@ -644,11 +711,16 @@
 % \begin{macro}{\scr@new@scaptionname}
 % \changes{v3.12}{2013/07/30}{neu (intern)}%^^A
 % \changes{v3.26}{2018/08/29}{diverse \cs{expandafter} eingespart}%^^A
+% \changes{v3.27}{2019/07/10}{unmittelbare Aktivierung auch in der
+%   Dokumentpräambel}%^^A
 % Die Sternvariante von \cs{newcaptionname}. Die Argumente sind dieselben.
 %    \begin{macrocode}
 \newcommand*{\scr@new@scaptionname}[3]{%
-  \if@atdocument \expandafter\@firstofone
-  \else \expandafter\AtBeginDocument
+  \if@atdocument
+    \expandafter\@firstofone
+  \else
+    \scr@ifactivelanguageisoneof{#1}{\newcommand*{#2}{#3}}{}%
+    \expandafter\AtBeginDocument
   \fi
   {%
     \begingroup
@@ -715,11 +787,16 @@
 % \begin{macro}{\scr@new@captionname}
 % \changes{v3.12}{2013/07/30}{neu (intern)}%^^A
 % \changes{v3.26}{2018/08/29}{diverse \cs{expandafter} eingespart}%^^A
+% \changes{v3.27}{2019/07/10}{unmittelbare Aktivierung auch in der
+%   Dokumentpräambel}%^^A
 % Die Normalvariante von \cs{newcaptionname}, mit denselben Argumenten.
 %    \begin{macrocode}
 \newcommand*{\scr@new@captionname}[3]{%
-  \if@atdocument \expandafter\@firstofone
-  \else \expandafter\AtBeginDocument
+  \if@atdocument
+    \expandafter\@firstofone
+  \else
+    \scr@ifactivelanguageisoneof{#1}{\newcommand*{#2}{#3}}{}%
+    \expandafter\AtBeginDocument
   \fi
   {%
     \begingroup
@@ -813,11 +890,16 @@
 % \begin{macro}{\scr@renew@scaptionname}
 % \changes{v3.12}{2013/07/30}{neu (intern)}%^^A
 % \changes{v3.26}{2018/08/29}{diverse \cs{expandafter} eingespart}%^^A
+% \changes{v3.27}{2019/07/10}{unmittelbare Aktivierung auch in der
+%   Dokumentpräambel}%^^A
 % Die Sternvariante von \cs{renewcaptionname}. Die Argumente sind dieselben.
 %    \begin{macrocode}
 \newcommand*{\scr@renew@scaptionname}[3]{%
-  \if@atdocument \expandafter\@firstofone
-  \else \expandafter\AtBeginDocument
+  \if@atdocument
+    \expandafter\@firstofone
+  \else
+    \scr@ifactivelanguageisoneof{#1}{\renewcommand*{#2}{#3}}{}%
+    \expandafter\AtBeginDocument
   \fi
   {%
     \begingroup
@@ -883,11 +965,16 @@
 % \begin{macro}{\scr@renew@captionname}
 % \changes{v3.12}{2013/07/30}{neu (intern)}%^^A
 % \changes{v3.26}{2018/08/29}{diverse \cs{expandafter} eingespart}%^^A
+% \changes{v3.27}{2019/07/10}{unmittelbare Aktivierung auch in der
+%   Dokumentpräambel}%^^A
 % Die Normalvariante von \cs{renewcaptionname}, mit denselben Argumenten.
 %    \begin{macrocode}
 \newcommand*{\scr@renew@captionname}[3]{%
-  \if@atdocument \expandafter\@firstofone
-  \else \expandafter\AtBeginDocument
+  \if@atdocument
+    \expandafter\@firstofone
+  \else
+    \scr@ifactivelanguageisoneof{#1}{\renewcommand*{#2}{#3}}{}%
+    \expandafter\AtBeginDocument
   \fi
   {%
     \begingroup
