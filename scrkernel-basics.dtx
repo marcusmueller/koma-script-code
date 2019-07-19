@@ -1,4 +1,4 @@
-% \CheckSum{4087}
+% \CheckSum{4142}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -314,6 +314,7 @@
 % \changes{v3.00}{2008/04/30}{Neu (intern)}%^^A
 % \begin{macro}{\scr@if@familymember}
 % \changes{v3.00}{2008/04/30}{Neu (intern)}%^^A
+% \changes{v3.27}{2019/07/19}{das leere Mitglied existiert immer}%^^A
 % \begin{macro}{\scr@define@family@key}
 % \changes{v3.00}{2008/04/30}{Neu (intern)}%^^A
 % \begin{macro}{\scr@define@family@key@nodefault}
@@ -353,21 +354,25 @@
 }
 \newcommand*{\scr@if@familymember}[3]{%
   \scr@if@family{#2}{#3}{%
-    \edef\reserved@a{%
-      \noexpand\in@{#2#1,}{\csname #2@key@familylist\endcsname}}%
-    \reserved@a
-    \ifin@
-      \expandafter\@firstofone
-    \else
-      \PackageError{scrbase}{%
-        unknown member `#1' at family `#2'%
-      }{%
-        You've tried to #3 for member `#1' of family `#2'.\MessageBreak
-        This my be done only for previous defined family members.\MessageBreak
-        You should call `\string\DefineFamilyMember[{#1}]{#2}' first.%
-      }%
-      \expandafter\@gobble
-    \fi
+    \IfArgIsEmpty{#1}{%
+      \@firstofone
+    }{%
+      \edef\reserved@a{%
+        \noexpand\in@{#2#1,}{\csname #2@key@familylist\endcsname}}%
+      \reserved@a
+      \ifin@
+        \expandafter\@firstofone
+      \else
+        \PackageError{scrbase}{%
+          unknown member `#1' at family `#2'%
+        }{%
+          You've tried to #3 for member `#1' of family `#2'.\MessageBreak
+          This my be done only for previous defined family members.\MessageBreak
+          You should call `\string\DefineFamilyMember[{#1}]{#2}' first.%
+        }%
+        \expandafter\@gobble
+      \fi
+    }%
   }%
 }
 \newcommand*{\DefineFamilyKey}[3][.\@currname.\@currext]{%
@@ -1535,8 +1540,11 @@
 % \begin{macro}{\IfArgIsEmpty}
 % \changes{v3.19}{2015/08/29}{neu}%^^A
 % \changes{v3.27}{2019/03/11}{\cs{long}}%^^A
+% \changes{v3.27}{2019/07/19}{wird bereits vor den Optionen benötigt}%^^A
 % Falls das erste Argument tatsächlich leer ist, wird das zweite Argument
 % ausgeführt sonst das dritte.
+%</body>
+%<*prepare>
 %<*base>
 %    \begin{macrocode}
 \newcommand{\IfArgIsEmpty}[1]{%
@@ -1548,6 +1556,8 @@
 }
 %    \end{macrocode}
 %</base>
+%</prepare>
+%<*body>
 % \end{macro}%^^A \IfArgIsEmpty
 %
 %
@@ -3166,19 +3176,48 @@
 %    \begin{macrocode}
         \let\scr@key@run@errors\@empty
 %    \end{macrocode}
-%
 % \changes{v3.04b}{2010/01/29}{\cs{edef} durch \cs{protected@edef} ersetzt}
 % \changes{v3.09a}{2011/06/07}{weniger Expansion durch sinnvollen Gebrauch
 %     von \cs{unexpanded}}
-% Dann wird in einer Schleife über alle Familien festgestellt, ob die Option
-% in einer Familie bekannt ist und ggf. ausgeführt. Hier ist wichtig, dass
-% keines der internen Macros vom Aufruf verändert wird. Außerdem muss der
-% Status und die daraus resultierenden Meldungen aufgesammelt werden.
+% Dann wird in einer Schleife über alle Familienmitglieder festgestellt, ob
+% die Option bei einem Mitglied bekannt ist und ggf. ausgeführt. Hier ist
+% wichtig, dass keines der internen Macros vom Aufruf verändert wird. Außerdem
+% muss der Status und die daraus resultierenden Meldungen aufgesammelt
+% werden. Hilfreich ist, dass \cs{\meta{Familie}@key@familylist} eine Liste
+% aus Familie + Mitglied ist und nicht nur aus dem Namen der Mitglieder.
+% \changes{v3.27}{2019/07/19}{Fix: Familienoptionen werden zuerst
+%   ausgeführt}%^^A
 %    \begin{macrocode}
         \scr@key@found@false
-        \edef\reserved@a{\csname #1@key@familylist\endcsname}%
+        \edef\reserved@a{#1,\csname #1@key@familylist\endcsname}%
         \@for\reserved@a:=\reserved@a\do{%
-          \scr@ifundefinedorrelax{KV@\reserved@a @\scr@key@name}{}{%
+          \scr@ifundefinedorrelax{KV@\reserved@a @\scr@key@name}{%
+%    \end{macrocode}
+% \changes{v3.27}{2019/07/19}{Behandlung für \texttt{@else@}-Optionen}%^^A
+% Wenn das Familiemitglied keine entsprechende Option besitzt, kann es noch
+% immer eine \texttt{@else@}-Option besitzen. In diesem Fall wird selbige
+% ausgeführt. Die Ausführung hat aber nur dann Einfluss auf den
+% Fehlerspeicher, wenn sie erfolgreich war. In diesem Fall wird der
+% Fehlerspeicher gelöscht. Ausnahme ist, wenn das aktuelle Mitglied die
+% Familie selbst ist. In diesem Fall wird die \texttt{@else@}-Option nicht
+% hier ausgeführt. Das erledigen wir später und nur in dem Fall, dass
+% tatsächlich kein Mitglied eine solche Option oder eine
+% \texttt{@else@}-Option hatte.
+%    \begin{macrocode}
+            \ifstr{\reserved@a}{#1}{}{%
+              \scr@ifundefinedorrelax{KV@\reserved@a @@else@}{}{%
+                \expandafter\scr@execute@elseoption\expandafter{\reserved@a}%
+                \ifx\FamilyKeyState\FamilyKeyStateProcessed
+                  \scr@key@found@true
+                  \let\scr@key@run@errors\relax
+                \fi
+              }%
+            }%
+          }{%
+%    \end{macrocode}
+% Wurde hingegen eine Option für ein Familienmitglied gefunden, so wird sie
+% ausgeführt und bei Bedarf der Fehlerspeicher angepasst.
+%    \begin{macrocode}
             \expandafter\scr@execute@option\expandafter{\reserved@a}%
             \scr@key@found@true
             \ifx\scr@key@run@errors\relax\else
@@ -3189,21 +3228,21 @@
                   \edef\scr@key@run@errors{%
                     \unexpanded\expandafter{\scr@key@run@errors}%
                     \noexpand\MessageBreak
-                    \FamilyMemberOfKey: unkown value
-                    `\expandafter\detokenize\expandafter{\scr@key@value}'.%
+                    \space\space- `\FamilyMemberOfKey': unkown value
+                    `\expandafter\detokenize\expandafter{\scr@key@value}'%
                   }%
                 \else
                   \ifx\FamilyKeyState\FamilyKeyStateNeedValue
                     \edef\scr@key@run@errors{%
                       \unexpanded\expandafter{\scr@key@run@errors}%
                       \noexpand\MessageBreak
-                      \FamilyMemberOfKey: value expected.
+                      \space\space- `\FamilyMemberOfKey': value expected
                     }%
                   \else
                     \edef\scr@key@run@errors{%
                       \unexpanded\expandafter{\scr@key@run@errors}%
                       \noexpand\MessageBreak
-                      \FamilyMemberOfKey: \FamilyKeyState.
+                      \space\space- `\FamilyMemberOfKey': \FamilyKeyState
                     }%
                   \fi
                 \fi
@@ -3214,35 +3253,58 @@
         \ifscr@key@found@
           \ifx\scr@key@run@errors\relax\else
             \ifx\scr@key@run@errors\@empty\else
+              \scr@ifundefinedorrelax{KV@#1@@else@}{}{%
+                \scr@execute@elseoption{#1}%
+                \ifx\FamilyKeyState\FamilyKeyStateProcessed
+                  \PackageInfo{scrbase}{%
+                    option
+                    `\expandafter\detokenize\expandafter{\scr@key@atlist}'%
+                    \MessageBreak
+                    processed by `@else@' option of family\MessageBreak
+                    `#1', after the members said:
+                    \scr@key@run@errors\MessageBreak
+                    o\expandafter\@gobble
+                  }%
+                  \let\scr@key@run@errors\relax
+                \else
+                  \PackageError{scrbase}{%
+                    unknown option
+                    `\expandafter\detokenize\expandafter{\scr@key@atlist}'%
+                  }{%
+                    The members of family `#1' cannot set option
+                    `\scr@key@name'
+                    \ifx\scr@key@value\@empty\else
+                      \MessageBreak
+                      to value
+                      `\expandafter\detokenize\expandafter{\scr@key@value}'%
+                    \fi.\MessageBreak
+                    Here's what each member says:
+                    \scr@key@run@errors\MessageBreak
+                    o\expandafter\@gobble
+                  }%
+                \fi
+              }%  
+            \fi
+          \fi
+        \else
+          \scr@ifundefinedorrelax{KV@#1@@else@}{}{%
+            \scr@execute@elseoption{#1}%
+            \ifx\FamilyKeyState\FamilyKeyStateProcessed
+            \else
               \PackageError{scrbase}{%
                 unknown option
                 `\expandafter\detokenize\expandafter{\scr@key@atlist}'%
               }{%
-                The members of family `#1' cannot set option
-                `\scr@key@name'
+                No one of the members of family `#1'\MessageBreak
+                can handle option `\scr@key@name'.\MessageBreak
+                So it cannot be set%
                 \ifx\scr@key@value\@empty\else
-                  \MessageBreak
-                  to value
+                  \space to value
                   `\expandafter\detokenize\expandafter{\scr@key@value}'%
-                \fi.\MessageBreak
-                Here's what each member says:
-                \scr@key@run@errors
+                \fi.%
               }%
             \fi
-          \fi
-        \else
-          \PackageError{scrbase}{%
-            unknown option
-            `\expandafter\detokenize\expandafter{\scr@key@atlist}'%
-          }{%
-            No one of the members of family `#1'\MessageBreak
-            can handle option `\scr@key@name'.\MessageBreak
-            So it cannot be set%
-            \ifx\scr@key@value\@empty\else
-              \space to value
-              `\expandafter\detokenize\expandafter{\scr@key@value}'%
-            \fi.%
-          }%
+          }%  
         \fi
       \fi
     \fi
