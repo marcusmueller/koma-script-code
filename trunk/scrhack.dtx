@@ -1,4 +1,4 @@
-% \CheckSum{941}
+% \CheckSum{1688}
 % \iffalse meta-comment
 % ======================================================================
 % scrhack.dtx
@@ -10,7 +10,7 @@
 % the LaTeX Project Public License, version 1.3c of the license.
 % The latest version of this license is in
 %   http://www.latex-project.org/lppl.txt
-% and version 1.3c or later is part of all distributions of LaTeX
+% and version 1.<3c or later is part of all distributions of LaTeX
 % version 2005/12/01 or later and of this work.
 %
 % This work has the LPPL maintenance status "author-maintained".
@@ -85,6 +85,7 @@
 %<setspace&identify>\ProvidesFile{setspace.hak}[%
 %<lscape&identify>\ProvidesFile{lscape.hak}[%
 %<nomencl&identify>\ProvidesFile{nomencl.hak}[%
+%<standardsections&identify>\ProvidesFile{standardsections.hak}[%
 %<*dtx|identify>
 %!KOMAScriptVersion
   package
@@ -95,7 +96,7 @@
   (hacking other packages)%
 %</!identify>
 %</dtx|identify>
-%<hack&identify>  (hacking package
+%<hack&identify&!standardsections>  (hacking package
 %<hyperref&identify>    hyperref)%
 %<float&identify>    float)%
 %<floatrow&identify>    floatrow)%
@@ -103,6 +104,7 @@
 %<setspace&identify>    setspace)%
 %<lscape&identify>    lscape)%
 %<nomencl&identify>    nomencl)%
+%<standardsections&identify>  (defining standard LaTeX class section headings)%
 %<*dtx|identify>
 ]
 %</dtx|identify>
@@ -155,6 +157,11 @@
       \from{scrkernel-version.dtx}{trace,file,nomencl.hak}%
       \from{scrhack.dtx}{trace,hack,nomencl,identify}%
       \from{scrhack.dtx}{trace,hack,nomencl,body}%
+    }%
+    \file{standardsections.hak}{%
+      \from{scrkernel-version.dtx}{trace,file,standardsections.hak}%
+      \from{scrhack.dtx}{trace,hack,standardsections,identify}%
+      \from{scrhack.dtx}{trace,hack,standardsections,body}%
     }%
   }
   \@@input scrstrop.inc
@@ -1284,6 +1291,495 @@
 %    \end{macrocode}
 % \end{Length}%^^A \scrh@LT@textheight
 % \end{macro}%^^A \landscape
+%
+%
+%
+% \subsection{Der Standard-Überschriften-Hack}
+% \label{sec:standardsections}
+% Der Standard-Überschriften-Hack unterscheidet sich grundlegend von den
+% anderen Hacks. Zum einen patcht er nicht ein bestimmtes Paket, zum anderen
+% muss man ihn explizit aktivieren, damit er verwendet wird. Wird er
+% aktiviert, definiert er die Gliederungsbefehle hart auf die Definition aus
+% den Standardklassen um. Damit wird sichergestellt, dass auch Pakete, die
+% aufgrund der Überschriftendefinitionen in \KOMAScript{} nicht mit
+% \KOMAScript-Klassen funktionieren, plötzlich doch funktionieren. Dafür sind
+% aber diverse Features von \KOMAScript{} anschließend nicht mehr
+% funktionsfähig. Daher gibt es auch eine deutliche Warnung.
+%
+% \begin{option}{standardsections}
+%    \begin{macrocode}
+%<*package&option>
+\KOMA@ifkey{standardsections}{@scrhack@standardsections}
+\KOMAExecuteOptions{standardsections=false}
+%</package&option>
+%<*package&body>
+\AtEndOfPackage{%
+  \if@scrhack@standardsections
+    \PackageInfo{scrhack}{loading standard sections hack}%
+    \input{standardsections.hak}%
+  \fi
+}
+%</package&body>
+%    \end{macrocode}
+% \end{option}%^^A standardsections
+%
+% \begin{macro}{\part}
+% \begin{macro}{\chapter}
+% \begin{macro}{\section}
+% \begin{macro}{\subsection}
+% \begin{macro}{\subsubsection}
+% \begin{macro}{\paragraph}
+% \begin{macro}{\subparagraph}
+% The hack redefines all these commands to a definition copied from the
+% standard \LaTeX{} classes version v1.4i. Copyright of this code is by the
+% \LaTeX3{} Project. The complete, unmodified code can be found on
+% \url{https://ctan.org/tex-archive/macros/latex/base/classes.dtx}.
+%    \begin{macrocode}
+%<*standardsections&body>
+\PackageWarningNoLine{scrhack}{%
+  using dangerous standard sections hack!\MessageBreak
+  This hack can break several classes and packages.\MessageBreak
+  However, sometimes it is needed to make a\MessageBreak
+  package work%
+}%
+\PackageInfo{scrhack}{%
+  Using code from the standard LaTeX classes.\MessageBreak
+  For more information about this code and the\MessageBreak
+  license of this code, plead see:\MessageBreak
+  https://ctan.org/tex-archive/macros/latex/base/classes.dtx
+}%
+\@ifpackageloaded{titlesec}{%
+  \PackageWarning{scrhack}{this hack should not be loaded after `titlesec'}%
+}{}
+\@ifpackageloaded{sectsty}{%
+  \PackageWarning{scrhack}{this hack should not be loaded after `sectsty'}%
+}{}
+\@ifpackageloaded{sectsty}{%
+  \PackageWarning{scrhack}{this hack should not be loaded after `sectsty'}%
+}{}
+\scr@ifundefinedorrelax{chapter}{%
+%    \end{macrocode}
+% It seems to be an article class, so we use the code from \textsf{article}.
+%    \begin{macrocode}
+  \scr@ifundefinedorrelax{c@part}{\newcounter{part}}{}%
+  \scr@ifundefinedorrelax{c@section}{\newcounter{section}}{}%
+  \scr@ifundefinedorrelax{c@subsection}{\newcounter{subsection}[section]}{}%
+  \scr@ifundefinedorrelax{c@subsubsection}{%
+    \newcounter{subsubsection}[subsection]}{}%
+  \scr@ifundefinedorrelax{c@paragraph}{%
+    \newcounter{paragraph}[subsubsection]}{}%
+  \scr@ifundefinedorrelax{c@subparagraph}{%
+    \newcounter{subparagraph}[paragraph]}{}%
+  \renewcommand\thepart {\@Roman\c@part}%
+  \renewcommand\thesection {\@arabic\c@section}%
+  \renewcommand\thesubsection   {\thesection.\@arabic\c@subsection}%
+  \renewcommand\thesubsubsection{\thesubsection.\@arabic\c@subsubsection}%
+  \renewcommand\theparagraph    {\thesubsubsection.\@arabic\c@paragraph}%
+  \renewcommand\thesubparagraph {\theparagraph.\@arabic\c@subparagraph}%
+  \def\part{%
+     \if@noskipsec \leavevmode \fi
+     \par
+     \addvspace{4ex}%
+     \@afterindentfalse
+     \secdef\@part\@spart}%
+  \def\@part[#1]#2{%
+      \ifnum \c@secnumdepth >\m@ne
+        \refstepcounter{part}%
+        \addcontentsline{toc}{part}{\thepart\hspace{1em}#1}%
+      \else
+        \addcontentsline{toc}{part}{#1}%
+      \fi
+      {\parindent \z@ \raggedright
+       \interlinepenalty \@M
+       \normalfont
+       \ifnum \c@secnumdepth >\m@ne
+         \Large\bfseries \partname\nobreakspace\thepart
+         \par\nobreak
+       \fi
+       \huge \bfseries #2%
+       \markboth{}{}\par}%
+      \nobreak
+      \vskip 3ex
+      \@afterheading}%
+  \def\@spart#1{%
+      {\parindent \z@ \raggedright
+       \interlinepenalty \@M
+       \normalfont
+       \huge \bfseries #1\par}%
+       \nobreak
+       \vskip 3ex
+       \@afterheading}%
+  \def\section{\@startsection {section}{1}{\z@}%
+                                     {-3.5ex \@plus -1ex \@minus -.2ex}%
+                                     {2.3ex \@plus.2ex}%
+                                     {\normalfont\Large\bfseries}}%
+  \def\subsection{\@startsection{subsection}{2}{\z@}%
+                                       {-3.25ex\@plus -1ex \@minus -.2ex}%
+                                       {1.5ex \@plus .2ex}%
+                                       {\normalfont\large\bfseries}}%
+  \def\subsubsection{\@startsection{subsubsection}{3}{\z@}%
+                                       {-3.25ex\@plus -1ex \@minus -.2ex}%
+                                       {1.5ex \@plus .2ex}%
+                                       {\normalfont\normalsize\bfseries}}%
+  \def\paragraph{\@startsection{paragraph}{4}{\z@}%
+                                      {3.25ex \@plus1ex \@minus.2ex}%
+                                      {-1em}%
+                                      {\normalfont\normalsize\bfseries}}%
+  \def\subparagraph{\@startsection{subparagraph}{5}{\parindent}%
+                                         {3.25ex \@plus1ex \@minus .2ex}%
+                                         {-1em}%
+                                        {\normalfont\normalsize\bfseries}}%
+}{%
+%    \end{macrocode}
+% It seems to be either a book or report class.
+%    \begin{macrocode}
+  \scr@ifundefinedorrelax{c@part}{\newcounter{part}}{}%
+  \scr@ifundefinedorrelax{c@chapter}{\newcounter{chapter}}{}%
+  \scr@ifundefinedorrelax{c@section}{\newcounter{section}[chapter]}{}%
+  \scr@ifundefinedorrelax{c@subsection}{\newcounter{subsection}[section]}{}%
+  \scr@ifundefinedorrelax{c@subsubsection}{%
+    \newcounter{subsubsection}[subsection]}{}%
+  \scr@ifundefinedorrelax{c@paragraph}{%
+    \newcounter{paragraph}[subsubsection]}{}%
+  \scr@ifundefinedorrelax{c@subparagraph}{%
+    \newcounter{subparagraph}[paragraph]}{}%
+  \def\@chapapp{\chaptername}%
+  \scr@ifundefinedorrelax{frontmatter}{%
+%    \end{macrocode}
+% It seems not to be a book class.
+%    \begin{macrocode}
+    \def\part{%
+      \if@openright
+        \cleardoublepage
+      \else
+        \clearpage
+      \fi
+      \thispagestyle{plain}%
+      \if@twocolumn
+        \onecolumn
+        \@tempswatrue
+      \else
+        \@tempswafalse
+      \fi
+      \null\vfil
+      \secdef\@part\@spart}
+
+    \def\@part[#1]#2{%
+        \ifnum \c@secnumdepth >-2\relax
+          \refstepcounter{part}%
+          \addcontentsline{toc}{part}{\thepart\hspace{1em}#1}%
+        \else
+          \addcontentsline{toc}{part}{#1}%
+        \fi
+        \markboth{}{}%
+        {\centering
+         \interlinepenalty \@M
+         \normalfont
+         \ifnum \c@secnumdepth >-2\relax
+           \huge\bfseries \partname\nobreakspace\thepart
+           \par
+           \vskip 20\p@
+         \fi
+         \Huge \bfseries #2\par}%
+        \@endpart}
+    \def\@spart#1{%
+        {\centering
+         \interlinepenalty \@M
+         \normalfont
+         \Huge \bfseries #1\par}%
+        \@endpart}
+    \def\@endpart{\vfil\newpage
+                  \if@twoside
+                   \if@openright
+                    \null
+                    \thispagestyle{empty}%
+                    \newpage
+                   \fi
+                  \fi
+                  \if@tempswa
+                    \twocolumn
+                  \fi}
+    \def\chapter{\if@openright\cleardoublepage\else\clearpage\fi
+                        \thispagestyle{plain}%
+                        \global\@topnum\z@
+                        \@afterindentfalse
+                        \secdef\@chapter\@schapter}
+    \def\@chapter[#1]#2{\ifnum \c@secnumdepth >\m@ne
+                             \refstepcounter{chapter}%
+                             \typeout{\@chapapp\space\thechapter.}%
+                             \addcontentsline{toc}{chapter}%
+                                       {\protect\numberline{\thechapter}#1}%
+                        \else
+                          \addcontentsline{toc}{chapter}{#1}%
+                        \fi
+                        \chaptermark{#1}%
+                        \addtocontents{lof}{\protect\addvspace{10\p@}}%
+                        \addtocontents{lot}{\protect\addvspace{10\p@}}%
+                        \if@twocolumn
+                          \@topnewpage[\@makechapterhead{#2}]%
+                        \else
+                          \@makechapterhead{#2}%
+                          \@afterheading
+                        \fi}
+    \def\@makechapterhead#1{%
+      \vspace*{50\p@}%
+      {\parindent \z@ \raggedright \normalfont
+        \ifnum \c@secnumdepth >\m@ne
+            \huge\bfseries \@chapapp\space \thechapter
+            \par\nobreak
+            \vskip 20\p@
+        \fi
+        \interlinepenalty\@M
+        \Huge \bfseries #1\par\nobreak
+        \vskip 40\p@
+      }}
+    \def\@schapter#1{\if@twocolumn
+                       \@topnewpage[\@makeschapterhead{#1}]%
+                     \else
+                       \@makeschapterhead{#1}%
+                       \@afterheading
+                     \fi}
+    \def\@makeschapterhead#1{%
+      \vspace*{50\p@}%
+      {\parindent \z@ \raggedright
+        \normalfont
+        \interlinepenalty\@M
+        \Huge \bfseries  #1\par\nobreak
+        \vskip 40\p@
+      }}
+    \def\section{\@startsection {section}{1}{\z@}%
+                                       {-3.5ex \@plus -1ex \@minus -.2ex}%
+                                       {2.3ex \@plus.2ex}%
+                                       {\normalfont\Large\bfseries}}%
+    \def\subsection{\@startsection{subsection}{2}{\z@}%
+                                         {-3.25ex\@plus -1ex \@minus -.2ex}%
+                                         {1.5ex \@plus .2ex}%
+                                         {\normalfont\large\bfseries}}%
+    \def\subsubsection{\@startsection{subsubsection}{3}{\z@}%
+                                         {-3.25ex\@plus -1ex \@minus -.2ex}%
+                                         {1.5ex \@plus .2ex}%
+                                         {\normalfont\normalsize\bfseries}}%
+    \def\paragraph{\@startsection{paragraph}{4}{\z@}%
+                                        {3.25ex \@plus1ex \@minus.2ex}%
+                                        {-1em}%
+                                        {\normalfont\normalsize\bfseries}}%
+    \def\subparagraph{\@startsection{subparagraph}{5}{\parindent}%
+                                           {3.25ex \@plus1ex \@minus .2ex}%
+                                           {-1em}%
+                                          {\normalfont\normalsize\bfseries}}%
+  }{%
+%    \end{macrocode}
+% It seems to be a book class.
+%    \begin{macrocode}
+    \scr@ifundefinedorrelax{if@mainmatter}{%
+      \expandafter\newif\csname if@mainmatter\endcsname
+    }{}%
+    \def\frontmatter{%
+        \cleardoublepage
+      \@mainmatterfalse
+      \pagenumbering{roman}}%
+    \def\mainmatter{%
+        \cleardoublepage
+      \@mainmattertrue
+      \pagenumbering{arabic}}%
+    \def\backmatter{%
+      \if@openright
+        \cleardoublepage
+      \else
+        \clearpage
+      \fi
+      \@mainmatterfalse}%
+    \def\part{%
+      \if@openright
+        \cleardoublepage
+      \else
+        \clearpage
+      \fi
+      \thispagestyle{plain}%
+      \if@twocolumn
+        \onecolumn
+        \@tempswatrue
+      \else
+        \@tempswafalse
+      \fi
+      \null\vfil
+      \secdef\@part\@spart}%
+
+    \def\@part[#1]#2{%
+        \ifnum \c@secnumdepth >-2\relax
+          \refstepcounter{part}%
+          \addcontentsline{toc}{part}{\thepart\hspace{1em}#1}%
+        \else
+          \addcontentsline{toc}{part}{#1}%
+        \fi
+        \markboth{}{}%
+        {\centering
+         \interlinepenalty \@M
+         \normalfont
+         \ifnum \c@secnumdepth >-2\relax
+           \huge\bfseries \partname\nobreakspace\thepart
+           \par
+           \vskip 20\p@
+         \fi
+         \Huge \bfseries #2\par}%
+        \@endpart}%
+    \def\@spart#1{%
+        {\centering
+         \interlinepenalty \@M
+         \normalfont
+         \Huge \bfseries #1\par}%
+        \@endpart}%
+    \def\@endpart{\vfil\newpage
+                  \if@twoside
+                   \if@openright
+                    \null
+                    \thispagestyle{empty}%
+                    \newpage
+                   \fi
+                  \fi
+                  \if@tempswa
+                    \twocolumn
+                  \fi}%
+    \def\chapter{\if@openright\cleardoublepage\else\clearpage\fi
+                        \thispagestyle{plain}%
+                        \global\@topnum\z@
+                        \@afterindentfalse
+                        \secdef\@chapter\@schapter}%
+    \def\@chapter[#1]#2{\ifnum \c@secnumdepth >\m@ne
+                           \if@mainmatter
+                             \refstepcounter{chapter}%
+                             \typeout{\@chapapp\space\thechapter.}%
+                             \addcontentsline{toc}{chapter}%
+                                       {\protect\numberline{\thechapter}#1}%
+                           \else
+                             \addcontentsline{toc}{chapter}{#1}%
+                           \fi
+                        \else
+                          \addcontentsline{toc}{chapter}{#1}%
+                        \fi
+                        \chaptermark{#1}%
+                        \addtocontents{lof}{\protect\addvspace{10\p@}}%
+                        \addtocontents{lot}{\protect\addvspace{10\p@}}%
+                        \if@twocolumn
+                          \@topnewpage[\@makechapterhead{#2}]%
+                        \else
+                          \@makechapterhead{#2}%
+                          \@afterheading
+                        \fi}%
+    \def\@makechapterhead#1{%
+      \vspace*{50\p@}%
+      {\parindent \z@ \raggedright \normalfont
+        \ifnum \c@secnumdepth >\m@ne
+          \if@mainmatter
+            \huge\bfseries \@chapapp\space \thechapter
+            \par\nobreak
+            \vskip 20\p@
+          \fi
+        \fi
+        \interlinepenalty\@M
+        \Huge \bfseries #1\par\nobreak
+        \vskip 40\p@
+      }}%
+    \def\@schapter#1{\if@twocolumn
+                       \@topnewpage[\@makeschapterhead{#1}]%
+                     \else
+                       \@makeschapterhead{#1}%
+                       \@afterheading
+                     \fi}%
+    \def\@makeschapterhead#1{%
+      \vspace*{50\p@}%
+      {\parindent \z@ \raggedright
+        \normalfont
+        \interlinepenalty\@M
+        \Huge \bfseries  #1\par\nobreak
+        \vskip 40\p@
+      }}%
+    \def\section{\@startsection {section}{1}{\z@}%
+                                       {-3.5ex \@plus -1ex \@minus -.2ex}%
+                                       {2.3ex \@plus.2ex}%
+                                       {\normalfont\Large\bfseries}}%
+    \def\subsection{\@startsection{subsection}{2}{\z@}%
+                                         {-3.25ex\@plus -1ex \@minus -.2ex}%
+                                         {1.5ex \@plus .2ex}%
+                                         {\normalfont\large\bfseries}}%
+    \def\subsubsection{\@startsection{subsubsection}{3}{\z@}%
+                                         {-3.25ex\@plus -1ex \@minus -.2ex}%
+                                         {1.5ex \@plus .2ex}%
+                                         {\normalfont\normalsize\bfseries}}%
+    \def\paragraph{\@startsection{paragraph}{4}{\z@}%
+                                        {3.25ex \@plus1ex \@minus.2ex}%
+                                        {-1em}%
+                                        {\normalfont\normalsize\bfseries}}%
+    \def\subparagraph{\@startsection{subparagraph}{5}{\parindent}%
+                                           {3.25ex \@plus1ex \@minus .2ex}%
+                                           {-1em}%
+                                          {\normalfont\normalsize\bfseries}}%
+  }%
+}
+% End of the derived code.
+\scr@ifundefinedorrelax{scr@saved@startsection}{}{%
+  \ifx\@startsection\scr@saved@startsection\else
+    \PackageWarning{scrhack}{resetting \string\@startsection}%
+    \let\@startsection\scr@saved@startsection
+  \fi
+}
+\scr@ifundefinedorrelax{DeclareSectionCommand}{}{%
+  \PackageWarningNoLine{scrhack}{%
+    deactivating \string\DeclareSectionCommand\space
+    and all derivates}%
+  \let\DeclareSectionCommand\undefined
+  \let\DeclareSectionCommands\undefined
+  \let\RedeclareSectionCommand\undefined
+  \let\RedeclareSectionCommands\undefined
+  \let\DeclareNewSectionCommand\undefined
+  \let\DeclareNewSectionCommands\undefined
+  \let\ProvideSectionCommand\undefined
+  \let\ProvideSectionCommands\undefined
+}
+\scr@ifundefinedorrelax{scr@osectarg}{}{%
+  \def\reserved@a{0}%
+  \ifx\scr@osectarg\reserved@a\else
+    \let\scr@osectarg\reserved@a
+    \PackageWarningNoLine{scrhack}{%
+      extended option handling for section commands\MessageBreak
+      deactivated, because of loading standard class%
+    }%
+  \fi
+}%
+\scr@ifundefinedorrelax{sectionformat}{}{%
+  \PackageWarningNoLine{scrhack}{%
+    Usage of \string\partformat\space
+    ...\string\subparagraphformat\MessageBreak
+    deactivated, because of loading\MessageBreak
+    standard class sections hack%
+  }%
+}
+\scr@ifundefinedorrelax{KOMAClassName}{}{%
+  \PackageWarningNoLine{scrhack}{%
+    KOMA-Script option `headings' removed,\MessageBreak
+    because of loading standard class sections hack%
+  }%
+  \RelaxFamilyKey[.\KOMAClassFileName]{KOMA}{headings}%
+  \KOMA@kav@removekey{.\KOMAClassFileName}{headings}%
+}
+\def\scr@class@titlesec@warning{%
+  \PackageWarning{scrhack}{%
+    Usage of `titlesec' should work, because of\MessageBreak
+    loading the standard class sections hack.\MessageBreak
+    However, you should know, there is not any\MessageBreak
+    support for this combination by the\MessageBreak
+    KOMA-Script author%
+  }%
+}
+%</standardsections&body>
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 %
 %
 % \subsection{Optionen ausführen}
