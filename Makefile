@@ -114,6 +114,7 @@ CLS_MAIN	= scrbook.cls \
 		  nomencl.hak \
 		  setspace.hak \
 		  lscape.hak \
+		  standardsections.hak \
 		  scrfontsizes.sty \
 		  visualize.lco \
 	          DIN.lco \
