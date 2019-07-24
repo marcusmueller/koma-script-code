@@ -1,4 +1,4 @@
-% \CheckSum{1688}
+% \CheckSum{1784}
 % \iffalse meta-comment
 % ======================================================================
 % scrhack.dtx
@@ -1293,18 +1293,18 @@
 % \end{macro}%^^A \landscape
 %
 %
-%
-% \subsection{Der Standard-Überschriften-Hack}
+% \selectlanguage{english}
+% \subsection{The standard classes sections hack}
 % \label{sec:standardsections}
-% Der Standard-Überschriften-Hack unterscheidet sich grundlegend von den
-% anderen Hacks. Zum einen patcht er nicht ein bestimmtes Paket, zum anderen
-% muss man ihn explizit aktivieren, damit er verwendet wird. Wird er
-% aktiviert, definiert er die Gliederungsbefehle hart auf die Definition aus
-% den Standardklassen um. Damit wird sichergestellt, dass auch Pakete, die
-% aufgrund der Überschriftendefinitionen in \KOMAScript{} nicht mit
-% \KOMAScript-Klassen funktionieren, plötzlich doch funktionieren. Dafür sind
-% aber diverse Features von \KOMAScript{} anschließend nicht mehr
-% funktionsfähig. Daher gibt es auch eine deutliche Warnung.
+% The \emph{standard classes sections hack} differs from each other
+% hack. First of all it does not patch a specific package but the class
+% definitions of section commands from \cs{part} till
+% \cs{subparagraph}. Additionally it resets several internal \LaTeX{} macros
+% which are changed by \KOMAScript{} classes to their original
+% definition. Last but not least it is not activated by default, but the user
+% has to activate it, if he needs it. The hack has more potential to break
+% things than to make things better. Because if this, there is not any support
+% for using this hack and the hack shows several warning messages.
 %
 % \begin{option}{standardsections}
 %    \begin{macrocode}
@@ -1315,7 +1315,7 @@
 %<*package&body>
 \AtEndOfPackage{%
   \if@scrhack@standardsections
-    \PackageInfo{scrhack}{loading standard sections hack}%
+    \PackageInfo{scrhack}{loading standard classes sections hack}%
     \input{standardsections.hak}%
   \fi
 }
@@ -1337,7 +1337,8 @@
 %    \begin{macrocode}
 %<*standardsections&body>
 \PackageWarningNoLine{scrhack}{%
-  using dangerous standard sections hack!\MessageBreak
+  You are loosing every kind of support because of\MessageBreak
+  using the dangerous standard classes sections hack!\MessageBreak
   This hack can break several classes and packages.\MessageBreak
   However, sometimes it is needed to make a\MessageBreak
   package work%
@@ -1715,14 +1716,45 @@
                                            {-1em}%
                                           {\normalfont\normalsize\bfseries}}%
   }%
-}
-% End of the derived code.
+}% End of the derived code.
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\@startsection}
+% \KOMAScript{} classes redefine this internal \LaTeX{} kernel macro. In this
+% case \cs{scr@saved@startsection} is defined, differs from
+% \cs{@startsection} and has the definition found before redefining the
+% original macro. We do nothing else but resetting \cs{@startsection} to this
+% saved definition.
+%    \begin{macrocode}
 \scr@ifundefinedorrelax{scr@saved@startsection}{}{%
   \ifx\@startsection\scr@saved@startsection\else
-    \PackageWarning{scrhack}{resetting \string\@startsection}%
+    \PackageWarningNoLine{scrhack}{Resetting \string\@startsection}%
     \let\@startsection\scr@saved@startsection
   \fi
 }
+%    \end{macrocode}
+% \end{macro}%^^A \@startsection
+%
+% \begin{macro}{\DeclareSectionCommand}
+% \begin{macro}{\RedeclareSectionCommand}
+% \begin{macro}{\DeclareNewSectionCommand}
+% \begin{macro}{\ProvideSectionCommand}
+% \begin{macro}{\DeclareSectionCommands}
+% \begin{macro}{\RedeclareSectionCommands}
+% \begin{macro}{\DeclareNewSectionCommands}
+% \begin{macro}{\ProvideSectionCommands}
+% These \KOMAScript{} commands do not make sense any longer after forced
+% redefinition of \cs{part} \dots{} \cs{subparagraph}. They even would not
+% work correctly after resetting, e.g., \cs{@startsection}. So best reaction
+% is to \emph{undefine} them.
+%    \begin{macrocode}
 \scr@ifundefinedorrelax{DeclareSectionCommand}{}{%
   \PackageWarningNoLine{scrhack}{%
     deactivating \string\DeclareSectionCommand\space
@@ -1736,42 +1768,6 @@
   \let\ProvideSectionCommand\undefined
   \let\ProvideSectionCommands\undefined
 }
-\scr@ifundefinedorrelax{scr@osectarg}{}{%
-  \def\reserved@a{0}%
-  \ifx\scr@osectarg\reserved@a\else
-    \let\scr@osectarg\reserved@a
-    \PackageWarningNoLine{scrhack}{%
-      extended option handling for section commands\MessageBreak
-      deactivated, because of loading standard class%
-    }%
-  \fi
-}%
-\scr@ifundefinedorrelax{sectionformat}{}{%
-  \PackageWarningNoLine{scrhack}{%
-    Usage of \string\partformat\space
-    ...\string\subparagraphformat\MessageBreak
-    deactivated, because of loading\MessageBreak
-    standard class sections hack%
-  }%
-}
-\scr@ifundefinedorrelax{KOMAClassName}{}{%
-  \PackageWarningNoLine{scrhack}{%
-    KOMA-Script option `headings' removed,\MessageBreak
-    because of loading standard class sections hack%
-  }%
-  \RelaxFamilyKey[.\KOMAClassFileName]{KOMA}{headings}%
-  \KOMA@kav@removekey{.\KOMAClassFileName}{headings}%
-}
-\def\scr@class@titlesec@warning{%
-  \PackageWarning{scrhack}{%
-    Usage of `titlesec' should work, because of\MessageBreak
-    loading the standard class sections hack.\MessageBreak
-    However, you should know, there is not any\MessageBreak
-    support for this combination by the\MessageBreak
-    KOMA-Script author%
-  }%
-}
-%</standardsections&body>
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -1780,7 +1776,165 @@
 % \end{macro}
 % \end{macro}
 % \end{macro}
+% \end{macro}%^^A \DeclareSectionCommand
 %
+% \begin{macro}{\scr@osectarg}
+% The \KOMAScript{} classes use this macro to store how to use the optional
+% argument of section commands. But with the standard class definition the
+% only possibility is to use it as running head and write it into the table of
+% contents without any extended handling. So the only value, that makes sense
+% is 0.
+%    \begin{macrocode}
+\scr@ifundefinedorrelax{scr@osectarg}{}{%
+  \def\reserved@a{0}%
+  \ifx\scr@osectarg\reserved@a\else
+    \let\scr@osectarg\reserved@a
+    \PackageWarningNoLine{scrhack}{%
+      Extended option handling for section commands\MessageBreak
+      deactivated, because of loading\MessageBreak
+      standard classes sections hack%
+    }%
+  \fi
+}%
+%    \end{macrocode}
+% \begin{macro}{\scr@activate@xsection}
+% Further changing of the value has to be deactivated.
+%    \begin{macrocode}
+\scr@ifundefinedorrelax{scr@activate@xsection}{}{%
+  \renewcommand*{\scr@activate@xsection}[1]{%
+    \edef\scr@osectarg{#1}\def\reserved@a{0}%
+    \ifx\scr@osectarg\reserved@a
+    \else
+      \let\scr@osectarg\reserved@a
+      \PackageWarning{scrhack}{%
+        Because of loading the standard classes\MessageBreak
+        sections hack, the extended option handling\MessageBreak
+        of section commands failed%
+      }%
+    \fi
+  }%
+}
+%    \end{macrocode}
+% \end{macro}%^^A \scr@activate@xsection
+% \end{macro}%^^A \scr@osectarg
+%
+% \begin{macro}{\partformat}
+% \begin{macro}{\chapterformat}
+% Most \cs{\dots format} macros of \KOMAScript{} are still used, because of
+% the redefinition of \cs{@seccntformat}. But \cs{part} and \cs{chapter} are
+% defined without using them.
+%    \begin{macrocode}
+\scr@ifundefinedorrelax{partformat}{}{%
+  \PackageWarningNoLine{scrhack}{%
+    Usage of \string\partformat\space
+    deactivated,\MessageBreak
+    because of loading the\MessageBreak
+    standard classes sections hack%
+  }%
+}
+\scr@ifundefinedorrelax{chapterformat}{}{%
+  \PackageWarningNoLine{scrhack}{%
+    Usage of \string\chapterformat\space
+    deactivated,\MessageBreak
+    because of loading the\MessageBreak
+    standard classes sections hack%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}%^^A \chapterformat
+% \end{macro}%^^A \partformat
+%
+% \begin{macro}{\sectionformat}
+% \begin{macro}{\subsectionformat}
+% \begin{macro}{\subsubsectionformat}
+% \begin{macro}{\paragraphformat}
+% \begin{macro}{\subparagraphformat}
+% All these commands have to be resetted to not use the automatic dot and to
+% add a \cs{quad} instead of an \cs{enskip}.
+%    \begin{macrocode}
+\scr@ifundefinedorrelax{sectionformat}{}{%
+  \PackageWarningNoLine{scrhack}{%
+    \string\sectionformat\space set to
+    `\string\thesection\string\quad',\MessageBreak
+    because of loading the standard classes sections hack%
+  }%
+  \renewcommand*{\sectionformat}{\thesection\quad}%
+}
+\scr@ifundefinedorrelax{subsectionformat}{}{%
+  \PackageWarningNoLine{scrhack}{%
+    \string\subsectionformat\space set to
+    `\string\thesubsection\string\quad'\MessageBreak
+    because of loading the standard classes sections hack%
+  }%
+  \renewcommand*{\subsectionformat}{\thesubsection\quad}%
+}
+\scr@ifundefinedorrelax{subsubsectionformat}{}{%
+  \PackageWarningNoLine{scrhack}{%
+    \string\subsubsectionformat\space set to
+    `\string\thesubsubsection\string\quad'\MessageBreak
+    because of loading the standard classes sections hack%
+  }%
+  \renewcommand*{\subsubsectionformat}{\thesubsubsection\quad}%
+}
+\scr@ifundefinedorrelax{paragraphformat}{}{%
+  \PackageWarningNoLine{scrhack}{%
+    \string\paragraphformat\space set to
+    `\string\theparagraph\string\quad'\MessageBreak
+    because of loading the standard classes sections hack%
+  }%
+  \renewcommand*{\paragraphformat}{\theparagraph\quad}%
+}
+\scr@ifundefinedorrelax{subparagraphformat}{}{%
+  \PackageWarningNoLine{scrhack}{%
+    \string\subparagraphformat\space set to
+    `\string\thesubparagraph\string\quad'\MessageBreak
+    because of loading the standard classes sections hack%
+  }%
+  \renewcommand*{\subparagraphformat}{\thesubparagraph\quad}%
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\partlineswithprefixformat}
+% \begin{macro}{\chapterlineswithprefixformat}
+% \begin{macro}{\chapterlinesformat}
+% \begin{macro}{\sectionlinesformat}
+% \begin{macro}{\sectioncatchphraseformat}
+% These \KOMAScript{} commands are not used any longer.
+%    \begin{macrocode}
+
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \begin{macrocode}
+\scr@ifundefinedorrelax{KOMAClassName}{}{%
+  \PackageWarningNoLine{scrhack}{%
+    KOMA-Script option `headings' removed,\MessageBreak
+    because of loading standard classes\MessageBreak
+    sections hack%
+  }%
+  \RelaxFamilyKey[.\KOMAClassFileName]{KOMA}{headings}%
+  \KOMA@kav@removekey{.\KOMAClassFileName}{headings}%
+}
+\def\scr@class@titlesec@warning{%
+  \PackageWarning{scrhack}{%
+    Usage of `titlesec' should work, because of\MessageBreak
+    loading the standard classes sections hack.\MessageBreak
+    However, you should know, there is not any\MessageBreak
+    support for this combination by the\MessageBreak
+    KOMA-Script author%
+  }%
+}
+%</standardsections&body>
+%    \end{macrocode}
+% \selectlanguage{ngerman}%^^A
 %
 % \subsection{Optionen ausführen}
 %
