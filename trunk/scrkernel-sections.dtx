@@ -1,4 +1,4 @@
-% \CheckSum{4780}
+% \CheckSum{4786}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -4017,7 +4017,11 @@
 %
 %
 % \begin{macro}{\hy@insteadofrefstepcounter}
-% \changes{v3.18}{2015/05/22}{neu (intern und \textsf{hyperref})}
+% \changes{v3.18}{2015/05/22}{neu (intern und \textsf{hyperref})}%^^A
+% \begin{macro}{\scr@chapter@before@hyperref@patch}
+% \changes{v3.27}{2019/07/24}{neu (intern für \textsf{scrhack})}%^^A
+% \begin{macro}{\scr@chapter@after@hyperref@patch}
+% \changes{v3.27}{2019/07/24}{neu (intern für \textsf{scrhack})}%^^A
 % Normalerweise führt \textsf{hyperref} via \cs{refstepcounter}
 % Initialisierungen für ein nachfolgendes \cs{addcontentsline} durch. Wenn
 % allerdings eine nicht nummerierte Überschrift ins Inhaltsverzeichnis
@@ -4033,25 +4037,29 @@
 %    \begin{macrocode}
 \newcommand*{\hy@insteadofrefstepcounter}[1]{}
 \let\hy@insteadofrefstepcounter\@gobble
-\BeforePackage{hyperref}{%
+\newcommand*{\scr@chapter@before@hyperref@patch}{%
   \let\scr@orig@chapter\@chapter
   \let\scr@orig@schapter\@schapter
   \let\scr@orig@addchap\@addchap
 }
-\AfterPackage!{hyperref}{%
+\BeforePackage{hyperref}{\scr@chapter@before@hyperref@patch}
+\newcommand*{\scr@chapter@after@hyperref@patch}{%
   \let\@chapter\scr@orig@chapter
   \let\@schapter\scr@orig@schapter
   \let\@addchap\scr@orig@addchap
   \ifx\hy@insteadofrefstepcounter\@gobble
     \renewcommand*{\hy@insteadofrefstepcounter}[1]{%
-      \Hy@MakeCurrentHrefAuto{#1*}%
+      \Hy@MakeCurrentHrefAuto{##1*}%
       \Hy@raisedlink{%
         \hyper@anchorstart{\@currentHref}\hyper@anchorend
       }%
     }%
   \fi
 }
+\AfterPackage!{hyperref}{\scr@chapter@after@hyperref@patch}
 %    \end{macrocode}
+% \end{macro}%^^A \scr@after@hyperref@patch
+% \end{macro}%^^A \scr@before@hyperref@patch
 % \end{macro}%^^A \hy@insteadofrefstepcounter
 %
 % \begin{macro}{\addparttocentry}
