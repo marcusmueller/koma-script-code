@@ -1554,6 +1554,71 @@ Es gibt keine interne Variante.%
 \EndIndexGroup
 
 
+\begin{Declaration}
+  \Macro{IfActiveMkBoth}\Parameter{Dann-Teil}\Parameter{Sonst-Teil}
+\end{Declaration}
+Bei\ChangedAt{v3.27}{\Package{scrbase}} der Umschaltung zwischen automatischen
+und manuellen Kolumnentiteln, verwendet der \LaTeX-Kern die Anweisung
+\DescRef{scrlayer.cmd.@mkboth}\important{\Macro{@mkboth}}\IndexCmd{@mkboth}.
+Im Falle automatischer Kolumnentitel setzt diese normalerweise sowohl den
+linken als auch rechten Markenanteil. Im Falle manueller Kolumnentiteln setzt
+sie keine Marke. Will man wissen, ob \DescRef{scrlayer.cmd.@mkboth} Marken
+setzt oder nicht, so verwenden viele Pakete einen Vergleich entweder mit
+\DescRef{maincls.cmd.markboth}\IndexCmd{markboth} oder
+\Macro{@gobbletwo}. Dies deckt aber nicht alle Fälle von möglichen
+Umdefinierungen von \DescRef{scrlayer.cmd.@mkboth} ab. Daher testet
+\Macro{IfActiveMkBoth}, ob \DescRef{scrlayer.cmd.@mkboth} tatsächlich zum
+Setzen einer Marke führen würde und deckt dabei sogar die Verwendung von
+\Macro{marks} für die Definition von \DescRef{scrlayer.cmd.@mkboth} ab. Wird
+eine solches aktives \DescRef{scrlayer.cmd.@mkboth} entdeckt, so wird der
+\PName{Dann-Teil} ausgeführt. In allen anderen Fällen wird der
+\PName{Sonst-Teil} ausgeführt.%
+\begin{Example}
+  Angenommen, Sie wollen in einem Paket im Fall der Verwendung automatischer
+  Kolumnentitel, beispielsweise durch den Seitenstil
+  \PageStyle{headings}\IndexPagestyle{headings} nur die rechte Marke setzen
+  und die linke unverändert lassen, wohingegen bei Verwendung manueller
+  Kolumentitel die Marken unverändert bleiben sollen. In einem ersten Ansatz
+  verwenden Sie dafür:
+\begin{lstcode}
+  \ifx\@mkboth\markboth \markright{Kolumnentitel}\fi
+\end{lstcode}
+  Etwas später entdecken Sie, dass irgendein Paket nicht wie gewohnt
+\begin{lstcode}
+  \let\@mkboth\markboth
+\end{lstcode}
+  sondern
+\begin{lstcode}
+  \renewcommand{\@mkboth}{\markboth}
+\end{lstcode}
+  verwendet hat, um automatische Kolumnentitel zu aktivieren. Daher ruft Ihr
+  Vergleich niemals die \DescRef{maincls.cmd.markright}-Anweisung auf.  Daher
+  ändern Sie den Vergleich oben zu
+\begin{lstcode}
+  \ifx\@mkboth\@gobbletwo\else \markright{Kolumnentitel}\fi
+\end{lstcode}
+  Leider wird nun \DescRef{maincls.cmd.markright} auch bei manuellen
+  Kolumentiteln aufgerufen, weil irgend jemand für diesen Fall
+\begin{lstcode}
+  \renewcommand{\@mkboth}[2]{%
+    \typeout{DEBUG: ignoring running head setting}%
+  }
+\end{lstcode}
+  definiert hat.
+
+  Beide Probleme sind jedoch mit Hilfe von \Package{scrbase} einfach zu lösen:
+\begin{lstcode}
+  \IfActiveMKBoth{\markright{Kolumnentitel}}{}
+\end{lstcode}%
+\end{Example}
+Noch einfacher lässt sich das Problem aus dem Beispiel übrigens mit Hilfe von
+\DescRef{scrlayer.cmd.@mkright} aus Paket
+\hyperref[cha:scrlayer]{\Package{scrlayer}} lösen (siehe
+\autoref{sec:scrlayer.pagestyle.content},
+\DescPageRef{scrlayer.cmd.@mkright}).%
+\EndIndexGroup
+
+
 \section{Definition sprachabhängiger Bezeichner}
 \seclabel{languageSupport}
 \BeginIndexGroup

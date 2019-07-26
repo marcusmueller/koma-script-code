@@ -1349,6 +1349,69 @@ corresponding internal command.%
 \EndIndexGroup
 
 
+\begin{Declaration}
+  \Macro{IfActiveMkBoth}\Parameter{then code}\Parameter{else code}
+\end{Declaration}
+% TODO: Fix new translations
+The\ChangedAt{v3.27}{\Package{scrbase}} \LaTeX{} kernel uses
+\DescRef{scrlayer.cmd.@mkboth}\important{\Macro{@mkboth}}\IndexCmd{@mkboth} to
+distinguish between automatic and manual running heads. Usually with automatic
+running heads it sets both marks. With manual running heads it does not set
+any mark. If someone wants to know whether or not automatic running heads are
+active, package authors often compare \DescRef{scrlayer.cmd.@mkboth} with
+\DescRef{maincls.cmd.markboth}\IndexCmd{markboth} or \Macro{@gobbletwo}. But
+this does not take care for all kind of possible definitions of
+\DescRef{scrlayer.cmd.@mkboth}. Because of this, \Macro{IfActiveMkBoth} tests
+whether or not \DescRef{scrlayer.cmd.@mkboth} really would set a mark. The
+test even accomplishes the usage of \Macro{marks} in the definition of
+\DescRef{scrlayer.cmd.@mkboth}. If it recognises such an active
+\DescRef{scrlayer.cmd.@mkboth} \PName{then code} is executed. In all other
+cases \PName{else code} is used.%
+\begin{Example}
+  Assuming, in a package you try to set only the right mark if and only if
+  automatic running heads, i.\,e. of pagestyle
+  \PageStyle{headings}\IndexPagestyle{headings}, are used. A first suggestion
+  for this could be:
+\begin{lstcode}
+  \ifx\@mkboth\markboth \markright{running head}\fi
+\end{lstcode}
+  Later you recognise, that some package does not use the usual
+\begin{lstcode}
+  \let\@mkboth\markboth
+\end{lstcode}
+  but
+\begin{lstcode}
+  \renewcommand{\@mkboth}{\markboth}
+\end{lstcode}
+  to activate automatic running heads. Because of this, your comparison always
+  fails and never calls \DescRef{maincls.cmd.markright}. To solve this, you
+  try the following change:
+\begin{lstcode}
+  \ifx\@mkboth\@gobbletwo\else \markright{running head}\fi
+\end{lstcode}
+  Unfortunately, now \DescRef{maincls.cmd.markright} is also called in case of
+  manual running heads, because someone defined
+\begin{lstcode}
+  \renewcommand{\@mkboth}[2]{%
+    \typeout{DEBUG: ignoring running head setting}%
+  }
+\end{lstcode}
+  for this case.
+
+  Fortunately both problems can be solved easily using \Package{scrbase}:
+\begin{lstcode}
+  \IfActiveMKBoth{\markright{Kolumnentitel}}{}
+\end{lstcode}%
+\end{Example}
+By the way, a slightly more simple solution for the problem from the example
+would be to use \DescRef{scrlayer.cmd.@mkright} from package
+\hyperref[cha:scrlayer]{\Package{scrlayer}} (see
+\autoref{sec:scrlayer.pagestyle.content},
+\DescPageRef{scrlayer.cmd.@mkright}).%
+% :ODOT
+\EndIndexGroup
+
+
 \section{Defining Language-Dependent Terms}
 \seclabel{languageSupport}
 \BeginIndexGroup
