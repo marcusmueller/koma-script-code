@@ -106,7 +106,7 @@ See `README'.
 
 The KOMA-Script bundle (but maybe not this file) was based upon the
 LaTeX 2.09 Script family created by Frank Neukam 1993 and the LaTeX2e
-standard classes created by The LaTeX3 Project 1994-1996.  You may
+standard classes created by The LaTeX3 Project 1994-1996.  You can
 find a complete unmodified copy of LaTeX2e at 
 <http://mirror.ctan.org/tex-archive/macros/latex/base/>.
 
