@@ -1023,18 +1023,19 @@ Currently, \Package{tocbasic} defines the following entry styles:
   \PValue{section} and \PValue{subsection} using this style, but add extra
   \PName{initial code} to the clones to change their defaults.
 
-  The style supports 16\important{\PValue{level}, \PValue{beforeskip},
+  The style supports 18\important{\PValue{level}, \PValue{beforeskip},
     \PValue{breakafternumber}, \PValue{dynnumwidth}, \PValue{entryformat},
     \PValue{entrynumberformat}, \PValue{indent}, \PValue{linefill},
     \PValue{numsep}, \PValue{numwidth}, \PValue{onstarthigherlevel},
     \PValue{onstartlowerlevel}, \PValue{onstartsamelevel},
     \PValue{pagenumberbox}, \PValue{pagenumberformat},
-    \PValue{raggedentrytext}, \PValue{raggedpagenumber}} additional attributes
-  in addition to the default \PValue{level} attribute. The defaults of all
-  these attributes depend on the name of the \PName{entry level} and
-  correspond to the results of the standard classes. So after loading
-  \Package{tocbasic}, you can change the style of the entries in the table of
-  contents of the standard classes into \PValue{tocline} using
+    \PValue{pagenumberwidth}, \PValue{raggedentrytext},
+    \PValue{raggedpagenumber}, \PValue{rightindent}} additional attributes in
+  addition to the default \PValue{level} attribute. The defaults of all these
+  attributes depend on the name of the \PName{entry level} and correspond to
+  the results of the standard classes. So after loading \Package{tocbasic},
+  you can change the style of the entries in the table of contents of the
+  standard classes into \PValue{tocline} using
   \DescRef{\LabelBase.cmd.DeclareTOCEntryStyle} without this leading directly
   to major changes in their appearance. Thus you can precisely change only
   those attributes that are necessary for the desired changes. The same
@@ -1197,6 +1198,17 @@ Currently, \Package{tocbasic} defines the following entry styles:
       \PValue{tocline} style}
     \label{fig:tocbasic.tocline}
   \end{figure}
+\item[\PValue{toctext}]\ChangedAt{v3.27}{\Package{tocbasic}}%
+% TODO: Fix new translation
+  is somehow special. All other styles produce one paragraph per entry. But
+  this one produces one paragraph for all consecutive entries of this
+  style. With 13 attributes it is almost as high configurable as
+  \PValue{tocline}. This style hardly needs, that a still open paragraph is
+  finished at the very beginning of the entry of another style and at the end
+  of the current table of contents or list of something. So it should never be
+  combined with entries or tables of contents or lists of something, that are
+  generated without using mechanisms of \Package{tocbasic}.
+% :ODOT
 \item[\PValue{undottedtocline}] is similar to the style used by the standard
   \Class{book} and \Class{report} classes for the \PValue{chapter} entry
   level, or by \Class{article} for the \PValue{section} entry level in the
@@ -1276,6 +1288,15 @@ Finally, using \Macro{DeclareTOCStyleEntry} will define the internal command
   }{%
     Attributes of the TOC-entry styles (\emph{continued})%
   }%
+  \entry{\OptionVName{afterpar}{code}}{%
+    \ChangedAt{v3.27}{\Package{tocbasic}}%
+% TODO: Fix new translation
+    The \PName{code} will be executed at the end of the paragraph in which an
+    entry with style \PValue{toctext} is printed. If several entries of the
+    paragraph has such settings, the code of them is be executed in the
+    same order as the entries are printed.%
+% :ODOT
+  }%
   \entry{\OptionVName{beforeskip}{length}}{%
     The  vertical distance inserted before an entry of this level in the
     \PValue{tocline} style (see \autoref{fig:tocbasic.tocline}). The distance
@@ -1350,11 +1371,17 @@ Finally, using \Macro{DeclareTOCStyleEntry} will define the internal command
     will execute the \PName{command} as well.%
   }%
   \entry{\OptionVName{indent}{length}}{%
-    The horizontal distance of the entry from the left margin (see
-    \autoref{fig:tocbasic.dottedtocline} and \autoref{fig:tocbasic.tocline}).
-
-    For the \PValue{tocline} style, all entry levels whose names start with
-    ``\texttt{sub}'' are initialised with the
+% TODO: Fix new translation
+    For\ChangedAt{v3.27}{\Package{tocbasic}} style \PValue{toctext} the
+    \PName{length} is the horizontal distance of the paragraph with the
+    entries. If different entries have different setting, the last one
+    wins. For the other style \PName{length} is the horizontal distance of the
+    entry from the left margin (see \autoref{fig:tocbasic.dottedtocline} and
+    \autoref{fig:tocbasic.tocline}).
+% :ODOT
+    
+    For the styles \PValue{tocline} and \PValue{toctext}, all entry levels
+    whose names start with ``\texttt{sub}'' are initialised with the
     \PValue{indent}+\PValue{numwidth} of the entry level of the same name
     without this prefix. For the \PValue{dottedtocline},
     \PValue{undottedtocline}, and \PValue{tocline} styles, the initial values
@@ -1405,6 +1432,12 @@ Finally, using \Macro{DeclareTOCStyleEntry} will define the internal command
     \PValue{dynnumwidth} is active, it will correct the number width to achieve
     this. Otherwise it simply throws a warning, if the condition is not met.
 
+% TODO: Fix new translation
+    The\ChangedAt{v3.27}{\Package{tocbasic}} style \PValue{toctext} always
+    adds a horizontal space of width \PName{length} after the number of the
+    entry.
+% :ODOT
+    
     The initial \PName{length} is 0.4\Unit{em}.%
   }%
   \entry{\OptionVName{numwidth}{length}}{%
@@ -1425,6 +1458,44 @@ Finally, using \Macro{DeclareTOCStyleEntry} will define the internal command
     standard classes. All other levels do not have an initial value. Therefore
     you must set \PValue{numwidth} explicitly when the entry level is first
     used.%
+  }%
+  \entry{\OptionVName{onendentry}{code}}{%
+    \ChangedAt{v3.27}{\Package{tocbasic}}%
+% TODO: Fix new translation
+    The \PName{code} is executed immediately after an entry with style
+    \PValue{toctext}, if this entry is not the last one of the paragraph. The
+    user has to take care to not finish the paragraph within \PName{Code}.
+
+    Note: In reality the \PName{code} is not executed at the end of the entry
+    but before the next entry with style \PValue{toctext}.%
+% :ODOT
+  }%
+  \entry{\OptionVName{onlastendentry}{code}}{%
+    \ChangedAt{v3.27}{\Package{tocbasic}}%
+% TODO: Fix new translation
+    The \PName{code} is executed immediately before the paragraph of an entry
+    with style \PValue{toctext} ends, if this entry is the last one of the
+    paragraph. The user should take care to not finish the paragraph within
+    \PName{code}.%
+% :ODOT
+  }%
+  \entry{\OptionVName{onstartentry}{code}}{%
+    \ChangedAt{v3.27}{\Package{tocbasic}}%
+% TODO: Fix new translation
+    The \PName{code} is executed immediately before an entry with style
+    \PValue{toctext}, if this entry is not the first one of the paragraph.
+    The user has to take care to not finish the paragraph within
+    \PName{code}.%
+% :ODOT
+  }%
+  \entry{\OptionVName{onstartfirstentry}{code}}{%
+    \ChangedAt{v3.27}{\Package{tocbasic}}%
+% TODO: Fix new translation
+    The \PName{code} is executed immediately before an entry with style
+    \PValue{toctext}, if this entry is the first one of the paragraph.
+    The user should take care to not already start the paragraph within
+    \PName{code}.%
+% :ODOT
   }%
   \entry{\OptionVName{onstarthigherlevel}{code}}{%
     The \PValue{tocline} style can execute \PName{code} at the start of an
@@ -1489,6 +1560,25 @@ Finally, using \Macro{DeclareTOCStyleEntry} will define the internal command
     all other levels prints the argument in
     \Macro{normalfont}\Macro{normalcolor}.%
   }%
+  \entry{\OptionVName{pagenumberwidth}{length}}{%
+    \ChangedAt{v3.27}{\Package{tocbasic}}%
+% TODO: Fix new translation
+    You can use this attribute to locally change the width of the default page
+    number box of an entry with the style \PValue{tocline} from
+    \Macro{@pnumwidth} to the given \PName{length}. Note, if you change the
+    default page number box with attribute \Option{pagenumberbox} this is not
+    longer used automatically.%
+% :ODOT
+  }%
+  \entry{\OptionVName{prepagenumber}{code}}{%
+% TODO: Fix new translation
+    Style \PValue{toctext} executes \PName{code} between the text of an entry
+    and the page number of the entry. Usually this is used to add a horizontal
+    space or separator between text and page number.%
+
+    The default is to a non breakable space using \Macro{nonbreakspace}.%
+% :ODOT
+  }%
   \entry{\OptionVName{raggedentrytext}{switch}}{%
     The\ChangedAt{v3.21}{\Package{tocbasic}} \PName{switch} is one of the
     values for simple switches from \autoref{tab:truefalseswitch},
@@ -1515,6 +1605,23 @@ Finally, using \Macro{DeclareTOCStyleEntry} will define the internal command
     \DescRef{\LabelBase.cmd.TOCLineLeaderFill} for the \PValue{linefill}
     attribute.%
   }%
+  \entry{\OptionVName{raggedright}{switch}}{%
+    \ChangedAt{v3.27}{\Package{tocbasic}}%
+% TODO: Fix new translation
+    The \PName{switch} is one of the values for simple switches from
+    \autoref{tab:truefalseswitch}, \autopageref{tab:truefalseswitch}. If the
+    switch is active for any entry with style \PValue{toctext} inside the same
+    paragraph, the whole paragraph is printed ragged-right.
+% :ODOT
+  }%
+  \entry{\OptionVName{rightindent}{length}}{%
+    \ChangedAt{v3.27}{\Package{tocbasic}}%
+% TODO: Fix new translation
+    You can use this attribute to locally change the right indent of the text
+    of an entry with style \PValue{tocline} from \Macro{@tocrmarg} to the
+    given \PName{length}.%
+  }%
+% :ODOT
 \end{desclist}
 
 While \Macro{DeclareTOCStyleEntry} defines only one \PName{entry level},
@@ -2173,7 +2280,9 @@ the styles.%
   }%
   \entry{\OptionVName{category}{string}}{%
     \ChangedAt{v3.27}{\Package{tocbasic}}%
+% TODO: Fix new translation
     This option can be used as a synonym of \OptionVName{owner}{string}.%
+% :ODOT
   }%
   \entry{\OptionVName{counterwithin}{\LaTeX{} counter}}{%
     If you define a new floating or non-floating environment, a new counter

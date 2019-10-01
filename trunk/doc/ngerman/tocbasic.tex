@@ -749,12 +749,12 @@ Komma getrennte Folge von \PName{Eigenschaften}. Das Paket
 \item[\PValue{numberline}] \ChangedAt{v3.12}{\Package{tocbasic}}%
   bedeutet, dass all diejenigen Einträge, die mit Hilfe der Anweisung
   \DescRef{\LabelBase.cmd.addxcontentsline} oder der Anweisung
-  \DescRef{\LabelBase.cmd.addxcontentslinetoeachtocfile} vorgenommen werden, wobei das optionale Argument für die Nummer fehlt
-  oder leer ist, mit einer leeren
-  \DescRef{\LabelBase.cmd.numberline}-Anweisung versehen werden. Das führt in
-  der Regel dazu, dass diese Einträge nicht linksbündig mit der Nummer,
-  sondern mit dem Text der nummerierten Einträge gleicher Ebene gesetzt
-  werden. Bei\ChangedAt{v3.20}{\Package{tocbasic}} Verwendung des
+  \DescRef{\LabelBase.cmd.addxcontentslinetoeachtocfile} vorgenommen werden,
+  wobei das optionale Argument für die Nummer fehlt oder leer ist, mit einer
+  leeren \DescRef{\LabelBase.cmd.numberline}-Anweisung versehen werden. Das
+  führt in der Regel dazu, dass diese Einträge nicht linksbündig mit der
+  Nummer, sondern mit dem Text der nummerierten Einträge gleicher Ebene
+  gesetzt werden. Bei\ChangedAt{v3.20}{\Package{tocbasic}} Verwendung des
   Verzeichniseintragsstils \PValue{tocline} kann die Eigenschaft weitere
   Auswirkungen haben. Siehe dazu die Stil-Eigenschaften
   \Option{breakafternumber} und \Option{entrynumberformat} in
@@ -1103,22 +1103,23 @@ Derzeit werden von \Package{tocbasic} die folgenden Eintragsstile definiert:
   der Klone so ab, dass sie unterschiedliche Voreinstellungen besitzen.
 
   Der Stil kennt neben der Standardeigenschaft \PValue{level} noch
-  16\important{\PValue{level}, \PValue{beforeskip}, \PValue{breakafternumber},
+  18\important{\PValue{level}, \PValue{beforeskip}, \PValue{breakafternumber},
     \PValue{dynnumwidth}, \PValue{entryformat}, \PValue{entrynumberformat},
     \PValue{indent}, \PValue{linefill}, \PValue{numsep}, \PValue{numwidth},
     \PValue{onstarthigherlevel}, \PValue{onstartlowerlevel},
     \PValue{onstartsamelevel}, \PValue{pagenumberbox},
-    \PValue{pagenumberformat}, \PValue{raggedentrytext},
-    \PValue{raggedpagenumber}} weitere Eigenschaften. Die Voreinstellungen all
-  dieser Eigenschaften werden abhängig vom Namen der \PName{Eintragsebene}
-  bestimmt und orientieren sich dann an den Ergebnissen der
-  Standardklassen. Es ist daher möglich, nach Laden von \Package{tocbasic} den
-  Stil der Inhaltsverzeichniseinträge der Standardklassen mit
-  \DescRef{\LabelBase.cmd.DeclareTOCEntryStyle} in \PValue{tocline} zu ändern,
-  ohne dass dies unmittelbar zu größeren Veränderungen im Aussehen der
-  Inhaltsverzeichniseinträge führt. So kann man gezielt nur die Eigenschaften
-  ändern, die für erwünschte Änderungen notwendig sind.  Dasselbe gilt für
-  Abbildungs- und Tabellenverzeichnis der Standardklassen.%
+    \PValue{pagenumberformat}, \PValue{pagenumberwidth},
+    \PValue{raggedentrytext}, \PValue{raggedpagenumber}, \PValue{rightindent}}
+  weitere Eigenschaften. Die Voreinstellungen all dieser Eigenschaften werden
+  abhängig vom Namen der \PName{Eintragsebene} bestimmt und orientieren sich
+  dann an den Ergebnissen der Standardklassen. Es ist daher möglich, nach
+  Laden von \Package{tocbasic} den Stil der Inhaltsverzeichniseinträge der
+  Standardklassen mit \DescRef{\LabelBase.cmd.DeclareTOCEntryStyle} in
+  \PValue{tocline} zu ändern, ohne dass dies unmittelbar zu größeren
+  Veränderungen im Aussehen der Inhaltsverzeichniseinträge führt. So kann man
+  gezielt nur die Eigenschaften ändern, die für erwünschte Änderungen
+  notwendig sind.  Dasselbe gilt für Abbildungs- und Tabellenverzeichnis der
+  Standardklassen.%
 
   Aufgrund der hohen Flexibilität kann dieser Stil prinzipiell die Stile
   \PValue{dottedtocline}, \PValue{undottedtocline} und \PValue{largetocline}
@@ -1272,6 +1273,21 @@ Derzeit werden von \Package{tocbasic} die folgenden Eintragsstile definiert:
       \PValue{tocline}}
     \label{fig:tocbasic.tocline}
   \end{figure}
+\item[\PValue{toctext}]\ChangedAt{v3.27}{\Package{tocbasic}}%
+  stellt eine Besonderheit dar. Während alle anderen Stile je Eintrag einen
+  Absatz erzeugen, wird hier für alle aufeinanderfolgenden Einträge dieses
+  Stils nur ein einziger Absatz erzeugt.  Für die Konfigurierung stehen mit
+  13\important{\PValue{afterpar}, \PValue{entryformat},
+    \PValue{entrynumberformat}, \PValue{indent}, \PValue{numsep},
+    \PValue{onendentry}, \PValue{onendlastentry}, \PValue{onstartentry},
+    \PValue{onstartfirstentry}, \PValue{pagenumberformat},
+    \PValue{prepagenumber}, \PValue{raggedright}, \PValue{rightindent}}
+  Eigenschaften fast so viele Möglichkeiten wie bei \PValue{tocline} zur
+  Verfügung. Dieser Stil ist aber zwingend darauf angewiesen, dass am Anfang
+  aller anderen Stile und auch am Ende des Verzeichnisses ein noch nicht
+  beendeter Absatz tasächlich beendet wird. Daher sollten Einträge dieses
+  Stils nicht mit Einträgen oder Verzeichnissen kombiniert werden, die an
+  \Package{tocbasic} vorbei erzeugt werden.
 \item[\PValue{undottedtocline}] entspricht dem Stil, der von den
   Standardklassen \Class{book} und \Class{report} für die Ebene
   \PValue{chapter} und von \Class{article} für die Ebene \PValue{section}
@@ -1353,12 +1369,20 @@ Anweisung \Macro{l@\PName{Eintragsebene}}.
   }{%
     Attribute der Verzeichniseintragsstile (\emph{Fortsetzung})%
   }%
+  \entry{\OptionVName{afterpar}{Code}}{%
+    \ChangedAt{v3.27}{\Package{tocbasic}}%
+    Der angegebene \PName{Code} wird nach dem Ende des Absatzes ausgeführt, in
+    dem ein Eintrag mit dem Stil \PValue{toctext} ausgegeben wird. Verfügen
+    mehrere Einträge über solche Einstellungen, so werden diese in der
+    Reihenfolge der Einträge ausgeführt.%
+  }%
   \entry{\OptionVName{beforeskip}{Länge}}{%
     Vertikaler Abstand, der vor einem Eintrag dieser Ebene im Stil
-    \PValue{tocline} eingefügt wird (siehe \autoref{fig:tocbasic.tocline}). Der
-    Abstand wird je nach Ebene mit \Macro{vskip} oder \Macro{addvspace}
-    eingefügt, so dass diesbezüglich möglichst Kompatibilität zu den
-    Standardklassen und früheren Versionen von \KOMAScript{} besteht.
+    \PValue{tocline} eingefügt wird (siehe
+    \autoref{fig:tocbasic.tocline}). Der Abstand wird je nach Ebene mit
+    \Macro{vskip} oder \Macro{addvspace} eingefügt, so dass diesbezüglich
+    möglichst Kompatibilität zu den Standardklassen und früheren Versionen von
+    \KOMAScript{} besteht.
 
     Bei der \PName{Eintragsebene} \PValue{part} wird das Attribut mit
     \texttt{2.25em plus 1pt} initialisiert, bei \PValue{chapter} mit
@@ -1438,17 +1462,22 @@ Anweisung \Macro{l@\PName{Eintragsebene}}.
     ausgeführt wird.%
   }%
   \entry{\OptionVName{indent}{Länge}}{%
-    Horizontaler Abstand des Eintrags vom linken Rand (siehe
-    \autoref{fig:tocbasic.dottedtocline} und \autoref{fig:tocbasic.tocline}).
+    Beim\ChangedAt{v3.27}{\Package{tocbasic}} Stil \PValue{toctext} ist
+    \PName{Länge} der horizontale Abstand des Absatzes vom linken Rand. Haben
+    die unterschiedlichen Einträge des Absatzes unterschiedliche
+    Einstellungen, so gewinnt der letzte Eintrag. Bei den übrigen Stilen ist
+    \PValue{Länge} entsprechend der horizontale Abstand des Eintrags vom
+    linken Rand (siehe \autoref{fig:tocbasic.dottedtocline} und
+    \autoref{fig:tocbasic.tocline}).
 
-    Beim Stil \PValue{tocline} wird für alle Eintragsebenen, deren Name mit
-    »\texttt{sub}« beginnt, eine Initialisierung mit
-    \PValue{indent}+\PValue{numwidth} der gleichnamigen Eintragsebene ohne
-    diesen Präfix vorgenommen, falls eine solche Ebene mit entsprechenden
-    Eigenschaften existiert. Bei den Stilen \PValue{dottedtocline},
-    \PValue{undottedtocline} und \PValue{tocline} findet für die
-    Eintragsebenen \PValue{part} bis \PValue{subparagraph} sowie
-    \PValue{figure} und \PValue{table} eine Initialisierung mit Werten
+    Bei den Stilen \PValue{tocline} und \PValue{toctext} wird für alle
+    Eintragsebenen, deren Name mit »\texttt{sub}« beginnt, eine
+    Initialisierung mit \PValue{indent}+\PValue{numwidth} der gleichnamigen
+    Eintragsebene ohne diesen Präfix vorgenommen, falls eine solche Ebene mit
+    entsprechenden Eigenschaften existiert. Bei den Stilen
+    \PValue{dottedtocline}, \PValue{undottedtocline} und \PValue{tocline}
+    findet für die Eintragsebenen \PValue{part} bis \PValue{subparagraph}
+    sowie \PValue{figure} und \PValue{table} eine Initialisierung mit Werten
     entsprechend der Standardklassen statt. Alle anderen Ebenen erhalten keine
     Initialisierung. Für sie ist eine explizite Angabe daher bei der ersten
     Verwendung zwingend.%
@@ -1503,6 +1532,10 @@ Anweisung \Macro{l@\PName{Eintragsebene}}.
     hingegen lediglich eine Warnung ausgegeben, wenn diese Bedingung nicht
     eingehalten wird.
 
+    Der\ChangedAt{v3.27}{\Package{tocbasic}} Stil \PValue{toctext} fügt
+    dagegen immer einen Abstand dieser \PName{Länge} nach der Nummer des
+    Eintrags ein.
+
     Die Eigenschaft wird mit einem Wert von 0,4\Unit{em} initialisiert.%
   }%
   \entry{\OptionVName{numwidth}{Länge}}{%
@@ -1516,22 +1549,52 @@ Anweisung \Macro{l@\PName{Eintragsebene}}.
     Beim Stil \PValue{tocline} wird für alle Eintragsebenen, deren Name mit
     »\texttt{sub}« beginnt, eine Initialisierung mit dem Wert der
     gleichnamigen Eintragsebene ohne diesen Präfix zuzüglich 0,9\Unit{em}
-    vorgenommen, falls eine solche Ebene mit entsprechender
-    Eigenschaften existiert. Bei den Stilen \PValue{dottedtocline},
-    \PValue{undottedtocline} und \PValue{tocline} findet für die
-    Eintragsebenen \PValue{part} bis \PValue{subparagraph} sowie
-    \PValue{figure} und \PValue{table} eine Initialisierung mit Werten
-    entsprechend der Standardklassen statt. Alle anderen Ebenen erhalten keine
-    Initialisierung. Für sie ist eine explizite Angabe daher bei der
-    ersten Verwendung zwingend.%
+    vorgenommen, falls eine solche Ebene mit entsprechender Eigenschaften
+    existiert. Bei den Stilen \PValue{dottedtocline}, \PValue{undottedtocline}
+    und \PValue{tocline} findet für die Eintragsebenen \PValue{part} bis
+    \PValue{subparagraph} sowie \PValue{figure} und \PValue{table} eine
+    Initialisierung mit Werten entsprechend der Standardklassen statt. Alle
+    anderen Ebenen erhalten keine Initialisierung. Für sie ist eine explizite
+    Angabe daher bei der ersten Verwendung zwingend.%
+  }%
+  \entry{\OptionVName{onendentry}{Code}}{%
+    \ChangedAt{v3.27}{\Package{tocbasic}}%
+    Führt den angegebenen \PName{Code} unmittelbar nach einem Eintrag im Stil
+    \PValue{toctext} aus, sofern es nicht der letzte Eintrag im Absatz
+    ist. Der Anwender muss unbedingt sicherstellen, dass \PName{Code} auf
+    keinen Fall zum Beenden des Absatzes führt.
+
+    Hinweis: Tatsächlich wird der \PName{Code} gar nicht am Ende des Eintrags,
+    sondern vor dem nächsten Eintrag im Stil \PValue{toctext} ausgeführt.%
+  }%
+  \entry{\OptionVName{onlastendentry}{Code}}{%
+    \ChangedAt{v3.27}{\Package{tocbasic}}%
+    Führt den angegebenen \PName{Code} unmittelbar vor dem Ende des Absatzes
+    mit dem Eintrag im Stil \PValue{toctext} aus, sofern es sich um den
+    letzten Eintrag im Absatz handelt. Der Anwender sollte sicherstellen, dass
+    \PName{Code} nicht zum Beenden des Absatzes führt.%
+  }%
+  \entry{\OptionVName{onstartentry}{Code}}{%
+    \ChangedAt{v3.27}{\Package{tocbasic}}%
+    Führt den angegebenen \PName{Code} unmittelbar vor dem Eintrag im Stil
+    \PValue{toctext} aus, sofern es sich nicht um den ersten Eintrag im Absatz
+    handelt. Der Anwender muss unbedingt sicherstellen, dass \PName{Code} auf
+    keinen Fall zum Beenden des Absatzes führt.%
+  }%
+  \entry{\OptionVName{onstartfirstentry}{Code}}{%
+    \ChangedAt{v3.27}{\Package{tocbasic}}%
+    Führt den angegebenen \PName{Code} unmittelbar vor dem Eintrag im Stil
+    \PValue{toctext} aus, sofern es sich um den ersten Eintrag im Absatz
+    handelt. Der Anwender sollte sicherstellen, dass \PName{Code} den
+    Absatz nicht bereits beginnt.%
   }%
   \entry{\OptionVName{onstarthigherlevel}{Code}}{%
     Der Stil \PValue{tocline} kann zu Beginn eines Eintrags eine Aktion in
     Abhängigkeit davon ausführen, ob der zuletzt gesetzte Eintrag einen
-    höheren, denselben oder einen niedrigeren \PName{level}-Wert
-    hatte. Im Falle, dass der aktuelle Eintrag einen größeren
-    \PName{level}-Wert besitzt, in der Hierarchie der Einträge also tiefer
-    steht, wird der über diese Eigenschaft angegebene \PName{Code} ausgeführt.
+    höheren, denselben oder einen niedrigeren \PName{level}-Wert hatte. Im
+    Falle, dass der aktuelle Eintrag einen größeren \PName{level}-Wert
+    besitzt, in der Hierarchie der Einträge also tiefer steht, wird der über
+    diese Eigenschaft angegebene \PName{Code} ausgeführt.
 
     Die Erkennung funktioniert übrigens nur, solange sich \Macro{lastpenalty}
     seit dem letzten Eintrag nicht geändert hat.
@@ -1593,6 +1656,24 @@ Anweisung \Macro{l@\PName{Eintragsebene}}.
     \Macro{large}\Macro{bfseries}. Für alle anderen Ebenen erfolgt die Ausgabe
     in \Macro{normalfont}\Macro{normalcolor}.%
   }%
+  \entry{\OptionVName{pagenumberwidth}{Länge}}{%
+    \ChangedAt{v3.27}{\Package{tocbasic}}%
+    Mit dieser Eigenschaft kann die Breite der Standardbox für die Seitenzahl
+    eines Eintrags im Stil \PValue{tocline} von \Macro{@pnumwidth} in die
+    angegebene \PName{Länge} geändert werden. Es ist zu beachten, dass bei
+    Änderung des Befehls für die Box über die Eigenschaft
+    \Option{pagenumberbox} die angegebene \PName{Länge} nicht mehr automatisch
+    Anwendung findet.%
+  }%
+  \entry{\OptionVName{prepagenumber}{Code}}{%
+    \ChangedAt{v3.27}{\Package{tocbasic}}%
+    Im Stil \PValue{toctext} wird zwischen dem Eintragstext und der Seitenzahl
+    \PName{Code} ausgeführt. Dies dient in erster Linie dazu, Abstand oder
+    Trennzeichen zwischen Text und Seitenzahl einzufügen.%
+
+    Voreingestellt ist mit \Macro{nonbreakspace} ein nicht umbrechbares
+    Leerzeichen.%
+  }%
   \entry{\OptionVName{raggedentrytext}{Schalter}}{%
     \ChangedAt{v3.21}{\Package{tocbasic}}%
     \PName{Schalter} ist einer der Werte für einfache Schalter aus
@@ -1617,6 +1698,20 @@ Anweisung \Macro{l@\PName{Eintragsebene}}.
     In der Voreinstellung ist dieser Schalter nicht gesetzt und passt damit
     zur Initialisierung von \PValue{linefill} sowohl mit \Macro{hfill} als
     auch mit \DescRef{\LabelBase.cmd.TOCLineLeaderFill}.%
+  }%
+  \entry{\OptionVName{raggedright}{Schalter}}{%
+    \ChangedAt{v3.27}{\Package{tocbasic}}%
+    \PName{Schalter} ist einer der Werte für einfache Schalter aus
+    \autoref{tab:truefalseswitch}, \autopageref{tab:truefalseswitch}.
+    Ist der Schalter innerhalb eines Absatzes bei irgend einem Eintrag im Stil
+    \PValue{toctext} gesetzt, so wird der komplette Absatz in linksbündigem
+    Flattersatz gesetzt.%
+  }%
+  \entry{\OptionVName{rightindent}{Länge}}{%
+    \ChangedAt{v3.27}{\Package{tocbasic}}%
+    Mit dieser Eigenschaft kann der rechte Rand für den Text eines Eintrags im
+    Stil \PValue{tocline} von \Macro{@tocrmarg} in die angegebene
+    \PName{Länge} geändert werden.%
   }%
 \end{desclist}
 
