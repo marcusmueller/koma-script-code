@@ -1,4 +1,4 @@
-% \CheckSum{1591}
+% \CheckSum{1600}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-tocstyle.dtx
@@ -792,6 +792,21 @@
 %    \begin{macrocode}
 \newcommand*{\@ExecuteTOCEntryStyleInitCode}[2]{%
   \let\scr@dte@doopts\@empty
+%    \end{macrocode}
+% \changes{v3.27}{2019/10/02}{Initialisierung von
+%   \cs{scr@dte@\meta{Stil}@init}}%^^A
+% Weil die Festlegung, welche Optionen bzw. welche Makros für einen Stil
+% benötigt werden über die Deklaration der Optionen stattfindet und diese
+% Deklaration nicht etwa bei der Festlegung des Stils sondern bei der
+% Zuweisung des Stils an einen Eintrag erfolgt, muss hier auch die do-Liste
+% dieser Information gelöscht werden. Anderenfalls würde sie über alle
+% Einträge desselben Stils ständig anwachsen und damit diverse Einträge
+% mehrfach enthalten. Vermutlich wäre es besser, hier tatsächlich eine Liste
+% je Eintrag statt eine je Stil zu erzeugen, aber so ist es eben nicht. Also
+% wird hier immer wieder die gleiche Liste neu aufgebaut und muss deshalb zu
+% Beginn zurückgesetzt werden.
+%    \begin{macrocode}
+  \expandafter\let\csname scr@dte@#1@needs\endcsname\relax
   \scr@ifundefinedorrelax{scr@dte@#1@init}{}{%
     \def\DefineTOCEntryBooleanOption{\@DefineTOCEntryBooleanOption{#1}}%
     \def\DefineTOCEntryCommandOption{\@DefineTOCEntryCommandOption{#1}}%
@@ -893,7 +908,19 @@
     \endgroup
     \if@tempswa
       \@nameuse{scr@dte@def@l@#2}{#3}%
+%    \end{macrocode}
+% \changes{v3.27}{2019/10/02}{macro name prefix for style information
+% changed}%^^A
+% Note: Before \KOMAScript~3.27 the style name of an entry was stored in
+% \cs{scr@dte@\meta{level name}@style}. But this war wrong, because the prefix
+% \texttt{scr@dte} is used for attributes of the style (while declaring an
+% entry), but the style is an attribute of the entry. So usage of the prefix
+% \texttt{scr@tso} would be much better. This means usage of
+% \cs{scr@dte@\meta{level name}@style} is deprecated and should be replaced by
+% \cs{scr@tso@\meta{level name}@style}.
+%    \begin{macrocode}
       \expandafter\edef\csname scr@dte@#3@style\endcsname{#2}%
+      \expandafter\edef\csname scr@tso@#3@style\endcsname{#2}%
 %    \end{macrocode}
 % \changes{v3.21}{2016/06/09}{\cs{toclevel@\emph{ebene}} wird für
 %     \textsf{hyperref} neu gesetzt}%^^A
