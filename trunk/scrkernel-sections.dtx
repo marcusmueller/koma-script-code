@@ -1,4 +1,4 @@
-% \CheckSum{4795}
+% \CheckSum{4824}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -2237,14 +2237,23 @@
 % \begin{description}
 % \item[\texttt{tocstyle}] 
 % \changes{v3.20}{2015/11/12}{Option \texttt{tocstyle} frühzeitig
-%     auswerten}%^^A
-%   Verzeichnis-Eintrags-Stil, damit auch für diesen anschließend die Optionen
-%   definiert bzw. aktiviert werden können.
+%   auswerten}%^^A
+% \changes{v3.27}{2019/10/02}{Präfix für die Speicherung des
+%   Verzeichnisstils geändert}%^^A
+% Verzeichnis-Eintrags-Stil, damit auch für diesen anschließend die Optionen
+% definiert bzw. aktiviert werden können. Zu beachten ist hier, dass ab
+% \textsf{tocbasic} 3.27 der Stil korrekter Weise in \cs{scr@tso@\meta{level
+% name}@style} statt in \cs{scr@dte@\meta{level name}@style} gespeichert
+% wird. Zur Sicherheit werden hier beide Makros behandelt.
 % \end{description}
 %    \begin{macrocode}
   \DefineFamilyKey[.dsc]{KOMAarg}{tocstyle}{%
     \IfArgIsEmpty{##1}{%
-      \expandafter\let\csname scr@dte@\scr@dsc@current @style\endcsname
+      \@ifundefined{scr@dte@\scr@dsc@current @style}{}{%
+        \expandafter\let\csname scr@dte@\scr@dsc@current @style\endcsname
+        \relax
+      }%
+      \expandafter\let\csname scr@tso@\scr@dsc@current @style\endcsname
       \relax
       \FamilyKeyStateProcessed
     }{%
@@ -2256,6 +2265,7 @@
       }{%
 %<trace>        \typeout{TRACE: style defined}%
         \@namedef{scr@dte@\scr@dsc@current @style}{##1}%
+        \@namedef{scr@tso@\scr@dsc@current @style}{##1}%
         \FamilyKeyStateProcessed
       }%
     }%
@@ -2310,10 +2320,10 @@
 % Außerdem muss der Verzeichniseintrags-Stils initialisiert werden:
 %    \begin{macrocode}
 %<trace>    \typeout{TRACE: tocstyle=%
-%<trace>      \@nameuse{scr@dte@\scr@dsc@current @style}}%
-    \scr@ifundefinedorrelax{scr@dte@\scr@dsc@current @style}{%
+%<trace>      \@nameuse{scr@tso@\scr@dsc@current @style}}%
+    \scr@ifundefinedorrelax{scr@tso@\scr@dsc@current @style}{%
       \scr@ifundefinedorrelax{l@\scr@dsc@current}{%
-        \@namedef{scr@dte@\scr@dsc@current @style}{default}%
+        \@namedef{scr@tso@\scr@dsc@current @style}{default}%
       }{}%
     }{}%
 %    \end{macrocode}
@@ -2329,12 +2339,17 @@
 %    \begin{macrocode}
     \let\scr@dsc@tocstyle@options\@empty
     \let\scr@dsc@extra@relax@opts\@empty
-    \scr@ifundefinedorrelax{scr@dte@\scr@dsc@current @style}{}{%
+    \scr@ifundefinedorrelax{scr@tso@\scr@dsc@current @style}{%
+      \expandafter\let
+      \csname scr@tso@\scr@dsc@current @style\expandafter\endcsname
+      \csname scr@dte@\scr@dsc@current @style\endcsname
+    }{}%
+    \scr@ifundefinedorrelax{scr@tso@\scr@dsc@current @style}{}{%
       \begingroup
         \def\scr@dte@current{#2}%
         \edef\reserved@a{%
           \noexpand\@ExecuteTOCEntryStyleInitCode{%
-            \@nameuse{scr@dte@\scr@dsc@current @style}%
+            \@nameuse{scr@tso@\scr@dsc@current @style}%
           }{\scr@dsc@current}%
         }\reserved@a
         \def\do@endgroup{\endgroup}%
@@ -2596,10 +2611,14 @@
       \csname add#2tocentry\endcsname[2]{%
         \addtocentrydefault{#2}{##1}{##2}%
       }%
-      \scr@ifundefinedorrelax{scr@dte@#2@style}{%
+      \scr@ifundefinedorrelax{scr@tso@#2@style}{%
+        \expandafter\let\csname scr@tso@#2@style\expandafter\endcsname
+        \csname scr@dte@#2@style\endcsname
+      }{}%
+      \scr@ifundefinedorrelax{scr@tso@#2@style}{%
       }{%
         \DeclareTOCStyleEntry[\scr@dsc@tocstyle@options]{%
-          \@nameuse{scr@dte@#2@style}%
+          \@nameuse{scr@tso@#2@style}%
         }{#2}%
       }%
       \scr@ifundefinedorrelax{l@#2}{%
@@ -2807,7 +2826,7 @@
     }%
   }{%
     \DeclareSectionCommand[{#1}]{#2}%
-  }%
+l  }%
 }
 %    \end{macrocode}
 % \end{macro}%^^A \RedeclareSectionCommand
