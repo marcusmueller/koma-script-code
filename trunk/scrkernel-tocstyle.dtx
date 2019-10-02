@@ -1,4 +1,4 @@
-% \CheckSum{1606}
+% \CheckSum{1763}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-tocstyle.dtx
@@ -339,7 +339,10 @@
   \begingroup
     \def\do@endgroup{\endgroup}%
     \def\do##1{%
-      \l@addto@macro\do@endgroup{\RelaxFamilyKey[.dte]{KOMAarg}{##1}}%
+      \l@addto@macro\do@endgroup{%
+        \RelaxFamilyKey[.dte]{KOMAarg}{##1}%
+        \RelaxFamilyKey[.dte]{KOMAarg}{##1:}%
+      }%
       \scr@dte@gobbleopt
     }%
     \scr@dte@doopts
@@ -351,7 +354,7 @@
 % \end{macro}%^^A \@RelaxTOCEntryOptions
 %
 % \begin{macro}{\@DefineTOCEntryLengthOption}
-% \changes{v3.20}{2015/12/04}{neu (intern)}
+% \changes{v3.20}{2015/12/04}{neu (intern)}%^^A
 % Verwendet \cs{DefineTOCEntryOption}, um eine Option zu definieren, die ein
 % Längenmacro definiert. Es gibt folgende Parameter:
 % \begin{description}
@@ -364,11 +367,20 @@
 % \item[\oarg{Init}: \meta{Code},] Initialisierung der Option
 % \end{description}
 % Zwischen Prefix und Postfix wird bei der späteren, tatsächlichen Definition
-% automatisch \cs{scr@dte@current} eingefügt.
+% automatisch \cs{scr@dte@current} eingefügt. Gleichzeitig wird auch noch eine
+% Kopieroption definiert, die sich von der eigentlichen Option dadurch
+% unterscheidet, dass dem Gleichheitszeichen ein Doppelpunkt voran gestellt
+% ist. Der Wert der Kopieroption ist der Name eines anderen Eintrags, dessen
+% Einstellung dann kopiert wird, sofern dieser Eintrag eine entsprechende
+% Einstellung hat.
 % \begin{macro}{\@DefineTOCEntryLengthOptionWithoutDefault}
 % \changes{v3.20}{2015/11/10}{neu (intern)}%^^A
+% \changes{v3.27}{2019/10/02}{es wird gleichzeitig eine Kopieroption
+%   definiert}%^^A
 % \begin{macro}{\@DefineTOCEntryLengthOptionWithDefault}
 % \changes{v3.20}{2015/11/10}{neu (intern)}%^^A
+% \changes{v3.27}{2019/10/02}{es wird gleichzeitig eine Kopieroption
+%   definiert}%^^A
 % \begin{macro}{\@DefineTOCEntryLengthOptionMacro}
 % \changes{v3.20}{2015/11/10}{neu (intern)}%^^A
 % Da mit einem optionalen Argument an Position 3 gearbeitet wird, werden drei
@@ -385,12 +397,28 @@
   \@DefineTOCEntryOption{#1}{#2}{%
     \@DefineTOCEntryLengthOptionMacro{#2}{#3}{#4}{##1}%
   }%
+  \DefineFamilyKey[.dte]{KOMAarg}{#2:}{%
+    \scr@ifundefinedorrelax{#3##1#4}{\FamilyKeyStateUnknownValue}{%
+      \expandafter\let
+      \csname #3\scr@dte@current#4\expandafter\endcsname
+      \csname #3##1#4\endcsname
+      \FamilyKeyStateProcessed
+    }%
+  }%
 }
 \newcommand*{\@DefineTOCEntryLengthOptionWithDefault}{}
 \def\@DefineTOCEntryLengthOptionWithDefault#1#2[#3]#4#5#6{%
   \@TOCEntryStyleNeedsCommandByOption{#1}{#4}{#5}{#2}{#6}%
   \@DefineTOCEntryOption{#1}{#2}[{#3}]{%
     \@DefineTOCEntryLengthOptionMacro{#2}{#4}{#5}{##1}%
+  }%
+  \DefineFamilyKey[.dte]{KOMAarg}{#2:}{%
+    \scr@ifundefinedorrelax{#4##1#5}{\FamilyKeyStateUnknownValue}{%
+      \expandafter\let
+      \csname #4\scr@dte@current#5\expandafter\endcsname
+      \csname #4##1#5\endcsname
+      \FamilyKeyStateProcessed
+    }%
   }%
 }
 \newcommand*{\@DefineTOCEntryLengthOptionMacro}[4]{%
@@ -427,11 +455,20 @@
 % \item[\oarg{Init}: \meta{Code},] Initialisierung der Option
 % \end{description}
 % Zwischen Prefix und Postfix wird bei der späteren, tatsächlichen Definition
-% automatisch \cs{scr@dte@current} eingefügt.
+% automatisch \cs{scr@dte@current} eingefügt. Gleichzeitig wird auch noch eine
+% Kopieroption definiert, die sich von der eigentlichen Option dadurch
+% unterscheidet, dass dem Gleichheitszeichen ein Doppelpunkt voran gestellt
+% ist. Der Wert der Kopieroption ist der Name eines anderen Eintrags, dessen
+% Einstellung dann kopiert wird, sofern dieser Eintrag eine entsprechende
+% Einstellung hat.
 % \begin{macro}{\@DefineTOCEntryNumberOptionWithoutDefault}
 % \changes{v3.20}{2015/11/12}{neu (intern)}
+% \changes{v3.27}{2019/10/02}{es wird gleichzeitig eine Kopieroption
+%   definiert}%^^A
 % \begin{macro}{\@DefineTOCEntryNumberOptionWithDefault}
 % \changes{v3.20}{2015/11/12}{neu (intern)}
+% \changes{v3.27}{2019/10/02}{es wird gleichzeitig eine Kopieroption
+%   definiert}%^^A
 % \begin{macro}{\@DefineTOCEntryNumberOptionMacro}
 % \changes{v3.20}{2015/11/12}{neu (intern)}
 % Da mit einem optionalen Argument an Position 3 gearbeitet wird, werden drei
@@ -448,12 +485,28 @@
   \@DefineTOCEntryOption{#1}{#2}{%
     \@DefineTOCEntryNumberOptionMacro{#2}{#3}{#4}{##1}%
   }%
+  \DefineFamilyKey[.dte]{KOMAarg}{#2:}{%
+    \scr@ifundefinedorrelax{#3##1#4}{\FamilyKeyStateUnknownValue}{%
+      \expandafter\let
+      \csname #3\scr@dte@current#4\expandafter\endcsname
+      \csname #3##1#4\endcsname
+      \FamilyKeyStateProcessed
+    }%
+  }%
 }
 \newcommand*{\@DefineTOCEntryNumberOptionWithDefault}{}
 \def\@DefineTOCEntryNumberOptionWithDefault#1#2[#3]#4#5#6{%
   \@TOCEntryStyleNeedsCommandByOption{#1}{#4}{#5}{#2}{#6}%
   \@DefineTOCEntryOption{#1}{#2}[{#3}]{%
     \@DefineTOCEntryNumberOptionMacro{#2}{#4}{#5}{##1}%
+  }%
+  \DefineFamilyKey[.dte]{KOMAarg}{#2:}{%
+    \scr@ifundefinedorrelax{#4##1#5}{\FamilyKeyStateUnknownValue}{%
+      \expandafter\let
+      \csname #4\scr@dte@current#5\expandafter\endcsname
+      \csname #4##1#5\endcsname
+      \FamilyKeyStateProcessed
+    }%
   }%
 }
 \newcommand*{\@DefineTOCEntryNumberOptionMacro}[4]{%
@@ -484,11 +537,20 @@
 % \item[\oarg{Init}: \meta{Code},] Initialisierung der Option
 % \end{description}
 % Zwischen Prefix und Postfix wird bei der späteren, tatsächlichen Definition
-% automatisch \cs{scr@dte@current} eingefügt.
+% automatisch \cs{scr@dte@current} eingefügt. Gleichzeitig wird auch noch eine
+% Kopieroption definiert, die sich von der eigentlichen Option dadurch
+% unterscheidet, dass dem Gleichheitszeichen ein Doppelpunkt voran gestellt
+% ist. Der Wert der Kopieroption ist der Name eines anderen Eintrags, dessen
+% Einstellung dann kopiert wird, sofern dieser Eintrag eine entsprechende
+% Einstellung hat.
 % \begin{macro}{\@DefineTOCEntryBoolOptionWithoutDefault}
 % \changes{v3.20}{2015/11/12}{neu (intern)}
+% \changes{v3.27}{2019/10/02}{es wird gleichzeitig eine Kopieroption
+%   definiert}%^^A
 % \begin{macro}{\@DefineTOCEntryBoolOptionWithDefault}
 % \changes{v3.20}{2015/11/12}{neu (intern)}
+% \changes{v3.27}{2019/10/02}{es wird gleichzeitig eine Kopieroption
+%   definiert}%^^A
 % \begin{macro}{\@DefineTOCEntryBoolOptionMacro}
 % \changes{v3.20}{2015/11/12}{neu (intern)}
 % Da mit einem optionalen Argument an Position 3 gearbeitet wird, werden drei
@@ -507,6 +569,14 @@
   \@DefineTOCEntryOption{#1}{#2}[true]{%
     \@DefineTOCEntryBoolOptionMacro{#2}{#3}{#4}{##1}%
   }%
+  \DefineFamilyKey[.dte]{KOMAarg}{#2:}{%
+    \scr@ifundefinedorrelax{if#3##1#4}{\FamilyKeyStateUnknownValue}{%
+      \expandafter\let
+      \csname if#3\scr@dte@current#4\expandafter\endcsname
+      \csname if#3##1#4\endcsname
+      \FamilyKeyStateProcessed
+    }%
+  }%
 }
 \newcommand*{\@DefineTOCEntryBoolOptionWithDefault}{}
 \def\@DefineTOCEntryBoolOptionWithDefault#1#2[#3]#4#5#6{%
@@ -515,6 +585,14 @@
   \@TOCEntryStyleNeedsCommandByOption{#1}{#4}{#5false}{#2}{#6}%
   \@DefineTOCEntryOption{#1}{#2}[{#3}]{%
     \@DefineTOCEntryBoolOptionMacro{#2}{#4}{#5}{##1}%
+  }%
+  \DefineFamilyKey[.dte]{KOMAarg}{#2:}{%
+    \scr@ifundefinedorrelax{if#4##1#5}{\FamilyKeyStateUnknownValue}{%
+      \expandafter\let
+      \csname if#4\scr@dte@current#5\expandafter\endcsname
+      \csname if#4##1#5\endcsname
+      \FamilyKeyStateProcessed
+    }%
   }%
 }
 \newcommand*{\@DefineTOCEntryBoolOptionMacro}[4]{%
@@ -544,11 +622,20 @@
 % \item[\marg{Erklärung}: \meta{String},] Erklärung der Option
 % \end{description}
 % Zwischen Prefix und Postfix wird bei der späteren, tatsächlichen Definition
-% automatisch \cs{scr@dte@current} eingefügt.
+% automatisch \cs{scr@dte@current} eingefügt. Gleichzeitig wird auch noch eine
+% Kopieroption definiert, die sich von der eigentlichen Option dadurch
+% unterscheidet, dass dem Gleichheitszeichen ein Doppelpunkt voran gestellt
+% ist. Der Wert der Kopieroption ist der Name eines anderen Eintrags, dessen
+% Einstellung dann kopiert wird, sofern dieser Eintrag eine entsprechende
+% Einstellung hat.
 % \begin{macro}{\@DefineTOCEntryIfOptionWithoutDefault}
 % \changes{v3.20}{2015/11/12}{neu (intern)}
+% \changes{v3.27}{2019/10/02}{es wird gleichzeitig eine Kopieroption
+%   definiert}%^^A
 % \begin{macro}{\@DefineTOCEntryIfOptionWithDefault}
 % \changes{v3.20}{2015/11/12}{neu (intern)}
+% \changes{v3.27}{2019/10/02}{es wird gleichzeitig eine Kopieroption
+%   definiert}%^^A
 % \begin{macro}{\@DefineTOCEntryIfOptionMacro}
 % \changes{v3.20}{2015/11/12}{neu (intern)}
 % Da mit einem optionalen Argument an Position 3 gearbeitet wird, werden drei
@@ -565,12 +652,28 @@
   \@DefineTOCEntryOption{#1}{#2}[true]{%
     \@DefineTOCEntryIfOptionMacro{#2}{#3}{#4}{##1}%
   }%
+  \DefineFamilyKey[.dte]{KOMAarg}{#2:}{%
+    \scr@ifundefinedorrelax{If#3##1#4}{\FamilyKeyStateUnknownValue}{%
+      \expandafter\let
+      \csname If#3\scr@dte@current#4\expandafter\endcsname
+      \csname If#3##1#4\endcsname
+      \FamilyKeyStateProcessed
+    }%
+  }%
 }
 \newcommand*{\@DefineTOCEntryIfOptionWithDefault}{}
 \def\@DefineTOCEntryIfOptionWithDefault#1#2[#3]#4#5#6{%
   \@TOCEntryStyleNeedsCommandByOption{#1}{If#4}{#5}{#2}{#6}%
   \@DefineTOCEntryOption{#1}{#2}[{#3}]{%
     \@DefineTOCEntryIfOptionMacro{#2}{#4}{#5}{##1}%
+  }%
+  \DefineFamilyKey[.dte]{KOMAarg}{#2:}{%
+    \scr@ifundefinedorrelax{If#4##1#5}{\FamilyKeyStateUnknownValue}{%
+      \expandafter\let
+      \csname If#4\scr@dte@current#5\expandafter\endcsname
+      \csname If#4##1#5\endcsname
+      \FamilyKeyStateProcessed
+    }%
   }%
 }
 \newcommand*{\@DefineTOCEntryIfOptionMacro}[4]{%
@@ -605,15 +708,24 @@
 % \item[\oarg{Init}: \meta{Code},] Initialisierung der Option
 % \end{description}
 % Zwischen Prefix und Postfix wird bei der späteren, tatsächlichen Definition
-% automatisch \cs{scr@dte@current} eingefügt.
+% automatisch \cs{scr@dte@current} eingefügt. Gleichzeitig wird auch noch eine
+% Kopieroption definiert, die sich von der eigentlichen Option dadurch
+% unterscheidet, dass dem Gleichheitszeichen ein Doppelpunkt voran gestellt
+% ist. Der Wert der Kopieroption ist der Name eines anderen Eintrags, dessen
+% Einstellung dann kopiert wird, sofern dieser Eintrag eine entsprechende
+% Einstellung hat.
 % \begin{macro}{\@DefineTOCEntryCommandOptionWithoutDefault}
 % \changes{v3.20}{2015/11/12}{neu (intern)}
 % \begin{macro}{\@@DefineTOCEntryCommandOptionWithoutDefault}
 % \changes{v3.20}{2015/11/26}{neu (intern)}
+% \changes{v3.27}{2019/10/02}{es wird gleichzeitig eine Kopieroption
+%   definiert}%^^A
 % \begin{macro}{\@DefineTOCEntryCommandOptionWithDefault}
 % \changes{v3.20}{2015/11/12}{neu (intern)}
 % \begin{macro}{\@@DefineTOCEntryCommandOptionWithDefault}
 % \changes{v3.20}{2015/11/26}{neu (intern)}
+% \changes{v3.27}{2019/10/02}{es wird gleichzeitig eine Kopieroption
+%   definiert}%^^A
 % \begin{macro}{\@DefineTOCEntryCommandOptionMacro}
 % \changes{v3.20}{2015/11/12}{neu (intern)}
 % \begin{macro}{\@@DefineTOCEntryCommandOptionMacro}
@@ -637,9 +749,25 @@
     \@DefineTOCEntryOption{#1}{#2}{%
       \@DefineTOCEntryCommandOptionMacro{#2}{#3}{#4}[#5]{##1}%
     }%
+    \DefineFamilyKey[.dte]{KOMAarg}{#2:}{%
+      \scr@ifundefinedorrelax{#3##1#4}{\FamilyKeyStateUnknownValue}{%
+        \expandafter\let
+        \csname #3\scr@dte@current#4\expandafter\endcsname
+        \csname #3##1#4\endcsname
+        \FamilyKeyStateProcessed
+      }%
+    }%
   \or
     \@DefineTOCEntryOption{#1}{#2}{%
       \@DefineTOCEntryCommandOptionMacro{#2}{#3}{#4}[#5]{##1{####1}}%
+    }%
+    \DefineFamilyKey[.dte]{KOMAarg}{#2:}{%
+      \scr@ifundefinedorrelax{#3##1#4}{\FamilyKeyStateUnknownValue}{%
+        \expandafter\let
+        \csname #3\scr@dte@current#4\expandafter\endcsname
+        \csname #3##1#4\endcsname
+        \FamilyKeyStateProcessed
+      }%
     }%
   \else
 %<class>    \ClassError{\KOMAClassName
@@ -660,13 +788,37 @@
     \@DefineTOCEntryOption{#1}{#2}[{#3}]{%
       \@DefineTOCEntryCommandOptionMacro{#2}{#4}{#5}[#6]{##1}%
     }%
+    \DefineFamilyKey[.dte]{KOMAarg}{#2:}{%
+      \scr@ifundefinedorrelax{#4##1#5}{\FamilyKeyStateUnknownValue}{%
+        \expandafter\let
+        \csname #4\scr@dte@current#5\expandafter\endcsname
+        \csname #4##1#5\endcsname
+        \FamilyKeyStateProcessed
+      }%
+    }%
   \or
     \@DefineTOCEntryOption{#1}{#2}[{#3}]{%
       \@DefineTOCEntryCommandOptionMacro{#2}{#4}{#5}[#6]{##1{####1}}%
     }%
+    \DefineFamilyKey[.dte]{KOMAarg}{#2:}{%
+      \scr@ifundefinedorrelax{#4##1#5}{\FamilyKeyStateUnknownValue}{%
+        \expandafter\let
+        \csname #4\scr@dte@current#5\expandafter\endcsname
+        \csname #4##1#5\endcsname
+        \FamilyKeyStateProcessed
+      }%
+    }%
   \or
     \@DefineTOCEntryOption{#1}{#2}[{#3}]{%
       \@DefineTOCEntryCommandOptionMacro{#2}{#4}{#5}[#6]{##1{####1}{####2}}%
+    }%
+    \DefineFamilyKey[.dte]{KOMAarg}{#2:}{%
+      \scr@ifundefinedorrelax{#4##1#5}{\FamilyKeyStateUnknownValue}{%
+        \expandafter\let
+        \csname #4\scr@dte@current#5\expandafter\endcsname
+        \csname #4##1#5\endcsname
+        \FamilyKeyStateProcessed
+      }%
     }%
   \else
 %<class>    \ClassError{\KOMAClassName
