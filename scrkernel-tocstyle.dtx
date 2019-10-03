@@ -1,4 +1,4 @@
-% \CheckSum{1763}
+% \CheckSum{1934}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-tocstyle.dtx
@@ -341,7 +341,6 @@
     \def\do##1{%
       \l@addto@macro\do@endgroup{%
         \RelaxFamilyKey[.dte]{KOMAarg}{##1}%
-        \RelaxFamilyKey[.dte]{KOMAarg}{##1:}%
       }%
       \scr@dte@gobbleopt
     }%
@@ -377,12 +376,18 @@
 % \changes{v3.20}{2015/11/10}{neu (intern)}%^^A
 % \changes{v3.27}{2019/10/02}{es wird gleichzeitig eine Kopieroption
 %   definiert}%^^A
+% \changes{v3.27}{2019/10/03}{es wird gleichzeitig eine Addieroption
+%   definiert}%^^A
 % \begin{macro}{\@DefineTOCEntryLengthOptionWithDefault}
 % \changes{v3.20}{2015/11/10}{neu (intern)}%^^A
 % \changes{v3.27}{2019/10/02}{es wird gleichzeitig eine Kopieroption
 %   definiert}%^^A
+% \changes{v3.27}{2019/10/03}{es wird gleichzeitig eine Addieroption
+%   definiert}%^^A
 % \begin{macro}{\@DefineTOCEntryLengthOptionMacro}
 % \changes{v3.20}{2015/11/10}{neu (intern)}%^^A
+% \begin{macro}{\@DefineTOCEntryAddLengthOptionMacro}
+% \changes{v3.27}{2019/10/03}{neu (intern)}%^^A
 % Da mit einem optionalen Argument an Position 3 gearbeitet wird, werden drei
 % Hilfsmakros benötigt.
 %    \begin{macrocode}
@@ -405,6 +410,13 @@
       \FamilyKeyStateProcessed
     }%
   }%
+  \DefineFamilyKey[.dte]{KOMAarg}{#2+}{%
+    \@DefineTOCEntryAddLengthOptionMacro{#2+}{#3}{#4}{##1}%
+  }%
+  \edef\scr@dte@doopts{%
+    \unexpanded\expandafter{\scr@dte@doopts}%
+    \noexpand\do{#2:}\noexpand\do{#2+}%
+  }%
 }
 \newcommand*{\@DefineTOCEntryLengthOptionWithDefault}{}
 \def\@DefineTOCEntryLengthOptionWithDefault#1#2[#3]#4#5#6{%
@@ -420,6 +432,13 @@
       \FamilyKeyStateProcessed
     }%
   }%
+  \DefineFamilyKey[.dte]{KOMAarg}{#2+}{%
+    \@DefineTOCEntryAddLengthOptionMacro{#2+}{#4}{#5}{##1}%
+  }%
+  \edef\scr@dte@doopts{%
+    \unexpanded\expandafter{\scr@dte@doopts}%
+    \noexpand\do{#2:}\noexpand\do{#2+}%
+  }%
 }
 \newcommand*{\@DefineTOCEntryLengthOptionMacro}[4]{%
   \protected@edef\reserved@a{%
@@ -434,8 +453,29 @@
     \fi
   \fi
 }
+\newcommand*{\@DefineTOCEntryAddLengthOptionMacro}[4]{%
+  \@ifundefined{#2\scr@dte@current#3}{%
+    \FamilyKeyStateUnknownValue
+  }{%
+    \protected@edef\reserved@a{%
+      \noexpand\FamilySetLength{KOMAarg}{#1}{\noexpand\@tempskipa}{#4}%
+    }\reserved@a
+    \ifx\FamilyKeyState\FamilyKeyStateProcessed
+      \ifscr@dte@expandtopt
+        \expandafter\edef\csname #2\scr@dte@current#3\endcsname{%
+          \the\glueexpr\@tempskipa
+          +\csname #2\scr@dte@current#3\endcsname\relax}%
+      \else
+        \expandafter\protected@edef\csname #2\scr@dte@current#3\endcsname{%
+          \the\glueexpr #4%
+            +\csname #2\scr@dte@current#3\endcsname\relax}%
+      \fi
+    \fi
+  }%
+}
 %</body>
 %    \end{macrocode}
+% \end{macro}%^^A \@DefineTOCEntryAddLengthOptionMacro
 % \end{macro}%^^A \@DefineTOCEntryLengthOptionMacro
 % \end{macro}%^^A \@DefineTOCEntryLengthOptionWithDefault
 % \end{macro}%^^A \@DefineTOCEntryLengthOptionWithoutDefault
@@ -465,12 +505,18 @@
 % \changes{v3.20}{2015/11/12}{neu (intern)}
 % \changes{v3.27}{2019/10/02}{es wird gleichzeitig eine Kopieroption
 %   definiert}%^^A
+% \changes{v3.27}{2019/10/03}{es wird gleichzeitig eine Addieroption
+%   definiert}%^^A
 % \begin{macro}{\@DefineTOCEntryNumberOptionWithDefault}
 % \changes{v3.20}{2015/11/12}{neu (intern)}
 % \changes{v3.27}{2019/10/02}{es wird gleichzeitig eine Kopieroption
 %   definiert}%^^A
+% \changes{v3.27}{2019/10/03}{es wird gleichzeitig eine Addieroption
+%   definiert}%^^A
 % \begin{macro}{\@DefineTOCEntryNumberOptionMacro}
 % \changes{v3.20}{2015/11/12}{neu (intern)}
+% \begin{macro}{\@DefineTOCEntryAddNumberOptionMacro}
+% \changes{v3.27}{2019/10/03}{neu (intern)}
 % Da mit einem optionalen Argument an Position 3 gearbeitet wird, werden drei
 % Hilfsmakros benötigt.
 %    \begin{macrocode}
@@ -493,6 +539,13 @@
       \FamilyKeyStateProcessed
     }%
   }%
+  \DefineFamilyKey[.dte]{KOMAarg}{#2+}{%
+    \@DefineTOCEntryAddNumberOptionMacro{#2+}{#3}{#4}{##1}%
+  }%
+  \edef\scr@dte@doopts{%
+    \unexpanded\expandafter{\scr@dte@doopts}%
+    \noexpand\do{#2:}\noexpand\do{#2+}%
+  }%
 }
 \newcommand*{\@DefineTOCEntryNumberOptionWithDefault}{}
 \def\@DefineTOCEntryNumberOptionWithDefault#1#2[#3]#4#5#6{%
@@ -508,6 +561,13 @@
       \FamilyKeyStateProcessed
     }%
   }%
+  \DefineFamilyKey[.dte]{KOMAarg}{#2+}{%
+    \@DefineTOCEntryAddNumberOptionMacro{#2+}{#4}{#5}{##1}%
+  }%
+  \edef\scr@dte@doopts{%
+    \unexpanded\expandafter{\scr@dte@doopts}%
+    \noexpand\do{#2:}\noexpand\do{#2+}%
+  }%
 }
 \newcommand*{\@DefineTOCEntryNumberOptionMacro}[4]{%
   \protected@edef\reserved@a{%
@@ -516,8 +576,23 @@
     }{#4}%
   }\reserved@a
 }
+\newcommand*{\@DefineTOCEntryAddNumberOptionMacro}[4]{%
+  \@ifundefined{#2\scr@dte@current#3}{%
+    \FamilyKeyStateUnknownValue
+  }{%
+    \FamilySetCounterMacro{KOMAarg}{#1}{%
+      \reserved@a
+    }{#4}%
+    \ifx\FamilyKeyState\FamilyKeyStateProcessed
+      \expandafter\edef\csname #2\scr@dte@current#3\endcsname{%
+        \the\numexpr \reserved@a+\csname #2\scr@dte@current#3\endcsname\relax
+      }%
+    \fi
+  }%
+}
 %</body>
 %    \end{macrocode}
+% \end{macro}%^^A \@DefineTOCEntryAddNumberOptionMacro
 % \end{macro}%^^A \@DefineTOCEntryNumberOptionMacro
 % \end{macro}%^^A \@DefineTOCEntryNumberOptionWithDefault
 % \end{macro}%^^A \@DefineTOCEntryNumberOptionWithoutDefault
@@ -577,6 +652,9 @@
       \FamilyKeyStateProcessed
     }%
   }%
+  \edef\scr@dte@doopts{%
+    \unexpanded\expandafter{\scr@dte@doopts}\noexpand\do{#2:}%
+  }%
 }
 \newcommand*{\@DefineTOCEntryBoolOptionWithDefault}{}
 \def\@DefineTOCEntryBoolOptionWithDefault#1#2[#3]#4#5#6{%
@@ -593,6 +671,9 @@
       \csname if#4##1#5\endcsname
       \FamilyKeyStateProcessed
     }%
+  }%
+  \edef\scr@dte@doopts{%
+    \unexpanded\expandafter{\scr@dte@doopts}\noexpand\do{#2:}%
   }%
 }
 \newcommand*{\@DefineTOCEntryBoolOptionMacro}[4]{%
@@ -660,6 +741,9 @@
       \FamilyKeyStateProcessed
     }%
   }%
+  \edef\scr@dte@doopts{%
+    \unexpanded\expandafter{\scr@dte@doopts}\noexpand\do{#2:}%
+  }%
 }
 \newcommand*{\@DefineTOCEntryIfOptionWithDefault}{}
 \def\@DefineTOCEntryIfOptionWithDefault#1#2[#3]#4#5#6{%
@@ -674,6 +758,9 @@
       \csname If#4##1#5\endcsname
       \FamilyKeyStateProcessed
     }%
+  }%
+  \edef\scr@dte@doopts{%
+    \unexpanded\expandafter{\scr@dte@doopts}\noexpand\do{#2:}%
   }%
 }
 \newcommand*{\@DefineTOCEntryIfOptionMacro}[4]{%
@@ -757,6 +844,9 @@
         \FamilyKeyStateProcessed
       }%
     }%
+    \edef\scr@dte@doopts{%
+      \unexpanded\expandafter{\scr@dte@doopts}\noexpand\do{#2:}%
+    }%
   \or
     \@DefineTOCEntryOption{#1}{#2}{%
       \@DefineTOCEntryCommandOptionMacro{#2}{#3}{#4}[#5]{##1{####1}}%
@@ -768,6 +858,9 @@
         \csname #3##1#4\endcsname
         \FamilyKeyStateProcessed
       }%
+    }%
+    \edef\scr@dte@doopts{%
+      \unexpanded\expandafter{\scr@dte@doopts}\noexpand\do{#2:}%
     }%
   \else
 %<class>    \ClassError{\KOMAClassName
@@ -796,6 +889,9 @@
         \FamilyKeyStateProcessed
       }%
     }%
+    \edef\scr@dte@doopts{%
+      \unexpanded\expandafter{\scr@dte@doopts}\noexpand\do{#2:}%
+    }%
   \or
     \@DefineTOCEntryOption{#1}{#2}[{#3}]{%
       \@DefineTOCEntryCommandOptionMacro{#2}{#4}{#5}[#6]{##1{####1}}%
@@ -808,6 +904,9 @@
         \FamilyKeyStateProcessed
       }%
     }%
+    \edef\scr@dte@doopts{%
+      \unexpanded\expandafter{\scr@dte@doopts}\noexpand\do{#2:}%
+    }%
   \or
     \@DefineTOCEntryOption{#1}{#2}[{#3}]{%
       \@DefineTOCEntryCommandOptionMacro{#2}{#4}{#5}[#6]{##1{####1}{####2}}%
@@ -819,6 +918,9 @@
         \csname #4##1#5\endcsname
         \FamilyKeyStateProcessed
       }%
+    }%
+    \edef\scr@dte@doopts{%
+      \unexpanded\expandafter{\scr@dte@doopts}\noexpand\do{#2:}%
     }%
   \else
 %<class>    \ClassError{\KOMAClassName
