@@ -1,4 +1,4 @@
-% \CheckSum{794}
+% \CheckSum{817}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlfile.dtx
@@ -169,22 +169,29 @@
 % macros\,---\,one before loading the file and one after loading the
 % file. But before we redefine the macro, we test, if the macro was
 % defined like we expected. \LaTeX{} will warn, if not.
-% \changes{v3.27}{2019/03/28}{\LaTeX{} 2019-04-01 changes the definition}%^^A
+% \changes{v3.27}{2019/10/06}{\LaTeX{} 2019-10-01 changed the definition}%^^A
 %    \begin{macrocode}
 \long\def\reserved@a#1#2{%
   \IfFileExists{#1}%
     {#2\@addtofilelist{#1}\@@input \@filef@und}}%
 \ifx\reserved@a\InputIfFileExists\else
-  \CheckCommand{\InputIfFileExists}[2]{%
-    \IfFileExists{#1}%
-    {%
-      \expandafter\swap@args\expandafter
-      {\@filef@und}{#2\@addtofilelist{#1}\@@input}}}%
+  \expandafter\CheckCommand\expandafter*\expandafter\InputIfFileExists
+  \expandafter{%
+    \expandafter\protect\csname InputIfFileExists \endcsname
+  }%
+  \expandafter\CheckCommand \csname InputIfFileExists \endcsname[2]{%
+    \IfFileExists {#1}{%
+      \expandafter \@swaptwoargs \expandafter {\@filef@und }%
+      {#2\@addtofilelist {#1}\@@input }%
+    }%
+  }%
 \fi
 %    \end{macrocode}
 % Now we can redefine the macro like described above:
 %    \begin{macrocode}
-\renewcommand{\InputIfFileExists}[2]{%
+\expandafter\def\expandafter\InputIfFileExists\expandafter{\expandafter
+  \protect\csname InputIfFileExists \endcsname}%
+\expandafter\renewcommand\csname InputIfFileExists\endcsname[2]{%
   \begingroup\expandafter\expandafter\expandafter\endgroup
   \expandafter\ifx\csname #1-@alias\endcsname\relax
     \expandafter\@secondoftwo
