@@ -1349,20 +1349,38 @@ Derzeit werden von \Package{tocbasic} die folgenden Eintragsstile definiert:
 \end{description}
 Eine Erklärung zu den Eigenschaften der von \Package{tocbasic} definierten
 Stile findet sich in \autoref{tab:tocbasic.tocstyle.attributes}.
-Bei\ChangedAt{v3.21}{\Package{tocbasic}} Verwendung der Eigenschaften
-als Optionen für
-\DescRef{\LabelBase.cmd.DeclareNewTOC}\IndexCmd{DeclareNewTOC} (siehe
-\DescPageRef{\LabelBase.cmd.DeclareNewTOC}) sind die Namen der Eigenschaften
-mit dem Präfix \PValue{tocentry}, also beispielsweise \Option{tocentrylevel}
-anstelle von \PValue{level}, zu
-verwenden. Bei\ChangedAt{v3.20}{\Package{tocbasic}} Verwendung als
-Optionen für \DescRef{maincls-experts.cmd.DeclareSectionCommand}%
+Neben\ChangedAt{v3.27}{\Package{tocbasic}} der normalen Zuweisung eines Wertes
+in der Form \Option{\PName{Schlüssel}=\PName{Wert}} verstehen beide Befehle für
+die durch \KOMAScript{} definierten Stile für alle Optionen auch die
+Zuweisungen in der Form \Option{\PName{Schlüssel}:=\PName{Eintragsebene}}. In
+diesem Fall wird die aktuell gültige Einstellung für \PName{Eintragsebene}
+kopiert, soweit diese verfügbar ist. Es kann also beispielsweise mit
+\OptionValue{indent:}{figure} der Einzug für \PValue{figure}-Einträge kopiert
+werden. Für Optionen, die eine Länge oder einen Integer als \PName{Wert}
+erwarten gibt es außerdem die Möglichkeit mit
+\Option{\PName{Schlüssel}+=\PName{Wert}} den\PName{Wert} zur aktuell gültigen
+Einstellung zu addieren. Für eine Substraktion kann ein negativer \PName{Wert}
+verwendet werden. Mit \OptionValue{indent+}{1cm} könnte so beispielsweise der
+Einzug um 1\Unit{cm} erhöht werden.
+
+Bei\ChangedAt{v3.21}{\Package{tocbasic}} Verwendung der Eigenschaften als
+Optionen für \DescRef{\LabelBase.cmd.DeclareNewTOC}\IndexCmd{DeclareNewTOC}
+(siehe \DescPageRef{\LabelBase.cmd.DeclareNewTOC}) sind die Namen der
+Eigenschaften mit dem Präfix \PValue{tocentry}, also beispielsweise
+\Option{tocentrylevel} anstelle von \PValue{level}, zu verwenden. Die zuvor
+beschriebene Kopiermöglichkeit mit \Option{:=} ist hierbei ebenfalls
+verfügbar. Die Addition mit Hilfe von \Option{+=} wird derzeit jedoch nicht
+unterstützt.
+
+Bei\ChangedAt{v3.20}{\Package{tocbasic}} Verwendung als Optionen
+für \DescRef{maincls-experts.cmd.DeclareSectionCommand}%
 \IndexCmd{DeclareSectionCommand}\IndexCmd{DeclareNewSectionCommand}%
 \IndexCmd{RedeclareSectionCommand}\IndexCmd{ProvideSectionCommand} (siehe
 \DescPageRef{maincls-experts.cmd.DeclareSectionCommand}) und verwandten
 Anweisungen sind die Namen der Eigenschaften mit dem Präfix \PValue{toc} zu
 versehen, also beispielsweise \Option{toclevel} anstelle von \PValue{level} zu
-verwenden.
+verwenden. Hierbei existiert derzeit weder die Kopiermöglichkeit mit
+\Option{:=} noch die Addition mit \Option{+=}.
 
 Letztlich führt der Aufruf von \Macro{DeclareTOCStyleEntry} zur Definition der
 Anweisung \Macro{l@\PName{Eintragsebene}}.
@@ -1830,6 +1848,20 @@ Aktivierungswerte aus \autoref{tab:truefalseswitch},
 \autopageref{tab:truefalseswitch}, so expandiert die Anweisung zum ersten
 Argument. Ist der an die Option übergebene Wert hingegen ein
 Deaktivierungswert, so expandiert die Anweisung zum zweiten Argument.
+
+Neben den normalen Optionen der Form \Option{\PName{Schlüssel}=\PName{Wert}}
+werden von allen fünf \Macro{DefineTOCEntry\dots Option}-Anweisungen
+automatisch Optionen der Form
+\Option{\PName{Schlüssel}:=\PName{Eintragsebene}} definiert. Diese dienen
+dazu, den Wert einer anderen \PName{Eintragsebene} zu kopieren, sofern der
+Wert in einem Makro mit gleichem \PName{Präfix} und \PName{Postfix}
+gespeichert ist. Bei den von \Package{tocbasic} vordefinierten Stilen ist das
+für gleichnamige Optionen über Stilgrenzen hinweg der Fall. Von
+\Macro{DefineTOCEntryLengthOption} und \Macro{DefineTOCEntryNumberOption}
+werden außerdem Optionen der Form \Option{\PName{Schlüssel}+=\PName{Wert}}
+mit definiert, die dazu dienen, zu dem in
+\Macro{\PName{Präfix}\PName{Eintragsebene}\PName{Postfix}} bereits
+gespeicherten Wert den neuen \PName{Wert} zu addieren.
 
 Die \PName{Erklärung} sollte ein möglichst kurzer Text sein, der den Sinn der
 Option mit wenigen Schlagworten beschreibt. Er wird von \Package{tocbasic} bei
