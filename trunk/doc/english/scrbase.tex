@@ -85,7 +85,7 @@ The options provided by \Package{scrbase} also use \Package{keyval} syntax:
 \PName{key}\texttt{=}\PName{value}.
 
 
-\section{Keys as Attributes of Families and their Members}
+\section{Keys as Attributes of Families and Their Members}
 \seclabel{keyvalue}
 
 As already mentioned in \autoref{sec:scrbase.loadit}, \Package{scrbase} uses
@@ -238,8 +238,8 @@ predefined states should be sufficient.
   If the key is used later, one of the permitted values, or no value, must be
   used. In the second case, the default \PName{true} value will be used.
 
-  The definitions for the other packages are similar. Only ``\texttt{salami}''
-  has to be replaced by the respective names.
+  The definitions for the other packages are nearly identical. Only the string
+  ``\texttt{salami}'' has to be replaced.
 \end{Example}
 %
 \EndIndexGroup
@@ -373,14 +373,10 @@ If\ChangedAt{v3.20}{\Package{scrbase}} you call \Macro{FamilyExecuteOptions}
 with an unknown option inside the \PName{options list}, you will get an error.
 An exception to this rule occurs when the \PName{member} has an option called
 \Option{@else@}. In this case, the \Option{@else@} option will be used instead
-of the unknown option.
-% TODO: Fix new translation
-The value of the \Option{@else@} option is the unknown option and value of
-the \PName{option list}.
-% :ODOT
-\KOMAScript{} itself uses this feature, for example
-inside the definition of sectioning commands, to evaluate the style option
-before all other attributes.
+of the unknown one. The value passed to the \Option{@else@} option is the
+unknown option with the value specified in the call. \KOMAScript{} itself uses
+this feature, for example inside the definition of sectioning commands,
+to evaluate the style option before all other attributes.
 
 You can also use this command inside the code executed when processing the
 option.%
@@ -457,16 +453,15 @@ members returns an error through \DescRef{\LabelBase.cmd.FamilyKeyState}.
   This avoids endless recursion.
 \end{Example}
 
-% TODO: Fix new translation
-There\ChangedAt{v3.27}{\Package{scrbase}} is also a handling for an option
-called \Option{@else@}\important{\Option{@else@}} similar to
-\DescRef{\LabelBase.cmd.FamilyExecuteOptions}. If a family member has such an
-option it is used whenever an option of the \PName{option list} is unknown for
-the member. If the family itself has an option \Option{@else@} it is used
-only, if for an option from the \PName{option list} neither the family nor a
-member of the family has executed
+Like\ChangedAt{v3.27}{\Package{scrbase}}
+\DescRef{\LabelBase.cmd.FamilyExecuteOptions}, \Macro{FamilyOptions} offers
+special handling for an option named
+\Option{@else@}\important{\Option{@else@}}. If a family member has such an
+option, it will be executed whenever an option in the \PName{option list} is
+unrecognized by the member. If the family itself defines an option
+\Option{@else@}, it will only be called if neither the family nor any of its
+members were able to fully process the given option by executing
 \DescRef{\LabelBase.cmd.FamilyKeyStateProcessed}.%
-% :ODOT
 \EndIndexGroup
 
 
@@ -514,10 +509,8 @@ described for \DescRef{\LabelBase.cmd.FamilyOptions}.
 \end{lstcode}
 \end{Example}
 
-% TODO: Fix new translation
-The\ChangedAt{v3.27}{\Package{scrbase}} handling of an option \Option{@else@}
-is equal to \DescRef{\LabelBase.cmd.FamilyOptions}.%
-% :ODOT
+An\ChangedAt{v3.27}{\Package{scrbase}} \Option{@else@} option is processed
+in the same manner as with \DescRef{\LabelBase.cmd.FamilyOptions}.%
 \EndIndexGroup
 
 
@@ -643,16 +636,14 @@ message about an unknown value assignment is printed if necessary (see also
                               \Parameter{key}\Parameter{switch name}
                               \Parameter{value}
 \end{Declaration}
-% TODO: Fix new translation
 These\ChangedAt{v3.27}{\Package{scrbase}} two commands differ from
-\DescRef{\LabelBase.cmd.FamilyBoolKey} respectively
-\DescRef{\LabelBase.cmd.FamilySetBool} only in the inverse boolean logic they
-are using. Inverse logic means, the values \PValue{true}, \PValue{yes}, and
+\DescRef{\LabelBase.cmd.FamilyBoolKey} and
+\DescRef{\LabelBase.cmd.FamilySetBool}, respectively, only in that the
+logic is inverted. This means that the values \PValue{true}, \PValue{yes}, and
 \PValue{on} set the boolean switch given by \PName{switch name} to
 \Macro{iffalse} and therefore deactivate it. The values \PValue{false},
 \PValue{no}, and \PValue{off} set the boolean switch to \Macro{iftrue} and
-therefore active it.%
-% :ODOT
+therefore activate it.%
 \EndIndexGroup
 
 
@@ -1352,30 +1343,29 @@ corresponding internal command.%
 \begin{Declaration}
   \Macro{IfActiveMkBoth}\Parameter{then code}\Parameter{else code}
 \end{Declaration}
-% TODO: Fix new translation
 The\ChangedAt{v3.27}{\Package{scrbase}} \LaTeX{} kernel uses
 \DescRef{scrlayer.cmd.@mkboth}\important{\Macro{@mkboth}}\IndexCmd{@mkboth} to
-distinguish between automatic and manual running heads. Usually with automatic
-running heads it sets both marks. With manual running heads it does not set
-any mark. If someone wants to know whether or not automatic running heads are
-active, package authors often compare \DescRef{scrlayer.cmd.@mkboth} with
+distinguish between automatic and manual running heads. Usually, it sets both
+marks with automatic running heads. With manual running heads, it does not set
+any mark. To determine whether automatic running heads are active, many
+packages compare \DescRef{scrlayer.cmd.@mkboth} with either
 \DescRef{maincls.cmd.markboth}\IndexCmd{markboth} or \Macro{@gobbletwo}. But
-this does not take care for all kind of possible definitions of
-\DescRef{scrlayer.cmd.@mkboth}. Because of this, \Macro{IfActiveMkBoth} tests
-whether or not \DescRef{scrlayer.cmd.@mkboth} really would set a mark. The
-test even accomplishes the usage of \Macro{marks} in the definition of
-\DescRef{scrlayer.cmd.@mkboth}. If it recognises such an active
-\DescRef{scrlayer.cmd.@mkboth} \PName{then code} is executed. In all other
-cases \PName{else code} is used.%
+this does not account for all cases in which \DescRef{scrlayer.cmd.@mkboth}
+may be redefined. Therefore \Macro{IfActiveMkBoth} tests if
+\DescRef{scrlayer.cmd.@mkboth} would actually set a mark, even when
+\Macro{marks} appears in the definition of \DescRef{scrlayer.cmd.@mkboth}. If
+such an active \DescRef{scrlayer.cmd.@mkboth} is detected, the
+\PName{then code} is executed. In all other cases, the \PName{else code} is
+used.%
 \begin{Example}
-  Assuming, in a package you try to set only the right mark if and only if
-  automatic running heads, i.\,e. of pagestyle
-  \PageStyle{headings}\IndexPagestyle{headings}, are used. A first suggestion
-  for this could be:
+  For example, suppose you want to set the right mark if and only if
+  automatic running heads are used, e.\,g., the pagestyle
+  \PageStyle{headings}\IndexPagestyle{headings}. For a first attempt,
+  you might use:
 \begin{lstcode}
   \ifx\@mkboth\markboth \markright{running head}\fi
 \end{lstcode}
-  Later you recognise, that some package does not use the usual
+  Later you discover that some package does not use the usual
 \begin{lstcode}
   \let\@mkboth\markboth
 \end{lstcode}
@@ -1389,8 +1379,8 @@ cases \PName{else code} is used.%
 \begin{lstcode}
   \ifx\@mkboth\@gobbletwo\else \markright{running head}\fi
 \end{lstcode}
-  Unfortunately, now \DescRef{maincls.cmd.markright} is also called in case of
-  manual running heads, because someone defined
+  Unfortunately, now \DescRef{maincls.cmd.markright} is also called for
+  manual running heads, because someone has defined
 \begin{lstcode}
   \renewcommand{\@mkboth}[2]{%
     \typeout{DEBUG: ignoring running head setting}%
@@ -1398,17 +1388,16 @@ cases \PName{else code} is used.%
 \end{lstcode}
   for this case.
 
-  Fortunately both problems can be solved easily using \Package{scrbase}:
+  Fortunately, both problems are easy to solve with \Package{scrbase}:
 \begin{lstcode}
   \IfActiveMKBoth{\markright{Kolumnentitel}}{}
 \end{lstcode}%
 \end{Example}
-By the way, a slightly more simple solution for the problem from the example
+By the way, an even simpler solution for the problem in the example
 would be to use \DescRef{scrlayer.cmd.@mkright} from package
 \hyperref[cha:scrlayer]{\Package{scrlayer}} (see
 \autoref{sec:scrlayer.pagestyle.content},
 \DescPageRef{scrlayer.cmd.@mkright}).%
-% :ODOT
 \EndIndexGroup
 
 
@@ -1754,9 +1743,9 @@ prefix it with \Macro{the}.%
 \BeginIndex{}{Hooks}
 The \LaTeX{} kernel provides a few \emph{hooks} in the processing of
 a document where additional code can be inserted. Class and package authors
-should be very familiar with \Macro{AtBeginDocument} and \Macro{AtEndDocument}.
-\KOMAScript{} offers similar features in some places, for example to hook code
-into the execution of 
+should be very familiar with \Macro{AtBeginDocument} and
+\Macro{AtEndDocument}. \KOMAScript{} offers similar features in some places,
+for example to hook code into the execution of 
 \hyperref[sec:maincls.structure]{sectioning commands}. Over the years, there
 have been two problems:
 \begin{itemize}
@@ -1798,9 +1787,9 @@ slashes (``/''). Initially, \Macro{ExecuteDoHook} divides the string at the
 first slash. The first part is the name. The remainder (without the slash) is
 the argument. Then the code for the hook with this name is executed. Next the
 first part of the remaining string is divided again from the remainder,
-combined with a slash after the name to form a new name, and the code with this
-name is executed. This process continues until the code for the hook with the
-name \PName{specifier} has been executed and the argument is empty.
+combined with a slash after the name to form a new name, and the code with
+this name is executed. This process continues until the code for the hook with
+the name \PName{specifier} has been executed and the argument is empty.
 
 In the simplest case, the \PName{specifier} consists of a single name. In this
 case, the persistent code is executed first, with an empty argument, for
