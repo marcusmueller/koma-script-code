@@ -1,4 +1,4 @@
-% \CheckSum{1937}
+% \CheckSum{1932}
 % \iffalse meta-comment
 % ======================================================================
 % scrjura.dtx
@@ -1903,16 +1903,30 @@
 % \begin{macro}{\thesentence}
 % \begin{macro}{\theHsentence}
 % \begin{macro}{\p@sentence}
+% \changes{v3.27}{2019/10/09}{Anpassung an \LaTeX{} 2019-10-01}%^^A
 % Der Zähler wird für die Nummerierung der Sätze verwendet. Dabei ist wichtig,
-% dass beim Zitieren der Sätze als Elternobjekt der Absatz mit ausgegeben wird.
+% dass beim Zitieren der Sätze als Elternobjekt der Absatz mit ausgegeben
+% wird. Die Methode, mit der ursprünglich dafür gesorgt wurde, dass
+% \cs{thesentence} als Argument von \cs{p@sentence} verwendet werden konnte,
+% funktioniert leider seit \LaTeX{} 2019-10-01 nicht mehr und führt seither zu
+% einer Fehlermeldung. Daher musste der Code an der Stelle an die
+% Neudefinition von \cs{refstepcounter} in \LaTeX{} 2019-10-01 angepasst
+% werden und verwendet ab dieser \LaTeX-Version \cs{labelformat}. Wie ich dazu
+% stehe, dass neuerdings \LaTeX{} kein Problem damit hat, existierende Pakete
+% zu beschädigen, lassen wir dabei besser unausgeprochen.
 %    \begin{macrocode}
 %<*body>
 \newcounter{sentence}[par]
 \renewcommand*{\thesentence}{\arabic{sentence}}
 \newcommand*{\theHsentence}{\theHpar-\arabic{sentence}}
-\renewcommand*{\p@sentence}{\expandafter\p@@sentence}
-\newcommand*{\p@@sentence}[1]{\p@par{{\par@cite{\thepar}}%
-    \scrjura@separator{\nobreakspace}}{\sentence@cite{#1}}}
+\scr@ifundefinedorrelax{labelformat}{%
+  \renewcommand*{\p@sentence}{\expandafter\p@@sentence}
+  \newcommand*{\p@@sentence}[1]{\p@par{{\par@cite{\thepar}}%
+      \scrjura@separator{\nobreakspace}}{\sentence@cite{#1}}}%
+}{%
+  \labelformat{sentence}{\p@par{{\par@cite{\thepar}}%
+      \scrjura@separator{\nobreakspace}}{\sentence@cite{#1}}}%
+}
 \newcommand*{\contract@sentence}{%
 %    \end{macrocode}
 % \changes{v0.9e}{2015/11/04}{erst den Absatz beginnen, dann die Nummer
