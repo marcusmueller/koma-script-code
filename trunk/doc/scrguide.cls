@@ -120,7 +120,7 @@
 %       problems of early versions of package \textsf{listings}.
 %    \begin{macrocode}
 \LoadClassWithOptions{scrbook}
-\RequirePackage[latin1]{inputenc}
+\RequirePackage[utf8]{inputenc}
 \RequirePackage[TS1,T1]{fontenc}
 \newcommand*{\strngerman}{ngerman}
 \newcommand*{\strenglish}{english}
@@ -1923,7 +1923,17 @@
   basicstyle=\ttfamily,%
   columns=fullflexible,keepspaces,%
   aboveskip=.4\baselineskip,%
-  belowskip=\dp\strutbox plus 1pt minus .5pt%
+  belowskip=\dp\strutbox plus 1pt minus .5pt,%
+  literate=%
+    {Ö}{{\"O}}1
+    {Ä}{{\"A}}1
+    {Ü}{{\"U}}1
+    {ß}{{\ss}}1
+    {ü}{{\"u}}1
+    {ä}{{\"a}}1
+    {ö}{{\"o}}1
+    {»}{{\guillemetright}}1
+    {«}{{\guillemetleft}}1
 }%
 \lstdefinestyle{code}{%
   language=[LaTeX]TeX,%
