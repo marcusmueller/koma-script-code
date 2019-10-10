@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2019/02/20 v1.14a internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2019/10/10 v1.15 internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -116,11 +116,8 @@
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
-% NOTE: I use \texttt{latin1} instead of the prefered \texttt{utf8} because of
-%       problems of early versions of package \textsf{listings}.
 %    \begin{macrocode}
 \LoadClassWithOptions{scrbook}
-\RequirePackage[utf8]{inputenc}
 \RequirePackage[TS1,T1]{fontenc}
 \newcommand*{\strngerman}{ngerman}
 \newcommand*{\strenglish}{english}
