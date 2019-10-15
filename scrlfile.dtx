@@ -1,4 +1,4 @@
-% \CheckSum{820}
+% \CheckSum{836}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlfile.dtx
@@ -289,6 +289,15 @@
       \noexpand\@onefilewithoptions{\csname #1.#4-@aliasname\endcsname}}%
   \fi
   \scr@@onefilewithoptions[{#2}][{#3}]{#4}%
+%    \end{macrocode}
+% \changes{v3.27a}{2019/10/15}{workaround for \LaTeX\space bug added}
+% Unfortunately \LaTeX{} (at least until version 2019-10-01) forget to
+% un-define the h@@k if the file already has been loaded. At this point we
+% cannot use \cs{@currname} and \cs{@currext}, because they are already
+% pop-ed from the stack. So we use the arguments as we do for our own hooks to
+% reset the h@@k. This is not nice, but it should work.
+%    \begin{macrocode}
+  \expandafter\let\csname #1.#4-h@@k\endcsname\undefined
   \scr@load@hook{lateafter}{#1.#4}%
 }
 %    \end{macrocode}
@@ -412,7 +421,7 @@
 %    \end{macrocode}
 %  \end{macro}
 %
-%  \begin{macro}{\scr@set@load@hook}
+% \begin{macro}{\scr@set@load@hook}
 % This command adds stuff to a load-file-hook, either the
 % \emph{before} or the \emph{after} one. First argument is the type of
 % hook (\meta{before} or \meta{after}), second is a filename. There's
@@ -425,80 +434,113 @@
   \@ifundefined{#2-@#1}{\@namedef{#2-@#1}{}}{}%
   \expandafter\g@addto@macro\csname #2-@#1\endcsname}
 %    \end{macrocode}
-%  \end{macro}
+% \end{macro}
 %
-%  \begin{macro}{\BeforeFile}
-%  \begin{macro}{\AfterFile}
-%  \begin{macro}{\BeforeClass}
-%  \begin{macro}{\AfterClass}
-% \changes{v3.20}{2016/04/12}{\cs{@ifnextchar} replaced by
-%     \cs{kernel@ifnextchar}}%^^A
-% \changes{v3.20}{2016/04/12}{\cs{@ifstar} durch \cs{kernel@ifstar}
-%     ersetzt}%^^A
-%  \begin{macro}{\AfterAtEndOfClass}
-%  \begin{macro}{\@AfterClass}
-%  \begin{macro}{\@@AfterClass}
-% \changes{v3.09}{2011/03/08}{new (internal)}
-%  \begin{macro}{\@@@AfterClass}
-% \changes{v3.09}{2011/03/09}{new (internal)}
-% \changes{v3.27}{2019/08/26}{using inside class fixed}
-%  \begin{macro}{\@sAfterClass}
-%  \begin{macro}{\BeforePackage}
-%  \begin{macro}{\AfterPackage}
-% \changes{v3.20}{2016/04/12}{\cs{@ifnextchar} replaced by
-%     \cs{kernel@ifnextchar}}%^^A
-% \changes{v3.20}{2016/04/12}{\cs{@ifstar} durch \cs{kernel@ifstar}
-%     ersetzt}%^^A
-%  \begin{macro}{\AfterAtEndOfPackage}
-%  \begin{macro}{\@AfterPackage}
-%  \begin{macro}{\@@AfterPackage}
-% \changes{v3.09}{2011/03/08}{new (internal)}
-%  \begin{macro}{\@@@AfterPackage}
-% \changes{v3.09}{2011/03/09}{new (internal)}
-% \changes{v3.27}{2019/08/26}{using inside package fixed}
-%  \begin{macro}{\@sAfterPackage}
-% These macros add stuff to a load-file-hook of a file, class or
-% package. First argument is the name of the file (with extension),
-% class (without extension) or package (without extension). There's a
-% second argument parsed by wether the macros themself nor
-% \cs{scr@set@load@hook} but \cs{g@addto@macro}. See
-% \cs{scr@set@load@hook} for more information. The star-forms
-% \cs{AfterClass*} and \cs{AfterPackage*} does the action immediate,
-% if the class or package was already loaded.
+% \begin{macro}{\BeforeFile}
+% \begin{macro}{\AfterFile}
+% Just add code to the \emph{before} or \emph{after} hook of a file. The
+% arguments are:
+% \begin{description}
+% \item[\meta{file name}:] mandatory argument with the file name as given by
+%   \cs{InputIfFileExists}.
+% \item[\meta{code}:] this argument is not processed by \cs{BeforeFile} or
+%   \cs{AfterFile} but the internal \cs{scr@set@load@hook}. It is the code
+%   that should be added to either the \emph{before} or the \emph{after} hook.
+% \end{description}
 %    \begin{macrocode}
 \newcommand*{\BeforeFile}{\scr@set@load@hook{before}}
 \newcommand*{\AfterFile}{\scr@set@load@hook{after}}
+%    \end{macrocode}
+% \end{macro}%^^A \AfterFile
+% \end{macro}%^^A \BeforeFile
+%
+% \begin{macro}{\BeforeClass}
+% \changes{v3.20}{2016/04/12}{\cs{@ifnextchar} replaced by
+%   \cs{kernel@ifnextchar}}%^^A
+% \changes{v3.20}{2016/04/12}{\cs{@ifstar} durch \cs{kernel@ifstar}
+%   ersetzt}%^^A
+% This is quite simple. It only has to add code to the \emph{before} hook
+% already known by \cs{BeforeFile}. The arguments are:
+% \begin{description}
+% \item[\meta{package name}:] mandatory argument.
+% \item[\meta{code}:] this argument is processed not by \cs{BeforeClass} but
+%   by the internal \cs{scr@set@loaf@hook} (see above), that will add the code
+%   to the \emph{before} hook of file \meta{code}\texttt{.cls} (or whatever the
+%   package extension is).
+% \end{description}
+%    \begin{macrocode}
 \newcommand*{\BeforeClass}[1]{%
   \scr@set@load@hook{before}{#1.\@clsextension}}
+%    \end{macrocode}
+% \end{macro}%^^A \BeforeClass
+%
+% \begin{macro}{\AfterClass}
+% \changes{v3.20}{2016/04/12}{\cs{@ifnextchar} replaced by
+%   \cs{kernel@ifnextchar}}%^^A
+% \changes{v3.20}{2016/04/12}{\cs{@ifstar} durch \cs{kernel@ifstar}
+%   ersetzt}%^^A
+% \begin{macro}{\AfterAtEndOfClass}
+% These are more complicated. There are five forms:
+% \begin{description}
+% \item[\cs{AfterClass}] corresponds to \cs{AfterFile}. So the code will be
+%   added to the usual \emph{after} hook and the code is exexuted before code
+%   added by the class itself using \cs{AtEndOfClass}. Argument procession
+%   will be done by \cs{@AfterClass}.
+% \item[\cs{AfterAtEndOfClass}] This uses the \emph{lateafter} hook, which
+%   is executed after the class has been loaded completely inclusive the
+%   execution of \cs{AtEndOfClass} code. However, the code will never be
+%   executed, if the class will not be loaded (again). But it does nothing,
+%   if the class has already been loaded. The arguments are:
+%   \begin{description}
+%   \item[\meta{class name}] mandatory argument
+%   \item[\meta{code}:] this argument is processed not by \cs{BeforeClass}
+%     but by the internal \cs{scr@set@loaf@hook} (see above), that will add
+%     the code to the \emph{lateafter} hook of file \meta{code}\texttt{.cls}
+%     (or whatever the class extension is), or by \cs{@gobble}.
+%   \end{description}
+% \item[\cs{AfterClass*}] like \cs{AfterClass}, but if loading of the
+%   class has already began, the code will be executed immediately. So, if
+%   the command is used inside the class it is simply
+%   \cs{@firstofone}. Argument procession will be done by \cs{@sAfterClass}.
+% \item[\cs{AfterClass+}] like \cs{AfterClass*}, but the code will be
+%   executed immediately only if the class already has been loaded
+%   completely or it is used inside \cs{AtEndOfClass}. So inside the class
+%   it is similar to \cs{AtEndOfClass}. Argument procession will be done by
+%   \cs{@pAfterClass}.
+% \item[\cs{AfterClass!}] like \cs{AfterClass+}, but even inside
+%   \cs{AtEndOfClass} the code is executed after every all the
+%   \cs{AtEndOfClass} code. Argument procession will be done by
+%   \cs{@xAfterClass}. (Some class authors interpret this as the star
+%   form of \cs{AfterAtEndOfClass}.)
+% \end{description}
+%    \begin{macrocode}
 \newcommand*{\AfterClass}{%
   \kernel@ifstar {\@sAfterClass}{%
-    \kernel@ifnextchar +\@@AfterClass{%
-      \kernel@ifnextchar !\@@@AfterClass\@AfterClass
+    \kernel@ifnextchar +\@pAfterClass{%
+      \kernel@ifnextchar !\@xAfterClass\@AfterClass
     }%
   }%
 }
-\newcommand*{\@@@AfterClass}[2]{%
-  \begingroup
-    \expandafter\ifx\csname #2.\@clsextension-h@@k\endcsname\relax
-      \aftergroup\@sAfterClass
-    \else
-      \aftergroup\AfterAtEndOfClass
-    \fi
-  \endgroup{#2}%
-}
-\newcommand*{\AfterAtEndOfClass}[1]{%
-  \scr@set@load@hook{lateafter}{#1.\@clsextension}}
-\newcommand*{\@@AfterClass}[2]{%
-  \begingroup
-    \expandafter\ifx\csname #2.\@clsextension-h@@k\endcsname\relax
-      \aftergroup\@sAfterClass
-    \else
-      \aftergroup\@AfterClass
-    \fi
-  \endgroup{#2}%
-}
+%    \end{macrocode}
+% \begin{macro}{\@AfterClass}
+% \cs{AfterClass}\marg{class name}\marg{code}.
+% It uses \cs{scr@set@load@hook} to add \meta{code} to the
+% \emph{after} hook. The second argument will be processed by
+% \cs{scr@set@load@hook}.
+%    \begin{macrocode}
 \newcommand*{\@AfterClass}[1]{%
   \scr@set@load@hook{after}{#1.\@clsextension}}
+%    \end{macrocode}
+% \end{macro}%^^A \@AfterClass
+% \begin{macro}{\@sAfterClass}
+% This is the internal implementation of:
+% \cs{AfterClass*}\marg{class name}\marg{code}.
+% It tests, whether or not \LaTeX{} thinks that the class
+% has already been loaded, but this only means whether or not the class
+% loading has already been started. If so, it immediately executes the next
+% argument. If not, is uses \cs{@AfterClass} to execute the \meta{code}
+% after loading the class.
+%    \begin{macrocode}
 \newcommand*{\@sAfterClass}[1]{%
   \begingroup
     \@ifclassloaded{#1}{%
@@ -509,37 +551,182 @@
   \endgroup
   {#1}%
 }
+%    \end{macrocode}
+% \end{macro}%^^A \@sAfterClass
+% \begin{macro}{\@pAfterClass}
+% \changes{v3.09}{2011/03/08}{new (internal)}%^^A
+% \changes{v3.27a}{2019/10/15}{renamed from \cs{@@AfterClass}}%^^A
+% This is the internal implementation of:
+% \cs{AfterClass+}\marg{class name}\marg{code}.
+% Note, that the plus has not already read. So the arguments are:
+% \begin{description}
+% \item[\texttt{+}:] static plus, to be ignored.
+% \item[\meta{class name}] mandatory argument
+% \item[\meta{code}:] this argument is processed not by \cs{BeforeClass} but
+%   by the internal \cs{@sAfterClass} or \cs{@AfterClass} (see above).
+% \end{description}
+% Here we cannot use \LaTeX's test, whether or not the class as already been
+% loaded, because it tests only, if loading of the class has already been
+% started. Here we use an internal information about
+% \cs{@onefilewithoptions}. While the class loading is in process,
+% \cs{\meta{class name}.cls-h@@k} is either \cs{@empty} or stores code of
+% \cs{AtEndOfClass}. Before or after loading the class it is undefined. So
+% if it is undefined (or \cs{relax}) we can use \cs{@sAfterClass} to either
+% execute \meta{code} immediately or add it to the \emph{after} hook. If is
+% defined (and not \cs{relax}) loading of the class is in progress and
+% \cs{AfterClass} is used to add \meta{code} to the \emph{after} hook. The
+% effect is, that \meta{code} is executed immediately if loading of
+% \meta{class name} has already been finished and after the class if the
+% loading of the \meta{class name} has not already been finished.
+%    \begin{macrocode}
+\newcommand*{\@pAfterClass}[2]{%
+  \begingroup
+    \expandafter\ifx\csname #2.\@clsextension-h@@k\endcsname\relax
+      \aftergroup\@sAfterClass
+    \else
+      \aftergroup\@AfterClass
+    \fi
+  \endgroup{#2}%
+}
+%    \end{macrocode}
+% \end{macro}%^^A \@pAfterClass
+% \begin{macro}{\@xAfterClass}
+% \changes{v3.09}{2011/03/09}{new (internal)}%^^A
+% \changes{v3.27}{2019/08/26}{using inside class fixed}%^^A
+% \changes{v3.27a}{2019/10/15}{renamed from \cs{@@@AfterClass}}%^^A
+% This is the internal implementation of:
+% \cs{AfterClass!}\marg{class name}\marg{code}. Note, that the exclamation
+% mark has not already read. So the arguments are:
+% \begin{description}
+% \item[\texttt{!}:] static exclamation mark, to be ignored.
+% \item[\meta{class name}] mandatory argument
+% \item[\meta{code}:] this argument is processed not by \cs{BeforeClass} but
+%   by the internal \cs{@sAfterClass} or \cs{@AfterClass} (see above).
+% \end{description}
+% There are two differences to \cs{@pAfterClass}:
+% \begin{enumerate}
+% \item In case of \cs{\meta{class name}.cls-h@@k} is defined (and not
+%   \cs{relax}), to while loading a class, it used \cs{AfterAtEndOfClass}
+%   instead of \cs{AfterClass} to add \meta{code} to the \emph{lateafter}
+%   hook instead of the \emph{after} hook.
+% \item In case of \cs{\meta{class name}.cls-h@@k} is defined (or
+%   \cs{relax}) it also has to test, whether or not the class has already
+%   been loaded. If so, it uses \cs{@sAfterClass} to execute the \meta{code}
+%   immediately, otherwise it uses \cs{AfterAtEndOfClass} to add the
+%   \meta{code} to the \emph{lateafter} hook.
+% \end{enumerate}
+% So it is more like (the not existing) \cs{AfterAtEndOfClass+} than
+% \cs{AfterAtEndOfClass*}.
+%    \begin{macrocode}
+\newcommand*{\@xAfterClass}[2]{%
+  \begingroup
+    \expandafter\ifx\csname #2.\@clsextension-h@@k\endcsname\relax
+      \@ifclassloaded{#2}{%
+        \aftergroup\@sAfterClass
+      }{%
+        \aftergroup\AfterAtEndOfClass
+      }%
+    \else
+      \aftergroup\AfterAtEndOfClass
+    \fi
+  \endgroup{#2}%
+}
+%    \end{macrocode}
+% \end{macro}%^^A \@xAfterClass
+% Note that \cs{AfterAtEndOfClass} executed the \meta{code} after each try
+% to load a class, even if the class has already been loaded and you try
+% to load it again.
+%    \begin{macrocode}
+\newcommand*{\AfterAtEndOfClass}[1]{%
+  \scr@set@load@hook{lateafter}{#1.\@clsextension}}
+%    \end{macrocode}
+% \end{macro}%^^A \AfterAtEndOfClass
+% \end{macro}%^^A \AfterClass
+%
+% \begin{macro}{\BeforePackage}
+% This is quite simple. It only has to add code to the \emph{before} hook
+% already known by \cs{BeforeFile}. The arguments are:
+% \begin{description}
+% \item[\meta{package name}:] mandatory argument.
+% \item[\meta{code}:] this argument is processed not by \cs{BeforePackage} but
+%   by the internal \cs{scr@set@loaf@hook} (see above), that will add the code
+%   to the \emph{before} hook of file \meta{code}\texttt{.sty} (or whatever the
+%   package extension is).
+% \end{description}
+%    \begin{macrocode}
 \newcommand*{\BeforePackage}[1]{%
   \scr@set@load@hook{before}{#1.\@pkgextension}}
+%    \end{macrocode}
+% \end{macro}%^^A \BeforePackage
+%
+% \begin{macro}{\AfterPackage}
+% \changes{v3.20}{2016/04/12}{\cs{@ifnextchar} replaced by
+%   \cs{kernel@ifnextchar}}%^^A
+% \changes{v3.20}{2016/04/12}{\cs{@ifstar} durch \cs{kernel@ifstar}
+%   ersetzt}%^^A
+% \begin{macro}{\AfterAtEndOfPackage}
+% These are more complicated. There are five forms:
+% \begin{description}
+% \item[\cs{AfterPackage}] corresponds to \cs{AfterFile}. So the code will be
+%   added to the usual \emph{after} hook and the code is exexuted before code
+%   added by the package itself using \cs{AtEndOfPackage}. Argument procession
+%   will be done by \cs{@AfterPackage}.
+% \item[\cs{AfterAtEndOfPackage}] This uses the \emph{lateafter} hook, which
+%   is executed after the package has been loaded completely inclusive the
+%   execution of \cs{AtEndOfPackage} code. However, the code will never be
+%   executed, if the package will not be loaded (again). But it does nothing,
+%   if the package has already been loaded. The arguments are:
+%   \begin{description}
+%   \item[\meta{package name}] mandatory argument
+%   \item[\meta{code}:] this argument is processed not by \cs{BeforePackage}
+%     but by the internal \cs{scr@set@loaf@hook} (see above), that will add
+%     the code to the \emph{lateafter} hook of file \meta{code}\texttt{.sty}
+%     (or whatever the package extension is), or by \cs{@gobble}.
+%   \end{description}
+% \item[\cs{AfterPackage*}] like \cs{AfterPackage}, but if loading of the
+%   package has already began, the code will be executed immediately. So, if
+%   the command is used inside the package it is simply
+%   \cs{@firstofone}. Argument procession will be done by \cs{@sAfterPackage}.
+% \item[\cs{AfterPackage+}] like \cs{AfterPackage*}, but the code will be
+%   executed immediately only if the package already has been loaded
+%   completely or it is used inside \cs{AtEndOfPackage}. So inside the package
+%   it is similar to \cs{AtEndOfPackage}. Argument procession will be done by
+%   \cs{@pAfterPackage}.
+% \item[\cs{AfterPackage!}] like \cs{AfterPackage+}, but even inside
+%   \cs{AtEndOfPackage} the code is executed after every all the
+%   \cs{AtEndOfPackage} code. Argument procession will be done by
+%   \cs{@xAfterPackage}. (Some package authors interpret this as the star
+%   form of \cs{AfterAtEndOfPackage}.)
+% \end{description}
+%    \begin{macrocode}
 \newcommand*{\AfterPackage}{%
   \kernel@ifstar {\@sAfterPackage}{%
-    \kernel@ifnextchar +\@@AfterPackage{%
-      \kernel@ifnextchar !\@@@AfterPackage\@AfterPackage
+    \kernel@ifnextchar +\@pAfterPackage{%
+      \kernel@ifnextchar !\@xAfterPackage\@AfterPackage
     }%
   }%
 }
-\newcommand*{\@@@AfterPackage}[2]{%
-  \begingroup
-    \expandafter\ifx\csname #2.\@pkgextension-h@@k\endcsname\relax
-      \aftergroup\@sAfterPackage
-    \else
-      \aftergroup\AfterAtEndOfPackage
-    \fi
-  \endgroup{#2}%
-}
-\newcommand*{\AfterAtEndOfPackage}[1]{%
-  \scr@set@load@hook{lateafter}{#1.\@pkgextension}}
-\newcommand*{\@@AfterPackage}[2]{%
-  \begingroup
-    \expandafter\ifx\csname #2.\@pkgextension-h@@k\endcsname\relax
-      \aftergroup\@sAfterPackage
-    \else
-      \aftergroup\@AfterPackage
-    \fi
-  \endgroup{#2}%
-}
+%    \end{macrocode}
+% \begin{macro}{\@AfterPackage}
+% This is the internal implementation of:
+% \cs{AfterPackage}\marg{package name}\marg{code}.
+% It uses \cs{scr@set@load@hook} to add \meta{code} to the
+% \emph{after} hook. The second argument will be processed by
+% \cs{scr@set@load@hook}.
+%    \begin{macrocode}
 \newcommand*{\@AfterPackage}[1]{%
   \scr@set@load@hook{after}{#1.\@pkgextension}}
+%    \end{macrocode}
+% \end{macro}%^^A \@AfterPackage
+% \begin{macro}{\@sAfterPackage}
+% This is the internal implementation of:
+% \cs{AfterPackage*}\marg{package name}\marg{code}.
+% It tests, whether or not \LaTeX{} thinks that the package
+% has already been loaded, but this only means whether or not the package
+% loading has already been started. If so, it immediately executes the next
+% argument. If not, is uses \cs{@AfterPackage} to execute the \meta{code}
+% after loading the package.
+%    \begin{macrocode}
 \newcommand*{\@sAfterPackage}[1]{%
   \begingroup
     \@ifpackageloaded{#1}{%
@@ -551,23 +738,112 @@
   {#1}%
 }
 %    \end{macrocode}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
-%  \end{macro}
-%
+% \end{macro}%^^A \@sAfterPackage
+% \begin{macro}{\@pAfterPackage}
+% \changes{v3.09}{2011/03/08}{new (internal)}%^^A
+% \changes{v3.27a}{2019/10/15}{renamed from \cs{@@AfterPackage}}%^^A
+% This is the internal implementation of:
+% \cs{AfterPackage+}\marg{package name}\marg{code}.
+% Note, that the plus has not already read. So the arguments are:
+% \begin{description}
+% \item[\texttt{+}:] static plus, to be ignored.
+% \item[\meta{package name}] mandatory argument
+% \item[\meta{code}:] this argument is processed not by \cs{BeforePackage} but
+%   by the internal \cs{@sAfterPackage} or \cs{@AfterPackage} (see above).
+% \end{description}
+% Here we cannot use \LaTeX's test, whether or not the package as already been
+% loaded, because it tests only, if loading of the package has already been
+% started. Here we use an internal information about
+% \cs{@onefilewithoptions}. While the package loading is in process,
+% \cs{\meta{package name}.sty-h@@k} is either \cs{@empty} or stores code of
+% \cs{AtEndOfPackage}. Before or after loading the package it is undefined. So
+% if it is undefined (or \cs{relax}) we can use \cs{@sAfterPackage} to either
+% execute \meta{code} immediately or add it to the \emph{after} hook. If is
+% defined (and not \cs{relax}) loading of the package is in progress and
+% \cs{AfterPackage} is used to add \meta{code} to the \emph{after} hook. The
+% effect is, that \meta{code} is executed immediately if loading of
+% \meta{package name} has already been finished and after the package if the
+% loading of the \meta{package name} has not already been finished.
+%    \begin{macrocode}
+\newcommand*{\@pAfterPackage}[2]{%
+  \begingroup
+    \expandafter\ifx\csname #2.\@pkgextension-h@@k\endcsname\relax
+      \aftergroup\@sAfterPackage
+    \else
+      \aftergroup\@AfterPackage
+    \fi
+  \endgroup{#2}%
+}
+%    \end{macrocode}
+% \end{macro}%^^A \@pAfterPackage
+% \begin{macro}{\@xAfterPackage}
+% \changes{v3.09}{2011/03/09}{new (internal)}%^^A
+% \changes{v3.27}{2019/08/26}{using inside package fixed}%^^A
+% \changes{v3.27a}{2019/10/15}{renamed from \cs{@@@AfterPackage}}%^^A
+% This is the internal implementation of:
+% \cs{AfterPackage!}\marg{package name}\marg{code}. Note, that the exclamation
+% mark has not already read. So the arguments are:
+% \begin{description}
+% \item[\texttt{!}:] static exclamation mark, to be ignored.
+% \item[\meta{package name}] mandatory argument
+% \item[\meta{code}:] this argument is processed not by \cs{BeforePackage} but
+%   by the internal \cs{@sAfterPackage} or \cs{@AfterPackage} (see above).
+% \end{description}
+% There are two differences to \cs{@pAfterPackage}:
+% \begin{enumerate}
+% \item In case of \cs{\meta{package name}.sty-h@@k} is defined (and not
+%   \cs{relax}), to while loading a package, it used \cs{@AfterAtEndOfPackage}
+%   instead of \cs{AfterPackage} to add \meta{code} to the \emph{lateafter}
+%   hook instead of the \emph{after} hook.
+% \item In case of \cs{\meta{package name}.sty-h@@k} is defined (or
+%   \cs{relax}) it also has to test, whether or not the package has already
+%   been loaded. If so, it uses \cs{@sAfterPackage} to execute the \meta{code}
+%   immediately, otherwise it uses \cs{@AfterAtEndOfPackage} to add the
+%   \meta{code} to the \emph{lateafter} hook.
+% \end{enumerate}
+% So it is more like (the not existing) \cs{AfterAtEndOfPackage+} than
+% \cs{AfterAtEndOfPackage*}.
+%    \begin{macrocode}
+\newcommand*{\@xAfterPackage}[2]{%
+  \begingroup
+    \expandafter\ifx\csname #2.\@pkgextension-h@@k\endcsname\relax
+      \@ifpackageloaded{#2}{%
+        \aftergroup\@sAfterPackage
+      }{%
+        \aftergroup\@AfterAtEndOfPackage
+      }%
+    \else
+      \aftergroup\@AfterAtEndOfPackage
+    \fi
+  \endgroup
+  {#2}%
+}
+%    \end{macrocode}
+% \end{macro}%^^A \@xAfterPackage
+% \begin{macro}{\@AfterAtEndOfPackage}
+% \changes{v3.27a}{2019/10/15}{new (internal)}
+% Note that until 3.27a \cs{AfterAtEndOfPackage} executed the \meta{code}
+% after each try to load a package, even if the package has already been
+% loaded and you've try to load it again. Since 3.27a this is the
+% functionality of \cs{@AfterAtEndOfPackage}. \cs{AfterAtEndOfPackage} now
+% does not do anything for already loaded packages or while loading the
+% package.
+%    \begin{macrocode}
+\newcommand*{\AfterAtEndOfPackage}[1]{%
+  \@ifpackageloaded{#1}{%
+    \@gobble
+  }{%
+    \@AfterAtEndOfPackage{#1}%
+  }%
+}
+\newcommand*{\@AfterAtEndOfPackage}[1]{%
+  \scr@set@load@hook{lateafter}{#1.\@pkgextension}%
+}
+%    \end{macrocode}
+% \end{macro}%^^A \@AfterAtEndOfPackage
+% \end{macro}%^^A \AfterAtEndOfPackage
+% \end{macro}%^^A \AfterPackage
+%  
 % \begin{macro}{\PreventPackageFromLoading}
 % \changes{v3.08}{2010/11/04}{New}
 % \changes{v3.11a}{2012/06/13}{write fault error in \cs{MessageBreak} fixed}
