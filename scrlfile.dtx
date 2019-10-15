@@ -1,4 +1,4 @@
-% \CheckSum{836}
+% \CheckSum{850}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlfile.dtx
@@ -830,11 +830,18 @@
 % package.
 %    \begin{macrocode}
 \newcommand*{\AfterAtEndOfPackage}[1]{%
-  \@ifpackageloaded{#1}{%
-    \@gobble
-  }{%
-    \@AfterAtEndOfPackage{#1}%
-  }%
+  \begingroup
+    \@ifpackageloaded{#1}{%
+      \expandafter\ifx\csname #1.\@pkgextension-h@@k\endcsname\relax
+        \aftergroup\@gobbletwo
+      \else
+        \aftergroup\@AfterAtEndOfPackage
+      \fi
+    }{%
+      \aftergroup\@AfterAtEndOfPackage
+    }%
+  \endgroup
+  {#1}%  
 }
 \newcommand*{\@AfterAtEndOfPackage}[1]{%
   \scr@set@load@hook{lateafter}{#1.\@pkgextension}%
