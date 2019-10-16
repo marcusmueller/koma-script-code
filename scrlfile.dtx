@@ -1,4 +1,4 @@
-% \CheckSum{856}
+% \CheckSum{815}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlfile.dtx
@@ -287,19 +287,8 @@
     \scr@replacefile@msg{\csname #1.#4-@aliasname\endcsname.#4}{#1.#4}%
     \edef\scr@@onefilewithoptions{%
       \noexpand\@onefilewithoptions{\csname #1.#4-@aliasname\endcsname}}%
-  \fi
+  \fi 
   \scr@@onefilewithoptions[{#2}][{#3}]{#4}%
-%    \end{macrocode}
-% \changes{v3.27a}{2019/10/16}{workaround for \LaTeX\space bug added}
-% Unfortunately \LaTeX{} (at least until version 2019-10-01) forget to
-% un-define the h@@k if the file already has been loaded. At this point we
-% cannot use \cs{@currname} and \cs{@currext}, because they are already
-% pop-ed from the stack. So we use the arguments as we do for our own hooks to
-% reset the h@@k. This is not nice, but it should work.
-%    \begin{macrocode}
-  \expandafter\ifx\csname #1.#4-h@@k\endcsname\@empty
-    \expandafter\let\csname #1.#4-h@@k\endcsname\@undefined
-  \fi
   \scr@load@hook{lateafter}{#1.#4}%
 }
 %    \end{macrocode}
@@ -410,16 +399,39 @@
 %    \end{macrocode}
 %  \end{macro}
 %
-%  \begin{macro}{\scr@load@hook}
+% \begin{macro}{\scr@load@hook}
 % This macro simply calls a load-file-hook, either the \emph{before}
 % or the \emph{after} one, if the hook exists. After calling the hook
 % it will be deleted. First argument is the type of hook
 % (\meta{before} or \meta{after}), second argument is a filename. 
 %    \begin{macrocode}
 \newcommand*{\scr@load@hook}[2]{%
+%    \end{macrocode}
+% \changes{v3.27a}{2019/10/16}{workaround for strange handling of
+%   \cs{AtEndOfPackage} hook in \cs{@onefilewithoptions}}%^^A
+% Workaround for strange handling of the \cs{AtEndOfPackage} hook in
+% \cs{@onefilewithoptions} (becomes \cs{@empty}, if the package already has
+% been loaded and is not loaded again). This workaround is not nice but
+% smart. Before loading a file it defines a marker macro and undefines it
+% later.
+%    \begin{macrocode}
+  \edef\scr@hookname{#1}%
+  \def\scr@cmd@hook{before}%
+  \ifx\scr@hookname\scr@cmd@hook
+    \expandafter\def\csname #2-l@ading\endcsname{#2}%
+  \fi
+  \let\scr@cmd@hook\@undefined
   \@ifundefined{#2-@#1}{}{%
     \@nameuse{#2-@#1}%
-    \expandafter\let\csname #2-@#1\endcsname=\relax}}
+    \expandafter\let\csname #2-@#1\endcsname\relax
+  }%
+  \edef\scr@hookname{#1}%
+  \def\scr@cmp@hook{after}%
+    \ifx\scr@hookname\scr@cmp@hook
+      \expandafter\let\csname #2-l@ading\endcsname\@undefined
+    \fi
+  \let\scr@hookname\@undefined
+}
 %    \end{macrocode}
 %  \end{macro}
 %
@@ -466,7 +478,7 @@
 % \begin{description}
 % \item[\meta{package name}:] mandatory argument.
 % \item[\meta{code}:] this argument is processed not by \cs{BeforeClass} but
-%   by the internal \cs{scr@set@loaf@hook} (see above), that will add the code
+%   by the internal \cs{scr@set@load@hook} (see above), that will add the code
 %   to the \emph{before} hook of file \meta{code}\texttt{.cls} (or whatever the
 %   package extension is).
 % \end{description}
@@ -496,7 +508,7 @@
 %   \begin{description}
 %   \item[\meta{class name}] mandatory argument
 %   \item[\meta{code}:] this argument is processed not by \cs{BeforeClass}
-%     but by the internal \cs{scr@set@loaf@hook} (see above), that will add
+%     but by the internal \cs{scr@set@load@hook} (see above), that will add
 %     the code to the \emph{lateafter} hook of file \meta{code}\texttt{.cls}
 %     (or whatever the class extension is), or by \cs{@gobble}.
 %   \end{description}
@@ -535,6 +547,7 @@
 %    \end{macrocode}
 % \end{macro}%^^A \@AfterClass
 % \begin{macro}{\@sAfterClass}
+% \changes{v3.27a}{2019/10/16}{group removed}%^^A
 % This is the internal implementation of:
 % \cs{AfterClass*}\marg{class name}\marg{code}.
 % It tests, whether or not \LaTeX{} thinks that the class
@@ -544,13 +557,11 @@
 % after loading the class.
 %    \begin{macrocode}
 \newcommand*{\@sAfterClass}[1]{%
-  \begingroup
-    \@ifclassloaded{#1}{%
-      \aftergroup\@secondoftwo
-    }{%
-      \aftergroup\@AfterClass
-    }%
-  \endgroup
+  \@ifclassloaded{#1}{%
+    \@secondoftwo
+  }{%
+    \@AfterClass
+  }%
   {#1}%
 }
 %    \end{macrocode}
@@ -558,6 +569,8 @@
 % \begin{macro}{\@pAfterClass}
 % \changes{v3.09}{2011/03/08}{new (internal)}%^^A
 % \changes{v3.27a}{2019/10/15}{renamed from \cs{@@AfterClass}}%^^A
+% \changes{v3.27a}{2019/10/16}{usage of \emph{l@ading} marker}%^^A
+% \changes{v3.27a}{2019/10/16}{group removed}%^^A
 % This is the internal implementation of:
 % \cs{AfterClass+}\marg{class name}\marg{code}.
 % Note, that the plus has not already read. So the arguments are:
@@ -569,26 +582,23 @@
 % \end{description}
 % Here we cannot use \LaTeX's test, whether or not the class as already been
 % loaded, because it tests only, if loading of the class has already been
-% started. Here we use an internal information about
-% \cs{@onefilewithoptions}. While the class loading is in process,
-% \cs{\meta{class name}.cls-h@@k} is either \cs{@empty} or stores code of
-% \cs{AtEndOfClass}. Before or after loading the class it is undefined. So
-% if it is undefined (or \cs{relax}) we can use \cs{@sAfterClass} to either
-% execute \meta{code} immediately or add it to the \emph{after} hook. If is
-% defined (and not \cs{relax}) loading of the class is in progress and
-% \cs{AfterClass} is used to add \meta{code} to the \emph{after} hook. The
+% started. Here we use an internal information of our \emph{l@ading} marker
+% (see \cs{scr@load@hook}). It is as long defined as a file is read while
+% input. If it is undefined (or \cs{relax}) we can use \cs{@sAfterClass} to
+% either execute \meta{code} immediately or add it to the \emph{after}
+% hook. If is defined (and not \cs{relax}) loading of the class is in progress
+% and \cs{AfterClass} is used to add \meta{code} to the \emph{after} hook. The
 % effect is, that \meta{code} is executed immediately if loading of
 % \meta{class name} has already been finished and after the class if the
 % loading of the \meta{class name} has not already been finished.
 %    \begin{macrocode}
 \newcommand*{\@pAfterClass}[2]{%
-  \begingroup
-    \expandafter\ifx\csname #2.\@clsextension-h@@k\endcsname\relax
-      \aftergroup\@sAfterClass
-    \else
-      \aftergroup\@AfterClass
-    \fi
-  \endgroup{#2}%
+  \@ifundefined{#2.\@clsextension-l@ading}{%
+    \@sAfterClass
+  }{%
+    \@AfterClass
+  }%
+  {#2}%
 }
 %    \end{macrocode}
 % \end{macro}%^^A \@pAfterClass
@@ -596,6 +606,8 @@
 % \changes{v3.09}{2011/03/09}{new (internal)}%^^A
 % \changes{v3.27}{2019/08/26}{using inside class fixed}%^^A
 % \changes{v3.27a}{2019/10/15}{renamed from \cs{@@@AfterClass}}%^^A
+% \changes{v3.27a}{2019/10/16}{usage of \emph{l@ading} marker}%^^A
+% \changes{v3.27a}{2019/10/16}{group removed}%^^A
 % This is the internal implementation of:
 % \cs{AfterClass!}\marg{class name}\marg{code}. Note, that the exclamation
 % mark has not already read. So the arguments are:
@@ -607,11 +619,11 @@
 % \end{description}
 % There are two differences to \cs{@pAfterClass}:
 % \begin{enumerate}
-% \item In case of \cs{\meta{class name}.cls-h@@k} is defined (and not
-%   \cs{relax}), to while loading a class, it used \cs{AfterAtEndOfClass}
+% \item In case of \cs{\meta{class name}.cls-l@ading} is defined (and not
+%   \cs{relax}), while loading a class, it used \cs{AfterAtEndOfClass}
 %   instead of \cs{AfterClass} to add \meta{code} to the \emph{lateafter}
 %   hook instead of the \emph{after} hook.
-% \item In case of \cs{\meta{class name}.cls-h@@k} is defined (or
+% \item In case of \cs{\meta{class name}.cls-l@ading} is undefined (or
 %   \cs{relax}) it also has to test, whether or not the class has already
 %   been loaded. If so, it uses \cs{@sAfterClass} to execute the \meta{code}
 %   immediately, otherwise it uses \cs{AfterAtEndOfClass} to add the
@@ -621,17 +633,16 @@
 % \cs{AfterAtEndOfClass*}.
 %    \begin{macrocode}
 \newcommand*{\@xAfterClass}[2]{%
-  \begingroup
-    \expandafter\ifx\csname #2.\@clsextension-h@@k\endcsname\relax
-      \@ifclassloaded{#2}{%
-        \aftergroup\@sAfterClass
-      }{%
-        \aftergroup\AfterAtEndOfClass
-      }%
-    \else
-      \aftergroup\AfterAtEndOfClass
-    \fi
-  \endgroup{#2}%
+  \@ifundefined{#2.\@clsextension-l@ading}{%
+    \@ifclassloaded{#2}{%
+      \@sAfterClass
+    }{%
+      \AfterAtEndOfClass
+    }%
+  }{%
+    \AfterAtEndOfClass
+  }%
+  {#2}%
 }
 %    \end{macrocode}
 % \end{macro}%^^A \@xAfterClass
@@ -651,7 +662,7 @@
 % \begin{description}
 % \item[\meta{package name}:] mandatory argument.
 % \item[\meta{code}:] this argument is processed not by \cs{BeforePackage} but
-%   by the internal \cs{scr@set@loaf@hook} (see above), that will add the code
+%   by the internal \cs{scr@set@load@hook} (see above), that will add the code
 %   to the \emph{before} hook of file \meta{code}\texttt{.sty} (or whatever the
 %   package extension is).
 % \end{description}
@@ -721,6 +732,7 @@
 %    \end{macrocode}
 % \end{macro}%^^A \@AfterPackage
 % \begin{macro}{\@sAfterPackage}
+% \changes{v3.27a}{2019/10/16}{group removed}%^^A
 % This is the internal implementation of:
 % \cs{AfterPackage*}\marg{package name}\marg{code}.
 % It tests, whether or not \LaTeX{} thinks that the package
@@ -730,13 +742,11 @@
 % after loading the package.
 %    \begin{macrocode}
 \newcommand*{\@sAfterPackage}[1]{%
-  \begingroup
-    \@ifpackageloaded{#1}{%
-      \aftergroup\@secondoftwo
-    }{%
-      \aftergroup\@AfterPackage
-    }%
-  \endgroup
+  \@ifpackageloaded{#1}{%
+    \@secondoftwo
+  }{%
+    \@AfterPackage
+  }%
   {#1}%
 }
 %    \end{macrocode}
@@ -744,6 +754,8 @@
 % \begin{macro}{\@pAfterPackage}
 % \changes{v3.09}{2011/03/08}{new (internal)}%^^A
 % \changes{v3.27a}{2019/10/15}{renamed from \cs{@@AfterPackage}}%^^A
+% \changes{v3.27a}{2019/10/16}{usage of \emph{l@ading} marker}%^^A
+% \changes{v3.27a}{2019/10/16}{group removed}%^^A
 % This is the internal implementation of:
 % \cs{AfterPackage+}\marg{package name}\marg{code}.
 % Note, that the plus has not already read. So the arguments are:
@@ -755,26 +767,24 @@
 % \end{description}
 % Here we cannot use \LaTeX's test, whether or not the package as already been
 % loaded, because it tests only, if loading of the package has already been
-% started. Here we use an internal information about
-% \cs{@onefilewithoptions}. While the package loading is in process,
-% \cs{\meta{package name}.sty-h@@k} is either \cs{@empty} or stores code of
-% \cs{AtEndOfPackage}. Before or after loading the package it is undefined. So
-% if it is undefined (or \cs{relax}) we can use \cs{@sAfterPackage} to either
-% execute \meta{code} immediately or add it to the \emph{after} hook. If is
-% defined (and not \cs{relax}) loading of the package is in progress and
-% \cs{AfterPackage} is used to add \meta{code} to the \emph{after} hook. The
-% effect is, that \meta{code} is executed immediately if loading of
-% \meta{package name} has already been finished and after the package if the
-% loading of the \meta{package name} has not already been finished.
+% started. Here we use an internal information of our \emph{l@ading} marker
+% (see \cs{scr@load@hook}). It is as long defined as a file is read while
+% input. If it is undefined (or \cs{relax}) we can use \cs{@sAfterPackage} to
+% either execute \meta{code} immediately or add it to the \emph{after}
+% hook. If is defined (and not \cs{relax}) loading of the package is in
+% progress and \cs{AfterPackage} is used to add \meta{code} to the
+% \emph{after} hook. The effect is, that \meta{code} is executed immediately
+% if loading of \meta{package name} has already been finished and after the
+% package if the loading of the \meta{package name} has not already been
+% finished.
 %    \begin{macrocode}
 \newcommand*{\@pAfterPackage}[2]{%
-  \begingroup
-    \expandafter\ifx\csname #2.\@pkgextension-h@@k\endcsname\relax
-      \aftergroup\@sAfterPackage
-    \else
-      \aftergroup\@AfterPackage
-    \fi
-  \endgroup{#2}%
+  \@ifundefined{#2.\@pkgextension-l@ading}{%
+    \@sAfterPackage
+  }{%
+    \@AfterPackage
+  }%
+  {#2}%
 }
 %    \end{macrocode}
 % \end{macro}%^^A \@pAfterPackage
@@ -782,6 +792,8 @@
 % \changes{v3.09}{2011/03/09}{new (internal)}%^^A
 % \changes{v3.27}{2019/08/26}{using inside package fixed}%^^A
 % \changes{v3.27a}{2019/10/15}{renamed from \cs{@@@AfterPackage}}%^^A
+% \changes{v3.27a}{2019/10/16}{usage of \emph{l@ading} marker}%^^A
+% \changes{v3.27a}{2019/10/16}{group removed}%^^A
 % This is the internal implementation of:
 % \cs{AfterPackage!}\marg{package name}\marg{code}. Note, that the exclamation
 % mark has not already read. So the arguments are:
@@ -793,11 +805,11 @@
 % \end{description}
 % There are two differences to \cs{@pAfterPackage}:
 % \begin{enumerate}
-% \item In case of \cs{\meta{package name}.sty-h@@k} is defined (and not
+% \item In case of \cs{\meta{package name}.sty-l@ading} is defined (and not
 %   \cs{relax}), to while loading a package, it used \cs{@AfterAtEndOfPackage}
 %   instead of \cs{AfterPackage} to add \meta{code} to the \emph{lateafter}
 %   hook instead of the \emph{after} hook.
-% \item In case of \cs{\meta{package name}.sty-h@@k} is defined (or
+% \item In case of \cs{\meta{package name}.sty-l@ading} is not defined (or
 %   \cs{relax}) it also has to test, whether or not the package has already
 %   been loaded. If so, it uses \cs{@sAfterPackage} to execute the \meta{code}
 %   immediately, otherwise it uses \cs{@AfterAtEndOfPackage} to add the
@@ -807,23 +819,22 @@
 % \cs{AfterAtEndOfPackage*}.
 %    \begin{macrocode}
 \newcommand*{\@xAfterPackage}[2]{%
-  \begingroup
-    \expandafter\ifx\csname #2.\@pkgextension-h@@k\endcsname\relax
-      \@ifpackageloaded{#2}{%
-        \aftergroup\@sAfterPackage
-      }{%
-        \aftergroup\@AfterAtEndOfPackage
-      }%
-    \else
-      \aftergroup\@AfterAtEndOfPackage
-    \fi
-  \endgroup
+  \@ifundefined{#2.\@pkgextension-l@ading}{%
+    \@ifpackageloaded{#2}{%
+      \@sAfterPackage
+    }{%
+      \@AfterAtEndOfPackage
+    }%
+  }{%
+    \@AfterAtEndOfPackage
+  }%
   {#2}%
 }
 %    \end{macrocode}
 % \end{macro}%^^A \@xAfterPackage
 % \begin{macro}{\@AfterAtEndOfPackage}
 % \changes{v3.27a}{2019/10/15}{new (internal)}
+% \changes{v3.27a}{2019/10/16}{group removed}%^^A
 % Note that until 3.27a \cs{AfterAtEndOfPackage} executed the \meta{code}
 % after each try to load a package, even if the package has already been
 % loaded and you've try to load it again. Since 3.27a this is the
@@ -832,17 +843,15 @@
 % package.
 %    \begin{macrocode}
 \newcommand*{\AfterAtEndOfPackage}[1]{%
-  \begingroup
-    \@ifpackageloaded{#1}{%
-      \expandafter\ifx\csname #1.\@pkgextension-h@@k\endcsname\relax
-        \aftergroup\@gobbletwo
-      \else
-        \aftergroup\@AfterAtEndOfPackage
-      \fi
+  \@ifpackageloaded{#1}{%
+    \@ifundefined{#1.\@pkgextension-l@ading}{%
+      \@gobbletwo
     }{%
-      \aftergroup\@AfterAtEndOfPackage
+      \@AfterAtEndOfPackage
     }%
-  \endgroup
+  }{%
+    \@AfterAtEndOfPackage
+  }%
   {#1}%  
 }
 \newcommand*{\@AfterAtEndOfPackage}[1]{%
