@@ -1,4 +1,4 @@
-% \CheckSum{4041}
+% \CheckSum{4045}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlayer.dtx
@@ -565,6 +565,7 @@
 % \changes{v3.25}{2017/10/13}{added to the \KOMAScript{} classes}%^^A
 % \begin{macro}{\@mkdouble}
 % \changes{v3.25}{2017/10/13}{added to the \KOMAScript{} classes}%^^A
+% \changes{v3.27a}{2019/10/17}{long definition}%^^A
 % These are new in \Package{scrlayer}. They may be updated, whenever
 % \Macro{@mkboth} will be updated. Otherwise they get a working default
 % definition. These commands will not become part of the interface and other
@@ -577,7 +578,7 @@
 \providecommand*{\@mkright}{%
   \IfActiveMkBoth{\markright}{\@gobble}%
 }%
-\providecommand*{\@mkdouble}[1]{%
+\providecommand{\@mkdouble}[1]{%
   \@mkboth{#1}{#1}%
 }
 %</(package|class)&body>
@@ -587,29 +588,42 @@
 % \end{macro}%^^A \@mkleft
 %
 % \begin{macro}{\markleft}
+% \changes{v3.27a}{2019/10/17}{robust and long definition}%^^A
 % \begin{macro}{\@markleft}
 % \LaTeX{} itself provides \Macro{markboth} and \Macro{markright} but not
 % \Macro{markleft}. So we add it.
 %    \begin{macrocode}
 %<*package&body>
-\providecommand*{\markleft}[1]{%
-  \begingroup
-    \let\label\relax \let\index\relax \let\glossary\relax
-    \expandafter\@markleft\@themark {#1}%
-    \@temptokena \expandafter{\@themark}%
-    \mark{\the\@temptokena}%
-  \endgroup
-  \if@nobreak\ifvmode\nobreak\fi\fi
-}
-\providecommand{\@markleft}[3]{%
-  \@temptokena {#2}%
-  \unrestored@protected@xdef\@themark{{#3}{\the\@temptokena}}%
-}
+\@ifundefined{markleft}{%
+  \DeclareRobustCommand{\markleft}[1]{%
+    \begingroup
+      \let\label\relax \let\index\relax \let\glossary\relax
+      \expandafter\@markleft\@themark {#1}%
+      \@temptokena \expandafter{\@themark}%
+      \mark{\the\@temptokena}%
+    \endgroup
+    \if@nobreak\ifvmode\nobreak\fi\fi
+  }%
+  \providecommand{\@markleft}[3]{%
+    \@temptokena {#2}%
+    \unrestored@protected@xdef\@themark{{#3}{\the\@temptokena}}%
+  }%
+}{}
 %</package&body>
 %    \end{macrocode}
 % \end{macro}%^^A \@markleft
 % \end{macro}%^^A \markleft
 %
+% \begin{macro}{\markdouble}
+% \changes{v3.28}{2019/10/17}{new}%^^A
+% This is easier, because it uses \cs{markboth}. So we do not need to declare
+% it robust and we can use \cs{providecommand}.
+%    \begin{macrocode}
+%<*package&body>
+\providecommand{\markdouble}[1]{\markboth{#1}{#1}}
+%</package&body>
+%    \end{macrocode}
+% \end{macro}%^^A \markdouble
 %
 % \begin{option}{autooneside}
 % \begin{macro}{\ifscrlayer@autooneside}
