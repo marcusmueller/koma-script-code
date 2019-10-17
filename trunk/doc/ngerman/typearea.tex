@@ -906,7 +906,7 @@ Wie\textnote{Tipp!} man an dem Beispiel sieht, spart man sich mit dem
 allerdings nur für die Standardschriftgrößen 10\Unit{pt}, 11\Unit{pt} und
 12\Unit{pt}. Für alle anderen Schriftgrößen verwendet das Paket 
 %
-\iftrue % Umbruchkorrektur
+\iffalse % Umbruchkorrektur
 einen näherungsweise passenden Dehnungswert.
 %
 \else %
@@ -979,7 +979,7 @@ von Satzspiegel und Rändern auslösen.%
   \Macro{typearea}\POParameter{current}\PParameter{current} verwenden.
 \end{Explain}
 
-\begin{table}
+\iffree{\begin{table}}{\begin{table}[bp]}% Umbruchkorrektur!
   \caption[{%
     Symbolische \PName{BCOR}-Argumente für \DescRef{typearea.cmd.typearea}%
   }]{%
@@ -1576,15 +1576,20 @@ eingestellte Bindekorrektur erhalten bleiben, sollte man den symbolischen Wert
   darauf ankommt, dass der Textbereich genau quadratisch mit einer
   Seitenlänge von 15\Unit{cm} ist, wobei ein Binderand von
   1\Unit{cm} zu berücksichtigen ist, so kann dies wie folgt
-  erreicht werden:
-%
+  erreicht werden:%
+\else %
+\iftrue %
+  Ein quadratischer Gedichtband im Format 15\Unit{cm}\,:\,15\Unit{cm} mit
+  mit 1\Unit{cm} Binderand gesetzt werden, ginge so:%
 \else %
   Soll stattdessen ein Gedichtband mit quadratischem Textbereich der
-  Seitenlänge 15\Unit{cm} und einem Binderand von 1\Unit{cm} gesetzt
-  werden, so ist Folgendes möglich:
-%
-\fi
-\begin{lstcode}
+  Seitenlänge 15\Unit{cm} und
+  einem Binderand von 1\Unit{cm} gesetzt
+  werden, so ist Folgendes möglich:%
+\fi %
+\fi %
+% Korrektur von Code am Ende eines Beispiels am Ende einer Erklärung
+\begin{lstcode}[belowskip=-1.5\baselineskip]
   \documentclass{gedichte}
   \usepackage{typearea}
   \areaset[1cm]{15cm}{15cm}
@@ -1597,34 +1602,32 @@ eingestellte Bindekorrektur erhalten bleiben, sollte man den symbolischen Wert
   \OptionValue{DIV}{areaset}
 \end{Declaration}%
 In\ChangedAt{v3.00}{\Package{typearea}} seltenen Fällen ist es nützlich, wenn
-man den aktuell eingestellten Satzspiegel neu ausrichten lassen kann. Dies ist
-mit der Option
+man den \iffalse aktuell eingestellten \fi% Umbruchkorrekturtext
+Satzspiegel neu ausrichten lassen kann. Dies ist mit der Option
 \OptionValue{DIV}{areaset}\important{\OptionValue{DIV}{areaset}} möglich,
 wobei \DescRef{\LabelBase.cmd.KOMAoptions}\PParameter{DIV=areaset} der
 Anweisung
 \begin{lstcode}
   \areaset[current]{\textwidth}{\textheight}
 \end{lstcode}
-entspricht. Dasselbe Ergebnis erhält man auch, wenn
-\OptionValueRef{\LabelBase}{DIV}{last} verwendet wird und der Satzspiegel
-zuletzt per \DescRef{\LabelBase.cmd.areaset} eingestellt wurde.%
+entspricht. Dasselbe Ergebnis erhält man%
+\iffalse auch\fi% Umbruchkorrekturtext!
+, wenn \OptionValueRef{\LabelBase}{DIV}{last} verwendet wird und der
+Satzspiegel zuletzt per \DescRef{\LabelBase.cmd.areaset} eingestellt wurde.%
 %
 \EndIndexGroup
 
-\iftrue% Umbruchkorrekturtext: Alternativen
+\iffalse% Umbruchkorrekturtext: Alternativen
+\iftrue%
 Wenn Sie konkrete Vorgaben bezüglich der Ränder zu erfüllen haben, ist
 \Package{typearea} nicht geeignet. In diesem Fall ist die Verwendung des
-Pakets
-\Package{geometry}\IndexPackage{geometry}\important{\Package{geometry}} (siehe
-\cite{package:geometry}) empfehlenswert.
-%
-\fi
-\iffalse
-%
+Pakets \Package{geometry}\IndexPackage{geometry}\important{\Package{geometry}}
+(siehe \cite{package:geometry}) empfehlenswert.%
+\else%
 Das Paket \Package{typearea} ist nicht dafür gedacht, bestimmte Randbreiten
 einzustellen. Dafür ist das Paket \Package{geometry}\IndexPackage{geometry}
-(siehe \cite{package:geometry}) empfehlenswert.
-%
+(siehe \cite{package:geometry}) empfehlenswert.%
+\fi%
 \fi
 
 
@@ -1632,8 +1635,10 @@ einzustellen. Dafür ist das Paket \Package{geometry}\IndexPackage{geometry}
 \seclabel{paperTypes}%
 \BeginIndexGroup
 
-Das Papierformat ist ein entscheidendes Grundmerkmal eines Dokuments. Wie
-bereits bei der Vorstellung der unterstützten Satzspiegelkonstruktionen (siehe
+Das Papierformat ist ein \iffalse entscheidendes \fi% Umbruchkorrekturtext
+Grundmerkmal eines Dokuments. Wie
+bereits bei der Vorstellung der \iffalse unterstützten \fi% Umbruchkorrekturtext
+Satzspiegelkonstruktionen (siehe
 \autoref{sec:typearea.basics} bis \autoref{sec:typearea.circleConstruction} ab
 \autopageref{sec:typearea.basics})
 aufgezeigt, steht und fällt die Auf"|teilung der Seite und damit das gesamte
@@ -1650,8 +1655,7 @@ Seitengrößen.
 Die Option \Option{paper}\ChangedAt{v3.00}{\Package{typearea}} ist das
 zentrale Element der Formatauswahl\important[i]{%
   \begin{tabular}[t]{@{}l@{}l@{}}
-    \KOption{paper} & \PValue{letter}, \\
-    & \PValue{legal}, \\
+    \KOption{paper} & \PValue{letter}, \PValue{legal}, \\
     & \PValue{executive}, \\
     & \PValue{A0}, \PValue{A1}, \PValue{A2} \dots\\
     & \PValue{B0}, \PValue{B1}, \PValue{B2} \dots\\
@@ -1764,10 +1768,11 @@ Option \hyperref[desc:\LabelBase.option.DIV.last]{\Option{DIV}} mit den Werten
   \OptionVName{pagesize}{Ausgabetreiber}
 \end{Declaration}%
 \begin{Explain}%
-  Die oben genannten Mechanismen zur Auswahl des Papierformats haben nur
-  insofern einen Einfluss auf die Ausgabe, als interne {\LaTeX}-Maße gesetzt
-  werden. Das Paket \Package{typearea} verwendet diese dann bei der
-  Auf"|teilung der Seite in Ränder und Textbereich. Die Spezifikation des
+  Die oben genannten Mechanismen zur Auswahl des Papierformats \iffree{haben
+    nur insofern einen Einfluss auf die Ausgabe, als interne {\LaTeX}-Maße
+    gesetzt werden}{führen nur zum Setzen interner {\LaTeX}-Maße}. Das Paket
+  \Package{typearea} verwendet diese \iffree{dann }{}bei der Auf"|teilung der
+  Seite in Ränder und Textbereich. Die Spezifikation des
   DVI-Formats\Index{DVI} sieht aber an keiner Stelle Angaben zum Papierformat
   vor. %
   \iffree{%
@@ -1789,21 +1794,22 @@ Option \hyperref[desc:\LabelBase.option.DIV.last]{\Option{DIV}} mit den Werten
     Low-Level-Druckersprachen übertragen wurde, spielte dies keine Rolle%
   }, da auch bei diesen Ausgaben der 0-Bezugspunkt wie bei DVI links oben
   liegt. \iffree{Wird aber}{Heutzutage wird aber meist} in Sprachen wie
-  PostScript\Index{PostScript} oder PDF\Index{PDF} übersetzt, bei denen der
-  0-Bezugspunkt an anderer Stelle liegt und außerdem das Papierformat in der
-  Ausgabedatei angegeben werden sollte\iffree{, so}{. Dabei} fehlt diese
-  Information. Als Lösung des Problems verwendet der entsprechende Treiber
-  eine voreingestellte Papiergröße, die der Anwender entweder per Option oder
-  durch entsprechende Angabe in der {\TeX}-Quelldatei verändern kann. Bei
-  Verwendung des DVI-Treibers \File{dvips} oder \File{dvipdfm} kann diese
-  Angabe in Form einer \Macro{special}-Anweisung erfolgen. Bei Verwendung von
-  {pdf\TeX}, {lua\TeX}, {\XeTeX} oder {V\TeX} werden deren
-  Papierformat-Längen entsprechend gesetzt.%
+  \iffree{PostScript\Index{PostScript} oder }{}% Umbruchkorrekturtext
+  PDF\Index{PDF} übersetzt, bei denen der 0-Bezugspunkt an anderer Stelle
+  liegt und außerdem das Papierformat in der Ausgabedatei angegeben werden
+  sollte\iffree{, so}{. Dabei} fehlt diese Information. Als Lösung des
+  Problems verwendet der entsprechende Treiber eine voreingestellte
+  Papiergröße, die der Anwender entweder per Option oder durch entsprechende
+  Angabe in der {\TeX}-Quelldatei verändern kann. Bei Verwendung des
+  DVI-Treibers \File{dvips} oder \File{dvipdfm} kann diese Angabe in Form
+  einer \Macro{special}-Anweisung erfolgen. Bei Verwendung von {pdf\TeX},
+  {lua\TeX}, {\XeTeX} oder {V\TeX} werden deren Papierformat-Längen
+  entsprechend gesetzt.%
 \end{Explain}
 Mit der Option \Option{pagesize} kann eingestellt werden, für welchen
-Ausgabetreiber die Papiergröße in das Ausgabedokument geschrieben wird. Die
-unterstützten Ausgabetreiber sind \autoref{tab:typearea.outputdriver} \iffalse
-auf \autopageref{tab:typearea.outputdriver}\fi zu
+\PName{Ausgabetreiber} die Papiergröße in das Dokument geschrieben wird. Die
+unterstützten \PName{Ausgabetreiber} sind \autoref{tab:typearea.outputdriver}
+\iffalse auf \autopageref{tab:typearea.outputdriver}\fi zu
 entnehmen. Voreingestellt\ChangedAt{v3.17}{\Package{typearea}} ist
 \Option{pagesize}. Diese Verwendung der Option ohne Angabe eines Wertes
 entspricht \OptionValue{pagesize}{auto}.
@@ -1882,16 +1888,9 @@ entspricht \OptionValue{pagesize}{auto}.
   {pdf\LaTeX} --, so wird ein \Macro{special} an den Anfang dieser
   Datei geschrieben.
 \end{Example}%
-\iffree{% Die Empfehlung ist eigentlich überholt. Wer derart alte Versionen
-        % von typearea verwendet, ist selbst schuld.
-Es wird empfohlen\textnote{Achtung!}, die Option \Option{pagesize} immer
-anzugeben, weil frühere Versionen von \Package{typearea} sie noch nicht als
-Voreinstellung gesetzt haben. In der Regel ist dabei die Methode ohne
-\PName{Ausgabetreiber} oder mit \PValue{auto} oder \PValue{automedia}
-günstig.%
-}{%
+\iffree{}{%
   \vskip-1\ht\strutbox plus .75\ht\strutbox% Wegen Beispiel am Ende der Erklärung
-}
+}%
 \EndIndexGroup
 %
 \EndIndexGroup
@@ -1942,20 +1941,19 @@ Oft sind die typografisch mehr als fragwürdigen Satzvorschriften mit {\LaTeX}
 auch außerordentlich schwierig umzusetzen. So kann eine feste Anzahl von
 »Anschlägen« nur dann eingehalten werden, wenn keine proportionale Schrift
 verwendet wird. Es gibt nur wenige gute nichtproportionale Schriften.
-\iffalse % Umbruchkorrektur
-Kaum ein Text, der mit einer derartigen Schrift gesetzt ist, wirkt wirklich
-gut. So wird häufig %
-\else
-Häufig wird %
+\iftrue % Umbruchkorrektur
+Kaum ein Text, der mit einer derartigen Schrift gesetzt ist, wirkt
+gleichmäßig. So wird häufig %
+\else Häufig wird %
 \fi %
-versucht, durch ausladende Serifen beispielsweise beim kleinen
-»i« oder »l« die unterschiedliche Breite der Zeichen auszugleichen. Dies kann
-nicht funktionieren. Im Ergebnis wirkt der Text unruhig und
-zerrissen. Außerdem verträgt sich eine solche Schrift kaum mit dem im
-deutschen Sprachraum üblichen und allgemein vorzuziehenden Blocksatz. Gewisse
-Vorgaben können daher bei Verwendung von {\LaTeX} nur ignoriert oder großzügig
-ausgelegt werden, etwa indem man »60~Anschläge pro Zeile« nicht als feste,
-sondern als durchschnittliche oder maximale Angabe interpretiert.
+versucht, durch ausladende Serifen beispielsweise beim kleinen »i« oder »l«
+die unterschiedliche Breite der Zeichen auszugleichen. Dies kann nicht
+funktionieren. Im Ergebnis wirkt der Text unruhig und zerrissen. Außerdem
+verträgt sich eine solche Schrift kaum mit dem im deutschen Sprachraum
+üblichen und allgemein vorzuziehenden Blocksatz. Gewisse Vorgaben können daher
+bei Verwendung von {\LaTeX} nur ignoriert oder großzügig ausgelegt werden,
+etwa indem man »60~Anschläge pro Zeile« nicht als feste, sondern als
+durchschnittliche oder maximale Angabe interpretiert.
 
 Wie ausgeführt, sind Satzvorschriften meist dazu gedacht, ein brauchbares
 Ergebnis zu erhalten, auch wenn der Ausführende selbst nicht weiß, was dabei
