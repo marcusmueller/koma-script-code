@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2019/10/10 v1.15 internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2019/10/17 v1.15a internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -1425,12 +1425,13 @@
 % \end{environment}
 %
 % \begin{environment}{Example}
-%   This environment is used for all examples at the \KOMAScript{} guide.
+% \changes{v1.15a}{2019/10/17}{Space removed}%
+% This environment is used for all examples at the \KOMAScript{} guide.
 %    \begin{macrocode}
 \newenvironment{Example}{%
   \lstset{belowskip=0pt plus 1pt minus .5pt}%
-  \labeling{{\usekomafont{disposition}\GuideExample:\ }}
-  \item[{\usekomafont{disposition}\GuideExample:\ }]%
+  \labeling{{\usekomafont{disposition}\GuideExample:}}
+  \item[{\usekomafont{disposition}\GuideExample:}]%
 }{%
   \endlabeling
 }
@@ -2073,14 +2074,15 @@
   }%
 }%
 \lstnewenvironment{lstoutput}[1][]{%
-  \lstset{style=output,basicstyle=\ttfamily\small,#1}%
+  \lstset{style=output,basicstyle=\ttfamily\codesize,#1}%
 }{}%
 \lstnewenvironment{lstcode}[1][]{%
-  \lstset{style=KOMA,basicstyle=\ttfamily\small,#1}%
+  \lstset{style=KOMA,basicstyle=\ttfamily\codesize,#1}%
 }{}%
 \newcommand*{\lstinputcode}[1][]{%
-  \lstinputlisting[style=KOMA,basicstyle=\ttfamily\small,#1]%
+  \lstinputlisting[style=KOMA,basicstyle=\ttfamily\codesize,#1]%
 }
+\newcommand*{\codesize}{\small}
 %    \end{macrocode}
 %
 %
