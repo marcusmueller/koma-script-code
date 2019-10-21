@@ -72,8 +72,8 @@ Die einfachste Möglichkeit, anstelle einer Standardklasse eine
 \KOMAScript-Klasse zu verwenden, ist das Ersetzen des Klassennamens in der
 Anweisung \verb|\documentclass| entsprechend
 \autoref{tab:maincls.overview}. Man tauscht
-also beispielsweise \Macro{documentclass}\PParameter{book} gegen
-\Macro{documentclass}\PParameter{scrbook}. Der anschließende \LaTeX-Lauf
+also beispielsweise \Macro{documentclass}\PParameter{article} gegen
+\Macro{documentclass}\PParameter{scrartcl}. Der anschließende \LaTeX-Lauf
 sollte lediglich einige Layoutänderungen mit sich bringen. Ein großer Teil der
 in den nachfolgenden Abschnitten beschriebenen vielfältigen Möglichkeiten und
 Optionen werden von den \KOMAScript-Klassen zusätzlich geboten.
@@ -99,6 +99,22 @@ Optionen werden von den \KOMAScript-Klassen zusätzlich geboten.
   \end{tabular}
   \end{captionbeside}
 \end{table}
+
+Es sei an dieser Stelle jedoch nicht verschwiegen, dass einige Paketautoren
+ihre Pakete auf Basis der Implementierung und sogar von internem Code der
+Standardklassen entwickeln und dabei keine Rücksicht auf komplett unabhängige
+Entwicklungen wie die \KOMAScript-Klassen nehmen. In solchen Fällen kann es
+beim ersten \LaTeX-Lauf nach der Umstellung durchaus zu Fehlermeldungen oder
+zusäzlichen Warnungen kommen. Meist lassen sich diese auf einfache Weise
+beheben. Oftmals können dazu die erweiterten Möglichkeiten von \KOMAScript{}
+genutzt werden, wodurch das problematische Paket dann vollständig
+entfällt. Manchmal kann auch das in \autoref{cha:scrhack} ab Seite
+\autopageref{cha:scrhack} dokumentierte \hyperref[cha:scrhack]{Paket
+  \Package{scrhack}}\IndexPackage{scrhack} Abhilfe schaffen. Auch der Ersatz
+von veralteten Paketen durch aktuelle Nachfolger kann zur Beseitigung
+derartiger Probleme beitragen. Teilweise geben sogar die \KOMAScript-Klassen
+durch entsprechende Warnungen Hilfestellung bei der Lösung von
+Inkompatibilitäten.
 
 Lassen Sie mich der Erläuterung der Klassen noch eine Bemerkung
 vorausschicken. Oft ist man sich am Anfang eines Dokuments unsicher, welche
@@ -191,11 +207,26 @@ vertikalen Ausgleich. \iffree{}{Näheres dazu ist in
 \BeginIndexGroup
 \BeginIndex{}{Zusammenfassung}%
 
-Insbesondere bei Artikeln, seltener bei Berichten findet man unmittelbar unter
-der Titelei und noch vor dem Inhaltsverzeichnis eine Zusammenfassung.  Bei
-Verwendung eines Titelkopfes ist die Zusammenfassung in der Regel ein rechts
-und links eingezogener Block. Im Vergleich dazu wird bei Verwendung von
-Titelseiten die Zusammenfassung eher als Kapitel oder Abschnitt gesetzt.
+Insbesondere bei Artikeln%
+\iffalse % Umbruchkorrektur
+, seltener bei Berichten findet man unmittelbar unter der Titelei und noch vor
+dem Inhaltsverzeichnis %
+\else %
+\ findet man zwischen Titel und Inhaltsverzeichnis oft %
+\fi %
+eine Zusammenfassung.  Bei Verwendung eines Titelkopfes ist die
+Zusammenfassung in der Regel %
+\iffalse % Umbruchkorrektur
+ein rechts und links eingezogener Block. %
+\else %
+rechts und links eingezogen. %
+\fi %
+\iffalse % Umbruchkorrektur
+Im Vergleich dazu wird bei Verwendung von Titelseiten %
+\else %
+Bei Verwendung von Titelseiten wird %
+\fi %
+die Zusammenfassung eher als Kapitel oder Abschnitt gesetzt.
 
 \begin{Declaration}
   \OptionVName{abstract}{Ein-Aus-Wert}
@@ -453,7 +484,8 @@ Einen Überblick über alle möglichen Werte für die \PName{Einstellung} von
     Das Stichwortverzeichnis erhält einen Eintrag im Inhaltsverzeichnis, ohne
     dass es nummeriert wird.%
     \IndexOption{toc~=\textKValue{index}}}%
-  \entry{\PValue{indexnumbered}}{%
+  \entry{\PValue{indexnumbered}, \PValue{idxnumbered}, \PValue{numberedindex},
+    \PValue{numberedidx}}{%
     \ChangedAt{v3.18}{\Class{scrbook}\and \Class{scrreprt}\and
       \Class{scrartcl}}%
     Das Stichwortverzeichnis erhält einen Eintrag im Inhaltsverzeichnis und
@@ -1013,11 +1045,20 @@ außerdem die Anweisung \DescRef{scrlayer-scrpage.cmd.markleft}%
 \IndexCmd{markleft}\important{\DescRef{scrlayer-scrpage.cmd.markleft}} zur
 Verfügung.
 
-Die Anweisungen können auch zusammen mit anderen Seitenstilen verwendet
-werden. Bei Kombination mit automatischen Kolumnentiteln, etwa dem Seitenstil
+Die Anweisungen können %
+\iffalse % Umbruchkorrektur
+auch zusammen mit anderen %
+\else %
+mit beliebigen %
+\fi %
+Seitenstilen verwendet werden. Bei Kombination mit automatischen
+Kolumnentiteln, etwa dem Seitenstil
 \DescRef{\LabelBase.pagestyle.headings}\IndexPagestyle{headings}, ist der
-Wirkungsbereich allerdings bis zum nächsten automatischen Setzen der
-entsprechenden Marke begrenzt.%
+Wirkungsbereich %
+\iffalse % Umbruchkorrektur
+allerdings %
+\fi %
+bis zum nächsten automatischen Setzen der entsprechenden Marke begrenzt.%
 %
 \EndIndexGroup
 
@@ -1069,17 +1110,23 @@ werden.
 \end{lstcode}
   Wie Sie auf \DescPageRef{\LabelBase.pagestyle.empty} erfahren haben, ist
   der Seitenstil \DescRef{\LabelBase.pagestyle.empty}\IndexPagestyle{empty}
-  genau das, was in diesem Beispiel verlangt wird. Natürlich können Sie auch
-  einen selbst definierten Seitenstil verwenden.
+  genau das, was in diesem Beispiel verlangt wird.%
+  \iffalse % Umbruchkorrektur
+  \ Natürlich können Sie auch einen selbst definierten Seitenstil verwenden.%
+  \fi %
 
-  Angenommen, Sie haben mit dem Paket
-  \hyperref[cha:scrlayer]{\Package{scrlayer}} (siehe
+  Angenommen, Sie haben mit einem der Pakete
+  \hyperref[cha:scrlayer]{\Package{scrlayer}}\IndexPackage{scrlayer} (siehe
   \autoref{sec:scrlayer.pagestyles}) oder Paket
-  \hyperref[cha:scrlayer-scrpage]{\Package{scrlayer-scrpage}} (siehe
+  \hyperref[cha:scrlayer-scrpage]{\Package{scrlayer-scrpage}}%
+  \IndexPackage{scrlayer-scrpage} (siehe
   \autoref{sec:scrlayer-scrpage-experts.pagestyle.pairs}) einen eigenen
-  Seitenstil für Kapitelanfangsseiten\Index{Kapitel>Seitenstil}%
-  \textnote{Kapitel\-anfangs\-seiten} definiert. Diesem Seitenstil haben Sie
-  den passenden Namen \PValue{chapter} gegeben. Um ihn auch tatsächlich zu
+  Seitenstil \iftrue mit Namen \PValue{chapter} \fi% Umbruchkorrektur
+  für Kapitelanfangsseiten\Index{Kapitel>Seitenstil}%
+  \textnote{Kapitel\-anfangs\-seiten} erstellt. %
+  \iffalse Diesem Seitenstil haben Sie den passenden Namen \PValue{chapter}
+  gegeben. \fi% Umbruchkorrektur (abhängig von oben)
+  Um ihn auch tatsächlich zu
   verwenden, definieren Sie \Macro{chapterpagestyle} entsprechend um:
 \begin{lstcode}
   \renewcommand*{\chapterpagestyle}{chapter}
@@ -1118,14 +1165,19 @@ werden.
   Anweisungen wie \Macro{label} rasch zu unvorhergesehenen Ergebnissen
   führen.
 
+  \iffalse % Umbruchoptimierung
   Auf \DescPageRef{tocbasic.cmd.AfterTOCHead} in \autoref{sec:tocbasic.toc}
   werden Sie die Anweisung \DescRef{tocbasic.cmd.AfterTOCHead} kennenlernen,
-  mit der eine Lösung noch einfacher ist:
+  mit der eine Lösung noch einfacher ist:%
+  \else %
+  Mit der Anweisung \DescRef{tocbasic.cmd.AfterTOCHead} aus
+  \autoref{sec:tocbasic.toc}, \DescPageRef{tocbasic.cmd.AfterTOCHead} wird die
+  Lösung noch einfacher:%
+  \fi %
 \begin{lstcode}
   \AfterTOCHead[toc]{%
     \thispagestyle{empty}%
-    \pagestyle{empty}%
-  }
+    \pagestyle{empty}}
 \end{lstcode}%
   Hierbei wird die Tatsache ausgenutzt. dass bei mehreren
   \DescRef{\LabelBase.cmd.thispagestyle}-Anweisungen auf derselben Seite immer
@@ -1153,10 +1205,11 @@ werden.
 \begin{Declaration}
   \Macro{pagenumbering}\Parameter{Nummerierungsstil}
 \end{Declaration}
-Diese Anweisung funktioniert bei \KOMAScript{} in der gleichen Weise wie
-bei den Standardklassen. Genau genommen handelt es sich dabei weder um eine
-Fähigkeit der Standardklassen noch der \KOMAScript-Klassen, sondern um eine
-Anweisung des \LaTeX-Kerns. Sie wird verwendet, um den
+Diese Anweisung funktioniert bei \KOMAScript{} in der gleichen Weise wie bei
+den Standardklassen. Genau genommen handelt es sich dabei %
+\iffalse weder um eine Fähigkeit der Standardklassen noch der
+\KOMAScript-Klassen, sondern \fi % Umbruchkorrektur
+um eine Anweisung des \LaTeX-Kerns. Sie wird verwendet, um den
 \PName{Nummerierungsstil} für die Seitenzahlen umzuschalten.
 
 Die Umschaltung gilt ab sofort, also ab der Seite, auf der diese Anweisung
@@ -1235,13 +1288,11 @@ eingefügten Vakatseite erfahren Sie im nächsten Abschnitt.
 \end{lstcode}
   Hier hat der Ersteller versucht, das Problem mit der letzten Seite des
   Inhaltsverzeichnisses mit Hilfe von \Macro{pagebreak}\IndexCmd{pagebreak} zu
-  lösen.
-
-  Diese Lösung ist aber leider auch nicht viel besser. Hier wird die letzte
-  Seite des Inhaltsverzeichnisses auf die nächste Seite umbrochen. Damit
-  werden bei einem doppelseitigen Dokument unter Umständen die Einträge auf
-  der letzten Seite mit einem erhöhten vertikalen Abstand gesetzt (siehe
-  \DescRef{\LabelBase.cmd.flushbottom} auf
+  lösen. Diese Lösung ist aber leider auch nicht viel besser. Hier wird die
+  letzte Seite des Inhaltsverzeichnisses auf die nächste Seite
+  umbrochen. Damit werden bei einem doppelseitigen Dokument unter Umständen
+  die Einträge auf der letzten Seite mit einem erhöhten vertikalen Abstand
+  gesetzt (siehe \DescRef{\LabelBase.cmd.flushbottom} auf
   \DescPageRef{\LabelBase.cmd.flushbottom}). \Macro{pagebreak} ist hier
   eindeutig die falsche Anweisung.
 
@@ -1267,7 +1318,7 @@ eingefügten Vakatseite erfahren Sie im nächsten Abschnitt.
   Umschaltung nicht, so sollten Sie den Nummerierungsstil der Seiten über das
   gesamte Dokument konsequent durchhalten, ohne ihn zwischendurch zu
   ändern.
-\iffalse% Umbruchkorrekturtext
+\iftrue% Umbruchkorrekturtext
   Bei Artikeln oder anderen kurzen Dokumenten ist das generell zu
   empfehlen.
 \fi
@@ -1296,8 +1347,12 @@ eingefügten Vakatseite erfahren Sie im nächsten Abschnitt.
 
 Bei Büchern gibt es teilweise die Grobauf"|teilung in
 \emph{Vorspann}\Index{Vorspann}, \emph{Hauptteil}\Index{Hauptteil} und
-\emph{Nachspann}\Index{Nachspann}. Auch \KOMAScript{} bietet für
-\Class{scrbook} diese Möglichkeit.
+\emph{Nachspann}\Index{Nachspann}%
+\iffalse % Umbruchkorrektur
+. Auch \KOMAScript{} bietet für \Class{scrbook} diese Möglichkeit.%
+\else
+, die auch von \Class{scrbook} unterstützt wird.
+\fi
 
 
 \begin{Declaration}
@@ -1306,7 +1361,7 @@ Bei Büchern gibt es teilweise die Grobauf"|teilung in
   \Macro{backmatter}
 \end{Declaration}%
 Mit \Macro{frontmatter}\important{\Macro{frontmatter}} wird der Vorspann
-eingeleitet. Im Vorspann werden die nummerierten Seiten mit römischen
+eingeleitet. Dadruch werden die nummerierten Seiten mit römischen
 Seitenzahlen versehen.  Kapitelüberschriften sind im Vorspann nicht
 nummeriert.  Abschnittsüberschriften wären jedoch nummeriert, gingen von
 Kapitelnummer~0 aus und wären außerdem über Kapitelgrenzen hinweg durchgehend
