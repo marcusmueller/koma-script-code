@@ -1,4 +1,4 @@
-% \CheckSum{815}
+% \CheckSum{818}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlfile.dtx
@@ -400,6 +400,8 @@
 %  \end{macro}
 %
 % \begin{macro}{\scr@load@hook}
+% \changes{v3.27a}{2019/10/16}{workaround for strange handling of
+%   \cs{AtEndOfPackage} hook in \cs{@onefilewithoptions}}%^^A
 % This macro simply calls a load-file-hook, either the \emph{before}
 % or the \emph{after} one, if the hook exists. After calling the hook
 % it will be deleted. First argument is the type of hook
@@ -407,32 +409,48 @@
 %    \begin{macrocode}
 \newcommand*{\scr@load@hook}[2]{%
 %    \end{macrocode}
-% \changes{v3.27a}{2019/10/16}{workaround for strange handling of
-%   \cs{AtEndOfPackage} hook in \cs{@onefilewithoptions}}%^^A
+% \begin{macro}{\scrlfile@cmp@hook}
+% \changes{v3.27a}{2019/10/23}{local macros renamed}
+% \begin{macro}{\scrlfile@hookname}
+% \changes{v3.27a}{2019/10/23}{local macros renamed}
 % Workaround for strange handling of the \cs{AtEndOfPackage} hook in
 % \cs{@onefilewithoptions} (becomes \cs{@empty}, if the package already has
 % been loaded and is not loaded again). This workaround is not nice but
 % smart. Before loading a file it defines a marker macro and undefines it
-% later.
+% later. To decide whether to define or remove the marker, two local macros
+% are used \cs{scrlfile@hookname} and \cs{scrlfile@cmp@hook}. The first has
+% the name of the current hook from the first argument. The other is a compare
+% string. The first one is also valid while processing the hook. The names are
+% very unique, so we do not reserve them using \cs{newcommand} outside. The
+% name of the marker is less unique. Nevertheless it is not reserved.
+% Note: For recursive loading of files this does not work. But this also does
+% not matter, because it is needed only for packages and classes, which are
+% never loaded recursive.
 %    \begin{macrocode}
-  \edef\scr@hookname{#1}%
-  \def\scr@cmd@hook{before}%
-  \ifx\scr@hookname\scr@cmd@hook
+  \edef\scrlfile@hookname{#1}%
+  \def\scrlfile@cmp@hook{before}%
+  \ifx\scrlfile@hookname\scrlfile@cmp@hook
     \expandafter\def\csname #2-l@ading\endcsname{#2}%
   \fi
-  \let\scr@cmd@hook\@undefined
+  \let\scrlfile@cmp@hook\@undefined
   \@ifundefined{#2-@#1}{}{%
     \@nameuse{#2-@#1}%
     \expandafter\let\csname #2-@#1\endcsname\relax
   }%
-  \edef\scr@hookname{#1}%
-  \def\scr@cmp@hook{after}%
-    \ifx\scr@hookname\scr@cmp@hook
-      \expandafter\let\csname #2-l@ading\endcsname\@undefined
-    \fi
-  \let\scr@hookname\@undefined
+%    \end{macrocode}
+% The hook could destroy \cs{scrlfile@hookname} so define it again:
+%    \begin{macrocode}
+  \edef\scrlfile@hookname{#1}%
+  \def\scrlfile@cmp@hook{after}%
+  \ifx\scrlfile@hookname\scrlfile@cmp@hook
+    \expandafter\let\csname #2-l@ading\endcsname\@undefined
+  \fi
+  \let\scrlfile@cmp@hook\@undefined
+  \let\scrlfile@hookname\@undefined
 }
 %    \end{macrocode}
+%  \end{macro}
+%  \end{macro}
 %  \end{macro}
 %
 % \begin{macro}{\scr@set@load@hook}
