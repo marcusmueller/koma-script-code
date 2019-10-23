@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2019/10/17 v1.15a internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2019/10/23 v1.16 internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -1734,11 +1734,12 @@
 % \end{environment}
 %
 % \begin{macro}{\start@desctab}
-%   \changes{v1.7c}{2013/10/13}{\cs{leavevmode}\cs{ignorespaces} added to
-%     \cs{nentry}}
-%   This is the \emph{worker} macro of \texttt{desctable} and
-%   \texttt{desctabular}. It does the complete calculations and definition of
-%   the entry (something like |\item|) commands.
+% \changes{v1.7c}{2013/10/13}{\cs{leavevmode}\cs{ignorespaces} added to
+%   \cs{nentry}}%^^A
+% \changes{v1.16}{2019/10/23}{links for plengths added}%^^A
+% This is the \emph{worker} macro of \texttt{desctable} and
+% \texttt{desctabular}. It does the complete calculations and definition of
+% the entry (something like |\item|) commands.
 %    \begin{macrocode}
 \newcommand*{\start@desctab}[1]{%
   \setlength{\descwidth}{\linewidth}%
@@ -1752,7 +1753,15 @@
   }%
   \newcommand{\entry}[2]{\nentry{##1}{##2}[.5\baselineskip]}%
   \newcommand*{\pentry}[1]{%
-    \entry{\PLength{##1}\IndexPLength[indexmain]{##1}}}%
+    \entry{%
+      \scr@ifundefinedorrelax{r@\label@desc@prefix\LabelBase.plength.##1}{%
+        \ClassWarning{scrguide}{%
+          Reference `\label@desc@prefix\LabelBase.plength.##1' undefined}%
+        \PLength{##1}%
+      }{%
+        \DescRef{\LabelBase.plength.##1}%
+      }%
+      \IndexPLength[indexmain]{##1}}}%
   \newcommand*{\pventry}[1]{\entry{\PValue{##1}}}%
   \newcommand*{\mentry}[1]{\entry{\Macro{##1}}}%
   \newcommand*{\ventry}[1]{%
