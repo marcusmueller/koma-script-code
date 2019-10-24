@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2019/10/23 v1.16 internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2019/10/24 v1.17 internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -1737,6 +1737,7 @@
 % \changes{v1.7c}{2013/10/13}{\cs{leavevmode}\cs{ignorespaces} added to
 %   \cs{nentry}}%^^A
 % \changes{v1.16}{2019/10/23}{links for plengths added}%^^A
+% \changes{v1.17}{2019/10/23}{links for variables added}%^^A
 % This is the \emph{worker} macro of \texttt{desctable} and
 % \texttt{desctabular}. It does the complete calculations and definition of
 % the entry (something like |\item|) commands.
@@ -1765,7 +1766,16 @@
   \newcommand*{\pventry}[1]{\entry{\PValue{##1}}}%
   \newcommand*{\mentry}[1]{\entry{\Macro{##1}}}%
   \newcommand*{\ventry}[1]{%
-    \entry{\Variable{##1}\IndexVariable[indexmain]{##1}}%
+    \entry{%
+      \scr@ifundefinedorrelax{r@\label@desc@prefix\LabelBase.variable.##1}{%
+        \ClassWarning{scrguide}{%
+          Reference `\label@desc@prefix\LabelBase.variable.##1 undefined}%
+        \Variable{##1}%
+      }{%
+        \DescRef{\LabelBase.variable.##1}%
+      }%
+      \IndexVariable[indexmain]{##1}%
+    }%
   }%
   \newcommand*{\feentry}[1]{%
     \entry{%
