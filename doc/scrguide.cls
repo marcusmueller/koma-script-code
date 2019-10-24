@@ -652,12 +652,13 @@
 % \begin{macro}{\Counter}
 % \begin{macro}{\Length}
 % \begin{macro}{\PLength}
+% \changes{v1.17}{2019/10/24}{\cs{setplength} verschoben}%^^A
 % \begin{macro}{\FloatStyle}
 % \begin{macro}{\PageStyle}
 % \begin{macro}{\Variable}
 % \begin{macro}{\FontElement}
 % \begin{macro}{\DoHook}
-% \changes{v1.14}{2019/02/20}{neu}^^A
+% \changes{v1.14}{2019/02/20}{neu}%^^A
 % \begin{macro}{\PName}
 % \begin{macro}{\PValue}
 % \begin{macro}{\Parameter}
@@ -1002,12 +1003,12 @@
   \BeginIndex{PLength}{#1}%
   \LabelPLength{#1}%
   \scr@ifundefinedorrelax{%
-    r@\label@desc@prefix scrlttr2-experts.cmd.setplength}{%
+    r@\label@desc@prefix scrlttr2.cmd.setplength}{%
     \textMacro{setplength}%
   }{%
     \begingroup
       \let\Macro\textMacro
-      \DescRef{scrlttr2-experts.cmd.setplength}%
+      \DescRef{scrlttr2.cmd.setplength}%
     \endgroup
   }%
   \PParameter{#1}\Parameter{\lengthname}%
