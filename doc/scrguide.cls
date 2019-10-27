@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2019/10/24 v1.17 internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2019/10/25 v1.18 internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -1438,6 +1438,15 @@
 }
 %    \end{macrocode}
 % \end{environment}
+% \begin{macro}{\ExampleEndFix}
+% \changes{v1.18}{2019/10/25}{New}%^^A
+% If an example is at the end of a description and before a new description
+% the vertical spacing is suboptimal. Sorry, but this cannot be fixed
+% automatically currently. But here is a manual fix:
+%    \begin{macrocode}
+\newcommand*{\ExampleEndFix}{\vskip -1\ht\strutbox plus .75\strutbox}
+%    \end{macrocode}
+% \end{macro}
 %
 % \begin{environment}{ShowOutput}
 %   This environment is used for the output of examples. It shows the middle
