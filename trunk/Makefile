@@ -35,6 +35,8 @@
 # Dieses Werk besteht aus den in manifest.txt aufgefuehrten Dateien.
 # ======================================================================
 
+NOCHANGELOG = 1 # We do not longer make or package the ChangeLog
+
 # ----------------------------------------------------------------------
 # All directories with Makefiles
 export BASEDIR ?= $(PWD)/
@@ -229,14 +231,19 @@ CLS_SRC		= $(CLS_MAIN_SRC)
 
 NODIST_GENERATED = $(CLS_DVIS) $(CLS_FILES) $(ALPHA_DOC)
 
-GENERATED	= $(NODIST_GENERATED) ChangeLog \
+GENERATED	= $(NODIST_GENERATED) \
 		  scrjura.ins \
 		  scrwfile.ins \
 		  tocbasic.ins \
 	 	  tocstyle.ins tocstyle.tex tocstyle.drv
 
 MISC_SRC	= $(MAKE_FILES) \
-                  scrdoc.dtx ChangeLog ChangeLog.2
+                  scrdoc.dtx
+
+ifndef NOCHANGELOG
+GENERATED      += ChangeLog
+MISC_SRC       += ChangeLog ChangeLog.2
+endif
 
 DIST_SRC	= $(MISC_SRC) $(CLS_SRC)
 
@@ -289,7 +296,9 @@ bindist:tdsdist
 	  $(UNZIP) ../../komascript.tds.zip
 	# copy some of the files to primary folder
 	$(MV) komascript.tds.zip $(notdir $(DISTDIR))-bin/
+ifndef NOCHANGELOG
 	$(INSTALL) $(notdir $(DISTDIR))-bin/komascript-texmf/source/latex/koma-script/ChangeLog $(notdir $(DISTDIR))-bin
+endif
 	$(INSTALL) $(notdir $(DISTDIR))-bin/komascript-texmf/doc/latex/koma-script/scrgui* $(notdir $(DISTDIR))-bin
 	$(INSTALL) $(notdir $(DISTDIR))-bin/komascript-texmf/doc/latex/koma-script/*.txt $(notdir $(DISTDIR))-bin
 	$(INSTALL) $(notdir $(DISTDIR))-bin/komascript-texmf/doc/latex/koma-script/README $(notdir $(DISTDIR))-bin
@@ -424,7 +433,9 @@ maintainclean_local: clean_local
 
 dist_prior:
 ifdef PREPARERELEASE
+ifndef NOCHANGELOG
 	developer/scripts/preparerelease.sh 1
+endif
 	$(MAKE) prepare
 endif
 	-$(RMDIR) $(DISTDIR)
