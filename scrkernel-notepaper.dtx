@@ -4522,26 +4522,32 @@
         \ifkomavarempty{togivenname}{%
           \usekomavar[\setkomavar{toname}]{tofamilyname}%
         }{%
+          % Fixme: The \cs{protected@edef}s are critical!
           \usekomavar[\protected@edef\reserved@a]{togivenname}%
           \usekomavar[\protected@edef\reserved@b]{tofamilyname}%
-          \protected@edef\reserved@a{%
-            \noexpand\setkomavar{toname}{\reserved@a\ \reserved@b}%
+          \edef\reserved@a{%
+            \noexpand\setkomavar{toname}{%
+              \unexpanded\expandafter{\reserved@a}\ %
+              \unexpanded\expandafter{\reserved@b}}%
           }\reserved@a
         }%
       }%
     }{}%
     \ifkomavarempty{toaddress}{%
+      % Fixme: The \cs{protected@edef}s are critical!
       \usekomavar[\protected@edef\reserved@a]{toname}%
       \protected@edef\reserved@a{%
         \noexpand\usekomafont{toname}{\reserved@a}%
       }\reserved@a
     }{%
       \ifkomavarempty{toname}{%
+        % Fixme: The \cs{protected@edef}s are critical!
         \usekomavar[\protected@edef\reserved@a]{toaddress}%
         \protected@edef\reserved@a{%
           \noexpand\usekomafont{toaddress}{\reserved@a}%
         }\reserved@a
       }{%
+        % Fixme: The \cs{protected@edef}s are critical!
         \usekomavar[\protected@edef\scr@local@toname]{toname}%
         \usekomavar[\protected@edef\reserved@b]{toaddress}%
         \protected@edef\reserved@a{%
@@ -4563,6 +4569,7 @@
 % For the package set variable \texttt{addressee}:
 %    \begin{macrocode}
 %<*package&willbe>
+    % Fixme: The \cs{protected@edef}s are critical!
     \protected@edef\reserved@c{%
       \noexpand\setkomavar{addressee}{%
         {\noexpand\usekomafont{toname}{\reserved@a}}%
@@ -4575,6 +4582,7 @@
 % If \texttt{toname} is empty, set it:
 %    \begin{macrocode}
     \ifkomavarempty{toname}{%
+      % Fixme: The \cs{protected@edef}s are critical!
       \protected@edef\reserved@a{%
         \noexpand\reserved@c{\noexpand\setkomavar{toname}{\reserved@a}}}%
     }{\let\reserved@a\reserved@c}%
@@ -4582,6 +4590,7 @@
 % If \texttt{toaddress} is empty, set it:
 %    \begin{macrocode}
     \ifkomavarempty{toaddress}{%
+      % Fixme: The \cs{protected@edef}s are critical!
       \protected@edef\reserved@b{\noexpand\reserved@a
         \noexpand\setkomavar{toaddress}{\reserved@b}}%
       \reserved@b
@@ -4589,11 +4598,13 @@
 %</package&willbe>
 %    \end{macrocode}
 % For the class simply set \texttt{toname} und \texttt{toaddress}:
+% \changes{v3.27}{2019/10/28}{don't expand the contents of \cs{reserved@a} and
+%   \cs{reserved@b}}%^^A
 %    \begin{macrocode}
 %<*class|!willbe>
-    \protected@edef\reserved@a{%
-      \noexpand\setkomavar{toname}{\reserved@a}%
-      \noexpand\setkomavar{toaddress}{\reserved@b}%
+    \edef\reserved@a{%
+      \noexpand\setkomavar{toname}{\unexpanded\expandafter{\reserved@a}}%
+      \noexpand\setkomavar{toaddress}{\unexpanded\expandafter{\reserved@b}}%
     }\reserved@a
 %</class|!willbe>
   }%
