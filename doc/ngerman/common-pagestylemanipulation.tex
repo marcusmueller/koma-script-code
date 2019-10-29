@@ -137,14 +137,13 @@
       Verwendet man hingegen als Seitenstil
       \DescRef{maincls.pagestyle.myheadings}\IndexPagestyle{myheadings}%
       \important{\DescRef{maincls.pagestyle.myheadings}}%
-      \textnote{manuelle Kolumnentitel}, so
-      existieren zwar die Marken im Kopf genauso und auch die Seitenzahlen
-      werden gleich platziert, allerdings werden die Marken nicht automatisch
-      durch die Überschriften gesetzt. Man kann sie dann nur
-      manuell\important{%
+      \textnote{manuelle Kolumnentitel}, so existieren zwar die Marken im Kopf
+      genauso und auch die Seitenzahlen werden gleich platziert, allerdings
+      werden die Marken nicht automatisch durch die Überschriften gesetzt. Man
+      kann sie dann nur manuell über die später in diesem Abschnitt
+      dokumentierten Anweisungen\important{%
         \DescRef{\ThisCommonLabelBase.cmd.markright}\\
         \DescRef{\ThisCommonLabelBase.cmd.markboth}}
-      über die später in diesem Abschnitt dokumentierten Anweisungen
       \DescRef{\ThisCommonLabelBase.cmd.markright} und
       \DescRef{\ThisCommonLabelBase.cmd.markboth} befüllen.
     \end{Explain}\par%
@@ -248,8 +247,9 @@
   \lipsum[21-40]
   \end{document}
 \end{lstcode}
+      \IfThisCommonLabelBase{scrlayer-scrpage}{}{% Umbruchkorrektur
       Dabei ist das Paket \Package{lipsum}\IndexPackage{lipsum} mit seiner
-      Anweisung \Macro{lipsum}\IndexCmd{lipsum} sehr nützlich. 
+      Anweisung \Macro{lipsum}\IndexCmd{lipsum} sehr nützlich.}%
 
       Wenn Sie dieses Beispiel einmal testen, werden Sie sehen, dass die
       Kapitelanfangsseite wie üblich ohne Kolumnentitel ist, da sie
@@ -291,7 +291,7 @@
 \end{lstcode}
   \fi
 
-  \IfThisCommonLabelBase{scrlayer-scrpage}{%
+  \IfThisCommonLabelBase{scrlayer-scrpage}{% Umbruchkorrektur
     Im einseitigen Modus\textnote{einseitiger Satz} will man in der Regel,
     dass nur die höheren Ebenen den Kolumnentitel vorgeben.%
   }{%
@@ -311,12 +311,21 @@
     iffalse\endcsname}%
     \begin{Example}
       \phantomsection\xmpllabel{mark.oneside}%
-      Angenommen, Sie wollen im einseitigen Modus eines Berichts eine ganz
-      ähnliche Verwendung des Kolumnentitels erreichen wie im vorherigen
-      Beispiel. Konkret soll so lange die Kapitelüberschrift verwendet werden,
+      Angenommen, Sie wollen im einseitigen Modus eines Berichts %
+      \iffalse % Umbruchkorrektur
+      eine ganz ähnliche Verwendung des Kolumnentitels erreichen wie im
+      vorherigen Beispiel. Konkret soll so lange die Kapitelüberschrift
+      verwendet werden, %
+      \else %
+      so lange die Kapitelüberschriften für den Kolumnentitel verwenden, %
+      \fi %
       bis ein Abschnitt gesetzt wird. Ab dann soll nur noch die
-      Abschnittsüberschrift verwendet werden. Dazu wird das Beispiel wie folgt
-      abgewandelt:
+      Abschnittsüberschrift verwendet werden. %
+      \iftrue % Umbruchkorrektur
+      Dazu wird das %
+      \iftrue vorheringe \fi % Umbruchkorrektur
+      Beispiel wie folgt abgewandelt:%
+      \fi %
 \begin{lstcode}
   \documentclass{scrreprt}
   \usepackage[autooneside=false]{scrlayer-scrpage}
@@ -330,11 +339,20 @@
   \lipsum[21-40]
   \end{document}
 \end{lstcode}
-      Wie zu sehen ist, wird in diesem Fall keine ergänzende
+      \iffalse % Umbruchkorrektur
+      Wie zu sehen ist, wird in diesem Fall keine %
+      \else %
+      In diesem Fall wird keine %
+      \fi
+      \iffalse ergänzende \fi % Umbruchkorrektur
       \DescRef{\LabelBase.cmd.automark*}-Anweisung benötigt. Sie sollten zum
-      Vergleich die Option \Option{autooneside} auch einmal auf \PValue{true}
-      setzen oder sie entfernen. Ein Unterschied ist dann ab Seite~4 im
-      Kolumnentitel im Kopf der Seiten zu sehen.
+      Vergleich die Option \Option{autooneside} %
+      \iffalse auch \fi % Umbruchkorrektur
+      einmal %
+      \iffalse auf \PValue{true} setzen oder sie \fi % Umbruchkorrektur
+      entfernen. Ein Unterschied ist dann ab Seite~4 %
+      \iffalse im Kolumnentitel im Kopf der Seiten \fi % Umbruchkorrektur
+      zu sehen.
     \end{Example}
   \fi
 
@@ -344,19 +362,14 @@
   oder \Option{manualmark} oder einer der beiden Anweisungen
   \DescRef{\LabelBase.cmd.automark} oder \DescRef{\LabelBase.cmd.manualmark}
   schafft hier klare Verhältnisse.%
-  \IfThisCommonLabelBase{scrlayer-scrpage}{\par%
-    Bei Bedarf finden Sie weitere Hintergründe und Beispiele zur Verwendung
-    dieser Befehle und Optionen mit dem auf \Package{scrlayer} basierenden
-    Paket \IfThisCommonLabelBase{scrlayer-scrpage}{%
-    \Package{scrlayer-scrpage}%
-  }{%
+  \IfThisCommonLabelBase{scrlayer}{\par%
+    Bei Bedarf finden Sie weitere Beispiele zur Verwendung dieser Befehle und
+    Optionen mit dem auf \Package{scrlayer} basierenden Paket
     \hyperref[cha:scrlayer-scrpage]{\Package{scrlayer-scrpage}}%
-  } in
-    \autoref{sec:scrlayer-scrpage.pagestyle.content}, ab
+    in \autoref{sec:scrlayer-scrpage.pagestyle.content}, ab
     \DescPageRef{scrlayer-scrpage.cmd.manualmark}.%
   }{}%
-  \EndIndexGroup
-  \EndIndexGroup
+  \EndIndexGroup \EndIndexGroup
 
 
   \begin{Declaration}
@@ -367,20 +380,24 @@
   angegeben sind. Ist die Option aktiviert, so werden
   \IfThisCommonLabelBase{scrlayer}{für die Entwurfsphase}{\unskip} alle
   Elemente der Seitenstile zusätzlich mit
-  Maßlinien\Index{Masslinien=Maßlinien}
-  versehen. \IfThisCommonLabelBase{scrlayer}{\unskip}{Dies kann während der
-    Entwurfsphase manchmal nützlich sein.}%
+  Maßlinien\Index{Masslinien=Maßlinien} versehen.%
+  \IfThisCommonLabelBaseOneOf{scrlayer,scrlayer-scrpage}{}{ % Umbruchkorrektur
+    Dies kann während der Entwurfsphase manchmal nützlich sein.}%
   \IfThisCommonLabelBase{scrlayer-scrpage}{ %
     Falls diese Option global gesetzt wurde, die Maßlinien aber nicht
     gewünscht sind, kann die Option auch nur für das Paket deaktiviert werden,
-    indem man \OptionValue{draft}{false} als optionales Argument von
-    \DescRef{\LabelBase.cmd.usepackage} beim Laden des Pakets angibt.%
+    indem man \OptionValue{draft}{false} %
+    \iffalse % Umbruchkorrektur
+    als optionales Argument von \DescRef{\LabelBase.cmd.usepackage} %
+    \fi %
+    beim Laden des Pakets angibt.%
   }{}%
   \EndIndexGroup
 
 
   \begin{Declaration}
     \Macro{MakeMarkcase}\Parameter{Text}
+    \OptionVName{markcase}{Wert}
   \end{Declaration}
   Die automatischen, nicht jedoch die manuellen Kolumnentitel verwenden
   \Macro{MakeMarkcase} für ihre Ausgabe. Ist die Anweisung beim Laden von
@@ -390,39 +407,47 @@
     \hyperref[cha:scrlayer]{\Package{scrlayer}}%
   } nicht\textnote{bedingte Voreinstellung} definiert, so wird sie in der
   Voreinstellung derart definiert, dass sie ihr Argument \PName{Text}
-  unverändert ausgibt. Diese Voreinstellung kann jedoch entweder durch
-  Umdefinierung von \Macro{MakeMarkcase} oder durch die nachfolgend
-  dokumentierte Option \DescRef{\LabelBase.option.markcase}%
-  \IndexOption{markcase}\important{\DescRef{\LabelBase.option.markcase}}
-  geändert werden. Je nach Einstellung wird das Argument dann beispielsweise
-  in Groß- oder Kleinbuchstaben umgewandelt.
-  % 
-  \EndIndexGroup
-
-
-  \begin{Declaration}
-    \OptionVName{markcase}{Wert}
-  \end{Declaration}
-  Wie bereits früher erläutert, kann man bei
-  \IfThisCommonLabelBase{scrlayer}{%
-    \Package{scrlayer}%
-  }{%
-    \hyperref[cha:scrlayer]{\Package{scrlayer}}%
-  } zwischen manuellen und automatischen Kolumnentiteln wählen. Bei den
-  automatischen Kolumnentiteln werden dabei die entsprechenden Marken über die
-  Gliederungsbefehle gesetzt. In manchen Kulturkreisen ist es im Gegensatz zur
-  Typografie des deutschsprachigen Raums üblich, die Kolumnentitel in
-  Großbuchstaben zu setzen. Die Standardklassen machen genau dies in der
-  Voreinstellung. Das Paket \IfThisCommonLabelBase{scrlayer}{%
-    \Package{scrlayer}%
-  }{%
-    \hyperref[cha:scrlayer]{\Package{scrlayer}}%
-  } unterstützt das optional ebenfalls. Hierzu gibt man als Option
-  \OptionValue{markcase}{upper}\important{\OptionValue{markcase}{upper}}%
-  \IndexOption[indexmain]{markcase~=upper} an. Im Endeffekt führt das zu einer
-  Umdefinierung von
-  \DescRef{\ThisCommonLabelBase.cmd.MakeMarkcase}%
-  \IndexCmd[indexmain]{MakeMarkcase}.
+  unverändert ausgibt. Diese Voreinstellung kann jedoch durch Umdefinierung
+  von \Macro{MakeMarkcase} geändert werden. Die Umdefinierung kann auch
+  automatisch durch Verwendung von Option \Option{markcase} mit einem der
+  Werte aus \autoref{tab:\ThisCommonLabelBase.markcase}%
+  \IfThisCommonLabelBase{scrlayer-scrpage}{}{,
+    \autopageref{tab:\ThisCommonLabelBase.markcase}} erfolgen.%
+  \IfThisCommonLabelBase{scrlayer-scrpage}{%
+    \begin{table}
+      \centering
+      \caption[Mögliche Werte für Option \Option{markcase}]{Mögliche Werte für
+        Option \Option{markcase} zur Wahl von Groß-/Kleinschreibung in
+        automatischen Kolumnentiteln}%
+      \label{tab:\ThisCommonLabelBase.markcase}%
+      \begin{desctabular}
+        \pventry{lower}{\IndexOption[indexmain]{markcase~=lower}%
+          definiert \DescRef{\LabelBase.cmd.MakeMarkcase} so um, dass
+          automatische Kolumnentitel mit Hilfe von \Macro{MakeLowercase} in
+          Kleinbuchstaben gewandelt werden (Minuskelsatz).%
+        }\\[-1.7ex]
+        \pventry{upper}{\IndexOption[indexmain]{markcase~=upper}%
+          definiert \DescRef{\LabelBase.cmd.MakeMarkcase} so um, dass
+          automatische Kolumnentitel mit Hilfe von \Macro{MakeUppercase} in
+          Großbuchstaben gewandelt werden (Versalsatz).%
+        }\\[-1.7ex]
+        \pventry{used}{\IndexOption[indexmain]{markcase~=used}%
+          definiert \DescRef{\LabelBase.cmd.MakeMarkcase} so um, dass für
+          automatische Kolumnentitel keine automatische Veränderung der
+          Groß-/Kleinschreibung durchgeführt wird.%
+        }\\[-1.7ex]
+        \entry{\PValue{ignoreuppercase}, \PValue{nouppercase},
+          \PValue{ignoreupper},
+          \PValue{noupper}}{\IndexOption[indexmain]{markcase~=noupper}%
+          definiert nicht nur \DescRef{\LabelBase.cmd.MakeMarkcase} so um,
+          dass für automatische Kolumnentitel keine automatische Veränderung
+          der Groß-/Kleinschreibung durchgeführt wird, sondern deaktiviert
+          zusätzlich lokal für alle Ebenen aller Seitenstile
+          \Macro{MakeUppercase} und \Macro{uppercase}.%
+        }%
+      \end{desctabular}
+    \end{table}
+  }{}%
 
   \IfThisCommonLabelBase{scrlayer}{%
     Aufgrund der mangelnden typografischen Qualität der primitiven Umwandlung
@@ -451,46 +476,6 @@
   \IndexOption[indexmain]{markcase~=noupper}, mit deren Hilfe
   \Macro{MakeUppercase} und \Macro{uppercase} für die Kolumnentitel lokal
   deaktiviert werden können.
-
-  Alle für \Option{markcase} möglichen Werte sind noch einmal in
-  \autoref{tab:scrlayer-scrpage.markcase}%
-  \IfThisCommonLabelBase{scrlayer-scrpage}{}{,
-    \autopageref{tab:scrlayer-scrpage.markcase}} zusammengefasst.%
-  \IfThisCommonLabelBase{scrlayer-scrpage}{%
-    \begin{table}
-      \centering
-      \caption[Mögliche Werte für Option \Option{markcase}]{Mögliche Werte für
-        Option \Option{markcase} zur Wahl von Groß-/Kleinschreibung in
-        automatischen Kolumnentiteln}%
-      \label{tab:\ThisCommonLabelBase.markcase}%
-      \begin{desctabular}
-        \pventry{lower}{\IndexOption[indexmain]{markcase~=lower}%
-          definiert \DescRef{\LabelBase.cmd.MakeMarkcase} so um, dass
-          automatische Kolumnentitel mit Hilfe von \Macro{MakeLowercase} in
-          Kleinbuchstaben gewandelt werden (Minuskelsatz).%
-        }%
-        \pventry{upper}{\IndexOption[indexmain]{markcase~=upper}%
-          definiert \DescRef{\LabelBase.cmd.MakeMarkcase} so um, dass
-          automatische Kolumnentitel mit Hilfe von \Macro{MakeUppercase} in
-          Großbuchstaben gewandelt werden (Versalsatz).%
-        }%
-        \pventry{used}{\IndexOption[indexmain]{markcase~=used}%
-          definiert \DescRef{\LabelBase.cmd.MakeMarkcase} so um, dass für
-          automatische Kolumnentitel keine automatische Veränderung der
-          Groß-/Kleinschreibung durchgeführt wird.%
-        }%
-        \entry{\PValue{ignoreuppercase}, \PValue{nouppercase},
-          \PValue{ignoreupper},
-          \PValue{noupper}}{\IndexOption[indexmain]{markcase~=noupper}%
-          definiert nicht nur \DescRef{\LabelBase.cmd.MakeMarkcase} so um,
-          dass für automatische Kolumnentitel keine automatische Veränderung
-          der Groß-/Kleinschreibung durchgeführt wird, sondern deaktiviert
-          zusätzlich lokal für alle Ebenen aller Seitenstile
-          \Macro{MakeUppercase} und \Macro{uppercase}.%
-        }%
-      \end{desctabular}
-    \end{table}
-  }{}%
   \EndIndexGroup
 
 
@@ -657,7 +642,7 @@
   }%
     \begin{Example}
       \phantomsection\xmpllabel{cmd.sectionmarkformat}%
-      \iftrue
+      \iffalse
       Wollen Sie auf Abschnittsebene Kolumnentitel ohne Gliederungsnummer,
       geht das beispielsweise so:
       \else
@@ -673,6 +658,7 @@
   \fi
   % 
   \EndIndexGroup
+  \ExampleEndFix
 
 
   \begin{Declaration}
