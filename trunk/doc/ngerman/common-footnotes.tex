@@ -55,6 +55,10 @@
 \BeginIndex{}{Fussnoten=Fußnoten}%
 
 \IfThisCommonFirstRun{}{%
+  \IfThisCommonLabelBase{scrextendderzeitauchnicht}{% Umbruchkorrektur
+    Die Fußnoten-Möglichkeiten der \KOMAScript-Klassen werden von
+    \Package{scrextend} ebenfalls bereitgestellt. %
+  }{}%
   Es gilt sinngemäß, was in \autoref{sec:\ThisCommonFirstLabelBase.footnotes}
   geschrieben wurde. Falls Sie also
   \autoref{sec:\ThisCommonFirstLabelBase.footnotes} bereits gelesen und
@@ -70,13 +74,29 @@
     \autoref{sec:scrextend.footnotes} ab
     \autopageref{sec:scrextend.footnotes}.%
     \iffalse% Umbruchkorrekturtext
-      \ Beachten Sie insbesondere, dass in
-      diesem Fall einige \KOMAScript-typische Erweiterungen in der
-      Voreinstellung\textnote{Voreinstellung} nicht aktiv sind. Stattdessen
-      gelten in der Voreinstellung die Fußnotenmöglichkeiten der verwendeten
-      Klasse oder des \LaTeX-Kerns.%
+    \ Beachten Sie insbesondere, dass in diesem Fall einige
+    \KOMAScript-typische Erweiterungen in der
+    Voreinstellung\textnote{Voreinstellung} nicht aktiv sind. Stattdessen
+    gelten in der Voreinstellung die Fußnotenmöglichkeiten der verwendeten
+    Klasse oder des \LaTeX-Kerns.%
     \fi%
-  }{}%
+  }{%
+    \IfThisCommonLabelBase{scrextend}{%
+      \ In der Voreinstellung wird die Formatierung der Fußnoten jedoch der
+      verwendeten Klasse überlassen. Dies ändert sich, sobald die Anweisung
+      \DescRef{\ThisCommonLabelBase.cmd.deffootnote} %
+      \iftrue % Umbruchkorrektur
+      (siehe \DescPageRef{\ThisCommonLabelBase.cmd.deffootnote}) verwendet
+      wird. %
+      \else %
+      verwendet wird, die auf
+      \DescPageRef{\ThisCommonLabelBase.cmd.deffootnote} näher erläutert
+      wird. %
+      \fi %
+      Die Einstellmöglichkeiten für die Trennlinie über den Fußnoten werden
+      hingegen von \Package{scrextend} nicht bereitgestellt.%
+    }{}%
+  }%
 }
 
 \IfThisCommonLabelBase{derzeitnichtverwendet}{%
@@ -109,15 +129,6 @@
     }{}%
   }{%
     \IfThisCommonLabelBase{scrextend}{%
-      Die Fußnoten-Möglichkeiten der \KOMAScript-Klassen werden von
-      \Package{scrextend} ebenfalls bereitgestellt. In der Voreinstellung wird
-      die Formatierung der Fußnoten jedoch der verwendeten Klasse
-      überlassen. Dies ändert sich, sobald die Anweisung
-      \DescRef{\ThisCommonLabelBase.cmd.deffootnote} verwendet wird, die auf
-      \DescPageRef{\ThisCommonLabelBase.cmd.deffootnote} näher erläutert wird.
-
-      Die Einstellmöglichkeiten für die Trennlinie über den Fußnoten werden
-      hingegen von \Package{scrextend} nicht bereitgestellt.%
     }{\InternalCommonFileUsageError}%
   }%
 }%
@@ -127,7 +138,7 @@
   \OptionVName{footnotes}{Einstellung}
   \Macro{multfootsep}
 \end{Declaration}
-\IfThisCommonLabelBase{scrextend}{Bei vielen Klassen werden Fußnoten }{%
+\IfThisCommonLabelBase{scrextend}{}{%
   Fußnoten %
   \IfThisCommonLabelBase{maincls}{%
     \ChangedAt{v3.00}{\Class{scrbook}\and \Class{scrreprt}\and
@@ -137,11 +148,9 @@
       \ChangedAt{v3.00}{\Class{scrlttr2}}%
     }{}%
   } %
-  werden %
-}%
-im Text in der Voreinstellung\textnote{Voreinstellung} mit kleinen,
-hochgestellten Ziffern markiert. Werden in der
-Voreinstellung\important{\OptionValue{footnotes}{nomultiple}}
+  werden im Text in der Voreinstellung\textnote{Voreinstellung} mit kleinen,
+  hochgestellten Ziffern markiert. }%
+Werden in der Voreinstellung\important{\OptionValue{footnotes}{nomultiple}}
 \OptionValue{footnotes}{nomultiple} zu einer Textstelle mehrere Fußnoten
 hintereinander gesetzt, so entsteht der Eindruck, dass es sich nicht um zwei
 einzelne Fußnoten, sondern um eine einzige Fußnote mit hoher Nummer handele.
@@ -166,13 +175,20 @@ sich sowohl auf Fußnotenmarkierungen aus, die mit
 als auch auf solche, die direkt mit
 \DescRef{\ThisCommonLabelBase.cmd.footnotemark}\IndexCmd{footnotemark}
 ausgegeben werden.
-
-Es ist jederzeit möglich, mit \DescRef{\ThisCommonLabelBase.cmd.KOMAoptions}
-oder \DescRef{\ThisCommonLabelBase.cmd.KOMAoption} auf die Voreinstellung
-\OptionValue{footnotes}{nomultiple} zurückzuschalten. Bei Problemen mit
-anderen Paketen, die Einfluss auf die Fußnoten nehmen, sollte die Option
-jedoch nicht verwendet und die Einstellung auch nicht innerhalb des Dokuments
-umgeschaltet werden.
+%
+\IfThisCommonLabelBase{scrextend}{%
+  Bei Problemen mit der verwendeten Klasse oder anderen Paketen, die Einfluss
+  auf die Fußnoten nehmen, sollte Option \Option{footnotes} nicht verwendet
+  werden.%
+}{%
+  \par
+  Es ist jederzeit möglich, mit \DescRef{\ThisCommonLabelBase.cmd.KOMAoptions}
+  oder \DescRef{\ThisCommonLabelBase.cmd.KOMAoption} auf die Voreinstellung
+  \OptionValue{footnotes}{nomultiple} zurückzuschalten. Bei Problemen mit
+  anderen Paketen, die Einfluss auf die Fußnoten nehmen, sollte die Option
+  jedoch nicht verwendet und die Einstellung auch nicht innerhalb des
+  Dokuments umgeschaltet werden.%
+}%
 
 Eine Zusammenfassung möglicher Werte für die \PName{Einstellung} von
 \Option{footnotes} bietet
@@ -374,7 +390,8 @@ Da die Fußnotenmarken mit Hilfe des \Macro{label}-Mechanismus gesetzt werden,
 werden nach Änderungen, die sich auf die Fußnotennummerierung auswirken,
 gegebenenfalls zwei \LaTeX-Durchläufe benötigt, bis die mit \Macro{footref}
 gesetzten Marken korrekt sind.%
-\IfThisCommonLabelBaseOneOf{scrlttr2,scrextend}{\par%
+\IfThisCommonLabelBaseOneOf{scrlttr2,scrextend}{%
+  \IfThisCommonLabelBase{scrlttr2}{\par}{\ }%
   Ein Beispiel zur Verwendung von \Macro{footref} finden Sie in
   \autoref{sec:\ThisCommonFirstLabelBase.footnotes} auf
   \PageRefxmpl{\ThisCommonFirstLabelBase.cmd.footref}.%
