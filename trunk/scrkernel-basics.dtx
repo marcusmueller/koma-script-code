@@ -1,4 +1,4 @@
-% \CheckSum{4201}
+% \CheckSum{4210}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -1237,6 +1237,9 @@
 % \begin{option}{internalonly}
 % \changes{v2.96}{2006/11/26}{neu}%^^A
 % \changes{v2.97c}{2007/06/20}{geht auch ohne Argument}%^^A
+% \changes{v3.27a}{2019/11/04}{\cs{FamilyKeyStateProcessed} ergänzt}%^^A
+% \changes{v3.27a}{2019/11/04}{nur innerhalb des Pakets definiert}%^^A
+% \changes{v3.27a}{2019/11/04}{temporär in den Klassen definiert}%^^A
 % \begin{macro}{\dont@let@as@internal@defined}
 % \changes{v2.96}{2006/11/26}{neu (intern)}%^^A
 % Anweisungen, die mit einem internen und einem Anwendername vorhanden sind,
@@ -1258,8 +1261,26 @@
     \expandafter\endgroup
     \ifin@\else\g@addto@macro\dont@let@as@internal@defined{#1/}\fi
   \fi
+  \FamilyKeyStateProcessed
+}
+\AtEndOfPackage{%
+  \RelaxFamilyKey[.scrbase.sty]{KOMA}{internalonly}%
 }
 %</base>
+%    \end{macrocode}
+% Da \textsf{scrbase} von den Klassen bereits vor der Verarbeitung der
+% Optionen geladen wird, wird die Option zwar verarbeitet aber dann trotzdem
+% als unbekannt gemeldet. Das kann man nnotdürftig beheben, indem die Klasse
+% vorrübergehend eine Dummy-Option erhält.
+%    \begin{macrocode}
+%</option>
+%<*load&class>
+\KOMA@key{internalonly}[\relax]{%
+  \FamilyKeyStateProcessed
+}
+\AtEndOfClass{\RelaxFamilyKey[.\KOMAClassFileName]{KOMA}{internalonly}}%
+%</load&class>
+%<*option>
 %    \end{macrocode}
 % \end{macro}
 % \end{option}
