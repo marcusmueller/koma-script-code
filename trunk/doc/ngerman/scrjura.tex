@@ -70,10 +70,17 @@ Das Paket ist in Zusammenarbeit mit Rechtsanwalt Dr.\,Alexander Willand,
 Karlsruhe, entstanden. Viele der Möglichkeiten gehen außerdem auf konstruktive
 Nachfragen von Prof.\,Heiner Richter von der Hochschule Stalsund zurück.
 
-Es ist zu beachten\textnote{Achtung!}, dass das Paket mit
-\Package{hyperref}\IndexPackage{hyperref} zusammenarbeitet. Es ist dabei
-jedoch wichtig, dass \Package{hyperref} wie üblich nach \Package{scrjura}
-geladen wird!
+\iffalse % Umbruchkorrektur
+Es ist zu beachten, dass das Paket mit
+\Package{hyperref}\IndexPackage{hyperref}\important{\Package{hyperref}}
+zusammenarbeitet. %
+\else%
+Das Paket arbeitet auch mit
+\Package{hyperref}\IndexPackage{hyperref}\important{\Package{hyperref}}
+zusammen. %
+\fi%
+Es ist dabei jedoch wichtig, dass \Package{hyperref} wie üblich nach
+\Package{scrjura} geladen wird!
 
 \LoadCommonFile{options}% \section{Frühe oder späte Optionenwahl}
 
@@ -82,7 +89,7 @@ geladen wird!
 \section{Verzeichnisse}
 \label{sec:scrjura.toc}
 
-Die Überschriften juristischer Paragraphen können auf Wunsch auch automatisch
+Die Überschriften juristischer Paragraphen können auf Wunsch automatisch
 ins Inhaltsverzeichnis eingetragen
 werden. Dazu\ChangedAt{v3.27}{\Package{scrjura}} definiert das Paket mit Hilfe
 von \DescRef{tocbasic.cmd.DeclareTOCStyleEntry} (siehe
@@ -135,10 +142,11 @@ Inhaltsverzeichnis sowohl der Einzug als auch die Breite, die für Nummern
 reserviert wird, festgelegt werden. Voreingestellt\textnote{Voreinstellung}
 sind dieselben Werte wie für
 \DescRef{maincls.cmd.subsection}-Einträge\IndexCmd{subsection}%
-\important{\DescRef{maincls.cmd.subsection}} bei \Class{scrartcl}.
+\important{\DescRef{maincls.cmd.subsection}} bei \Class{scrartcl}, also
+\OptionValue{juratocindent}{1.5em} und \OptionValue{juratocnumberwidth}{2em}.
 
 Intern\ChangedAt{v3.27}{\Package{scrjura}} führt die Verwendung der Optionen
-zu erneuten Aufrufen von
+zu einem erneuten Aufruf von
 \DescRef{tocbasic.cmd.DeclareTOCStyleEntry}\IndexCmd{DeclareTOCStyleEntry} mit
 dem \PName{Stil} \PValue{default} und \OptionVName{indent}{Einzug}
 beziehungsweise \OptionVName{numwidth}{Nummernbreite} in der
@@ -170,7 +178,14 @@ dieser Umgebungen so behandelt, als stünden sie innerhalb einer einzigen
 Umgebung. Durch das Beenden der Umgebung wird diese also quasi
 unterbrochen und durch den Beginn einer neuen Umgebung wird sozusagen die alte
 Umgebung fortgesetzt. Dabei sind allerdings keine Unterbrechungen innerhalb
-eines Paragraphen möglich.%
+eines Paragraphen möglich.
+
+Sollten Sie stattdessen Umgebungen für voneinander unabhängigen Verträgen
+innerhalb desselben Dokuments benötigen, so sei auf die Möglichkeit der
+Definition weiterer Vertragsumgebungen mit
+\DescRef{\LabelBase.cmd.DeclareNewJuraEnvironment} in
+\autoref{sec:\LabelBase.newenv},
+\DescPageRef{\LabelBase.cmd.DeclareNewJuraEnvironment}) verwiesen.%
 \EndIndexGroup
 
 \begin{Declaration}
@@ -187,9 +202,10 @@ genau eine \DescRef{\LabelBase.env.contract}-Umgebung enthalten.
 Es\textnote{Achtung!} wird darauf hingewiesen, dass Option \Option{contract}
 weder mit \DescRef{\LabelBase.cmd.KOMAoption} noch
 \DescRef{\LabelBase.cmd.KOMAoptions} gesetzt werden kann!  Damit ist es auch
-nicht möglich die Option wieder abzuschalten. Verwenden Sie in einem solchen
-Fall stattdessen direkt eine \DescRef{\LabelBase.env.contract}-Umgebung.
-%
+nicht möglich die Option wieder abzuschalten. Außerdem würde mit der Option
+beispielsweise ein Dokumenttitel innerhalb der Vertragsumgebung
+gesetzt werden, was zu vermeiden ist. Verwenden Sie in solchen Fällen
+besser eine explizite \DescRef{\LabelBase.env.contract}-Umgebung.%
 \EndIndexGroup
 
 
@@ -198,17 +214,16 @@ Fall stattdessen direkt eine \DescRef{\LabelBase.env.contract}-Umgebung.
 \BeginIndexGroup
 \BeginIndex{}{Paragraphen>juristische} 
 
-Paragraphen\footnote{Obwohl der korrekte Begriff für juristische Paragraphen
-  im Englischen »\emph{section}« wäre, sind die Bezeichnungen in
-  \Package{scrjura} von »\emph{clause}« abgeleitet. Dadurch sollen
-  Verwechslungen sowohl mit \DescRef{maincls.cmd.section} als auch mit
-  \DescRef{maincls.cmd.paragraph} vermieden werden.} im juristischen Sinn
-sind bei \Package{scrjura} nur innerhalb von Verträgen, also innerhalb der
-Umgebung \DescRef{\LabelBase.env.contract} oder weiteren mit
-\DescRef{\LabelBase.cmd.DeclareNewJuraEnvironment} (siehe
+Paragraphen im juristischen Sinn sind bei \Package{scrjura} nur innerhalb von
+Verträgen, also innerhalb der Umgebung \DescRef{\LabelBase.env.contract} oder
+weiteren mit \DescRef{\LabelBase.cmd.DeclareNewJuraEnvironment} (siehe
 \autoref{sec:\LabelBase.newenv},
 \DescPageRef{\LabelBase.cmd.DeclareNewJuraEnvironment}) erstellten Umgebungen,
-definiert.
+definiert. Um Verwechslungen\textnote{Hinweis!} von juristischen Paragraphen
+mit Gliederungsbefehlen für typografische Paragraphen oder Abschnitte zu
+vermeiden leiten sich die Bezeichnungen von \Package{scrjura} nicht vom dem
+eigentlich korrekten englischen Begriff »\emph{section}«, sondern von
+»\emph{clause}« ab.
 
 \begin{Declaration}
   \phantomsection\label{desc:scrjura.contract.macro.Clause}%
@@ -225,13 +240,14 @@ Nummer noch ein fortlaufender Kleinbuchstabe angehängt wird. Gedacht ist
 \Macro{SubClause} vor allem für den Fall, dass bei der Novellierung von
 Gesetzen oder Verträgen nicht nur Paragraphen umformuliert oder gestrichen
 werden, sondern zwischen existierenden Paragraphen neue eingefügt werden, ohne
-dass eine komplett neue Nummerierung erfolgt.
+dass eine komplett neue Nummerierung erfolgt. Bezüglich der generellen
+Formatierung oder beispielsweise der Erzeugung von Inhaltsverzeichniseinträgen
+wird jedoch nicht zwischen \Macro{Clause} und \Macro{SubClause} unterschieden.
 
 Als \PName{Einstellungen} kann bei beiden Anweisungen eine durch Komma
 separierte Liste von Eigenschaften angegeben werden. Eine Übersicht über die
 möglichen Eigenschaften bietet \autoref{tab:scrjura.Clause.options}. Auf die
-wichtigsten soll noch näher eingegangen werden.
-
+wichtigsten soll noch näher eingegangen werden.%
 \begin{table}
   \caption{Mögliche Eigenschaften für die optionalen Argumente der Anweisungen
     \Macro{Clause} und \Macro{SubClause}}
@@ -239,31 +255,31 @@ wichtigsten soll noch näher eingegangen werden.
   \begin{desctabular}
     \entry{\Option{dummy}}{%
       Die Überschrift wird nicht gesetzt, aber gezählt.%
-    }%
+    }\\[-1.7ex]
     \entry{\OptionVName{head}{Kolumnentitel}}{%
       Sind Kolumnentitel aktiviert, wird unabhängig von einem Titel für den
       Paragraphen dieser Kolumnentitel verwendet.%
-    }%
+    }\\[-1.7ex]
     \entry{\Option{nohead}}{%
       Es wird kein neuer Kolumnentitel gesetzt.%
-    }%
+    }\\[-1.7ex]
     \entry{\Option{notocentry}}{%
       Es wird kein Eintrag ins Inhaltsverzeichnis vorgenommen.%
-    }%
+    }\\[-1.7ex]
     \entry{\OptionVName{number}{Nummer}}{%
       Die Nummer für den Paragraphen wird direkt angegeben.%
-    }%
+    }\\[-1.7ex]
     \entry{\OptionVName{preskip}{Abstand}}{%
       Neuer Abstand vor den Überschriften der Paragraphen.%
-    }%
+    }\\[-1.7ex]
     \entry{\OptionVName{postskip}{Abstand}}{%
       Neuer Abstand nach den Überschrift der Paragraphen.%
-    }%
+    }\\[-1.7ex]
     \entry{\OptionVName{title}{Überschrift}}{%
       Der Paragraph wird zusätzlich zur Nummer mit einem Titel versehen. Dies
       ist gleichzeitig die Grundeinstellung für die Einträge in den
       Kolumnentitel und das Inhaltsverzeichnis.%
-    }%
+    }\\[-1.7ex]
     \entry{\OptionVName{tocentry}{Inhaltsverzeichniseintrag}}{%
       Unabhängig von einem Titel für den Paragraphen wird dieser Eintrag ins
       Inhaltsverzeichnis vorgenommen.%
@@ -279,13 +295,10 @@ werden. Die neue Einstellung gilt dann aber nicht nur für den aktuellen
 Paragraphen, sondern ab dem aktuellen Paragraphen bis zum Ende der aktuellen
 Umgebung. Es ist auch möglich, die entsprechende Einstellung bereits vorab mit
 Hilfe von
-\begin{flushleft}\quad\small
-  \textbf{\Macro{setkeys}}\PParameter{contract}%
-  \PParameter{preskip=\PName{Abstand},\\
-    \normalsize\quad\small
-    \hspace{11.5em}postskip=\PName{Abstand}}
-\end{flushleft}
-unabhängig von einem konkreten Paragraphen und auch außerhalb einer
+\begin{lstcode}[escapeinside=><]
+  \setkeys{contract}{preskip=>\PName{Abstand}<,postskip=>\PName{Abstand}<}
+\end{lstcode}
+unabhängig von einem konkreten Paragraphen, außerhalb einer
 \DescRef{\LabelBase.env.contract}-Umgebung vorzunehmen. Auch das Setzen
 innerhalb der Präambel nach dem Laden von \Package{scrjura} ist so
 möglich. Dagegen ist es nicht möglich, diese beiden Optionen bereits beim
@@ -341,9 +354,8 @@ entsprechende Paragraph in einer späteren Fassung eines Vertrags gestrichen
 wurde.
 
 Es\textnote{Achtung!} ist zu beachten, dass Eigenschaft \Option{dummy} als
-Wert allenfalls \PValue{true} und \PValue{false} versteht. Alle anderen Werte
-werden normalerweise ignoriert, können im ungünstigsten Fall aber auch zu
-einer Fehlermeldung führen.%
+Wert allenfalls \PValue{true} und \PValue{false} versteht. Andere Werte
+können zu einer Fehlermeldung führen.%
 \EndIndexGroup
 
 
@@ -396,24 +408,24 @@ erzeugt werden. Die möglichen Werte und ihre Bedeutung sind
       Paragraphen erzeugen linke und rechte Marken für Kolumnentitel, wenn das
       Dokument die Verwendung von lebenden Kolumnentiteln vorsieht.%
       \IndexOption{clausemark~=\textKValue{both}}%
-    }%
+    }\\[-1.7ex]
     \entry{\PValue{false}, \PValue{off}, \PValue{no}}{%
       Paragraphen erzeugen keine Kolumnentitel.%
       \IndexOption{clausemark~=\textKValue{false}}%
-    }%
+    }\\[-1.7ex]
     \entry{\PValue{forceboth}}{%
       Paragraphen erzeugen mit \DescRef{maincls.cmd.markboth} linke und rechte
       Marken für Kolumnentitel unabhängig davon, ob das Dokument
       beispielsweise über den Seitenstil überhaupt lebende Kolumnentitel
       verwendet.%
       \IndexOption{clausemark~=\textKValue{forceboth}}%
-    }%
+    }\\[-1.7ex]
     \entry{\PValue{forceright}}{%
       Paragraphen erzeugen mit \DescRef{maincls.cmd.markright} rechte Marken
       für Kolumnentitel unabhängig davon, ob das Dokument beispielsweise über
       den Seitenstil überhaupt lebende Kolumnentitel verwendet.%
       \IndexOption{clausemark~=\textKValue{forceright}}%
-    }%
+    }\\[-1.7ex]
     \entry{\PValue{right}}{%
       Paragraphen erzeugen rechte Marken für Kolumnentitel, wenn das Dokument
       die Verwendung von lebenden Kolumnentiteln vorsieht.%
