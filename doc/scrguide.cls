@@ -1325,7 +1325,8 @@
 \newcommand*{\Declaration@UseBox}[1]{%
   \colorbox{Declaration}{\usebox\Declaration@Box}%
 }
-\newenvironment{Declaration}{%
+\newenvironment{Declaration}[1][2]{%
+  \def\Declare@Lines{#1\baselineskip}%
   % Als erstes wird eine neue Index-Gruppe begonnen. Dagegen darf die
   % vorherige Index-Gruppe hier nicht automatisch geschlossen werden, weil
   % beispielsweise ein Abschnitt oder ein Kapitel ebenfalls eine Index-Gruppe
@@ -1396,10 +1397,10 @@
   \end{lrbox}
   \vskip 1\baselineskip \@plus .75\baselineskip \@minus .25\baselineskip
   % Hier darf ein Seitenumbruch ohne vertikalen Ausgleich erfolgen, wenn nicht
-  % mindestens für die Deklaration und zwei Zeilen Platz ist.
-  \vskip \dimexpr\ht\Declaration@Box+\dp\Declaration@Box+2\baselineskip\relax
+  % mindestens für die Deklaration und einige Zeilen Platz ist.
+  \vskip \dimexpr\ht\Declaration@Box+\dp\Declaration@Box+\Declare@Lines\relax
   \penalty-\@medpenalty
-  \vskip -\dimexpr\ht\Declaration@Box+\dp\Declaration@Box+2\baselineskip\relax
+  \vskip -\dimexpr\ht\Declaration@Box+\dp\Declaration@Box+\Declare@Lines\relax
   \begingroup% Dann wird die erzeugte Box farbig hinterlegt leicht im linken
              % Rand ausgegeben.
     \parfillskip\@flushglue
