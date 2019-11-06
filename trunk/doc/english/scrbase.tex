@@ -50,7 +50,7 @@
                   KOMA-Script package scrbase]
 \translator{Markus Kohm\and Melvin Hendrix\and Karl Hagen}
 
-% Date of the translated German file: 2019-10-09
+% Date of the translated German file: 2019-11-06
 
 \chapter{Basic Functions in the \Package{scrbase} Package}
 \labelbase{scrbase}
@@ -953,6 +953,7 @@ currently not evaluated by \Package{scrbase}.
 \begin{Declaration}
   \Macro{FamilyElseValues}
 \end{Declaration}
+\iffalse % Deprecated --> no user documentation needed
 In\ChangedAt{v3.12}{\Package{scrbase}} previous\textnote{Obsolete!} versions
 of \Package{scrbase}, you could use the \Macro{FamilyElseValues} command to
 define additional values for processing by
@@ -963,7 +964,11 @@ define additional values for processing by
 which were then output in an error message. Since version~3.12,
 \DescRef{\LabelBase.cmd.FamilyUnknownKeyValue} no longer issues error messages
 itself but signals them using \DescRef{\LabelBase.cmd.FamilyKeyState}.
-Therefore, \Macro{FamilyElseValues} is now deprecated. Nevertheless,
+Therefore, \Macro{FamilyElseValues} is now deprecated. %
+\else%
+Since version 3.12 the command is deprecated. %
+\fi%
+Nevertheless,
 \Package{scrbase} detects its use and issues a message requesting that you
 update the code accordingly.%
 \EndIndexGroup
@@ -1012,7 +1017,8 @@ replacing ``\Macro{}'' with ``\texttt{/}''.
 Authors of packages and classes normally should not use this option. Users can
 specify it with or without the \PName{value} either as a global option with
 \DescRef{maincls.cmd.documentclass} or using
-\Macro{PassOptionsToPackage}\IndexCmd{PassOptionsToPackage}.
+\Macro{PassOptionsToPackage}\IndexCmd{PassOptionsToPackage}. Especially if you
+do not use a \KOMAScript{} class the second one is recommended.
 \begin{Example}
   The user does not want \Package{scrbase} to define the
   \DescRef{\LabelBase.cmd.ifVTeX} and
@@ -1027,6 +1033,25 @@ specify it with or without the \PName{value} either as a global option with
   commands \DescRef{\LabelBase.cmd.ifVTeX} and
   \DescRef{\LabelBase.cmd.ifundefinedorrelax} are explained later in this
   section.
+
+% TODO: Fix new translation
+  If \Class{foo} is not a \KOMAScript{} class in the \File{log} file of the
+  \LaTeX{} run may occur a warning message:
+\begin{lstoutput}
+  LaTeX Warning: Unused global option(s):
+       [internalonly=/ifpdftex/ifVTeX].
+\end{lstoutput}
+  Such a false warning usually occurs if a class loads \Package{scrbase}
+  before it processes its own options. That is the usual case. Therefore users
+  are recommended to set the option with \Macro{PassOptionsToPackage} before
+  loading the class. With
+\begin{lstcode}
+  \PassOptionsToPackage{internalonly=/ifVTeX/ifundefinedorrelax}
+                       {scrbase}
+  \documentclass{foo}
+\end{lstcode}
+  there is not any such problem.
+%: ODOT
 \end{Example}
 
 Authors of packages and classes should use the same internal names as

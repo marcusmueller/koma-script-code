@@ -77,7 +77,8 @@ diesen Anweisungen ist \cite{latex:clsguide} zu entnehmen.
 Das Paket \Package{scrbase} benötigt intern die Funktionalität des Pakets
 \Package{keyval}\IndexPackage{keyval}\important{\Package{keyval}}. Diese kann
 auch vom Paket \Package{xkeyval} zur Verfügung gestellt werden. Bei Bedarf
-lädt \Package{scrbase} selbst \Package{keyval}.
+lädt \Package{scrbase} selbst \Package{keyval}. Näheres zu dem Paket is
+\cite{package:keyval} zu entnehmen.
 
 Das Paket \Package{keyval} erlaubt es, Schlüssel zu definieren und diesen
 Werten zuzuweisen.  Auch die Optionen, die \Package{scrbase} bereitstellt,
@@ -147,6 +148,7 @@ den Namen einzelner Pakete im Gesamtpaket als Mitglied zu verwenden.
 \end{Example}
 %
 \EndIndexGroup
+\ExampleEndFix
 
 
 \begin{Declaration}
@@ -189,34 +191,29 @@ eingesetzt. Falls kein \PName{Säumniswert} angegeben wird, kann später der
   wobei \Macro{define@key} im \Package{keyval}-Paket\IndexPackage{keyval}
   definiert ist (siehe \cite{package:keyval}). Allerdings kommen zu dem Aufruf
   von \Macro{define@key} noch einige zusätzliche Vorkehrungen und auch die
-  \PName{Aktion} wird um zusätzliche Vorkehrungen erweitert.
+  \PName{Aktion} wird automatisch um einige interne Aktionen erweitert.
 %\end{Explain}
 
-Erfolg\ChangedAt{v3.12}{\Package{scrbase}} oder Misserfolg der Ausführung der
-\PName{Aktion} werden über
-\Macro{FamilyKeyState} %\important{\Macro{FamilyKeyState}} % einige davon sind
-                                                           % schlicht zu breit!
-an \Package{scrbase} zurückgemeldet, damit dieses je nach Bedarf und
-Verwendung des Schlüssels weitere Maßnahmen ergreifen kann. Dies kann
-beispielsweise eine Fehlermeldung aber auch nur die Signalisierung einer
-unbekannten Option sein.
+Erfolg\ChangedAt{v3.12}{\Package{scrbase}} oder Misserfolg der Ausführung
+der \PName{Aktion} werden über \Macro{FamilyKeyState} an \Package{scrbase}
+zurückgemeldet, damit dieses je nach Bedarf und Verwendung des Schlüssels
+weitere Maßnahmen ergreifen kann. Das kann beispielsweise eine Fehlermeldung
+aber auch nur die Signalisierung einer unbekannten Option sein.
 
-Der Zustand \Macro{FamilyKeyState} ist in der Voreinstellung identisch mit dem
-Zustand \Macro{FamilyKeyStateUnknown}. Das bedeutet, dass es nicht sicher ist,
-ob der Schlüssel korrekt verarbeitet werden konnte. Findet \Package{scrbase}
-nach Ausführung der \PName{Aktion} noch immer diesen Zustand vor, so wird ein
-Hinweis in die \File{log}-Datei geschrieben und im weiteren der Zustand
-\Macro{FamilyKeyStateProcessed} angenommen.
+Der Zustand\textnote{unbekannt} \Macro{FamilyKeyState} ist in der
+Voreinstellung identisch mit dem Zustand \Macro{FamilyKeyStateUnknown}. Das
+bedeutet, dass es nicht sicher ist, ob der Schlüssel korrekt verarbeitet
+werden konnte. Findet \Package{scrbase} nach Ausführung der \PName{Aktion}
+noch immer diesen Zustand vor, so wird ein Hinweis in die \File{log}-Datei
+geschrieben und im weiteren der Zustand \Macro{FamilyKeyStateProcessed}
+angenommen.
 
-Der Zustand
-\Macro{FamilyKeyStateProcessed} %\important{\Macro{FamilyKeyStateProcessed}}
-signalisiert, dass der Schlüssel und die Wertzuweisung an den Schlüssel
-vollständig abgeschlossen wurde und alles in Ordnung ist. Auf den Zustand kann
-einfach durch Aufruf von \Macro{FamilyKeyStateProcessed} selbst umgeschaltet
-werden.
+Der Zustand\textnote{Erfolg} \Macro{FamilyKeyStateProcessed} signalisiert,
+dass der Schlüssel und die Wertzuweisung an den Schlüssel vollständig
+abgeschlossen wurde und alles in Ordnung ist. Auf den Zustand kann einfach
+durch Aufruf von \Macro{FamilyKeyStateProcessed} selbst umgeschaltet werden.
 
-Der Zustand
-\Macro{FamilyKeyStateUnknownValue} %\important{\Macro{FamilyKeyStateUnknownValue}}
+Der Zustand\textnote{unbekannter Wert} \Macro{FamilyKeyStateUnknownValue}
 signalisiert, dass der Schlüssel zwar verarbeitet wurde, ihm jedoch ein Wert
 zugewiesen werden sollte, der nicht erlaubt ist. Diesen Zustand meldet
 beispielsweise \hyperref[cha:typearea]{\Package{typearea}}, wenn versucht
@@ -224,8 +221,8 @@ wird, an Option \DescRef{typearea.option.twoside} den Wert \PValue{unbekannt}
 zuzuweisen. Die Umschaltung auf den Zustand erfolgt einfach durch Aufruf von
 \Macro{FamilyKeyStateUnknownValue} selbst.
 
-Der Zustand
-\Macro{FamilyKeyStateNeedValue} %\important{\Macro{FamilyKeyStateNeedValue}}
+Der Zustand\textnote{fehlender Wert}
+\Macro{FamilyKeyStateNeedValue}
 signalisiert, dass der Schlüssel nicht verarbeitet werden konnte, weil er
 zwingend einen Wert erwartet, er aber ohne Wertzuweisung aufgerufen
 wurde. Dieser Zustand wird automatisch gesetzt, wenn ein Schlüssel, der keinen
@@ -233,9 +230,10 @@ wurde. Dieser Zustand wird automatisch gesetzt, wenn ein Schlüssel, der keinen
 wäre aber auch eine explizite Umschaltung darauf durch Aufruf von
 \Macro{FamilyKeyStateNeedValue} selbst möglich.
 
-Des Weiteren können zusätzliche Fehlerzustände definiert werden, indem man
-\Macro{FamilyKeyState} auf eine kurze Meldung umdefiniert. In der Regel
-sollten jedoch die vier vordefinierten Zustände verwendet werden.
+Des Weiteren können zusätzliche\textnote{Fehler} Fehlerzustände definiert
+werden, indem man \Macro{FamilyKeyState} auf eine kurze Meldung
+umdefiniert. In der Regel sollten jedoch die vier vordefinierten Zustände
+verwendet werden.
 
 \begin{Example}
   Nehmen wir an, jedes der drei Pakete aus dem letzten Beispiel soll einen
@@ -267,18 +265,19 @@ sollten jedoch die vier vordefinierten Zustände verwendet werden.
 \end{Example}
 %
 \EndIndexGroup
+\ExampleEndFix
 
 
 \begin{Declaration}
   \Macro{RelaxFamilyKey}\OParameter{Mitglied}\Parameter{Familie}
                         \Parameter{Schlüssel}
 \end{Declaration}
-Wurde\ChangedAt{v3.15}{\Package{scrbase}} \PName{Schlüssel} zuvor als
+Wurde\ChangedAt{v3.15}{\Package{scrbase}} zuvor \PName{Schlüssel} für das
 \PName{Mitglied} der \PName{Familie} definiert, so wird diese Definition
 quasi aufgehoben. Der \PName{Schlüssel} ist dann für dieses \PName{Mitglied}
 der \PName{Familie} nicht mehr definiert. Die Verwendung für einen
 \PName{Schlüssel}, der für dieses \PName{Mitglied} der \PName{Familie} gar
-nicht definiert ist, ist ebenfalls zulässig.
+nicht definiert ist, ist ebenfalls zulässig und bleibt wirkungslos.
 
 Ist kein \PName{Mitglied} angegeben, so wird genau wie bei Anweisung
 \DescRef{\LabelBase.cmd.DefineFamilyKey} wieder das Mitglied
@@ -317,9 +316,9 @@ Mitglieds gesetzt wird.
 \end{lstcode}
   ergänzt wird, so kann der Anwender bereits beim Laden der Pakete mit
   \Macro{usepackage} die Eigenschaft \Option{Aufschnitt} als Option
-  angeben. Wird die Option global, also bei \Macro{documentclass}, angegeben,
-  so wird die Eigenschaft automatisch bei allen drei Paketen gesetzt, wenn
-  alle drei Pakete einzeln geladen werden.
+  angeben. Wird die Option bei \Macro{documentclass} und damit global
+  angegeben, so wird die Eigenschaft automatisch bei allen drei Paketen
+  gesetzt, wenn alle drei Pakete einzeln geladen werden.
 \end{Example}
 Es\textnote{Achtung!} wird darauf hingewiesen, dass bei Paketen globale
 Optionen vor den lokal dem Paket zugewiesenen Optionen ausgeführt
@@ -391,6 +390,7 @@ ausgeführt und bleibt auch über die Ausführung hinaus erhalten.
   \Macro{BeforeFamilyProcessOptions} in \Package{Mettwurst} einschleusen.%
 \end{Example}
 \EndIndexGroup
+\ExampleEndFix
 
 
 \begin{Declaration}
@@ -517,15 +517,15 @@ zurückmeldet.
   Rekursion vermieden.%
 \end{Example}%
 
-Wie\ChangedAt{v3.27}{\Package{scrbase}} schon bei
-\DescRef{\LabelBase.cmd.FamilyExecuteOptions} gibt es auch bei
-\Macro{FamilyOptions} eine Sonderbehandlung für eine Option Namens
-\Option{@else@}\important{\Option{@else@}}. Ist eine solche für ein Mitglied
-definiert, so wird sie immer dann ausgeführt, wenn das Mitglied eine
-angegebene Option nicht kennt. Ist für die Familie selbst eine Option
-\Option{@else@} definiert, so wird sie nur aufgerufen, wenn weder die Familie
-noch eines ihrer Mitglieder eine angegebene Option vollständig verarbeiten
-konnte und mit \DescRef{\LabelBase.cmd.FamilyKeyStateProcessed} quitiert hat.%
+Für\ChangedAt{v3.27}{\Package{scrbase}} die Option Namens
+\Option{@else@}\important{\Option{@else}} existiert ähnlich wie bei Anweisung
+\DescRef{\LabelBase.cmd.FamilyExecuteOptions} eine Sonderbehandlung. Ist eine
+solche für ein Mitglied definiert, so wird sie immer dann ausgeführt, wenn das
+Mitglied eine angegebene Option nicht kennt. Ist für die Familie selbst eine
+Option \Option{@else@} definiert, so wird sie nur aufgerufen, wenn weder die
+Familie noch eines ihrer Mitglieder eine angegebene Option vollständig
+verarbeiten konnte und mit \DescRef{\LabelBase.cmd.FamilyKeyStateProcessed}
+quitiert hat.%
 \EndIndexGroup
 
 
@@ -576,9 +576,16 @@ setzt. Die weitere Funktionsweise ist der vorhergehenden Erklärung zu
   verwenden.
 \end{Example}
 
+\iffalse% Umbruchkorrektur
 Die\ChangedAt{v3.27}{\Package{scrbase}} Verarbeitung einer Option
 \Option{@else@} findet in derselben Weise statt wie bei
 \DescRef{\LabelBase.cmd.FamilyOptions}.%
+\else%
+Intern basiert \Macro{FamilyOption} auf
+\DescRef{\LabelBase.cmd.FamilyOptions}.
+Die\ChangedAt{v3.27}{\Package{scrbase}} Verarbeitung einer Option
+\Option{@else@} findet daher in gleicher Weise statt.%
+\fi%
 \EndIndexGroup
 
 
@@ -593,13 +600,12 @@ von
 \DescRef{\LabelBase.cmd.FamilyProcessOptions}\IndexCmd{FamilyProcessOptions}
 oder
 \DescRef{\LabelBase.cmd.FamilyExecuteOptions}\IndexCmd{FamilyExecuteOptions}
-beziehungsweise \DescRef{\LabelBase.cmd.FamilyOptions}\IndexCmd{FamilyOptions}
-oder \DescRef{\LabelBase.cmd.FamilyOption}\IndexCmd{FamilyOptions}
-abgeschlossen sind. Genau das ist mit Hilfe von \Macro{AtEndOfFamilyOptions}
-und dessen Sternvariante\ChangedAt{v3.23}{\Package{scrbase}} möglich. Die
-Rückmeldung von Fehlerzuständen ist über diese Anweisung jedoch ebenso wenig
-möglich wie die Verwendung dieser Anweisung außerhalb der Ausführung von
-Optionen.
+respektive \DescRef{\LabelBase.cmd.FamilyOptions}\IndexCmd{FamilyOptions} oder
+\DescRef{\LabelBase.cmd.FamilyOption}\IndexCmd{FamilyOptions} abgeschlossen
+sind. Genau das ist mit Hilfe von \Macro{AtEndOfFamilyOptions} und dessen
+Sternvariante\ChangedAt{v3.23}{\Package{scrbase}} möglich. Die Rückmeldung von
+Fehlerzuständen ist über diese Anweisung jedoch ebenso wenig möglich wie die
+Verwendung dieser Anweisung außerhalb der Ausführung von Optionen.
 
 Die beiden Variante unterscheiden sich im Falle von verschachtelt definierten
 Optionen, wenn also die Ausführung einer Option den Aufruf einer oder mehrerer
@@ -640,16 +646,17 @@ Option ist immer \PValue{true}.
 \Macro{FamilySetBool} wiederum versteht als \PName{Wert} neben \PValue{true}
 auch die Werte \PValue{on} und \PValue{yes} zum Einschalten und neben
 \PValue{false} auch die Werte \PValue{off} und \PValue{no} zum
-Ausschalten. Wird ein unbekannter Wert übergeben, so wird die Anweisung
-\DescRef{\LabelBase.cmd.FamilyUnknownKeyValue} mit den Argumenten
-\PName{Familie}, \PName{Schlüssel} und \PName{Wert} aufgerufen und so
-\DescRef{\LabelBase.cmd.FamilyKeyState} entsprechend gesetzt. Dadurch wird
-dann gegebenenfalls eine Meldung über eine unbekannte Wertzuweisung ausgegeben
-(siehe auch \DescPageRef{\LabelBase.cmd.FamilyUnknownKeyValue} und
-\DescPageRef{\LabelBase.cmd.FamilyKeyState}).
+Ausschalten. Wird ein unbekannter Wert übergeben, so wird die auf
+\DescPageRef{\LabelBase.cmd.FamilyUnknownKeyValue} erklärte Anweisung
+\DescRef{\LabelBase.cmd.FamilyUnknownKeyValue} aufgerufen und so
+\DescRef{\LabelBase.cmd.FamilyKeyState} (siehe
+\DescPageRef{\LabelBase.cmd.FamilyKeyState}) entsprechend gesetzt. Dadurch
+kann dann gegebenenfalls eine Meldung über eine unbekannte Wertzuweisung
+ausgegeben werden.%
 \begin{Example}
   Der Schlüssel \Option{Aufschnitt} soll in den Wurstpaketen etwas robuster
-  definiert werden. Außerdem sollen alle Wurstpakete denselben Schalter
+  definiert werden, so dass Fehleingaben erkannt und behandelt
+  werden. Außerdem sollen alle Wurstpakete denselben Schalter
   verwenden, so dass entweder alle Wurstpakete Aufschnitt produzieren oder
   keines.
 \begin{lstcode}
@@ -715,6 +722,8 @@ dann gegebenenfalls eine Meldung über eine unbekannte Wertzuweisung ausgegeben
   Fehlermeldungen und auch zu falschen Ergebnissen führen.%
 \end{Example}%
 \EndIndexGroup
+\ExampleEndFix
+
 
 \begin{Declaration}
   \Macro{FamilyInverseBoolKey}\OParameter{Mitglied}\Parameter{Familie}
@@ -817,11 +826,12 @@ Intern wird von \Macro{FamilyNumericalKey} dann
 \DescRef{\LabelBase.cmd.DefineFamilyKey} mit der Anweisung
 \Macro{FamilySetNumerical} verwendet. Wird an einen solchen Schlüssel ein
 unbekannter Wert übergeben, so wird von \Macro{FamilySetNumerical} Anweisung
-\DescRef{\LabelBase.cmd.FamilyUnknownKeyValue} mit den Argumenten
-\PName{Familie}, \PName{Schlüssel} und \PName{Wert} aufgerufen. Dies führt zu
-einer Fehlersignalisierung in \DescRef{\LabelBase.cmd.FamilyKeyState} mit
-Hilfe des Status \DescRef{\LabelBase.cmd.FamilyKeyStateUnknownValue} und
-beispielsweise bei der Verwendung als lokale Option zu einer
+\DescRef{\LabelBase.cmd.FamilyUnknownKeyValue} (siehe
+\DescPageRef{\LabelBase.cmd.FamilyUnknownKeyValue}) aufgerufen. Dies führt zu
+einer Fehlersignalisierung, indem \DescRef{\LabelBase.cmd.FamilyKeyState} den
+Status \DescRef{\LabelBase.cmd.FamilyKeyStateUnknownValue} annimmt (siehe
+\DescPageRef{\LabelBase.cmd.FamilyKeyStateUnknownValue}). Daraus resultiert
+beispielsweise bei der Verwendung als lokale Option dann eine
 Fehlermeldung. Ebenso wird beim Aufruf von \Macro{FamilySetNumerical} auch der
 Erfolg via \DescRef{\LabelBase.cmd.FamilyKeyStateProcessed} in
 \DescRef{\LabelBase.cmd.FamilyKeyState} signalisiert.%
@@ -921,13 +931,13 @@ stattdessen der \PName{Säumniswert} eingesetzt. Falls kein \PName{Säumniswert}
 angegeben wird, kann später der \PName{Schlüssel} nur mit Wertübergabe
 verwendet werden.
 
-Bei Verwendung der Anweisungen \Macro{FamilyLengthMacroKey} und
-\Macro{FamilyUseLengthMacroKey} beziehungsweise \Macro{FamilySetLengthMacro}
-und \Macro{FamilySetUseLengthMacro} findet die Speicherung des Wertes nicht in
-einer \PName{Länge}, sondern in einem \PName{Makro} statt. Dabei wird bei
-\Macro{FamilyLengthMacroKey} und \Macro{FamilySetLengthMacro} vergleichbar zu
-\Macro{setlength} der aktuelle \PName{Wert} zum Zeitpunkt des Aufrufs der
-beiden Anweisungen in \PName{Makro} gespeichert. Dagegen wird bei
+\Macro{FamilyLengthMacroKey} und \Macro{FamilySetLengthMacroKey} sowie
+\Macro{FamilyUseLengthMacro} und \Macro{FamilySetUseLengthMacro} verwenden für
+die Speicherung des Wertes keine \PName{Länge}, sondern ein \PName{Makro}. Bei
+\Macro{FamilyLengthMacroKey} und \Macro{FamilySetLengthMacro} wird wie im
+Falle einer \PName{Länge} der aktuelle \PName{Wert} zum Zeitpunkt der
+Verwendung des Schlüssels beziehungsweise der Anweisung in \PName{Makro}
+gespeichert. Dagegen wird bei
 \Macro{FamilyUseLengthMacroKey}\ChangedAt{v3.20}{\Package{scrbase}} und
 \Macro{FamilySetUseLengthMacro} \PName{Wert} selbst gespeichert. Damit wird
 \PName{Wert} dann bei jeder Verwendung von \PName{Makro} neu ausgewertet.%
@@ -962,7 +972,7 @@ das optionale Argument für den \PName{Säumniswert} so entspricht die Anweisung
   In der Voreinstellung sollen 250\,g Wurstsalat erzeugt werden. Die Menge
   soll jedoch einfach per Option geändert werden können. Dazu wird die zu
   erstellende Menge im Makro \Macro{Salatgewicht} gespeichert. Die Option,
-  über die das Gewicht geändert werden kann, soll ebenfalls
+  über die das Gewicht geändert werden kann, soll \iffalse ebenfalls \fi
   \PValue{Salatgewicht} heißen:
 \begin{lstcode}
   \newcommand*{\Salatgewicht}{250g}
@@ -971,7 +981,7 @@ das optionale Argument für den \PName{Säumniswert} so entspricht die Anweisung
                   {\Salatgewicht}
 \end{lstcode}
   Soll nach einer Änderung
-  \iffalse% Umbruchkorrekturtext
+  \iftrue% Umbruchkorrekturtext
   wie
 \begin{lstcode}
   \FamilyOptions{Fleichermeister}{Salatgewicht=100g}
@@ -986,9 +996,9 @@ das optionale Argument für den \PName{Säumniswert} so entspricht die Anweisung
   Das ist möglich, weil die Standardmenge bei der Definition auch als
   Säumniswert angegeben wurde.
 \end{Example}
-In diesem Fall existieren keine unbekannten Werte, da alle Werte schlicht für
-eine Makrodefinition verwendet werden. Es ist jedoch zu beachten, dass in der
-Wertzuweisung an den Schlüssel keine Absätze enthalten sein dürfen.
+Da alle Werte unmittelbar für eine Makrodefinition verwendet werden, gibt es
+keine unbekannten Werte. In der Wertzuweisung an den \PName{Schlüssel} dürfen
+jedoch keine Absätze enthalten sein.
 
 Im\ChangedAt{v3.25}{\Package{scrbase}} Unterschied zu \Macro{FamilyStringKey}
 erwartet \Macro{FamilyCSKey} kein Makro als letztes Argument, sondern
@@ -1072,11 +1082,13 @@ erwartet. Allerdings\ChangedAt{v3.12}{\Package{scrbase}} wird die
 \end{Example}
 %
 \EndIndexGroup
+\ExampleEndFix
 
 
 \begin{Declaration}
   \Macro{FamilyElseValues}
 \end{Declaration}
+\iffalse% Lange veraltet --> Doku entfernt.
 In\ChangedAt{v3.12}{\Package{scrbase}} früheren\textnote{Veraltet!} Versionen
 von \Package{scrbase} konnte man über die Anweisung \Macro{FamilyElseValues}
 weitere erlaubte Werte für die Bearbeitung durch
@@ -1091,9 +1103,13 @@ ablegen, die dann ebenfalls in einer Fehlermeldung mit ausgegeben wurden. Seit
 Version~3.12 gibt \DescRef{\LabelBase.cmd.FamilyUnknownKeyValue} keine
 Fehlermeldungen mehr aus, sondern setzt nur noch
 \DescRef{\LabelBase.cmd.FamilyKeyState} entsprechend. Damit ist die Verwendung
-von \Macro{FamilyElseValue} ebenfalls überholt. Ihre Verwendung wird jedoch
-erkannt und führt dann zu einer Aufforderung, den Code entsprechend
-anzupassen.%
+von \Macro{FamilyElseValue} ebenfalls überholt. %
+\else%
+Diese\ChangedAt{v3.12}{\Package{scrbase}} Anweisung ist seit Version~3.12
+veraltet. Ihre ursprüngliche Bedeutung ist nicht mehr von Belang. %
+\fi%
+Ihre Verwendung wird jedoch erkannt und führt dann zu einer Aufforderung, den
+Code entsprechend anzupassen.%
 \EndIndexGroup
 
 
@@ -1143,26 +1159,79 @@ Anweisungen, die nicht definiert werden sollen, als Wert an, wobei er
 Paket- und Klassenautoren sollten diese Option normalerweise nicht verwenden.
 Anwender können sie mit oder ohne Wertangabe entweder als globale Option bei
 \DescRef{maincls.cmd.documentclass} oder per
-\Macro{PassOptionsToPackage}\IndexCmd{PassOptionsToPackage} angeben.
+\Macro{PassOptionsToPackage}\IndexCmd{PassOptionsToPackage}
+angeben. Insbesondere wenn keine \KOMAScript-Klasse verwendet wird, sei der
+zweite Weg unter Verwendung von \Macro{PassOptionsToPackage} ausdrücklich
+empfohlen.
 \begin{Example}
   Der Anwender will nicht, dass die Anweisungen
-  \DescRef{\LabelBase.cmd.ifVTeX} und
-  \DescRef{\LabelBase.cmd.ifundefinedorrelax} von \Package{scrbase} definiert
+  \DescRef{\LabelBase.cmd.ifpdftex} und
+  \DescRef{\LabelBase.cmd.ifVTeX} von \Package{scrbase} definiert
   werden. Also verwendet er beim Laden der Klasse:
 \begin{lstcode}
   \documentclass[%
-    internalonly=/ifVTeX/ifundefinedorrelax%
+    internalonly=/ifpdftex/ifVTeX%
   ]{foo}
 \end{lstcode}
   Der Klassenname \Class{foo} wird hier als Platzhalter für irgendeine Klasse
   verwendet.  Die Anweisungen \DescRef{\LabelBase.cmd.ifVTeX}
-  und \DescRef{\LabelBase.cmd.ifundefinedorrelax} werden im weiteren Verlauf
-  dieses Abschnittes erklärt.%
+  und \DescRef{\LabelBase.cmd.ifpdftex} werden im weiteren Verlauf
+  dieses Abschnittes erklärt.
+
+  Falls \Class{foo} keine \KOMAScript-Klasse ist, kann man in der
+  \File{log}-Datei des \LaTeX-Laufs eventuell die Warnung
+\begin{lstoutput}
+  LaTeX Warning: Unused global option(s):
+       [internalonly=/ifpdftex/ifVTeX].
+\end{lstoutput}
+  finden. Diese Warnung trifft trotz Verwendung von \Package{scrbase} und
+  trotz der darin stattfindenden Auswertung der Option auf, wenn
+  eine Klasse \Package{scrbase} vor der Verarbeitung der eigenen Optionen
+  lädt. Dies dürfte die Regel sein, da nur so die Klasse \Package{scrbase} für
+  die Definition eigener Optionen verwenden kann. Daher sei Anwendern das
+  Setzen der Option per \Macro{PassOptionsToPackage} vor dem Laden der Klasse
+  empfohlen. Mit
+\begin{lstcode}
+  \PassOptionsToPackage{%
+    internalonly=/ifpdftex/ifVTeX%
+  }{scrbase}
+  \documentclass{foo}
+\end{lstcode}
+  tritt das Problem nicht auf.
 \end{Example}
 
 Paket- und Klassenautoren sollten wie \KOMAScript{} selbst auch die internen
 Namen verwenden. Zur Vollständigkeit sind in den nachfolgenden Erklärungen
 aber auch die Anwenderanweisungen angegeben.%
+
+Das\textnote{Achtung!} \LaTeX-Team hat 2019 in Version~1.0 des Pakets
+\Package{iftex}\IndexPackage{iftex}\important{\Package{iftex}} selbst
+\DescRef{\LabelBase.cmd.ifpdftex} und \DescRef{\LabelBase.cmd.ifVTeX} neu
+definiert. Leider sind diese Definitionen inkompatibel mit den bereits seit
+2002 existierenden Definitionen in \Package{scrbase}. Diese Inkompatibilität\important[i]{\Package{ifluatex}\\ \Package{ifpdf}\\
+  \Package{ifvtex}\\ \Package{ifxetex}} betrifft leider auch die Pakete
+\Package{ifpdf}\IndexPackage{ifpdf} und \Package{ifvtex}\IndexPackage{ifvtex}
+und sogar von \Package{ifxetex}\IndexPackage{ifxetex} und
+\Package{ifluatex}\IndexPackage{ifluatex} in ihren Neuauflagen als
+Wrapper-Pakete von \Package{iftex}. Da anzunehmen ist, dass sich Paketautoren
+und Beispiele im Internet zunehmend auf die Implementierung in \Package{iftex}
+verlassen, ist leider zu befürchten, dass solche Pakete und Beispiele
+zunehmend inkompatibel mit \Package{scrbase} werden.  Um solche Probleme zu
+vermeiden, muss leider empfohlen werden, die im Beispiel gezeigte Option
+grundsätzlich zu setzen und so auf die \Package{scrbase}-Version der genannten
+Befehle zu verzichten. Eine grundsätzliche Änderung in \Package{scrbase} würde
+leider ihrerseits unvermeidbar zu Inkompatibilitäten mit existierenden
+Dokumenten und eventuell auch mit Paketen oder Klassen führen, die sich auf
+die bisherige Definition in \Package{scrbase} verlassen. Daher ist sie leider
+nicht möglich.  Da nur wenige Anwender wissen, welche Pakete \Package{iftex},
+\Package{ifpdf}, \Package{ifluatex}, \Package{ifvtex} oder \Package{ifxetex}
+verwenden, bleibt für neue Dokumente somit der gezeigte, eher unkomfortable
+Weg. Für existierende Dokumente kann nicht ausgeschlossen werden, dass diese
+im Zuge von Updates abhängiger Pakete irgendwann Fehler produzieren und
+geändert werden müssen. Der Autor von \KOMAScript{} bedauert dies
+ausdrücklich, zumal solche Probleme durch die freundliche Rücksichtnahme
+früherer Autoren der genannten Pakete über Jahrzehnte vermieden werden
+konnten.%
 \EndIndexGroup
 
 
@@ -1176,7 +1245,7 @@ Diese Anweisung funktioniert prinzipiell wie \Macro{@ifundefined} aus dem
 \LaTeX-Kern (siehe \cite{latex:source2e}). Es wird also der \PName{Dann-Teil}
 ausgeführt, wenn \PName{Name} der Name einer undefinierten Anweisung oder
 \Macro{\PName{Name}} derzeit \Macro{relax} ist. Im Unterschied zu
-\Macro{@ifundefined} wird %
+\Macro{@ifundefined} wird auch bei älteren \LaTeX-Versionen %
 \iftrue% Umbruchvarianten
 weder Hash-Speicher belegt noch \Macro{\PName{Name}} %
 \else%
@@ -1193,11 +1262,13 @@ zu \Macro{relax}, wenn \Macro{\PName{Name}} zuvor undefiniert war.%
 Ist die Anweisung mit dem angegebenen Namen bereits definiert wird der
 \PName{Dann-Teil} ausgeführt, anderenfalls der \PName{Sonst-Teil}. Da es bei
 \eTeX{} bereits ein Primitiv \Macro{ifdefined} gibt, musste leider diese
-etwas unhandliche Bezeichnung gewählt werden. %
-\iftrue% Umbruchvaritanten
-Von dieser Anweisung gibt es keine interne Variante.%
+etwas unhandliche Bezeichnung gewählt werden.%
+\iffalse%
+\iftrue% Umbruchvarianten
+\ Von dieser Anweisung gibt es keine interne Variante.%
 \else%
-Es gibt keine interne Variante.%
+\ Es gibt keine interne Variante.%
+\fi%
 \fi%
 \EndIndexGroup
 
@@ -1208,32 +1279,16 @@ Es gibt keine interne Variante.%
 \end{Declaration}
 Wird\ChangedAt{v3.21}{\Package{scrbase}} mit lua\TeX{} gearbeitet, wird der
 \PName{Dann-Teil} ausgeführt, anderenfalls der \PName{Sonst-Teil}.
-\iftrue% Umbruchkorrekturtext
+\iffalse% Umbruchkorrekturtext
 Diese Unterscheidung ist nur sehr selten wirklich von Nutzen. %
 \fi%
-In der Regel sollte man besser auf die gewünschte Anweisung
-testen. Von\textnote{Achtung!} dieser Anweisung gibt es kein
-Benutzeräquivalent. Verwenden Sie stattdessen bei Bedarf das Paket
-\Package{ifluatex}\important{\Package{ifluatex}} (siehe
-\cite{package:ifluatex}).%
+In der Regel sollte man besser auf die gewünschte Anweisung oder Fähigkeit
+testen.%
+\iffalse% Umbruchvarianten
+Von\textnote{Achtung!} dieser Anweisung gibt es kein
+Benutzeräquivalent.%
+\fi%
 \EndIndexGroup
-
-
-\iffalse% Es ergibt keinen Sinn, diese Anweisung noch zu dokumentieren
-\begin{Declaration}
-  \Macro{scr@ifpdforluatex}
-  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
-\end{Declaration}
-Bis lua\TeX~0.85 war es meist unerheblich, ob mit pdf\TeX{} oder lua\TeX{}
-gearbeitet wurde. Von daher stammt diese Anweisung, die in beiden Fällen den
-\PName{Dann-Teil} ausführt. Wird weder mit pdf\TeX{} noch mit lua\TeX{}
-gearbeitet, so wird der \PName{Sonst-Teil} ausgeführt.
-Seit Version 0.85 wurde bei lua\TeX{} die Kompatibilität bei vielen der
-zusätzlichen Befehle jedoch aufgegeben. Daher ist diese Unterscheidung in der
-Praxis nicht mehr von Nutzen und wird von \KOMAScript{} selbst auch nicht mehr
-verwendet. Von dieser Anweisung gibt es auch kein Benutzeräquivalent.%
-\EndIndexGroup
-\fi
 
 
 \begin{Declaration}
@@ -1245,10 +1300,12 @@ verwendet. Von dieser Anweisung gibt es auch kein Benutzeräquivalent.%
 Wird mit pdf\TeX{} gearbeitet, wird der \PName{Dann-Teil} ausgeführt,
 anderenfalls der \PName{Sonst-Teil}. Dabei ist es unerheblich, ob tatsächlich
 eine PDF-Datei ausgegeben werden soll oder nicht.
-\iftrue% Umbruchkorrekturtext
+\iffalse% Umbruchkorrekturtext
 Diese Unterscheidung ist nur sehr selten wirklich von Nutzen. %
 \fi%
-In der Regel sollte man besser auf die gewünschte Anweisung testen.%
+In der Regel sollte man besser auf die gewünschte Anweisung testen.
+Beachten\textnote{Achtung!} Sie auch den Hinweis bezüglich \Package{iftex} am
+Ende der Erklärung zu Option \DescRef{\LabelBase.option.internalonly}.%
 \EndIndexGroup
 
 
@@ -1259,11 +1316,13 @@ In der Regel sollte man besser auf die gewünschte Anweisung testen.%
   \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
 \end{Declaration}
 Wird mit V\TeX{} gearbeitet, wird der \PName{Dann-Teil} ausgeführt,
-anderenfalls der \PName{Sonst-Teil}.
-\iftrue% Umbruchkorrekturtext
+anderenfalls der \PName{Sonst-Teil}. %
+\iffalse% Umbruchkorrekturtext
 Diese Unterscheidung ist nur sehr selten wirklich von Nutzen. %
 \fi%
-In der Regel sollte man besser auf die gewünschte Anweisung testen.%
+In der Regel sollte man besser auf die gewünschte Anweisung testen.
+Beachten\textnote{Achtung!} Sie auch den Hinweis bezüglich \Package{iftex} am
+Ende der Erklärung zu Option \DescRef{\LabelBase.option.internalonly}.%
 \EndIndexGroup
 
 
@@ -1313,29 +1372,38 @@ Postscript-Datei erkannt werden kann.%
   \Macro{if@atdocument}\ \PName{Dann-Teil}\ %
   \textMacro{else}\ \PName{Sonst-Teil} \textMacro{fi}
 \end{Declaration}
+\iffalse% Umbruchvarianten
 Diese Verzweigung existiert ganz bewusst nur als interne Anweisung. Dabei
 entspricht \Macro{if@atdocument} in der Dokumentpräambel \Macro{iffalse}, nach
 \Macro{begin}\PParameter{document} entspricht \Macro{if@atdocument} hingegen
-\Macro{iftrue}. Klassen und Paketautoren können dieses Anweisung manchmal
-sinnvoll nutzen, wenn sich Anweisungen in der Dokumentpräambel anders
-verhalten sollen als innerhalb des Dokuments. Es\textnote{Achtung!} ist zu
-beachten, dass es sich bei dieser Anweisung um eine Verzweigung in \TeX-Syntax
-und nicht in \LaTeX-Syntax handelt!
-%
+\Macro{iftrue}.  Klassen- und Paketautoren können dieses Anweisung manchmal
+sinnvoll nutzen, %
+\else%
+In der Dokumentpräambel enspricht \Macro{if@atdocument}
+\iftrue dem Schalter \fi
+\Macro{iffalse}, nach \Macro{begin}\PParameter{document} hingegen
+\Macro{iftrue}.  Klassen- und Paketautoren können dieses Anweisung nutzen, %
+\fi%
+wenn sich Anweisungen in der Dokumentpräambel anders verhalten sollen als
+innerhalb des Dokuments. Es\textnote{Achtung!} ist zu beachten, dass es sich
+bei dieser Anweisung um eine Verzweigung in \TeX-Syntax und nicht in
+\LaTeX-Syntax handelt!%
 \EndIndexGroup
 
 
-\begin{Declaration}
+\iffree{\begin{Declaration}}{\begin{Declaration}[0]}% Umbruchkorrektur
   \Macro{ifstr}\Parameter{Zeichenfolge}\Parameter{Zeichenfolge}%
   \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
 \end{Declaration}
 Die beiden Argumente \PName{Zeichenfolge} werden expandiert und dann
-verglichen. Sind sie dabei gleich, so wird der \PName{Dann-Teil} ausgeführt,
-anderenfalls der \PName{Sonst-Teil}. %
-\iftrue% Umbruchvaritanten
-Von dieser Anweisung gibt es keine interne Variante.%
+verglichen. Sind sie gleich, so wird der \PName{Dann-Teil} ausgeführt,
+anderenfalls der \PName{Sonst-Teil}.%
+\iffalse% Umbruchkorrektur
+\iftrue% Umbruchvarianten
+\ Von dieser Anweisung gibt es keine interne Variante.%
 \else%
-Es gibt keine interne Variante.%
+\ Es gibt keine interne Variante.%
+\fi%
 \fi%
 \EndIndexGroup
 
@@ -1347,11 +1415,13 @@ Es gibt keine interne Variante.%
 Die\ChangedAt{v3.12}{\Package{scrbase}} beiden Argumente \PName{Zeichenfolge}
 werden expandiert und dann verglichen. Beginnt die erste Zeichenfolge, von
 Leerzeichen abgesehen, mit der zweiten Zeichenfolge, so wird der
-\PName{Dann-Teil} ausgeführt, anderenfalls der \PName{Sonst-Teil}. %
-\iftrue% Umbruchvaritanten
-Von dieser Anweisung gibt es keine interne Variante.%
+\PName{Dann-Teil} ausgeführt, anderenfalls der \PName{Sonst-Teil}.%
+\iffalse% Umbruchkorrektur
+\iftrue% Umbruchvarianten
+\ Von dieser Anweisung gibt es keine interne Variante.%
 \else%
-Es gibt keine interne Variante.%
+\ Es gibt keine interne Variante.%
+\fi%
 \fi%
 \EndIndexGroup
 
@@ -1362,11 +1432,13 @@ Es gibt keine interne Variante.%
 Wenn\ChangedAt{v3.12}{\Package{scrbase}} die Expansion von \PName{Code} in
 einem \Macro{dimen}, also einem \TeX-Längenregister, resultiert, wird der
 \PName{Dann-Teil} ausgeführt, anderenfalls der \PName{Sonst-Teil}. Die
-Anweisung ist nicht voll expandierbar.  %
-\iftrue% Umbruchvaritanten
-Von dieser Anweisung gibt es keine interne Variante.%
+Anweisung ist nicht voll expandierbar.%
+\iffalse% Umbruchkorrektur
+\iftrue% Umbruchvarianten
+\ Von dieser Anweisung gibt es keine interne Variante.%
 \else%
-Es gibt keine interne Variante.%
+\ Es gibt keine interne Variante.%
+\fi%
 \fi%
 \EndIndexGroup
 
@@ -1379,11 +1451,13 @@ Wenn\ChangedAt{v3.12}{\Package{scrbase}} die Expansion von \PName{Code} in
 etwas resultiert, das syntaktisch dem Wert einer Länge entspricht, wird der
 \PName{Dann-Teil} ausgeführt, anderenfalls der \PName{Sonst-Teil}. Es ist zu
 beachten,\textnote{Achtung!} dass derzeit unbekannte Einheiten zu einer
-Fehlermeldung führen. Die Anweisung ist nicht voll expandierbar. %
-\iftrue% Umbruchvaritanten
-Von dieser Anweisung gibt es keine interne Variante.%
+Fehlermeldung führen. Die Anweisung ist nicht voll expandierbar.%
+\iffalse% Umbruchkorrektur
+\iftrue% Umbruchvarianten
+\ Von dieser Anweisung gibt es keine interne Variante.%
 \else%
-Es gibt keine interne Variante.%
+\ Es gibt keine interne Variante.%
+\fi%
 \fi%
 \EndIndexGroup
 
@@ -1394,13 +1468,14 @@ Es gibt keine interne Variante.%
 \end{Declaration}
 Der \PName{Dann-Teil} wird ausgeführt, wenn die einfache Expansion der
 \PName{Zeichenfolge} eine gültige Länge mit einer gültigen Längeneinheit
-ist. Anderenfalls wird der \PName{Sonst-Teil} verwendet. %
-\iftrue% Umbruchvaritanten
-Von dieser Anweisung gibt es keine interne Variante.%
+ist. Anderenfalls wird der \PName{Sonst-Teil} verwendet.%
+\iffalse% Umbruchkorrektur
+\iftrue% Umbruchvarianten
+\ Von dieser Anweisung gibt es keine interne Variante.%
 \else%
-Es gibt keine interne Variante.%
+\ Es gibt keine interne Variante.%
 \fi%
-%
+\fi%
 \EndIndexGroup
 
 
@@ -1413,11 +1488,13 @@ einer \Macro{dimexpr}\IndexCmd{dimexpr}, also einem \eTeX-Längenausdruck
 resultiert, wird der \PName{Dann-Teil} ausgeführt, anderenfalls der
 \PName{Sonst-Teil}. Es ist zu beachten,\textnote{Achtung!} dass fehlerhafte
 Ausdrücke zu Fehlermeldungen führen! Die Anweisung ist nicht voll
-expandierbar. %
-\iftrue% Umbruchvaritanten
-Von dieser Anweisung gibt es keine interne Variante.%
+expandierbar.%
+\iffalse% Umbruchkorrektur
+\iftrue% Umbruchvarianten
+\ Von dieser Anweisung gibt es keine interne Variante.%
 \else%
-Es gibt keine interne Variante.%
+\ Es gibt keine interne Variante.%
+\fi%
 \fi%
 \EndIndexGroup
 
@@ -1428,16 +1505,18 @@ Es gibt keine interne Variante.%
 Wenn\ChangedAt{v3.12}{\Package{scrbase}} die Expansion von \PName{Code} in
 einem \Macro{skip}, also einem \TeX-Abstand, resultiert, wird der
 \PName{Dann-Teil} ausgeführt, anderenfalls der \PName{Sonst-Teil}. Die
-Anweisung ist nicht voll expandierbar. %
-\iftrue% Umbruchvaritanten
-Von dieser Anweisung gibt es keine interne Variante.%
+Anweisung ist nicht voll expandierbar.%
+\iffalse% Umbruchkorrektur
+\iftrue% Umbruchvarianten
+\ Von dieser Anweisung gibt es keine interne Variante.%
 \else%
-Es gibt keine interne Variante.%
+\ Es gibt keine interne Variante.%
+\fi%
 \fi%
 \EndIndexGroup
 
 
-\begin{Declaration}
+\iffree{\begin{Declaration}}{\begin{Declaration}[0]}% Umbruchkorrektur
   \Macro{ifisglue}\Parameter{Code}%
   \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
 \end{Declaration}
@@ -1445,11 +1524,13 @@ Wenn\ChangedAt{v3.12}{\Package{scrbase}} die Expansion von \PName{Code} in
 etwas resultiert, das syntaktisch dem Wert eines Abstandes entspricht, wird der
 \PName{Dann-Teil} ausgeführt, anderenfalls der \PName{Sonst-Teil}. Es ist zu
 beachten,\textnote{Achtung!} dass derzeit unbekannte Einheiten zu einer
-Fehlermeldung führen. Die Anweisung ist nicht voll expandierbar. %
-\iffalse% Umbruchvaritanten
-Von dieser Anweisung gibt es keine interne Variante.%
+Fehlermeldung führen. Die Anweisung ist nicht voll expandierbar.%
+\iffalse% Umbruchkorrektur
+\iftrue% Umbruchvarianten
+\ Von dieser Anweisung gibt es keine interne Variante.%
 \else%
-Es gibt keine interne Variante.%
+\ Es gibt keine interne Variante.%
+\fi%
 \fi%
 \EndIndexGroup
 
@@ -1463,11 +1544,13 @@ einer \Macro{glueexpr}\IndexCmd{glueexpr}, also einem
 \mbox{\eTeX}-Abstandsausdruck resultiert, wird der \PName{Dann-Teil}
 ausgeführt, anderenfalls der \PName{Sonst-Teil}. Es ist zu
 beachten,\textnote{Achtung!} dass fehlerhafte Ausdrücke zu Fehlermeldungen
-führen! Die Anweisung ist nicht voll expandierbar. %
-\iftrue% Umbruchvaritanten
-Von dieser Anweisung gibt es keine interne Variante.%
+führen! Die Anweisung ist nicht voll expandierbar.%
+\iffalse% Umbruchkorrektur
+\iftrue% Umbruchvarianten
+\ Von dieser Anweisung gibt es keine interne Variante.%
 \else%
-Es gibt keine interne Variante.%
+\ Es gibt keine interne Variante.%
+\fi%
 \fi%
 \EndIndexGroup
 
@@ -1478,11 +1561,13 @@ Es gibt keine interne Variante.%
 \end{Declaration}
 Wenn\ChangedAt{v3.12}{\Package{scrbase}} \PName{Zähler} ein definierter
 \LaTeX-Zähler ist, wird der \PName{Dann-Teil} ausgeführt, anderenfalls der
-\PName{Sonst-Teil}. Die Anweisung ist nicht voll expandierbar. %
-\iftrue% Umbruchvaritanten
-Von dieser Anweisung gibt es keine interne Variante.%
+\PName{Sonst-Teil}. Die Anweisung ist nicht voll expandierbar.%
+\iffalse% Umbruchkorrektur
+\iftrue% Umbruchvarianten
+\ Von dieser Anweisung gibt es keine interne Variante.%
 \else%
-Es gibt keine interne Variante.%
+\ Es gibt keine interne Variante.%
+\fi%
 \fi%
 \EndIndexGroup
 
@@ -1494,11 +1579,13 @@ Wenn\ChangedAt{v3.12}{\Package{scrbase}} die Expansion von \PName{Code} in
 einem \Macro{count}, also einem \TeX-Zähler, resultiert, wird der
 \PName{Dann-Teil} ausgeführt, anderenfalls der \PName{Sonst-Teil}. Die
 Anweisung ist nicht voll expandierbar. Für einen Test auf einen \LaTeX-Zähler
-siehe \DescRef{\LabelBase.cmd.ifiscounter}. %
-\iftrue% Umbruchvaritanten
-Von dieser Anweisung gibt es keine interne Variante.%
+siehe \DescRef{\LabelBase.cmd.ifiscounter}.%
+\iffalse% Umbruchkorrektur
+\iftrue% Umbruchvarianten
+\ Von dieser Anweisung gibt es keine interne Variante.%
 \else%
-Es gibt keine interne Variante.%
+\ Es gibt keine interne Variante.%
+\fi%
 \fi%
 \EndIndexGroup
 
@@ -1511,11 +1598,13 @@ Wenn\ChangedAt{v3.12}{\Package{scrbase}} die Expansion von \PName{Code} in
 etwas resultiert, das syntaktisch dem Wert eines Zählers entspricht, also eine
 negative oder positive ganze Zahl ist, wird der \PName{Dann-Teil} ausgeführt,
 anderenfalls der \PName{Sonst-Teil}. Die Anweisung ist nicht voll
-expandierbar. %
-\iftrue% Umbruchvaritanten
-Von dieser Anweisung gibt es keine interne Variante.%
+expandierbar.%
+\iffalse% Umbruchkorrektur
+\iftrue% Umbruchvarianten
+\ Von dieser Anweisung gibt es keine interne Variante.%
 \else%
-Es gibt keine interne Variante.%
+\ Es gibt keine interne Variante.%
+\fi%
 \fi%
 \EndIndexGroup
 
@@ -1526,11 +1615,13 @@ Es gibt keine interne Variante.%
 \end{Declaration}
 Der \PName{Dann-Teil} wird ausgeführt, wenn die einfache Expansion der
 \PName{Zeichenfolge} nur aus Ziffern besteht. In allen anderen Fällen wird der
-\PName{Sonst-Teil} verwendet. %
-\iftrue% Umbruchvaritanten
-Von dieser Anweisung gibt es keine interne Variante.%
+\PName{Sonst-Teil} verwendet.%
+\iffalse% Umbruchkorrektur
+\iftrue% Umbruchvarianten
+\ Von dieser Anweisung gibt es keine interne Variante.%
 \else%
-Es gibt keine interne Variante.%
+\ Es gibt keine interne Variante.%
+\fi%
 \fi%
 \EndIndexGroup
 
@@ -1544,16 +1635,18 @@ einer \Macro{numexpr}\IndexCmd{numexpr}, also einem \eTeX-Zahlenausdruck
 resultiert, wird der \PName{Dann-Teil} ausgeführt, anderenfalls der
 \PName{Sonst-Teil}. Es ist zu beachten,\textnote{Achtung!} dass fehlerhafte
 Ausdrücke zu Fehlermeldungen führen! Die Anweisung ist nicht voll
-expandierbar. %
-\iftrue% Umbruchvaritanten
-Von dieser Anweisung gibt es keine interne Variante.%
+expandierbar.%
+\iffalse% Umbruchkorrektur
+\iftrue% Umbruchvarianten
+\ Von dieser Anweisung gibt es keine interne Variante.%
 \else%
-Es gibt keine interne Variante.%
+\ Es gibt keine interne Variante.%
+\fi%
 \fi%
 \EndIndexGroup
 
 
-\begin{Declaration}
+\iffree{\begin{Declaration}}{\begin{Declaration}[0]}% Umbruchkorrektur
   \Macro{IfActiveMkBoth}\Parameter{Dann-Teil}\Parameter{Sonst-Teil}
 \end{Declaration}
 Bei\ChangedAt{v3.27}{\Package{scrbase}} der Umschaltung zwischen automatischen
@@ -1623,7 +1716,7 @@ Noch einfacher lässt sich das Problem aus dem Beispiel übrigens mit Hilfe von
 \BeginIndexGroup
 \BeginIndex{}{Sprachdefinition}
 
-\iftrue
+\iffalse% Umbruchkorrektur
 Anfänger haben häufig Probleme damit, sprachabhängige Begriffe wie
 \Macro{listfigurename}\IndexCmd{listfigurename}, in der Voreinstellung meist
 »List of Figures« beziehungsweise in Deutsch: »Abbildungsverzeichnis«, zu
@@ -2004,7 +2097,7 @@ Ausgabe als arabische Zahl ist \Macro{the} voranzustellen.%
 
 \section[{Allgemeiner Mechanismus für mehrstufige Haken}]
 {Allgemeiner Mechanismus für mehrstufige
-  Haken\ChangedAt[2019/01]{v3.27}{\Package{scrbase}}}
+  Haken\ChangedAt{v3.27}{\Package{scrbase}}}
 \seclabel{hooks}
 
 \BeginIndexGroup
@@ -2107,6 +2200,8 @@ genommen wird.
 \end{Example}%
 %
 \EndIndexGroup
+\ExampleEndFix
+
 
 \begin{Declaration}
   \Macro{AddtoDoHook}\Parameter{Name}\Parameter{Befehl}
