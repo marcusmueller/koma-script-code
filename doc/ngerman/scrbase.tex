@@ -1667,11 +1667,11 @@ eine solches aktives \DescRef{scrlayer.cmd.@mkboth} entdeckt, so wird der
 \PName{Sonst-Teil} ausgeführt.%
 \begin{Example}
   Angenommen, Sie wollen in einem Paket im Fall der Verwendung automatischer
-  Kolumnentitel, beispielsweise durch den Seitenstil
-  \PageStyle{headings}\IndexPagestyle{headings} nur die rechte Marke setzen
-  und die linke unverändert lassen, wohingegen bei Verwendung manueller
-  Kolumentitel die Marken unverändert bleiben sollen. In einem ersten Ansatz
-  verwenden Sie dafür:
+  Kolumnentitel, wie sie beispielsweise der Seitenstil
+  \PageStyle{headings}\IndexPagestyle{headings} aktiviert, nur die rechte
+  Marke setzen und die linke unverändert lassen, wohingegen bei Verwendung
+  manueller Kolumentitel die Marken unverändert bleiben sollen. In einem
+  ersten Ansatz verwenden Sie dafür:
 \begin{lstcode}
   \ifx\@mkboth\markboth \markright{Kolumnentitel}\fi
 \end{lstcode}
@@ -1687,7 +1687,8 @@ eine solches aktives \DescRef{scrlayer.cmd.@mkboth} entdeckt, so wird der
   Vergleich niemals die \DescRef{maincls.cmd.markright}-Anweisung auf.  Daher
   ändern Sie den Vergleich oben zu
 \begin{lstcode}
-  \ifx\@mkboth\@gobbletwo\else \markright{Kolumnentitel}\fi
+  \ifx\@mkboth\@gobbletwo
+  \else \markright{Kolumnentitel}\fi
 \end{lstcode}
   Leider wird nun \DescRef{maincls.cmd.markright} auch bei manuellen
   Kolumentiteln aufgerufen, weil irgend jemand für diesen Fall
@@ -1731,18 +1732,13 @@ Normalerweise muss man zur Definition oder zur Änderung sprachabhängiger
 Begriffe Anweisungen wie \Macro{captionsngerman} so umdefinieren, dass
 zusätzlich zu den bisherigen Begriffen auch die neuen oder geänderten
 definiert werden. Erschwert wird dieses Vorhaben dadurch, dass beim Laden
-eines Pakets wie \Package{german}\IndexPackage{german} oder
-\Package{ngerman}\IndexPackage{ngerman} diese Anweisungen von den Paketen
-erneut definiert werden. Bei den genannten Paketen geschieht dies leider in
-einer Form, die alle zuvor gemachten Änderungen zunichte macht. Aus diesem
-Grund ist es sinnvoll, die Änderungen mit Hilfe von \Macro{AtBeginDocument} bis
-\Macro{begin}\PParameter{document}, also bis nach dem Laden aller Pakete, zu
-verzögern.
-\iftrue
-Auch der Anwender muss entweder von \Macro{AtBeginDocument}
-Gebrauch machen oder aber seine Änderungen nicht in die Dokumentpräambel,
-sondern hinter \Macro{begin}\PParameter{document} einfügen.
-\fi
+eines Pakets wie \Package{babel}\IndexPackage{babel} oder
+\Package{polyglossia}\IndexPackage{polyglossia} diese Anweisungen von den
+Paketen erneut definiert werden. Bei den genannten Paketen geschieht dies,
+indem alle zuvor gemachten Änderungen überschrieben werden. Aus diesem Grund
+ist es sinnvoll, eigene Änderungen bis nach dem Laden entsprechender Pakete
+oder mit Hilfe von \Macro{AtBeginDocument} bis
+\Macro{begin}\PParameter{document} zu verzögern.
 
 Darüber hinaus kommt erschwerend hinzu, dass einige Pakete zusätzliche,
 sprachabhängige Begriffe in \Macro{captions\PName{Sprache}} definieren,
@@ -1752,7 +1748,7 @@ richtige Weise zu ergänzen.
 
 Das Paket \Package{scrbase} bietet dem Anwender daher für die Definition und
 Änderung selbst einige zusätzliche Anweisungen, die ihn von vielen dieser
-Überlegungen entlasten. Gleichzeitig erlauben diese Befehle, die
+Überlegungen befreit. Gleichzeitig erlauben die Befehle, die
 sprachabhängigen Begriffe mehrerer Dialekte oder Ausprägungen einer Sprache
 gleichzeitig zu definieren oder zu ändern.
 
@@ -1774,23 +1770,22 @@ gleichzeitig zu definieren oder zu ändern.
   \Macro{renewcaptionname*}%
     \Parameter{Sprachliste}\Parameter{Begriff}\Parameter{Inhalt}
 \end{Declaration}
-Mit Hilfe dieser vier Anweisungen und ihrer Sternvarianten ist es möglich,
-einem \PName{Begriff} in Abhängigkeit der Sprache einen \PName{Inhalt}
-zuzuweisen. Mehrere Sprachen können durch Komma voneinander getrennt als
+Mit Hilfe dieser Anweisungen ist es möglich, einem \PName{Begriff} in
+Abhängigkeit der Sprache einen \PName{Inhalt} zuzuweisen. Mehrere Sprachen
+können durch Komma voneinander getrennt als
 \PName{Sprachliste}\ChangedAt{v3.12}{\Package{scrbase}} angegeben werden.
-
 Der \PName{Begriff} ist immer ein Makro. Die Arbeitsweise der Anweisungen
 unterscheidet sich je nachdem, ob eine Sprache und ein \PName{Begriff}
 innerhalb der Sprache zum Zeitpunkt des Aufrufs bereits definiert ist.
 
-Ist eine Sprache nicht definiert, so tut \Macro{providecaptionname} nichts
-weiter, als dies in der \File{log}-Datei zu vermerken. Dabei wird für jede
-Sprache nur einmal eine entsprechende Information in die \File{log}-Datei
-geschrieben. Ist die Sprache definiert, enthält aber bisher keinen
-entsprechenden \PName{Begriff}, so wird er mit dem angegebenen \PName{Inhalt}
-definiert. Ist der \PName{Begriff} hingegen in der Sprache bereits definiert,
-so wird er nicht umdefiniert, sondern ebenfalls ein entsprechender Hinweis in
-die \File{log}-Datei geschrieben.
+Ist eine Sprache nicht definiert, vermerkt \Macro{providecaptionname} das
+lediglich in \File{log}-Datei. Dabei wird für jede Sprache nur einmal eine
+entsprechende Information in die \File{log}-Datei geschrieben. Ist die Sprache
+definiert, enthält aber bisher keinen entsprechenden \PName{Begriff}, so wird
+er mit dem angegebenen \PName{Inhalt} definiert. Ist der \PName{Begriff}
+hingegen in der Sprache bereits definiert, so wird er nicht umdefiniert,
+sondern ebenfalls ein entsprechender Hinweis in die \File{log}-Datei
+geschrieben.
 
 Ist dagegen bei \Macro{newcaptionname}
 eine Sprache nicht definiert, dann wird diese neu definiert, indem eine
@@ -1802,20 +1797,19 @@ vorhanden, so wird er mit dem gewünschten \PName{Inhalt} definiert. Ist der
 \PName{Begriff} in der Sprache bereits vorhanden, so wird eine
 Fehlermeldung ausgegeben.
 
-Die Anweisung \Macro{renewcaptionname} verhält sich noch einmal anders. Ist
-eine Sprache nicht definiert, so wird eine Fehlermeldung
-ausgegeben. Ist die Sprache definiert, der \PName{Begriff} in dieser
-Sprache jedoch nicht, so wird ebenfalls eine Fehlermeldung
-ausgegeben. Ist der \PName{Begriff} in der Sprache definiert, so wird
-er auf den gewünschten \PName{Inhalt} umdefiniert.
+Ist bei Anweisung \Macro{renewcaptionname} eine Sprache nicht definiert, so
+wird eine Fehlermeldung ausgegeben. Ist die Sprache definiert, der
+\PName{Begriff} in dieser Sprache jedoch nicht, so wird ebenfalls eine
+Fehlermeldung ausgegeben. Ist der \PName{Begriff} in der Sprache definiert, so
+wird er auf den gewünschten \PName{Inhalt} umdefiniert.
 
 Die\ChangedAt{v3.12}{\Package{scrbase}} Anweisung \Macro{defcaptionname}
 definiert einen \PName{Begriff} immer, überschreibt also eventuell vorhandene
 Definitionen. Wie bei \Macro{providecaptionname} braucht eine angegebene
 Sprache nicht definiert zu sein.
 
-\KOMAScript{} selbst verwendet \Macro{providecaptionname} um die Begriffe aus
-\autoref{sec:scrlttr2-experts.languages},
+\KOMAScript{} selbst verwendet \Macro{providecaptionname} um beispielsweise
+die Begriffe aus \autoref{sec:scrlttr2-experts.languages},
 \DescPageRef{scrlttr2-experts.cmd.yourrefname} zu definieren.
 
 \begin{Example}
@@ -1843,6 +1837,7 @@ Sprache nicht definiert zu sein.
   \PValue{swissgerman}, also Deutsch, Österreichisch und Schweizer Deutsch
   nach der veralteten Rechtschreibung, hinzugefügt werden.
 \end{Example}
+\iffalse % Das ist 6 Jahre her und damit nicht mehr von Belang!
 \begin{Explain}
   Die Sprachen \PValue{swissgerman} und \PValue{nswissgerman} werden übrigens
   von älteren Versionen von \Package{babel} noch nicht unterstützt. Sie sind
@@ -1855,27 +1850,29 @@ Sprache nicht definiert zu sein.
   Umdefinierung für \Option{nswissgerman} und \Option{swissgerman} bei
   Verwendung einer älteren Version von \Package{babel} in einer entsprechenden
   Fehlermeldung.
-\end{Explain}
+\end{Explain}%
+\fi
 
-Seit \KOMAScript~3.12\ChangedAt{v3.12}{\Package{scrbase}} ist es auch nicht
-mehr erforderlich, die Definierung oder Umdefinierung mit Hilfe von
-\Macro{AtBeginDocument} bis \Macro{begin}\PParameter{document} zu
-verzögern. Stattdessen erledigt \Package{scrbase} dies selbst, falls die
-Anweisungen in der Dokumentpräambel aufgerufen werden. Außerdem prüft
-\Package{scrbase} nun auch, ob ein umzudefinierender Begriff statt in
-\Macro{captions\PName{Sprache}} in \Macro{extras\PName{Sprache}} zu definieren
-ist. Die neuen Sternvarianten der Befehle verwenden grundsätzlich
-\Macro{extras\PName{Sprache}}, da dessen Definitionen in der Regel nach
-\Macro{captions\PName{Sprache}} Anwendung finden. Damit funktioniert nun in
-der Regel auch das Umdefinieren von sprachabhängigen Bezeichnern von Paketen
-wie \Package{hyperref}, die dafür \Macro{extras\PName{Sprache}} verwenden.
+Es\ChangedAt{v3.12}{\Package{scrbase}} ist nicht erforderlich, die Definierung
+oder Umdefinierung via \Macro{AtBeginDocument} bis
+\Macro{begin}\PParameter{document} zu verzögern. Stattdessen erledigt
+\Package{scrbase} das selbst, falls die Anweisungen in der Dokumentpräambel
+aufgerufen werden. Außerdem prüft \Package{scrbase} auch, ob ein
+umzudefinierender Begriff statt in \Macro{captions\PName{Sprache}} in
+\Macro{extras\PName{Sprache}} zu definieren ist. Die Sternvarianten der
+Befehle verwenden grundsätzlich \Macro{extras\PName{Sprache}}, da dessen
+Definitionen in der Regel nach \Macro{captions\PName{Sprache}} Anwendung
+finden. Damit funktioniert auch das Umdefinieren von sprachabhängigen
+Bezeichnern von Paketen\iffalse\ wie \Package{hyperref}\fi, die dafür
+\Macro{extras\PName{Sprache}} verwenden.
 
 In \autoref{tab:scrbase.commonNames} ist ein Überblick über die üblicherweise
 von Klassen und Sprachpaketen definierten Begriffe und deren Verwendung zu
 finden.\iffree{}{ \KOMAScript{} selbst definiert noch einige weitere
   Begriffe. Siehe dazu \autoref{sec:scrlttr2-experts.languages} ab
   \DescPageRef{scrlttr2-experts.cmd.yourrefname}.}
-
+%
+\iffree{}{\enlargethispage{4pt}}% Umbruchkorrektur
 \begin{desclist}
   \renewcommand*{\abovecaptionskipcorrection}{-\normalbaselineskip}%
   \desccaption[{%
@@ -1991,9 +1988,9 @@ grundlegenden \KOMAScript-Paketen vorhanden sind.
 \begin{Declaration}
   \Macro{KOMAScript}
 \end{Declaration}
-Diese Anweisung setzt schlicht die Wortmarke »\KOMAScript« in serifenloser
+Diese Anweisung gibt die Wortmarke »\KOMAScript« in serifenloser
 Schrift und mit leichter Sperrung des in Versalien gesetzten
-Teils. \Macro{KOMAScript} wird übrigens bei Bedarf von allen
+Teils aus. \Macro{KOMAScript} wird übrigens bei Bedarf von allen
 \KOMAScript-Klassen und "~Paketen definiert. Die Definition erfolgt mit
 \Macro{DeclareRobustCommand}. Da auch Pakete, die nicht zu \KOMAScript{}
 gehören, diese Wortmarke definieren können, sollte man die Anweisung jedoch
@@ -2010,7 +2007,7 @@ abgelegt. Diese Hauptversion ist für alle \KOMAScript-Klassen und alle
 \KOMAScript-Pakete, die von den Klassen verwendet werden, gleich. Daher kann
 sie auch nach dem Laden von \Package{scrbase} abgefragt werden. Diese
 Anleitung wurde beispielsweise mit der \KOMAScript-Version
-»\KOMAScriptVersion« erstellt. Das Vorhandensein dieser Anweisung ist ein
+»\KOMAScriptVersion« erstellt. Das Vorhandensein der Anweisung ist ein
 starkes Indiz dafür, dass zumindest ein \KOMAScript-Paket verwendet wird.%
 \EndIndexGroup
 
@@ -2041,20 +2038,20 @@ von \Package{scrbase} bereit gestellt.
 \EndIndexGroup
 
 
-\begin{Declaration}
+\iffree{\begin{Declaration}}{\begin{Declaration}[0]}% Umbruchkorrektur
   \Macro{l@addto@macro}\Parameter{Anweisung}\Parameter{Erweiterung}%
 \end{Declaration}%
 Der \LaTeX-Kern bietet mit \Macro{g@addto@macro} eine interne Anweisung, um
 die Definition eines Makro \PName{Anweisung} global um den Code
 \PName{Erweiterung} zu erweitern. Das funktioniert in dieser Form nur für
-Makros ohne Argumente. Dennoch könnte man diese Anweisung in einigen Fällen
+Makros ohne Argumente. Dennoch könnte man die Anweisung in einigen Fällen
 auch in einer Form benötigen, die lokal zur aktuellen Gruppe arbeitet. Diese
 wird mit \Macro{l@addto@macro} von \Package{scrbase} bereit gestellt. Eine
 Alternative stellt hier die Verwendung des Pakets
 \Package{etoolbox}\IndexPackage{etoolbox} oder
 \Package{xpatch}\IndexPackage{xpatch} dar, das eine ganze Reihe solcher
 Anweisungen für unterschiedliche Zwecke bietet (siehe
-\cite{package:etoolbox} beziehungsweise \cite{package:xpatch}).
+\cite{package:etoolbox} oder \cite{package:xpatch}).
 %
 \EndIndexGroup
 
@@ -2066,8 +2063,8 @@ Das für \LaTeX{} inzwischen verwendete und von \KOMAScript{} vorausgesetzte
 \eTeX{} besitzt mit \Macro{numexpr}\IndexCmd{numexpr} erweiterte Möglichkeiten
 zur Berechnung einfacher Ausdrücke mit \TeX-Zählern und ganzen Zahlen. Als
 Operationen werden dabei die vier Grundrechenarten und Klammern
-unterstützt. Bei der Division wird korrekt gerundet. Manchmal sind weitere
-Operationen nützlich.
+unterstützt. Bei der Division wird korrekt gerundet.
+\iffalse Manchmal sind weitere Operationen nützlich.\fi% Umbruchkorrektur
 
 \begin{Declaration}
   \Macro{XdivY}\Parameter{Dividend}\Parameter{Divisor}
@@ -2117,19 +2114,18 @@ Jahre zeigten sich dabei zwei Probleme:
   Durchlaufen des Hakens auszuführen ist, also dauerhaft auf dem Haken bleibt.
 \end{itemize}
 Üblicherweise muss man zur Definition eines einzelnen Hakens eine Anweisung
-definieren, mit der Code für den jeweiligen Haken aufgesammelt wird. Dieser
-Code wird dann in einem weiteren internen Makro abgelegt, das man an der
-Stelle einfügen muss, an der der aufgesammelte Code auszuführen ist. Je mehr
-Haken man einfügt, desto mehr solcher Anweisungen gibt es. Um sowohl
-Einmalcode als auch dauerhaften Code zu ermöglichen, benötigt es gegebenfalls
-sogar zwei Haken und damit die doppelte Anzahl an zu definierenden
-Anweisungen.
+definieren, mit der Code für den jeweiligen Haken aufgesammelt wird. Der Code
+wird dazu in einem weiteren internen Makro abgelegt, das man an der Stelle
+einfügen muss, an der der aufgesammelte Code auszuführen ist. Je mehr Haken
+man einfügt, desto mehr solcher Anweisungen gibt es. Um sowohl Einmalcode als
+auch dauerhaften Code zu ermöglichen, bedarf es sogar zweier Haken und damit
+der doppelten Anzahl an zu definierenden Anweisungen.
 
 Das Beispiel der Gliederungsbefehle zeigt, dass sich das erste Problem
-teilweise an einem einzigen Codeausführungspunkt noch verschärfen kann. Hier
-benötigt der eine Paketautor lediglich eine Möglichkeit für alle
+an einem einzigen Codeausführungspunkt noch verschärfen kann. Der
+eine Paketautor benötigt nur eine Möglichkeit, für alle
 Gliederungsbefehle denselben Code auszuführen. Ein anderer Paketautor hätte
-lieber, dass er nur bei bestimmten Gliederungsbefehlen unterschiedlichen Code
+lieber, dass er bei bestimmten Gliederungsbefehlen unterschiedlichen Code
 ausführen kann. Es würde also sowohl ein allgemeiner Haken als auch ein Haken
 je Gliederungsbefehl benötigt. Das ganze dann wieder wegen des zweiten
 Problems verdoppelt.
@@ -2150,9 +2146,9 @@ expandiert.
 
 Der \PName{Spezifikator} besteht allgemein aus durch Querstrichen,
 »\texttt{/}«, voneinander getrennten Zeichenfolgen. Von \Macro{ExecuteDoHook}
-wird dann zunächst die Zeichenfolge vor dem ersten Querstrich
-abgetrennt. Diese ist der Name. Der verbleibende Rest (ohne den Querstrich)
-ist das Argument. Dann wird der Code für den Haken mit diesem Namen
+wird zunächst die Zeichenfolge vor dem ersten Querstrich abgetrennt. Diese ist
+der Name. Der verbleibende Rest ohne dem führenden Querstrich ist das
+Argument. Dann wird der Code für den Haken mit diesem Namen
 ausgeführt. Anschließend wird erneut die vordere Zeichenfolge vom Rest
 abgetrennt und mit einem Querstrich hinten an den Namen angefügt und der Code
 für den so neu gebildeten Namen ausgeführt. Das geht so lange, bis der Code
@@ -2168,9 +2164,9 @@ zusätzlich Einmalcode ausgeführt, bevor der Einmalcode global vom Haken
 genommen wird.
 
 \begin{Example}
-  Durch Einfügen von \DescRef{\LabelBase.cmd.ExecuteDoHook}%
-  \PParameter{heading/begingroup/\PName{Name}} in die Ausführung eines jeden
-  mit \DescRef{maincls-experts.cmd.DeclareSectionCommand} definierten
+  Mit \DescRef{\LabelBase.cmd.ExecuteDoHook}%
+  \PParameter{heading/begingroup/\PName{Name}} in der Ausführung jedes
+  durch \DescRef{maincls-experts.cmd.DeclareSectionCommand} definierten
   Gliederungbefehls wurden in den \KOMAScript-Klassen letztlich sechs Haken an
   diesem Codepunkt eingefügt, die in dieser Reihenfolge ausgeführt werden:
   \begin{enumerate}
@@ -2187,14 +2183,15 @@ genommen wird.
   \item \PValue{heading/begingroup/}\PName{Name} mit leerem Argument für
     Einmalcode.
   \end{enumerate}
-  \PName{Name} ist dabei der bei
+  Der Platzhalter \PName{Name} ist dabei indentisch mit dem bei
   \DescRef{maincls-experts.cmd.DeclareSectionCommand},
   \DescRef{maincls-experts.cmd.DeclareNewSectionCommand} oder
-  \DescRef{maincls-experts.cmd.ProvideSectionCommand} angegebene \PName{Name}
+  \DescRef{maincls-experts.cmd.ProvideSectionCommand}
+  angegebene \PName{Name}
   der Gliederungsebene beziehungsweise des dadurch bestimmten
-  Gliederungsbefehls, also beispielsweise \PValue{chapter} oder
-  \PValue{subparagraph}. Betrachtet man obige Auflistung unter
-  Berücksichtigung der Tatsache, dass es diverse Gliederungsbefehle gibt,
+  Gliederungsbefehls, also beispielsweise \PValue{subparagraph} oder
+  \PValue{chapter}. Betrachtet man obige Auflistung unter
+  Berücksichtigung der Vielzahl an Gliederungsbefehlen,
   wird klar, dass die Haken \PValue{heading} und \PValue{heading/begingroup}
   mehrfach, nämlich für jeden Gliederungsbefehl existieren.%
 \end{Example}%
@@ -2208,9 +2205,9 @@ genommen wird.
   \Macro{AddtoOneTimeDoHook}\Parameter{Name}\Parameter{Befehl}
 \end{Declaration}
 Mit\ChangedAt[2019/01]{v3.27}{\Package{scrbase}} \Macro{AddtoDoHook} wird an
-dem Haken mit dem Namen \PName{Name} dauerhafter Code aufgehängt. Als Code
-dient dabei der \PName{Befehl}, dem das in der Erklärung zu
-\DescRef{\LabelBase.cmd.ExecuteDoHook} erwähnte Argument als Parameter
+dem Haken mit dem Namen \PName{Name} dauerhafter\textnote{dauerhaft} Code
+aufgehängt. Als Code dient dabei der \PName{Befehl}, dem das in der Erklärung
+zu \DescRef{\LabelBase.cmd.ExecuteDoHook} erwähnte Argument als Parameter
 angehängt wird.
 \begin{Example}
   Angenommen, es soll innerhalb von \Macro{section} mitgezählt werden, wie oft
@@ -2234,8 +2231,8 @@ angehängt wird.
   \AddtoDoHook{heading/begingroup/section}
               {\stepcountergobble{sectionZaehler}}
 \end{lstcode}
-  Hier wird der angehängte, leere Parameter von \Macro{stepcountergobble}
-  gelesen, aber nicht verwendet.
+  Somit wird der angehängte, leere Parameter von der neuen Anweisung
+  \Macro{stepcountergobble} gelesen, aber nicht verwendet.
 
   Sollen nun statt \Macro{section} alle Gliederungsbefehle gezählt werden, so
   muss nur ein anderer Hakenname eingesetzt werden:
@@ -2258,9 +2255,9 @@ angehängt wird.
   definiert werden.
 \end{Example}
 
-Die Anweisung \Macro{AddtoOneTimeDoHook} arbeitet vergleichbar, fügt den
-\PName{Befehl} aber dem Einmalcode hinzu. Dieser Code wird dann nach der
-ersten Ausführung global vom Haken genommen.%
+Die Anweisung \Macro{AddtoOneTimeDoHook}\textnote{einmalig} arbeitet
+vergleichbar, fügt den \PName{Befehl} aber dem Einmalcode hinzu. Dieser Code
+wird dann nach der ersten Ausführung global vom Haken genommen.%
 \EndIndexGroup
 
 \begin{Declaration}
@@ -2331,7 +2328,7 @@ kein Rest bleibt, wird das \PName{Rest-Makro} leer definiert. Falls bereits der
   \PValue{heading} aber abweichendem Argument geben kann.
 \end{Example}
 
-Genau genommen ist diese Anweisung ein Abfallprodukt aus der Implementierung
+Genau genommen ist diese Anweisung ein Abfallprodukt der Implementierung
 von \DescRef{\LabelBase.cmd.ForDoHook}.%
 \EndIndexGroup
 %
