@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2019/10/25 v1.18 internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2019/11/07 v1.19 internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -1966,8 +1966,10 @@
 \lstdefinestyle{code}{%
   language=[LaTeX]TeX,%
   moretexcs={%
-    @auxout,@currext,@dottedtocline,@empty,@float,@hangfrom,@ifpackagelater,
-    @ifundefined,
+    @auxout,@currext,@dottedtocline,@empty,@float,
+    @gobble,@gobbletwo,
+    @hangfrom,@ifpackagelater,
+    @ifundefined,@mkboth,
     @rightmark,@secondoftwo,
     @tempskipa,@tempdima,@tempswafalse,@tempswatrue,
     @undefined,
@@ -2046,14 +2048,16 @@
     GenericMarkFormat,
     headfont,headmark,
     ifundefinedorrelax,
-    ifattoclist,ifoot,ihead,ifkomavarempty,ifstr,ifthispageodd,InputAddressFile,
+    ifattoclist,ifoot,ihead,ifkomavarempty,ifstr,ifthispageodd,
+    IfAktiveMkBoth,InputAddressFile,
     KOMAoption,KOMAoptions,KOMAScript, l@addto@macro,
     LastName,layerwidth,layerheight,lefoot,lefttopmark,leftbotmark,
     leftfirstmark,lehead,LetterOptionNeedsPapersize,
     LenToUnit,
     lipsum,listoffigures,
     listoftables,listoftoc,LoadLetterOption,lofoot,lohead,lowertitleback,
-    MakeMarkcase,makenote,maketitle,manualmark,marginline,minisec,
+    MakeMarkcase,makenote,maketitle,manualmark,marginline,markleft,markdouble,
+    minisec,
     multfootsep,multiplefootnoteseparator,
     Name,nameday,newbibstyle,newcaptionname,newkomavar,nexthead,
     ofoot,ohead,opening,othersectionlevelsformat,
