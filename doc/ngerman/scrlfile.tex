@@ -66,60 +66,62 @@ bestand daher die Hoffnung, dass es künftig unerheblich wäre, in welcher
 Reihenfolge Pakete geladen werden. Diese Hoffnung hat sich leider nicht
 erfüllt.
 
-\section{Die Sache mit den Paketabhängigkeiten}
-\seclabel{dependency}
+%\section{Die Sache mit den Paketabhängigkeiten}
+%\seclabel{dependency}
 %\begin{Explain}
-  Immer häufiger definieren unterschiedliche Pakete den gleichen
-  Befehl neu oder um. Dabei ist es dann sehr entscheidend, in welcher
-  Reihenfolge die Pakete geladen werden. Manchmal ist das für den
-  Anwender kaum zu überschauen. Teilweise ist es auch
-  notwendig, in irgendeiner Form auf das Laden eines
-  anderen Pakets zu reagieren.
+Immer\textnote{Problem} häufiger definieren unterschiedliche Pakete den
+gleichen Befehl neu oder um. Dabei ist es dann sehr entscheidend, in welcher
+Reihenfolge die Pakete geladen werden. Manchmal ist das für den Anwender kaum
+zu überschauen. Teilweise ist es auch notwendig, in irgendeiner Form auf das
+Laden eines anderen Pakets zu reagieren.
 
-  Nehmen wir als einfaches Beispiel das Laden des
-  \Package{longtable}-Pakets bei Verwendung von \KOMAScript{}. Das
-  \Package{longtable}-Paket definiert seine eigene Form von
-  Tabellenüberschriften. Diese passen perfekt zu den
-  Standardklassen. Sie passen aber überhaupt
-  nicht zu den Voreinstellungen für die Tabellenüberschriften von
-  \KOMAScript{} und reagieren auch nicht auf die entsprechenden
-  Möglichkeiten der Konfiguration. Um dieses Problem zu lösen, müssen
-  die Befehle von \Package{longtable}, die für die
-  Tabellenüberschriften zuständig sind, von \KOMAScript{} umdefiniert
-  werden. Allerdings sind die \KOMAScript{}-Klassen bereits
-  abgearbeitet, wenn das Paket geladen wird.
+Nehmen\textnote{Beispiel} wir als einfaches Beispiel das Laden des
+\Package{longtable}-Pakets bei Verwendung von \KOMAScript{}. Das
+\Package{longtable}-Paket definiert seine eigene Form von
+Tabellenüberschriften. Diese passen perfekt zu den Standardklassen. Sie passen
+aber überhaupt nicht zu den Voreinstellungen für die Tabellenüberschriften von
+\KOMAScript{} und reagieren auch nicht auf die entsprechenden Möglichkeiten
+der Konfiguration. Um dieses Problem zu lösen, müssen die Befehle von
+\Package{longtable}, die für die Tabellenüberschriften zuständig sind, von
+\KOMAScript{} umdefiniert werden. Allerdings sind die \KOMAScript{}-Klassen
+bereits abgearbeitet, wenn das Paket geladen wird.
 
-  Bisher bestand die einzige Möglichkeit, dieses Problem zu lösen
-  darin, die Umdefinierung mit Hilfe von \Macro{AtBeginDocument} auf
-  einen späteren Zeitpunkt zu verschieben. Will der Anwender die
-  entsprechende Anweisung jedoch selbst umdefinieren, so sollte er
-  dies eigentlich ebenfalls in der Präambel tun. Das kann er jedoch
-  nicht, weil \KOMAScript{} ihm dabei in die Quere kommt. Er müsste
-  die Umdefinierung also ebenfalls mit Hilfe von
-  \Macro{AtBeginDocument} durchführen.
+Ursprünglich\textnote{ursprünglicher Ansatz} bestand die einzige %
+\iffalse% Umbruchkorrektur
+Möglichkeit, dieses Problem zu lösen %
+\else%
+Lösungsmöglichkeit %
+\fi%
+darin, die Umdefinierung mit Hilfe von \Macro{AtBeginDocument} auf einen
+späteren Zeitpunkt zu verschieben. Will der Anwender die entsprechende
+Anweisung jedoch selbst umdefinieren, so sollte er dies eigentlich ebenfalls
+in der Präambel tun. Das kann er jedoch nicht, weil \KOMAScript{} ihm dabei in
+die Quere kommt. Er müsste die Umdefinierung also ebenfalls mit Hilfe von
+\Macro{AtBeginDocument} durchführen.
 
-  Aber eigentlich müsste \KOMAScript{} die Abarbeitung gar nicht auf
-  den Zeitpunkt von \Macro{begin}\PParameter{document} verschieben. Es
-  würde genügen, wenn sie bis unmittelbar nach dem Laden von
-  \Package{longtable} verzögert werden könnte. Leider fehlen
-  entsprechende Anweisungen im \LaTeX-Kern. Das Paket
-  \Package{scrlfile} bringt hier Abhilfe.
+Aber\textnote{Potential} eigentlich müsste \KOMAScript{} die Abarbeitung gar
+nicht auf den Zeitpunkt von \Macro{begin}\PParameter{document} verschieben. Es
+würde genügen, wenn sie bis unmittelbar nach dem Laden von \Package{longtable}
+verzögert werden könnte. Leider fehlen entsprechende Anweisungen im
+\LaTeX-Kern. Das Paket \Package{scrlfile} bringt hier Abhilfe.
 
-  Ebenso wäre es denkbar, dass man vor dem Laden eines bestimmten
-  Pakets gerne die Bedeutung eines Makros in einem Hilfsmakro retten
-  und nach dem Laden des Pakets wieder restaurieren will. Auch das
-  geht mit \Package{scrlfile}.
+Ebenso\textnote{weitere Anwendungen} wäre es denkbar, dass man vor dem Laden
+eines bestimmten Pakets gerne die Bedeutung eines Makros in einem Hilfsmakro
+retten und nach dem Laden des Pakets wieder restaurieren will. Auch das geht
+mit \Package{scrlfile}.
 
-  Die Anwendung von \Package{scrlfile} ist nicht auf die Abhängigkeit
-  von Paketen beschränkt. Auch Abhängigkeiten von anderen Dateien
-  können berücksichtigt werden. So kann beispielsweise dafür gesorgt
-  werden, dass das nicht unkritische Laden einer Datei wie
-  \File{french.ldf} automatisch zu einer Warnung führt.
+Die Anwendung von \Package{scrlfile} ist nicht auf die Abhängigkeit von
+Paketen beschränkt. Auch Abhängigkeiten von anderen Dateien, die mit
+\Macro{input} oder \Macro{InputIfFileExists} geladen werden, können
+berücksichtigt werden.%
+\iffalse% Stimmt so nur noch bedingt
+So kann beispielsweise dafür gesorgt werden, dass das nicht unkritische Laden
+einer Datei wie \File{french.ldf} automatisch zu einer Warnung führt.%
+\fi
 
-  Obwohl das Paket in erster Linie für andere Paketautoren interessant
-  sein dürfte, gibt es durchaus auch Anwendungen für normale
-  \LaTeX-Benutzer. Deshalb sind in diesem Kapitel auch für beide
-  Gruppen Beispiele aufgeführt.
+Obwohl das Paket in erster Linie für andere Paketautoren interessant sein
+dürfte, gibt es durchaus auch Anwendungen für normale \LaTeX-Benutzer. Deshalb
+sind in diesem Kapitel auch für beide Gruppen Beispiele aufgeführt.
 %\end{Explain}
 
 
@@ -175,10 +177,11 @@ verwenden. Beachten Sie die Klammern um den Dateinamen!%
   \Macro{BeforeClass}\Parameter{Klasse}\Parameter{Anweisungen}
   \Macro{BeforePackage}\Parameter{Paket}\Parameter{Anweisungen}
 \end{Declaration}%
-Diese beiden Befehle arbeiten vergleichbar zu \DescRef{\LabelBase.cmd.BeforeFile} mit dem einen
-Unterschied, dass die \PName{Klasse} beziehungsweise das \PName{Paket} mit
-seinem Namen und nicht mit seinem Dateinamen angegeben wird. Die Endungen
-»\File{.cls}« und »\File{.sty}« entfallen hier also.%
+Diese beiden Befehle arbeiten vergleichbar zu
+\DescRef{\LabelBase.cmd.BeforeFile} mit dem einen Unterschied, dass die
+\PName{Klasse} beziehungsweise das \PName{Paket} mit seinem Namen und nicht
+mit seinem Dateinamen angegeben wird. Die Endungen »\File{.cls}« und
+»\File{.sty}« entfallen hier also.%
 %
 \EndIndexGroup
 
@@ -242,12 +245,12 @@ und für Pakete \Macro{AfterAtEndOfPackage}.%
   \AfterPackage{hyperref}{%
     \@ifpackagelater{hyperref}{2001/02/19}{}{%
       \ClassWarningNoLine{scrbook}{%
-        You are using an old version of hyperref 
+        You are using an old version of the hyperref 
         package!\MessageBreak%
-        This version has a buggy hack at many 
-        drivers\MessageBreak%
+        This version has a buggy hack in many 
+        drivers,\MessageBreak%
         causing \string\addchap\space to behave 
-        strange.\MessageBreak%
+        strangely.\MessageBreak%
         Please update hyperref to at least version
         6.71b}%
     }%
@@ -275,8 +278,8 @@ und für Pakete \Macro{AfterAtEndOfPackage}.%
   \Package{caption2} die Kontrolle über die
   \DescRef{maincls.cmd.caption}-Anweisung übernimmt und daher die normale
   Definition von \DescRef{maincls.cmd.setcapindent} keinerlei Wirkung mehr
-  hätte. Die Umdefinierung verbessert dann die Zusammenarbeit mit
-  \Package{caption2}.
+  hätte. Die Umdefinierung verbessert dann die Zusammenarbeit mit dem
+  veralteten \Package{caption2}.
 
   Es gibt aber auch Beispiele für den sinnvollen Einsatz der neuen
   Anweisungen durch normale Anwender. Angenommen, Sie erstellen ein
@@ -343,19 +346,19 @@ anstelle von \DescRef{maincls.cmd.usepackage} zu verwenden (siehe
   \Macro{BeforeClosingMainAux}\Parameter{Anweisungen}
   \Macro{AfterReadingMainAux}\Parameter{Anweisungen}
 \end{Declaration}
+\iffalse% Umbruchkorrektur
 Diese Anweisungen unterscheiden sich in einem Detail von den zuvor erklärten
-Anweisungen. Jene ermöglichen Aktionen vor und nach dem Laden von
-Dateien. Das ist hier nicht der Fall. Paketautoren haben des Öfteren das
-Problem, dass sie Anweisungen in die \File{aux}-Datei schreiben wollen,
-nachdem die letzte Seite des Dokuments ausgegeben wurde. Dazu wird -- in
-Unkenntnis der dadurch verursachten Probleme -- häufig Code
-wie der folgende eingesetzt:
+Anweisungen. Jene ermöglichen Aktionen vor und nach dem Laden von Dateien. Das
+ist hier nicht der Fall. %
+\fi%
+Paketautoren haben des Öfteren das Problem, dass sie Anweisungen in die
+\File{aux}-Datei schreiben wollen, nachdem die letzte Seite des Dokuments
+ausgegeben wurde. Dazu wird -- in Unkenntnis der dadurch verursachten Probleme
+-- häufig Code wie der folgende eingesetzt:
 \begin{lstcode}[escapechar=\$]
   \AtEndDocument{%$\textnote{Nicht nachmachen!}$
     \if@filesw
-      \write\@auxout{%
-        \protect\writethistoaux%
-      }%
+      \write\@auxout{\protect\writethistoaux}%
     \fi
   } 
 \end{lstcode}
@@ -371,9 +374,7 @@ daher häufig auch Lösungsversuche wie:
   \AtEndDocument{%$\textnote{Nicht nachmachen!}$
     \if@filesw
       \clearpage
-      \immediate\write\@auxout{%
-        \protect\writethistoaux%
-      }%
+      \immediate\write\@auxout{\protect\writethistoaux}%
     \fi
   } 
 \end{lstcode}
@@ -400,9 +401,7 @@ Ziel von \Macro{BeforeClosingMainAux}:
 \begin{lstcode}
   \BeforeClosingMainAux{%
     \if@filesw
-      \immediate\write\@auxout{%
-        \protect\writethistoaux%
-      }%
+      \immediate\write\@auxout{\protect\writethistoaux}%
     \fi
   }
 \end{lstcode}
@@ -440,7 +439,7 @@ ist, vor oder nach dem Einlesen einer bestimmten Datei, eines bestimmten
 Pakets oder einer Klasse Aktionen auszuführen. Es ist mit \Package{scrlfile}
 aber auch möglich, eine ganz andere Datei als die angeforderte einzulesen.
 
-\begin{Declaration}
+\begin{Declaration}[0]
   \Macro{ReplaceInput}\Parameter{Dateiname}\Parameter{Ersatzdatei}
 \end{Declaration}
 Mit\ChangedAt{v2.96}{\Package{scrlfile}} dieser Anweisung wird eine Ersetzung
@@ -543,9 +542,7 @@ ersetzt, die eine geforderte Option nicht unterstützt, würde das zu den
   \BeforePackage{newfoo}{%
     \DeclareOption{oldopt}{%
       \PackageInfo{newfoo}%
-                  {option `oldopt' not supported}%
-    }%
-  }%
+                  {option `oldopt' not supported}}}%
 \end{lstcode}
   wird diese Option nun für das Paket \Package{newfoo} nachdefiniert. Dadurch
   wird vermieden, dass beim Laden des Pakets \Package{oldfoo} ein Fehler über
@@ -556,18 +553,13 @@ ersetzt, die eine geforderte Option nicht unterstützt, würde das zu den
   werden:
 \begin{lstcode}
   \BeforePackage{newfoo}{%
-    \DeclareOption{oldopt}{%
-      \ExecuteOptions{newopt}%
-    }%
-  }%
+    \DeclareOption{oldopt}{\ExecuteOptions{newopt}}}%
 \end{lstcode}
   Es ist sogar möglich, festzulegen, dass beim Laden des neuen Pakets
   andere Voreinstellung gelten sollen:
 \begin{lstcode}
   \BeforePackage{newfoo}{%
-    \DeclareOption{oldopt}{%
-      \ExecuteOptions{newopt}%
-    }%
+    \DeclareOption{oldopt}{\ExecuteOptions{newopt}}%
     \PassOptionsToPackage{newdefoptA,newdefoptB}%
                          {newfoo}%
   }
@@ -575,20 +567,20 @@ ersetzt, die eine geforderte Option nicht unterstützt, würde das zu den
   oder auch direkt:
 \begin{lstcode}
   \BeforePackage{newfoo}{%
-    \DeclareOption{oldopt}{%
-      \ExecuteOptions{newopt}%
-    }%
+    \DeclareOption{oldopt}{\ExecuteOptions{newopt}}%
   }%
   \PassOptionsToPackage{newdefoptA,newdefoptB}%
                        {newfoo}%
 \end{lstcode}
+  \iffalse% Umbruchkorrektur
   Man beachte, dass im letzten Beispiel der Aufruf von
-  \Macro{PassOptionsToPackage} nicht innerhalb, sondern erst nach
-  \Macro{BeforePackage} erfolgt.      
+  \Macro{PassOptionsToPackage} nicht innerhalb, sondern nach
+  \Macro{BeforePackage} erfolgt.%
+  \fi%
 \end{Example}
 
-Damit Klassen ersetzt werden können, ist es natürlich erforderlich
-\Package{scrlfile} vor der Klasse zu laden. Dazu ist
+Damit Klassen mir \Macro{ReplaceClass} ersetzt werden können, ist es natürlich
+erforderlich \Package{scrlfile} vor der Klasse zu laden. Dazu ist
 \Macro{RequirePackage}\IndexCmd{RequirePackage} anstelle von
 \DescRef{maincls.cmd.usepackage} zu verwenden (siehe \cite{latex:clsguide}).%
 \EndIndexGroup
@@ -769,6 +761,7 @@ einer gespeicherten Liste wiederhergestellt wird, wird dann der
   ausgeführt.%
 \end{Example}%
 \EndIndexGroup
+%\ExampleEndFix % Am Ende des Kapitels nicht ausführen
 %
 \EndIndexGroup
 

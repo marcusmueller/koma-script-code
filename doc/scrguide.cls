@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2019/11/07 v1.19 internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2019/11/11 v1.20 internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -2000,6 +2000,7 @@
     addxcontentslinetoeachtocfile,addsec,
     addtoeachtocfile,
     addtokomafont,addtolengthplength,addtoreffields,addtotoclist,
+    addxcontentsline,
     adrchar,adrentry,
     AddLayersAtBeginOfPageStyle,AddLayersToPageStyle,
     AddtoDoHook,AddtoOneTimeDoHook,
@@ -2009,7 +2010,8 @@
     AtBeginLetter,At@startsection,
     Before@sect,Before@ssect,
     BeforeFamilyProcessOptions,
-    BeforeClosingMainAux,BeforePackage,bib@beginhook,bib@endhook,
+    BeforeClosingMainAux,BeforePackage,BeforeStartingTOC,
+    bib@beginhook,bib@endhook,
     blinddocument,blindtext,Blinddocument,Blindtext,
     cc,captionabove,captionaboveof,captionbelow,captionbelowof,captionformat,
     captionof,cefoot,cfoot,chapapp, chapappifchapterprefix,
