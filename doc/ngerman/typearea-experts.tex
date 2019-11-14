@@ -73,11 +73,14 @@ nicht mehr verwendet werden.
 
 In diesem Abschnitt werden experimentelle Möglichkeiten
 beschrieben. Experimentell bedeutet in diesem Zusammenhang, dass die Funktion
-nicht garantiert werden kann. Dafür kann es zwei Gründe geben. Zum einen
+nicht garantiert werden kann.
+\iffalse % Umbruchkorrektur
+Dafür kann es zwei Gründe geben. Zum einen
 steht die endgültige Funktion oder Implementierung eventuell noch nicht
 abschließend fest. Zum anderen hängen die Möglichkeiten teilweise von Interna
 anderer Pakete ab und können deshalb in ihrer Funktion nur so lange garantiert
 werden, wie diese anderen Pakete nicht geändert werden.
+\fi
 
 \begin{Declaration}
   \OptionVName{usegeometry}{Ein-Aus-Wert}
@@ -109,7 +112,7 @@ Kopf, Fuß etc. benötigt werden -- man spricht von \emph{Überbestimmung} -- un
 gleichzeitig bei neuen Aufrufen von \Macro{newgeometry} fehlende Angaben aus
 bereits bekannten ableitet -- man spricht von \emph{Werterhalt} --,
 muss man gegebenenfalls durch vollständige Bestimmung neuer Werte
-bei einem eigenen Aufruf von \Macro{newgeometry} alle gewünschten
+mit einem eigenen Aufruf von \Macro{newgeometry} alle gewünschten
 Einstellungen explizit vornehmen. Nichts desto Trotz kann die Berücksichtigung
 von \Package{geometry} durch \Package{typearea} zusätzliche Möglichkeiten
 eröffnen.
@@ -141,19 +144,29 @@ unterscheiden sich Einstellungen, die zu gleich großen Textbereichen führen
 zwischen den beiden Befehlen weiterhin, da \DescRef{typearea.cmd.typearea}
 immer auf ganze Zeile rundet und dabei gegebenenfalls den unteren Rand um bis
 zu eine Zeile kleiner wählt, während \DescRef{typearea.cmd.areaset} den oberen
-und unteren Rand immer im Verhältnis 1:2 einstellt. Die Textbereiche der
+und unteren Rand immer im Verhältnis 1:2 einstellt.  Die Textbereiche der
 unterschiedlichen Befehle können also bei gleicher Größe vertikal leicht
-verschoben sein.%
+verschoben sein.
+
+Nach Aktivierung von \Option{areasetadvanced} kann jedoch mit einer
+Kombination wie
+\begin{lstcode}[escapeinside=><]
+  \typearea{>\PName{BCOR}<}{>\PName{DIV}<}
+  \areaset{current}{\textwidth}{\textheight}
+\end{lstcode}
+das unterschiedliche Verhalten ausgeglichen werden, ohne dass dabei die
+eingangs erwähnten Abstriche in der Arbeitsweise von \Macro{areaset} in Kauf
+genommen werden müssen. Siehe dazu auch das Beispiel im nächsten Abschnitt.%
 \EndIndexGroup
 
 
 \section{Anweisungen für Experten}
 \seclabel{experts}
 
+
 In diesem Abschnitt werden Anweisungen beschrieben, die für den normalen
 Anwender kaum oder gar nicht von Interesse sind. Experten bieten diese
-Anweisungen zusätzliche Möglichkeiten.\iffree{ Da die Beschreibungen für
-  Experten gedacht sind, sind sie kürzer gefasst.}{}
+Anweisungen zusätzliche Möglichkeiten.
 
 \begin{Declaration}
   \Macro{activateareas}
@@ -172,7 +185,6 @@ Dokuments manuell geändert haben. Der Experte ist dabei für eventuell
 notwendige Seitenumbrüche vor oder nach der Verwendung jedoch selbst
 verantwortlich! Darüber hinaus sind alle von \Macro{activateareas}
 durchgeführten Änderungen lokal!%
-% 
 \EndIndexGroup
 
 
@@ -190,16 +202,24 @@ anschließend die Einstellungen zu ändern und dann die gespeicherten
 Einstellungen wieder zu reaktivieren.
 
 \begin{Example}
-  Sie wollen in einem Dokument im Hochformat eine Seite im Querformat
-  unterbringen. Mit \Macro{storeareas} kein Problem:
+  Immer wieder fragen Anwender nach der Möglichkeit, in einem A4-Dokument
+  unter Beibehaltung der Randeinstellungen eine A3-Seite im Querformat
+  einfügen zu können. Der Textbereich soll also lediglich um die gewonnene
+  Papierbreite verbreitert werden. Mit \Macro{storeareas}
+  \DescRef{\LabelBase.cmd.areaset} und der zuvor bereits erklärten Option
+  \DescRef{\LabelBase.option.areasetadvanced} ist das sehr einfach möglich:
 \begin{lstcode}
-  \documentclass{scrartcl}
+  \documentclass[areasetadvanced]{scrartcl}
+  \areaset[current]{\textwidth}{\textheight}
 
   \begin{document}
   \noindent\rule{\textwidth}{\textheight}
 
   \storeareas\meinegespeichertenWerte
-  \KOMAoptions{paper=landscape,DIV=current}
+  \KOMAoption{paper}{a3,landscape}
+  \areaset[current]
+          {\dimexpr\textwidth+.5\paperwidth\relax}
+          {\textheight}
   \noindent\rule{\textwidth}{\textheight}
 
   \clearpage
@@ -207,7 +227,19 @@ Einstellungen wieder zu reaktivieren.
   \noindent\rule{\textwidth}{\textheight}
   \end{document}
 \end{lstcode}
-  Wichtig\textnote{Achtung!} ist dabei die Anweisung
+  Die \DescRef{\LabelBase.cmd.areaset}-Anweisung\IndexCmd{areaset} in der
+  Dokumentpräambel dient dabei zusammen mit Option
+  \DescRef{\LabelBase.option.areasetadvanced}\IndexOption{areasetadvanced}
+  dazu, die Unterschiede zwischen der
+  \DescRef{typearea.cmd.typearea}-Voreinstellung und der späteren Verwendung
+  von \DescRef{\LabelBase.cmd.areaset} auszugeleichen, wie dies bereits auf
+  \DescPageRef{\LabelBase.option.areasetadvanced} erklärt wurde. Ohne diese
+  Maßnahme könnte es insbesondere bei Verwendung von Optionen wie
+  \DescRef{typearea.option.headinclude} und
+  \DescRef{typearea.option.headheight} zu deutlichen Abweichungen bei den
+  Randeinstellungen kommen.
+  
+  Wichtig\textnote{Achtung!} ist auch die Anweisung
   \DescRef{maincls.cmd.clearpage} vor dem Aufruf von
   \Macro{meinegespeichertenWerte}, damit die Wiederherstellung erst auf der
   nächsten Seite erfolgt. Bei doppelseitigen Dokumenten sollte bei Änderungen
