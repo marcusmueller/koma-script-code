@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2019/11/11 v1.20 internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2019/11/14 v1.21 internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -1978,6 +1978,7 @@
     DeclareOption,DeclareRobustCommand,dimexpr,end@float,ExecuteOptions,
     gluexpr,
     if@filesw,if@tempswa,if@twoside,includegraphics,
+    labelformat,
     MessageBreak,
     numexpr,
     onehalfspacing,
