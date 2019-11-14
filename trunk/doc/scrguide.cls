@@ -2713,7 +2713,7 @@ KOMAScript \endcsname
 % index with reference to that index at another index. And there are even
 % entries that will be added to one index with reference to that index from
 % another index and from the main index.
-% \begin{macro}{\DefineSingeIndex}
+% \begin{macro}{\DefineSingleIndex}
 %   \changes{v1.22}{2019/11/14}{support \cs{PName} in second argument}%^^A
 %   This defines a single index entry, e.g. of commands. A macro will be
 %   defined that addes the entry only to one index. First (optional)
