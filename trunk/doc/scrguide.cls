@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2019/11/14 v1.21 internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2019/11/14 v1.22 internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -2714,6 +2714,7 @@ KOMAScript \endcsname
 % entries that will be added to one index with reference to that index from
 % another index and from the main index.
 % \begin{macro}{\DefineSingeIndex}
+%   \changes{v1.22}{2019/11/14}{support \cs{PName} in second argument}%^^A
 %   This defines a single index entry, e.g. of commands. A macro will be
 %   defined that addes the entry only to one index. First (optional)
 %   agrument is a not, which shows the kind of entry (e.g. |\GuideMacro|). The
@@ -2726,12 +2727,24 @@ KOMAScript \endcsname
   \ifx\relax#1\relax
     \expandafter\newcommand\expandafter*%
     \csname Index#2\endcsname[2][indexother]{%
-      \Index[##1]{##2=\UseIndex{#3}#4{##2}}%
+      \begingroup
+        \let\PName\@firstofone
+        \protected@edef\reserved@a{%
+          \unexpanded{\endgroup\Index[##1]}%
+          {##2\unexpanded{=\UseIndex{#3}#4{##2}}}%
+        }%
+      \reserved@a
     }%
   \else
     \expandafter\newcommand\expandafter*%
     \csname Index#2\endcsname[2][indexother]{%
-      \Index[##1]{##2 (#1)=\UseIndex{#3}#4{##2} (\protect #1)}%
+      \begingroup
+        \let\PName\@firstofone
+        \protected@edef\reserved@a{%
+          \unexpanded{\endgroup\Index[##1]}%
+          {##2 \unexpanded{(#1)=\UseIndex{#3}#4{##2} (\protect #1)}}%
+        }%
+      \reserved@a
     }%
   \fi
 }
