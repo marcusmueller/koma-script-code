@@ -110,11 +110,14 @@ nicht. Bezüglich der verwendeten \KOMAScript-Version sei auf
   \Macro{ClassName}
 \end{Declaration}
 In \Macro{KOMAClassName} ist der Name der aktuell verwendeten
-\KOMAScript-Klasse abgelegt. Will man also wissen, ob eine oder welche
-\KOMAScript-Klasse verwendet wird, so kann man einfach auf diese Anweisung
-testen. Demgegenüber gibt \Macro{ClassName} Auskunft, welche Standardklasse
-durch diese \KOMAScript-Klasse ersetzt wird.
-
+\KOMAScript-Klasse abgelegt. Will man also wissen, ob eine \KOMAScript-Klasse
+verwendet wird, so kann man einfach mit \Macro{@ifundefined} auf diese
+Anweisung testen. Tests auf eine konkrete \KOMAScript-Klasse, beispielsweise
+mit \DescRef{scrbase.cmd.ifstr}, sind ebenfalls möglich. Demgegenüber gibt
+\Macro{ClassName} Auskunft, welche Standardklasse durch diese
+\KOMAScript-Klasse ersetzt wird.%
+\iffalse% Umbruchkorrektur
+\par
 Es\textnote{Achtung!} sei in diesem Zusammenhang darauf hingewiesen, dass
 dagegen die Existenz von
 \DescRef{scrbase.cmd.KOMAScript}\IndexCmd{KOMAScript} nicht als Indiz für die
@@ -122,6 +125,7 @@ Verwendung einer \KOMAScript-Klasse dienen kann. Zum einen definieren alle
 \KOMAScript-Pakete diese Anweisung, zum anderen können auch andere Pakete es
 für sinnvoll erachten, das \KOMAScript-Piktogramm unter diesem Namen zu
 definieren.%
+\fi%
 \EndIndexGroup
 
 
@@ -134,6 +138,40 @@ auf der Verwendung von \Package{tocbasic} (siehe
 \autoref{sec:tocbasic.tocstyle} ab
 \autopageref{sec:tocbasic.tocstyle}). Andere sind direkt in den Klassen
 implementiert.
+
+
+\begin{Declaration}
+  \Macro{raggedchapterentry}
+\end{Declaration}
+Bei früheren\ChangedAt{v3.21}{\Class{scrbook}\and \Class{scrreprt}} Version
+von \KOMAScript{} gab es die Möglichkeit, das Makro \Macro{raggedchapterentry}
+als \Macro{raggedright} zu definieren, um den Text der Kapiteleinträge ins
+Inhaltsverzeichnis im linksbündigen Flattersatz zu setzen. Offiziell existiert
+diese Möglichkeit seit \KOMAScript-Version~3.21 nicht mehr.
+
+Tatsächlich ist aber die Eigenschaft \PValue{raggedentrytext} für den
+Eintrags-Stil \PValue{tocline} im Paket
+\hyperref[cha:tocbasic]{\Package{tocbasic}}\IndexPackage{tocbasic} so
+implementiert, dass sie das Makro \Macro{ragged\PName{Eintragsebene}entry}
+entweder auf \Macro{relax} oder auf \Macro{raggedright} setzt. Bei der
+Auswertung der Eigenschaft wird dann getestet, ob das entsprechende Makro
+entweder \Macro{raggedright} ist oder als \Macro{raggedright} definiert
+ist. In beiden Fällen wird Flattersatz verwendet. In allen anderen Fällen wird
+kein Flattersatz verwendet.
+
+Da schon früher dokumentiert war, dass \Macro{raggedchapterentry} nicht
+als etwas anderes als \Macro{raggedright} definiert werden sollte, ist damit
+Kompatibilität zum dokumentierten Verhalten früherer Versionen erreicht. Wie
+in früheren Versionen gewarnt, führen andere Definitionen von
+\Macro{raggedchapterentry} -- nun aber auch von \Macro{raggedsectionentry} und
+entsprechend für die anderen Eintragsebenen -- möglicherweise zu unerwarteten
+Ergebnissen.
+
+Empfohlen wird, eventuell gewünschten Flattersatz für Verzeichniseinträge
+stattdessen über die genannte Eigenschaft des Verzeichniseintragsstils
+\PValue{tocline} zu wählen.%
+\EndIndexGroup
+
 
 \begin{Declaration}
   \Macro{addtocentrydefault}\Parameter{Ebene}\Parameter{Nummer}%
@@ -225,39 +263,6 @@ ihre \PName{Ebene} und die Argumente direkt an
 \EndIndexGroup
 
 
-\begin{Declaration}
-  \Macro{raggedchapterentry}
-\end{Declaration}
-Bei früheren\ChangedAt{v3.21}{\Class{scrbook}\and \Class{scrreprt}} Version
-von \KOMAScript{} gab es die Möglichkeit, das Makro \Macro{raggedchapterentry}
-als \Macro{raggedright} zu definieren, um den Text der Kapiteleinträge ins
-Inhaltsverzeichnis im linksbündigen Flattersatz zu setzen. Offiziell existiert
-diese Möglichkeit seit \KOMAScript-Version~3.21 nicht mehr.
-
-Tatsächlich ist aber die Eigenschaft \PValue{raggedentrytext} für den
-Eintrags-Stil \PValue{tocline} im Paket
-\hyperref[cha:tocbasic]{\Package{tocbasic}}\IndexPackage{tocbasic} so
-implementiert, dass sie das Makro \Macro{ragged\PName{Eintragsebene}entry}
-entweder auf \Macro{relax} oder auf \Macro{raggedright} setzt. Bei der
-Auswertung der Eigenschaft wird dann getestet, ob das entsprechende Makro
-entweder \Macro{raggedright} ist oder als \Macro{raggedright} definiert
-ist. In beiden Fällen wird Flattersatz verwendet. In allen anderen Fällen wird
-kein Flattersatz verwendet.
-
-Da schon früher dokumentiert war, dass \Macro{raggedchapterentry} nicht
-als etwas anderes als \Macro{raggedright} definiert werden sollte, ist damit
-Kompatibilität zum dokumentierten Verhalten früherer Versionen erreicht. Wie
-in früheren Versionen gewarnt, führen andere Definitionen von
-\Macro{raggedchapterentry} -- nun aber auch von \Macro{raggedsectionentry} und
-entsprechend für die anderen Eintragsebenen -- möglicherweise zu unerwarteten
-Ergebnissen.
-
-Empfohlen wird, eventuell gewünschten Flattersatz für Verzeichniseinträge
-stattdessen über die genannte Eigenschaft des Verzeichniseintragsstils
-\PValue{tocline} zu wählen.%
-\EndIndexGroup
-
-
 \section{Schrifteinstellungen}
 \seclabel{fonts}
 
@@ -266,26 +271,7 @@ Auswahl der Grundschriftgröße. Sie erlauben auch die Definition von Elementen
 mit eigenen Schrifteinstellungen, sowie deren Manipulation und dedizierter
 Anwendung.
 
-\begin{Declaration}
-  \Macro{@fontsizefilebase}
-  \Macro{changefontsizes}\Parameter{Schriftgröße}
-\end{Declaration}
-Der\iffree{ in \autoref{sec:maincls-experts.addInfos}}{} auf
-\DescPageRef{maincls-experts.option.fontsize} für die Schriftgrößendateien
-angegebene Präfix \File{scrsize}, ist lediglich die Voreinstellung für das
-interne Makro \Macro{@fontsizefilebase}\IndexCmd{@fontsizefilebase}, die
-verwendet wird, wenn das Makro beim Laden der Klasse oder des Pakets
-\Package{scrextend} noch nicht definiert ist. Autoren von Wrapper-Klassen
-können dieses Makro abweichend definieren, um andere Schriftgrößendateien zu
-verwenden. Ebenso\textnote{Tipp!}  können Autoren von Wrapper-Klassen die
-\emph{fallback}-Lösung der berechneten Schriftgrößen dadurch ändern oder
-abschalten, dass sie das Makro
-\Macro{changefontsizes}\important{\Macro{changefontsizes}}, das als Argument
-die gewünschte \PName{Schriftgröße} erwartet, umdefinieren. Das
-Makro\textnote{Achtung!} \Macro{changefontsizes} ist jedoch nicht als
-Anweisung für den Aufruf durch Anwender konzipiert.%
-\EndIndexGroup
-
+\LoadNonFree{scrbookreportarticle-experts}{5}
 
 \begin{Declaration}
   \Macro{newkomafont}\OParameter{Warnung}\Parameter{Element}
@@ -483,8 +469,11 @@ deaktiviert.%
 \section{Zähler}
 \seclabel{counter}
 
-% TODO: Die entsprechenden Erklärungen für die Buchfassung an die Verwendung
-%       eines eigenen Abschnitts anpassen.
+Zähler sind bei \LaTeX{} eine durchaus komplexere Angelegenheit, als dies auf
+den ersten Blick erscheinen mag. Das gilt insbesondere, wenn die
+Referenzierung von Zählern über \Macro{refstepcounter}, \Macro{label} und
+\Macro{ref} mit betrachtet wird.
+
 \LoadNonFree{scrbookreportarticle-experts}{3}
 
 \section{Gliederung}
@@ -513,6 +502,22 @@ unabhängigen Eigenschaften, die
 es auch Eigenschaften, die vom jeweiligen Stil abhängig sind. Derzeit stehen
 die folgenden Stile zur Verfügung:
 \begin{description}\setkomafont{descriptionlabel}{}
+\item[\PValue{part}] \ChangedAt{v3.18}{\Class{scrbook}\and
+    \Class{scrreprt}\and \Class{scrartcl}}ist der
+  Stil\textnote{Gliederungsstil
+    \PValue{part}}\Index{Gliederung>Stil>~\PValue{part}} für
+  Teileüberschriften. Dieser Stil wird in der Voreinstellung für
+  \DescRef{maincls.cmd.part}\IndexCmd{part} und indirekt für
+  \DescRef{maincls.cmd.addpart}\IndexCmd{addpart} verwendet. Neue
+  Überschriften in diesem Stil können definiert werden, haben dann aber nicht
+  automatisch auch eine \Macro{add\dots}-Variante. Für die Konfiguration der
+  vorhandenen oder neuer Überschriften stehen zusätzlich die Eigenschaften aus
+  \autoref{tab:maincls-experts.declarepartstyle.keys},
+  \autopageref{tab:maincls-experts.declarepartstyle.keys} zur
+  Verfügung. Die\textnote{Achtung!} Anweisung \DescRef{maincls.cmd.addpart}
+  wird ebenso wie die Sternformen automatisch zusammen mit
+  \DescRef{maincls.cmd.part} umkonfiguriert und kann nicht unabhängig davon
+  verändert werden.
 \item[\PValue{chapter}] \ChangedAt{v3.18}{\Class{scrbook}\and
     \Class{scrreprt}}ist der Stil\textnote{Gliederungsstil
     \PValue{chapter}}\Index{Gliederung>Stil>~\PValue{chapter}} für
@@ -530,22 +535,6 @@ die folgenden Stile zur Verfügung:
   verändert werden. Es ist zu beachten, dass dieser Stil von
   \Class{scrartcl}\OnlyAt{\Class{scrbook}\and \Class{scrreprt}} nicht
   bereitgestellt wird.
-\item[\PValue{part}] \ChangedAt{v3.18}{\Class{scrbook}\and
-    \Class{scrreprt}\and \Class{scrartcl}}ist der
-  Stil\textnote{Gliederungsstil
-    \PValue{part}}\Index{Gliederung>Stil>~\PValue{part}} für
-  Teileüberschriften. Dieser Stil wird in der Voreinstellung für
-  \DescRef{maincls.cmd.part}\IndexCmd{part} und indirekt für
-  \DescRef{maincls.cmd.addpart}\IndexCmd{addpart} verwendet. Neue
-  Überschriften in diesem Stil können definiert werden, haben dann aber nicht
-  automatisch auch eine \Macro{add\dots}-Variante. Für die Konfiguration der
-  vorhandenen oder neuer Überschriften stehen zusätzlich die Eigenschaften aus
-  \autoref{tab:maincls-experts.declarepartstyle.keys},
-  \autopageref{tab:maincls-experts.declarepartstyle.keys} zur
-  Verfügung. Die\textnote{Achtung!} Anweisung \DescRef{maincls.cmd.addpart}
-  wird ebenso wie die Sternformen automatisch zusammen mit
-  \DescRef{maincls.cmd.part} umkonfiguriert und kann nicht unabhängig davon
-  verändert werden.
 \item[\PValue{section}] ist der Stil\textnote{Gliederungsstil
     \PValue{section}}\Index{Gliederung>Stil>~\PValue{section}} für
   Abschnittsüberschriften und tieferer Ebenen. Dieser Stil wird derzeit sowohl
@@ -572,12 +561,19 @@ die folgenden Stile zur Verfügung:
   Sternformen zusammen mit \DescRef{maincls.cmd.section} umkonfiguriert und
   kann nicht unabhängig davon verändert werden.
 \end{description}
-Bei der Definition eines Gliederungsbefehls wird ein gleichnamiges Element
+
+\BeginIndexGroup%
+\BeginIndex{FontElement}{\PName{Gliederungsebene}}%
+\BeginIndex{FontElement}{\PName{Gliederungsebene}prefix}%
+Bei der Definition eines Gliederungsbefehls wird ein gleichnamiges
+Element\textnote{Elemente}%
+\Index{Element=\UseIndex {gen}\protect\GuideFontElement} % Getrickst!
 angelegt, falls es noch nicht existiert. Bei \PValue{chapter} und
 \PValue{part} werden ebenso Elemente für die Präfixzeile erzeugt. Die
 Schrifteinstellung der Elemente kann mit \DescRef{maincls.cmd.setkomafont} und
 \DescRef{maincls.cmd.addtokomafont} (siehe \autoref{sec:maincls.textmarkup},
-\DescPageRef{maincls.cmd.setkomafont}) geändert werden.
+\DescPageRef{maincls.cmd.setkomafont}) geändert werden.%
+\EndIndexGroup
 
 \begin{table}
   \caption[{Stil unabhängige Eigenschaften bei der Deklaration von
@@ -665,139 +661,6 @@ Schrifteinstellung der Elemente kann mit \DescRef{maincls.cmd.setkomafont} und
 \end{table}
 
 \begin{table}
-  \caption[{Eigenschaften des Stils \PValue{section} bei der Deklaration von
-    Gliederungsbefehlen}]{Zusätzliche \PName{Schlüssel} und \PName{Werte} für
-    die \PName{Eigenschaften} bei der Deklaration von Gliederungsbefehlen des
-    Stils \PValue{section}\Index{Gliederung>Stil>~\PValue{section}}}%
-  \label{tab:maincls-experts.declaresectionstyle.keys}%
-  \begin{tabularx}{\linewidth}{llX}
-    \toprule
-    \PName{Schlüssel} & \PName{Wert} & Bedeutung \\
-    \midrule
-    \PValue{afterindent}%
-    \ChangedAt{v3.26}{\Class{scrbook}\and \Class{scrreprt}\and
-      \Class{scrartcl}}%
-    & \PName{Schalter}
-    & Es wird bestimmt, ob auf die erste Zeile nach einer freistehenden
-      Überschrift (siehe \PValue{runin}) der aktuelle Absatzeinzug angewendet
-      wird. Bei der Voreinstellung \PValue{bysign} bestimmt das Vorzeichen von
-      \PValue{beforeskip} das Verhalten. Ein negativer Wert für
-      \PValue{beforeskip} bewirkt dann, dass der Absatzeinzug entfällt. Mit
-      den Werten für einfache Schalter (siehe \autoref{tab:truefalseswitch},
-      \autopageref{tab:truefalseswitch}) kann die Anwendung des aktuellen
-      Absatzeinzugs explizit aktiviert oder deaktiviert werden.\\
-    \PValue{afterskip}
-    & \PName{Länge}
-    & Im Fall einer Spitzmarke (siehe \PValue{runin}) ist der Betrag der
-      \PName{Länge} der horizontale Abstand nach der Überschrift. Es
-      wird in diesem Fall also immer ein positiver Abstand eingefügt. Im Fall
-      einer freistehenden Überschrift ist \PName{Länge} der vertikale Abstand
-      nach der Überschrift. Ist \OptionValue{runin}{bysign}, so
-      führt ein positiver Wert zu einer freistehenden Überschrift, während
-      ein negativer Wert oder Null zu einer Spitzmarke führt.\\
-    \PValue{beforeskip}
-    & \PName{Länge}
-    & Gibt den vertikalen Abstand vor der Überschrift an. Ist
-      \OptionValue{afterindent}{bysign}, so wird für den Abstand der Betrag
-      von \PName{Länge} verwendet, es wird also trotzdem ein positiver
-      Abstand eingefügt. Negative Werte bedeuten in diesem Fall, dass ein
-      Absatzeinzug nach der Überschrift entfällt.\\
-    \PValue{font}
-    & \PName{Befehle}
-    & Die Schrifteinstellungen, die zusätzlich zum Element
-      \DescRef{maincls.fontelement.disposition} bei der Ausgabe der
-      Überschrift verwendet werden sollen. Hier sind alle \PName{Befehle}
-      erlaubt, die auch über \DescRef{maincls.cmd.setkomafont} und
-      \DescRef{maincls.cmd.addtokomafont} für das Element des
-      Gliederungsbefehls erlaubt sind.\\
-    \PValue{indent}
-    & \PName{Länge}
-    & Einzug vom linken Rand vor der Ausgabe der Nummer und des Textes
-      der Überschrift.\\
-    \PValue{runin}%
-    \ChangedAt{v3.26}{\Class{scrbook}\and \Class{scrreprt}\and
-      \Class{scrartcl}}%
-    & \PName{Schalter}
-    & Es wird bestimmt, ob die Überschrift als Spitzmarke\iffree{ (am
-        Zeilenanfang)}{} oder freistehend gesetzt wird. \iffree{}{Bei einer
-        Spitzmarke schließt sich der nachfolgende Text direkt an die
-        Überschrift an, während bei einer freistehenden Überschrift erst noch
-        ein Absatz und ein vertikaler Abstand (siehe \PValue{afterskip})
-        folgt. }%
-      Bei der Voreinstellung \PValue{bysign} bestimmt das Vorzeichen von
-      \PValue{afterskip} das Verhalten. Ein positiver Wert für
-      \PValue{afterskip} bewirkt dann eine freistehende Überschrift.
-      Darüber hinaus kann mit den Werten für einfache Schalter (siehe
-      \autoref{tab:truefalseswitch}, \autopageref{tab:truefalseswitch})
-      eine Spitzmarke explizit aktiviert oder deaktiviert werden.\\
-    \bottomrule
-  \end{tabularx}
-\end{table}
-
-\begin{table}
-  \caption[{Eigenschaften des Stils \PValue{chapter} bei der Konfiguration von
-    Gliederungsbefehlen}]{Zusätzliche \PName{Schlüssel} und \PName{Werte} für
-    die \PName{Eigenschaften} bei der Konfiguration von Gliederungsbefehlen des
-    Stils \PValue{chapter}\Index{Gliederung>Stil>~\PValue{chapter}}}%
-  \label{tab:maincls-experts.declarechapterstyle.keys}%
-  \begin{tabularx}{\linewidth}{llX}
-    \toprule
-    \PName{Schlüssel} & \PName{Wert} & Bedeutung \\
-    \midrule
-    \PValue{afterindent}%
-    \ChangedAt{v3.26}{\Class{scrbook}\and \Class{scrreprt}}%
-    & \PName{Schalter}
-    & Es wird bestimmt, ob auf die erste Zeile nach der Überschrift der
-      aktuelle Absatzeinzug angewendet wird. Bei der Voreinstellung
-      \PValue{bysign} bestimmt das Vorzeichen von \PValue{beforeskip} das
-      Verhalten. Ein negativer Wert für \PValue{beforeskip} bewirkt dann, dass
-      der Absatzeinzug entfällt. Mit den Werten für einfache Schalter (siehe
-      \autoref{tab:truefalseswitch}, \autopageref{tab:truefalseswitch}) kann
-      die Anwendung des aktuellen Absatzeinzugs explizit aktiviert oder
-      deaktiviert werden.\\
-    \PValue{afterskip}%
-    \ChangedAt{v3.26}{\Class{scrbook}\and \Class{scrreprt}}%
-    & \PName{Länge}
-    & Gibt den vertikalen Abstand nach der Überschrift an.\\
-    \PValue{beforeskip}
-    & \PName{Länge}
-    & Gibt den vertikalen Abstand vor der Überschrift an. Ist
-      \OptionValue{afterindent}{bysign}, so wird für den Abstand der Betrag
-      von \PName{Länge} verwendet, es wird also trotzdem ein positiver
-      Abstand eingefügt. Negative Werte bedeuten in diesem Fall, dass ein
-      Absatzeinzug nach der Überschrift entfällt.\\
-    \PValue{font}
-    & \PName{Befehle}
-    & Die Schrifteinstellungen, die zusätzlich zum Element
-      \DescRef{maincls.fontelement.disposition} bei der Ausgabe der
-      Überschrift verwendet werden sollen. Hier sind alle \PName{Befehle}
-      erlaubt, die auch über \DescRef{maincls.cmd.setkomafont} und 
-      \DescRef{maincls.cmd.addtokomafont} für das Element des
-      Gliederungsbefehls erlaubt sind.\\
-    \PValue{innerskip}
-    & \PName{Länge}
-    & Der vertikale Abstand zwischen Präfixzeile und Text der
-      Überschrift, falls eine Präfixzeile verwendet wird.\\
-    \PValue{pagestyle}
-    & \PName{Seitenstil}
-    & Der Name des Seitenstils, der für die Seite mit der Überschrift
-      verwendet werden soll. Es findet keine Überprüfung statt, ob der
-      angegebene \PName{Seitenstil} gültig ist. Fehlerhafte Angaben führen
-      daher zu Fehlermeldungen bei Verwendung des Gliederungsbefehls.\\
-    \PValue{prefixfont}
-    & \PName{Befehle}
-    & Die Schrifteinstellungen, die zusätzlich zum Element
-      \DescRef{maincls.fontelement.disposition} und dem Element des
-      Gliederungsbefehls bei der Ausgabe einer Präfixzeile in der Überschrift
-      verwendet werden sollen. Hier sind alle \PName{Befehle} erlaubt, die
-      auch über \DescRef{maincls.cmd.setkomafont} und 
-      \DescRef{maincls.cmd.addtokomafont}für das Element der Präfixzeile des
-      Gliederungsbefehls erlaubt sind.\\    
-    \bottomrule
-  \end{tabularx}
-\end{table}
-
-\begin{table}
   \caption[{Eigenschaften des Stils \PValue{part} bei der Konfiguration von
     Gliederungsbefehlen}]{Zusätzliche \PName{Schlüssel} und \PName{Werte} für
     die \PName{Eigenschaften} bei der Konfiguration von Gliederungsbefehlen des
@@ -868,24 +731,158 @@ Schrifteinstellung der Elemente kann mit \DescRef{maincls.cmd.setkomafont} und
   \end{tabularx}
 \end{table}
 
-\Macro{DeclareNewSectionCommand} dient der Definition eines neuen
-Gliederungsbefehls. Ist derselbe \PName{Name} von \TeX{} bereits anderweitig
-belegt, so wird ein Fehler ausgegeben und es findet keine Umdefinierung
-statt.
+\begin{table}
+  \caption[{Eigenschaften des Stils \PValue{chapter} bei der Konfiguration von
+    Gliederungsbefehlen}]{Zusätzliche \PName{Schlüssel} und \PName{Werte} für
+    die \PName{Eigenschaften} bei der Konfiguration von Gliederungsbefehlen des
+    Stils \PValue{chapter}\Index{Gliederung>Stil>~\PValue{chapter}}}%
+  \label{tab:maincls-experts.declarechapterstyle.keys}%
+  \begin{tabularx}{\linewidth}{llX}
+    \toprule
+    \PName{Schlüssel} & \PName{Wert} & Bedeutung \\
+    \midrule
+    \PValue{afterindent}%
+    \ChangedAt{v3.26}{\Class{scrbook}\and \Class{scrreprt}}%
+    & \PName{Schalter}
+    & Es wird bestimmt, ob auf die erste Zeile nach der Überschrift der
+      aktuelle Absatzeinzug angewendet wird. Bei der Voreinstellung
+      \PValue{bysign} bestimmt das Vorzeichen von \PValue{beforeskip} das
+      Verhalten. Ein negativer Wert für \PValue{beforeskip} bewirkt dann, dass
+      der Absatzeinzug entfällt. Mit den Werten für einfache Schalter (siehe
+      \autoref{tab:truefalseswitch}, \autopageref{tab:truefalseswitch}) kann
+      die Anwendung des aktuellen Absatzeinzugs explizit aktiviert oder
+      deaktiviert werden.\\
+    \PValue{afterskip}%
+    \ChangedAt{v3.26}{\Class{scrbook}\and \Class{scrreprt}}%
+    & \PName{Länge}
+    & Gibt den vertikalen Abstand nach der Überschrift an.\\
+    \PValue{beforeskip}
+    & \PName{Länge}
+    & Gibt den vertikalen Abstand vor der Überschrift an. Ist
+      \OptionValue{afterindent}{bysign}, so wird für den Abstand der Betrag
+      von \PName{Länge} verwendet, es wird also trotzdem ein positiver
+      Abstand eingefügt. Negative Werte bedeuten in diesem Fall, dass ein
+      Absatzeinzug nach der Überschrift entfällt.\\
+    \PValue{font}
+    & \PName{Befehle}
+    & Die Schrifteinstellungen, die zusätzlich zum Element
+      \DescRef{maincls.fontelement.disposition} bei der Ausgabe der
+      Überschrift verwendet werden sollen. Hier sind alle \PName{Befehle}
+      erlaubt, die auch über \DescRef{maincls.cmd.setkomafont} und 
+      \DescRef{maincls.cmd.addtokomafont} für das Element des
+      Gliederungsbefehls erlaubt sind.\\
+    \PValue{innerskip}
+    & \PName{Länge}
+    & Der vertikale Abstand zwischen Präfixzeile und Text der
+      Überschrift, falls eine Präfixzeile verwendet wird.\\
+    \PValue{pagestyle}
+    & \PName{Seitenstil}
+    & Der Name des Seitenstils, der für die Seite mit der Überschrift
+      verwendet werden soll. Es findet keine Überprüfung statt, ob der
+      angegebene \PName{Seitenstil} gültig ist. Fehlerhafte Angaben führen
+      daher zu Fehlermeldungen bei Verwendung des Gliederungsbefehls.\\
+    \PValue{prefixfont}
+    & \PName{Befehle}
+    & Die Schrifteinstellungen, die zusätzlich zum Element
+      \DescRef{maincls.fontelement.disposition} und dem Element des
+      Gliederungsbefehls bei der Ausgabe einer Präfixzeile in der Überschrift
+      verwendet werden sollen. Hier sind alle \PName{Befehle} erlaubt, die
+      auch über \DescRef{maincls.cmd.setkomafont} und 
+      \DescRef{maincls.cmd.addtokomafont}für das Element der Präfixzeile des
+      Gliederungsbefehls erlaubt sind.\\    
+    \bottomrule
+  \end{tabularx}
+\end{table}
 
-\Macro{ProvideSectionSommand} verhält sich ähnlich, gibt aber keine
-Fehlermeldung aus.
+\begin{table}
+  \caption[{Eigenschaften des Stils \PValue{section} bei der Deklaration von
+    Gliederungsbefehlen}]{Zusätzliche \PName{Schlüssel} und \PName{Werte} für
+    die \PName{Eigenschaften} bei der Deklaration von Gliederungsbefehlen des
+    Stils \PValue{section}\Index{Gliederung>Stil>~\PValue{section}}}%
+  \label{tab:maincls-experts.declaresectionstyle.keys}%
+  \begin{tabularx}{\linewidth}{llX}
+    \toprule
+    \PName{Schlüssel} & \PName{Wert} & Bedeutung \\
+    \midrule
+    \PValue{afterindent}%
+    \ChangedAt{v3.26}{\Class{scrbook}\and \Class{scrreprt}\and
+      \Class{scrartcl}}%
+    & \PName{Schalter}
+    & Es wird bestimmt, ob auf die erste Zeile nach einer freistehenden
+      Überschrift (siehe \PValue{runin}) der aktuelle Absatzeinzug angewendet
+      wird. Bei der Voreinstellung \PValue{bysign} bestimmt das Vorzeichen von
+      \PValue{beforeskip} das Verhalten. Ein negativer Wert für
+      \PValue{beforeskip} bewirkt dann, dass der Absatzeinzug entfällt. Mit
+      den Werten für einfache Schalter (siehe \autoref{tab:truefalseswitch},
+      \autopageref{tab:truefalseswitch}) kann die Anwendung des aktuellen
+      Absatzeinzugs explizit aktiviert oder deaktiviert werden.\\
+    \PValue{afterskip}
+    & \PName{Länge}
+    & Im Fall einer Spitzmarke (siehe \PValue{runin}) ist der Betrag der
+      \PName{Länge} der horizontale Abstand nach der Überschrift. Es
+      wird in diesem Fall also immer ein positiver Abstand eingefügt. Im Fall
+      einer freistehenden Überschrift ist \PName{Länge} der vertikale Abstand
+      nach der Überschrift. Ist \OptionValue{runin}{bysign}, so
+      führt ein positiver Wert zu einer freistehenden Überschrift, während
+      ein negativer Wert oder Null zu einer Spitzmarke führt.\\
+    \PValue{beforeskip}
+    & \PName{Länge}
+    & Gibt den vertikalen Abstand vor der Überschrift an. Ist
+      \OptionValue{afterindent}{bysign}, so wird für den Abstand der Betrag
+      von \PName{Länge} verwendet, es wird also trotzdem ein positiver
+      Abstand eingefügt. Negative Werte bedeuten in diesem Fall, dass ein
+      Absatzeinzug nach der Überschrift entfällt.\\
+    \PValue{font}
+    & \PName{Befehle}
+    & Die Schrifteinstellungen, die zusätzlich zum Element
+      \DescRef{maincls.fontelement.disposition} bei der Ausgabe der
+      Überschrift verwendet werden sollen. Hier sind alle \PName{Befehle}
+      erlaubt, die auch über \DescRef{maincls.cmd.setkomafont} und
+      \DescRef{maincls.cmd.addtokomafont} für das Element des
+      Gliederungsbefehls erlaubt sind.\\
+    \PValue{indent}
+    & \PName{Länge}
+    & Einzug vom linken Rand vor der Ausgabe der Nummer und des Textes
+      der Überschrift.\\
+    \PValue{runin}%
+    \ChangedAt{v3.26}{\Class{scrbook}\and \Class{scrreprt}\and
+      \Class{scrartcl}}%
+    & \PName{Schalter}
+    & Es wird bestimmt, ob die Überschrift als Spitzmarke\iffree{ (am
+        Zeilenanfang)}{} oder freistehend gesetzt wird. \iffree{}{Bei einer
+        Spitzmarke schließt sich der nachfolgende Text direkt an die
+        Überschrift an, während bei einer freistehenden Überschrift erst noch
+        ein Absatz und ein vertikaler Abstand (siehe \PValue{afterskip})
+        folgt. }%
+      Bei der Voreinstellung \PValue{bysign} bestimmt das Vorzeichen von
+      \PValue{afterskip} das Verhalten. Ein positiver Wert für
+      \PValue{afterskip} bewirkt dann eine freistehende Überschrift.
+      Darüber hinaus kann mit den Werten für einfache Schalter (siehe
+      \autoref{tab:truefalseswitch}, \autopageref{tab:truefalseswitch})
+      eine Spitzmarke explizit aktiviert oder deaktiviert werden.\\
+    \bottomrule
+  \end{tabularx}
+\end{table}
 
-\Macro{RedeclareSectionCommand} kann hingegen nur verwendet werden, um eine
-existierende Anweisung zu einem Gliederungsbefehl mit den angegebenen
-\PName{Eigenschaften} zu ändern. Dabei wird nicht überprüft, ob
+\Macro{DeclareNewSectionCommand}\textnote{Neudefinition} dient der Definition
+eines neuen Gliederungsbefehls. Ist derselbe \PName{Name} von \TeX{} bereits
+anderweitig belegt, so wird ein Fehler ausgegeben und es findet keine
+Umdefinierung statt.
+
+\Macro{ProvideSectionCommand}\textnote{bedingte Definition} verhält sich
+ähnlich, gibt aber keine Fehlermeldung aus, wenn der Gliederungsbefehl bereits
+existiert. Es findet dann nur keine Umdefinierung statt.
+
+\Macro{RedeclareSectionCommand}\textnote{Änderung} kann hingegen nur verwendet
+werden, um eine existierende Anweisung zu einem Gliederungsbefehl mit den
+angegebenen \PName{Eigenschaften} zu ändern. Dabei wird nicht überprüft, ob
 \Macro{\PName{Name}} bereits zuvor ein Gliederungsbefehl war. Es muss nur ein
 von \TeX{} bereits belegter \PName{Name} sein.
 
-Bei \Macro{DeclareSectionCommand} findet keinerlei Überprüfung statt, ob
-\PName{Name} von \TeX{} bereits anderweitig belegt ist. Stattdessen wird der
-Gliederungsbefehl \Macro{\PName{Name}} unbedingt entsprechend der angegebenen
-\PName{Eigenschaften} definiert.
+Bei \Macro{DeclareSectionCommand}\textnote{unbedingte Definition} findet
+keinerlei Überprüfung statt, ob \PName{Name} von \TeX{} bereits anderweitig
+belegt ist. Stattdessen wird der Gliederungsbefehl \Macro{\PName{Name}}
+unbedingt entsprechend der angegebenen \PName{Eigenschaften} definiert.
 
 Zu jeder Gliederungsanweisung gehört außerdem ein Zähler: \PName{Name}, der
 bei Bedarf von allen vier Befehlen mit \Macro{newcounter} neu angelegt
@@ -897,7 +894,7 @@ erwähnten Elemente: \FontElement{\PName{Name}} und gegebenenfalls
 \FontElement{\PName{Name}prefix}, die nummerische Gliederungsebene:
 \Macro{\PName{Name}numdepth}. Die Anweisung \Macro{\PName{Name}mark} wird
 gegebenenfalls so vordefiniert, dass kein Kolumnentitel erzeugt wird. Die
-Ausgabe des Zählers, \Macro{\PName{the}mark}, wird als arabische Zahl
+Ausgabe des Zählers, \Macro{the\PName{Name}}, wird als arabische Zahl
 vordefiniert. Wird über den \PName{Schlüssel} \PValue{counterwithin} der
 Zähler als von einem anderen Zähler abhängig definiert, so wird in der Ausgabe
 dieser andere Zähler mit einem Punkt getrennt vorangestellt.
@@ -945,9 +942,18 @@ Seite \autopageref{sec:tocbasic.tocstyle}.
   Abschnitts nach der Überschrift abgeschaltet. Obwohl eigentlich nach der
   Überschrift kein vertikaler Abstand gewünscht wird, wurde als Wert hier
   1\,sp angegeben. Der Grund ist einfach: Einen Wert von 0\,pt betrachtet
-  \LaTeX{} an dieser Stelle nicht als positiven Wert und erzeugt damit eine
-  Überschrift in der Form einer Spitzmarke. Der kleinste positive Wert ist
-  1\,sp.
+  \TeX{} nicht als positiven Wert und \Macro{RedeclareSectionCommand} erzeugt
+  damit unter Berücksichtigung der Voreinstellung \OptionValue{runin}{bysign}
+  eine Überschrift in der Form einer Spitzmarke. Der kleinste positive Wert
+  ist 1\,sp. Natürlich könnte man stattdessen auch explizit die Verwendung von
+  Spitzmarken aktivieren und dann wirklich einen Wert von 0\,pt einstellen:
+\begin{lstcode}
+  \RedeclareSectionCommand[%
+    beforeskip=-10pt,%
+    runin=true,%
+    afterskip=0pt%
+  ]{paragraph}
+\end{lstcode}
 
   In der Regel ist es für den vertikalen Ausgleich (siehe
   \DescRef{maincls.cmd.flushbottom}, \autoref{sec:maincls.typearea},
@@ -956,26 +962,38 @@ Seite \autopageref{sec:tocbasic.tocstyle}.
 \begin{lstcode}
   \RedeclareSectionCommand[%
     beforeskip=-10pt plus -2pt minus -1pt,%
-    afterskip=1sp plus -1sp minus 1sp%
+    runin=true,%
+    afterskip=0pt%
   ]{paragraph}
 \end{lstcode}
   Dabei ist zu beachten, dass natürlich auch der Leim bei der Anwendung als
   vertikaler Abstand das Vorzeichen wechselt, also bei \PValue{beforeskip} im
-  Beispiel negativ angegeben wird. Gleichzeitig wurde die Gelegenheit genutzt,
-  über den Leim bei \PValue{afterskip} dafür zu sorgen, dass der Abstand dort
-  gegebenenfalls tatsächlich bis auf 0 schrumpft.
+  Beispiel negativ angegeben wird. Auch diese Überlegung kann man sich jedoch
+  sparen, indem man den Erstzeileneinzug nach der Überschrift nicht über das
+  Vorzeichen von \Option{beforeskip} steuert, sondern über
+  \Option{afterindent}:
+\begin{lstcode}
+  \RedeclareSectionCommand[%
+    afterindent=false,%
+    beforeskip=10pt plus 2pt minus 1pt,%
+    runin=true,%
+    afterskip=0pt%
+  ]{paragraph}
+\end{lstcode}
 \end{Example}
 
-Dass im Beispiel nur die Schlüssel \PValue{beforeskip} und \PValue{afterskip}
-verwendet werden mussten, liegt daran, dass seit \KOMAScript{} 3.15
+Dass im Beispiel nur die Schlüssel verwendet werden mussten, deren Einstellung
+geändert werden soll, liegt daran, dass seit \KOMAScript{} 3.15
 \DescRef{maincls.cmd.paragraph} intern bereits mit
-\Macro{DeclareSectionCommand} definiert wird und daher die übrigen
-Einstellungen unverändert übernommen werden können. Die Originaldefinition von
-\DescRef{maincls.cmd.paragraph} entspricht bei \Class{scrartcl}:
+\Macro{DeclareSectionCommand} definiert wird. Alle anderen Einstellungen
+aus der Originaldefinition bleiben so enthalten. Bei
+\Class{scrartcl}\OnlyAt{scrartcl} entspräche dies der Definition:
 \begin{lstcode}
   \DeclareSectionCommand[%
     level=4,
     indent=0pt,
+    afterindent=bysign,
+    runin=bysign,
     beforeskip=3.25ex plus 1ex minus .2ex,
     afterskip=-1em,
     font={},
@@ -984,24 +1002,8 @@ Einstellungen unverändert übernommen werden können. Die Originaldefinition vo
     counterwithin=subsubsection
   ]{paragraph}
 \end{lstcode}
-Bei \Class{scrreprt} und \Class{scrbook} werden teilweise abweichende Werte
-verwendet.
 
-Für \DescRef{maincls.cmd.chapter} sind einige Einstellungen für die
-Überschriften von Option \DescRef{maincls.option.headings} (siehe
-\autoref{sec:maincls.structure}, \DescPageRef{maincls.option.headings})
-abhängig. Diese abhängigen Einstellungen sind in
-\autoref{tab:maincls.chapter.skips} zu finden. Eine Übersicht über alle
-Voreinstellungen bietet \autoref{tab:maincls.section.defaults}. Es ist zu
-beachten, dass dabei \PValue{1ex} und \Length{baselineskip} von der
-voreingestellten Größe der Überschrift beziehungsweise des
-Inhaltsverzeichniseintrags abhängig sind. Weitere
-Voreinstellungen\ChangedAt[2016/03]{v3.20}{\Class{scrbook}\and
-  \Class{scrreprt}\and \Class{scrartcl}} für die Stile der Verzeichniseinträge
-sind \autoref{sec:tocbasic.tocstyle}%
-\important{\hyperref[cha:tocbasic]{\Package{tocbasic}}} ab
-\autopageref{sec:tocbasic.tocstyle} zu entnehmen.
-
+% Umbruchkorrektur: Tabelle verschoben
 \begin{table}
   %\centering
   \KOMAoptions{captions=topbeside}%
@@ -1058,7 +1060,28 @@ sind \autoref{sec:tocbasic.tocstyle}%
   \end{captionbeside}
 \end{table}
 
-%begin{table}
+Die Werte für \Class{scrreprt} und \Class{scrbook}\OnlyAt{\Class{scrbook}\and
+  \Class{scrreprt}} weichen teilweise ab.  Für \DescRef{maincls.cmd.chapter}
+sind einige Einstellungen für die Überschriften von Option
+\DescRef{maincls.option.headings} (siehe \autoref{sec:maincls.structure},
+\DescPageRef{maincls.option.headings}) abhängig. Diese abhängigen
+Einstellungen sind in \autoref{tab:maincls.chapter.skips} zu finden. Eine
+Übersicht über alle Voreinstellungen bietet
+\autoref{tab:maincls.section.defaults}. Es ist zu beachten, dass dabei
+\PValue{1ex} und \Length{baselineskip} von der voreingestellten Größe der
+Überschrift beziehungsweise des Inhaltsverzeichniseintrags abhängig
+sind. Weitere Voreinstellungen\ChangedAt[2016/03]{v3.20}{\Class{scrbook}\and
+  \Class{scrreprt}\and \Class{scrartcl}} für die Stile der Verzeichniseinträge
+sind \autoref{sec:tocbasic.tocstyle}%
+\important{\hyperref[cha:tocbasic]{\Package{tocbasic}}} ab
+\autopageref{sec:tocbasic.tocstyle} zu entnehmen.
+
+Das in den Einstellungen für \DescRef{maincls.cmd.subparagraph} verwendete
+interne Makro \Macro{scr@parindent} ist übrigens, der per Option
+\DescRef{maincls.option.parskip} oder Befehl
+\DescRef{maincls-experts.cmd.setparsizes} eingestellte Absatzeinzug.%
+% Umbruchkorrektur: longtable verschoben
+% begin{table}
 % \centering
   \begin{longtable}{@{}p{\columnwidth}@{}}
     \caption{Voreinstellungen für die Formatierung der Überschriften von
@@ -1217,10 +1240,6 @@ sind \autoref{sec:tocbasic.tocstyle}%
     \end{tabularx}
   \end{longtable}
 %end{table}
-Das in den Einstellungen für \DescRef{maincls.cmd.subparagraph} verwendete
-interne Makro \Macro{scr@parindent} ist übrigens, der per Option
-\DescRef{maincls.option.parskip} oder Befehl
-\DescRef{maincls-experts.cmd.setparsizes} eingestellte Absatzeinzug.%
 \EndIndexGroup
 
 
@@ -1239,27 +1258,26 @@ Diese\ChangedAt{v3.15}{\Class{scrbook}\and \Class{scrreprt}\and
 Gliederungsbefehlen definieren oder ändern. Dabei ist \PName{Namensliste} eine
 durch Komma separierte Liste von Namen der Gliederungsbefehle.
 
-Diese Anweisungen unterscheiden sich in zwei weiteren Punkten von den zuvor
+Die Befehle unterscheiden sich in zwei weiteren Punkten von den zuvor
 erklärten Anweisungen zur Definition oder Änderung eines einzelnen
-Gliederungsbefehls. Zum einen wird im Fehlerfall, also wenn eine Anweisung bei
-\Macro{DeclareNewSectionCommands} bereits zuvor existierte oder bei
-\Macro{RedeclareSectionCommands} noch nicht existierte, die Definition dennoch
-vorgenommen. Ein entsprechender Fehler wird natürlich trotzdem gemeldet.
-
-Zum anderen gibt es eine weitere Einstellung,
+Gliederungsbefehls. Zum einen wird im Fehlerfall\textnote{Fehlerbehandlung},
+also wenn eine Anweisung bei \Macro{DeclareNewSectionCommands} bereits zuvor
+existierte oder bei \Macro{RedeclareSectionCommands} noch nicht existierte,
+die Definition dennoch vorgenommen. Ein entsprechender Fehler wird natürlich
+trotzdem gemeldet.  Zum anderen gibt es eine weitere Einstellung:
 \important{\PValue{increaselevel}}\OptionVName{increaselevel}{Ganzzahl}.
 Damit ändert sich die Bedeutung von \PValue{level} und \PValue{toclevel}
 (siehe \autoref{tab:maincls-experts.declaresection.keys},
 \autopageref{tab:maincls-experts.declaresection.keys}) dahingehend, dass deren
 Werte lediglich als \PName{Einstellungen} des ersten Gliederungsbefehls aus
-der \PName{Namensliste} dienen. Für alle weiteren Gliederungsbefehle werden die
-Werte von \PValue{level} und \PValue{toclevel} um den Wert von
+der \PName{Namensliste} dienen. Für alle weiteren Gliederungsbefehle werden
+die Werte von \PValue{level} und \PValue{toclevel} um den Wert von
 \PValue{increaselevel} erhöht. Wurde die Einstellung \PValue{increaselevel}
 ohne Wertzuweisung verwendet, so wird der Wert 1 angenommen.%
 \EndIndexGroup
 
 
-\begin{Declaration}
+\begin{Declaration}[0]
   \Macro{IfSectionCommandStyleIs}\Parameter{Name}\Parameter{Stil}
   \Parameter{Dann-Code}\Parameter{Sonst-Code}
 \end{Declaration}
@@ -1366,8 +1384,7 @@ definiert. Ihre\ChangedAt{v3.17}{\Class{scrbook}\and \Class{scrreprt}\and
     \null\vskip-\baselineskip\vskip\@tempskipa
   }
   \newcommand*{\partheadmidvskip}{%
-    \par\nobreak
-    \vskip\@tempskipa
+    \par\nobreak\vskip\@tempskipa
   }
   \newcommand*{\partheadendvskip}{%
     \vskip\@tempskipa\newpage
@@ -1427,11 +1444,9 @@ enthält also auch keine Formatierungsanweisungen.
 
 Vordefiniert ist die Anweisung mit:
 \begin{lstcode}
-  \newcommand{\partlineswithprefixformat}[3]{%
-    #2#3%
-  }
+  \newcommand{\partlineswithprefixformat}[3]{#2#3}
 \end{lstcode}
-bisher eher spartanisch.
+\iffalse bisher eher spartanisch.\fi% Umbruchkorrektur
 
 \begin{Example}
   Sie wollen die Teile-Überschriften in eine hellblaue Box mit blauer
@@ -1527,16 +1542,12 @@ ein komplett leeres Argument, enthält also auch keine
 Formatierungsanweisungen.
 
 Vordefiniert\textnote{Voreinstellung} sind die beiden Anweisungen mit:
-% Umbruchkorrektur bei Aufeinanderfolgen von Code und Beispiel
-\begin{lstcode}[belowskip=-1\dp\strutbox plus \dp\strutbox]
+\begin{lstcode}
   \newcommand{\chapterlinesformat}[3]{%
     \@hangfrom{#2}{#3}%
   }
-  \newcommand{\chapterlineswithprefixformat}[3]{%
-    #2#3%
-  }
+  \newcommand{\chapterlineswithprefixformat}[3]{#2#3}
 \end{lstcode}
-%bisher eher spartanisch.
 
 \begin{Example}
   Sie wollen Überschriften im Kapitelstil gelb hinterlegen. Für
@@ -1665,9 +1676,7 @@ Vordefiniert sind die beiden Anweisungen als:
 \newcommand{\sectionlinesformat}[4]{%
   \@hangfrom{\hskip #2#3}{#4}%
 }
-\newcommand{\sectioncatchphraseformat}[4]{%
-  \hskip #2#3#4%
-}
+\newcommand{\sectioncatchphraseformat}[4]{\hskip #2#3#4}
 \end{lstcode}
 
 Bei Umdefinierung einer der beiden Anweisungen ist wiederum der Anwender
@@ -1733,17 +1742,17 @@ Stil \PValue{section} zu unterscheiden.%
 \DoHook{heading/endgroup/\PName{Name}}%
 \end{Declaration}
 \BeginIndex{}{Haken}%
-Neben\ChangedAt[2019/01]{v3.27}{\Class{scrbook}\and \Class{scrreprt}\and
-  \Class{scrartcl}} den übrigen Einstellmöglichkeiten bieten sämtliche mit
+Abgesehen\ChangedAt[2019/01]{v3.27}{\Class{scrbook}\and \Class{scrreprt}\and
+  \Class{scrartcl}} von den übrigen Einstellmöglichkeiten bieten sämtliche mit
 \DescRef{\LabelBase.cmd.DeclareSectionCommand},
 \DescRef{\LabelBase.cmd.DeclareNewSectionCommand} und
-\DescRef{\LabelBase.cmd.ProvideSectionCommand} definierten oder mit
-\DescRef{\LabelBase.cmd.RedeclareSectionCommand} umdefinierten
+\DescRef{\LabelBase.cmd.ProvideSectionCommand} definierten und ebenso auch die
+mit \DescRef{\LabelBase.cmd.RedeclareSectionCommand} umdefinierten
 Gliederungsanweisungen eine ganze Reihe an Haken, die per
 \DescRef{scrbase.cmd.AddtoDoHook} manipuliert werden können. Zur
 Funktionsweise dieser \emph{do-hook} genannten Haken sei auf
-\autoref{sec:scrbase.hooks} ab \autopageref{sec:scrbase.hooks}
-verwiesen. Der letzte Teil des Spezifikators ist dabei der \PName{Name} der
+\autoref{sec:scrbase.hooks} ab \autopageref{sec:scrbase.hooks} verwiesen. Der
+letzte Teil des Spezifikators ist dabei der \PName{Name} der
 Gliederungsanweisung, wie er auch bei den oben genannten Befehlen als letztes
 Argument anzugeben ist.
 
@@ -1767,12 +1776,12 @@ Der\textnote{\DoHook{\dots/postinit/\dots}} Haken
 diesem Zeitpunkt wurden einige Einstellungen bereits vorgenommen und auch ein
 vorausgehender Absatz wurde bereits beendet.
 
-Von\textnote{\DoHook{\dots/branch/\dots}} den Haken
-\DoHook{heading/branch/nostar/\PName{Name}} oder
-\DoHook{heading/branch/star/\PName{Name}} wird jeweils nur einer ausgeführt,
-sobald feststeht, ob die Sternform oder die Normalform der
-Gliederungsanweisung ausgeführt wird. Zu diesem Zeitpunkt sind auch bereits
-vertikale Abstände über der jeweiligen Überschrift ausgeführt.
+Der Haken \textnote{\DoHook{\dots/branch/\dots}}
+\DoHook{heading/branch/nostar/\PName{Name}} wird ausgeführt, sobald feststeht,
+dass keine Sternform der Gliederungsanweisung vorliegt. Für die Sternform wird
+hingegen \DoHook{heading/branch/star/\PName{Name}} ausgeführt. Zu diesem
+Zeitpunkt sind gegebenenfalls auch bereits vertikale Abstände über der
+jeweiligen Überschrift eingefügt.
 
 Der\textnote{\DoHook{\dots/begingroup/\dots}} Haken
 \DoHook{heading/begingroup/\PName{Name}} wird am Anfang der Gruppe
@@ -1795,8 +1804,8 @@ genannten Haken daher auf diese Anweisung keine Anwendung finden.%
 \end{Declaration}
 Streng\ChangedAt{v3.27}{\Class{scrbook}\and \Class{scrreprt}\and
   \Class{scrartcl}} genommen handelt es sich hier um eine interne
-Anweisung. Sie ist nur innerhalb von Überschriften von Haken
-\DoHook{\dots/begingroup/\dots} bis \DoHook{\dots/endgroup/\dots}
+Anweisung. Sie ist nur innerhalb von Überschriften zwischen den beiden Haken
+\DoHook{\dots/begingroup/\dots} und \DoHook{\dots/endgroup/\dots}
 spezifiziert. In diesem Fall wird der \PName{Dann-Code} ausgeführt, wenn die
 aktuelle Überschrift gemäß Einstellung von
 \DescRef{maincls.counter.secnumdepth} und Aufgrund der Nichtverwendung einer
@@ -1837,23 +1846,24 @@ des \LaTeX-Kerns zu ersetzen:
 \begin{itemize}
 \item Statt
   \Macro{@startsection}\IndexCmd{@startsection}\important{\Macro{@startsection}}
-  wird von \KOMAScript{} \Macro{scr@startsection} verwendet. Die Definition
+  wird \Macro{scr@startsection} verwendet. Die Definition
   von \Macro{@startsection} wird jedoch geprüft. Entspricht diese beim Laden
-  der Klasse nicht den Erwartungen, so wird eine Warnung ausgegeben, diverse
+  der Klasse nicht den Erwartungen, so wird eine Warnung
+  ausgegeben, diverse
   Möglichkeiten von \KOMAScript{} werden deaktiviert und
   \Macro{scr@startsection} stützt sich auf eine Kopie von
-  \Macro{@startsection}, während \Macro{@startsection} selbst dann
+  \Macro{@startsection}, während \Macro{@startsection} selbst
   \Macro{scr@startsection} aufruft.
 \item Statt \Macro{@dblarg}\IndexCmd{@dblarg}\important{\Macro{@dblarg}} wird
-  in \KOMAScript{} von den Gliederungsbefehlen eine eigene, interne Anweisung
+  von den Gliederungsbefehlen eine eigene, interne Anweisung
   verwendet.
 \item Statt \Macro{secdef}\IndexCmd{secdef}\important{\Macro{secdef}} wird
-  von \KOMAScript{} \Macro{SecDef} verwendet, um die erwähnte Änderung
+  \Macro{SecDef} verwendet, um die erwähnte Änderung
   bezüglich \Macro{@dblarg} zu erreichen. Sollte die Definition von
   \Macro{secdef} nicht den Erwartungen entsprechen, wird eine Warnung
   ausgegeben.
 \item \Macro{@sect}\IndexCmd{@sect}\important{\Macro{@sect}} wird umdefiniert,
-  um diverse Erweiterungen von \KOMAScript{} zu realisieren.
+  um diverse Erweiterungen durch \KOMAScript{} zu realisieren.
 \item \Macro{@ssect}\IndexCmd{@ssect}\important{\Macro{@ssect}} wird
   umdefiniert, um diverse Erweiterungen von \KOMAScript{} zu realisieren.
 \item \Macro{@xsect}\IndexCmd{@xsect}\important{\Macro{@xsect}} wird
@@ -1886,20 +1896,20 @@ Als\ChangedAt[2019/01]{v3.27}{\Class{scrbook}\and \Class{scrreprt}\and
     \Macro{Before@sect}\Parameter{Code}
   \end{Declaration}
   Bis\ChangedAt[2019/01]{v3.27}{\Class{scrbook}\and \Class{scrreprt}\and
-    \Class{scrartcl}} \KOMAScript{}~v3.26b dienten diese Anweisungen ebenfalls
+    \Class{scrartcl}} \KOMAScript{}~3.26b dienten diese Anweisungen ebenfalls
   als Ersatz für die Umdefinierung von
   \DescRef{\LabelBase.cmd.scr@startsection} und
   \DescRef{\LabelBase.cmd.SecDef}. Seit\textnote{veraltete
-    \KOMAScript-Anweisungen} \KOMAScript~v3.27 gelten sie jedoch als veraltet.
+    \KOMAScript-Anweisungen} \KOMAScript~3.27 gelten sie jedoch als veraltet.
 
-  Intern wird \Macro{At@startsection} nun über den Haken
+  Intern wird \Macro{At@startsection} seit \KOMAScript~3.27 über den Haken
   \DescRef{\LabelBase.dohook.heading/postinit}
   realisiert. \Macro{Before@ssect} ist mit Hilfe von
-  \DescRef{\LabelBase.dohook.heading/branch/star} und \Macro{Before@sect} über
-  \DescRef{\LabelBase.dohook.heading/branch/nostar} implementiert. Der
+  \DescRef{\LabelBase.dohook.heading/branch/star} implementiert und
+  \Macro{Before@sect} über \DescRef{\LabelBase.dohook.heading/branch/nostar}.
   \PName{Code} wird den Haken per \DescRef{scrbase.cmd.AddtoDoHook}
-  hinzugefügt. Es ist nicht vorgesehen, einmal eingefügten Code wieder zu
-  entfernen.%
+  hinzugefügt. Es ist nicht vorgesehen, einmal eingefügten \PName{Code} wieder
+  zu entfernen.%
   \EndIndexGroup
 \end{Explain}
 
@@ -1969,6 +1979,8 @@ Kraft setzen, ohne es zu merken.
 \end{Example}%
 %
 \EndIndexGroup
+\ExampleEndFix
+
 
 \section{Literaturverzeichnis}
 \seclabel{bibliography}
@@ -2025,16 +2037,24 @@ Literaturverzeichnisses werden diese Anweisungen außerdem am Anfang und Ende
 jedes Teils, also unmittelbar vor und nach
 \DescRef{maincls.cmd.BreakBibliography} ausgeführt.
 
-Die Anweisungen \Macro{newblock}, \Macro{@openbib@code},
-\Macro{bib@beginhook} und \Macro{bib@endhook} werden bei der Verwendung eines
-neuen Literaturverzeichnisstils zunächst als leer definiert. Danach werden die
+Die Anweisungen \Macro{newblock}, \Macro{@openbib@code}, \Macro{bib@beginhook}
+und \Macro{bib@endhook} werden bei der Verwendung eines neuen
+Literaturverzeichnisstils zunächst als leer definiert. Danach werden die
 \PName{Anweisungen} des bei der Definition des Stils optional angegebenen
 Elternstils ausgeführt und dann erst die \PName{Anweisungen}, die bei
-Definition des neuen Stils angegeben wurden. Daraus ergibt sich auch, dass
-jede der vier Anweisungen innerhalb von \PName{Anweisung} bei Bedarf
+Definition des neuen Stils angegeben wurden. Daraus ergibt sich auch, %
+\iffalse % Umbruchkorrektur
+dass jede der vier Anweisungen innerhalb von \PName{Anweisung} bei Bedarf
 keinesfalls mit \Macro{newcommand}, sondern mit
 \Macro{renewcommand}\IndexCmd{renewcommand}\important{\Macro{renewcommand}}
-definiert werden sollte.
+definiert werden sollte.%
+\else%
+\enlargethispage{3pt}% Umbruchkorrektur (im Paar)
+dass die vier Anweisungen innerhalb von \PName{Anweisung} bei Bedarf mit
+\Macro{renewcommand}\IndexCmd{renewcommand}\important{\Macro{renewcommand}}
+umzudefinieren sind.%
+\par\enlargethispage{3pt}% Umbruchkorrektur (im Paar)
+\fi%
 
 Setzt der Anwender mit den Anweisungen
 \DescRef{maincls.cmd.AtEndBibliography}%\important[i]{\DescRef{maincls.cmd.AtEndBibliography}\\
