@@ -1,4 +1,4 @@
-% \CheckSum{243}
+% \CheckSum{273}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-variables.dtx
@@ -314,9 +314,28 @@
 %
 % \begin{macro}{\ifkomavar}
 % \changes{v3.03}{2009/03/04}{Neu}%^^A
-% Feststellen, ob eine \KOMAScript-Variable überhaupt definiert ist.
+% \changes{v3.28}{2019/11/15}{umbenannt in \cs{Ifkomavar}}%^^A
+% \begin{macro}{\Ifkomavar}
+% \changes{v3.28}{2019/11/15}{Neu aus Umbenennung von \cs{ifkomavar}}%^^A
+% Feststellen, ob eine \KOMAScript-Variable überhaupt definiert ist. Weil
+% einige Mitglieder des \LaTeX3-Teams sich beschwert haben, dass trotz fehlens
+% einer eindeutigen Empfehlung, \KOMAScript{} \LaTeX-Verzweigungen mit
+% \cs{if\dots} definiert, statt dies \TeX-Verzweigungen vorzubehalten, habe
+% ich das hier nach mehr zehn Jahren geändert. Sollte es öffentliche
+% Beschwerden dazu geben und Ulrike diese sehen, will sie übrigens darauf
+% antworten.
 %    \begin{macrocode}
-\DeclareRobustCommand*{\ifkomavar}[1]{%
+\newcommand*{\ifkomavar}{%
+%<package>  \PackageWarning{scrletter}{%
+%<class>  \ClassWarning{\KOMAClassName}{%
+    Usage of deprecated command `\string\ifkomavar`.\MessageBreak
+    The command has been renamed to because of a\MessageBreak
+    recommendation of LaTeX3 team members.\MessageBreak
+    Please replace `\string\ifkomavar` by `\string\Ifkomavar`%
+  }%
+  \Ifkomavar
+}
+\DeclareRobustCommand*{\Ifkomavar}[1]{%
   \scr@ifundefinedorrelax{scr@#1@var}{%
     \expandafter\@secondoftwo
   }{%
@@ -324,32 +343,53 @@
   }%
 }
 %    \end{macrocode}
-% \end{macro}
+% \end{macro}%^^A \Ifkomavar
+% \end{macro}%^^A \ifkomavar
 %
 % \begin{macro}{\ifkomavarempty}
 % \changes{v2.8q}{2002/01/14}{Neu}%^^A
 % \changes{v2.9i}{2002/09/04}{Leerzeichen rausgeworfen}%^^A
 % \changes{v2.9i}{2002/09/04}{robust}%^^A
 % \changes{v3.20}{2016/04/12}{\cs{@ifstar} durch \cs{kernel@ifstar}
-%     ersetzt}%^^A
+%   ersetzt}%^^A
+% \changes{v3.28}{2019/11/15}{umbenannt in \cs{Ifkomavar}}%^^A
+% \begin{macro}{\Ifkomavarempty}
+% \changes{v3.28}{2019/11/15}{Neu aus Umbenennung von \cs{ifkomavarempty}}%^^A
 % Es gibt auch noch ein Makro, um zu testen, ob eine \KOMAScript{}
 % Variable oder deren Name leer ist. Die Sternvariante ist wieder für
-% den Namen zuständig.
+% den Namen zuständig. Weil einige Mitglieder des \LaTeX3-Teams sich beschwert
+% haben, dass trotz fehlens einer eindeutigen Empfehlung, \KOMAScript{}
+% \LaTeX-Verzweigungen mit \cs{if\dots} definiert, statt dies
+% \TeX-Verzweigungen vorzubehalten, habe ich das hier nach mehr 17 Jahren
+% geändert. Sollte es öffentliche Beschwerden dazu geben und Ulrike diese
+% sehen, will sie übrigens darauf antworten.
 % \begin{macro}{\if@komavarempty}
 % \changes{v2.8q}{2002/01/14}{Neu}%^^A
 % \changes{v3.03}{2009/03/04}{die neue Anweisung \cs{ifkomavar} wird
-%     verwendet}
-% \changes{v3.03}{2009/03/04}{die Argumente werden nicht mehr direkt gelesen}%^^A
+%   verwendet}
+% \changes{v3.03}{2009/03/04}{die Argumente werden nicht mehr direkt
+%   gelesen}%^^A
+% \changes{v3.28}{2019/11/15}{\cs{ifkomavar} durch \cs{Ifkomavar} ersetzt}%^^A
 % Da mit einer Sternvariante gearbeitet wird, wird wieder ein
 % Hilfsmakro verwendet.
 %    \begin{macrocode}
-\DeclareRobustCommand*{\ifkomavarempty}{%
+\newcommand*{\ifkomavarempty}{%
+%<package>  \PackageWarning{scrletter}{%
+%<class>  \ClassWarning{\KOMAClassName}{%
+    Usage of deprecated command `\string\ifkomavarempty`.\MessageBreak
+    The command has been renamed to because of a\MessageBreak
+    recommendation of LaTeX3 team members.\MessageBreak
+    Please replace `\string\ifkomavarempty` by `\string\Ifkomavarempty`%
+  }%
+  \Ifkomavarempty
+}
+\DeclareRobustCommand*{\Ifkomavarempty}{%
   \begingroup
   \kernel@ifstar {\@tempswatrue\@ifkomavarempty}%
                  {\@tempswafalse\@ifkomavarempty}%
 }
 \newcommand{\@ifkomavarempty}[1]{%
-    \ifkomavar{#1}{%
+    \Ifkomavar{#1}{%
       \if@tempswa
         \@ifundefined{scr@#1@name}{%
           \aftergroup\@firstoftwo
@@ -374,8 +414,9 @@
   \endgroup
 }
 %    \end{macrocode}
-% \end{macro}
-% \end{macro}
+% \end{macro}%^^A \@ifkomavarempty
+% \end{macro}%^^A \Ifkomavarempty
+% \end{macro}%^^A \ifkomavarempty
 %
 % \selectlanguage{english}
 % \begin{macro}{\foreachkomavar}
@@ -399,6 +440,8 @@
 %
 % \begin{macro}{\foreachkomavarifempty}
 % \changes{v3.27}{2019/03/13}{new}%^^A
+% \changes{v3.28}{2019/11/15}{\cs{ifkomavarempty} durch \cs{Ifkomavarempty}
+%   ersetzt}%^^A
 % Same like \cs{foreachkomavar} but \texttt{\#2} is called only for empty
 % variables and \texttt{\#3} is called for non empty.
 %    \begin{macrocode}
@@ -407,7 +450,7 @@
     \scr@trim@spaces\reserved@a
     \ifx\reserved@a\@empty\else
       \edef\reserved@a{%
-        \noexpand\ifkomavarempty{\reserved@a}%
+        \noexpand\Ifkomavarempty{\reserved@a}%
         {\unexpanded{#2}{\reserved@a}}%
         {\unexpanded{#3}{\reserved@a}}%
       }\expandafter\reserved@a
@@ -419,6 +462,8 @@
 %
 % \begin{macro}{\foreachemptykomavar}
 % \changes{v3.27}{2019/03/13}{new}%^^A
+% \changes{v3.28}{2019/11/15}{\cs{ifkomavarempty} durch \cs{Ifkomavarempty}
+%   ersetzt}%^^A
 % Similar to \cs{foreachemptykomavar} with \texttt{\#3}=\cs{@gobble}.
 %    \begin{macrocode}
 \newcommand*{\foreachemptykomavar}[2]{%
@@ -426,7 +471,7 @@
     \scr@trim@spaces\reserved@a
     \ifx\reserved@a\@empty\else
       \edef\reserved@a{%
-        \noexpand\ifkomavarempty{\reserved@a}{\unexpanded{#2}{\reserved@a}}{}%
+        \noexpand\Ifkomavarempty{\reserved@a}{\unexpanded{#2}{\reserved@a}}{}%
       }\expandafter\reserved@a
     \fi
   }%
@@ -436,6 +481,8 @@
 %
 % \begin{macro}{\foreachnonemptykomavar}
 % \changes{v3.27}{2019/03/13}{new}%^^A
+% \changes{v3.28}{2019/11/15}{\cs{ifkomavarempty} durch \cs{Ifkomavarempty}
+%   ersetzt}%^^A
 % Similar to \cs{foreachemptykomavar} with \texttt{\#2}=\cs{@gobble}.
 %    \begin{macrocode}
 \newcommand*{\foreachnonemptykomavar}[2]{%
@@ -443,7 +490,7 @@
     \scr@trim@spaces\reserved@a
     \ifx\reserved@a\@empty\else
       \edef\reserved@a{%
-        \noexpand\ifkomavarempty{\reserved@a}{}{\unexpanded{#2}{\reserved@a}}%
+        \noexpand\Ifkomavarempty{\reserved@a}{}{\unexpanded{#2}{\reserved@a}}%
       }\expandafter\reserved@a
     \fi
   }%
