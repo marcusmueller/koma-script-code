@@ -741,8 +741,9 @@
 %
 % \begin{macro}{\automark}
 % \changes{v3.20}{2016/04/12}{\cs{@ifstar} durch \cs{kernel@ifstar}
-%     ersetzt}%^^A
+%   ersetzt}%^^A
 % \begin{macro}{\@automark}
+% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
 % This is the brain knot of the game! I'll try to explain, what I'm doing:
 % First of all the new starred version of \Macro{automark} doesn't reset the
 % mark commands. So it works cumulatively. This may be useful e.g. to have
@@ -753,8 +754,8 @@
   \kernel@ifstar{\@automark}{\manualmark\@automark}%
 }
 \newcommand*{\@automark}[2][]{%
-  \ifstr{#2}{}{%
-    \ifstr{#1}{}{%
+  \Ifstr{#2}{}{%
+    \Ifstr{#1}{}{%
 %    \end{macrocode}
 % \Macro{automark[]{}} or \Macro{automark{}} has been used. This will activate
 % the low level mark commands, but doesn't change the high level commands. It
@@ -770,7 +771,7 @@
       \automark@righthigh{#1}%
     }%
   }{%
-    \ifstr{#1}{}{%
+    \Ifstr{#1}{}{%
 %    \end{macrocode}
 % \Macro{automark[]{\dots}} or \Macro{automark{\dots}} has been used. This
 % will activate the low level mark commands and also set up either the left or
@@ -962,6 +963,7 @@
 % \end{macro}%^^A \automark
 %
 % \begin{macro}{\DeclareSectionNumberDepth}
+% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
 %   \begin{description}
 %   \item[\Parameter{string}:] the name of the section level, e.g.,
 %     part, chapter, section etc. (must be fully
@@ -986,7 +988,7 @@
   }{}%
   \begingroup
     \@tempswatrue
-    \def\@elt##1{\ifstr{#1}{##1}{\@tempswafalse}{}}%
+    \def\@elt##1{\Ifstr{#1}{##1}{\@tempswafalse}{}}%
     \scrlayer@level@list
     \if@tempswa
       \aftergroup\@firstofone
@@ -1904,7 +1906,8 @@
 % \begin{macro}{\ModifyLayer}
 % \changes{v3.14}{2014/10/20}{\cs{long}}%^^A
 % \changes{v0.9}{2014/08/31}{missing definition and reset of
-%     \cs{scr@current@layer} added}%^^A
+%   \cs{scr@current@layer} added}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
 % There are also two commands for declaration of layers, that haven't been
 % declared before, with or without error message for already declared layers,
 % and two commands for changing already declared layers, first one beginning
@@ -1948,7 +1951,7 @@
     \edef\reserved@a{%
       \unexpanded{%
         \FamilyExecuteOptions[.definelayer]{KOMAarg}{#1}%
-        \ifstr{\csname scr@l@#2@mode\endcsname}%
+        \Ifstr{\csname scr@l@#2@mode\endcsname}%
       }{\csname scr@l@#2@mode\endcsname}%
     }\reserved@a{}{%
       \PackageWarning{scrlayer}{%
@@ -2686,6 +2689,7 @@
 %   \textsf{multicol}}%^^A 
 % \changes{v3.24}{2017/05/22}{test for \cs{if@ps@singlespacing} added}%^^A
 % \changes{v3.26}{2018/08/29}{\cs{scr@trim@spaces} added}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
 % Needed, because of page style aliases. Same arguments like
 % \cs{DeclarePageStyleByLayers} but, \#1 is the name of the page style, \#2 is
 % the list of options and \#3 is still the list of layers.
@@ -2843,7 +2847,7 @@
   \@namedef{@ps@#1@layers}{}%
   \@for \reserved@a:=#3\do {%
     \scr@trim@spaces\reserved@a
-    \ifstr\reserved@a\@empty{}{%
+    \Ifstr\reserved@a\@empty{}{%
       \expandafter\@cons\csname @ps@#1@layers\endcsname{{\reserved@a}}%
     }%
   }%
@@ -3292,10 +3296,12 @@
 %
 % \begin{macro}{\AddLayersToPageStyle}
 % \changes{v3.26}{2018/08/29}{\cs{scr@trim@spaces} added}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
 % \begin{macro}{\AddLayersAtBeginOfPageStyle}
 % \begin{macro}{\AddLayersAtEndOfPageStyle}
 % \begin{macro}{\RemoveLayersFromPageStyle}
 % \changes{v3.26}{2018/08/29}{\cs{scr@trim@spaces} added}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
 %   \begin{description}
 %   \item[\Parameter{string}:] the name of the page style to be modified (must
 %     be expandable and result in a string).
@@ -3323,7 +3329,7 @@
   \IfLayerPageStyleExists{\reserved@b}{%
     \@for \reserved@a:=#2\do {%
       \scr@trim@spaces\reserved@a
-      \ifstr\reserved@a\@empty{}{%
+      \Ifstr\reserved@a\@empty{}{%
         \expandafter\@cons\csname @ps@\reserved@b @layers\endcsname
         {{\reserved@a}}%
       }%
@@ -3357,7 +3363,7 @@
   \IfLayerPageStyleExists{#1}{%
     \@for \reserved@a:=#2\do {%
       \scr@trim@spaces\reserved@a
-      \ifstr\reserved@a\@empty{}{%
+      \Ifstr\reserved@a\@empty{}{%
         \expandafter\remove@layer@from@page@style\expandafter{\reserved@a}%
         {\reserved@b}%
       }%
@@ -3369,6 +3375,7 @@
 %    \end{macrocode}
 % \begin{macro}{\remove@layer@from@page@style}
 % \changes{v0.9}{2014/07/25}{cleaning of layer list must be global}
+% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
 % Helper macro to remove exactly one layer (arg 1) from a page style (arg 2).
 %    \begin{macrocode}
 \newcommand*{\remove@layer@from@page@style}[2]{%
@@ -3376,7 +3383,7 @@
     \expandafter\let\expandafter\reserved@a\csname @ps@#2@layers\endcsname
     \expandafter\global\expandafter\let\csname @ps@#2@layers\endcsname\@empty
     \def\@elt##1{%
-      \ifstr{#1}{##1}{}{%
+      \Ifstr{#1}{##1}{}{%
         \expandafter\@cons\csname @ps@#2@layers\endcsname{{##1}}%
       }%
     }\reserved@a
@@ -3419,7 +3426,9 @@
 %
 % \begin{macro}{\AddLayersToPageStyleBeforeLayer}
 % \changes{v3.26}{2018/08/29}{\cs{scr@trim@spaces} added}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
 % \begin{macro}{\AddLayersToPageStyleAfterLayer}
+% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
 % \changes{v3.26}{2018/08/29}{\cs{scr@trim@spaces} added}%^^A
 %   \begin{description}
 %   \item[\Parameter{string}:] the name of the page style to be modified (must
@@ -3444,12 +3453,12 @@
       \csname @ps@\reserved@b @layers\endcsname
       \@namedef{@ps@\reserved@b @layers}{}%
       \def\@elt##1{%
-        \ifstr{##1}\@empty{}{%
+        \Ifstr{##1}\@empty{}{%
           \expandafter\@cons\csname @ps@\reserved@b @layers\endcsname{{##1}}%
-          \ifstr{##1}{#3}{%
+          \Ifstr{##1}{#3}{%
             \@for \reserved@a:=#2\do {%
               \scr@trim@spaces\reserved@a
-              \ifstr\reserved@a\@empty{}{%
+              \Ifstr\reserved@a\@empty{}{%
                 \expandafter\@cons\csname @ps@\reserved@b @layers\endcsname
                 {{\reserved@a}}%
               }%
@@ -3471,11 +3480,11 @@
       \csname @ps@\reserved@b @layers\endcsname
       \@namedef{@ps@\reserved@b @layers}{}%
       \def\@elt##1{%
-        \ifstr{##1}\@empty{}{%
-          \ifstr{##1}{#3}{%
+        \Ifstr{##1}\@empty{}{%
+          \Ifstr{##1}{#3}{%
             \@for \reserved@a:=#2\do {%
               \scr@trim@spaces\reserved@a
-              \ifstr\reserved@a\@empty{}{%
+              \Ifstr\reserved@a\@empty{}{%
                 \expandafter\@cons\csname @ps@\reserved@b @layers\endcsname
                 {{\reserved@a}}%
               }%
@@ -3497,6 +3506,7 @@
 %
 %
 % \begin{macro}{\UnifyLayersAtPageStyle}
+% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
 %   \begin{description}
 %   \item[\Parameter{string}:] the name of the page style to be unified (must
 %     be expandable and result in a string).
@@ -3512,7 +3522,7 @@
     \@namedef{@ps@\reserved@b @layers}{}%
     \begingroup
       \def\@elt##1{%
-        \ifstr{##1}\@empty{}{%
+        \Ifstr{##1}\@empty{}{%
           \remove@layer@from@page@style{##1}{\reserved@b}%
           \expandafter\@cons\csname @ps@\reserved@b @layers\endcsname{{##1}}%
         }%
@@ -3639,7 +3649,7 @@
 }
 \AfterPackage*{tagpdf}{%
   \providecommand*{\scrlayer@beginartifact}[1]{%
-    \ifstr{#1}{}{%
+    \Ifstr{#1}{}{%
       \tagmcbegin{artifact}%
     }{%
       \tagmcbegin{artifact=#1}%
@@ -3825,8 +3835,10 @@
 %
 % \begin{macro}{\IfLayerAtPageStyle}
 % \changes{v3.26}{2018/08/29}{\cs{scr@trim@spaces} added}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
 % \begin{macro}{\IfSomeLayersAtPageStyle}
 % \changes{v3.26}{2018/08/29}{\cs{scr@trim@spaces} added}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
 % \begin{macro}{\IfLayersAtPageStyle}
 %   \begin{description}
 %   \item[\Parameter{string}:] the name of the page style to be tested (must
@@ -3863,13 +3875,13 @@
     \begingroup
       \edef\reserved@a{\GetRealPageStyle{#1}}%
       \@tempswafalse
-      \ifstr{#2}{}{%
+      \Ifstr{#2}{}{%
         \expandafter\ifx\csname @ps@\reserved@a @layers\endcsname\@empty
           \@tempswatrue
         \fi
       }{%
         \expandafter\ForEachLayerOfPageStyle\expandafter{%
-          \reserved@a}{\ifstr{##1}{#2}{\aftergroup\@tempswatrue}{}}%
+          \reserved@a}{\Ifstr{##1}{#2}{\aftergroup\@tempswatrue}{}}%
       }%
       \if@tempswa \aftergroup\@firstoftwo \else \aftergroup\@secondoftwo \fi
     \expandafter\endgroup
@@ -3898,7 +3910,7 @@
   \IfLayerPageStyleExists{#1}{%
     \begingroup
       \@tempswatrue
-      \ifstr{#2}{}{%
+      \Ifstr{#2}{}{%
         \edef\reserved@a{\GetRealPageStyle{#1}}%
         \expandafter\ifx\csname @scr@\reserved@a @layers\endcsname\@empty \else
           \@tempswafalse
@@ -3925,6 +3937,7 @@
 %
 %
 % \begin{macro}{\DestroyRealLayerPageStyle}
+% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
 %   \begin{description}
 %   \item[\Parameter{string}:] name of the layer page style to be destroyed.
 %   \end{description}
@@ -3949,13 +3962,13 @@
     \expandafter\let\csname @ps@#1@nonfloatpagehook\endcsname\relax
     \expandafter\let\csname @ps@#1@layers\endcsname\relax
     \expandafter\let\csname ps@#1\endcsname\relax
-    \ifstr{\currentpagestyle}{#1}{%
+    \Ifstr{\currentpagestyle}{#1}{%
       \def\currentpagestyle{scrlayer@empty}%
       \let\@oddhead\@empty\let\@evenhead\@empty
       \let\@oddfoot\@empty\let\@evenfoot\@empty
     }{}%
     \if@specialpage
-      \ifstr{\@specialstyle}{#1}{%
+      \Ifstr{\@specialstyle}{#1}{%
         \global\let\@specialstyle\relax
         \global\@specialpagefalse
       }{}%
@@ -3982,6 +3995,7 @@
 %
 % \begin{macro}{\pagestyle}
 % \begin{macro}{\currentpagestyle}
+% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
 % We save the current page style. Note, that this doesn't work for special
 % page styles\footnote{Special page styles are set by
 % \Macro{thispagestyle}.} that hasn't been defined using
@@ -4016,7 +4030,7 @@
     \let\scrlayer@exec@after@pagestyle@hook\@gobble
     \def\ps@test{}%
     \pagestyle{test}%
-    \ifstr{\currentpagestyle}{test}{}{%
+    \Ifstr{\currentpagestyle}{test}{}{%
       \PackageError{scrlayer}{package incompatibility detected}{%
         Another package redefines \string\pagestyle\space incompatible with
         scrlayer.\MessageBreak

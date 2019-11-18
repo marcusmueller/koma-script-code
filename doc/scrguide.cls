@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2019/11/18 v1.22a internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2019/11/18 v1.22b internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -94,6 +94,7 @@
 %
 % \begin{macro}{\KOMAProvidesFile}
 % \begin{macro}{\@KOMAProvidesFile}
+% \changes{v1.22b}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
 %   Extended version of |\ProvidesFile|, that uses the date from the
 %   repository.
 %    \begin{macrocode}
@@ -104,7 +105,7 @@
 }
 \newcommand*{\@KOMAProvidesFile}{}
 \def\@KOMAProvidesFile#1[$#2: #3-#4-#5 #6$#7]{%
-  \ifstr{#2}{Date}{%
+  \Ifstr{#2}{Date}{%
     \ProvidesFile{#1}[#3/#4/#5 \detokenize{#6 #7}]\relax
   }{%
     \ClassError{scrguide}{missmatch repository date string}{%
@@ -255,7 +256,7 @@
 \newcommand*{\ThisCommonFile}{}%
 \newcommand*{\ThisCommonLabelBase}{}
 \newcommand*{\IfThisCommonLabelBase}[1]{%
-  \expandafter\ifstr\expandafter{\ThisCommonLabelBase}{#1}%
+  \expandafter\Ifstr\expandafter{\ThisCommonLabelBase}{#1}%
   \@firstoftwo\@secondoftwo
 }
 \newcommand*{\IfThisCommonLabelBaseOneOf}[1]{%
@@ -295,7 +296,7 @@
   \else \expandafter\@secondoftwo \fi
 }
 \newcommand*{\LoadCommonFile}[1]{%
-  \ifstr{\ThisCommonFile}{}{%
+  \Ifstr{\ThisCommonFile}{}{%
     \def\ThisCommonFile{#1}%
     \let\ThisCommonLabelBase\label@base
     \@ifundefined{CommonFile@\ThisCommonFile @LabelBase}{%
@@ -1236,9 +1237,10 @@
 %
 % \begin{macro}{\LabelBase}
 % \begin{macro}{\labelbase}
+% \changes{v1.22b}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
 %    \begin{macrocode}
 \newcommand*{\labelbase}[1]{%
-  \ifstr{\label@base@sec}{unknown}{}{%
+  \Ifstr{\label@base@sec}{unknown}{}{%
     \labelofbase[sec]{\label@base@sec.next}%
     \gdef\label@base@sec{}%
   }%
@@ -1607,11 +1609,12 @@
 % will be marked and these marks are referenced at a kind of index.
 %
 % \begin{macro}{\ChangedAt}
+% \changes{v1.22b}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
 %   Set the margin note and write an entry to the change log.\footnote{TODO:
 %     Don't use the glossary, use a file by my own.}
 %    \begin{macrocode}
 \providecommand*{\ChangedAt}[3][]{%
-  \ifstr{#1}{}{%
+  \Ifstr{#1}{}{%
     \marginnote{\tiny\fbox{\strut#2}}%
   }{%
     \def\reserved@a##1/##2\@nil{%
@@ -1629,8 +1632,8 @@
   }%
   \begingroup
     \let\@tempa\@empty
-    \ifstr{#2}{v2.9i}{\def\@tempa{v2.90i=}}{}%
-    \ifstr{#2}{v2.9t}{\def\@tempa{v2.90t=}}{}%
+    \Ifstr{#2}{v2.9i}{\def\@tempa{v2.90i=}}{}%
+    \Ifstr{#2}{v2.9t}{\def\@tempa{v2.90t=}}{}%
     \let\and\ignorespaces
     \def\Package##1{%
       \glossary{##1=\string\Package{##1}>\@tempa#2|indexrm}%
@@ -2545,6 +2548,7 @@ KOMAScript \endcsname
 %
 % \begin{macro}{\BeginIndex}
 % \begin{macro}{\EndIndex}
+% \changes{v1.22b}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
 %   Its also usefull to define index range entries. These have three
 %   arguments. First (optiona) argument is the page number style. Default of
 %   this parameter is \texttt{indexmain}. See |\Index| for more information
@@ -2629,9 +2633,9 @@ KOMAScript \endcsname
   \begingroup
     \@tempswatrue
     \def\do##1##2##3{%
-      \ifstr{#1}{##1}{%
-        \ifstr{#2}{##2}{%
-          \ifstr{\detokenize{#3}}{\detokenize{##3}}{}{\@tempswafalse}%
+      \Ifstr{#1}{##1}{%
+        \Ifstr{#2}{##2}{%
+          \Ifstr{\detokenize{#3}}{\detokenize{##3}}{}{\@tempswafalse}%
         }{\@tempswafalse}%
       }{\@tempswafalse}%
       \if@tempswa

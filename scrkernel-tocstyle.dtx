@@ -146,6 +146,7 @@
 %     \cs{numberline@postfix}}%^^A
 % \changes{v3.12}{2013/11/22}{use \cs{numberline@numberformat} only, if the
 %     argument expands to a non-empty string}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
 % Dieses Makro wird indirekt im Inhaltsverzeichnis verwendet und muss
 % umdefiniert werden, um Duden, 20.~Auflage, Regel~5 und Regel~6 zu
 % implementieren.
@@ -154,7 +155,7 @@
 \newcommand*{\scr@numberline}[1]{%
   \numberline@box{%
     \numberline@prefix
-    \ifstr{#1}{}{#1}{%
+    \Ifstr{#1}{}{#1}{%
       \numberline@numberformat{#1}%
     }%
     \numberline@postfix
@@ -205,12 +206,13 @@
 % \begin{macro}{\numberline@numberformat}
 % \changes{v3.06}{2010/05/18}{neu (intern)}%^^A
 % \changes{v3.12}{2013/11/22}{don't output anything, if argument expands to
-%     an empty string}%^^A
+%   an empty string}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
 % Das dient in der Voreinstellung dazu, Regel~5 und 6 aus der 20.~Auflage des
 % DUDENs umzusetzen.
 %    \begin{macrocode}
 \newcommand*{\numberline@numberformat}[1]{%
-  \ifstr{#1}{}{}{\numberline@numberprefix#1\numberline@numberpostfix}%
+  \Ifstr{#1}{}{}{\numberline@numberprefix#1\numberline@numberpostfix}%
 }
 %    \end{macrocode}
 % \begin{macro}{\numberline@numberprefix}
@@ -1553,10 +1555,11 @@
 % automatisch bestimmt werden. Zum einen wird für Sub-Ebenen die Elternebene
 % um eins erhöht verwendet, falls die Elternebene bereits definiert ist.
 % \changes{v3.21}{2016/06/09}{\cs{the} eingefügt}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
 %    \begin{macrocode}
 %<*tocline|toctext>
   \scr@ifundefinedorrelax{#1tocdepth}{%
-    \ifstrstart{#1}{sub}{%
+    \Ifstrstart{#1}{sub}{%
       \scr@ifundefinedorrelax{\scr@dte@nosub{#1}tocdepth}{}{%
         \expandafter\edef\csname #1tocdepth\endcsname{%
           \the\numexpr \noexpand\@nameuse{\scr@dte@nosub{#1}tocdepth}+\@ne\relax
@@ -1571,15 +1574,15 @@
 % Standardklassen und bei \KOMAScript{} zutreffen.
 %    \begin{macrocode}
   \@ifundefined{#1tocdepth}{%
-    \ifstr{#1}{part}{\@namedef{#1tocdepth}{-1}}{%
-      \ifstr{#1}{chapter}{\@namedef{#1tocdepth}{0}}{%
-        \ifstr{#1}{section}{\@namedef{#1tocdepth}{1}}{%
-          \ifstr{#1}{subsection}{\@namedef{#1tocdepth}{2}}{%
-            \ifstr{#1}{subsubsection}{\@namedef{#1tocdepth}{3}}{%
-              \ifstr{#1}{paragraph}{\@namedef{#1tocdepth}{4}}{%
-                \ifstr{#1}{subparagraph}{\@namedef{#1tocdepth}{5}}{%
-                  \ifstr{#1}{figure}{\@namedef{#1tocdepth}{1}}{%
-                    \ifstr{#1}{table}{\@namedef{#1tocdepth}{1}}{%
+    \Ifstr{#1}{part}{\@namedef{#1tocdepth}{-1}}{%
+      \Ifstr{#1}{chapter}{\@namedef{#1tocdepth}{0}}{%
+        \Ifstr{#1}{section}{\@namedef{#1tocdepth}{1}}{%
+          \Ifstr{#1}{subsection}{\@namedef{#1tocdepth}{2}}{%
+            \Ifstr{#1}{subsubsection}{\@namedef{#1tocdepth}{3}}{%
+              \Ifstr{#1}{paragraph}{\@namedef{#1tocdepth}{4}}{%
+                \Ifstr{#1}{subparagraph}{\@namedef{#1tocdepth}{5}}{%
+                  \Ifstr{#1}{figure}{\@namedef{#1tocdepth}{1}}{%
+                    \Ifstr{#1}{table}{\@namedef{#1tocdepth}{1}}{%
 %    \end{macrocode}
 % Für unbekannte Anweisungen wird stattdessen eine eventuell vorhandene
 % Gliederungsebene auch als Verzeichnisebene übernommen:
@@ -1602,7 +1605,7 @@
 %<*tocline|toctext>
   \scr@ifundefinedorrelax{scr@tso@#1@indent}{%
     \@ifundefined{scr@#1@tocindent}{%
-      \ifstrstart{#1}{sub}{%
+      \Ifstrstart{#1}{sub}{%
         \scr@ifundefinedorrelax{scr@tso@\scr@dte@nosub{#1}@indent}{%
           \scr@ifundefinedorrelax{scr@tso@\scr@dte@nosub{#1}@numwidth}{}{%
             \expandafter\edef\csname scr@tso@#1@indent\endcsname{%
@@ -1640,7 +1643,7 @@
 %    \begin{macrocode}
 %<*tocline>
   \scr@ifundefinedorrelax{scr@tso@#1@pagenumberwidth}{%
-    \ifstrstart{#1}{sub}{%
+    \Ifstrstart{#1}{sub}{%
       \scr@ifundefinedorrelax{scr@tso@\scr@dte@nosub{#1}@pagenumberwidth}{%
         \@namedef{scr@tso@#1@pagenumberwidth}{\@pnumwidth}%
       }{%
@@ -1655,7 +1658,7 @@
 %</tocline>
 %<*tocline|toctext>
   \scr@ifundefinedorrelax{scr@tso@#1@rightindent}{%
-    \ifstrstart{#1}{sub}{%
+    \Ifstrstart{#1}{sub}{%
       \scr@ifundefinedorrelax{scr@tso@\scr@dte@nosub{#1}@rightindent}{%
         \@namedef{scr@tso@#1@rightindent}{\@tocrmarg}%
       }{%
@@ -1677,24 +1680,24 @@
 %<*dottedtocline|undottedtocline|largetocline>
     \@ifundefined{scr@#1@tocindent}{%
 %</dottedtocline|undottedtocline|largetocline>
-      \ifstr{#1}{figure}{\@namedef{scr@tso@#1@indent}{1.5em}}{%
-        \ifstr{#1}{table}{\@namedef{scr@tso@#1@indent}{1.5em}}{%
-          \ifstr{#1}{part}{\@namedef{scr@tso@#1@indent}{0em}}{%
-            \ifstr{#1}{chapter}{\@namedef{scr@tso@#1@indent}{0em}}{%
+      \Ifstr{#1}{figure}{\@namedef{scr@tso@#1@indent}{1.5em}}{%
+        \Ifstr{#1}{table}{\@namedef{scr@tso@#1@indent}{1.5em}}{%
+          \Ifstr{#1}{part}{\@namedef{scr@tso@#1@indent}{0em}}{%
+            \Ifstr{#1}{chapter}{\@namedef{scr@tso@#1@indent}{0em}}{%
 %    \end{macrocode}
 % Ab hier hängt es nun davon ab, ob es eine Kapitel-Ebene gibt oder
 % nicht. Dazu sollte die Kapitelebene bereits definiert sein!
 %    \begin{macrocode}
               \scr@ifundefinedorrelax{l@chapter}{%
-                \ifstr{#1}{section}{\@namedef{scr@tso@#1@indent}{0pt}}{%
-                  \ifstr{#1}{subsection}{\@namedef{scr@tso@#1@indent}{1.5em}}{%
-                    \ifstr{#1}{subsubsection}{%
+                \Ifstr{#1}{section}{\@namedef{scr@tso@#1@indent}{0pt}}{%
+                  \Ifstr{#1}{subsection}{\@namedef{scr@tso@#1@indent}{1.5em}}{%
+                    \Ifstr{#1}{subsubsection}{%
                       \@namedef{scr@tso@#1@indent}{3.8em}%
                     }{%
-                      \ifstr{#1}{paragraph}{%
+                      \Ifstr{#1}{paragraph}{%
                         \@namedef{scr@tso@#1@indent}{7em}%
                       }{%
-                        \ifstr{#1}{subparagraph}{%
+                        \Ifstr{#1}{subparagraph}{%
                           \@namedef{scr@tso@#1@indent}{10em}%
                         }{%
 %    \end{macrocode}
@@ -1706,15 +1709,15 @@
                   }%
                 }%
               }{%
-                \ifstr{#1}{section}{\@namedef{scr@tso@#1@indent}{1.5em}}{%
-                  \ifstr{#1}{subsection}{\@namedef{scr@tso@#1@indent}{3.8em}}{%
-                    \ifstr{#1}{subsubsection}{%
+                \Ifstr{#1}{section}{\@namedef{scr@tso@#1@indent}{1.5em}}{%
+                  \Ifstr{#1}{subsection}{\@namedef{scr@tso@#1@indent}{3.8em}}{%
+                    \Ifstr{#1}{subsubsection}{%
                       \@namedef{scr@tso@#1@indent}{7.0em}%
                     }{%
-                      \ifstr{#1}{paragraph}{%
+                      \Ifstr{#1}{paragraph}{%
                         \@namedef{scr@tso@#1@indent}{10em}%
                       }{%
-                        \ifstr{#1}{subparagraph}{%
+                        \Ifstr{#1}{subparagraph}{%
                           \@namedef{scr@tso@#1@indent}{12em}%
                         }{%
 %    \end{macrocode}
@@ -1746,7 +1749,7 @@
 %<*tocline>
   \scr@ifundefinedorrelax{scr@tso@#1@numwidth}{%
     \scr@ifundefinedorrelax{scr@#1@tocnumwidth}{%
-      \ifstrstart{#1}{sub}{%
+      \Ifstrstart{#1}{sub}{%
         \scr@ifundefinedorrelax{scr@tso@\scr@dte@nosub{#1}@numwidth}{}{%
           \expandafter\edef\csname scr@tso@#1@numwidth\endcsname{%
             \glueexpr \noexpand\@nameuse{scr@tso@\scr@dte@nosub{#1}@numwidth}%
@@ -1764,23 +1767,23 @@
 %<*dottedtocline|undottedtocline>
     \@ifundefined{scr@#1@tocnumwidth}{%
 %</dottedtocline|undottedtocline>
-      \ifstr{#1}{figure}{\@namedef{scr@tso@#1@numwidth}{2.3em}}{%
-        \ifstr{#1}{table}{\@namedef{scr@tso@#1@numwidth}{2.3em}}{%
-          \ifstr{#1}{chapter}{\@namedef{scr@tso@#1@numwidth}{1.5em}}{%
+      \Ifstr{#1}{figure}{\@namedef{scr@tso@#1@numwidth}{2.3em}}{%
+        \Ifstr{#1}{table}{\@namedef{scr@tso@#1@numwidth}{2.3em}}{%
+          \Ifstr{#1}{chapter}{\@namedef{scr@tso@#1@numwidth}{1.5em}}{%
 %    \end{macrocode}
 % Ab hier hängt es nun davon ab, ob es eine Kapitel-Ebene gibt oder
 % nicht. Dazu sollte die Kapitelebene bereits definiert sein!
 %    \begin{macrocode}
             \scr@ifundefinedorrelax{chapter}{%
-              \ifstr{#1}{section}{\@namedef{scr@tso@#1@numwidth}{1.5em}}{%
-                \ifstr{#1}{subsection}{\@namedef{scr@tso@#1@numwidth}{2.3em}}{%
-                  \ifstr{#1}{subsubsection}{%
+              \Ifstr{#1}{section}{\@namedef{scr@tso@#1@numwidth}{1.5em}}{%
+                \Ifstr{#1}{subsection}{\@namedef{scr@tso@#1@numwidth}{2.3em}}{%
+                  \Ifstr{#1}{subsubsection}{%
                     \@namedef{scr@tso@#1@numwidth}{3.2em}%
                   }{%
-                    \ifstr{#1}{paragraph}{%
+                    \Ifstr{#1}{paragraph}{%
                       \@namedef{scr@tso@#1@numwidth}{4.1em}%
                     }{%
-                      \ifstr{#1}{subparagraph}{%
+                      \Ifstr{#1}{subparagraph}{%
                         \@namedef{scr@tso@#1@numwidth}{5m}%
                       }{%
 %    \end{macrocode}
@@ -1792,15 +1795,15 @@
                 }%
               }%
             }{%
-              \ifstr{#1}{section}{\@namedef{scr@tso@#1@numwidth}{2.3em}}{%
-                \ifstr{#1}{subsection}{\@namedef{scr@tso@#1@numwidth}{3.2em}}{%
-                  \ifstr{#1}{subsubsection}{%
+              \Ifstr{#1}{section}{\@namedef{scr@tso@#1@numwidth}{2.3em}}{%
+                \Ifstr{#1}{subsection}{\@namedef{scr@tso@#1@numwidth}{3.2em}}{%
+                  \Ifstr{#1}{subsubsection}{%
                     \@namedef{scr@tso@#1@numwidth}{3.1em}%
                   }{%
-                    \ifstr{#1}{paragraph}{%
+                    \Ifstr{#1}{paragraph}{%
                       \@namedef{scr@tso@#1@numwidth}{5em}%
                     }{%
-                      \ifstr{#1}{subparagraph}{%
+                      \Ifstr{#1}{subparagraph}{%
                         \@namedef{scr@tso@#1@numwidth}{6em}%
                       }{%
 %    \end{macrocode}
@@ -1845,13 +1848,13 @@
 % verwendet.
 %    \begin{macrocode}
   \@ifundefined{scr@tso@#1@beforeskip}{%
-    \ifstr{#1}{part}{%
+    \Ifstr{#1}{part}{%
       \@namedef{scr@tso@#1@beforeskip}{\glueexpr 2.25em \@plus\p@\relax}%
     }{%
-      \ifstr{#1}{chapter}{%
+      \Ifstr{#1}{chapter}{%
         \@namedef{scr@tso@#1@beforeskip}{\glueexpr 1.0em \@plus\p@\relax}%
       }{%
-        \ifstr{#1}{section}{%
+        \Ifstr{#1}{section}{%
           \scr@ifundefinedorrelax{l@chapter}{%
             \@namedef{scr@tso@#1@beforeskip}{\glueexpr 1.0em \@plus\p@\relax}%
           }{}%
@@ -1907,16 +1910,16 @@
   \expandafter\providecommand%
   \csname scr@tso@#1@numberformat\endcsname[1]{##1}%
 %<*tocline>
-  \ifstr{#1}{part}{%
+  \Ifstr{#1}{part}{%
     \expandafter\providecommand%
     \csname scr@tso@#1@entryformat\endcsname[1]{\large\bfseries ##1}%
   }{%
-    \ifstr{#1}{chapter}{%
+    \Ifstr{#1}{chapter}{%
       \expandafter\providecommand%
       \csname scr@tso@#1@entryformat\endcsname[1]{\bfseries ##1}%
     }{%
       \scr@ifundefinedorrelax{l@chapter}{%
-        \ifstr{#1}{section}{%
+        \Ifstr{#1}{section}{%
           \expandafter\providecommand%
           \csname scr@tso@#1@entryformat\endcsname[1]{\bfseries ##1}%
         }{}%
@@ -1944,14 +1947,14 @@
 % Option werden. In der Voreinstellung wird mit \cs{hfill} gefüllt.
 %    \begin{macrocode}
   \@ifundefined{scr@tso@#1@linefill}{%
-    \ifstr{#1}{part}{%
+    \Ifstr{#1}{part}{%
       \@namedef{scr@tso@#1@linefill}{\hfill}%
     }{%
-      \ifstr{#1}{chapter}{%
+      \Ifstr{#1}{chapter}{%
         \@namedef{scr@tso@#1@linefill}{\hfill}%
       }{%
         \scr@ifundefinedorrelax{l@chapter}{%
-          \ifstr{#1}{section}{%
+          \Ifstr{#1}{section}{%
             \@namedef{scr@tso@#1@linefill}{\hfill}%
           }{}%
         }{}%
@@ -1968,7 +1971,7 @@
 %    \end{macrocode}
 % Auch die Seitenzahl kann speziell formatiert werden, wenn das gewünscht ist.
 %    \begin{macrocode}
-  \ifstr{#1}{part}{%
+  \Ifstr{#1}{part}{%
 %    \end{macrocode}
 % Für \texttt{part} normalerweise groß und fett:
 %    \begin{macrocode}
@@ -1980,12 +1983,12 @@
 %   Voreinstellung fett}%^^A
 % Für \texttt{chapter} nur fett:
 %    \begin{macrocode}
-    \ifstr{#1}{chapter}{%
+    \Ifstr{#1}{chapter}{%
       \expandafter\providecommand%
       \csname scr@tso@#1@pagenumberformat\endcsname[1]{\bfseries ##1}%
     }{%
       \scr@ifundefinedorrelax{l@chapter}{%
-        \ifstr{#1}{section}{%
+        \Ifstr{#1}{section}{%
 %    \end{macrocode}
 % \changes{v3.25}{2017/11/23}{Seitenzahlen für \texttt{section}-Einräge in der
 %   Voreinstellung unter Umständen fett}%^^A
