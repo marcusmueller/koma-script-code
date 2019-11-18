@@ -1,4 +1,4 @@
-% \CheckSum{4210}
+% \CheckSum{4169}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -721,6 +721,7 @@
 %
 % \begin{macro}{\KOMA@kav@defone}
 % \changes{v3.17}{2015/02/25}{neu (\KOMAScript intern)}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstrstart} umbenannt in \cs{Ifstrstart}}%^^A
 % Dieses Makro liefert alle aktuellen Werte eine Schlüssels aus der
 % \texttt{key=value}-Liste aller gespeicherten Paare. Falls es mehr als einen
 % Wert gibt, so werden diese \cs{KOMAoption}-tauglich verknüpft. Das erste
@@ -736,7 +737,7 @@
     \begingroup
       \let\reserved@a\@empty
       \def\reserved@b##1##2{%
-        \ifstr{##1}{#3}{\l@addto@macro\reserved@a{,{##2}}}{}%
+        \Ifstr{##1}{#3}{\l@addto@macro\reserved@a{,{##2}}}{}%
       }%
       \def\do##1{\reserved@b##1}%
       \@nameuse{scr@kav@KOMA#2}%
@@ -1240,27 +1241,16 @@
 % \changes{v3.27a}{2019/11/04}{\cs{FamilyKeyStateProcessed} ergänzt}%^^A
 % \changes{v3.27a}{2019/11/04}{nur innerhalb des Pakets definiert}%^^A
 % \changes{v3.27a}{2019/11/04}{temporär in den Klassen definiert}%^^A
+% \changes{v3.28}{2019/11/18}{Option ist veraltet}%^^A
 % \begin{macro}{\dont@let@as@internal@defined}
 % \changes{v2.96}{2006/11/26}{neu (intern)}%^^A
-% Anweisungen, die mit einem internen und einem Anwendername vorhanden sind,
-% können vor dem Anwender optional verborgen werden. Wird kein Argument
-% angegeben, so werden alle Anweisungen verborgen.
+% \changes{v3.28}{2019/11/18}{entfernt}%^^A
 %    \begin{macrocode}
 %<*base>
-\newcommand*{\dont@let@as@internal@defined}{/}
-\newif\if@let@as@internalonly@defined\@let@as@internalonly@definedfalse
 \DefineFamily{KOMA}
 \DefineFamilyMember{KOMA}
 \DefineFamilyKey{KOMA}{internalonly}[\relax]{%
-  \ifx\relax#1\relax
-    \@let@as@internalonly@definedtrue
-  \else
-    \@let@as@internalonly@definedfalse
-    \begingroup
-      \@expandtwoargs\in@{#1}\dont@let@as@internal@defined
-    \expandafter\endgroup
-    \ifin@\else\g@addto@macro\dont@let@as@internal@defined{#1/}\fi
-  \fi
+  \PackageInfo{scrbase}{Ignoring deprecated option `internalonly'}%
   \FamilyKeyStateProcessed
 }
 \AtEndOfPackage{%
@@ -1270,16 +1260,16 @@
 %    \end{macrocode}
 % Da \textsf{scrbase} von den Klassen bereits vor der Verarbeitung der
 % Optionen geladen wird, wird die Option zwar verarbeitet aber dann trotzdem
-% als unbekannt gemeldet. Das kann man nnotdürftig beheben, indem die Klasse
+% als unbekannt gemeldet. Das kann man notdürftig beheben, indem die Klasse
 % vorrübergehend eine Dummy-Option erhält.
 %    \begin{macrocode}
 %</option>
-%<*load&class>
+%<*load&class&neveruse>
 \KOMA@key{internalonly}[\relax]{%
   \FamilyKeyStateProcessed
 }
 \AtEndOfClass{\RelaxFamilyKey[.\KOMAClassFileName]{KOMA}{internalonly}}%
-%</load&class>
+%</load&class&neveruse>
 %<*option>
 %    \end{macrocode}
 % \end{macro}
@@ -1397,105 +1387,54 @@
 % \changes{v2.95}{2002/08/19}{neu (intern)}%^^A
 % \changes{v2.95c}{2006/08/12}{Warnung bei Umdefinierung}%^^A
 % \changes{v2.96}{2006/11/26}{Herausreichen von internen Makros als
-%     Benutzermakros kann verhindert werden}%^^A
+%   Benutzermakros kann verhindert werden}%^^A
 % \changes{v2.97c}{2007/06/20}{Herausreichen von internen Makros kann
-%     generell verhindert werden}%^^A
+%   generell verhindert werden}%^^A
 % \changes{v3.10}{2010/10/26}{\cs{ignorespaces} beim \cs{document}-Patch
-%     ergänzt}
+%   ergänzt}
 % \changes{v3.13a}{2014/08/13}{potentielle Leerzeichen durch Zeilenumbruch
-%     beseitigt}%^^A
-% Dieses Makro wird intern verwendet, um dokumentierte Makros mit der
-% Definition von internen Makros zu versehen, falls sie nicht bereits
-% definiert oder als nicht zu definieren markiert sind. Der Name des
-% dokumentierten Makros wird als Parameter übergeben. Dies wird gleich
-% benötigt.
-%    \begin{macrocode}
-%<*base>
-\newcommand*{\let@as@internal@defined}[1]{%
-  \begingroup
-    \if@let@as@internalonly@defined
-      \in@true
-    \else
-      \@expandtwoargs\in@{/#1/}\dont@let@as@internal@defined
-    \fi
-  \expandafter\endgroup
-  \ifin@
-    \PackageInfo{%
-      scrbase%
-    }{%
-      \expandafter\string\csname #1\endcsname\space excluded from being
-      defined%
-    }%
-  \else
-    \@ifundefined{#1}{%
-      \begingroup
-        \expandafter\def\expandafter\reserved@a
-          \expandafter{\csname scr@#1\endcsname}%
-        \expandafter\def\expandafter\reserved@b
-          \expandafter{\csname #1\endcsname}%
-      \expandafter\expandafter\expandafter\endgroup
-      \expandafter\expandafter\expandafter\let\expandafter\reserved@b\reserved@a
-      \if@atdocument\else
-        \g@addto@macro\document{%
-          \expandafter\ifx\csname #1\expandafter\endcsname
-          \csname scr@#1\endcsname
-          \else
-            \PackageWarning{scrbase}{%
-              \expandafter\string\csname #1\endcsname\space was
-              redefined\MessageBreak
-              at the document preamble.\MessageBreak
-              If you did not redefine it by yourself, have a\MessageBreak
-              a look at the description of this command at\MessageBreak
-              the manual of every package you are using\@gobble
-            }%
-          \fi
-          \ignorespaces
-        }%
-      \fi
-    }{%
-      \PackageInfo{%
-        scrbase%
-      }{%
-        \expandafter\string\csname #1\endcsname\space already
-        defined.\MessageBreak
-        If \expandafter\string\csname #1\endcsname\space does not behave
-        like\MessageBreak
-        it was described at the KOMA-Script manual, try to\MessageBreak
-        load `scrbase.\scr@pkgextension' earlier or find out at
-        which\MessageBreak
-        package or class \expandafter\string\csname #1\endcsname\space
-        was defined before\@gobble
-      }%
-    }%
-  \fi
-}
-%</base>
-%    \end{macrocode}
+%   beseitigt}%^^A
+% \changes{v3.28}{2019/11/18}{entfernt}%^^A
 % \end{macro}
 %
 % \begin{macro}{\ifundefinedorrelax}
 % \changes{v2.95}{2002/08/21}{neu}%^^A
 % \changes{v2.95c}{2006/08/12}{über interne Anweisung definiert}%^^A
-% \changes{v2.97c}{2007/06/20}{umbenannt von \cs{ifundefined}}
+% \changes{v2.97c}{2007/06/20}{umbenannt von \cs{ifundefined}}%^^A
+% \changes{3.28}{2019/11/18}{umbenannt in \cs{Ifundefinedorrelax}}%^^A
+% \begin{macro}{\Ifundefinedorrelax}%^^A
 % Dieses Makro arbeitet wie \cs{@ifundefined}, definiert dabei aber
 % ein undefiniertes Makro nicht als \cs{relax}.
 %    \begin{macrocode}
 %<*base>
-\let@as@internal@defined{ifundefinedorrelax}
+\newcommand*{\Ifundefinedorrelax}{scr@ifundefinedorrelax}%
 %</base>
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 %
 % \begin{macro}{\ifnotundefined}
 % \changes{v2.95}{2002/08/21}{neu}%^^A
-% \changes{v2.95c}{2006/08/12}{nutzt \eTeX{} wenn möglich}
-% \changes{v3.02c}{2009/02/19}{\eTeX{} ist zwingend}
+% \changes{v2.95c}{2006/08/12}{nutzt \eTeX{} wenn möglich}%^^A
+% \changes{v3.02c}{2009/02/19}{\eTeX{} ist zwingend}%^^A
+% \changes{v3.28}{2019/11/18}{umdefiniert in \cs{Ifnotundefined}}%^^A
+% \begin{macro}{\Ifnotundefined}
+% \changes{v3.28}{2019/11/18}{neu Umbenennung von \cs{ifnotundefinded}}%^^A
 % Dieses Makro arbeitet genau umgekehrt zu \cs{ifundefined}. Manchmal
 % ist es ganz nützlich, auch das zu haben. Dieses Makro heißt nicht
 % \cs{ifdefined}, weil \eTeX\ bereits ein solches Primitiv bietet.
 %    \begin{macrocode}
 %<*base>
-\newcommand{\ifnotundefined}[1]{%
+\providecommand*{\ifnotundefined}{%
+  \PackageWarning{scrbase}{Usage of deprecated command
+    `\string\ifnotundefined'.\MessageBreak
+    The command has been renamed to because of a\MessageBreak
+    recommendation of LaTeX3 team members.\MessageBreak
+    Please replace `\string\ifnotundefined` by `\string\Ifnotundefined`%
+  }%
+  \Ifnotundefined
+}
+\newcommand{\Ifnotundefined}[1]{%
   \ifcsname #1\endcsname
     \expandafter\@firstoftwo
   \else
@@ -1505,15 +1444,29 @@
 %</base>
 %    \end{macrocode}
 % \end{macro}
+% \end{macro}
 %
 % \begin{macro}{\ifstr}
 % \changes{v2.95}{2004/07/20}{if- und then-Teil werden nicht gefressen}%^^A
-% \changes{v3.04b}{2010/01/29}{\cs{edef} durch \cs{protected@edef} ersetzt}
+% \changes{v3.04b}{2010/01/29}{\cs{edef} durch \cs{protected@edef}
+%   ersetzt}%^^A
+% \changes{v3.28}{2019/11/18}{umbenannt in \cs{IfStr}}%^^A
+% \begin{macro}{\Ifstr}
+% \changes{v3.28}{2019/11/18}{neu aus Umbenennung von \cs{ifstr}}%^^A
 % Dieses Makro vergleicht zwei Tokenfolgen. Eigentlich müsste es also
 % eher \cs{ifequal} oder ähnlich heißen.
 %    \begin{macrocode}
 %<*base>
-\newcommand\ifstr[2]{%
+\providecommand*{\ifstr}{%
+  \PackageWarning{scrbase}{Usage of deprecated command
+    `\string\ifstr'.\MessageBreak
+    The command has been renamed to because of a\MessageBreak
+    recommendation of LaTeX3 team members.\MessageBreak
+    Please replace `\string\ifstr` by `\string\Ifstr`%
+  }%
+  \Ifstr
+}
+\newcommand\Ifstr[2]{%
   \begingroup\protected@edef\reserved@a{#1}\protected@edef\reserved@b{#2}%
   \ifx\reserved@a\reserved@b
     \endgroup\expandafter\@firstoftwo
@@ -1524,14 +1477,27 @@
 %</base>
 %    \end{macrocode}
 % \end{macro}
+% \end{macro}
 %
+% \begin{macro}{\Ifstrstart}
+% \changes{v3.28}{2019/11/18}{neu aus Umbenennung von \cs{ifstrstart}}%^^A
 % \begin{macro}{\ifstrstart}
 % \changes{v3.12}{2013/11/05}{neu}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstrstart} umbenannt in \cs{Ifstrstart}}%^^A
 % Falls die Expansion des ersten Arguments mit der Expansion des zweiten
 % Arguments beginnt, wird das dritte Argument ausgeführt, sonst das vierte.
 %    \begin{macrocode}
 %<*base>
-\newcommand*{\ifstrstart}[2]{%
+\providecommand*{\ifstrstart}{%
+  \PackageWarning{scrbase}{Usage of deprecated command
+    `\string\ifstrstart'.\MessageBreak
+    The command has been renamed to because of a\MessageBreak
+    recommendation of LaTeX3 team members.\MessageBreak
+    Please replace `\string\ifstrstart` by `\string\Ifstrstart`%
+  }%
+  \Ifstrstart
+}
+\newcommand*{\Ifstrstart}[2]{%
   \begingroup
     \edef\reserved@a{\noexpand\@ifstrstart{#1}{#2}}%
     \reserved@a{\aftergroup\@firstoftwo}{\aftergroup\@secondoftwo}%
@@ -1556,6 +1522,7 @@
 %    \end{macrocode}
 % \end{macro}%^^A \@ifstrstart
 % \end{macro}%^^A \ifstrstart
+% \end{macro}%^^A \Ifstrstart
 %
 % \begin{macro}{\IfArgIsEmpty}
 % \changes{v3.19}{2015/08/29}{neu}%^^A
@@ -1594,18 +1561,20 @@
 %    \end{macrocode}
 % \begin{macro}{\scr@ifislengthprimitive}
 % \changes{v3.20}{2015/10/19}{neu (intern)}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstrstart} umbenannt in \cs{Ifstrstart}}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
 % Hilfsmacro, das ggf. rekusiv auf diverse Primitive prüft.
 %    \begin{macrocode}
 \newcommand*{\scr@ifislengthprimitive}[1]{%
   \begingroup
-    \ifstrstart{\meaning #1}{\detokenize{macro:}}{%
+    \Ifstrstart{\meaning #1}{\detokenize{macro:}}{%
       \aftergroup\expandafter\aftergroup\scr@ifislengthprimitive
     }{%
       \def\reserved@c{\aftergroup\scr@secondoftwoAfterNil}%
       \@for\reserved@a:=\baselineskip,\dp,\hsize,\ht,\lineskip,%
                         \parindent,\parskip,\pdfpageheight,\pdfpagewidth,%
                         \wd,\vsize \do {%
-        \expandafter\ifstr\expandafter{\expandafter\string\reserved@a}{%
+        \expandafter\Ifstr\expandafter{\expandafter\string\reserved@a}{%
           \meaning #1%
         }{%
           \def\reserved@c{\aftergroup\scr@TestDimenAssignTillNil}%
@@ -1636,14 +1605,15 @@
 %    \end{macrocode}
 % \begin{macro}{\scr@ifisdimen}
 % \changes{v3.20}{2015/10/19}{neu (intern)}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstrstart} umbenannt in \cs{Ifstrstart}}%^^A
 % Hilfsmacro, das ggf. rekusiv auf ein \cs{dimen}-Register prüft
 %    \begin{macrocode}
 \newcommand*{\scr@ifisdimen}[1]{%
   \begingroup
-    \ifstrstart{\meaning #1}{\detokenize{macro:}}{%
+    \Ifstrstart{\meaning #1}{\detokenize{macro:}}{%
       \aftergroup\expandafter\aftergroup\scr@ifisdimen
     }{%
-      \ifstrstart{\meaning #1}{\string\dimen}{%
+      \Ifstrstart{\meaning #1}{\string\dimen}{%
         \aftergroup\scr@TestDimenAssignTillNil
       }{%
         \aftergroup\scr@secondoftwoAfterNil
@@ -1670,8 +1640,12 @@
 %    \end{macrocode}
 % \begin{macro}{\scr@IfAfterEndgroupArgIsRelaxTillNnil}
 % \changes{v3.20}{2015/10/19}{neu (intern)}
+% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstrstart} umbenannt in \cs{Ifstrstart}}%^^A
 % \begin{macro}{\scr@IfArgIsRelaxAfterRelaxTillNnil}
 % \changes{v3.20}{2015/10/19}{neu (intern)}
+% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstrstart} umbenannt in \cs{Ifstrstart}}%^^A
 % Die Hilfsmakros lesen ein durch \cs{@nnil} begrenztes Argument. Falls dieses
 % Argument nur aus einer Folge von \cs{relax} besteht, wird das erste Argument
 % nach \cs{@nnil} ausgeführt, sonst das zweite.
@@ -1679,16 +1653,16 @@
 \newcommand*\scr@AfterEndGroupIfArgIsRelaxTillNnil{}
 \def\scr@AfterEndGroupIfArgIsRelaxTillNnil#1\@nnil{%
   \endgroup
-  \ifstr{\detokenize{#1}}{\detokenize{\relax}}{\@firstoftwo}{%
-    \ifstrstart{\detokenize{#1}}{\detokenize{\relax}}{%
+  \Ifstr{\detokenize{#1}}{\detokenize{\relax}}{\@firstoftwo}{%
+    \Ifstrstart{\detokenize{#1}}{\detokenize{\relax}}{%
       \scr@IfArgIsRelaxAfterRelaxTillNnil #1\@nnil
     }{\@secondoftwo}%
   }%
 }
 \newcommand*\scr@IfArgIsRelaxAfterRelaxTillNnil{}
 \def\scr@IfArgIsRelaxAfterRelaxTillNnil \relax#1\@nnil{%
-  \ifstr{\detokenize{#1}}{\detokenize{\relax}}{\@firstoftwo}{%
-    \ifstrstart{\detokenize{#1}}{\detokenize{\relax}}{%
+  \Ifstr{\detokenize{#1}}{\detokenize{\relax}}{\@firstoftwo}{%
+    \Ifstrstart{\detokenize{#1}}{\detokenize{\relax}}{%
       \scr@IfArgIsRelaxAfterRelaxTillNnil #1\@nnil
     }{\@secondoftwo}%
   }%
@@ -1734,14 +1708,15 @@
 %    \end{macrocode}
 % \begin{macro}{\scr@ifisskip}
 % \changes{v3.20}{2015/10/19}{neu (intern)}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstrstart} umbenannt in \cs{Ifstrstart}}%^^A
 % Hilfsmacro, das ggf. rekusiv auf ein \cs{skip}-Register prüft
 %    \begin{macrocode}
 \newcommand*{\scr@ifisskip}[1]{%
   \begingroup
-    \ifstrstart{\meaning #1}{\detokenize{macro:}}{%
+    \Ifstrstart{\meaning #1}{\detokenize{macro:}}{%
       \aftergroup\expandafter\aftergroup\scr@ifisskip
     }{%
-      \ifstrstart{\meaning #1}{\string\skip}{%
+      \Ifstrstart{\meaning #1}{\string\skip}{%
         \aftergroup\scr@TestSkipAssignTillNil
       }{%
         \aftergroup\scr@secondoftwoAfterNil
@@ -1784,14 +1759,15 @@
 %    \end{macrocode}
 % \begin{macro}{\scr@ifiscount}
 % \changes{v3.20}{2015/10/19}{neu (intern)}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstrstart} umbenannt in \cs{Ifstrstart}}%^^A
 % Hilfsmacro, das ggf. rekusiv auf ein \cs{count}-Register prüft
 %    \begin{macrocode}
 \newcommand*{\scr@ifiscount}[1]{%
   \begingroup
-    \ifstrstart{\meaning #1}{\detokenize{macro:}}{%
+    \Ifstrstart{\meaning #1}{\detokenize{macro:}}{%
       \aftergroup\expandafter\aftergroup\scr@ifiscount
     }{%
-      \ifstrstart{\meaning #1}{\string\count}{%
+      \Ifstrstart{\meaning #1}{\string\count}{%
         \aftergroup\scr@TestCountAssignTillNil
       }{%
         \aftergroup\scr@secondoftwoAfterNil
@@ -1838,14 +1814,15 @@
 %    \end{macrocode}
 % \begin{macro}{\scr@ifisdimexpr}
 % \changes{v3.20}{2015/10/19}{neu (intern)}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstrstart} umbenannt in \cs{Ifstrstart}}%^^A
 % Hilfsmacro, das ggf. rekusiv auf eine \cs{dimexpr} prüft
 %    \begin{macrocode}
 \newcommand*{\scr@ifisdimexpr}[1]{%
   \begingroup
-    \ifstrstart{\meaning #1}{\detokenize{macro:}}{%
+    \Ifstrstart{\meaning #1}{\detokenize{macro:}}{%
       \aftergroup\expandafter\aftergroup\scr@ifisdimexpr
     }{%
-      \ifstrstart{\meaning #1}{\string\dimexpr}{%
+      \Ifstrstart{\meaning #1}{\string\dimexpr}{%
         \aftergroup\scr@TestDimenAssignTillNil
       }{%
         \aftergroup\scr@secondoftwoAfterNil
@@ -1877,14 +1854,15 @@
 %    \end{macrocode}
 % \begin{macro}{\scr@ifisglueexpr}
 % \changes{v3.20}{2015/10/19}{neu (intern)}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstrstart} umbenannt in \cs{Ifstrstart}}%^^A
 % Hilfsmacro, das ggf. rekusiv auf eine \cs{glueexpr} prüft
 %    \begin{macrocode}
 \newcommand*{\scr@ifisglueexpr}[1]{%
   \begingroup
-    \ifstrstart{\meaning #1}{\detokenize{macro:}}{%
+    \Ifstrstart{\meaning #1}{\detokenize{macro:}}{%
       \aftergroup\expandafter\aftergroup\scr@ifisglueexpr
     }{%
-      \ifstrstart{\meaning #1}{\string\glueexpr}{%
+      \Ifstrstart{\meaning #1}{\string\glueexpr}{%
         \aftergroup\scr@TestSkipAssignTillNil
       }{%
         \aftergroup\scr@secondoftwoAfterNil
@@ -1916,14 +1894,15 @@
 %    \end{macrocode}
 % \begin{macro}{\scr@ifisnumexpr}
 % \changes{v3.20}{2015/10/19}{neu (intern)}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstrstart} umbenannt in \cs{Ifstrstart}}%^^A
 % Hilfsmacro, das ggf. rekusiv auf eine \cs{numexpr} prüft
 %    \begin{macrocode}
 \newcommand*{\scr@ifisnumexpr}[1]{%
   \begingroup
-    \ifstrstart{\meaning #1}{\detokenize{macro:}}{%
+    \Ifstrstart{\meaning #1}{\detokenize{macro:}}{%
       \aftergroup\expandafter\aftergroup\scr@ifisnumexpr
     }{%
-      \ifstrstart{\meaning #1}{\string\numexpr}{%
+      \Ifstrstart{\meaning #1}{\string\numexpr}{%
         \aftergroup\scr@TestCountAssignTillNil
       }{%
         \aftergroup\scr@secondoftwoAfterNil
@@ -1954,14 +1933,15 @@
 %    \end{macrocode}
 % \begin{macro}{\scr@ifisdefchar}
 % \changes{v3.20}{2015/10/19}{neu (intern)}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstrstart} umbenannt in \cs{Ifstrstart}}%^^A
 % Hilfsmacro, das ggf. rekusiv auf eine \cs{char} prüft
 %    \begin{macrocode}
 \newcommand*{\scr@ifisdefchar}[1]{%
   \begingroup
-    \ifstrstart{\meaning #1}{\detokenize{macro:}}{%
+    \Ifstrstart{\meaning #1}{\detokenize{macro:}}{%
       \aftergroup\expandafter\aftergroup\scr@ifisdefchar
     }{%
-      \ifstrstart{\meaning #1}{\string\char\string"}{%
+      \Ifstrstart{\meaning #1}{\string\char\string"}{%
         \aftergroup\scr@TestCountAssignTillNil
       }{%
         \aftergroup\scr@secondoftwoAfterNil
@@ -2010,15 +1990,16 @@
 %    \end{macrocode}
 % \begin{macro}{\scr@ifisinteger}
 % \changes{v3.20}{2015/10/19}{neu (intern)}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstrstart} umbenannt in \cs{Ifstrstart}}%^^A
 % Hilfsmacro, das ggf. rekusiv auf ein Vorzeichen oder eine positive Zahl
 % prüft.
 %    \begin{macrocode}
 \def\scr@ifisinteger#1{%
   \begingroup
-    \ifstrstart{\meaning #1}{\detokenize{macro:}}{%
+    \Ifstrstart{\meaning #1}{\detokenize{macro:}}{%
       \aftergroup\expandafter\aftergroup\scr@ifisinteger\aftergroup#1%
     }{%
-      \ifstrstart{\meaning #1}{\detokenize{the character}}{%
+      \Ifstrstart{\meaning #1}{\detokenize{the character}}{%
         \if #1-\aftergroup\scr@ifisinteger
         \else
           \if #1+\aftergroup\scr@ifisinteger
@@ -2036,7 +2017,7 @@
           \fi
         \fi
       }{%
-        \ifstrstart{\meaning #1}{\string\char\string"}{%
+        \Ifstrstart{\meaning #1}{\string\char\string"}{%
           \aftergroup\scr@TestCountAssignTillNil
         }{%
           \def\reserved@c{%
@@ -2065,7 +2046,7 @@
                             \tolerance,\topskip,%
                             \wd,\vbadness,\vfuzz,\vsize 
           \do {%
-            \expandafter\ifstr\expandafter{\expandafter\string\reserved@a}{%
+            \expandafter\Ifstr\expandafter{\expandafter\string\reserved@a}{%
               \meaning #1%
             }{%
               \def\reserved@c{\aftergroup\scr@TestCountAssignTillNil}%
@@ -2121,6 +2102,7 @@
 %    \end{macrocode}
 % \begin{macro}{\scr@ifisdimension}
 % \changes{v3.20}{2015/10/20}{neu (intern)}
+% \changes{v3.28}{2019/11/18}{\cs{ifstrstart} umbenannt in \cs{Ifstrstart}}%^^A
 % Eigentlich wäre dieses Hilfsmakro extrem aufwändig, da eine Dimension recht
 % komplex aufgebaut sein darf. Ich habe aber beschlossen, hier mit einer
 % Heuristik zu Werke zu gehen: Wenn das Argument mit einer beliebigen Anzahl
@@ -2131,10 +2113,10 @@
 %    \begin{macrocode}
 \newcommand*{\scr@ifisdimension}[1]{%
   \begingroup
-    \ifstrstart{\meaning #1}{\detokenize{macro:}}{%
+    \Ifstrstart{\meaning #1}{\detokenize{macro:}}{%
       \aftergroup\expandafter\aftergroup\scr@ifisdimension\aftergroup#1%
     }{%
-      \ifstrstart{\meaning #1}{\detokenize{the character}}{%
+      \Ifstrstart{\meaning #1}{\detokenize{the character}}{%
         \if #1-\aftergroup\scr@ifisdimension
         \else
           \if #1-\aftergroup\scr@ifisdimension
@@ -2164,7 +2146,7 @@
           \fi
         \fi
       }{%
-        \ifstrstart{\meaning #1}{\string\char\string"}{%
+        \Ifstrstart{\meaning #1}{\string\char\string"}{%
           \aftergroup\scr@TestDimensionAssignTillNil
         }{%
           \def\reserved@c{%
@@ -2194,7 +2176,7 @@
                             \tolerance,\topskip,%
                             \wd,\vbadness,\vfuzz,\vsize 
           \do {%
-            \expandafter\ifstr\expandafter{\expandafter\string\reserved@a}{%
+            \expandafter\Ifstr\expandafter{\expandafter\string\reserved@a}{%
               \meaning #1%
             }{%
               \def\reserved@c{\aftergroup\scr@TestDimensionAssignTillNil}%
@@ -2224,8 +2206,12 @@
 %    \end{macrocode}
 % \begin{macro}{\scr@IfAfterEndgroupArgIsRelaxTillptNnil}
 % \changes{v3.20}{2015/10/19}{neu (intern)}
+% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstrstart} umbenannt in \cs{Ifstrstart}}%^^A
 % \begin{macro}{\scr@IfArgIsRelaxAfterRelaxTillptNnil}
 % \changes{v3.20}{2015/10/19}{neu (intern)}
+% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstrstart} umbenannt in \cs{Ifstrstart}}%^^A
 % Die Hilfsmakros lesen ein durch \cs{@nnil} begrenztes Argument. Falls dieses
 % Argument nur aus einer Folge von \cs{relax} besteht, wird das erste Argument
 % nach \cs{@nnil} ausgeführt, sonst das zweite.
@@ -2233,16 +2219,16 @@
 \newcommand*\scr@AfterEndGroupIfArgIsRelaxTillptNnil{}
 \def\scr@AfterEndGroupIfArgIsRelaxTillptNnil#1\@nnil{%
   \endgroup
-  \ifstr{\detokenize{#1}}{\detokenize{pt}}{\@firstoftwo}{%
-    \ifstrstart{\detokenize{#1}}{\detokenize{\relax}}{%
+  \Ifstr{\detokenize{#1}}{\detokenize{pt}}{\@firstoftwo}{%
+    \Ifstrstart{\detokenize{#1}}{\detokenize{\relax}}{%
       \scr@IfArgIsRelaxAfterRelaxTillptNnil #1\@nnil
     }{\@secondoftwo}%
   }%
 }
 \newcommand*\scr@IfArgIsRelaxAfterRelaxTillptNnil{}
 \def\scr@IfArgIsRelaxAfterRelaxTillptNnil \relax#1pt\@nnil{%
-  \ifstr{\detokenize{#1}}{\detokenize{pt}}{\@firstoftwo}{%
-    \ifstrstart{\detokenize{#1}}{\detokenize{\relax}}{%
+  \Ifstr{\detokenize{#1}}{\detokenize{pt}}{\@firstoftwo}{%
+    \Ifstrstart{\detokenize{#1}}{\detokenize{\relax}}{%
       \scr@IfArgIsRelaxAfterRelaxTillptNnil #1\@nnil
     }{\@secondoftwo}%
   }%
@@ -2271,6 +2257,7 @@
 %    \end{macrocode}
 % \begin{macro}{\scr@ifisglue}
 % \changes{v3.20}{2015/10/21}{neu (intern)}
+% \changes{v3.28}{2019/11/18}{\cs{ifstrstart} umbenannt in \cs{Ifstrstart}}%^^A
 % Eigentlich wäre dieses Hilfsmakro extrem aufwändig, da Leim recht
 % komplex aufgebaut sein darf. Ich habe aber beschlossen, hier mit einer
 % Heuristik zu Werke zu gehen: Wenn das Argument mit einer beliebigen Anzahl
@@ -2281,10 +2268,10 @@
 %    \begin{macrocode}
 \newcommand*{\scr@ifisglue}[1]{%
   \begingroup
-    \ifstrstart{\meaning #1}{\detokenize{macro:}}{%
+    \Ifstrstart{\meaning #1}{\detokenize{macro:}}{%
       \aftergroup\expandafter\aftergroup\scr@ifisglue\aftergroup#1%
     }{%
-      \ifstrstart{\meaning #1}{\detokenize{the character}}{%
+      \Ifstrstart{\meaning #1}{\detokenize{the character}}{%
         \if #1-\aftergroup\scr@ifisglue
         \else
           \if #1-\aftergroup\scr@ifisdimension
@@ -2314,7 +2301,7 @@
           \fi
         \fi
       }{%
-        \ifstrstart{\meaning #1}{\string\char\string"}{%
+        \Ifstrstart{\meaning #1}{\string\char\string"}{%
           \aftergroup\scr@TestGlueAssignTillNil
         }{%
           \def\reserved@c{%
@@ -2344,7 +2331,7 @@
                             \tolerance,\topskip,%
                             \wd,\vbadness,\vfuzz,\vsize 
           \do {%
-            \expandafter\ifstr\expandafter{\expandafter\string\reserved@a}{%
+            \expandafter\Ifstr\expandafter{\expandafter\string\reserved@a}{%
               \meaning #1%
             }{%
               \def\reserved@c{\aftergroup\scr@TestGlueAssignTillNil}%
@@ -2383,12 +2370,24 @@
 %   \cs{endgroup}\cs{expandafter}}%^^A
 % \changes{v3.12a}{2014/01/24}{Leerzeichenfehler korrigiert}%^^A
 % \changes{v3.27}{2019/08/26}{leere Argumente werden korrekt behandelt}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifnumber} umbenannt in \cs{Ifnumber}}%^^A
+% \begin{macro}{\Ifnumber}
+% \changes{v3.28}{2019/11/18}{Neu aus Umbenennung von \cs{ifnumber}}%^^A
 % Dieses Makro testet, ob ein übergebener Parameter eine positive,
 % ganze Zahl ist. Ist dies der Fall, wird der zweite Parameter
 % ausgeführt, sonst der dritte.
 %    \begin{macrocode}
 %<*base>
-\newcommand\ifnumber[1]{%
+\providecommand*{\ifnumber}{%
+  \PackageWarning{scrbase}{Usage of deprecated command
+    `\string\ifnumber'.\MessageBreak
+    The command has been renamed to because of a\MessageBreak
+    recommendation of LaTeX3 team members.\MessageBreak
+    Please replace `\string\ifnumber` by `\string\Ifnumber`%
+  }%
+  \Ifnumber
+}
+\newcommand\Ifnumber[1]{%
   \begingroup\@tempswafalse\let\scr@next\test@number
     \IfArgIsEmpty{#1}{}{\expandafter\scr@next#1\scr@next}%
     \if@tempswa
@@ -2438,15 +2437,29 @@
 % \end{macro}
 % \end{macro}
 % \end{macro}
+% \end{macro}
 %
 % \begin{macro}{\ifintnumber}
 % \changes{v3.12}{2013/10/30}{neu}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifintnumber} umbenannt in
+%   \cs{Ifintnumber}}%^^A
+% \begin{macro}{\Ifintnumber}
+% \changes{v3.28}{2019/11/18}{neu aus Umbenennung von \cs{ifintnumber}}
 % Ist das erste Argument eine positive oder negative ganze Zahl, to wird das
 % zweite Argument ausgeführt, sonst das dritte. Wie bei \TeX{} auch sind
 % beliebig viele Vorzeichen erlaubt.
 %    \begin{macrocode}
 %<*base>
-\newcommand\ifintnumber[1]{%
+\providecommand*{\ifintnumber}{%
+  \PackageWarning{scrbase}{Usage of deprecated command
+    `\string\ifintnumber'.\MessageBreak
+    The command has been renamed to because of a\MessageBreak
+    recommendation of LaTeX3 team members.\MessageBreak
+    Please replace `\string\ifintnumber` by `\string\Ifintnumber`%
+  }%
+  \Ifnumber
+}
+\newcommand\Ifintnumber[1]{%
   \begingroup\@tempswafalse\let\scr@next\scr@test@sign
     \expandafter\scr@next#1\scr@next
     \if@tempswa
@@ -2478,14 +2491,27 @@
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
+% \end{macro}
 %
 % \begin{macro}{\ifdimen}
+% \changes{v3.28}{2019/11/18}{umbenannt in \cs{Ifdimen}}%^^A
+% \begin{macro}{\Ifdimen}
+% \changes{v3.28}{2019/11/18}{neu aus Umbenennung von \cs{ifdimen}}%^^A
 % Dieses Makro testet, ob ein übergebener Parameter eine Dimension
 % ist und führt in Abhängigkeit davon den zweiten oder dritten
 % Parameter aus.
 %    \begin{macrocode}
 %<*base>
-\newcommand{\ifdimen}[1]{%
+\providecommand*{\ifdimen}{%
+  \PackageWarning{scrbase}{Usage of deprecated command
+    `\string\ifdimen'.\MessageBreak
+    The command has been renamed to because of a\MessageBreak
+    recommendation of LaTeX3 team members.\MessageBreak
+    Please replace `\string\ifdimen` by `\string\Ifdimen`%
+  }%
+  \Ifdimen
+}
+\newcommand{\Ifdimen}[1]{%
   \begingroup\@tempswatrue\let\scr@next\test@posdimen
   \expandafter\test@dimen#1\scr@next
   \if@tempswa
@@ -2546,24 +2572,25 @@
 %    \end{macrocode}
 % \begin{macro}{\test@@ifdimunt}
 % \changes{v3.21}{2016/05/27}{elf bis zwölf Einheiten nicht neun}
+% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
 % Anschließend wird dann getestet, ob es sich um eine der elf bis zwölf
 % üblichen Einheiten handelt.
 %    \begin{macrocode}
 \newcommand*\test@@ifdimunt[1]{%
   \@tempswafalse
-  \ifstr{#1}{pt}{\@tempswatrue}{%
-    \ifstr{#1}{pc}{\@tempswatrue}{%
-      \ifstr{#1}{in}{\@tempswatrue}{%
-        \ifstr{#1}{bp}{\@tempswatrue}{%
-          \ifstr{#1}{cm}{\@tempswatrue}{%
-            \ifstr{#1}{mm}{\@tempswatrue}{%
-              \ifstr{#1}{dd}{\@tempswatrue}{%
-                \ifstr{#1}{cc}{\@tempswatrue}{%
-                  \ifstr{#1}{sp}{\@tempswatrue}{%
-                    \ifstr{#1}{ex}{\@tempswatrue}{%
-                      \ifstr{#1}{em}{\@tempswatrue}{%
+  \Ifstr{#1}{pt}{\@tempswatrue}{%
+    \Ifstr{#1}{pc}{\@tempswatrue}{%
+      \Ifstr{#1}{in}{\@tempswatrue}{%
+        \Ifstr{#1}{bp}{\@tempswatrue}{%
+          \Ifstr{#1}{cm}{\@tempswatrue}{%
+            \Ifstr{#1}{mm}{\@tempswatrue}{%
+              \Ifstr{#1}{dd}{\@tempswatrue}{%
+                \Ifstr{#1}{cc}{\@tempswatrue}{%
+                  \Ifstr{#1}{sp}{\@tempswatrue}{%
+                    \Ifstr{#1}{ex}{\@tempswatrue}{%
+                      \Ifstr{#1}{em}{\@tempswatrue}{%
                         \scr@ifpdfoutput{%
-                          \ifstr{#1}{px}{\@tempswatrue}{}%
+                          \Ifstr{#1}{px}{\@tempswatrue}{}%
                         }{}%
                       }%
                     }%
@@ -2585,19 +2612,18 @@
 % \end{macro}
 % \end{macro}
 % \end{macro}
+% \end{macro}
 %
 %
 % \begin{macro}{\ifpdftex}
 % \changes{v2.95}{2002/08/19}{neu}%^^A
+% \changes{v3.28}{2019/11/18}{entfernt}%^^A
 % \begin{macro}{\scr@ifpdftex}
 % \changes{v2.95}{2002/08/19}{neu (intern)}%^^A
 % If-then-else-Konstrukt, um zu testen, ob pdf\TeX{} verwendet wird.
 %    \begin{macrocode}
 %<*base>
 \newcommand{\scr@ifpdftex}{\ifnotundefined{pdftexversion}}
-\let@as@internal@defined{ifpdftex}
-\BeforePackage{pdfcprot}{\let\ifpdftex\relax}
-\AfterPackage{pdfcprot}{\let@as@internal@defined{ifpdftex}}
 %</base>
 %    \end{macrocode}
 % \end{macro}
@@ -2628,7 +2654,8 @@
 %  
 % \begin{macro}{\ifVTeX}
 % \changes{v2.95}{2002/08/19}{neu}%^^A
-% \changes{v2.97c}{2007/06/20}{umdefiniert von \cs{ifvtex}}
+% \changes{v2.97c}{2007/06/20}{umdefiniert von \cs{ifvtex}}%^^A
+% \changes{v3.28}{2019/11/18}{entfernt}%^^A
 % \begin{macro}{\scr@ifVTeX}
 % \changes{v2.95}{2002/08/19}{neu}%^^A
 % \changes{v2.97c}{2007/06/20}{umdefiniert von \cs{scr@ifvtex}}
@@ -2636,7 +2663,6 @@
 %    \begin{macrocode}
 %<*base>
 \newcommand{\scr@ifVTeX}{\ifnotundefined{VTeXversion}}
-\let@as@internal@defined{ifVTeX}
 %</base>
 %    \end{macrocode}
 % \end{macro}
@@ -2647,7 +2673,10 @@
 % \changes{v2.8q}{2001/10/19}{\cs{pdfoutput} wird nicht mehr zu
 %      \cs{relax}, wenn zuvor undefiniert}
 % \changes{v2.8q}{2001/10/19}{darf bereits definiert sein}%^^A
-% \changes{v2.8q}{2001/10/19}{Verwendung von \cs{scr@ifpdfoutput}}
+% \changes{v2.8q}{2001/10/19}{Verwendung von \cs{scr@ifpdfoutput}}%^^A
+% \changes{v3.28}{2019/11/18}{Umbenannt in \cs{Ifpdfoutput}}%^^A
+% \begin{macro}{\Ifpdfoutput}
+% \changes{v3.28}{2019/11/18}{Neu aus Umbenennung von \cs{ifpdfoutput}}%^^A
 % \begin{macro}{\scr@ifpdfoutput}
 % \changes{v2.8q}{2001/10/19}{neu (intern)}%^^A
 % \changes{v2.8q}{2001/11/13}{funktioniert}%^^A
@@ -2686,14 +2715,18 @@
     \fi
   }%
 }%
-\let@as@internal@defined{ifpdfoutput}
+\newcommand*{\Ifpdfoutput}{\scr@ifpdfoutput}
 %</base>
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 %
 % \begin{macro}{\ifpsoutput}
 % \changes{v2.95}{2002/08/21}{neu}%^^A
+% \changes{v3.28}{2019/11/18}{umbenannt in \cs{Ifpsoutput}}%^^A
+% \begin{macro}{\Ifpsoutput}
+% \changes{v3.28}{2019/11/18}{neu aus Umbenennung von \cs{ifpsoutput}}%^^A
 % \begin{macro}{\scr@ifpsoutput}
 % \changes{v2.95}{2002/08/21}{neu (intern)}%^^A
 % \changes{v2.95}{2004/07/20}{Expandierbarkeit verbessert}%^^A
@@ -2720,14 +2753,18 @@
     }%
   }%
 }
-\let@as@internal@defined{ifpsoutput}
+\newcommand*{\Ifpsoutput}{\scr@ifpsoutput}
 %</base>
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 %
 % \begin{macro}{\ifdvioutput}
 % \changes{v2.95}{2002/08/21}{neu}%^^A
+% \changes{v3.28}{2019/11/18}{umbenannt in \cs{Ifdvioutput}}%^^A
+% \begin{macro}{\Ifdvioutput}
+% \changes{v3.28}{2019/11/18}{neu aus Umbenennung von \cs{ifdvioutput}}%^^A
 % \begin{macro}{\scr@ifdvioutput}
 % \changes{v2.95}{2002/08/21}{neu (intern)}%^^A
 % \changes{v2.95}{2004/07/20}{Expandierbarkeit verbessert}%^^A
@@ -2763,9 +2800,10 @@
     \fi
   }%
 }
-\let@as@internal@defined{ifdvioutput}
+\newcommand*{\Ifdvioutput}{\scr@ifdvioutput}
 %</base>
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 %
@@ -2932,6 +2970,7 @@
 % \changes{v3.23}{2017/02/16}{Korrektur: Haken danach verwendet die Familie
 %   statt des Mitglieds}%^^A
 % \changes{v3.27}{2019/10/02}{Fehlermeldungen verbessert}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
 % Entspriche \cs{ExecuteOptions} jedoch \textsf{keyval}-Optionen. Insbesondere
 % ist die Anweisung reentrant! Es ist jedoch zu beachten, dass der hook lokal
 % zum jeweiligen Aufruf ist.
@@ -3010,7 +3049,7 @@
           }%
         }{%
           \scr@execute@option{#2}%
-          \ifstr{#1}{}{}{%
+          \Ifstr{#1}{}{}{%
 %    \end{macrocode}
 % \changes{v3.20}{2015/11/18}{Memberoptionstest nach Familyoptionsausführung
 %     korrigiert}%^^A
@@ -3236,7 +3275,7 @@
 % tatsächlich kein Mitglied eine solche Option oder eine
 % \texttt{@else@}-Option hatte.
 %    \begin{macrocode}
-            \ifstr{\reserved@a}{#1}{}{%
+            \Ifstr{\reserved@a}{#1}{}{%
               \scr@ifundefinedorrelax{KV@\reserved@a @@else@}{}{%
                 \expandafter\scr@execute@elseoption\expandafter{\reserved@a}%
                 \ifx\FamilyKeyState\FamilyKeyStateProcessed
@@ -3950,18 +3989,19 @@
 % \changes{v3.00}{2008/04/30}{Neue Anweisung}%^^A
 % \changes{v3.11a}{2012/05/25}{Argument in Fehlermeldung korrigiert}%^^A
 % \changes{v3.27}{2019/07/08}{Leeres Argument ist \texttt{true}}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
 % Über diese Anweisung wird der Wert dann gesetzt. Dabei ist das erste
 % Argument die Familie, das zweite der Name des Schlüssels, das dritte der
 % Schalter und das vierte schließlich der gewünschte Wert.
 %    \begin{macrocode}
 \newcommand*{\FamilySetBool}[4]{%
-  \ifstr{#4}{}{\@nameuse{#3true}\FamilyKeyStateProcessed}{%
-    \ifstr{#4}{true}{\@nameuse{#3true}\FamilyKeyStateProcessed}{%
-      \ifstr{#4}{on}{\@nameuse{#3true}\FamilyKeyStateProcessed}{%
-        \ifstr{#4}{yes}{\@nameuse{#3true}\FamilyKeyStateProcessed}{%
-          \ifstr{#4}{false}{\@nameuse{#3false}\FamilyKeyStateProcessed}{%
-            \ifstr{#4}{off}{\@nameuse{#3false}\FamilyKeyStateProcessed}{%
-              \ifstr{#4}{no}{\@nameuse{#3false}\FamilyKeyStateProcessed}{%
+  \Ifstr{#4}{}{\@nameuse{#3true}\FamilyKeyStateProcessed}{%
+    \Ifstr{#4}{true}{\@nameuse{#3true}\FamilyKeyStateProcessed}{%
+      \Ifstr{#4}{on}{\@nameuse{#3true}\FamilyKeyStateProcessed}{%
+        \Ifstr{#4}{yes}{\@nameuse{#3true}\FamilyKeyStateProcessed}{%
+          \Ifstr{#4}{false}{\@nameuse{#3false}\FamilyKeyStateProcessed}{%
+            \Ifstr{#4}{off}{\@nameuse{#3false}\FamilyKeyStateProcessed}{%
+              \Ifstr{#4}{no}{\@nameuse{#3false}\FamilyKeyStateProcessed}{%
                 \FamilyUnknownKeyValue{#1}{#2}{#4}{%
                   `true', `on', `yes', `false', `off', `no'%
                 }%
@@ -4867,6 +4907,7 @@
 % 
 % \begin{macro}{\ForDoHook}
 % \changes{v3.27}{2019/02/05}{New}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
 % Arguments:
 % \begin{description}
 % \item[\meta{specificator}:]
@@ -4882,7 +4923,7 @@
 %    \begin{macrocode}
 %<*base>
 \newcommand*{\ForDoHook}[2]{%
-  \ifstr{#1}{}{%
+  \Ifstr{#1}{}{%
     \PackageError{scrbase}{empty do-hook specificator}{%
       You've tried to use an empty do-hook specificator,\MessageBreak
       but do-hook specificators must not be empty.%
@@ -4905,6 +4946,7 @@
 %    \end{macrocode}
 % \begin{macro}{\SplitDoHook}
 % \changes{v3.27}{2019/02/04}{New}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
 % Arguments:
 % \begin{description}
 % \item[\meta{specificator}:]
@@ -4917,7 +4959,7 @@
 % command} is defined to be the rest.
 %    \begin{macrocode}
 \newcommand*{\SplitDoHook}[3]{%
-  \ifstr{#1}{}{%
+  \Ifstr{#1}{}{%
     \PackageWarning{scrbase}{empty do-hook specificator}%
     \let#2\@empty\let#3\@empty
   }{%
@@ -5010,7 +5052,7 @@
 % is local to the current group.
 %    \begin{macrocode}
 \newcommand*{\AddtoDoHook}[2]{%
-  \ifstr{#1}{}{%
+  \Ifstr{#1}{}{%
     \PackageError{scrbase}{empty hook specificator}{%
       As hook specificators can never be empty, the first argument\MessageBreak
       of \string\AddtoDoHook\space must expand to an not empty string.%
@@ -5027,6 +5069,7 @@
 %
 % \begin{macro}{\AddtoOneTimeDoHook}
 % \changes{v3.27}{2019/02/02}{New}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
 % Arguments:
 % \begin{description}
 % \item[\meta{specificator}:]
@@ -5038,7 +5081,7 @@
 % is executed only once.
 %    \begin{macrocode}
 \newcommand*{\AddtoOneTimeDoHook}[2]{%
-  \ifstr{#1}{}{%
+  \Ifstr{#1}{}{%
     \PackageError{scrbase}{empty hook specificator}{%
       As hook specificators can never be empty, the first argument\MessageBreak
       of \string\AddtoDoHook\space must expand to an not empty string.%

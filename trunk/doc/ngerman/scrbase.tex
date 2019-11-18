@@ -717,8 +717,8 @@ ausgegeben werden.%
   \Macro{FamilySetBool} erfolgreich war oder nicht,
   auszuführen. Es\textnote{Achtung!} ist zu beachten, dass an dieser Stelle
   unbedingt ein Test mit Hilfe von \Macro{ifx} vorzunehmen ist. Expandierende
-  Tests wie \Macro{ifstr} sind hier zu vermeiden. Sie können abhängig vom
-  aktuellen Status und dem Vergleichszustand zu unterschiedlichen
+  Tests wie \DescRef{\LabelBase.cmd.Ifstr} sind hier zu vermeiden. Sie können
+  abhängig vom aktuellen Status und dem Vergleichszustand zu unterschiedlichen
   Fehlermeldungen und auch zu falschen Ergebnissen führen.%
 \end{Example}%
 \EndIndexGroup
@@ -1042,7 +1042,7 @@ erwartet. Allerdings\ChangedAt{v3.12}{\Package{scrbase}} wird die
     \ifx\FamilyKeyState\FamilyKeyStateProcessed
       \@Feinschnittfalse
     \else      
-      \ifstr{#1}{fein}{%
+      \Ifstr{#1}{fein}{%
         \@Aufschnitttrue
         \@Feinschnittrue
         \FamilyKeyStateProcessed
@@ -1077,192 +1077,54 @@ erwartet. Allerdings\ChangedAt{v3.12}{\Package{scrbase}} wird die
   einfach verzichten und damit den Fehlerstatus von
   \DescRef{\LabelBase.cmd.FamilySetBool} übernehmen können.
 
-  Die bei den Tests verwendete Anweisung \Macro{ifstr}\IndexCmd{ifstr} ist auf
-  \DescPageRef{scrbase.cmd.ifstr} in \autoref{sec:scrbase.if} erklärt.
+  Die bei den Tests verwendete Anweisung
+  \DescRef{\LabelBase.cmd.Ifstr}\IndexCmd{Ifstr} ist auf
+  \DescPageRef{scrbase.cmd.Ifstr} in \autoref{sec:scrbase.if} erklärt.
 \end{Example}
 %
 \EndIndexGroup
 \ExampleEndFix
 
 
-\begin{Declaration}
-  \Macro{FamilyElseValues}
-\end{Declaration}
-\iffalse% Lange veraltet --> Doku entfernt.
-In\ChangedAt{v3.12}{\Package{scrbase}} früheren\textnote{Veraltet!} Versionen
-von \Package{scrbase} konnte man über die Anweisung \Macro{FamilyElseValues}
-weitere erlaubte Werte für die Bearbeitung durch
-\DescRef{\LabelBase.cmd.FamilyUnknownKeyValue}
-\iffalse% Umbruchkorrekturtext
-in der Form
-\begin{flushleft}\vskip\dp\strutbox\begin{tabular}{l}
-    \texttt{,} `\PName{Wert}'\texttt{,} `\PName{Wert}' \dots
-\end{tabular}\vskip\dp\strutbox\end{flushleft}
-\fi%
-ablegen, die dann ebenfalls in einer Fehlermeldung mit ausgegeben wurden. Seit
-Version~3.12 gibt \DescRef{\LabelBase.cmd.FamilyUnknownKeyValue} keine
-Fehlermeldungen mehr aus, sondern setzt nur noch
-\DescRef{\LabelBase.cmd.FamilyKeyState} entsprechend. Damit ist die Verwendung
-von \Macro{FamilyElseValue} ebenfalls überholt. %
-\else%
-Diese\ChangedAt{v3.12}{\Package{scrbase}} Anweisung ist seit Version~3.12
-veraltet. Ihre ursprüngliche Bedeutung ist nicht mehr von Belang. %
-\fi%
-Ihre Verwendung wird jedoch erkannt und führt dann zu einer Aufforderung, den
-Code entsprechend anzupassen.%
-\EndIndexGroup
-
-
 \section{Verzweigungen}
 \seclabel{if}
 
-Das Paket \Package{scrbase} stellt eine ganze Reihe von
-Verzweigungsanweisungen zur Verfügung. Dabei wird nicht auf die \TeX-Syntax
-von Verzweigungen wie beispielsweise
-\begin{lstcode}
-  \iftrue
-    ...
-  \else
-    ...
-  \fi
-\end{lstcode}
-gebaut, sondern es wird die \LaTeX-Syntax mit Argumenten eingesetzt, wie man
-sie auch von \LaTeX-Anweisungen wie \Macro{IfFileExists},
-\Macro{@ifundefined}, \Macro{@ifpackageloaded} und vielen weiteren
-kennt. Einige Paketautoren ziehen es allerdings vor, die \TeX-Syntax auch für
-Anwender in die \LaTeX-Ebene zu bringen. Da es sich bei den Verzweigungen von
-\Package{scrbase} um recht grundlegende Möglichkeiten handelt, ist die
-Wahrscheinlichkeit gegeben, dass dabei gleichnamige Anwenderanweisungen
-verwendet würden. Dies könnte selbst bei eigentlich gleicher Semantik
-zu einem Problem aufgrund unterschiedlichen Syntax
-führen. \Package{scrbase} geht daher auf Nummer sicher.
+Das Paket \Package{scrbase} stellt diverse Verzweigungsanweisungen zur
+Verfügung. Dabei wird überwiegend die \LaTeX-Syntax mit Argumenten eingesetzt,
+die man von Anweisungen wie \Macro{IfFileExists}\iffalse % Umbruchkorrektur
+, \Macro{@ifundefined}, \Macro{@ifpackageloaded} und vielen weiteren\fi %
+\ kennt.
 
 \begin{Declaration}
-  \OptionVName{internalonly}{Wert}
-\end{Declaration}
-Von \Package{scrbase} werden einige Verzweigungsanweisungen
-bereitgestellt. Dabei verwendet es primär die Bezeichnungen
-\Macro{scr@\PName{Name}}\textnote{Paketautoren}. Es handelt sich somit
-um interne Anweisungen. Diese werden auch intern von \KOMAScript{}
-verwendet. Paket- und Klassenautoren können diese Anweisungen ebenfalls
-verwenden, sollten sie aber nicht umdefinieren. Da einige dieser Anweisungen
-auch für Benutzer nützlich sein können, werden die gleichen Anweisungen
-normalerweise auch als \Macro{\PName{Name}}\textnote{Anwender}
-bereitgestellt. Da eventuell andere Pakete gleichnamige Anweisungen mit
-anderer Syntax bereitstellen könnten und es so zu Konflikten kommen könnte,
-kann der Anwender die Definition von \Macro{\PName{Name}} verhindern. Dazu
-gibt er entweder die Option ohne Wertangabe an. In diesem Fall werden nur die
-internen Verzweigungsanweisungen definiert. Oder er gibt genau die
-Anweisungen, die nicht definiert werden sollen, als Wert an, wobei er
-»\Macro{}« durch »\texttt{/}« ersetzt.
-
-Paket- und Klassenautoren sollten diese Option normalerweise nicht verwenden.
-Anwender können sie mit oder ohne Wertangabe entweder als globale Option bei
-\DescRef{maincls.cmd.documentclass} oder per
-\Macro{PassOptionsToPackage}\IndexCmd{PassOptionsToPackage}
-angeben. Insbesondere wenn keine \KOMAScript-Klasse verwendet wird, sei der
-zweite Weg unter Verwendung von \Macro{PassOptionsToPackage} ausdrücklich
-empfohlen.
-\begin{Example}
-  Der Anwender will nicht, dass die Anweisungen
-  \DescRef{\LabelBase.cmd.ifpdftex} und
-  \DescRef{\LabelBase.cmd.ifVTeX} von \Package{scrbase} definiert
-  werden. Also verwendet er beim Laden der Klasse:
-\begin{lstcode}
-  \documentclass[%
-    internalonly=/ifpdftex/ifVTeX%
-  ]{foo}
-\end{lstcode}
-  Der Klassenname \Class{foo} wird hier als Platzhalter für irgendeine Klasse
-  verwendet.  Die Anweisungen \DescRef{\LabelBase.cmd.ifVTeX}
-  und \DescRef{\LabelBase.cmd.ifpdftex} werden im weiteren Verlauf
-  dieses Abschnittes erklärt.
-
-  Falls \Class{foo} keine \KOMAScript-Klasse ist, kann man in der
-  \File{log}-Datei des \LaTeX-Laufs eventuell die Warnung
-\begin{lstoutput}
-  LaTeX Warning: Unused global option(s):
-       [internalonly=/ifpdftex/ifVTeX].
-\end{lstoutput}
-  finden. Diese Warnung trifft trotz Verwendung von \Package{scrbase} und
-  trotz der darin stattfindenden Auswertung der Option auf, wenn
-  eine Klasse \Package{scrbase} vor der Verarbeitung der eigenen Optionen
-  lädt. Dies dürfte die Regel sein, da nur so die Klasse \Package{scrbase} für
-  die Definition eigener Optionen verwenden kann. Daher sei Anwendern das
-  Setzen der Option per \Macro{PassOptionsToPackage} vor dem Laden der Klasse
-  empfohlen. Mit
-\begin{lstcode}
-  \PassOptionsToPackage{%
-    internalonly=/ifpdftex/ifVTeX%
-  }{scrbase}
-  \documentclass{foo}
-\end{lstcode}
-  tritt das Problem nicht auf.
-\end{Example}
-
-Paket- und Klassenautoren sollten wie \KOMAScript{} selbst auch die internen
-Namen verwenden. Zur Vollständigkeit sind in den nachfolgenden Erklärungen
-aber auch die Anwenderanweisungen angegeben.%
-
-Das\textnote{Achtung!} \LaTeX-Team hat 2019 in Version~1.0 des Pakets
-\Package{iftex}\IndexPackage{iftex}\important{\Package{iftex}} selbst
-\DescRef{\LabelBase.cmd.ifpdftex} und \DescRef{\LabelBase.cmd.ifVTeX} neu
-definiert. Leider sind diese Definitionen inkompatibel mit den bereits seit
-2002 existierenden Definitionen in \Package{scrbase}. Diese Inkompatibilität\important[i]{\Package{ifluatex}\\ \Package{ifpdf}\\
-  \Package{ifvtex}\\ \Package{ifxetex}} betrifft leider auch die Pakete
-\Package{ifpdf}\IndexPackage{ifpdf} und \Package{ifvtex}\IndexPackage{ifvtex}
-und sogar von \Package{ifxetex}\IndexPackage{ifxetex} und
-\Package{ifluatex}\IndexPackage{ifluatex} in ihren Neuauflagen als
-Wrapper-Pakete von \Package{iftex}. Da anzunehmen ist, dass sich Paketautoren
-und Beispiele im Internet zunehmend auf die Implementierung in \Package{iftex}
-verlassen, ist leider zu befürchten, dass solche Pakete und Beispiele
-zunehmend inkompatibel mit \Package{scrbase} werden.  Um solche Probleme zu
-vermeiden, muss leider empfohlen werden, die im Beispiel gezeigte Option
-grundsätzlich zu setzen und so auf die \Package{scrbase}-Version der genannten
-Befehle zu verzichten. Eine grundsätzliche Änderung in \Package{scrbase} würde
-leider ihrerseits unvermeidbar zu Inkompatibilitäten mit existierenden
-Dokumenten und eventuell auch mit Paketen oder Klassen führen, die sich auf
-die bisherige Definition in \Package{scrbase} verlassen. Daher ist sie leider
-nicht möglich.  Da nur wenige Anwender wissen, welche Pakete \Package{iftex},
-\Package{ifpdf}, \Package{ifluatex}, \Package{ifvtex} oder \Package{ifxetex}
-verwenden, bleibt für neue Dokumente somit der gezeigte, eher unkomfortable
-Weg. Für existierende Dokumente kann nicht ausgeschlossen werden, dass diese
-im Zuge von Updates abhängiger Pakete irgendwann Fehler produzieren und
-geändert werden müssen. Der Autor von \KOMAScript{} bedauert dies
-ausdrücklich, zumal solche Probleme durch die freundliche Rücksichtnahme
-früherer Autoren der genannten Pakete über Jahrzehnte vermieden werden
-konnten.%
-\EndIndexGroup
-
-
-\begin{Declaration}
-  \Macro{scr@ifundefinedorrelax}
-  \Parameter{Name}\Parameter{Dann-Teil}\Parameter{Sonst-Teil}
-  \Macro{ifundefinedorrelax}
+  \Macro{Ifundefinedorrelax}
   \Parameter{Name}\Parameter{Dann-Teil}\Parameter{Sonst-Teil}
 \end{Declaration}
-Diese Anweisung funktioniert prinzipiell wie \Macro{@ifundefined} aus dem
-\LaTeX-Kern (siehe \cite{latex:source2e}). Es wird also der \PName{Dann-Teil}
-ausgeführt, wenn \PName{Name} der Name einer undefinierten Anweisung oder
-\Macro{\PName{Name}} derzeit \Macro{relax} ist. Im Unterschied zu
-\Macro{@ifundefined} wird auch bei älteren \LaTeX-Versionen %
+Diese\ChangedAt{v3.28}{\Package{scrbase}} Anweisung funktioniert
+prinzipiell wie \Macro{@ifundefined} aus dem \LaTeX-Kern (siehe
+\cite{latex:source2e}). Es wird also der \PName{Dann-Teil} ausgeführt, wenn
+\PName{Name} der Name einer undefinierten Anweisung oder \Macro{\PName{Name}}
+derzeit \Macro{relax} ist. Im Unterschied zu \Macro{@ifundefined} wird auch
+bei älteren \LaTeX-Versionen %
 \iftrue% Umbruchvarianten
 weder Hash-Speicher belegt noch \Macro{\PName{Name}} %
 \else%
 \Macro{\PName{Name}} nicht %
 \fi%
-zu \Macro{relax}, wenn \Macro{\PName{Name}} zuvor undefiniert war.%
+zu \Macro{relax}, wenn \Macro{\PName{Name}} zuvor undefiniert
+war.
 \EndIndexGroup
 
 
 \begin{Declaration}
-  \Macro{ifnotundefined}\Parameter{Name}%
+  \Macro{Ifnotundefined}\Parameter{Name}%
   \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
 \end{Declaration}
-Ist die Anweisung mit dem angegebenen Namen bereits definiert wird der
-\PName{Dann-Teil} ausgeführt, anderenfalls der \PName{Sonst-Teil}. Da es bei
-\eTeX{} bereits ein Primitiv \Macro{ifdefined} gibt, musste leider diese
-etwas unhandliche Bezeichnung gewählt werden.%
+Ist\ChangedAt{v3.28}{\Package{scrbase}} die Anweisung mit dem angegebenen
+Namen bereits definiert wird der \PName{Dann-Teil} ausgeführt, anderenfalls
+der \PName{Sonst-Teil}.\iftrue % Umbruchkorrektur
+\ Da es bereits ein Paket mit einer inkompatiblen
+Anweisung \Macro{Ifdefined} gibt, musste leider diese etwas unhandliche
+Bezeichnung gewählt werden.%
 \iffalse%
 \iftrue% Umbruchvarianten
 \ Von dieser Anweisung gibt es keine interne Variante.%
@@ -1270,151 +1132,16 @@ etwas unhandliche Bezeichnung gewählt werden.%
 \ Es gibt keine interne Variante.%
 \fi%
 \fi%
-\EndIndexGroup
-
-
-\begin{Declaration}
-  \Macro{scr@ifluatex}
-  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
-\end{Declaration}
-Wird\ChangedAt{v3.21}{\Package{scrbase}} mit lua\TeX{} gearbeitet, wird der
-\PName{Dann-Teil} ausgeführt, anderenfalls der \PName{Sonst-Teil}.
-\iffalse% Umbruchkorrekturtext
-Diese Unterscheidung ist nur sehr selten wirklich von Nutzen. %
-\fi%
-In der Regel sollte man besser auf die gewünschte Anweisung oder Fähigkeit
-testen.%
-\iffalse% Umbruchvarianten
-Von\textnote{Achtung!} dieser Anweisung gibt es kein
-Benutzeräquivalent.%
 \fi%
 \EndIndexGroup
 
 
 \begin{Declaration}
-  \Macro{scr@ifpdftex}
-  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
-  \Macro{ifpdftex}
+  \Macro{Ifstr}\Parameter{Zeichenfolge}\Parameter{Zeichenfolge}%
   \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
 \end{Declaration}
-Wird mit pdf\TeX{} gearbeitet, wird der \PName{Dann-Teil} ausgeführt,
-anderenfalls der \PName{Sonst-Teil}. Dabei ist es unerheblich, ob tatsächlich
-eine PDF-Datei ausgegeben werden soll oder nicht.
-\iffalse% Umbruchkorrekturtext
-Diese Unterscheidung ist nur sehr selten wirklich von Nutzen. %
-\fi%
-In der Regel sollte man besser auf die gewünschte Anweisung testen.
-Beachten\textnote{Achtung!} Sie auch den Hinweis bezüglich \Package{iftex} am
-Ende der Erklärung zu Option \DescRef{\LabelBase.option.internalonly}.%
-\EndIndexGroup
-
-
-\begin{Declaration}
-  \Macro{scr@ifVTeX}
-  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
-  \Macro{ifVTeX}
-  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
-\end{Declaration}
-Wird mit V\TeX{} gearbeitet, wird der \PName{Dann-Teil} ausgeführt,
-anderenfalls der \PName{Sonst-Teil}. %
-\iffalse% Umbruchkorrekturtext
-Diese Unterscheidung ist nur sehr selten wirklich von Nutzen. %
-\fi%
-In der Regel sollte man besser auf die gewünschte Anweisung testen.
-Beachten\textnote{Achtung!} Sie auch den Hinweis bezüglich \Package{iftex} am
-Ende der Erklärung zu Option \DescRef{\LabelBase.option.internalonly}.%
-\EndIndexGroup
-
-
-\begin{Declaration}
-  \Macro{scr@ifpdfoutput}
-  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
-  \Macro{ifpdfoutput}
-  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
-\end{Declaration}
-Wird eine PDF-Datei erzeugt, wird der \PName{Dann-Teil} ausgeführt,
-anderenfalls der \PName{Sonst-Teil}. Dabei ist es unerheblich, ob die
-PDF-Datei mit Hilfe von lua\TeX{}, pdf\TeX{}, V\TeX{} oder \XeTeX{} erzeugt
-wird.%
-\EndIndexGroup
-
-
-\begin{Declaration}
-  \Macro{scr@ifpsoutput}
-  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
-  \Macro{ifpsoutput}
-  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
-\end{Declaration}
-Wird eine PostScript-Datei erzeugt, wird der \PName{Dann-Teil} ausgeführt,
-anderenfalls der \PName{Sonst-Teil}. V\TeX{} kann PostScript direkt erzeugen,
-was hier erkannt wird. Wird hingegen kein V\TeX{} verwendet, ist aber ein
-Schalter \Macro{if@dvips} definiert, so wird die Entscheidung darüber
-getroffen. \KOMAScript{} stellt \Macro{if@dvips} in
-\hyperref[cha:typearea]{\Package{typearea}}\IndexPackage{typearea}%
-\IndexCmd{if@dvips} bereit.%
-\EndIndexGroup
-
-
-\begin{Declaration}
-  \Macro{scr@ifdvioutput}
-  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
-  \Macro{ifdvioutput}
-  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
-\end{Declaration}
-Wird eine DVI-Datei erzeugt, so wird der \PName{Dann-Teil} ausgeführt,
-anderenfalls der \PName{Sonst-Teil}. Es wird immer dann davon ausgegangen,
-dass eine DVI-Datei erzeugt wird, wenn keine direkte Ausgabe einer PDF- oder
-Postscript-Datei erkannt werden kann.%
-\EndIndexGroup
-
-
-\begin{Declaration}
-  \Macro{if@atdocument}\ \PName{Dann-Teil}\ %
-  \textMacro{else}\ \PName{Sonst-Teil} \textMacro{fi}
-\end{Declaration}
-\iffalse% Umbruchvarianten
-Diese Verzweigung existiert ganz bewusst nur als interne Anweisung. Dabei
-entspricht \Macro{if@atdocument} in der Dokumentpräambel \Macro{iffalse}, nach
-\Macro{begin}\PParameter{document} entspricht \Macro{if@atdocument} hingegen
-\Macro{iftrue}.  Klassen- und Paketautoren können dieses Anweisung manchmal
-sinnvoll nutzen, %
-\else%
-In der Dokumentpräambel enspricht \Macro{if@atdocument}
-\iftrue dem Schalter \fi
-\Macro{iffalse}, nach \Macro{begin}\PParameter{document} hingegen
-\Macro{iftrue}.  Klassen- und Paketautoren können dieses Anweisung nutzen, %
-\fi%
-wenn sich Anweisungen in der Dokumentpräambel anders verhalten sollen als
-innerhalb des Dokuments. Es\textnote{Achtung!} ist zu beachten, dass es sich
-bei dieser Anweisung um eine Verzweigung in \TeX-Syntax und nicht in
-\LaTeX-Syntax handelt!%
-\EndIndexGroup
-
-
-\iffree{\begin{Declaration}}{\begin{Declaration}[0]}% Umbruchkorrektur
-  \Macro{ifstr}\Parameter{Zeichenfolge}\Parameter{Zeichenfolge}%
-  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
-\end{Declaration}
-Die beiden Argumente \PName{Zeichenfolge} werden expandiert und dann
-verglichen. Sind sie gleich, so wird der \PName{Dann-Teil} ausgeführt,
-anderenfalls der \PName{Sonst-Teil}.%
-\iffalse% Umbruchkorrektur
-\iftrue% Umbruchvarianten
-\ Von dieser Anweisung gibt es keine interne Variante.%
-\else%
-\ Es gibt keine interne Variante.%
-\fi%
-\fi%
-\EndIndexGroup
-
-
-\begin{Declaration}
-  \Macro{ifstrstart}\Parameter{Zeichenfolge}\Parameter{Zeichenfolge}
-                    \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
-\end{Declaration}
-Die\ChangedAt{v3.12}{\Package{scrbase}} beiden Argumente \PName{Zeichenfolge}
-werden expandiert und dann verglichen. Beginnt die erste Zeichenfolge, von
-Leerzeichen abgesehen, mit der zweiten Zeichenfolge, so wird der
+Die\ChangedAt{v3.28}{\Package{scrbase}} beiden Argumente \PName{Zeichenfolge}
+werden expandiert und dann verglichen. Sind sie gleich, so wird der
 \PName{Dann-Teil} ausgeführt, anderenfalls der \PName{Sonst-Teil}.%
 \iffalse% Umbruchkorrektur
 \iftrue% Umbruchvarianten
@@ -1423,6 +1150,62 @@ Leerzeichen abgesehen, mit der zweiten Zeichenfolge, so wird der
 \ Es gibt keine interne Variante.%
 \fi%
 \fi%
+\EndIndexGroup
+
+
+\begin{Declaration}
+  \Macro{Ifstrstart}\Parameter{Zeichenfolge}\Parameter{Zeichenfolge}
+                    \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
+\end{Declaration}
+Die\ChangedAt{v3.12}{\Package{scrbase}}\ChangedAt{v3.28}{\Package{scrbase}}
+beiden Argumente \PName{Zeichenfolge} werden expandiert und dann
+verglichen. Beginnt die erste Zeichenfolge, von Leerzeichen abgesehen, mit der
+zweiten Zeichenfolge, so wird der \PName{Dann-Teil} ausgeführt, anderenfalls
+der \PName{Sonst-Teil}.%
+\iffalse% Umbruchkorrektur
+\iftrue% Umbruchvarianten
+\ Von dieser Anweisung gibt es keine interne Variante.%
+\else%
+\ Es gibt keine interne Variante.%
+\fi%
+\fi%
+\EndIndexGroup
+
+
+\begin{Declaration}
+  \Macro{Ifpdfoutput}
+  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
+\end{Declaration}
+Wird\ChangedAt{v3.28}{\Package{scrbase}} eine PDF-Datei erzeugt, wird der
+\PName{Dann-Teil} ausgeführt, anderenfalls der \PName{Sonst-Teil}. Dabei ist
+es unerheblich, ob die PDF-Datei mit Hilfe von lua\TeX{}, pdf\TeX{}, V\TeX{}
+oder \XeTeX{} erzeugt wird.%
+\EndIndexGroup
+
+
+\begin{Declaration}
+  \Macro{Ifpsoutput}
+  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
+\end{Declaration}
+Wird\ChangedAt{v3.28}{\Package{scrbase}} eine PostScript-Datei erzeugt, wird
+der \PName{Dann-Teil} ausgeführt, anderenfalls der \PName{Sonst-Teil}. V\TeX{}
+kann PostScript direkt erzeugen, was hier erkannt wird. Wird hingegen kein
+V\TeX{} verwendet, ist aber ein Schalter \Macro{if@dvips} definiert, so wird
+die Entscheidung darüber getroffen. \KOMAScript{} stellt \Macro{if@dvips} in
+\hyperref[cha:typearea]{\Package{typearea}}\IndexPackage{typearea}%
+\IndexCmd{if@dvips} bereit.%
+\EndIndexGroup
+
+
+\begin{Declaration}[0]
+  \Macro{Ifdvioutput}
+  \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
+\end{Declaration}
+Wird \ChangedAt{v3.28}{\Package{scrbase}}eine DVI-Datei erzeugt, so wird der
+\PName{Dann-Teil} ausgeführt, anderenfalls der \PName{Sonst-Teil}. Es wird
+immer dann davon \iffree{}{\pagebreak}% Umbruchkorrektur
+ausgegangen, dass eine DVI-Datei erzeugt wird, wenn keine
+direkte Ausgabe einer PDF- oder Postscript-Datei erkannt werden kann.%
 \EndIndexGroup
 
 
@@ -1463,12 +1246,13 @@ Fehlermeldung führen. Die Anweisung ist nicht voll expandierbar.%
 
 
 \begin{Declaration}
-  \Macro{ifdimen}\Parameter{Zeichenfolge}%
+  \Macro{Ifdimen}\Parameter{Zeichenfolge}%
   \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
 \end{Declaration}
-Der \PName{Dann-Teil} wird ausgeführt, wenn die einfache Expansion der
-\PName{Zeichenfolge} eine gültige Länge mit einer gültigen Längeneinheit
-ist. Anderenfalls wird der \PName{Sonst-Teil} verwendet.%
+Der\ChangedAt{v3.28}{\Package{scrbase}} \PName{Dann-Teil} wird ausgeführt,
+wenn die einfache Expansion der \PName{Zeichenfolge} eine gültige Länge mit
+einer gültigen Längeneinheit ist. Anderenfalls wird der \PName{Sonst-Teil}
+verwendet.%
 \iffalse% Umbruchkorrektur
 \iftrue% Umbruchvarianten
 \ Von dieser Anweisung gibt es keine interne Variante.%
@@ -1516,7 +1300,7 @@ Anweisung ist nicht voll expandierbar.%
 \EndIndexGroup
 
 
-\iffree{\begin{Declaration}}{\begin{Declaration}[0]}% Umbruchkorrektur
+\begin{Declaration}
   \Macro{ifisglue}\Parameter{Code}%
   \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
 \end{Declaration}
@@ -1535,16 +1319,17 @@ Fehlermeldung führen. Die Anweisung ist nicht voll expandierbar.%
 \EndIndexGroup
 
 
-\begin{Declaration}
+\iffree{\begin{Declaration}}{\begin{Declaration}[0]}% Umbruchkorrektur
   \Macro{ifisglueexpr}\Parameter{Code}%
   \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
 \end{Declaration}
 Wenn\ChangedAt{v3.12}{\Package{scrbase}} die Expansion von \PName{Code} in
 einer \Macro{glueexpr}\IndexCmd{glueexpr}, also einem
 \mbox{\eTeX}-Abstandsausdruck resultiert, wird der \PName{Dann-Teil}
-ausgeführt, anderenfalls der \PName{Sonst-Teil}. Es ist zu
-beachten,\textnote{Achtung!} dass fehlerhafte Ausdrücke zu Fehlermeldungen
-führen! Die Anweisung ist nicht voll expandierbar.%
+ausgeführt, \iffree{}{\pagebreak}% Umbruchkorrektur
+anderenfalls der \PName{Sonst-Teil}. Es ist zu beachten,\textnote{Achtung!}
+dass fehlerhafte Ausdrücke zu Fehlermeldungen führen! Die Anweisung ist nicht
+voll expandierbar.%
 \iffalse% Umbruchkorrektur
 \iftrue% Umbruchvarianten
 \ Von dieser Anweisung gibt es keine interne Variante.%
@@ -1610,12 +1395,12 @@ expandierbar.%
 
 
 \begin{Declaration}
-  \Macro{ifnumber}\Parameter{Zeichenfolge}%
+  \Macro{Ifnumber}\Parameter{Zeichenfolge}%
   \Parameter{Dann-Teil}\Parameter{Sonst-Teil}
 \end{Declaration}
-Der \PName{Dann-Teil} wird ausgeführt, wenn die einfache Expansion der
-\PName{Zeichenfolge} nur aus Ziffern besteht. In allen anderen Fällen wird der
-\PName{Sonst-Teil} verwendet.%
+Der\ChangedAt{v3.28}{\Package{scrbase}} \PName{Dann-Teil} wird ausgeführt,
+wenn die einfache Expansion der \PName{Zeichenfolge} nur aus Ziffern
+besteht. In allen anderen Fällen wird der \PName{Sonst-Teil} verwendet.%
 \iffalse% Umbruchkorrektur
 \iftrue% Umbruchvarianten
 \ Von dieser Anweisung gibt es keine interne Variante.%
@@ -1646,7 +1431,7 @@ expandierbar.%
 \EndIndexGroup
 
 
-\iffree{\begin{Declaration}}{\begin{Declaration}[0]}% Umbruchkorrektur
+\begin{Declaration}
   \Macro{IfActiveMkBoth}\Parameter{Dann-Teil}\Parameter{Sonst-Teil}
 \end{Declaration}
 Bei\ChangedAt{v3.27}{\Package{scrbase}} der Umschaltung zwischen automatischen
@@ -1704,11 +1489,34 @@ eine solches aktives \DescRef{scrlayer.cmd.@mkboth} entdeckt, so wird der
   \IfActiveMKBoth{\markright{Kolumnentitel}}{}
 \end{lstcode}%
 \end{Example}
-Noch einfacher lässt sich das Problem aus dem Beispiel übrigens mit Hilfe von
-\DescRef{scrlayer.cmd.@mkright} aus Paket
+Noch einfacher lässt sich das Problem aus dem Beispiel %
+\iffalse übrigens \fi % Umbruchkorrektur
+mit Hilfe von \DescRef{scrlayer.cmd.@mkright} aus Paket
 \hyperref[cha:scrlayer]{\Package{scrlayer}} lösen (siehe
 \autoref{sec:scrlayer.pagestyle.content},
 \DescPageRef{scrlayer.cmd.@mkright}).%
+\EndIndexGroup
+
+
+\begin{Declaration}[0]
+  \Macro{if@atdocument}\ \PName{Dann-Teil}\ %
+  \textMacro{else}\ \PName{Sonst-Teil} \textMacro{fi}
+\end{Declaration}
+\iftrue% Umbruchvarianten
+Diese Verzweigung in \TeX-Syntax existiert bewusst nur als interne
+Anweisung. In der Dokument \Macro{if@atdocument} in der Dokumentpräambel
+\Macro{iffalse}, nach \Macro{begin}\PParameter{document} entspricht
+\Macro{if@atdocument} hingegen \Macro{iftrue}.  Klassen- und Paketautoren
+können dieses Anweisung manchmal sinnvoll nutzen, %
+\else%
+In der Dokumentpräambel enspricht \Macro{if@atdocument} \iftrue dem Schalter
+\fi \Macro{iffalse}, nach \Macro{begin}\PParameter{document} hingegen
+\Macro{iftrue}.  Klassen- und Paketautoren können dieses Anweisung nutzen, %
+\fi%
+wenn sich Anweisungen in der Dokumentpräambel anders verhalten sollen als
+innerhalb des Dokuments. Es\textnote{Achtung!} ist zu beachten, dass es sich
+bei dieser Anweisung um eine Verzweigung in \TeX-Syntax und nicht in
+\LaTeX-Syntax handelt!%
 \EndIndexGroup
 
 
@@ -1872,7 +1680,7 @@ finden.\iffree{}{ \KOMAScript{} selbst definiert noch einige weitere
   Begriffe. Siehe dazu \autoref{sec:scrlttr2-experts.languages} ab
   \DescPageRef{scrlttr2-experts.cmd.yourrefname}.}
 %
-\iffree{}{\enlargethispage{4pt}}% Umbruchkorrektur
+%\iffree{}{\enlargethispage{4pt}}% Umbruchkorrektur
 \begin{desclist}
   \renewcommand*{\abovecaptionskipcorrection}{-\normalbaselineskip}%
   \desccaption[{%
@@ -2038,7 +1846,7 @@ von \Package{scrbase} bereit gestellt.
 \EndIndexGroup
 
 
-\iffree{\begin{Declaration}}{\begin{Declaration}[0]}% Umbruchkorrektur
+\begin{Declaration}
   \Macro{l@addto@macro}\Parameter{Anweisung}\Parameter{Erweiterung}%
 \end{Declaration}%
 Der \LaTeX-Kern bietet mit \Macro{g@addto@macro} eine interne Anweisung, um
@@ -2092,8 +1900,8 @@ Ausgabe als arabische Zahl ist \Macro{the} voranzustellen.%
 \EndIndexGroup
 
 
-\section[{Allgemeiner Mechanismus für mehrstufige Haken}]
-{Allgemeiner Mechanismus für mehrstufige
+\section[{Mechanismus für mehrstufige Haken}]
+{Mechanismus für mehrstufige
   Haken\ChangedAt{v3.27}{\Package{scrbase}}}
 \seclabel{hooks}
 
@@ -2333,6 +2141,16 @@ von \DescRef{\LabelBase.cmd.ForDoHook}.%
 \EndIndexGroup
 %
 \EndIndexGroup
+
+\section{Obsolete Optionen und Anweisungen}
+\seclabel{obsolete}
+
+Frühere Versionen von \Package{scrbase} verfügten über Optionen und
+Anweisungen, die inzwischen entfernt oder ersetzt wurden. Diese sind hier nur
+aus Gründen der Vollständigkeit aufgeführt und sollten nicht mehr verwendet
+werden.
+
+\LoadNonFree{scrbase}{0}%
 \EndIndexGroup
 
 \endinput

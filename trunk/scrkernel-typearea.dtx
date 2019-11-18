@@ -190,6 +190,7 @@
 %
 % \begin{macro}{\PaperNameToSize}
 % \changes{v3.23}{2017/02/22}{new}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
 % This command sets \cs{paperheight} and \cs{paperwidth} depending on
 % the name of a paper size. It currently supports the ISO formats of the
 % series A, B, C and D and the American formats letter, legal and
@@ -201,19 +202,19 @@
 %    \begin{macrocode}
 %<*package&options>
 \providecommand*{\PaperNameToSize}[2][warning]{%
-  \ifstr{#2}{letter}{%
+  \Ifstr{#2}{letter}{%
     \setlength\paperheight{11in}%
     \setlength\paperwidth {8.5in}%
   }{%
-    \ifstr{#2}{legal}{%
+    \Ifstr{#2}{legal}{%
       \setlength\paperheight{14in}%
       \setlength\paperwidth {8.5in}%
     }{%
-      \ifstr{#2}{executive}{%
+      \Ifstr{#2}{executive}{%
         \setlength\paperheight{10.5in}%
         \setlength\paperwidth {7.25in}%
       }{%
-        \ifstr{#2}{}{%
+        \Ifstr{#2}{}{%
           \ISO@PaperNameToSize[#1]{}{}\@nil
         }{%
           \edef\reserved@a{\noexpand\ISO@PaperNameToSize[#1]#2 \noexpand\@nil}%
@@ -226,6 +227,7 @@
 %    \end{macrocode}
 % \begin{macro}{\ISO@PaperNameToSize}
 % \changes{v3.23}{2017/02/22}{new (internal)}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifnumber} umbenannt in \cs{Ifnumber}}%^^A
 % For ISO paper sizes a sub-macro is used. It has to split the series and the
 % root.
 %    \begin{macrocode}
@@ -234,28 +236,28 @@
     \lowercase{\edef\reserved@a{#2}}%
     \@tempswafalse
     \if \reserved@a a%
-      \ifnumber{#3}{%
+      \Ifnumber{#3}{%
         \setlength{\paperwidth}{841sp}%
         \setlength{\paperheight}{1189sp}%
         \@tempswatrue
       }{}%
     \else
       \if \reserved@a b%
-        \ifnumber{#3}{%
+        \Ifnumber{#3}{%
           \setlength{\paperwidth}{1000sp}%
           \setlength{\paperheight}{1414sp}%
           \@tempswatrue
         }{}%
       \else
         \if \reserved@a c%
-          \ifnumber{#3}{%
+          \Ifnumber{#3}{%
             \setlength{\paperwidth}{917sp}%
             \setlength{\paperheight}{1297sp}%
             \@tempswatrue
           }{}%
         \else
           \if \reserved@a d%
-            \ifnumber{#3}{%
+            \Ifnumber{#3}{%
               \setlength{\paperwidth}{771sp}%
               \setlength{\paperheight}{1090sp}%
               \@tempswatrue
@@ -415,6 +417,7 @@
 % \changes{v3.02c}{2009/02/12}{new \Option{paper!=seascape}}%^^A
 % \changes{v3.12}{2013/03/05}{status signaling using \cs{FamilyKeyState}}%^^A
 % \changes{v3.22}{2016/07/29}{paper orientation depends on format name}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
 % Normally, the paper size should be set using this option. It provides the
 % ISO series A, B, C, D, value pairs
 % \Option{(\meta{width},\meta{height})} and the orientations
@@ -422,7 +425,7 @@
 %    \begin{macrocode}
 %<*package&typearea&options>
 \KOMA@key{paper}{%
-  \ifstr{#1}{seascape}{%
+  \Ifstr{#1}{seascape}{%
     \@seascapetrue
     \expandafter\ifnum\scr@ta@v@is@ge{3.22}\relax
       \@landscapetrue
@@ -436,7 +439,7 @@
     \KOMA@kav@remove{.typearea.\scr@pkgextension}{paper}{seascape}%
     \KOMA@kav@add{.typearea.\scr@pkgextension}{paper}{seascape}%
   }{%      
-    \ifstr{#1}{landscape}{%
+    \Ifstr{#1}{landscape}{%
       \@seascapefalse
       \expandafter\ifnum\scr@ta@v@is@ge{3.22}\relax
         \@landscapetrue
@@ -450,7 +453,7 @@
       \KOMA@kav@remove{.typearea.\scr@pkgextension}{paper}{seascape}%
       \KOMA@kav@add{.typearea.\scr@pkgextension}{paper}{landscape}%
     }{%
-      \ifstr{#1}{portrait}{%
+      \Ifstr{#1}{portrait}{%
         \expandafter\ifnum\scr@ta@v@is@ge{3.22}\relax
           \@landscapefalse
           \scr@setpaperorientation
@@ -463,7 +466,7 @@
         \KOMA@kav@remove{.typearea.\scr@pkgextension}{paper}{seascape}%
         \KOMA@kav@add{.typearea.\scr@pkgextension}{paper}{portrait}%
       }{%
-        \ifstr{#1}{letter}{%
+        \Ifstr{#1}{letter}{%
           \if@landscape
             \setlength\paperheight{8.5in}%
             \setlength\paperwidth {11in}%
@@ -479,7 +482,7 @@
             \if@landscape landscape\else portrait\fi\fi
           }%
         }{%
-          \ifstr{#1}{legal}{%
+          \Ifstr{#1}{legal}{%
             \if@landscape
               \setlength\paperheight{8.5in}%
               \setlength\paperwidth {14in}%
@@ -495,7 +498,7 @@
               \if@landscape landscape\else portrait\fi\fi
             }%
           }{%
-            \ifstr{#1}{executive}{%
+            \Ifstr{#1}{executive}{%
               \if@landscape
                 \setlength\paperheight{7.25in}%
                 \setlength\paperwidth {10.5in}%
@@ -725,17 +728,21 @@
 %   \cs{page\dots} will be tried (needed for lua\TeX{}~0.80.1)}%^^A
 % \begin{macro}{\set@dvipspagesize}
 % \changes{v2.95}{2002/08/27}{new (internal)}%^^A
-% \changes{v3.02c}{2009/02/13}{respecting \Option{seascape}}
+% \changes{v3.02c}{2009/02/13}{respecting \Option{seascape}}%^^A
 % \changes{v3.02c}{2009/02/14}{can be used inside the document}%^^A
 % \changes{v3.12}{2012/02/06}{not expanded
-%     \cs{let}\cs{if@tempswa}\cs{if@dvips} does even work is the later is not
-%     yet defined}
+%   \cs{let}\cs{if@tempswa}\cs{if@dvips} does even work is the later is not
+%   yet defined}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifnotundefined} renamed into
+%   \cs{Ifnotundefined}}%^^A
 % \begin{macro}{\setnot@dvipspagesize}
 % \changes{v2.95}{2002/08/27}{new (internal)}%^^A
 % \begin{macro}{\set@dvipdfmxpagesize}
 % \changes{v3.05a}{2010/03/18}{new (internal)}%^^A
 % \begin{macro}{\set@vtexpagesize}
 % \changes{v2.95}{2002/08/27}{new (internal)}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifnotundefined} renamed into
+%   \cs{Ifnotundefined}}%^^A
 % \begin{macro}{\scr@updatedvipspagesize}
 % \changes{v3.02c}{2009/02/14}{new (internal)}%^^A
 % \changes{v3.12}{2013/05/10}{deactivated, if \cs{XeTeXversion} exists}%^^A
@@ -760,7 +767,7 @@
       \begingroup
         \@tempswafalse
         \scr@ifdvioutput{\@tempswatrue}{%
-          \ifnotundefined{if@dvips}{%
+          \Ifnotundefined{if@dvips}{%
             \expandafter\let\csname if@tempswa\expandafter\endcsname
             \csname if@dvips\endcsname
           }{}%
@@ -852,7 +859,7 @@
   \begingroup
     \@tempswafalse
     \scr@ifdvioutput{\@tempswatrue}{%
-      \ifnotundefined{if@dvips}{%
+      \Ifnotundefined{if@dvips}{%
         \expandafter\let\csname if@tempswa\expandafter\endcsname
         \csname if@dvips\endcsname
       }{}%
@@ -909,8 +916,8 @@
   }{}%
 }
 \newcommand*{\set@vtexpagesize}{%
-  \ifnotundefined{mediawith}{\mediawidth=\paperwidth}{}%
-  \ifnotundefined{mediaheight}{\mediaheight=\paperheight}{}%
+  \Ifnotundefined{mediawith}{\mediawidth=\paperwidth}{}%
+  \Ifnotundefined{mediaheight}{\mediaheight=\paperheight}{}%
 }
 \newcommand*{\scr@updatedvipspagesize}{%
   \scr@ifundefinedorrelax{XeTeXversion}{%
@@ -997,6 +1004,7 @@
 %     \cs{raggedbottom}}%^^A
 % \changes{v3.17}{2015/03/17}{early setting of default}%^^A
 % \changes{v3.17}{2015/03/18}{use \cs{cleardoubleoddpage} if available}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
 % \begin{macro}{\if@semitwoside}
 % \changes{v3.00}{2008/07/09}{new boolean switch (intern)}%^^A
 % \begin{macro}{\if@twoside}
@@ -1024,7 +1032,7 @@
       }%
   \else\clearpage\fi\fi
 %</package>
-  \ifstr{#1}{semi}{%
+  \Ifstr{#1}{semi}{%
     \@twosidetrue
 %<package>    \@semitwosidetrue
     \FamilyKeyStateProcessed
@@ -1662,13 +1670,14 @@
 % \changes{v2.2a}{1995/01/25}{new}%^^A
 % \changes{v2.95}{2002/12/04}{new implementation using \textsf{keyval}}%^^A
 % \changes{v3.12}{2013/03/05}{status signaling using \cs{FamilyKeyState}}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
 % The value is written into the length \cs{ta@bcor}. Several symbolic values
 % are supported that have to be converted into a length. Note, while loading
 % the package symbolic values are nonsense.
 %    \begin{macrocode}
 %<*package&typearea&options>
 \KOMA@key{BCOR}{%
-  \ifstr{#1}{current}{}{%
+  \Ifstr{#1}{current}{}{%
     \setlength{\ta@bcor}{#1}%
   }%
   \FamilyKeyStateProcessed
@@ -2953,7 +2962,9 @@
 % \begin{macro}{\x@paper}
 % \begin{macro}{\x@@paper}
 % \changes{v2.5}{1997/06/17}{neue Mustererkennung für die
-%      Papiergröße}%^^A
+%   Papiergröße}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifnumber} umbenannt in \cs{Ifnumber}}%^^A
 % Diese Makros werden ebenfalls später benötigt, wenn die Papiergröße
 % festgelegt wird.
 % \begin{macro}{\isopaper}
@@ -3040,6 +3051,7 @@
 % ISO-Papierformats als einziges Argument.
 % \begin{macro}{\iso@@paper}
 % \changes{v2.95}{2002/12/03}{neu (intern)}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifnumber} umbenannt in \cs{Ifnumber}}%^^A
 % Dieses Argument wird dann über einen weiteren internen Befehl per
 % Mustererkennung in den Kennbuchstaben und eine Zahl zerlegt.
 %    \begin{macrocode}
@@ -3057,7 +3069,7 @@
               \else\if #1D\@tempswatrue
   \fi\fi\fi\fi\fi\fi\fi\fi
   \if@tempswa
-    \ifnumber{#2}{\isopaper[#1]{#2}}{\@tempswafalse}%
+    \Ifnumber{#2}{\isopaper[#1]{#2}}{\@tempswafalse}%
   \fi
 }
 %</package&typearea&options>
@@ -3082,7 +3094,8 @@
 % \begin{macro}{\@BCOR}
 % \begin{macro}{\@@BCOR}
 % \changes{v2.5}{1997/06/17}{Einzelzeichenscanner durch
-%      Mustererkennung ersetzt}%^^A
+%   Mustererkennung ersetzt}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
 % Das Makro \cs{@BCOR} wird später benötigt, um die Option
 % \texttt{BCOR\emph{BCOR}} zu erkennen. Die Option wird über ihr
 % Muster erkannt. 
@@ -3095,20 +3108,21 @@
 % Handelt es sich um die Option \texttt{BCOR}, so ist der erste
 % Parameter leer.
 %    \begin{macrocode}
-  \ifstr{#1}{}{%
+  \Ifstr{#1}{}{%
 %    \end{macrocode}
 % Außerdem ist der dritte Parameter dann \texttt{BCOR}.
 %    \begin{macrocode}
-    \ifstr{#3}{BCOR}{%
+    \Ifstr{#3}{BCOR}{%
 %    \end{macrocode}
 % Der zweite Parameter sollte dann die Größe enthalten. Ist dies
 % nicht der Fall, wird ein Fehler gemeldet (Fehlerzeile ist dann
 % \cs{ProcessOptions}).
 % \changes{v3.22}{2016/07/29}{missing deprecated option warning added}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifdimen} renamed to \cs{Ifdimen}}%^^A
 %    \begin{macrocode}
 %<class>      \PassOptionsToPackage{BCOR#2}{typearea}%
 %<*package>
-      \ifdimen{#2}{%
+      \Ifdimen{#2}{%
         \KOMA@UseDeprecatedOption{%
           \PackageWarningNoLine{typearea}}{BCOR#2}{BCOR=#2}%
       }{\scr@pti@nerr@r}%
@@ -3130,6 +3144,7 @@
 % \changes{v2.5}{1997/06/17}{Einzelzeichenscanner durch
 %      Mustererkennung ersetzt}%^^A
 % \changes{v3.22}{2016/07/29}{missing deprecated option warning added}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifnumber} umbenannt in \cs{Ifnumber}}%^^A
 % Die grundsätzliche Funktion ist die gleiche wie bei \cs{@BCOR},
 % \cs{@@BCOR}.
 %    \begin{macrocode}
@@ -3140,7 +3155,7 @@
     \edef\@tempa{#3}\def\@tempb{DIV}\ifx\@tempa\@tempb
 %<class>      \PassOptionsToPackage{DIV#2}{typearea}%
 %<*package>
-      \ifnumber{#2}{%
+      \Ifnumber{#2}{%
         \KOMA@UseDeprecatedOption{%
           \PackageWarningNoLine{typearea}}{DIV#2}{DIV=#2}%
       }{\scr@pti@nerr@r}%
@@ -3200,21 +3215,21 @@
 }
 \newcommand*{\x@@paper}{}
 \def\x@@paper #1#2paper#3\x@@paper{%
-  \ifstr{#3}{paper}{%
-    \ifnumber{#2}{%
-      \ifstr{#1}{a}{%
+  \Ifstr{#3}{paper}{%
+    \Ifnumber{#2}{%
+      \Ifstr{#1}{a}{%
 %<class>        \PassOptionsToPackage{#3=#1#2}{typearea}%
 %<package>        \isopaper[a]{#2}%
       }{%
-        \ifstr{#1}{b}{%
+        \Ifstr{#1}{b}{%
 %<class>          \PassOptionsToPackage{#3=#1#2}{typearea}%
 %<package>          \isopaper[b]{#2}%
         }{%
-          \ifstr{#1}{c}{%
+          \Ifstr{#1}{c}{%
 %<class>            \PassOptionsToPackage{#3=#1#2}{typearea}%
 %<package>            \isopaper[c]{#2}%
           }{%
-            \ifstr{#1}{d}{%
+            \Ifstr{#1}{d}{%
 %<class>              \PassOptionsToPackage{#3=#1#2}{typearea}%
 %<package>              \isopaper[d]{#2}%
             }{\scr@pti@nerr@r}%
