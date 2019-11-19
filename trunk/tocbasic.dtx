@@ -1,4 +1,4 @@
-% \CheckSum{1617}
+% \CheckSum{1643}
 % \iffalse meta-comment
 % ======================================================================
 % tocbasic.dtx
@@ -282,13 +282,25 @@
 % \end{macro}
 %
 % \begin{macro}{\ifattoclist}
+% \changes{v3.28}{2019/11/19}{renamed to \cs{Ifattoclist}}%^^A
+% \begin{macro}{\Ifattoclist}
+% \changes{v3.28}{2019/11/19}{renamed from \cs{ifattoclist}}%^^A
 % This command tests, if an extension is already at the list of
 % toc-files. The extension has to be the first argument. The second argument
 % will be done, if the extension is already at the list of toc-files. The
 % third argument will be done, if the extension is at the list of toc-files
 % not yet.
 %    \begin{macrocode}
-\newcommand{\ifattoclist}[1]{%
+\providecommand*{\ifattoclist}{%
+  \PackageWarning{tocbasic}{Usage of deprecated command
+    `\string\ifattoclist'.\MessageBreak
+    The command has been renamed to because of a\MessageBreak
+    recommendation of LaTeX3 team members.\MessageBreak
+    Please replace `\string\ifattoclist` by `\string\Ifattoclist`%
+  }%
+  \Ifattoclist
+}
+\newcommand{\Ifattoclist}[1]{%
   \begingroup
     \def\do##1##2{%
       \edef\reserved@a{##1}%
@@ -299,7 +311,8 @@
   \endgroup
 }
 %    \end{macrocode}
-% \end{macro}
+% \end{macro}%^^A \Ifattoclist
+% \end{macro}%^^A \ifattoclist
 %
 % \begin{macro}{\addtotoclist}
 % \changes{v1.0a}{2008/11/11}{internal \cs{@addtotoclist} renamed to
@@ -310,6 +323,10 @@
 %   internal list}%^^A
 % \changes{v3.20}{2016/04/12}{\cs{@ifnextchar} replaced by
 %   \cs{kernel@ifnextchar}}%^^A
+% \begin{macro}{\scr@addtotoclist}
+% \begin{macro}{\scr@@addtotoclist}
+% \changes{v3.28}{2019/11/19}{\cs{ifattoclist} replaced by
+%   \cs{Ifattoclist}}%^^A
 % This command adds an extension to the list of toc-files. The first,
 % optional argument is the class or package name with the corresponding
 % extension of class or package files. If this argument was omitted
@@ -332,7 +349,7 @@
   \reserved@a
 }
 \newcommand*{\scr@@addtotoclist}[2][]{%
-  \ifattoclist{#2}{%
+  \Ifattoclist{#2}{%
     \PackageError{tocbasic}{%
       file extension `#2' cannot be used twice
     }{%
@@ -366,6 +383,8 @@
   }%
 }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 %
 % \begin{macro}{\owneroftoc}
@@ -428,6 +447,8 @@
 % \end{macro}
 %
 % \begin{macro}{\tocbasic@extend@babel}
+% \changes{v3.28}{2019/11/19}{\cs{iftocfeature} replaced by
+%   \cs{Iftocfeature}}%^^A
 % NOTE: To extend the original \cs{bbl@set@language} the argument of
 % \cs{tocbasic@extend@babel} must not be a local macro (like \cs{@currext})
 %    \begin{macrocode}
@@ -436,7 +457,7 @@
     \PackageInfo{tocbasic}{babel extension for `#1' omitted\MessageBreak
       because of missing \string\bbl@set@language}%
   }{%
-    \iftocfeature{#1}{nobabel}{%
+    \Iftocfeature{#1}{nobabel}{%
       \PackageInfo{tocbasic}{omitting babel extension for `#1'\MessageBreak
         because of feature `nobabel' available\MessageBreak
         for `#1'}%
@@ -744,6 +765,8 @@
 % \begin{macro}{\tocbasic@starttoc}
 % \changes{v3.17}{2015/03/23}{usage of feature \texttt{noparskipfake}}%^^A
 % \changes{v3.27}{2019/07/08}{hack to add \cs{par} at end of (main) file}%^^A
+% \changes{v3.28}{2019/11/19}{\cs{iftocfeature} replaced by
+%   \cs{Iftocfeature}}%^^A
 % Some basics are done like setting up \cs{parskip}, \cs{parindent} and
 % \cs{parfillskip}, a general hook will be called, an individual hook will
 % be called, the toc will be started, an individual hook will be called, an
@@ -753,7 +776,7 @@
 \newcommand*{\tocbasic@starttoc}[1]{%
   \begingroup
     \edef\@currext{#1}%
-    \iftocfeature{\@currext}{noparskipfake}{}{%
+    \Iftocfeature{\@currext}{noparskipfake}{}{%
       \ifvmode
         \@tempskipa\lastskip
         \vskip-\lastskip
@@ -839,6 +862,8 @@
 % \changes{v1.01}{2008/11/13}{new feature \texttt{onecolumn}}%^^A
 % \changes{v3.09}{2011/03/01}{\cs{@currext} defined using \cs{edef} instead
 %   of \cs{def}}%^^A
+% \changes{v3.28}{2019/11/19}{\cs{iftocfeature} replaced by
+%   \cs{Iftocfeature}}%^^A
 % Command to handle the hole list of something. There are additional hooks
 % for this. The first optional argument is the title for this list. If the
 % optional argument was omitted \cs{listof\#2name} will be used. The star
@@ -864,17 +889,17 @@
       \expandafter\let\expandafter\list@fname\csname listof#2name\endcsname
     }%
     \edef\@currext{#2}%
-    \iftocfeature{\@currext}{onecolumn}{%
-      \iftocfeature{\@currext}{leveldown}{}{%
+    \Iftocfeature{\@currext}{onecolumn}{%
+      \Iftocfeature{\@currext}{leveldown}{}{%
         \if@twocolumn
           \aftergroup\twocolumn\onecolumn
         \fi
       }%
     }{}%
-    \iftocfeature{\@currext}{numberline}{\def\nonumberline{\numberline{}}}{}%
+    \Iftocfeature{\@currext}{numberline}{\def\nonumberline{\numberline{}}}{}%
     \tocbasic@listhead{#1}%
     \scr@ifundefinedorrelax{microtypesetup}{}{%
-      \iftocfeature{\@currext}{noprotrusion}{}{%
+      \Iftocfeature{\@currext}{noprotrusion}{}{%
         \microtypesetup{protrusion=false}%
         \PackageInfo{tocbasic}{%
           character protrusion at \@currext\space deactivated}%
@@ -976,6 +1001,8 @@
 % \changes{v3.26}{2018/06/22}{removed spurious group}%^^A
 % \changes{v3.26}{2018/09/03}{usage of \cs{addsecmark} or \cs{sectionmark}
 %   instead of \cs{@mkright} or \cs{markright}}%^^A
+% \changes{v3.28}{2019/11/19}{\cs{iftocfeature} replaced by
+%   \cs{Iftocfeature}}%^^A
 % Setting the headings of a list of something. The heading is the only
 % argument.
 %    \begin{macrocode}
@@ -983,14 +1010,14 @@
   \@ifundefined{tocbasic@listhead@\@currext}{%
     \scr@ifundefinedorrelax{chapter}{%
       \expandafter\def\csname tocbasic@listhead@\@currext\endcsname##1{%
-        \iftocfeature{\@currext}{leveldown}{%
-          \iftocfeature{\@currext}{numbered}{%
+        \Iftocfeature{\@currext}{leveldown}{%
+          \Iftocfeature{\@currext}{numbered}{%
             \subsection[##1]{##1}%
           }{%
             \subsection*{##1}%
             \ifvmode\@tempcnta\lastpenalty\@tempskipa\lastskip\unskip\fi
             \begingroup
-              \iftocfeature{\@currext}{totoc}{%
+              \Iftocfeature{\@currext}{totoc}{%
                 \expandafter\addxcontentsline\expandafter{\ext@toc}%
                 {subsection}{##1}%
               }{}%
@@ -1000,13 +1027,13 @@
             \ifvmode\penalty\@tempcnta\vskip\@tempskipa\fi
           }%
         }{%
-          \iftocfeature{\@currext}{numbered}{%
+          \Iftocfeature{\@currext}{numbered}{%
             \section[##1]{##1}%
           }{%
             \section*{##1}%
             \ifvmode\@tempcnta\lastpenalty\@tempskipa\lastskip\unskip\fi
             \begingroup
-              \iftocfeature{\@currext}{totoc}{%
+              \Iftocfeature{\@currext}{totoc}{%
                 \expandafter\addxcontentsline\expandafter{\ext@toc}%
                 {section}{##1}%
               }{}%
@@ -1022,11 +1049,11 @@
       }%
     }{%
       \expandafter\def\csname tocbasic@listhead@\@currext\endcsname##1{%
-        \iftocfeature{\@currext}{leveldown}{%
-          \iftocfeature{\@currext}{numbered}{%
+        \Iftocfeature{\@currext}{leveldown}{%
+          \Iftocfeature{\@currext}{numbered}{%
             \section{##1}%
           }{%
-            \iftocfeature{\@currext}{totoc}{%
+            \Iftocfeature{\@currext}{totoc}{%
               \@ifundefined{addsec}{%
                 \section*{##1}%
                 \ifvmode\@tempcnta\lastpenalty\@tempskipa\lastskip\unskip\fi
@@ -1058,7 +1085,7 @@
             }%
           }%
         }{%
-          \iftocfeature{\@currext}{numbered}{%
+          \Iftocfeature{\@currext}{numbered}{%
             \chapter[##1]{##1}%
           }{%
             \chapter*{##1}%
@@ -1069,7 +1096,7 @@
               }{%
                 \@mkdouble{\MakeMarkcase{##1}}%
               }%
-              \iftocfeature{\@currext}{totoc}{%
+              \Iftocfeature{\@currext}{totoc}{%
                 \expandafter\addxcontentsline\expandafter{\ext@toc}%
                 {chapter}{##1}%
               }{}%
@@ -1200,9 +1227,21 @@
 \setuptoc{lot}{nobabel}
 %    \end{macrocode}
 % \begin{macro}{\iftocfeature}
+% \changes{v3.28}{2019/11/19}{renamed to \cs{Iftocfeature}}%^^A
+% \begin{macro}{\Iftocfeature}
+% \changes{v3.28}{2019/11/19}{renamed from \cs{iftocfeature}}%^^A
 % We need a test for the features
 %    \begin{macrocode}
-\newcommand*{\iftocfeature}[2]{%
+\providecommand*{\iftocfeature}{%
+  \PackageWarning{tocbasic}{Usage of deprecated command
+    `\string\iftocfeature'.\MessageBreak
+    The command has been renamed to because of a\MessageBreak
+    recommendation of LaTeX3 team members.\MessageBreak
+    Please replace `\string\iftocfeature` by `\string\Iftocfeature`%
+  }%
+  \Iftocfeature
+}
+\newcommand*{\Iftocfeature}[2]{%
   \scr@ifundefinedorrelax{tocbasic@#1@feature@#2}{%
     \expandafter\@secondoftwo
   }{%
@@ -1214,12 +1253,15 @@
 % \end{macro}
 % \end{macro}
 % \end{macro}
+% \end{macro}
 %
 % \begin{macro}{\tocbasicautomode}
 % \changes{v1.0a}{2008/11/11}{use of \cs{addtotoclist} instead of
 %   internal}%^^A
 % \changes{v3.07a}{2010/11/25}{fix: added missing
 %   \cs{let}\cs{@starttoc}\cs{tocbasic@starttoc}}%^^A
+% \changes{v3.28}{2019/11/19}{\cs{ifattoclist} replaced by
+%   \cs{Ifattoclist}}%^^A
 % \textsf{tocbasic} can overtake \cs{@starttoc} to automaticly add all
 % used extensions to the list of known extensions and use
 % \cs{tocbasic@starttoc} instead of \cs{@starttoc} from \LaTeX{}
@@ -1235,7 +1277,7 @@
   \let\@starttoc\tocbasic@starttoc
   \BeforeStartingTOC{%
     \let\@starttoc\tb@saved@starttoc
-    \expandafter\ifattoclist\expandafter{\@currext}{}{%
+    \expandafter\Ifattoclist\expandafter{\@currext}{}{%
       \addtotoclist[tocbasicautomode]{\@currext}%
     }%
   }%
