@@ -50,7 +50,7 @@
                   KOMA-Script package scrbase]
 \translator{Markus Kohm\and Melvin Hendrix\and Karl Hagen}
 
-% Date of the translated German file: 2019-11-07
+% Date of the translated German file: 2019-11-19
 
 \chapter{Basic Functions in the \Package{scrbase} Package}
 \labelbase{scrbase}
@@ -944,33 +944,9 @@ currently not evaluated by \Package{scrbase}.
   status of \DescRef{\LabelBase.cmd.FamilySetBool}.
 
   The \Macro{ifstr} command used in the test is explained on
-  \DescPageRef{scrbase.cmd.ifstr} in \autoref{sec:scrbase.if}.
+  \DescPageRef{scrbase.cmd.Ifstr} in \autoref{sec:scrbase.if}.
 \end{Example}
 %
-\EndIndexGroup
-
-
-\begin{Declaration}
-  \Macro{FamilyElseValues}
-\end{Declaration}
-\iffalse % Deprecated --> no user documentation needed
-In\ChangedAt{v3.12}{\Package{scrbase}} previous\textnote{Obsolete!} versions
-of \Package{scrbase}, you could use the \Macro{FamilyElseValues} command to
-define additional values for processing by
-\DescRef{\LabelBase.cmd.FamilyUnknownKeyValue} in the form
-%\begin{flushleft}\vskip\dp\strutbox\begin{tabular}{l}
-  \texttt{,} `\PName{value}'\texttt{,} `\PName{value}' \dots,
-  %\end{tabular}\vskip\dp\strutbox\end{flushleft}
-which were then output in an error message. Since version~3.12,
-\DescRef{\LabelBase.cmd.FamilyUnknownKeyValue} no longer issues error messages
-itself but signals them using \DescRef{\LabelBase.cmd.FamilyKeyState}.
-Therefore, \Macro{FamilyElseValues} is now deprecated. %
-\else%
-Since version 3.12 the command is deprecated. %
-\fi%
-Nevertheless,
-\Package{scrbase} detects its use and issues a message requesting that you
-update the code accordingly.%
 \EndIndexGroup
 
 
@@ -978,7 +954,8 @@ update the code accordingly.%
 \seclabel{if}
 
 The \Package{scrbase} package provides several commands for conditional
-execution. It does not rely on the \TeX{} syntax of conditionals such as
+execution. Mostly it does not rely on the \TeX{} syntax of conditionals such
+as
 \begin{lstcode}
   \iftrue
     ...
@@ -988,137 +965,43 @@ execution. It does not rely on the \TeX{} syntax of conditionals such as
 \end{lstcode}
 but uses the \LaTeX{} syntax with arguments similar to those used by \LaTeX{}
 commands like \Macro{IfFileExists}, \Macro{@ifundefined},
-\Macro{@ifpackageloaded}, and many others. Some package authors, however,
-prefer to use the syntax of \TeX{} conditionals even for users working at the
-\LaTeX{} interface level. Since the \Package{scrbase} conditionals are fairly
-low-level instructions, it is possible that such packages could provide
-commands with the same names but a different syntax, leading to problems even
-if the underlying semantics were actually the same. Therefore,
-\Package{scrbase} plays it safe.
+\Macro{@ifpackageloaded}, and many others.
+
+% TODO: Fix translation (note: this text does not really correspond to the
+%       German manual but there is a similar note at the (not free) German book
+From \KOMAScript~3.28, following a recommendation from \LaTeX{} team members,
+\Package{scrbase} does not longer use \Macro{if\dots} but \Macro{If\dots} for
+commands that expect an argument instead of using the \TeX{}
+syntax. Some commands from prior versions of \KOMAScript{} have been
+removed. You may use package \Package{iftex} (see \cite{package:iftex}) to
+replace the functionality. Others have been renamed.
+% :ODOT
 
 \begin{Declaration}
-  \OptionVName{internalonly}{value}
-\end{Declaration}
-The \Package{scrbase} package provides some commands for conditional
-execution. It primarily uses names like
-\Macro{scr@\PName{name}}\textnote{package authors}, which are internal
-commands. \KOMAScript{} also uses these commands internally. Authors of
-packages and classes can also use these commands but should not redefine them.
-Because some of these commands may also be useful for users, they are provided
-as \Macro{\PName{name}}\textnote{users} normally. Since other packages may
-provide conflicting commands with the same name but different syntax or
-functionality, \Package{scrbase} can suppress the definition of
-\Macro{\PName{name}}. Using the \Option{internalonly} option without a
-\PName{value} will define only the internal commands and suppress definition
-of all the user commands for conditional execution. Alternatively, the user
-can list all the commands that should not be defined as the \PName{value},
-replacing ``\Macro{}'' with ``\texttt{/}''.
-
-Authors of packages and classes normally should not use this option. Users can
-specify it with or without the \PName{value} either as a global option with
-\DescRef{maincls.cmd.documentclass} or using
-\Macro{PassOptionsToPackage}\IndexCmd{PassOptionsToPackage}. Especially if you
-do not use a \KOMAScript{} class the second one is recommended.
-\begin{Example}
-  The user does not want \Package{scrbase} to define the
-  \DescRef{\LabelBase.cmd.ifpdftex} and
-  \DescRef{\LabelBase.cmd.ifVTeX} commands. So to load the class,
-  the user writes:
-\begin{lstcode}
-  \documentclass%
-    [internalonly=/ifpdftex/ifVTeX]%
-    {foo}
-\end{lstcode}
-  The class name \Class{foo} is used here as a placeholder for any class. The
-  commands \DescRef{\LabelBase.cmd.ifpdftex} and
-  \DescRef{\LabelBase.cmd.ifVTeX} are explained later in this
-  section.
-
-% TODO: Fix new translation
-  If \Class{foo} is not a \KOMAScript{} class in the \File{log} file of the
-  \LaTeX{} run may occur a warning message:
-\begin{lstoutput}
-  LaTeX Warning: Unused global option(s):
-       [internalonly=/ifpdftex/ifVTeX].
-\end{lstoutput}
-  Such a false warning usually occurs if a class loads \Package{scrbase}
-  before it processes its own options. That is the usual case. Therefore users
-  are recommended to set the option with \Macro{PassOptionsToPackage} before
-  loading the class. With
-\begin{lstcode}
-  \PassOptionsToPackage{internalonly=/ifpdftex/ifVTeX}
-                       {scrbase}
-  \documentclass{foo}
-\end{lstcode}
-  there is not any such problem.
-% :ODOT
-\end{Example}
-
-Authors of packages and classes should use the same internal names as
-\KOMAScript{} itself. For completeness, the user commands are also given in
-the following explanations.%
-% TODO: Fix missing translation (and remove the \iffalse and \fi)
-\iffalse%
-
-Das\textnote{Achtung!} \LaTeX-Team hat 2019 in Version~1.0 des Pakets
-\Package{iftex}\IndexPackage{iftex}\important{\Package{iftex}} selbst
-\DescRef{\LabelBase.cmd.ifpdftex} und \DescRef{\LabelBase.cmd.ifVTeX} neu
-definiert. Leider sind diese Definitionen inkompatibel mit den bereits seit
-2002 existierenden Definitionen in \Package{scrbase}. Diese Inkompatibilität\important[i]{\Package{ifluatex}\\ \Package{ifpdf}\\
-  \Package{ifvtex}\\ \Package{ifxetex}} betrifft leider auch die Pakete
-\Package{ifpdf}\IndexPackage{ifpdf} und \Package{ifvtex}\IndexPackage{ifvtex}
-und sogar von \Package{ifxetex}\IndexPackage{ifxetex} und
-\Package{ifluatex}\IndexPackage{ifluatex} in ihren Neuauflagen als
-Wrapper-Pakete von \Package{iftex}. Da anzunehmen ist, dass sich Paketautoren
-und Beispiele im Internet zunehmend auf die Implementierung in \Package{iftex}
-verlassen, ist leider zu befürchten, dass solche Pakete und Beispiele
-zunehmend inkompatibel mit \Package{scrbase} werden.  Um solche Probleme zu
-vermeiden, muss leider empfohlen werden, die im Beispiel gezeigte Option
-grundsätzlich zu setzen und so auf die \Package{scrbase}-Version der genannten
-Befehle zu verzichten. Eine grundsätzliche Änderung in \Package{scrbase} würde
-leider ihrerseits unvermeidbar zu Inkompatibilitäten mit existierenden
-Dokumenten und eventuell auch mit Paketen oder Klassen führen, die sich auf
-die bisherige Definition in \Package{scrbase} verlassen. Daher ist sie leider
-nicht möglich.  Da nur wenige Anwender wissen, welche Pakete \Package{iftex},
-\Package{ifpdf}, \Package{ifluatex}, \Package{ifvtex} oder \Package{ifxetex}
-verwenden, bleibt für neue Dokumente somit der gezeigte, eher unkomfortable
-Weg. Für existierende Dokumente kann nicht ausgeschlossen werden, dass diese
-im Zuge von Updates abhängiger Pakete irgendwann Fehler produzieren und
-geändert werden müssen. Der Autor von \KOMAScript{} bedauert dies
-ausdrücklich, zumal solche Probleme durch die freundliche Rücksichtnahme
-früherer Autoren der genannten Pakete über Jahrzehnte vermieden werden
-konnten.%
-\fi%
-% :ODOT
-\EndIndexGroup
-
-
-\begin{Declaration}
-  \Macro{scr@ifundefinedorrelax}%
-  \Parameter{name}\Parameter{then code}\Parameter{else code}%
-  \Macro{ifundefinedorrelax}%
+  \Macro{Ifundefinedorrelax}%
   \Parameter{name}\Parameter{then code}\Parameter{else code}
 \end{Declaration}
-This command works like \Macro{@ifundefined} from the \LaTeX{} kernel (see
-\cite{latex:source2e}). So the \PName{then code} will be executed if
-\PName{name} is the name of a command that is currently either not defined or
-\Macro{relax}. Otherwise, the \PName{else code} will be executed. Unlike
-\Macro{@ifundefined}, no hash memory is allocated nor is \Macro{\PName{Name}}
-set to \Macro{relax} if \Macro{\PName{name}} was previously undefined.%
+This\ChangedAt{v3.28}{\Package{scrbase}} command works like
+\Macro{@ifundefined} from the \LaTeX{} kernel (see \cite{latex:source2e}). So
+the \PName{then code} will be executed if \PName{name} is the name of a
+command that is currently either not defined or \Macro{relax}. Otherwise, the
+\PName{else code} will be executed. Unlike \Macro{@ifundefined}, no hash
+memory is allocated nor is \Macro{\PName{Name}} set to \Macro{relax} if
+\Macro{\PName{name}} was previously undefined.%
 \EndIndexGroup
 
 \begin{Declaration}
-  \Macro{ifnotundefined}\Parameter{name}%
+  \Macro{Ifnotundefined}\Parameter{name}%
   \Parameter{then code}\Parameter{else code}
 \end{Declaration}
-If the command with the given name has already been defined, the \PName{then
-code} will be executed. Otherwise, the \PName{else code} will be executed.
-Since \eTeX{} already has a primitive \Macro{ifdefined}, this somewhat
-unwieldy name, unfortunately, had to be chosen. There is no corresponding
-internal command.%
+If\ChangedAt{v3.28}{\Package{scrbase}} the command with the given name has
+already been defined, the \PName{then code} will be executed. Otherwise, the
+\PName{else code} will be executed.  Since \eTeX{} already has a primitive
+\Macro{ifdefined}, this somewhat unwieldy name, unfortunately, had to be
+chosen. There is no corresponding internal command.%
 \EndIndexGroup
 
-
+\iffalse % internal
 \begin{Declaration}
   \Macro{scr@ifluatex}
   \Parameter{then code}\Parameter{else code}
@@ -1133,7 +1016,7 @@ There\textnote{Attention!} is no user equivalent for this instruction. Use the
 \Package{ifluatex}\important{\Package{ifluatex}} package instead (see
 \cite{package:ifluatex}).%
 \EndIndexGroup
-
+\fi
 
 \iffalse% It makes no sense to document this instruction yet
 \begin{Declaration}
@@ -1150,55 +1033,51 @@ is no user equivalent of this statement.%
 \EndIndexGroup
 \fi
 
+\iffalse % internal
 \begin{Declaration}
   \Macro{scr@ifpdftex}%
   \Parameter{then code}\Parameter{else code}%
-  \Macro{ifpdftex}%
-  \Parameter{then code}\Parameter{else code}
 \end{Declaration}
 If you use pdf\TeX{}, the \PName{then code} will be executed. Otherwise, the
 \PName{else code} will be executed. It does not matter whether a PDF-file is
 actually generated or not. This test is rarely useful. As a rule, you should
 test directly for the command you want instead.%
 \EndIndexGroup
+\fi
 
-
+\iffalse % internal
 \begin{Declaration}
   \Macro{scr@ifVTeX}%
   \Parameter{then code}\Parameter{else code}%
-  \Macro{ifVTeX}%
-  \Parameter{then code}\Parameter{else code}
 \end{Declaration}
 If you use V\TeX{}, the \PName{then code} will be executed. Otherwise, the
 \PName{else code} will be executed. This test is seldom useful. As a rule,
 you should test directly for the command you want instead.%
 %
 \EndIndexGroup
-
+\fi
 
 \begin{Declaration}
-  \Macro{scr@ifpdfoutput}%
-  \Parameter{then code}\Parameter{else code}%
-  \Macro{ifpdfoutput}%
+  \Macro{Ifpdfoutput}%
   \Parameter{then code}\Parameter{else code}
 \end{Declaration}
-If a PDF file is generated, the \PName{then code} will be executed. Otherwise,
-the \PName{else code} will be executed. It does not matter whether PDF file is
-created using lua\TeX{}, pdf\TeX{}, or V\TeX{}, or \XeTeX{}.%
+If\ChangedAt{v3.28}{\Package{scrbase}} a PDF file is generated, the
+\PName{then code} will be executed. Otherwise, the \PName{else code} will be
+executed. It does not matter whether PDF file is created using lua\TeX{},
+pdf\TeX{}, or V\TeX{}, or \XeTeX{}.%
 \EndIndexGroup
 
 
 \begin{Declaration}
-  \Macro{scr@ifpsoutput}%
-  \Parameter{then code}\Parameter{else code}%
-  \Macro{ifpsoutput}%
+  \Macro{Ifpsoutput}%
   \Parameter{then code}\Parameter{else code}
 \end{Declaration}
-If a PostScript file is generated, the \PName{then code} will be executed.
-Otherwise, the \PName{else code} will be executed. V\TeX{} can generate
-PostScript directly, which is recognized here. However, if V\TeX{} is not used
-but the switch \Macro{if@dvips} has been defined, the decision depends on that
-switch. \KOMAScript{} provides \Macro{if@dvips} in
+If\ChangedAt{v3.28}{\Package{scrbase}} a PostScript file is generated, the
+\PName{then code} will be executed.  Otherwise, the \PName{else code} will be
+executed. V\TeX{} can generate PostScript directly, which is recognized
+here. However, if V\TeX{} is not used but the switch \Macro{if@dvips} has been
+defined, the decision depends on that switch. \KOMAScript{} provides
+\Macro{if@dvips} in
 \hyperref[cha:typearea]{\Package{typearea}}\IndexPackage{typearea}%
 \IndexCmd{if@dvips}.
 %
@@ -1206,15 +1085,13 @@ switch. \KOMAScript{} provides \Macro{if@dvips} in
 
 
 \begin{Declaration}
-  \Macro{scr@ifdvioutput}%
-  \Parameter{then code}\Parameter{else code}%
-  \Macro{ifdvioutput}%
+  \Macro{Ifdvioutput}%
   \Parameter{then code}\Parameter{else code}
 \end{Declaration}
-If a DVI-file is generated, the \PName{then code} will be executed. Otherwise,
-the \PName{else code} will be executed. A DVI file is always assumed to be
-generated if no direct output of a PDF file or a PostScript file can be
-detected.%
+If\ChangedAt{v3.28}{\Package{scrbase}} a DVI-file is generated, the
+\PName{then code} will be executed. Otherwise, the \PName{else code} will be
+executed. A DVI file is always assumed to be generated if no direct output of
+a PDF file or a PostScript file can be detected.%
 \EndIndexGroup
 
 
@@ -1234,167 +1111,175 @@ condition using \TeX{} syntax and not \LaTeX{} syntax!
 
 
 \begin{Declaration}
-  \Macro{ifstr}\Parameter{string 1}\Parameter{string 2}%
+  \Macro{Ifstr}\Parameter{string 1}\Parameter{string 2}%
   \Parameter{then code}\Parameter{else code}
 \end{Declaration}
-Both \PName{string} arguments are expanded and then compared. If the
-expansions are the same, the \PName{then code} will be executed. Otherwise the
-\PName{else code} will be executed. There is no corresponding internal
-command.
+Both\ChangedAt{v3.28}{\Package{scrbase}} \PName{string} arguments are expanded
+and then compared. If the expansions are the same, the \PName{then code} will
+be executed. Otherwise the \PName{else code} will be executed. There is no
+corresponding internal command.
 %
 \EndIndexGroup
 
 
 \begin{Declaration}
-  \Macro{ifstrstart}\Parameter{string 1}\Parameter{string 2}%
+  \Macro{Ifstrstart}\Parameter{string 1}\Parameter{string 2}%
   \Parameter{then code}\Parameter{else code}
 \end{Declaration}
-Both\ChangedAt{v3.12}{\Package{scrbase}} \PName{string} arguments are expanded
-and then compared. If \PName{string 1}, apart from white space, begins with
-\PName{string 2}, the \PName{then code} will be executed. Otherwise, the
-\PName{else code} will be executed. There is no corresponding internal
-command.%
+Both\ChangedAt{v3.12}{\Package{scrbase}}\ChangedAt{v3.28}{\Package{scrbase}}
+\PName{string} arguments are expanded and then compared. If \PName{string 1},
+apart from white space, begins with \PName{string 2}, the \PName{then code}
+will be executed. Otherwise, the \PName{else code} will be executed. There is
+no corresponding internal command.%
 \EndIndexGroup
 
 
 \begin{Declaration}
-  \Macro{ifisdimen}\Parameter{expression}%
+  \Macro{Ifisdimen}\Parameter{expression}%
   \Parameter{then code}\Parameter{else code}
 \end{Declaration}
-If\ChangedAt{v3.12}{\Package{scrbase}} \PName{expression} expands to a
-\Macro{dimen}, i.\,e. a \TeX{} length register, the \PName{then code} will be
-executed. Otherwise the \PName{else code} will be executed. The command is not
-completely expandable, and there is no corresponding internal command.%
+If\ChangedAt{v3.12}{\Package{scrbase}}\ChangedAt{v3.28}{\Package{scrbase}}
+\PName{expression} expands to a \Macro{dimen}, i.\,e. a \TeX{} length
+register, the \PName{then code} will be executed. Otherwise the \PName{else
+  code} will be executed. The command is not completely expandable, and there
+is no corresponding internal command.%
 \EndIndexGroup
 
 
 \begin{Declaration}
-  \Macro{ifisdimension}\Parameter{expression}%
+  \Macro{Ifisdimension}\Parameter{expression}%
   \Parameter{then code}\Parameter{else code}
 \end{Declaration}
-If\ChangedAt{v3.12}{\Package{scrbase}} \PName{expression} expands to something
-syntactically equivalent to a length, the \PName{then code} will be executed.
-Otherwise the \PName{else code} will be executed. Note\textnote{Attention!}
-that unknown units will cause an error message. The command is not completely
-expandable, and there is no corresponding internal command.%
-\EndIndexGroup
-
-
-\begin{Declaration}
-  \Macro{ifdimen}\Parameter{string}%
-  \Parameter{then code}\Parameter{else code}
-\end{Declaration}
-The \PName{then code} will be executed if the first-order expansion of
-\PName{string} consists of digits and a valid length unit. Otherwise, the
-\PName{else code} will be used. There is no corresponding internal command.%
-\EndIndexGroup
-
-
-\begin{Declaration}
-  \Macro{ifisdimexpr}\Parameter{expression}%
-  \Parameter{then code}\Parameter{else code}
-\end{Declaration}
-If\ChangedAt{v3.12}{\Package{scrbase}} \PName{expression} expands to an \eTeX{}
-\Macro{dimexpr}\IndexCmd{dimexpr}, the \PName{then code} will be executed.
-Otherwise, the \PName{else code} will be executed. Note\textnote{Attention!}
-that illegal expressions will result in error messages. The command is not
-completely expandable, and there is no corresponding internal command.%
-\EndIndexGroup
-
-
-\begin{Declaration}
-  \Macro{ifisskip}\Parameter{expression}%
-  \Parameter{then code}\Parameter{else code}
-\end{Declaration}
-If\ChangedAt{v3.12}{\Package{scrbase}} \PName{expression} expands to a
-\Macro{skip}, i.\,e. a \TeX{} distance, the \PName{then code} will be
-executed. Otherwise, the \PName{else code} will be executed. The command is not
-completely expandable, and there is no corresponding internal command.%
-\EndIndexGroup
-
-
-\begin{Declaration}
-  \Macro{ifisglue}\Parameter{expression}%
-  \Parameter{then code}\Parameter{else code}
-\end{Declaration}
-If\ChangedAt{v3.12}{\Package{scrbase}} \PName{expression} expands to something
-syntactically equivalent of the value of a skip, the \PName{then code} will be
-executed. Otherwise, the \PName{else code} will be executed.
-Note\textnote{Attention!} that invalid units will result in an error message.
-The command is not completely expandable, and there is no corresponding
-internal command.%
-\EndIndexGroup
-
-
-\begin{Declaration}
-  \Macro{ifisglueexpr}\Parameter{expression}%
-  \Parameter{then code}\Parameter{else code}
-\end{Declaration}
-If\ChangedAt{v3.12}{\Package{scrbase}} \PName{expression} expands to a
-\Macro{glueexpr}, i.\,e. an \eTeX{} distance expression, the \PName{then
-code} will be executed. Otherwise, the \PName{else code} will be executed.
-Note,\textnote{Attention!} that illegal expressions will result in error
-messages. The command is not completely expandable, and there is no
+If\ChangedAt{v3.12}{\Package{scrbase}}\ChangedAt{v3.28}{\Package{scrbase}}
+\PName{expression} expands to something syntactically equivalent to a length,
+the \PName{then code} will be executed.  Otherwise the \PName{else code} will
+be executed. Note\textnote{Attention!}  that unknown units will cause an error
+message. The command is not completely expandable, and there is no
 corresponding internal command.%
 \EndIndexGroup
 
 
 \begin{Declaration}
-  \Macro{ifiscounter}\Parameter{counter}%
+  \Macro{Ifdimen}\Parameter{string}%
   \Parameter{then code}\Parameter{else code}
 \end{Declaration}
-If\ChangedAt{v3.12}{\Package{scrbase}} \PName{counter} is defined as a
-\LaTeX{} counter, the \PName{then code} will be executed. Otherwise, the
-\PName{else code} will be executed. The command is not completely expandable,
-and there is no corresponding internal command.%
+The \PName{then code}\ChangedAt{v3.28}{\Package{scrbase}} will be executed if
+the first-order expansion of \PName{string} consists of digits and a valid
+length unit. Otherwise, the \PName{else code} will be used. There is no
+corresponding internal command.%
 \EndIndexGroup
 
 
 \begin{Declaration}
-  \Macro{ifiscount}\Parameter{count}%
+  \Macro{Ifisdimexpr}\Parameter{expression}%
   \Parameter{then code}\Parameter{else code}
 \end{Declaration}
-If\ChangedAt{v3.12}{\Package{scrbase}} \PName{count} expands to a
-\Macro{count}, i.\,e. a \TeX{} counter, the \PName{then code} will be
-executed. Otherwise, the \PName{else code} will be executed. The command is
-not completely expandable, and there is no corresponding internal command. For
-tests of \LaTeX{} counters, see \DescRef{\LabelBase.cmd.ifiscounter}.%
+If\ChangedAt{v3.12}{\Package{scrbase}}\ChangedAt{v3.28}{\Package{scrbase}}
+\PName{expression} expands to an \eTeX{} \Macro{dimexpr}\IndexCmd{dimexpr},
+the \PName{then code} will be executed.  Otherwise, the \PName{else code} will
+be executed. Note\textnote{Attention!}  that illegal expressions will result
+in error messages. The command is not completely expandable, and there is no
+corresponding internal command.%
 \EndIndexGroup
 
 
 \begin{Declaration}
-  \Macro{ifisinteger}\Parameter{expression}%
+  \Macro{Ifisskip}\Parameter{expression}%
   \Parameter{then code}\Parameter{else code}
 \end{Declaration}
-If\ChangedAt{v3.12}{\Package{scrbase}} \PName{expression} expands to something
-syntactically equivalent to of the value of a counter, i.\,e. a negative or
-positive integer, the \PName{then code} will be executed. Otherwise, the
-\PName{else code} will be executed. The command is not completely expandable,
-and there is no corresponding internal command.%
+If\ChangedAt{v3.12}{\Package{scrbase}}\ChangedAt{v3.28}{\Package{scrbase}}
+\PName{expression} expands to a \Macro{skip}, i.\,e. a \TeX{} distance, the
+\PName{then code} will be executed. Otherwise, the \PName{else code} will be
+executed. The command is not completely expandable, and there is no
+corresponding internal command.%
 \EndIndexGroup
 
 
 \begin{Declaration}
-  \Macro{ifnumber}\Parameter{string}%
+  \Macro{Ifisglue}\Parameter{expression}%
   \Parameter{then code}\Parameter{else code}
 \end{Declaration}
-The \PName{then code} will be executed if the first-order expansion of
-\PName{string} consists only of digits. Otherwise, the \PName{else code} will
-be used. There is no corresponding internal command.
+If\ChangedAt{v3.12}{\Package{scrbase}}\ChangedAt{v3.28}{\Package{scrbase}}
+\PName{expression} expands to something syntactically equivalent of the value
+of a skip, the \PName{then code} will be executed. Otherwise, the \PName{else
+  code} will be executed.  Note\textnote{Attention!} that invalid units will
+result in an error message.  The command is not completely expandable, and
+there is no corresponding internal command.%
+\EndIndexGroup
+
+
+\begin{Declaration}
+  \Macro{Ifisglueexpr}\Parameter{expression}%
+  \Parameter{then code}\Parameter{else code}
+\end{Declaration}
+If\ChangedAt{v3.12}{\Package{scrbase}}\ChangedAt{v3.28}{\Package{scrbase}}
+\PName{expression} expands to a \Macro{glueexpr}, i.\,e. an \eTeX{} distance
+expression, the \PName{then code} will be executed. Otherwise, the \PName{else
+  code} will be executed.  Note,\textnote{Attention!} that illegal expressions
+will result in error messages. The command is not completely expandable, and
+there is no corresponding internal command.%
+\EndIndexGroup
+
+
+\begin{Declaration}
+  \Macro{Ifiscounter}\Parameter{counter}%
+  \Parameter{then code}\Parameter{else code}
+\end{Declaration}
+If\ChangedAt{v3.12}{\Package{scrbase}}\ChangedAt{v3.28}{\Package{scrbase}}
+\PName{counter} is defined as a \LaTeX{} counter, the \PName{then code} will
+be executed. Otherwise, the \PName{else code} will be executed. The command is
+not completely expandable, and there is no corresponding internal command.%
+\EndIndexGroup
+
+
+\begin{Declaration}
+  \Macro{Ifiscount}\Parameter{count}%
+  \Parameter{then code}\Parameter{else code}
+\end{Declaration}
+If\ChangedAt{v3.12}{\Package{scrbase}}\ChangedAt{v3.28}{\Package{scrbase}}
+\PName{count} expands to a \Macro{count}, i.\,e. a \TeX{} counter, the
+\PName{then code} will be executed. Otherwise, the \PName{else code} will be
+executed. The command is not completely expandable, and there is no
+corresponding internal command. For tests of \LaTeX{} counters, see
+\DescRef{\LabelBase.cmd.Ifiscounter}.%
+\EndIndexGroup
+
+
+\begin{Declaration}
+  \Macro{Ifisinteger}\Parameter{expression}%
+  \Parameter{then code}\Parameter{else code}
+\end{Declaration}
+If\ChangedAt{v3.12}{\Package{scrbase}}\ChangedAt{v3.28}{\Package{scrbase}}
+\PName{expression} expands to something syntactically equivalent to of the
+value of a counter, i.\,e. a negative or positive integer, the \PName{then
+  code} will be executed. Otherwise, the \PName{else code} will be
+executed. The command is not completely expandable, and there is no
+corresponding internal command.%
+\EndIndexGroup
+
+
+\begin{Declaration}
+  \Macro{Ifnumber}\Parameter{string}%
+  \Parameter{then code}\Parameter{else code}
+\end{Declaration}
+The\ChangedAt{v3.28}{\Package{scrbase}} \PName{then code} will be executed if
+the first-order expansion of \PName{string} consists only of
+digits. Otherwise, the \PName{else code} will be used. There is no
+corresponding internal command.
 %
 \EndIndexGroup
 
 
 \begin{Declaration}
-  \Macro{ifisnumexpr}\Parameter{expression}%
+  \Macro{Ifisnumexpr}\Parameter{expression}%
   \Parameter{then code}\Parameter{else code}
 \end{Declaration}
-If\ChangedAt{v3.12}{\Package{scrbase}} \PName{expression} expands to a
-\Macro{numexpr}, i.\,e. an \eTeX{} number expression, the \PName{then code}
-will be executed. Otherwise, the \PName{else code} will be executed.
-Note\textnote{Attention!} that illegal expressions will result in error
-messages. The command is not completely expandable, and there is no
-corresponding internal command.%
+If\ChangedAt{v3.12}{\Package{scrbase}}\ChangedAt{v3.28}{\Package{scrbase}}
+\PName{expression} expands to a \Macro{numexpr}, i.\,e. an \eTeX{} number
+expression, the \PName{then code} will be executed. Otherwise, the \PName{else
+  code} will be executed.  Note\textnote{Attention!} that illegal expressions
+will result in error messages. The command is not completely expandable, and
+there is no corresponding internal command.%
 \EndIndexGroup
 
 
@@ -2018,6 +1903,36 @@ Strictly speaking, this command is a byproduct of the implementation of
 \EndIndexGroup
 %
 \EndIndexGroup
+
+\section{Obsolete Options and Commands}
+\seclabel{obsolete}
+
+% TODO: Fix new translation
+Prior release of \Package{scrbase} provided some options and commands that has
+been removed or replaced meanwhile. Those are documented in this section only
+for completeness but shouldn't be used any longer.
+% :ODOT
+
+% \LoadNonFree{scrbase}{0}% not available in English
+\begin{Explain}
+  \begin{Declaration}
+    \Macro{FamilyElseValues}
+  \end{Declaration}
+  Since version 3.12 the command is deprecated.  Nevertheless,
+  \Package{scrbase} detects its use and issues a message requesting that you
+  update the code accordingly.%
+  \EndIndexGroup%
+
+
+  \begin{Declaration}
+    \OptionVName{internalonly}{value}
+  \end{Declaration}
+  Since version 3.28 this option is deprecated. For compatibility it is
+  processed (see \DescRef{\LabelBase.cmd.FamilyKeyStateProcessed}) but
+  ignored.%
+  \EndIndexGroup%
+\end{Explain}%
+%
 \EndIndexGroup
 
 \endinput
