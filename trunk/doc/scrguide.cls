@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2019/11/18 v1.22b internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2019/11/18 v1.22c internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -211,7 +211,7 @@
   {headbackground}%
   \AddLayersAtBeginOfPageStyle{scrheadings}{headbackground}%
   \renewcommand*{\chaptermark}[1]{%
-    \@mkdouble{\ifnumbered{chapter}{\chaptermarkformat}{}##1}%
+    \@mkdouble{\Ifnumbered{chapter}{\chaptermarkformat}{}##1}%
   }%
   \renewcommand*{\chaptermarkformat}{%
     \makebox[\dimexpr \oddsidemargin+1in-.5em][r]{%
