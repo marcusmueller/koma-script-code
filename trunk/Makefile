@@ -138,8 +138,8 @@ CLS_MAIN	= scrbook.cls \
 		  scrlayer.sty \
 		  scrlayer-scrpage.sty \
 		  scrlayer-notecolumn.sty \
-		  scrlayer-fancyhdr.sty \
-		  komamarks.sty
+		  scrlayer-fancyhdr.sty
+#		  komamarks.sty
 
 CLS_MAIN_DTX    = scrkernel-basics.dtx \
 		  scrkernel-bibliography.dtx \
@@ -179,8 +179,8 @@ CLS_MAIN_DTX    = scrkernel-basics.dtx \
 		  scrlayer.dtx \
 		  scrlayer-scrpage.dtx \
 		  scrlayer-notecolumn.dtx \
-		  scrlayer-fancyhdr.dtx \
-		  komamarks.dtx
+		  scrlayer-fancyhdr.dtx
+#		  komamarks.dtx
 
 STATIC_DOC      = README \
 	          INSTALL.txt \
@@ -196,9 +196,11 @@ CLS_MAIN_INS	= scrmain.ins
 
 CLS_MAIN_SUBINS	= scrstrip.inc scrstrop.inc scrdocstrip.tex
 
-ALPHA_INS       = tocstyle.dtx scrlayer-fancyhdr.dtx komamarks.dtx
+ALPHA_INS       = tocstyle.dtx scrlayer-fancyhdr.dtx
+#                 komamarks.dtx
 
-ALPHA_DOC       = tocstyle.pdf scrlayer-fancyhdr.pdf komamarks.pdf
+ALPHA_DOC       = tocstyle.pdf scrlayer-fancyhdr.pdf
+#                 komamarks.pdf
 
 ALPHA_DTX       = $(subst .pdf,.dtx,$(ALPHA_DOC))
 
