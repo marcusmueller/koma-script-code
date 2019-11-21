@@ -1,4 +1,4 @@
-% \CheckSum{818}
+% \CheckSum{839}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlfile.dtx
@@ -170,22 +170,43 @@
 % file. But before we redefine the macro, we test, if the macro was
 % defined like we expected. \LaTeX{} will warn, if not.
 % \changes{v3.27}{2019/10/06}{\LaTeX{} 2019-10-01 changed the definition}%^^A
+%
+% \changes{v3.28}{2019/11/21}{support for \textsf{memoir}}%^^A
+% With \textsf{memoir} their is a special case. It also redefines
+% \cs{InputIfFileExists}. As shown in the source of the class it does so
+% because \textsf{scrlfile} does it. However it does it not compatible with
+% \textsf{scrlfile} and it does not emulate \textsf{scrlfile} as it do for
+% other packages. So if you try to use \textsf{scrlfile} with memoir,
+% \textsf{scrbase} has to take care to \textsf{memoir}. And in oposit to
+% \textsf{scrlfile} \textsf{memoir} does not always fix the argument order bug
+% of \LaTeX{} but do so only for the implementation of \LaTeX{} 2019-10-01.
+% So in case of \textsf{memoir} we just patch every version of it without
+% testing.
 %    \begin{macrocode}
-\long\def\reserved@a#1#2{%
-  \IfFileExists{#1}%
-    {#2\@addtofilelist{#1}\@@input \@filef@und}}%
-\ifx\reserved@a\InputIfFileExists\else
-  \expandafter\CheckCommand\expandafter*\expandafter\InputIfFileExists
-  \expandafter{%
-    \expandafter\protect\csname InputIfFileExists \endcsname
+\@ifclassloaded{memoir}{%
+  \PackageInfo{scrlfile}{class `memoir' detected.\MessageBreak
+    Using a compatible redefinition of \string\InputIfFileExists,\MessageBreak
+    but always robust and with the fix of the\MessageBreak
+    argument order bug even for old versions of the\MessageBreak
+    LaTeX kernel%
   }%
-  \expandafter\CheckCommand \csname InputIfFileExists \endcsname[2]{%
-    \IfFileExists {#1}{%
-      \expandafter \@swaptwoargs \expandafter {\@filef@und }%
-      {#2\@addtofilelist {#1}\@@input }%
+}{%
+  \long\def\reserved@a#1#2{%
+    \IfFileExists{#1}%
+      {#2\@addtofilelist{#1}\@@input \@filef@und}}%
+  \ifx\reserved@a\InputIfFileExists\else
+    \expandafter\CheckCommand\expandafter*\expandafter\InputIfFileExists
+    \expandafter{%
+      \expandafter\protect\csname InputIfFileExists \endcsname
     }%
-  }%
-\fi
+    \expandafter\CheckCommand \csname InputIfFileExists \endcsname[2]{%
+      \IfFileExists {#1}{%
+        \expandafter \@swaptwoargs \expandafter {\@filef@und }%
+        {#2\@addtofilelist {#1}\@@input }%
+      }%
+    }%
+  \fi
+}
 %    \end{macrocode}
 % Now we can redefine the macro like described above:
 %    \begin{macrocode}
@@ -211,15 +232,28 @@
 %    \end{macrocode}
 % \begin{macro}{\scr@input@withhook}
 % \changes{v3.27}{2019/03/28}{new (internal)}%^^A
+% \changes{v3.28}{2019/11/21}{support for \textsf{memoir}}%^^A
 % We need a new internal, because of expanding \cs{@file@und} before inputting
 % the file.
 %    \begin{macrocode}
-\newcommand{\scr@input@withhook}[3]{%
-  \scr@load@hook{before}{#2}%
-  #3\@addtofilelist{#2}%
-  \@@input #1%
-  \scr@load@hook{after}{#2}%
-}%
+\@ifclassloaded{memoir}{%
+  \newcommand{\scr@input@withhook}[3]{%
+    \scr@load@hook{before}{#2}%
+    #3\@addtofilelist{#2}%
+    \@ifundefined{m@matbeginf}{}{\m@matbeginf{#2}}%
+    \@@input #1%
+    \@ifundefined{m@matendf}{}{\m@matendf{#2}}%
+    \@ifundefined{killm@matf}{}{\killm@matf{#2}}%
+    \scr@load@hook{after}{#2}%
+  }%
+}{%
+  \newcommand{\scr@input@withhook}[3]{%
+    \scr@load@hook{before}{#2}%
+    #3\@addtofilelist{#2}%
+    \@@input #1%
+    \scr@load@hook{after}{#2}%
+  }%
+}
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
