@@ -1,4 +1,4 @@
-% \CheckSum{4339}
+% \CheckSum{4334}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -277,17 +277,10 @@
 %
 % \begin{macro}{\PackageErrorNoLine}
 % \changes{v3.12}{2013/09/19}{neu}%^^A
-% Dieses Makro wird zwar bereits seit langem für einige wenige Fehlermeldungen
-% verwendet, existierte bisher aber nicht. Es wird für Fehlermeldungen
-% verwendet, denen keine eindeutige Zeilennummer zugeordnet werden kann. In
-% der Regel ist dies zu vermeiden und besser \cs{PackageError} zu verwenden.
-%    \begin{macrocode}
-%<*base>
-\newcommand*\PackageErrorNoLine[2]{%
-  \PackageError{#1}{#2\@gobble}%
-}
-%</base>
-%    \end{macrocode}
+% \changes{v3.28}{2019/11/23}{unsinnige Anweisung entfernt}%^^A
+% Wie Falk richtig angemerkt hat, ist die Anweisung sinnlos, weil
+% \cs{PackageError} gar keine Zeilennummer anhängt. Verwendet wurde die
+% Anweisung nur in einem veralteten Paket.
 % \end{macro}
 %
 %
@@ -1857,7 +1850,7 @@
     recommendation of The LaTeX Project Team.\MessageBreak
     Please replace `\string\ifisdimexpr' by `\string\Ifisdimexpr'%
   }%
-  \Ifisdimension
+  \Ifisdimexpr
 }
 \newcommand*{\Ifisdimexpr}[1]{%
   \IfArgIsEmpty{#1}{\@secondoftwo}{\scr@ifisdimexpr#1\relax\@nil}%
@@ -2219,6 +2212,7 @@
 % \begin{macro}{\scr@ifisdimension}
 % \changes{v3.20}{2015/10/20}{neu (intern)}
 % \changes{v3.28}{2019/11/18}{\cs{ifstrstart} umbenannt in \cs{Ifstrstart}}%^^A
+% \changes{v3.28}{2019/11/23}{Vorzeichenfall \texttt{+} korrigiert}%^^A
 % Eigentlich wäre dieses Hilfsmakro extrem aufwändig, da eine Dimension recht
 % komplex aufgebaut sein darf. Ich habe aber beschlossen, hier mit einer
 % Heuristik zu Werke zu gehen: Wenn das Argument mit einer beliebigen Anzahl
@@ -2235,7 +2229,7 @@
       \Ifstrstart{\meaning #1}{\detokenize{the character}}{%
         \if #1-\aftergroup\scr@ifisdimension
         \else
-          \if #1-\aftergroup\scr@ifisdimension
+          \if #1+\aftergroup\scr@ifisdimension
           \else
             \if #1.%
               \aftergroup\scr@TestDimensionAssignTillNil
@@ -2386,7 +2380,11 @@
 %    \end{macrocode}
 % \begin{macro}{\scr@ifisglue}
 % \changes{v3.20}{2015/10/21}{neu (intern)}
-% \changes{v3.28}{2019/11/18}{\cs{ifstrstart} umbenannt in \cs{Ifstrstart}}%^^A
+% \changes{v3.28}{2019/11/18}{\cs{ifstrstart} umbenannt in
+%   \cs{Ifstrstart}}%^^A
+% \changes{v3.28}{2019/11/23}{Vorzeichenfall \texttt{+} korrigiert}%^^A
+% \changes{v3.28}{2019/11/23}{im Plusfall \cs{ifisdimension} durch
+%   \cs{ifisglue} ersetzt}%^^A
 % Eigentlich wäre dieses Hilfsmakro extrem aufwändig, da Leim recht
 % komplex aufgebaut sein darf. Ich habe aber beschlossen, hier mit einer
 % Heuristik zu Werke zu gehen: Wenn das Argument mit einer beliebigen Anzahl
@@ -2403,7 +2401,7 @@
       \Ifstrstart{\meaning #1}{\detokenize{the character}}{%
         \if #1-\aftergroup\scr@ifisglue
         \else
-          \if #1-\aftergroup\scr@ifisdimension
+          \if #1+\aftergroup\scr@ifisglue
           \else
             \if #1.%
               \aftergroup\scr@TestGlueAssignTillNil
@@ -2599,7 +2597,7 @@
     recommendation of The LaTeX Project Team.\MessageBreak
     Please replace `\string\ifintnumber' by `\string\Ifintnumber'%
   }%
-  \Ifnumber
+  \Ifintnumber
 }
 \newcommand\Ifintnumber[1]{%
   \begingroup\@tempswafalse\let\scr@next\scr@test@sign
@@ -3069,7 +3067,9 @@
 %     \textsf{remreset} und \textsf{chngcntr}}%^^A
 % Dieser alte Bekannte aus dem Paket \textsf{remreset} wird auch von
 % \KOMAScript{} benötigt. Es ist einfacher, ihn selbst zu definieren, als sich
-% auf andere Pakete zu verlassen.
+% auf andere Pakete zu verlassen. Ab \LaTeX~2018-04-01 ist das aber auch
+% Bestandteil von \LaTeX. Deshalb ist es in jedem Fall sinnvoll die Definition
+% nur vorzunehmen, wenn es nicht definiert ist.
 %    \begin{macrocode}
 %<*base>
 \providecommand*\@removefromreset[2]{%
@@ -3493,6 +3493,11 @@
         \ifscr@key@found@
           \ifx\scr@key@run@errors\relax\else
             \ifx\scr@key@run@errors\@empty\else
+%    \end{macrocode}
+% \changes{v3.28}{2019/11/23}{Fehlermeldungen und Infos korrigiert}%^^A
+% Jetzt muss gegebenenfalls noch eine \texttt{@else@} Option behandelt und
+% abhängig davon entweder ein Fehler oder eine Info ausgegeben werden.
+%    \begin{macrocode}
               \scr@ifundefinedorrelax{KV@#1@@else@}{%
                 \PackageError{scrbase}{%
                   unknown option
@@ -3506,8 +3511,7 @@
                     `\expandafter\detokenize\expandafter{\scr@key@value}'%
                   \fi.\MessageBreak
                   Here's what each member says:
-                  \scr@key@run@errors\MessageBreak
-                  o\expandafter\@gobble
+                  \scr@key@run@errors
                 }%
               }{%
                 \scr@execute@elseoption{#1}%
@@ -3538,8 +3542,7 @@
                       `\expandafter\detokenize\expandafter{\scr@key@value}'%
                     \fi.\MessageBreak
                     Here's what each member says:
-                    \scr@key@run@errors\MessageBreak
-                    o\expandafter\@gobble
+                    \scr@key@run@errors
                   }%
                 \fi
               }%  
@@ -4468,19 +4471,29 @@
 %    \begin{macrocode}
 \newcommand*{\FamilySetLength}[4]{%
   \begingroup
-    \protected@edef\reserved@a{#4}%
+  \protected@edef\reserved@a{#4}%
+%    \end{macrocode}
+% Zusammen mit \cs{@defaultsunits} (siehe unten) wäre hier das sinnvoll:
+%    \begin{macrocode}
+%<*neveruse>
     \expandafter\Ifiscount\expandafter{\reserved@a}{%
       \aftergroup\@firstoftwo
     }{%
+%</neveruse>
     \expandafter\Ifisdimen\expandafter{\reserved@a}{%
       \aftergroup\@firstoftwo
     }{%
       \expandafter\Ifisskip\expandafter{\reserved@a}{%
         \aftergroup\@firstoftwo
       }{%
+%    \end{macrocode}
+% Zusammen mit \cs{@defaultsunits} (siehe unten) wäre hier das sinnvoll:
+%    \begin{macrocode}
+%<*neveruse>
         \expandafter\Ifisnumexpr\expandafter{\reserved@a}{%
           \aftergroup\@firstoftwo
         }{%
+%</neveruse>
           \expandafter\Ifisdimexpr\expandafter{\reserved@a}{%
             \aftergroup\@firstoftwo
           }{%
@@ -4494,11 +4507,24 @@
               }%
             }%
           }%
+%<*neveruse>
         }%
+%</neveruse>
       }%
     }%
+%<*neveruse>
   }%
+%</neveruse>
   \endgroup
+%    \end{macrocode}
+% TODO: An der Stelle wäre etwas wie:
+%    \begin{macrocode}
+%<*neveruse>
+  {\@defaultunits#3=#4pt\relax\@nnil\FamilyKeyStateProcessed}
+%</neveruse>
+% schön. Aber aus irgend einem Grund habe ich mich seinerzeit dafür
+% entschieden, die einfacher Form zu wählen:
+%    \begin{macrocode}
   {#3=#4\FamilyKeyStateProcessed}%
   {%
     \FamilyUnknownKeyValue{#1}{#2}{#4}{%
