@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2019/11/18 v1.22c internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2019/12/06 v1.22d internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -1918,7 +1918,7 @@
       \fi
     \endgroup
     \ifx\desccaptionb@xnext\desccaptionb@xfirst
-      \ifthispageodd{\descpage@ddtrue}{\descpage@ddfalse}%
+      \Ifthispageodd{\descpage@ddtrue}{\descpage@ddfalse}%
     \fi
     \csname @desclistentryhook\endcsname
     {\copy\descentryb@x}%
