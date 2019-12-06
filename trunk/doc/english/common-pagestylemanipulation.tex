@@ -51,12 +51,7 @@
                                      Setting up defined page styles)]
 \translator{Markus Kohm\and Jana Schubert\and Karl Hagen}
 
-% Date version of the translated file: 2019-11-29
-
-% Note: The restructuration of the descriptions of \leftmark and \rightmark in
-% scrlayer and scrlayer-scrpage-expert has not been done. The restructuration
-% has been made for the German KOMA-Script book and I'm not sure if it
-% should be adapted in general for the English manual.
+% Date version of the translated file: 2019-12-06
 
 \section{Manipulating Page Styles}
 \seclabel{pagestyle.content}
@@ -98,6 +93,11 @@
 \IfThisCommonLabelBase{scrlayer-scrpage-experts}{\iffalse}{%
   \csname iftrue\endcsname}%
   \begin{Declaration}
+    \IfThisCommonLabelBase{scrlayer}{%
+      \Option{automark}
+      \OptionVName{autooneside}{simple switch}
+      \Option{manualmark}
+    }{}%
     \Macro{automark}\OParameter{section level of the right mark}
                     \Parameter{section level of the left mark}
     \Macro{automark*}\OParameter{section level of the right mark}
@@ -147,20 +147,24 @@
       \DescRef{\ThisCommonLabelBase.cmd.markright} and
       \DescRef{\ThisCommonLabelBase.cmd.markboth}, which are described later
       in this section.
-    \end{Explain}\par
+    \end{Explain}\par%
+    This distinction has been eliminated by %
+    \iffalse \Package{scrpage2} and now also by \fi%
+    \hyperref[cha:scrlayer]{\Package{scrlayer}}\IndexPackage{scrlayer}. Instead
+    of distinguishing between automatic\textnote{automatic and manual running
+      heads} and manual running heads by which page style is selected, there
+    are two new commands: \Macro{automark} and \Macro{manualmark}.%
   }{%
     \IfThisCommonLabelBase{scrlayer}{%
       For most classes, the choice of a page style\,---\,generally
       \PageStyle{headings} or \PageStyle{myheading}\,---\,determines whether
-      the running heads are created automatically or manually. %
+      the running heads are created automatically or manually.
+% TODO: Fix new translation
+      With \Package{scrlayer} the distinction is done with the two commands
+      \Macro{automark} and \Macro{manualmark}.%
+% :ODOT
     }{\InternalCommonFileUsageError}%
   }%
-  This distinction has been eliminated by %
-  \iffalse \Package{scrpage2} and now also by \fi%
-  \hyperref[cha:scrlayer]{\Package{scrlayer}}\IndexPackage{scrlayer}. Instead
-  of distinguishing between automatic\textnote{automatic and manual running
-    heads} and manual running heads by which page style is selected, there are
-  two new commands: \Macro{automark} and \Macro{manualmark}.
 
   The \Macro{manualmark}\important{\Macro{manualmark}} command switches to
   manual marks and deactivates the automatic filling of the marks. In contrast,
@@ -187,8 +191,10 @@
   previous commands to automatically set the mark, while \Macro{automark*}
   changes only the behaviour of the section levels specified in its
   arguments.%
-  \IfThisCommonLabelBase{scrlayer-scrpage}{}{ With this feature you can handle
-    relatively complex cases.}% Umbruchoptimierung
+  \IfThisCommonLabelBase{scrlayer-scrpage}{}{ %
+    With this feature you can handle
+    relatively complex cases.%
+  }% Umbruchoptimierung
   \IfThisCommonLabelBase{scrlayer-scrpage}{\iftrue}{\csname
     iffalse\endcsname}%
     \iffalse% Umbruchkorrekturtext
@@ -210,7 +216,8 @@
       have to load \IfThisCommonLabelBase{scrlayer-scrpage}{%
       	\Package{scrlayer-scrpage}%
       }{%
-      	\hyperref[cha:scrlayer-scrpage]{\Package{scrlayer-scrpage}}}
+      	\hyperref[cha:scrlayer-scrpage]{\Package{scrlayer-scrpage}}%
+      }
       and select the \DescRef{\LabelBase.pagestyle.scrheadings} page style,
       so the document starts with:
 \begin{lstcode}
@@ -259,11 +266,12 @@
     \end{Example}
   \fi
 
+  \IfThisCommonLabelBase{scrlayer}{}{%
   \begin{Declaration}
-	\Option{automark}
-	\OptionVName{autooneside}{simple switch}
-	\Option{manualmark}
-  \end{Declaration}
+    \Option{automark}
+    \OptionVName{autooneside}{simple switch}
+    \Option{manualmark}
+  \end{Declaration}}
   Instead of the commands described previously, you can also use the
   \Option{manualmark}\important{\Option{manualmark}\\\Option{automark}} and
   \Option{automark} options to switch between automatic and manual running
@@ -284,7 +292,7 @@
     for other classes.
   \fi
 
-  \IfThisCommonLabelBase{scrlayer-scrpage}{%
+  \IfThisCommonLabelBaseOneOf{scrlayer,scrlayer-scrpage}{%
     In one-sided printing, you normally want only the higher section levels
     to provide the running title.%
   }{%
@@ -334,38 +342,39 @@
   \Option{automark} or \Option{manualmark}, or the command
   \DescRef{\LabelBase.cmd.automark} or \DescRef{\LabelBase.cmd.manualmark},
   will the conditions here be initialized.%
-  \IfThisCommonLabelBase{scrlayer-scrpage}{\par%
+  \IfThisCommonLabelBase{scrlayer}{\par%
     You can find additional background information and examples of how to use
     these commands in the documentation for the \Package{scrlayer} package
-    \IfThisCommonLabelBase{scrlayer-scrpage}{%
-      \Package{scrlayer-scrpage}%
-    }{%
-      \hyperref[cha:scrlayer-scrpage]{\Package{scrlayer-scrpage}}%
-    } in \autoref{sec:scrlayer-scrpage.pagestyle.content}, starting on
+    \hyperref[cha:scrlayer-scrpage]{\Package{scrlayer-scrpage}}%
+    in \autoref{sec:scrlayer-scrpage.pagestyle.content}, starting on
     \DescPageRef{scrlayer-scrpage.cmd.manualmark}.%
-  }{}%
-  \EndIndexGroup
+  }{%
+    \EndIndexGroup%
+  }%
   \EndIndexGroup
 
 
-  \begin{Declaration}
-    \OptionVName{draft}{simple switch}
-  \end{Declaration}
-  This \KOMAScript{} option accepts the values for simple switches
-  listed in \autoref{tab:truefalseswitch}, \autopageref{tab:truefalseswitch}.
-  If this option is active, all elements of the page styles will also show
-  rulers\index{ruler}%
-  \IfThisCommonLabelBase{scrlayer}{ for}{%
-  	. This can sometimes be useful during}
-   the drafting process.%
-  \IfThisCommonLabelBase{scrlayer-scrpage}{ %
-    If this option has been set globally (see the optional argument
-    of \DescRef{\LabelBase.cmd.documentclass}) but you do not want the
-    rulers, you can deactivate them for this package alone by using
-    \OptionValue{draft}{false} as an optional argument of
-    \DescRef{\LabelBase.cmd.usepackage} while loading the package.%
-  }{}%
-  \EndIndexGroup
+  \IfThisCommonLabelBase{scrlayer}{% already described at \layercontentsmeasure
+  }{%
+    \begin{Declaration}
+      \OptionVName{draft}{simple switch}
+    \end{Declaration}
+    This \KOMAScript{} option accepts the values for simple switches
+    listed in \autoref{tab:truefalseswitch}, \autopageref{tab:truefalseswitch}.
+    If this option is active, all elements of the page styles will also show
+    rulers\index{ruler}%
+    \IfThisCommonLabelBase{scrlayer}{ for}{%
+          . This can sometimes be useful during}
+     the drafting process.%
+    \IfThisCommonLabelBase{scrlayer-scrpage}{ %
+      If this option has been set globally (see the optional argument
+      of \DescRef{\LabelBase.cmd.documentclass}) but you do not want the
+      rulers, you can deactivate them for this package alone by using
+      \OptionValue{draft}{false} as an optional argument of
+      \DescRef{\LabelBase.cmd.usepackage} while loading the package.%
+    }{}%
+    \EndIndexGroup%
+  }%
 
   \begin{Declaration}
     \Macro{MakeMarkcase}\Parameter{text}
@@ -447,25 +456,120 @@
     \end{table}
   }{}%
   \EndIndexGroup
+\fi
+  
 
-
+\IfThisCommonLabelBase{scrlayer-scrpage}{\iffalse}{\csname iftrue\endcsname}
   \begin{Declaration}
-    \Macro{leftmark}
+    \Macro{righttopmark}
+    \Macro{rightbotmark}
+    \Macro{rightfirstmark}
     \Macro{rightmark}
+    \Macro{lefttopmark}
+    \Macro{leftbotmark}
+    \Macro{leftfirstmark}
+    \Macro{leftmark}
+  \end{Declaration}
+  \LaTeX\ChangedAt{v3.16}{\Package{scrlayer}} typically uses a two-part
+  \TeX{} mark for page styles. Running heads can access the left part of that 
+  mark with \DescRef{scrlayer.cmd.leftmark}%
+  \important{\DescRef{scrlayer.cmd.leftmark}}\IndexCmd{leftmark} and the right
+  part with \DescRef{scrlayer.cmd.rightmark}%
+  \important{\DescRef{scrlayer.cmd.rightmark}}\IndexCmd{rightmark}. In fact,
+  it was probably intended to use \DescRef{scrlayer.cmd.leftmark} for the
+  running head of left (even) pages and \DescRef{scrlayer.cmd.rightmark} for
+  the running head of right (odd) pages of two-sided documents. In
+  one-sided printing, however, the standard classes do not even set the left
+  part of the mark.
+
+  \TeX{} itself knows three ways to access a mark. The \Macro{botmark}%
+  \IndexCmd{botmark}\important{\Macro{botmark}} is the last valid mark of the
+  most recent page that has been built. If no mark has been set on the page,
+  it corresponds to the last mark set on the pages that have already been
+  shipped out. The \LaTeX{} command \DescRef{scrlayer.cmd.leftmark} uses
+  precisely this mark, so it returns the left part of the last mark of the
+  page. This corresponds exactly to \Macro{leftbotmark}%
+  \important{\Macro{leftbotmark}}. By comparison, \Macro{rightbotmark}%
+  \important{\Macro{rightbotmark}} prints the right part of this mark.
+
+ \Macro{firstmark}\IndexCmd{firstmark}\important{\Macro{firstmark}} is the
+  first mark of the last page that has been built. This is the first mark that
+  has been set on the page. If no mark has been set on the page, it
+  corresponds to the last mark of the pages that have already been shipped
+  out. The \LaTeX{} command \DescRef{scrlayer.cmd.rightmark} uses precisely
+  this mark, so it returns the right part of the first mark of the page. This
+  corresponds exactly to \Macro{rightfirstmark}%
+  \important{\Macro{rightfirstmark}}. By comparison, \Macro{leftfirstmark}%
+  \important{\Macro{leftfirstmark}} prints the left part of this mark.
+
+  \Macro{topmark}\IndexCmd{topmark}\important{\Macro{topmark}} is the content
+  that \Macro{botmark} had before building the current page. \LaTeX{} itself
+  does not use it. Nevertheless, \IfThisCommonLabelBase{scrlayer}{%
+    \Package{scrlayer}%
+  }{%
+    \hyperref[cha:scrlayer]{\Package{scrlayer}}%
+  } provides \Macro{lefttopmark}\important{\Macro{lefttopmark}} to access the
+  left part of this mark and \Macro{righttopmark}%
+  \important{\Macro{righttopmark}} to access the right part.
+
+  Note\textnote{Attention!} that the left and right portions of the mark
+  can only be set together. Even if you use
+  \DescRef{scrlayer.cmd.markright}\IndexCmd{markright} to change only the
+  right part, the left part will set again (unchanged). Accordingly, in
+  two-sided printing, using the \PageStyle{headings}%
+  \important{\PageStyle{headings}}\IndexPagestyle{headings} page style,
+  the higher section levels always make both parts. For example,
+  \DescRef{scrlayer.cmd.chaptermark} uses \DescRef{scrlayer.cmd.markboth} with
+  an empty right argument in this case. This is the reason 
+  \DescRef{scrlayer.cmd.rightmark} or \Macro{rightfirstmark} always shows an
+  empty value on pages which start a chapter, even if there was a
+  \DescRef{scrlayer.cmd.sectionmark} or \DescRef{maincls.cmd.section} on the
+  same page to make the right part of the mark.
+  Please note\textnote{Attention!} that using any of these commands to show
+  the left or right part of the mark as part of the page content may lead to
+  unexpected results. They are really meant for use in the header or footer 
+  of a page style only. Therefore, they should always be part of the contents
+  of a layer when using \IfThisCommonLabelBase{scrlayer}{%
+    \Package{scrlayer}%
+  }{%
+    \hyperref[cha:scrlayer]{\Package{scrlayer}}%
+  }. But it does not matter whether the layer is restricted to the background
+  or the foreground, since all layers are shipped out after building the
+  current page.
+
+  If you need more information about the mark mechanism 
+  \iffree{of \TeX{}}{\unskip}, please have a look at 
+  \cite[chapter~23]{knuth:texbook}. The topic is flagged there as an issue for
+  real experts. \IfThisCommonLabelBase{scrlayer}{% Umbruchkorrektur
+  So if the explanation above confused you, please don't worry about it.}{}%
+  \EndIndexGroup
+\fi
+  
+  
+\IfThisCommonLabelBase{scrlayer-scrpage-experts}{\iffalse}{%
+  \csname iftrue\endcsname}%
+  \begin{Declaration}
+    \IfThisCommonLabelBase{scrlayer-scrpage}{%
+      \Macro{leftmark}
+      \Macro{rightmark}
+    }{}%
     \Macro{headmark}
     \Macro{pagemark}
   \end{Declaration}
-  If you want to depart from the predefined page styles, you typically need to
-  decide where to place the marks' contents. With 
-  \Macro{leftmark}\important{\Macro{leftmark}} you can define what will
-  appear in the left mark when the page is output.
+  \IfThisCommonLabelBase{scrlayer-scrpage}{%
+    If you want to depart from the predefined page styles, you typically need
+    to decide where to place the marks' contents. With
+    \Macro{leftmark}\important{\Macro{leftmark}} you can define what will
+    appear in the left mark when the page is output.
 
-  Similarly, you can use \Macro{rightmark}\important{\Macro{rightmark}} to 
-  define the contents of the right mark.\iffree{}{ For information about some
-  subtleties when using these commands, see further 
-  \DescRef{maincls-experts.cmd.rightmark} in
-  \autoref{sec:maincls-experts.addInfos},
-  \DescPageRef{maincls-experts.cmd.rightmark}.}
+    Similarly, you can use \Macro{rightmark}\important{\Macro{rightmark}} to
+    define the contents of the right mark.\iffree{}{ For information about
+      some subtleties when using these commands, see further
+      \DescRef{maincls-experts.cmd.rightmark} in
+      \autoref{sec:maincls-experts.addInfos},
+      \DescPageRef{maincls-experts.cmd.rightmark}.}
+
+  }{}%
 
   You can make life easier with \Macro{headmark}\important{\Macro{headmark}}. 
   This extension of \IfThisCommonLabelBase{scrlayer}{%
@@ -607,10 +711,11 @@
         in the running head. This can be accomplished easily with the
         following:
       \fi
-\begin{lstcode}[belowskip=-\dp\strutbox]
+\begin{lstcode}
   \renewcommand*{\sectionmarkformat}{}
 \end{lstcode}
     \end{Example}
+    \ExampleEndFix
   \fi% 
   \EndIndexGroup
 
@@ -889,92 +994,10 @@
     \end{Example}
   \fi% 
   \EndIndexGroup
+\fi
 
 
-  \begin{Declaration}
-    \Macro{righttopmark}%
-    \Macro{rightbotmark}%
-    \Macro{rightfirstmark}%
-    \Macro{lefttopmark}%
-    \Macro{leftbotmark}%
-    \Macro{leftfirstmark}
-  \end{Declaration}
-  \LaTeX\ChangedAt{v3.16}{\Package{scrlayer}} typically uses a two-part
-  \TeX{} mark for page styles. Running heads can access the left part of that 
-  mark with \DescRef{scrlayer.cmd.leftmark}%
-  \important{\DescRef{scrlayer.cmd.leftmark}}\IndexCmd{leftmark} and the right
-  part with \DescRef{scrlayer.cmd.rightmark}%
-  \important{\DescRef{scrlayer.cmd.rightmark}}\IndexCmd{rightmark}. In fact,
-  it was probably intended to use \DescRef{scrlayer.cmd.leftmark} for the
-  running head of left (even) pages and \DescRef{scrlayer.cmd.rightmark} for
-  the running head of right (odd) pages of two-sided documents. In
-  one-sided printing, however, the standard classes do not even set the left
-  part of the mark.
-
-  \TeX{} itself knows three ways to access a mark. The \Macro{botmark}%
-  \IndexCmd{botmark}\important{\Macro{botmark}} is the last valid mark of the
-  most recent page that has been built. If no mark has been set on the page,
-  it corresponds to the last mark set on the pages that have already been
-  shipped out. The \LaTeX{} command \DescRef{scrlayer.cmd.leftmark} uses
-  precisely this mark, so it returns the left part of the last mark of the
-  page. This corresponds exactly to \Macro{leftbotmark}%
-  \important{\Macro{leftbotmark}}. By comparison, \Macro{rightbotmark}%
-  \important{\Macro{rightbotmark}} prints the right part of this mark.
-
-  \Macro{firstmark}\IndexCmd{firstmark}\important{\Macro{firstmark}} is the
-  first mark of the last page that has been built. This is the first mark that
-  has been set on the page. If no mark has been set on the page, it
-  corresponds to the last mark of the pages that have already been shipped
-  out. The \LaTeX{} command \DescRef{scrlayer.cmd.rightmark} uses precisely
-  this mark, so it returns the right part of the first mark of the page. This
-  corresponds exactly to \Macro{rightfirstmark}%
-  \important{\Macro{rightfirstmark}}. By comparison, \Macro{leftfirstmark}%
-  \important{\Macro{leftfirstmark}} prints the left part of this mark.
-
-  \Macro{topmark}\IndexCmd{topmark}\important{\Macro{topmark}} is the content
-  that \Macro{botmark} had before building the current page. \LaTeX{} itself
-  does not use it. Nevertheless, \IfThisCommonLabelBase{scrlayer}{%
-    \Package{scrlayer}%
-  }{%
-    \hyperref[cha:scrlayer]{\Package{scrlayer}}%
-  } provides \Macro{lefttopmark}\important{\Macro{lefttopmark}} to access the
-  left part of this mark and \Macro{righttopmark}%
-  \important{\Macro{righttopmark}} to access the right part.
-
-  Note\textnote{Attention!} that the left and right portions of the mark
-  can only be set together. Even if you use
-  \DescRef{scrlayer.cmd.markright}\IndexCmd{markright} to change only the
-  right part, the left part will set again (unchanged). Accordingly, in
-  two-sided printing, using the \PageStyle{headings}%
-  \important{\PageStyle{headings}}\IndexPagestyle{headings} page style,
-  the higher section levels always make both parts. For example,
-  \DescRef{scrlayer.cmd.chaptermark} uses \DescRef{scrlayer.cmd.markboth} with
-  an empty right argument in this case. This is the reason 
-  \DescRef{scrlayer.cmd.rightmark} or \Macro{rightfirstmark} always shows an
-  empty value on pages which start a chapter, even if there was a
-  \DescRef{scrlayer.cmd.sectionmark} or \DescRef{maincls.cmd.section} on the
-  same page to make the right part of the mark.
-
-  Please note\textnote{Attention!} that using any of these commands to show
-  the left or right part of the mark as part of the page content may lead to
-  unexpected results. They are really meant for use in the header or footer 
-  of a page style only. Therefore, they should always be part of the contents
-  of a layer when using \IfThisCommonLabelBase{scrlayer}{%
-    \Package{scrlayer}%
-  }{%
-    \hyperref[cha:scrlayer]{\Package{scrlayer}}%
-  }. But it does not matter whether the layer is restricted to the background
-  or the foreground, since all layers are shipped out after building the
-  current page.
-
-  If you need more information about the mark mechanism 
-  \iffree{of \TeX{}}{\unskip}, please have a look at 
-  \cite[chapter~23]{knuth:texbook}. The topic is flagged there as an issue for
-  real experts. \IfThisCommonLabelBase{scrlayer}{% Umbruchkorrektur
-  So if the explanation above confused you, please don't worry about it.}{}%
-  \EndIndexGroup
-
-
+\IfThisCommonLabelBase{scrlayer-scrpage}{\iffalse}{\csname iftrue\endcsname}
   \begin{Declaration}
     \Macro{@mkleft}\Parameter{left mark}%
     \Macro{@mkright}\Parameter{right mark}%
@@ -1015,7 +1038,7 @@
   heads are activated.%
   \EndIndexGroup%
 \fi%
-%
+
 \IfThisCommonLabelBase{scrlayer}{%
   \par
   For more information about manipulating the contents of page styles, see
@@ -1031,3 +1054,5 @@
 %%% TeX-master: "../guide.tex"
 %%% TeX-PDF-mode: t
 %%% End: 
+
+% LocalWords:  scrlayer
