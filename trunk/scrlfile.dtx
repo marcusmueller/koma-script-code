@@ -1,8 +1,8 @@
-% \CheckSum{839}
+% \CheckSum{849}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlfile.dtx
-% Copyright (c) Markus Kohm, 2002-2019
+% Copyright (c) Markus Kohm, 2002-2020
 %
 % This file is part of the work `scrlfile' which is part of the LaTeX2e
 % KOMA-Script bundle.
@@ -21,7 +21,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrlfile.dtx
-% Copyright (c) Markus Kohm, 2002-2019
+% Copyright (c) Markus Kohm, 2002-2020
 %
 % Diese Datei ist Teil des Werks `scrlfile', das wiederum Teil des
 % LaTeX2e KOMA-Script Pakets ist.
@@ -444,9 +444,11 @@
 \newcommand*{\scr@load@hook}[2]{%
 %    \end{macrocode}
 % \begin{macro}{\scrlfile@cmp@hook}
-% \changes{v3.27a}{2019/10/23}{local macros renamed}
+% \changes{v3.27a}{2019/10/23}{local macros renamed}%^^A
 % \begin{macro}{\scrlfile@hookname}
-% \changes{v3.27a}{2019/10/23}{local macros renamed}
+% \changes{v3.27a}{2019/10/23}{local macros renamed}%^^A
+% \changes{v3.29}{2020/06/01}{do the class and package load hooks only in the
+%   document preamble}%^^A --> https://komascript.de/node/2274
 % Workaround for strange handling of the \cs{AtEndOfPackage} hook in
 % \cs{@onefilewithoptions} (becomes \cs{@empty}, if the package already has
 % been loaded and is not loaded again). This workaround is not nice but
@@ -454,19 +456,24 @@
 % later. To decide whether to define or remove the marker, two local macros
 % are used \cs{scrlfile@hookname} and \cs{scrlfile@cmp@hook}. The first has
 % the name of the current hook from the first argument. The other is a compare
-% string. The first one is also valid while processing the hook. The names are
-% very unique, so we do not reserve them using \cs{newcommand} outside. The
-% name of the marker is less unique. Nevertheless it is not reserved.
+% string. The first one is also valid while processing the hook, but only in
+% the document preamble. The names are very unique, so we do not reserve them
+% using \cs{newcommand} outside. The name of the marker is less
+% unique. Nevertheless it is not reserved.
 % Note: For recursive loading of files this does not work. But this also does
 % not matter, because it is needed only for packages and classes, which are
-% never loaded recursive.
+% never loaded recursive. For the same reason from \KOMAScript{} 3.29 this is
+% only used inside the document preamble. After the document preamble it can
+% be dangerous, e.g., inside a |tabular| or |array|.
 %    \begin{macrocode}
-  \edef\scrlfile@hookname{#1}%
-  \def\scrlfile@cmp@hook{before}%
-  \ifx\scrlfile@hookname\scrlfile@cmp@hook
-    \expandafter\def\csname #2-l@ading\endcsname{#2}%
+  \ifx\@begindocumenthook\@undefined\else
+    \edef\scrlfile@hookname{#1}%
+    \def\scrlfile@cmp@hook{before}%
+    \ifx\scrlfile@hookname\scrlfile@cmp@hook
+      \expandafter\def\csname #2-l@ading\endcsname{#2}%
+    \fi
+    \let\scrlfile@cmp@hook\@undefined
   \fi
-  \let\scrlfile@cmp@hook\@undefined
   \@ifundefined{#2-@#1}{}{%
     \@nameuse{#2-@#1}%
     \expandafter\let\csname #2-@#1\endcsname\relax
@@ -474,13 +481,15 @@
 %    \end{macrocode}
 % The hook could destroy \cs{scrlfile@hookname} so define it again:
 %    \begin{macrocode}
-  \edef\scrlfile@hookname{#1}%
-  \def\scrlfile@cmp@hook{after}%
-  \ifx\scrlfile@hookname\scrlfile@cmp@hook
-    \expandafter\let\csname #2-l@ading\endcsname\@undefined
+  \ifx\@begindocumenthook\@undefined\else
+    \edef\scrlfile@hookname{#1}%
+    \def\scrlfile@cmp@hook{after}%
+    \ifx\scrlfile@hookname\scrlfile@cmp@hook
+      \expandafter\let\csname #2-l@ading\endcsname\@undefined
+    \fi
+    \let\scrlfile@cmp@hook\@undefined
+    \let\scrlfile@hookname\@undefined
   \fi
-  \let\scrlfile@cmp@hook\@undefined
-  \let\scrlfile@hookname\@undefined
 }
 %    \end{macrocode}
 %  \end{macro}
