@@ -1,6 +1,6 @@
 # ======================================================================
 # Makefile
-# Copyright (c) Markus Kohm, 2002-2014
+# Copyright (c) Markus Kohm, 2002-2020
 #
 # This file is part of the LaTeX2e KOMA-Script bundle.
 #
@@ -18,7 +18,7 @@
 # This work consists of all files listed in manifest.txt.
 # ----------------------------------------------------------------------
 # Makefile
-# Copyright (c) Markus Kohm, 2002-2014
+# Copyright (c) Markus Kohm, 2002-2020
 #
 # Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 # Version 1.3c, verteilt und/oder veraendert werden.
@@ -108,10 +108,9 @@ STATIC_DOC_LINKS= komascript.html komascr.html \
 
 DOC_SRC		= scrguide.cls scrguide.ist scrguide.gst \
 	          guide.tex guide.bib plength.dtx \
-		  linkalias.tex \
-		  scrpage2.tex
+		  linkalias.tex
 
-DOC_FILES       = scrpage2.pdf
+DOC_FILES       =
 
 DOC_DIR         = doc
 
@@ -135,11 +134,6 @@ prepare_local: $(STATIC_DOC_LINKS)
 
 default_local: $(STATIC_DOC) $(DOC_FILES)
 	$(make_recursive)
-
-scrpage2.pdf: $(DOC_SRC)
-	$(LATEX) $(NONSTOPMODE) $(PDFOUTPUT) scrpage2.tex
-	$(LATEX) $(NONSTOPMODE) $(PDFOUTPUT) scrpage2.tex
-	$(LATEX) $(NONSTOPMODE) $(PDFOUTPUT) scrpage2.tex
 
 $(STATIC_DOC_LINKS): $(STATIC_DOC_SRC)
 	$(SYMLINK) $< $@
@@ -215,12 +209,10 @@ maintain_local:
 	$(make_recursive)
 
 distclean_local:
-	$(SRM) scrpage2-ngerman.tex scrpage2-english.tex
 	$(make_recursive)
 
 maintainclean_local:
-	$(SRM) ChangeLog.svn ChangeLog.bak $(STATIC_DOC_LINKS) $(DOC_FILES) \
-	       scrpage2-ngerman.tex scrpage2-english.tex
+	$(SRM) ChangeLog.svn ChangeLog.bak $(STATIC_DOC_LINKS) $(DOC_FILES)
 	$(make_recursive)
 
 edit:
