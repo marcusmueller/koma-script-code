@@ -2,7 +2,7 @@
 
 --[[
   Build script for koma-script-obsolete module scrpage-obsolete
-  Copyright (C) 2020-02-26 Markus Kohm
+  Copyright (C) 2020 Markus Kohm
 
   This file is part of the build system of koma-script-obsolete.
 

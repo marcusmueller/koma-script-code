@@ -1,7 +1,7 @@
 #!/usr/bin/env texlua
 
 --[[
-  Build script for koma-script-obsolete module scrlettr-obsolete
+  Build script for koma-script-obsolete module scrpage2-obsolete
   Copyright (C) 2020 Markus Kohm
 
   This file is part of the build system of koma-script-obsolete.
@@ -17,8 +17,10 @@
 -- Bundle and modules
 
 bundle = "koma-script-obsolete"
-module = "scrlettr-obsolete"
+module = "scrpage2-obsolete"
 maindir = "../"
+
+unpackfiles = { "*.dtx" }
 
 -- Find and run build system
 
