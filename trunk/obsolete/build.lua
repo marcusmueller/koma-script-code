@@ -2,7 +2,7 @@
 
 --[[
   Build script for koma-script-obsolete
-  Copyright (C) 2020-02-26 Markus Kohm
+  Copyright (C) 2020 Markus Kohm
 
   This file is part of the build system of koma-script-obsolete.
 
@@ -17,7 +17,7 @@
 -- Bundle and modules
 
 bundle = "koma-script-obsolete"
-modules = { "scrlettr-obsolete", "scrpage-obsolete" }
+modules = { "scrlettr-obsolete", "scrpage-obsolete", "scrpage2-obsolete" }
 textfiles = { "README" }
 
 -- Find and run build system
