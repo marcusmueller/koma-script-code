@@ -20,6 +20,8 @@ bundle = "koma-script-obsolete"
 modules = { "scrlettr-obsolete", "scrpage-obsolete", "scrpage2-obsolete" }
 textfiles = { "README" }
 
+packtdszip = false
+
 -- Find and run build system
 
 kpse.set_program_name("kpsewhich")
