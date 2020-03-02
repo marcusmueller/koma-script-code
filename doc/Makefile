@@ -197,7 +197,7 @@ dist_local: $(DIST_FILES)
 	$(MKDIR) $(DISTDIR)/$(BIN_DIR)
 	$(CP) $(DIST_FILES) $(DISTDIR)
 	$(CP) $(BIN_FILES) $(DISTDIR)/$(BIN_DIR)
-	$(CP) $(DOC_FILES) $(DISTDIR)/$(DOC_DIR)
+#	$(CP) $(DOC_FILES) $(DISTDIR)/$(DOC_DIR)
 	$(make_recursive)
 
 maintain_local:
