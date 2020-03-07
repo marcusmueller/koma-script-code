@@ -1,4 +1,4 @@
-% \CheckSum{4334}
+% \CheckSum{4366}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
@@ -243,6 +243,38 @@
 %<base>\providecommand*\kernel@ifstar[1]{\kernel@ifnextchar*{\@firstoftwo{#1}}}
 %    \end{macrocode}
 % \end{macro}%^^A \kernel@ifstar
+%
+% \selectlanguage{english}
+%
+% \subsection{Improved \LaTeX{} kernel commands}
+% The \LaTeX{} kernel already provides some useful commands, but some can be
+% improved.
+%
+% \begin{macro}{\rloop}
+% \changes{v3.30}{2020/03/07}{new}
+% The \cs{loop} \dots \cs{repeat} of the \LaTeX{} kernel cannot be used inside
+% a \cs{loop} \dots \cs{repeat} without extra code for preserving
+% \cs{iterate}. So here is a re-entrant version that is also long. This
+% version can be used even inside a \cs{loop} \dots \cs{repeat}. However you
+% should not use \cs{loop} \dots \cs{repeat} inside \cs{rloop} \dots
+% \cs{repeat}.
+%    \begin{macrocode}
+%<*base>
+\newcommand{\rloop}[1]{}
+\long\def\rloop#1\repeat{%
+  \ifdefined\iterate
+    \edef\iterate{\unexpanded{#1\relax\expandafter\iterate\fi\def\iterate}%
+      {\unexpanded\expandafter{\iterate}}}%
+  \else
+    \def\iterate{#1\relax\expandafter\iterate\fi\let\iterate\relax}%
+  \fi
+  \iterate
+}
+%</base>
+%    \end{macrocode}
+% \end{macro}
+% \selectlanguage{ngerman}
+%
 %
 % \subsection{Test von Anweisungen}
 %
@@ -5118,6 +5150,7 @@
 % \changes{v3.27}{2019/02/05}{New}%^^A
 % \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
 % \changes{v3.30}{2020/03/07}{\cs{loop}\dots\cs{repeat} inside group}%^^A
+% \changes{v3.30}{2020/03/07}{using \cs{rloop} instead of \cs{loop}}%^^A
 % Arguments:
 % \begin{description}
 % \item[\meta{specificator}:]
@@ -5143,7 +5176,7 @@
       \def\scr@hookrun{\endgroup}%
       \let\scr@hookname\relax
       \edef\scr@hookargument{#1}%
-      \loop
+      \rloop
         \scr@hooksplit@specificator\scr@hookname\scr@hookargument
                                    \scr@hookargument
         \edef\scr@hookrun{%
