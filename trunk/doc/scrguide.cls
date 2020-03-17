@@ -2231,13 +2231,15 @@ KOMAScript \endcsname
 %    \begin{macrocode}
 \RedeclareSectionCommand[%
   tocdynnumwidth,%
+  tocbreakafternumber=true,%
   tocentrynumberformat=\partnumberwithprefix,%
   tocpagenumberformat=\@firstofone
 ]{part}%
 \newcommand*{\partnumberwithprefix}[1]{\let\autodot:\partname~#1}%
 \RedeclareSectionCommand[%
   tocnumwidth=21pt,%
-  tocpagenumberformat=\@firstofone
+  tocpagenumberformat=\@firstofone,%
+  tocraggedentrytext=true%
 ]{chapter}%
 \RedeclareSectionCommand[tocindent=21pt,tocnumwidth=34pt]{section}%
 \RedeclareSectionCommand[tocindent=55pt,tocnumwidth=36pt]{subsection}%
