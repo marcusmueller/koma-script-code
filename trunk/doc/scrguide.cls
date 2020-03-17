@@ -1,6 +1,6 @@
 % ======================================================================
 % scrguide.cls
-% Copyright (c) Markus Kohm, 2005-2019
+% Copyright (c) Markus Kohm, 2005-2020
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -18,7 +18,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrguide.cls
-% Copyright (c) Markus Kohm, 2005-2019
+% Copyright (c) Markus Kohm, 2005-2020
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2019/12/06 v1.22d internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2020/03/17 v1.23 internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -163,7 +163,6 @@
 \newif\ifshortversion\shortversionfalse
 \InputIfFileExists{scrnonfree.tex}{}{%
   \RequirePackage[svgnames]{xcolor}%
-  \RequirePackage{tocstyle}% hyperref needs xcolor with tocstyle
   \RequirePackage{tikz}%
   \usetikzlibrary{calc}%
   \RequirePackage[\uselanguage]{hyperref}%
@@ -2230,19 +2229,22 @@ KOMAScript \endcsname
 % We have large page numbers, so better setup the needed width. And we like
 % other dot seperation.
 %    \begin{macrocode}
-\usetocstyle{classic}
+\RedeclareSectionCommand[%
+  tocdynnumwidth,%
+  tocentrynumberformat=\partnumberwithprefix,%
+  tocpagenumberformat=\@firstofone
+]{part}%
+\newcommand*{\partnumberwithprefix}[1]{\let\autodot:\partname~#1}%
+\RedeclareSectionCommand[%
+  tocnumwidth=21pt,%
+  tocpagenumberformat=\@firstofone
+]{chapter}%
+\RedeclareSectionCommand[tocindent=21pt,tocnumwidth=34pt]{section}%
+\RedeclareSectionCommand[tocindent=55pt,tocnumwidth=36pt]{subsection}%
+\DeclareTOCStyleEntries[dynnumwidth]{default}{figure,table}%
 \renewcommand*{\@pnumwidth}{1.8em}% 1.67
 \renewcommand*\@tocrmarg {2.70em}% 2.55em
-\renewcommand*\@dotsep{2.5}
-\settocfeature[toc][-1]{entryhook}{%
-  \let\sg@numberline\numberline
-  \renewcommand*{\numberline}[1]{%
-    \sg@numberline{\partname~##1}%
-    ~\linebreak\nopagebreak\hspace*{-\@tempdima}%
-  }%
-  \def\autodot{: }%
-  \sectfont
-}
+\renewcommand*\@dotsep{2.5}%
 %    \end{macrocode}
 %
 % \section{Part}
