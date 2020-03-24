@@ -1,4 +1,4 @@
-%\CheckSum{2881}
+% \CheckSum{2945}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-typearea.dtx
@@ -1413,37 +1413,39 @@
 %    \begin{macrocode}
 %<*class&body&!letter>
 \if@scr@emulatestandardclasses
-  \ifnum\@lastdiv=\z@
-    \setlength{\textwidth}{\dimexpr \paperwidth-2in\relax}
-    \ifdim \f@size\p@<10.5\p@
-        \setlength{\@tempdimb}{345\p@}
-    \else\ifdim \f@size\p@<11.5\p@
-        \setlength{\@tempdimb}{360\p@}
+  \Ifstr{\@lastdiv}{areaset}{}{%
+    \ifnum\@lastdiv=\z@
+      \setlength{\textwidth}{\dimexpr \paperwidth-2in\relax}
+      \ifdim \f@size\p@<10.5\p@
+          \setlength{\@tempdimb}{345\p@}
+      \else\ifdim \f@size\p@<11.5\p@
+          \setlength{\@tempdimb}{360\p@}
+        \else
+          \setlength{\@tempdimb}{390\p@}
+        \fi
+      \fi
+      \if@twocolumn
+        \ifdim\@textwidth>2\@tempdimb\relax
+          \setlength{\textwidth}{2\@tempdimb}
+        \fi
       \else
-        \setlength{\@tempdimb}{390\p@}
+        \ifdim\textwidth>\@tempdimb
+          \setlength{\textwidth}{\@tempdimb}
+        \fi
       \fi
+      \@settopoint\textwidth
+      \setlength{\@tempdima}{\dimexpr \paperheight-3.5in\relax}
+      \divide\@tempdima\baselineskip
+      \@tempcnta=\@tempdima
+      \setlength{\textheight}{\@tempcnta\baselineskip}
+      \addtolength{\textheight}{\topskip}
+      \edef\reserved@a{%
+        \noexpand\@areasetadvancedtrue
+        \noexpand\areaset[current]{\noexpand\textwidth}{\noexpand\textheight}%
+        \if@areasetadvanced\else\noexpand\@areasetadvancedfalse\fi
+      }\reserved@a
     \fi
-    \if@twocolumn
-      \ifdim\@textwidth>2\@tempdimb\relax
-        \setlength{\textwidth}{2\@tempdimb}
-      \fi
-    \else
-      \ifdim\textwidth>\@tempdimb
-        \setlength{\textwidth}{\@tempdimb}
-      \fi
-    \fi
-    \@settopoint\textwidth
-    \setlength{\@tempdima}{\dimexpr \paperheight-3.5in\relax}
-    \divide\@tempdima\baselineskip
-    \@tempcnta=\@tempdima
-    \setlength{\textheight}{\@tempcnta\baselineskip}
-    \addtolength{\textheight}{\topskip}
-    \edef\reserved@a{%
-      \noexpand\@areasetadvancedtrue
-      \noexpand\areaset[current]{\noexpand\textwidth}{\noexpand\textheight}%
-      \if@areasetadvanced\else\noexpand\@areasetadvancedfalse\fi
-    }\reserved@a
-  \fi
+  }%  
 \fi
 %</class&body&!letter>
 %    \end{macrocode}
@@ -1701,28 +1703,51 @@
 % \end{option}
 %
 % \begin{option}{DIV}
-% \changes{v2.2a}{1995/01/25}{neue Option}%^^A
+% \changes{v2.2a}{1995/01/25}{new option}%^^A
 % \changes{v2.95}{2002/12/04}{new implementation using \textsf{keyval}}%^^A
 % \changes{v3.12}{2013/03/05}{status signaling using \cs{FamilyKeyState}}%^^A
 % The value is written into the counter \cs{ta@div}. Several symbolic values
 % are supported and have to be converted into a counter. Note, while loading
 % the package symbolic values are nonsense.
+% \begin{macro}{\@lastdiv}
+% \changes{v3.30}{2020/03/24}{init the internal macro}%^^A
+% This internal macro stores the last value to option \texttt{DIV}. It is
+% initialized with \cs{relax}.
+%    \begin{macrocode}
+%<package&typearea&init>\newcommand*{\@lastdiv}{\z@}\let\@lastdiv\relax
+%    \end{macrocode}
+% \end{macro}%^^A \@lastdiv
 %    \begin{macrocode}
 %<*package&typearea&options>
+\def\movet@reserved@a@to@nnil#1\@nnil{\def\reserved@a{#1}}%
 \KOMA@key{DIV}[calc]{%
   \edef\@tempa{#1}%
-  \def\@tempb{last}\ifx\@tempa\@tempb\let\@tempa=\@lastdiv\fi
+  \def\@tempb{last}\ifx\@tempa\@tempb\let\@tempa=\@lastdiv
+    \ifx\@tempa\relax\def\@tempa{current}\fi
+  \fi  
   \def\@tempb{current}\ifx\@tempa\@tempb\else
     \def\@tempb{default}\ifx\@tempa\@tempb\ta@div=\z@ \else
       \def\@tempb{calc}\ifx\@tempa\@tempb\ta@div=\tw@ \else
         \def\@tempb{classic}\ifx\@tempa\@tempb\ta@div=\thr@@ \else
-          \ta@div=\@tempa
+          \expandafter\def\expandafter\@tempa\expandafter{\expandafter0\@tempa}%
+          \afterassignment\movet@reserved@a@to@nnil
+            \@tempcnta=\@tempa\relax\@nnil
+          \def\@tempb{\relax}\ifx\reserved@a\@tempb
+            \ta@div=\@tempcnta
+            \edef\@tempa{\the\ta@div}%
+          \else
+            \let\@tempa\relax  
+          \fi
         \fi
       \fi
     \fi
   \fi
-  \FamilyKeyStateProcessed
-  \KOMA@kav@xreplacevalue{.typearea.\scr@pkgextension}{DIV}{#1}%
+  \ifx\@tempa\relax
+    \FamilyKeyStateUnknownValue
+  \else
+    \FamilyKeyStateProcessed
+    \KOMA@kav@xreplacevalue{.typearea.\scr@pkgextension}{DIV}{\@tempa}%
+  \fi
 }
 %    \end{macrocode}
 % After loading the package we have to do a little bit more, because we need
@@ -2122,8 +2147,10 @@
 % \changes{v2.8q}{2001/11/06}{new symbolic value \texttt{last}}%^^A
 % \changes{v2.96}{2006/08/21}{warn if \cs{typearea} is used inside a
 %     group}%^^A
-% \changes{v3.10}{2011/09/13}{using \cs{scr@grouplevel@test}}
+% \changes{v3.10}{2011/09/13}{using \cs{scr@grouplevel@test}}%^^A
 % \changes{v3.12}{2013/03/26}{page footer height configurable}%^^A
+% \changes{v3.30}{2020/03/24}{\texttt{current} after \cs{areaset} is
+%   \texttt{areaset}}%^^A
 %      
 % The symbolic values of the obligatory argument of \cs{typearea}:
 % \begin{center}\begin{tabular}{lll}
@@ -2147,14 +2174,16 @@
   \fi
   \edef\@tempa{#2}%
   \def\@tempb{last}\ifx\@tempa\@tempb\let\@tempa=\@lastdiv
-    \ifx\csname @tempa\endcsname\relax
-      \def\@tempa{current}%
-    \fi
+    \ifx\@tempa\relax \def\@tempa{current}\fi
   \fi
+  \Ifstr{\@tempa}{current}{%
+    \Ifstr{\@lastdiv}{areaset}{\let\@tempa\@lastdiv}{}%
+  }{}%
   \def\@tempb{areaset}\ifx\@tempa\@tempb
     \areaset[current]{\textwidth}{\textheight}%
   \else
-    \def\@tempb{current}\ifx\@tempa\@tempb\else
+    \def\@tempb{current}\ifx\@tempa\@tempb
+    \else
       \def\@tempb{default}\ifx\@tempa\@tempb\ta@div=\z@ \else
         \def\@tempb{calc}\ifx\@tempa\@tempb\ta@div=\tw@ \else
           \def\@tempb{classic}\ifx\@tempa\@tempb\ta@div=\thr@@ \else
@@ -3098,6 +3127,8 @@
 % \changes{v2.5}{1997/06/17}{Einzelzeichenscanner durch
 %   Mustererkennung ersetzt}%^^A
 % \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
+% \changes{v3.30}{2020/03/24}{avoid error message for unknown \texttt{BCOR}
+%   value to \cs{documentclass}}%^^A
 % Das Makro \cs{@BCOR} wird später benötigt, um die Option
 % \texttt{BCOR\emph{BCOR}} zu erkennen. Die Option wird über ihr
 % Muster erkannt. 
@@ -3122,7 +3153,10 @@
 % \changes{v3.22}{2016/07/29}{missing deprecated option warning added}%^^A
 % \changes{v3.28}{2019/11/18}{\cs{ifdimen} renamed to \cs{Ifdimen}}%^^A
 %    \begin{macrocode}
-%<class>      \PassOptionsToPackage{BCOR#2}{typearea}%
+%<*class>  
+      \Ifstrstart{#2}{=}{\OptionNotUsed}{%
+        \PassOptionsToPackage{BCOR#2}{typearea}}%
+%</class>
 %<*package>
       \Ifdimen{#2}{%
         \KOMA@UseDeprecatedOption{%
@@ -3147,6 +3181,8 @@
 %      Mustererkennung ersetzt}%^^A
 % \changes{v3.22}{2016/07/29}{missing deprecated option warning added}%^^A
 % \changes{v3.28}{2019/11/18}{\cs{ifnumber} umbenannt in \cs{Ifnumber}}%^^A
+% \changes{v3.30}{2020/03/24}{avoid error message for unknown \texttt{DIV}
+%   value to \cs{documentclass}}%^^A
 % Die grundsätzliche Funktion ist die gleiche wie bei \cs{@BCOR},
 % \cs{@@BCOR}.
 %    \begin{macrocode}
@@ -3155,7 +3191,10 @@
 \def\@@DIV #1DIV#2DIV#3\@@DIV{%
   \edef\@tempa{#1}\ifx\@tempa\@empty
     \edef\@tempa{#3}\def\@tempb{DIV}\ifx\@tempa\@tempb
-%<class>      \PassOptionsToPackage{DIV#2}{typearea}%
+%<*class>  
+      \Ifstrstart{#2}{=}{\OptionNotUsed}{%
+        \PassOptionsToPackage{DIV#2}{typearea}}%
+%</class>
 %<*package>
       \Ifnumber{#2}{%
         \KOMA@UseDeprecatedOption{%
