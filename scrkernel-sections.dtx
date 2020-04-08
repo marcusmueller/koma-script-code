@@ -1,4 +1,4 @@
-% \CheckSum{4847}
+% \CheckSum{4897}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -1905,6 +1905,17 @@
 }
 %</book|report>
 %    \end{macrocode}
+% \begin{macro}{\scr@dsc@style@chapter@subcommands}
+% \selectlanguage{english}%^^A
+% \changes{v3.30}{2020/04/08}{new (internal)}
+% Internal name list of additional commands to be defined for style
+% \texttt{part} commands.
+%    \begin{macrocode}
+\newcommand*{\scr@dsc@style@chapter@subcommands}[1]{%
+  @#1,@s#1,@make#1head,@makes#1head,@@make#1head,@@makes#1head,set#1preamble%
+}
+%    \end{macrocode}
+% \end{macro}%^^A \scr@dsc@style@chapter@subcommands
 % \end{macro}%^^A \scr@dsc@def@style@chapter@command
 %
 % \begin{macro}{\scr@dsc@style@part@options}
@@ -1978,7 +1989,7 @@
 \DeclareSectionCommandStyleFontOption{part}{prefixfont}{}{prefix}
 %    \end{macrocode}
 % \end{macro}%^^A \scr@dsc@style@part@options
-% \begin{macro}{\scr@dsc@def@style@part@command}
+% \begin{macro}{\scr@dsc@def@style@part@ommand}
 % \changes{v3.18}{2015/05/23}{neue Anweisung (intern)}
 % Diese Anweisung legt fest, wie ein Gliederungsbefehl für den Stil
 % \texttt{part} zu definieren ist. Das einzige Argument ist dabei der
@@ -1993,6 +2004,17 @@
 %<book|report>  \@namedef{set#1preamble}{\set@preamble{#1}}%
 }
 %    \end{macrocode}
+% \begin{macro}{\scr@dsc@style@part@subcommands}
+% \selectlanguage{english}%^^A
+% \changes{v3.30}{2020/04/08}{new (internal)}
+% Internal name list of additional commands to be defined for style
+% \texttt{part} commands.
+%    \begin{macrocode}
+\newcommand*{\scr@dsc@style@part@subcommands}[1]{%
+  @#1,@s#1,@end#1,set#1preamble%
+}
+%    \end{macrocode}
+% \end{macro}%^^A \scr@dsc@style@part@subcommands
 % \end{macro}%^^A \scr@dsc@def@style@part@command
 %
 % \begin{macro}{\scr@dsc@style@section@neededoptionstest}
@@ -2789,6 +2811,7 @@
 % \changes{v3.25}{2018/03/10}{zusätzliche Tests und Fehlermeldungen bei
 %   \cs{the\dots}, \cs{\dots mark}, \cs{\dots format},
 %   \cs{\dots markformat}}%^^A
+% \changes{v3.30}{2020/04/08}{unerwünschte Leerzeichen eliminiert}%^^A
 % Basierend auf |\DeclareSectionCommand| wird eine Gliederungsanweisung
 % definiert, die zuvor noch nicht existierte. Wichtig zu bemerken ist, dass
 % die ganzen Hilfsanweisungen bereits existieren dürfen.
@@ -2801,8 +2824,45 @@
       \expandafter\scr@ifundefinedorrelax\expandafter{\reserved@a}{}{%
         \@tempswafalse
         \edef\reserved@b{\expandafter\string\csname \reserved@a\endcsname}%
-      }
-    }
+      }%
+    }%
+    \if@tempswa
+%    \end{macrocode}
+% \changes{v3.30}{2020/04/08}{erweiterte Neuheitsprüfung}%^^A
+% Es wird der Stil benötigt, um zu ermitteln, ob die Unterbefehle für diesen
+% Stil möglicherweise bereits definiert sind.
+%    \begin{macrocode}
+      \expandafter\let\expandafter\scr@dsc@current
+      \csname scr@tso@##2@style\endcsname
+      \DefineFamilyKey[.dsc]{KOMAarg}{style}{%
+        \edef\scr@dsc@current{##1}%
+        \FamilyKeyStateProcessed
+      }%
+      \DefineFamilyKey[.dsc]{KOMAarg}{@else@}{\FamilyKeyStateProcessed}%
+      \FamilyExecuteOptions[.dsc]{KOMAarg}{#1}%
+      \RelaxFamilyKey[.dsc]{KOMAarg}{@else@}%
+      \RelaxFamilyKey[.dsc]{KOMAarg}{style}%
+      \@tempswatrue
+%    \end{macrocode}
+% Wenn der Stil definiert ist und Unterbefehle kennt, diese ebenfalls testen.
+%    \begin{macrocode}
+      \@ifundefined{scr@dsc@current}{}{%
+        \scr@ifundefinedorrelax{scr@dsc@style@\scr@dsc@current @subcommands}{%
+        }{%
+          \edef\reserved@b{%
+            \csname scr@dsc@style@\scr@dsc@current @subcommands\endcsname{#2}%
+          }%
+          \expandafter\@for\expandafter\reserved@a\expandafter:\expandafter=%
+          \reserved@b\do{%
+            \expandafter\scr@ifundefinedorrelax\expandafter{\reserved@a}{}{%
+              \@tempswafalse
+              \edef\reserved@b{%
+                \expandafter\string\csname \reserved@a\endcsname}%
+            }%
+          }%
+        }
+      }%
+    \fi
     \if@tempswa
       \DeclareSectionCommand[{#1}]{#2}%
     \else
