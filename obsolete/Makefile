@@ -20,7 +20,7 @@ upload-ctan: svncheck dist-ctan
 svncheck:
 	svn up
 	$(eval SVNOUTPUT=$(shell svn status))
-	$(ifneq $(SVNOUTPUT),,$(error Please commit or revert outstanding changes.))
+	$(if $(SVNOUTPUT),$(error Please commit or revert outstanding changes '$(SVNOUTPUT)'))
 
 help:
 	@echo "SUPPORTED RULES"
