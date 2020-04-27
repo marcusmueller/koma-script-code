@@ -1,4 +1,3 @@
-% \CheckSum{2945}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-typearea.dtx
@@ -3127,8 +3126,6 @@
 % \changes{v2.5}{1997/06/17}{Einzelzeichenscanner durch
 %   Mustererkennung ersetzt}%^^A
 % \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
-% \changes{v3.30}{2020/03/24}{avoid error message for unknown \texttt{BCOR}
-%   value to \cs{documentclass}}%^^A
 % Das Makro \cs{@BCOR} wird später benötigt, um die Option
 % \texttt{BCOR\emph{BCOR}} zu erkennen. Die Option wird über ihr
 % Muster erkannt. 
@@ -3152,10 +3149,17 @@
 % \cs{ProcessOptions}).
 % \changes{v3.22}{2016/07/29}{missing deprecated option warning added}%^^A
 % \changes{v3.28}{2019/11/18}{\cs{ifdimen} renamed to \cs{Ifdimen}}%^^A
+% \changes{v3.30}{2020/03/24}{avoid error message for unknown \texttt{BCOR}
+%   value to \cs{documentclass}}%^^A
+% \changes{v3.31}{2020/04/27}{improved valid value recognization}%^^A
 %    \begin{macrocode}
 %<*class>  
-      \Ifstrstart{#2}{=}{\OptionNotUsed}{%
-        \PassOptionsToPackage{BCOR#2}{typearea}}%
+      \Ifstrstart{#2}{=}{%
+        \edef\reserved@a{\noexpand\Ifdimen{\@gobble#2}}%
+        \reserved@a{\PassOptionsToPackage{BCOR#2}{typearea}}{\OptionNotUsed}%
+      }{%
+        \Ifdimen{#2}{\PassOptionsToPackage{BCOR#2}{typearea}}{\OptionNotUsed}%
+      }%
 %</class>
 %<*package>
       \Ifdimen{#2}{%
@@ -3183,6 +3187,7 @@
 % \changes{v3.28}{2019/11/18}{\cs{ifnumber} umbenannt in \cs{Ifnumber}}%^^A
 % \changes{v3.30}{2020/03/24}{avoid error message for unknown \texttt{DIV}
 %   value to \cs{documentclass}}%^^A
+% \changes{v3.31}{2020/04/27}{improved valid value recognization}%^^A
 % Die grundsätzliche Funktion ist die gleiche wie bei \cs{@BCOR},
 % \cs{@@BCOR}.
 %    \begin{macrocode}
@@ -3192,8 +3197,12 @@
   \edef\@tempa{#1}\ifx\@tempa\@empty
     \edef\@tempa{#3}\def\@tempb{DIV}\ifx\@tempa\@tempb
 %<*class>  
-      \Ifstrstart{#2}{=}{\OptionNotUsed}{%
-        \PassOptionsToPackage{DIV#2}{typearea}}%
+      \Ifstrstart{#2}{=}{%
+        \edef\reserved@a{\noexpand\Ifnumber{\@gobble#2}}%
+        \reserved@a{\PassOptionsToPackage{DIV#2}{typearea}}{\OptionNotUsed}%
+      }{%
+        \Ifnumber{#2}{\PassOptionsToPackage{DIV#2}{typearea}}{\OptionNotUsed}%
+      }%
 %</class>
 %<*package>
       \Ifnumber{#2}{%
