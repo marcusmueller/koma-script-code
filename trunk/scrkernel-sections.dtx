@@ -1,4 +1,3 @@
-% \CheckSum{4900}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
@@ -1085,6 +1084,25 @@
       \z@
     \fi
     \let\@svsec\@empty
+%    \end{macrocode}
+% \selectlanguage{english}%
+% \changes{v3.31}{2020/06/02}{execute counter reset list}%^^A
+% Even for not numbered sections, the reset list für the section counter has
+% to be executed.
+%    \begin{macrocode}
+    \expandafter\ifnum\scr@v@is@lt{3.31}\relax\else
+      \begingroup
+        \let\@elt\@stpelt
+        \csname cl@#1\endcsname
+      \endgroup
+    \fi
+%    \end{macrocode}
+% \changes{v3.31}{2020/06/02}{\cs{hy@insteadofrefstepcounter} added}%^^A
+% At this point we have to make sure, that the \textsf{hyperref} code for not
+% increasing a counter is executed.
+% \selectlanguage{ngerman}%
+%    \begin{macrocode}
+    \hy@insteadofrefstepcounter{#1}%
   \else
     \refstepcounter{#1}%
     \expandafter\@maybeautodot\csname the#1\endcsname
@@ -1351,7 +1369,21 @@
       \string\scr@s@ct@@nn@m@\space locally.\MessageBreak
       This could result in several error messages}%
     \def\scr@s@ct@@nn@m@{\string\scr@s@ct@@nn@m@}%
-  }{}%
+  }{%
+%    \end{macrocode}
+% \selectlanguage{english}%
+% \changes{v3.31}{2020/06/02}{execute counter reset list}%^^A
+% Even for not numbered sections, the reset list für the corresponding section
+% counter has to be executed.
+% \selectlanguage{ngerman}%
+%    \begin{macrocode}
+    \expandafter\ifnum\scr@v@is@lt{3.31}\relax\else
+      \begingroup
+        \let\@elt\@stpelt
+        \csname cl@\scr@s@ct@@nn@m@\endcsname
+      \endgroup
+    \fi
+  }%
 %    \end{macrocode}
 % \changes{v3.26}{2018/09/18}{\cs{scr@sect@runin} beachten}%^^A
 % Falls \cs{scr@sect@runin} nicht definiert ist, wird es jetzt höchste Zeit
@@ -3907,10 +3939,10 @@
 %   \cs{typeout}}%^^A
 % \changes{v3.28}{2019/11/19}{\cs{ifnumbered} umbenannt in
 %   \cs{Ifnumbered}}%^^A
+% \changes{v3.31}{2020/06/02}{\cs{@maybeautodot}\cs{thepart} entfernt}%^^A
 %    \begin{macrocode}
   \Ifnumbered{#1}{%
     \refstepcounter{#1}%
-    \@maybeautodot\thepart%
     \expandafter\@maybeautodot\csname the#1\endcsname
     \typeout{#1 \csname the#1\endcsname.}%
     \ifx\@currenttocentry\@empty\else
