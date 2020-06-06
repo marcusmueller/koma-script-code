@@ -105,7 +105,6 @@ CLS_MAIN	= scrbook.cls \
 		  scrdate.sty \
 		  scrjura.sty \
 		  tocbasic.sty \
-		  tocstyle.sty \
 		  scrextend.sty \
 		  scrhack.sty \
 		  float.hak \
@@ -172,7 +171,6 @@ CLS_MAIN_DTX    = scrkernel-basics.dtx \
                   scrhack.dtx \
 		  scrjura.dtx \
 		  tocbasic.dtx \
-		  tocstyle.dtx \
 		  scrlayer.dtx \
 		  scrlayer-scrpage.dtx \
 		  scrlayer-notecolumn.dtx \
@@ -192,9 +190,9 @@ CLS_MAIN_INS	= scrmain.ins
 
 CLS_MAIN_SUBINS	= scrstrip.inc scrstrop.inc scrdocstrip.tex
 
-ALPHA_INS       = tocstyle.dtx scrlayer-fancyhdr.dtx
+ALPHA_INS       = scrlayer-fancyhdr.dtx
 
-ALPHA_DOC       = tocstyle.pdf scrlayer-fancyhdr.pdf
+ALPHA_DOC       = scrlayer-fancyhdr.pdf
 
 ALPHA_DTX       = $(subst .pdf,.dtx,$(ALPHA_DOC))
 
@@ -230,8 +228,7 @@ NODIST_GENERATED = $(CLS_DVIS) $(CLS_FILES) $(ALPHA_DOC)
 GENERATED	= $(NODIST_GENERATED) \
 		  scrjura.ins \
 		  scrwfile.ins \
-		  tocbasic.ins \
-	 	  tocstyle.ins tocstyle.tex tocstyle.drv
+		  tocbasic.ins
 
 MISC_SRC	= $(MAKE_FILES) \
                   scrdoc.dtx
