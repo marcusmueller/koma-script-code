@@ -17,7 +17,10 @@
 -- Bundle and modules
 
 bundle = "koma-script-obsolete"
-modules = { "scrlettr-obsolete", "scrpage-obsolete", "scrpage2-obsolete" }
+modules = { "scrlettr-obsolete",
+	    "scrpage-obsolete",
+	    "scrpage2-obsolete",
+	    "tocstyle-obsolete" }
 textfiles = { "README" }
 
 -- Tagging
@@ -42,7 +45,7 @@ end
 packtdszip = false
 uploadconfig = {
    pkg         = "koma-script-obsolete",
-   version     = "2020-04-19",
+   version     = 2020-06-06,
    author      = "Markus Kohm",
    license     = "lppl1.3c",
    summary     = "Deprecated packages from KOMA-Script",
