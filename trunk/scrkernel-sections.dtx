@@ -1144,8 +1144,7 @@
     \expandafter\csname #1mark\expandafter\endcsname\expandafter{\@currentheadentry}%
     \ifx\@currenttocentry\@empty\else
       \scr@ifundefinedorrelax{add#1tocentry}{%
-        \expandafter\global\expandafter\def
-        \csname add#1tocentry\endcsname##1##2{%
+        \expandafter\gdef\csname add#1tocentry\endcsname##1##2{%
           \addtocentrydefault{#1}{##1}{##2}%
         }%
       }{}%
@@ -1157,7 +1156,17 @@
         \fi
         \csname add#1tocentry\endcsname{}{\@currenttocentry}%
       \else
-        \csname add#1tocentry\endcsname{\csname the#1\endcsname}{%
+%    \end{macrocode}
+% \selectlanguage{english}%
+% \changes{v3.31}{2020/06/06}{use \cs{\dots tocformat}}%
+%^^ATODO: move \cs{autodot} to the definition of \cs{\dots tocformat}
+% \selectlanguage{ngerman}%
+%    \begin{macrocode}
+        \@ifundefined{#1tocformat}{%
+          \expandafter\gdef\csname #1tocformat\endcsname
+          {\csname the#1\endcsname}%
+        }{}%
+        \csname add#1tocentry\endcsname{\csname #1tocformat\endcsname}{%
           \@currenttocentry}%
       \fi
     \fi
@@ -1187,8 +1196,7 @@
       \expandafter{\@currentheadentry}%
       \ifx\@currenttocentry\@empty\else
         \scr@ifundefinedorrelax{add#1tocentry}{%
-          \expandafter\global\expandafter\def
-          \csname add#1tocentry\endcsname####1####2{%
+          \expandafter\gdef\csname add#1tocentry\endcsname####1####2{%
             \addtocentrydefault{#1}{####1}{####2}%
           }%
         }{}%
@@ -1200,8 +1208,18 @@
           \fi
           \csname add#1tocentry\endcsname{}{\@currenttocentry}%
         \else
-          \csname add#1tocentry\endcsname{\csname the#1\endcsname}{%
-            \@currenttocentry}%
+%    \end{macrocode}
+% \selectlanguage{english}%
+% \changes{v3.31}{2020/06/06}{use \cs{\dots tocformat}}%
+%^^ATODO: move \cs{autodot} to the definition of \cs{\dots tocformat}
+% \selectlanguage{ngerman}%
+%    \begin{macrocode}
+        \@ifundefined{#1tocformat}{%
+          \expandafter\gdef\csname #1tocformat\endcsname
+          {\csname the#1\endcsname}%
+        }{}%
+        \csname add#1tocentry\endcsname{\csname #1tocformat\endcsname}{%
+          \@currenttocentry}%
         \fi
       \fi
       \ExecuteDoHook{heading/endgroup/#1}%  
@@ -3946,11 +3964,22 @@
     \expandafter\@maybeautodot\csname the#1\endcsname
     \typeout{#1 \csname the#1\endcsname.}%
     \ifx\@currenttocentry\@empty\else
+%    \end{macrocode}
+% \selectlanguage{english}%
+% \changes{v3.31}{2020/06/06}{use \cs{\dots tocformat}}%
+%^^ATODO: move \cs{autodot} to the definition of \cs{\dots tocformat}
+% \selectlanguage{ngerman}%
+%    \begin{macrocode}
+      \@ifundefined{#1tocformat}{%
+        \expandafter\gdef\csname #1tocformat\endcsname
+        {\csname the#1\endcsname}%
+      }{}%
       \scr@ifundefinedorrelax{add#1tocentry}{%
         \addtocentrydefault{#1}%
       }{%
         \@nameuse{add#1tocentry}%
-      }{\csname the#1\endcsname}{\@currenttocentry}%
+      }{\csname\@ifundefined{#1tocformat}{the#1}{#1tocformat}\endcsname}%
+      {\@currenttocentry}%
     \fi
   }{%
 %    \end{macrocode}
@@ -4782,11 +4811,22 @@
     \expandafter\@maybeautodot\csname the#1\endcsname
     \typeout{#1 \csname the#1\endcsname.}%
     \ifx\@currenttocentry\@empty\else
+%    \end{macrocode}
+% \selectlanguage{english}%
+% \changes{v3.31}{2020/06/06}{use \cs{\dots tocformat}}%
+%^^ATODO: move \cs{autodot} to the definition of \cs{\dots tocformat}
+% \selectlanguage{ngerman}%
+%    \begin{macrocode}
+      \@ifundefined{#1tocformat}{%
+        \expandafter\gdef\csname #1tocformat\endcsname
+        {\csname the#1\endcsname}%
+      }{}%
       \scr@ifundefinedorrelax{add#1tocentry}{%
         \addtocentrydefault{#1}%
       }{%
         \@nameuse{add#1tocentry}%
-      }{\csname the#1\endcsname}{\@currenttocentry}%
+      }{\csname\@ifundefined{#1tocformat}{the#1}{#1tocformat}\endcsname}%
+      {\@currenttocentry}%
     \fi
 %    \end{macrocode}
 % Für alle nicht nummerieten Überschriften dieser Ebene trotzdem die
