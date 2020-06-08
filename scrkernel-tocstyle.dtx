@@ -1,8 +1,7 @@
-% \CheckSum{1936}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-tocstyle.dtx
-% Copyright (c) Markus Kohm, 2015-2019
+% Copyright (c) Markus Kohm, 2015-2020
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +19,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrkernel-tocstyle.dtx
-% Copyright (c) Markus Kohm, 2015-2019
+% Copyright (c) Markus Kohm, 2015-2020
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -1456,6 +1455,11 @@
     {scr@tso@}{@breakafternumber}{line break after number flag}%
   \DefineTOCEntryIfOption{dynnumwidth}%
     {scr@tso@}{@dynnumwidth}{dynamic number width flag}%
+%    \end{macrocode}
+% \changes{v3.31}{2020/06/08}{option for indent follows list}%^^A
+%    \begin{macrocode}
+  \DefineTOCEntryCommandOption{indentfollows}%
+    {scr@tso@}{@indentfollows}{list of levels that define the indent}%
 %</tocline>
 %<*tocline|toctext>
   \DefineTOCEntryCommandOption{entryformat}%
@@ -2014,6 +2018,13 @@
   \csname scr@tso@#1@pagenumberbox\endcsname[1]{%
     \hb@xt@\@nameuse{scr@dte@pagenumberwidth}{\hfil ##1}}%
   \expandafter\providecommand\csname Ifscr@tso@#1@dynnumwidth\endcsname[2]{##2}%
+%    \end{macrocode}
+% \selectlanguage{english}%
+% \changes{v3.31}{2020/06/08}{init indent follows list}%^^A
+% This command defines a list of levels that specify the indent (if not empty).
+%    \begin{macrocode}
+  \expandafter\providecommand\expandafter*%
+  \csname scr@tso@#1@indentfollows\endcsname{}%
 %</tocline>
 %    \end{macrocode}
 % \changes{v3.27}{2019/07/08}{Initialisierung von \texttt{raggedentry}}%^^A
@@ -2216,6 +2227,41 @@
   \else
     \tocbasic@DependOnPenaltyAndTOCLevel{#1}%
     \addvspace{\@nameuse{scr@tso@#1@beforeskip}}\relax
+%    \end{macrocode}
+% \selectlanguage{english}%
+% \changes{v3.31}{2020/06/08}{code for indent following list processing}%^^A
+% If a indent following list exists and the depth of an entry is lower than
+% the depth of the current entry, use the maximum of the ident + number width
+% for the indent of this entry.
+%    \begin{macrocode}
+    \expandafter\ifx\csname scr@tso@#1@indentfollows\endcsname\@empty
+    \else
+      \edef\reserved@a{\@nameuse{scr@tso@#1@indentfollows}}%
+      \@for \reserved@a:=\reserved@a\do {%
+        \scr@ifundefinedorrelax{\reserved@a tocdepth}{%
+        }{%
+          \ifnum \@nameuse{\reserved@a tocdepth}<\@nameuse{#1tocdepth}%
+            \@tempdima\@nameuse{scr@tso@\reserved@a @indent}\relax
+            \@nameuse{Ifscr@tso@\reserved@a @dynnumwidth}{%
+              \scr@ifundefinedorrelax{scr@dte@\reserved@a @lastmaxnumwidth}{%
+                \advance\@tempdima
+                \@nameuse{scr@tso@\reserved@a @numwidth}\relax
+              }{%
+                \advance\@tempdima
+                \@nameuse{scr@dte@\reserved@a @lastmaxnumwidth}\relax
+              }%
+            }{%
+              \advance\@tempdima
+              \@nameuse{scr@tso@\reserved@a @numwidth}\relax
+            }%
+            \ifdim \@tempdima>\@nameuse{scr@tso@#1@indent}\relax
+              \expandafter\edef\csname scr@tso@#1@indent\endcsname
+              {\the\@tempdima}%
+            \fi
+          \fi
+        }%
+      }%
+    \fi
     {%
       \Iftocfeature{\@currext}{noindent}{%
         \leftskip \z@
