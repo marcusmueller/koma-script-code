@@ -2517,8 +2517,27 @@
       }%
       \rightskip \@nameuse{scr@tso@#1@rightindent}\relax
       \parfillskip \z@ \@plus 1fill\relax
-      \edef\@noitemerr{\unexpanded{\par\def\@noitemerr}%
-        {\unexpanded\expandafter{\@noitemerr}}}%
+%    \end{macrocode}
+% \changes{v3.31}{2020/06/09}{redefinition of \cs{addvspace}}%^^A
+% \changes{v3.31}{2020/06/09}{redefinition of \cs{addpenalty}}%^^A
+% Now, make sure, that the first non-\texttt{toctext} entry does do a \cs{par}
+% before it uses \cs{addpenalty} or \cs{addvspace}. Before version~3.31 this
+% has been done by redefining \cs{@noitemerr} but this does not work, because
+% it ignores the argument of \cs{addpenalty} or \cs{addvspace}. So, this more
+% dangerous solution has been made, that redefines \cs{addvspace} and
+% \cs{addpenalty} locally.
+%    \begin{macrocode}
+      \ifx\addvspace\scr@dte@xaddvspace\else
+        \let\scr@dte@saddvspace\addvspace
+        \def\scr@dte@xaddvspace{%
+          \let\addvspace\scr@dte@saddvspace\par\addvspace}%
+        \let\addvspace\scr@dte@xaddvspace
+      \fi
+      \ifx\addpenalty\scr@dte@xaddpenalty\else
+        \let\scr@dte@saddpenalty\addpenalty
+        \def\scr@dte@xaddpenalty{%
+          \let\addpenalty\scr@dte@saddpenalty\par\addpenalty}%
+      \fi
 %    \end{macrocode}
 % Finally the init code of the first entry has to be used.
 %    \begin{macrocode}
