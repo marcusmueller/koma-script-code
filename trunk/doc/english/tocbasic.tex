@@ -49,7 +49,7 @@
                  [$Date$
                   KOMA-Script guide (package tocbasic)]
 
-% Date of the translated German file: 2020-06-09
+% Date of the translated German file: 2020-06-11
 
 \translator{Markus Kohm\and Arndt Schubert\and Karl Hagen}
 
@@ -1027,10 +1027,11 @@ Currently, \Package{tocbasic} defines the following entry styles:
   \PValue{section} and \PValue{subsection} using this style, but add extra
   \PName{initial code} to the clones to change their defaults.
 
-  The style supports 18\important{\PValue{level}, \PValue{beforeskip},
-    \PValue{breakafternumber}, \PValue{dynnumwidth}, \PValue{entryformat},
-    \PValue{entrynumberformat}, \PValue{indent}, \PValue{linefill},
-    \PValue{numsep}, \PValue{numwidth}, \PValue{onstarthigherlevel},
+  The style supports 20\important{\PValue{level}, \PValue{beforeskip},
+    \PValue{breakafternumber}, \PValue{dynindent}, \PValue{dynnumwidth},
+    \PValue{entryformat}, \PValue{entrynumberformat}, \PValue{indent},
+    \PValue{indentfollows}, \PValue{linefill}, \PValue{numsep},
+    \PValue{numwidth}, \PValue{onstarthigherlevel},
     \PValue{onstartlowerlevel}, \PValue{onstartsamelevel},
     \PValue{pagenumberbox}, \PValue{pagenumberformat},
     \PValue{pagenumberwidth}, \PValue{raggedentrytext},
@@ -1280,10 +1281,12 @@ the form \Option{\PName{key}:=\PName{entry level}} for all options of the
 \PName{entry level} will be copied. For example, you can copy the current
 indent of the \PValue{figure} level using \OptionValue{indent:}{figure}. For
 options that expect a length or integer value, you can also use
-\Option{\PName{key}+=\PName{value}} to add\PName{value} to the current setting
+\Option{\PName{key}+=\PName{value}} to add \PName{value} to the current setting
 of the \PName{key}. To subtract simply, you can use a negative \PName{value}.
 For example, with \OptionValue{indent+}{1cm} you can increase the indent by
-1\Unit{cm}.
+1\Unit{cm}. For options that expect a list value, you can use
+\Option{\PName{key}+=\PName{value}} to append \PName{value} to the current
+setting of the \PName{key}.
 
 If\ChangedAt{v3.21}{\Package{tocbasic}} you use these attributes as
 options to \DescRef{\LabelBase.cmd.DeclareNewTOC} (see
@@ -1351,13 +1354,22 @@ Finally, using \Macro{DeclareTOCStyleEntry} will define the internal command
     false for the \PValue{tocline} style.
 
     If\textnote{Attention!} the \Option{numberline} feature has been activated
-    for a content list  (see \DescRef{\LabelBase.cmd.setuptoc},
+    for a content list (see \DescRef{\LabelBase.cmd.setuptoc},
     \autoref{sec:tocbasic.toc}, \DescPageRef{\LabelBase.cmd.setuptoc}), as is
     the case with the \KOMAScript{} classes when the
     \OptionValueRef{maincls}{toc}{numberline}%
     \IndexOption{toc~=\textKValue{numberline}} option is used, then the
     unnumbered entries will nevertheless have a (by default empty) number line
     using the formatting of \Option{entrynumberformat}.%
+  }%
+  \entry{\OptionVName{dynindent}{switch}}{%
+    \ChangedAt{v3.31}{\Package{tocbasic}}%
+    \PName{switch} is one of the values for simple switches from
+    \autoref{tab:truefalseswitch}, \autopageref{tab:truefalseswitch}. If the
+    switch is active with the \PValue{tocline} style, the \PValue{indent}
+    attribute only specifies a minimum value. The maximum value is determined
+    by the number width and the indentation of the levels specified via
+    \PValue{indentfollows}.%
   }%
   \entry{\OptionVName{dynnumwidth}{switch}}{%
     \PName{switch} is one of the values for simple switches from
@@ -1445,6 +1457,15 @@ Finally, using \Macro{DeclareTOCStyleEntry} will define the internal command
     and \PValue{table}, are initialised to be compatible with the standard
     classes. For all other levels, the initialisation is done with the value
     of \Macro{\PName{entry level}numdepth}, if this is defined.%
+  }%
+  \entry{\OptionVName{indentfollows}{list of levels}}{%
+    \ChangedAt{v3.31}{\Package{tocbasic}}%
+    If \Option{dynindent} is set with style \PValue{tocline}, the
+    comma-separated list of level names specified here is used to determine
+    the actual indentation. Levels whose names begin with ``\texttt{sub}''
+    will be initialized with the name without this prefix. The \KOMAScript{}
+    classes also automatically set appropriate values for the levels
+    \PValue{section} and \PValue{paragraph}.%
   }%
   \entry{\OptionVName{linefill}{code}}{%
     With the \PValue{tocline} style, you can change what is used to fill the

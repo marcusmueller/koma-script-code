@@ -352,6 +352,97 @@
 %    \end{macrocode}
 % \end{macro}%^^A \@RelaxTOCEntryOptions
 %
+% \selectlanguage{english}
+% \begin{macro}{\@DefineTOCEntryListOption}
+% \changes{v3.31}{2020/06/11}{new (internal)}%^^A
+% Use \cs{DefineTOCEntryOption} to define an option that represents a list.
+% It has following parameters:
+% \begin{description}
+% \item[\marg{style}: \meta{string},] name of the entry style
+% \item[\marg{option}: \meta{string},] name of the option
+% \item[\oarg{default}: \meta{string},] default value of the option
+% \item[\marg{prefix}: \meta{string},] prefix of the macro to be defined
+% \item[\marg{postfix}: \meta{string},] postfix of the macro to be defined
+% \item[\marg{description}: \meta{String},] short description of the option
+% \item[\oarg{init}: \meta{code},] initialization of the option
+% \end{description}
+% Between the \meta{prefix} and \meta{postfix} automatically
+% \cs{scr@dte@current} will be added. A copy option using ``\texttt{:=}''
+% instead of ``\texttt{=}'' and an add (append) option using ``\texttt{+=}''
+% instead of ``\texttt{=}'' is also defined.
+%    \begin{macrocode}
+%<*body>
+\newcommand*{\@DefineTOCEntryListOption}[2]{%
+  \kernel@ifnextchar [%]
+    {\@DefineTOCEntryListOptionWithDefault{#1}{#2}}
+    {\@DefineTOCEntryListOptionWithoutDefault{#1}{#2}}%
+}
+%    \end{macrocode}
+% \begin{macro}{\@DefineTOCEntryListOptionWithoutDefault}
+% \changes{v3.31}{2020/06/11}{new (internal)}%^^A
+% This is the case without default value. So we only have to define
+% the three internal options, that manipulate a macro.
+% \begin{macrocode}
+\newcommand*{\@DefineTOCEntryListOptionWithoutDefault}[5]{%
+  \@TOCEntryStyleNeedsCommandByOption{#1}{#3}{#4}{#2}{#5}%
+  \@DefineTOCEntryOption{#1}{#2}{%
+    \expandafter\protected@edef\csname #3\scr@dte@current#4\endcsname{##1}%
+    \FamilyKeyStateProcessed
+  }%
+  \DefineFamilyKey[.dte]{KOMAarg}{#2:}{%
+    \scr@ifundefinedorrelax{#3##1#4}{\FamilyKeyStateUnknownValue}{%
+      \expandafter\let
+      \csname #3\scr@dte@current#4\expandafter\endcsname
+      \csname #3##1#4\endcsname
+      \FamilyKeyStateProcessed
+    }%
+  }%
+  \DefineFamilyKey[.dte]{KOMAarg}{#2+}{%
+    \expandafter\protected@edef\csname #2\scr@dte@current#4\endcsname{%
+      \csname #2\scr@dte@current#4\endcsname,##1}%
+    \FamilyKeyStateProcessed
+  }%
+  \edef\scr@dte@doopts{%
+    \unexpanded\expandafter{\scr@dte@doopts}\noexpand\do{#2:}\noexpand\do{#2+}%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}%^^A \@DefineTOCEntryListOptionWithoutDefault
+% \begin{macro}{\@DefineTOCEntryListOptionWithDefault}
+% \changes{v3.31}{2020/06/11}{new (internal)}%^^A
+% This is the case with a default value. It's almost the same, but the
+% argument numbers and using \cs{DefineFamilyKey} with optional argument.
+%    \begin{macrocode}
+\newcommand*{\@DefineTOCEntryListOptionWithDefault}{}
+\def\@DefineTOCEntryListOptionWithDefault#1#2[#3]#4#5#6{%
+  \@TOCEntryStyleNeedsCommandByOption{#1}{#4}{#5}{#2}{#6}%
+  \@DefineTOCEntryOption{#1}{#2}[{#3]}{%
+    \expandafter\protected@edef\csname #4\scr@dte@current#5\endcsname{##1}%
+    \FamilyKeyStateProcessed
+  }%
+  \DefineFamilyKey[.dte]{KOMAarg}{#2:}{%
+    \scr@ifundefinedorrelax{#4##1#5}{\FamilyKeyStateUnknownValue}{%
+      \expandafter\let
+      \csname #4\scr@dte@current#5\expandafter\endcsname
+      \csname #4##1#5\endcsname
+      \FamilyKeyStateProcessed
+    }%
+  }%
+  \DefineFamilyKey[.dte]{KOMAarg}{#2+}{%
+    \expandafter\protected@edef\csname #4\scr@dte@current#5\endcsname{%
+      \csname #4\scr@dte@current#5\endcsname,##1}%
+    \FamilyKeyStateProcessed
+  }%
+  \edef\scr@dte@doopts{%
+    \unexpanded\expandafter{\scr@dte@doopts}\noexpand\do{#2:}\noexpand\do{#2+}%
+  }%  
+}
+%</body>
+%    \end{macrocode}
+% \end{macro}%^^A \@DefineTOCEntryListOptionWithDefault
+% \end{macro}%^^A \@DefineTOCEntryListOption
+% \selectlanguage{ngerman}
+%
 % \begin{macro}{\@DefineTOCEntryLengthOption}
 % \changes{v3.20}{2015/12/04}{neu (intern)}%^^A
 % Verwendet \cs{DefineTOCEntryOption}, um eine Option zu definieren, die ein
@@ -359,7 +450,7 @@
 % \begin{description}
 % \item[\marg{Stil}: \meta{String},] Name des Eintragsstils
 % \item[\marg{Option}: \meta{String},] Name der Option
-% \item[\oarg{Wert}:] der Säumniswert der Option
+% \item[\oarg{Wert}: \meta{Länge},] der Säumniswert der Option
 % \item[\marg{Prefix}: \meta{String},] Präfix des zu definierenden Makros
 % \item[\marg{Postfix}: \meta{String},] Postfix des zu definierenden Makros
 % \item[\marg{Erklärung}: \meta{String},] Erklärung der Option
@@ -1066,6 +1157,7 @@
     \def\DefineTOCEntryCommandOption{\@DefineTOCEntryCommandOption{#1}}%
     \def\DefineTOCEntryIfOption{\@DefineTOCEntryIfOption{#1}}%
     \def\DefineTOCEntryLengthOption{\@DefineTOCEntryLengthOption{#1}}%
+    \def\DefineTOCEntryListOption{\@DefineTOCEntryListOption{#1}}%
     \def\DefineTOCEntryNumberOption{\@DefineTOCEntryNumberOption{#1}}%
     \def\DefineTOCEntryOption{\@DefineTOCEntryOption{#1}}%
     \def\AddToDeclareTOCEntryStylePreCheckNeeds{%
@@ -1080,6 +1172,7 @@
     \let\AddToDeclareTOCEntryStylePreCheckNeeds\relax
     \let\DefineTOCEntryOption\relax
     \let\DefineTOCEntryNumberOption\relax
+    \let\DefineTOCEntryListOption\relax
     \let\DefineTOCEntryLengthOption\relax
     \let\DefineTOCEntryIfOption\relax
     \let\DefineTOCEntryCommandOption\relax
@@ -1468,8 +1561,10 @@
 %    \end{macrocode}
 % \changes{v3.31}{2020/06/08}{option for indent follows list}%^^A
 %    \begin{macrocode}
-  \DefineTOCEntryCommandOption{indentfollows}%
+  \DefineTOCEntryListOption{indentfollows}%
     {scr@tso@}{@indentfollows}{list of levels that define the indent}%
+  \DefineTOCEntryIfOption{dynindent}%
+    {scr@tso@}{@dynindent}{dynamic indent width flag}%
 %</tocline>
 %<*tocline|toctext>
   \DefineTOCEntryCommandOption{entryformat}%
@@ -2048,8 +2143,16 @@
 % This command defines a list of levels that specify the indent (if not empty).
 % \selectlanguage{ngerman}%^^A
 %    \begin{macrocode}
-  \expandafter\providecommand\expandafter*%
-  \csname scr@tso@#1@indentfollows\endcsname{}%
+  \expandafter\providecommand\csname Ifscr@tso@#1@dynindent\endcsname[2]{##2}%
+  \scr@ifundefinedorrelax{scr@tso@#1@indentfollows}{%
+    \Ifstrstart{#1}{sub}{%
+      \expandafter\edef\csname scr@tso@#1@indentfollows\endcsname{%
+        \scr@dte@nosub{#1}%
+      }%
+    }{%
+      \expandafter\let\csname scr@tso@#1@indentfollows\endcsname\@empty
+    }%
+  }{}%
 %</tocline>
 %    \end{macrocode}
 % \changes{v3.27}{2019/07/08}{Initialisierung von \texttt{raggedentry}}%^^A
@@ -2260,34 +2363,41 @@
 % for the indent of this entry.
 % \selectlanguage{ngerman}%^^A
 %    \begin{macrocode}
-    \expandafter\ifx\csname scr@tso@#1@indentfollows\endcsname\@empty
-    \else
-      \edef\reserved@a{\@nameuse{scr@tso@#1@indentfollows}}%
-      \@for \reserved@a:=\reserved@a\do {%
-        \scr@ifundefinedorrelax{\reserved@a tocdepth}{%
-        }{%
-          \ifnum \@nameuse{\reserved@a tocdepth}<\@nameuse{#1tocdepth}%
-            \@tempdima\@nameuse{scr@tso@\reserved@a @indent}\relax
-            \@nameuse{Ifscr@tso@\reserved@a @dynnumwidth}{%
-              \scr@ifundefinedorrelax{scr@dte@\reserved@a @lastmaxnumwidth}{%
-                \advance\@tempdima
-                \@nameuse{scr@tso@\reserved@a @numwidth}\relax
-              }{%
-                \advance\@tempdima
-                \@nameuse{scr@dte@\reserved@a @lastmaxnumwidth}\relax
-              }%
+    \@nameuse{Ifscr@tso@#1@dynindent}{%
+      \expandafter\ifx\csname scr@tso@#1@indentfollows\endcsname\@empty
+        \PackageWarning{tocbasic}{`dynindent' for `#1' not available}%
+      \else
+        \edef\reserved@a{\@nameuse{scr@tso@#1@indentfollows}}%    
+        \@for \reserved@a:=\reserved@a\do {%
+          \scr@trim@spaces\reserved@a
+          \ifx\reserved@a\@empty\else
+            \scr@ifundefinedorrelax{\reserved@a tocdepth}{%
             }{%
-              \advance\@tempdima
-              \@nameuse{scr@tso@\reserved@a @numwidth}\relax
+              \ifnum \@nameuse{\reserved@a tocdepth}<\@nameuse{#1tocdepth}%
+                \@tempdima\@nameuse{scr@tso@\reserved@a @indent}\relax
+                \@nameuse{Ifscr@tso@\reserved@a @dynnumwidth}{%
+                  \scr@ifundefinedorrelax
+                  {scr@dte@\reserved@a @lastmaxnumwidth}{%
+                    \advance\@tempdima
+                    \@nameuse{scr@tso@\reserved@a @numwidth}\relax
+                  }{%
+                    \advance\@tempdima
+                    \@nameuse{scr@dte@\reserved@a @lastmaxnumwidth}\relax
+                  }%
+                }{%
+                  \advance\@tempdima
+                  \@nameuse{scr@tso@\reserved@a @numwidth}\relax
+                }%
+                \ifdim \@tempdima>\@nameuse{scr@tso@#1@indent}\relax
+                  \expandafter\edef\csname scr@tso@#1@indent\endcsname
+                  {\the\@tempdima}%
+                \fi
+              \fi
             }%
-            \ifdim \@tempdima>\@nameuse{scr@tso@#1@indent}\relax
-              \expandafter\edef\csname scr@tso@#1@indent\endcsname
-              {\the\@tempdima}%
-            \fi
           \fi
         }%
-      }%
-    \fi
+      \fi
+    }{}%  
     {%
       \Iftocfeature{\@currext}{noindent}{%
         \leftskip \z@
