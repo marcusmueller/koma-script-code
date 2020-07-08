@@ -1,4 +1,3 @@
-% \CheckSum{1643}
 % \iffalse meta-comment
 % ======================================================================
 % tocbasic.dtx
@@ -134,11 +133,11 @@
 \RecordChanges
 \GetFileInfo{tocbasic.dtx}
 \sloppy
+\begin{document}
 \DocInput{\filename}
 \end{document}
 % \fi
 %
-% \begin{document}
 % \title{\KOMAScript{} \partname\ \texttt{\filename}%
 %   \thanks{Diese Datei ist Version \fileversion\ von \texttt{\filename}.}}
 % \date{\filedate}
@@ -866,6 +865,8 @@
 %   of \cs{def}}%^^A
 % \changes{v3.28}{2019/11/19}{\cs{iftocfeature} replaced by
 %   \cs{Iftocfeature}}%^^A
+% \changes{v3.31}{2020/07/08}{use one time expansion of local
+%   \cs{list@fname}}%^^A
 % Command to handle the hole list of something. There are additional hooks
 % for this. The first optional argument is the title for this list. If the
 % optional argument was omitted \cs{listof\#2name} will be used. The star
@@ -874,11 +875,11 @@
 \newcommand*{\listoftoc}{%
   \kernel@ifstar \tocbasic@starttoc\@listoftoc
 }
-\newcommand*{\@listoftoc}[2][\list@fname]{%
+\newcommand*{\@listoftoc}[2][]{%
   \begingroup
+    \def\list@fname{#1}%
     \@ifundefined{listof#2name}{%
-      \let\list@fname\relax
-      \ifx\relax#1\relax
+      \ifx\list@fname\@empty
         \PackageWarning{tocbasic}{%
           You should either define \expandafter\string\csname
           listof#2name\endcsname\MessageBreak
@@ -899,7 +900,7 @@
       }%
     }{}%
     \Iftocfeature{\@currext}{numberline}{\def\nonumberline{\numberline{}}}{}%
-    \tocbasic@listhead{#1}%
+    \expandafter\tocbasic@listhead\expandafter{\list@fname}%
     \scr@ifundefinedorrelax{microtypesetup}{}{%
       \Iftocfeature{\@currext}{noprotrusion}{}{%
         \microtypesetup{protrusion=false}%
