@@ -30,8 +30,8 @@ tagfiles = { "build.lua", "README" }
 function update_tag(file,contents,tagname,tagdate)
    if string.match(file, "build.lua") then
       return string.gsub(contents,
-			 '(\n%s*version%s*=%s*)"[^"]+"',
-			 '%1' .. tagname)
+			 '(\n%s*version%s*=%s*")[^"]+"',
+			 '%1' .. tagname .. '"')
    elseif string.match(file, "README") then
       return string.gsub(contents,
 			 '(\nVersion:%s+)[^\n]*\n',
@@ -45,7 +45,7 @@ end
 packtdszip = false
 uploadconfig = {
    pkg         = "koma-script-obsolete",
-   version     = 2020-06-06,
+   version     = "2020-06-06",
    author      = "Markus Kohm",
    license     = "lppl1.3c",
    summary     = "Deprecated packages from KOMA-Script",
