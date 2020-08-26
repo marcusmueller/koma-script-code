@@ -268,18 +268,23 @@
 % Unfortunately we need an ugly hack to initialise the stack using an internal
 % kernel variable. This is a no go but I do not know a better solution for
 % this, because loading of the package could be done late.
+% TODO: Decide, if the second or fourth token is correct.  If fourth,
+%       \cs{CurrentFile} has to be used always instead of
+%       \cs{CurrentFileUsed}.
 %    \begin{macrocode}
 \cs_if_exist:NTF \g__filehook_input_file_seq
   {
     \seq_map_inline:Nn \g__filehook_input_file_seq
       {
         \seq_gput_right:Nx \g__scrlfile_input_file_seq
-          { \exp_after:wN \use:n \use_none:n #1 }
+          { \tl_item:nn { #1 } { 2 } }
       }
   }
   {
     \seq_gpush:Nx \g__scrlfile_input_file_seq { }
-    \seq_gpush:Nx \g__scrlfile_input_file_seq { \CurrentFile }
+    \cs_if_exist:NTF \CurrentFileUsed
+      { \seq_gpush:Nx \g__scrfile_input_file_seq { \CurrentFileUsed } }
+      { \seq_gpush:Nx \g__scrlfile_input_file_seq { \CurrentFile } }
   }
 %    \end{macrocode}
 % \end{variable}
