@@ -144,6 +144,10 @@
 %
 % \section{The Implementation of \textsf{scrlfile-hook}}
 %
+%    \begin{macrocode}
+%<@@=scrlfile>
+%    \end{macrocode}
+%
 % Test whether the uses \LaTeX{} provides all commands we need.
 %    \begin{macrocode}
 \@ifundefined{AddToHook}{%
@@ -159,15 +163,15 @@
 }{}
 %    \end{macrocode}
 %
+%
+% \section{Before and After Commands}
+%
 % The hook implementation is based on a \LaTeX{} version that provides
 % \LaTeX3. So it makes sense to use it.
 %
 %    \begin{macrocode}
 \ExplSyntaxOn
-%<@@=scrlfile>
 %    \end{macrocode}
-%
-% \section{Before and After Commands}
 %
 % \begin{macro}{\BeforeFile}
 % The hook version of this command is just a wrapper to the corresponding
@@ -283,7 +287,7 @@
   {
     \seq_gpush:Nx \g__scrlfile_input_file_seq { }
     \cs_if_exist:NTF \CurrentFileUsed
-      { \seq_gpush:Nx \g__scrfile_input_file_seq { \CurrentFileUsed } }
+      { \seq_gpush:Nx \g__scrlfile_input_file_seq { \CurrentFileUsed } }
       { \seq_gpush:Nx \g__scrlfile_input_file_seq { \CurrentFile } }
   }
 %    \end{macrocode}
@@ -380,10 +384,189 @@
 %    \end{macrocode}
 % \end{macro}
 %
-%
 %    \begin{macrocode}
 \ExplSyntaxOff
 %    \end{macrocode}
+%
+% \section{File Substitution}
+%
+% With new file hooks the substitutions are so easy we even do not need
+% \LaTeX3 syntax to implement them.
+%
+% \begin{macro}{\ReplaceInput}
+% This is only the simplest wrapper to \cs{declare@file@substitution}.
+%    \begin{macrocode}
+\newcommand*{\ReplaceInput}{\declare@file@substitution}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ReplaceClass}
+% \begin{macro}{\ReplacePackage}
+% These are also wrappers to \cs{declare@file@substitution}. But in this case
+% we also have to add the extension.
+% TODO: Unfortunately \cs{declare@file@substitution} can result in error
+% messages (see \url{https://github.com/latex3/latex2e/issues/386}). So this
+% code is currently deactivated, because it either needs invention by The
+% \LaTeX{} Team or a completely different implementation:
+%    \begin{macrocode}
+%<*disabled>
+\NewDocumentCommand\ReplaceClass{mm}{%
+  \declare@file@substitution{#1.\@clsextension}{#2.\@clsextension}%
+}
+\NewDocumentCommand\ReplacePackage{mm}{%
+  \declare@file@substitution{#1.\@pkgextension}{#2.\@pkgextension}%
+}
+%</disabled>
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\UnReplaceInput}
+% This is the simplest wrapper to \cs{undeclare@file@substitution}.
+%    \begin{macrocode}
+\newcommand*{\UnReplaceInput}{\undeclare@file@substitution}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\UnReplaceClass}
+% \begin{macro}{\UnReplacePackage}
+% Also very simple but again we have to add the extension.
+% TODO: Because \cs{ReplaceClass} and \cs{ReplacePackage} are currently not
+% working, these are disabled too.
+%    \begin{macrocode}
+%<*disabled>
+\NewDocumentCommand\UnReplaceClass{m}{%
+  \undeclare@file@substitution{#1.\@clsextension}%
+}
+\NewDocumentCommand\UnReplacePackage{mm}{%
+  \undeclare@file@substitution{#1.\@pkgextension}%
+}
+%</disabled>
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \section{Prevent Package from Loading}
+%
+% To store and reset the hole list of prevents we use a comma separated
+% list. So we need again use \LaTeX3.
+%
+%    \begin{macrocode}
+\ExplSyntaxOn
+%    \end{macrocode}
+%
+% \begin{variable}[added = 2020-09-02]{\g__scrlfile_prevents_clist}
+% This local variable stores the list of files, that should be prevented from
+% loading. It is needed to stay compatible with old \file{scrlfile}. Without
+% this compatibility purpose we would be able to use simple wrappers to
+% \cs{disable@package@load} and \cs{reenable@package@load}.
+%    \begin{macrocode}
+\clist_new:N \g__scrlfile_prevent_clist
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{macro}{\PreventPackageFromLoading}
+% This is more than a wrapper to \cs{disable@package@load} because we have to
+% manage an internal list and it is documented, that the re-enabling does not
+% undefine the \meta{alternate-code} setting but only disables it. So we have
+% to extra store it. Note: Local loading of packages does not make sense, so
+% local changes of the prevent list also does not make sense. Therefore this
+% is a global acting command!
+%    \begin{macrocode}
+\NewDocumentCommand \PreventPackageFromLoading { s +o m }
+  {
+    \clist_set:Nx \l__scrlfile_package_clist { #3 }
+    \clist_map_inline:Nn \l__scrlfile_package_clist
+      {
+        \@ifpackageloaded { ##1 }
+          {
+            \IfBooleanTF { #1 } { \msg_info:nnn } { \msg_warning:nnn }
+              { scrlfile } { no-prevent-for-already-loaded } { ##1 }
+          }
+          {
+            \clist_if_in:NnF \g__scrlfile_prevent_clist { ##1 }
+              { \clist_gput_right:Nn \g__scrlfile_prevent_clist { ##1 } }
+            \IfValueT { #2 }
+              {
+                \tl_if_exist:cF { scrlfile@exclude@package@##1@do }
+                  {
+                    \tl_new:c { scrlfile@exclude@package@##1@do }
+                  }
+                \tl_gput_right:cn { scrlfile@exclude@package@##1@do } { #2 }
+              }
+            \disable@package@load { ##1 }
+              { \tl_use:c { scrlfile@exclude@package@##1@do } }
+          }
+      }
+    \clist_clear:N \l__scrlfile_package_clist  
+  }
+%    \end{macrocode}
+%
+% \begin{macro}{\l__scrlfile_package_clist}
+% One local variable is used to process the \meta{package-list} argument of
+% \cs{PreventPackageFromLoading}.
+%    \begin{macrocode}
+\clist_new:N \l__scrlfile_package_clist
+%    \end{macrocode}
+% \end{macro}
+%
+% And here comes the message, that could be used either as a warning or as an
+% info.
+%    \begin{macrocode}
+\msg_new:nnn { scrlfile } { no-prevent-for-already-loaded }
+  {
+    Cannot~prevent~package~`#1'~from~being~loaded,~
+    because~it~has~been~loaded~already~before~line~\msg_line_number:
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\StorePreventPackageFromLoading}
+% This simply copies the internal \texttt{clist} to a macro.
+%    \begin{macrocode}
+\NewDocumentCommand \StorePreventPackageFromLoading { m }
+  { \edef #1 { \clist_use:Nn \g__scrlfile_prevent_clist { , } } }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ResetPreventPackageFromLoading}
+% Map the internal list to a function that re-enables the package. At the end
+% the internal list is cleared.
+%    \begin{macrocode}
+\NewDocumentCommand \ResetPreventPackageFromLoading {}
+  {
+    \clist_map_function:NN \g__scrlfile_prevent_clist \reenable@package@load
+    \clist_gclear:N \g__scrlfile_prevent_clist
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\UnPreventPackageFromLoading}
+% Here again the argument is a \meta{package-list} not only one
+% \meta{package}. So we have to build a local \texttt{clist} and walk through
+% it.
+%    \begin{macrocode}
+\NewDocumentCommand \UnPreventPackageFromLoading { s m }
+  {
+    \clist_set:Nx \l__scrlfile_package_clist { #2 }
+    \clist_map_inline:Nn \l__scrlfile_package_clist
+      {
+        \clist_if_in:NnT \g__scrlfile_prevent_clist { ##1 }
+          {
+            \clist_gremove_all:Nn \g__scrlfile_prevent_clist { ##1 }
+            \reenable@package@load { ##1 }
+          }
+        \IfBooleanT { #1 }
+          { \cs_undefine:c { scrlfile@exclude@package@##1@do } }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+% 
+%    \begin{macrocode}
+\ExplSyntaxOff
+%    \end{macrocode}
+%
 %
 % \Finale
 %
