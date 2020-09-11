@@ -1,8 +1,7 @@
-% \CheckSum{4107}
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlayer.dtx
-% Copyright (c) Markus Kohm, 2012-2019
+% Copyright (c) Markus Kohm, 2012-2020
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +19,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrlayer.dtx
-% Copyright (c) Markus Kohm, 2012-2019
+% Copyright (c) Markus Kohm, 2012-2020
 %
 % Diese Datei ist Teil der LaTeX2e KOMA-Script-Sammlung.
 %
@@ -38,25 +37,7 @@
 %
 % Dieses Werk besteht aus den in manifest.txt aufgefuehrten Dateien.
 % ======================================================================
-% \fi^^A meta-comment
 %
-% \CharacterTable
-%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
-%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
-%   Digits        \0\1\2\3\4\5\6\7\8\9
-%   Exclamation   \!     Double quote  \"     Hash (number) \#
-%   Dollar        \$     Percent       \%     Ampersand     \&
-%   Acute accent  \'     Left paren    \(     Right paren   \)
-%   Asterisk      \*     Plus          \+     Comma         \,
-%   Minus         \-     Point         \.     Solidus       \/
-%   Colon         \:     Semicolon     \;     Less than     \<
-%   Equals        \=     Greater than  \>     Question mark \?
-%   Commercial at \@     Left bracket  \[     Backslash     \\
-%   Right bracket \]     Circumflex    \^     Underscore    \_
-%   Grave accent  \`     Left brace    \{     Vertical bar  \|
-%   Right brace   \}     Tilde         \~}
-%
-% \iffalse^^A meta-comment
 %%% From File: $Id$
 %<identify>%%%            (run: identify)
 %<init>%%%            (run: init)
@@ -2033,9 +2014,10 @@
 % shouldn't matter, because layers with, e.g.,
 % \Macro{if@scr@l@\dots@nonfloatpage}=\Macro{relax} and
 % \Macro{if@scr@l@\dots@floatpage}=\Macro{relax} won't be output ever. This
-% command may and should be used by interfaces via
+% command could be used by interfaces via
 % \Macro{scrlayerOnAutoRemoveInterface} to remove the generated
-% layers. Therefore it only destroys existing layers and doesn't care for not
+% layers, if the interface commands wouldn't be depreacted.
+% However, it only destroys existing layers and doesn't care for not
 % existing.
 %    \begin{macrocode}
 %<*package&body>
@@ -3992,8 +3974,9 @@
 % Destroys the given layer page style but not the layers! If the page style is
 % the current page style, the empty page style an empty page style will be
 % activated. If the special page style is valid an the destroyed one, this
-% will be removed. This command may be used, e.g., at
-% \Macro{scrlayerOnAutoRemoveInterface} after destroying the layers.
+% will be removed. This command could be used, e.g., at
+% \Macro{scrlayerOnAutoRemoveInterface} after destroying the layers. However,
+% the interface commands are deprecated.
 %    \begin{macrocode}
 %<*package&body>
 \newcommand*{\DestroyRealLayerPageStyle}[1]{%
@@ -4133,6 +4116,8 @@
 %
 % \subsection{Declaration of End User Interfaces}
 %
+% \changes{v3.32}{2020/09/11}{the interface commands are deprecated}
+%
 % The package also supports an interface for loading end user interfaces.
 % Maybe it would be a good idea to move this to \Package{scrbase}, but
 % currently it is not needed.
@@ -4150,6 +4135,7 @@
 %    \begin{macrocode}
 %<*package&body>
 \newcommand*{\scrlayerAddToInterface}[2][\@currname.\@currext]{%
+  \scrlayer@report@deprecated{#1}{\scrlayerAddToInterface}%
   \begingroup
     \edef\reserve@a{%
       \noexpand\scrlayerAddCsToInterface[#1]{\expandafter\@gobble\string #2}%
@@ -4157,6 +4143,7 @@
   \expandafter\endgroup\reserve@a
 }
 \newcommand{\scrlayerAddCsToInterface}[3][\@currname.\@currext]{%
+  \scrlayer@report@deprecated{#1}{\scrlayerAddCsToInterface}%
   \@ifundefined{scrlayer@#1@commandlist}{%
     \PackageError{scrlayer}{unkown interface `#1'}{%
       I've been told to add a command sequence to an interface, that hasn't
@@ -4253,6 +4240,7 @@
 % \end{description}
 %    \begin{macrocode}
 \newcommand*\scrlayer@AddCsToInterface[2][\@currname.\@currext]{%
+  \scrlayer@report@deprecated{#1}{\scrlayer@AddCsToInterface}%
   \expandafter\expandafter\expandafter\def\expandafter
   \csname scrlayer@#1@commandlist\expandafter\expandafter\expandafter\endcsname
   \expandafter\expandafter\expandafter{%
@@ -4304,6 +4292,7 @@
 %</package>
 %<*interface>
 \KOMA@key{autoremoveinterfaces}[true]{%
+  \scrlayer@report@deprecated{#1}{autoremoveinterface}%
   \KOMA@set@ifkey{autoremoveinterfaces}{scrlayer@autoremoveinterfaces}{#1}%
   \KOMA@kav@replacebool{.scrlayer.sty}{autoremoveinterfaces}
                        {scrlayer@autoremoveinterfaces}%
@@ -4334,6 +4323,7 @@
 %    \begin{macrocode}
 %<*package&body>
 \newcommand*{\scrlayerInitInterface}[1][\@currname.\@currext]{%
+  \scrlayer@report@deprecated{#1}{\scrlayerInitInterface}%
   \@ifundefined{scrlayer@#1@commandlist}{%
     \@namedef{scrlayer@#1@commandlist}{}%
   }{%
@@ -4353,10 +4343,6 @@
 }
 %</package&body>
 %    \end{macrocode}
-% The initialisation has to be done by each interface package:
-%    \begin{macrocode}
-%<interface&init>\scrlayerInitInterface
-%    \end{macrocode}
 % \end{macro}%^^A \scrlayerInitInterface
 %
 % \begin{macro}{\scrlayerOnAutoRemoveInterface}
@@ -4370,6 +4356,7 @@
 %    \begin{macrocode}
 %<*package&body>
 \newcommand*{\scrlayerOnAutoRemoveInterface}[2][\@currname.\@currext]{%
+  \scrlayer@report@deprecated{#1}{\scrlayerOnAutoRemoveInterface}%
   \@ifundefined{scrlayer@#1@onremove}{\@namedef{scrlayer@#1@onremove}{}}{}%
   \expandafter\l@addto@macro\csname scrlayer@#1@onremove\endcsname{#2}%
 }
@@ -4377,6 +4364,25 @@
 %    \end{macrocode}
 % \end{macro}%^^A \scrlayerOnAutoRemoveInterface
 %
+% \begin{macro}{\scrlayer@report@deprecated}
+% \changes{v3.32}{2020/09/11}{new (internal)}
+% Report that the deprecated interface commands are used but should not. But
+% report this only once per interface.
+%    \begin{macrocode}
+%<*package&init>
+\newcommand*{\scrlayer@report@deprecated}[2]{%
+  \@ifundefined{scrlayer@deprecated@reported@for@#1}{%
+    \PackageWarning{scrlayer}{%
+      Deprecated interface detected for `#1'.\MessageBreak
+      There isn't any support for using, e.g.,\MessageBreak
+      `\string #2'%
+    }%
+    \@namedef{scrlayer@deprecated@reported@for@#1}{\string #2}%
+  }{}%
+}
+%</package&init>
+%    \end{macrocode}
+% \end{macro}
 %
 % \iffalse^^A meta-comment
 %</package|interface|class>
