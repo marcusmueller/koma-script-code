@@ -164,7 +164,7 @@
 %    \end{macrocode}
 %
 %
-% \section{Before and After Commands}
+% \subsection{Before and After Commands}
 %
 % The hook implementation is based on a \LaTeX{} version that provides
 % \LaTeX3. So it makes sense to use it.
@@ -347,7 +347,7 @@
 % \texttt{file/after} hook, because the user manual declares, that \meta{code}
 % is used before the code of \cs{AtEndOfClass} or \cs{AtEndOfPackage}.
 %    \begin{macrocode}
-\NewDocumentCommand \AfterClass { s m o +m }
+\NewDocumentCommand \scrlfile@AfterClass { s m o +m }
   {
     \IfBooleanTF { #1 }
       {
@@ -364,7 +364,8 @@
         \hook_gput_code:nnn { file / after / #2.\@clsextension } { #3 } { #4 }
       }
   }
-\NewDocumentCommand \AfterPackage { s m o +m }
+\NewDocumentCommand \AfterClass { } { \scrlfile@AfterClass }
+\NewDocumentCommand \scrlfile@AfterPackage { s m o +m }
   {
     \IfBooleanTF { #1 }
       {
@@ -381,14 +382,12 @@
         \hook_gput_code:nnn { file / after / #2.\@pkgextension } { #3 } { #4 }
       }
   }
+\NewDocumentCommand \AfterPackage { } { \scrlfile@AfterPackage }
 %    \end{macrocode}
 % \end{macro}
 %
-%    \begin{macrocode}
-\ExplSyntaxOff
-%    \end{macrocode}
 %
-% \section{File Substitution}
+% \subsection{File Substitution}
 %
 % With new file hooks the substitutions are so easy we even do not need
 % \LaTeX3 syntax to implement them.
@@ -396,7 +395,7 @@
 % \begin{macro}{\ReplaceInput}
 % This is only the simplest wrapper to \cs{declare@file@substitution}.
 %    \begin{macrocode}
-\newcommand*{\ReplaceInput}{\declare@file@substitution}
+\NewDocumentCommand{\ReplaceInput}{}{\declare@file@substitution}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -424,7 +423,7 @@
 % \begin{macro}{\UnReplaceInput}
 % This is the simplest wrapper to \cs{undeclare@file@substitution}.
 %    \begin{macrocode}
-\newcommand*{\UnReplaceInput}{\undeclare@file@substitution}
+\NewDocumentCommand{\UnReplaceInput}{}{\undeclare@file@substitution}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -446,14 +445,10 @@
 % \end{macro}
 % \end{macro}
 %
-% \section{Prevent Package from Loading}
+% \subsection{Prevent Package from Loading}
 %
 % To store and reset the hole list of prevents we use a comma separated
 % list. So we need again use \LaTeX3.
-%
-%    \begin{macrocode}
-\ExplSyntaxOn
-%    \end{macrocode}
 %
 % \begin{variable}[added = 2020-09-02]{\g__scrlfile_prevents_clist}
 % This local variable stores the list of files, that should be prevented from
@@ -564,7 +559,7 @@
 % \end{macro}
 %
 %
-% \section{Extra Document Hooks}
+% \subsection{Extra Document Hooks}
 %
 % \begin{macro}{\BeforeClosingMainAux}
 % \changes{v3.32}{2020/09/10}{optional argument added}
@@ -613,7 +608,7 @@
 \ExplSyntaxOff
 %    \end{macrocode}
 %
-% \section{Kernel Extensions not Using \LaTeX3}
+% \subsection{Kernel Extensions not Using \LaTeX3}
 %
 % \begin{macro}{\protected@immediate@write}
 % Like \LaTeX{} kernel's |\protected@write| but using |\immediate\write|. In
@@ -632,6 +627,13 @@
 %    \end{macrocode}
 % \end{macro}
 % 
+% \subsection{The \KOMAScript{} Logo}
+%
+% Last but not least this is a \KOMAScript{} package, so we also define the
+% \KOMAScript{} logo:
+%    \begin{macrocode}
+\RequirePackage{scrlogo}
+%    \end{macrocode}
 %
 % \Finale
 %
