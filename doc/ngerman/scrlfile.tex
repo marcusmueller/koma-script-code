@@ -1,6 +1,6 @@
 % ======================================================================
 % scrlfile.tex
-% Copyright (c) Markus Kohm, 2001-2019
+% Copyright (c) Markus Kohm, 2001-2020
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -18,7 +18,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrlfile.tex
-% Copyright (c) Markus Kohm, 2001-2019
+% Copyright (c) Markus Kohm, 2001-2020
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -124,6 +124,35 @@ dürfte, gibt es durchaus auch Anwendungen für normale \LaTeX-Benutzer. Deshalb
 sind in diesem Kapitel auch für beide Gruppen Beispiele aufgeführt.
 %\end{Explain}
 
+\begin{Declaration}
+  \Option{withdeprecated}
+\end{Declaration}
+Mit\ChangedAt{v3.32}{\Package{scrlfile}} \LaTeX{} 2020-10-01 steht ein
+komplett neuer \emph{Hook}-Mechanismus zur Verfügung. Statt Makros des
+\LaTeX-Kerns umzudefinieren, macht \Package{scrlfile} ab Version 3.32 davon
+auch Gebrauch. Dazu lädt es das interne Paket
+\Package{scrlfile-hook}\IndexPackage[indexmain]{scrlfile-hook}. Bei älteren
+\LaTeX-Versionen wird dagegen das interne Paket
+\Package{scrlfile-patcholdkernel}%
+\IndexPackage[indexmain]{scrlfile-patcholdkernel} verwendet. Da mit dem neuen
+Mechanismus in \LaTeX{} jedoch keine identische Funktionalität zu erreichen
+war, wurden einige Anweisungen von \Package{scrlfile} als veraltet
+markiert. Darüber hinaus wurde die Gelegenheit genutzt, den Wildwuchs an
+Befehlsvarianten zu ordnen. Sollte ein Anwender eine Klasse oder Pakete
+verwenden, die noch auf den dadurch nicht mehr unterstützten Befehlen
+basieren, so kann vor \Package{scrlfile} vor dem Laden der Klasse mit
+\begin{lstcode}
+  \RequirePackage[withdeprecated]{scrlfile}
+\end{lstcode}
+geladen werden. \Package{scrlfile} emuliert dann zusätzlich einige der
+veralteten Befehle in einer Weise, die in den meisten Fällen ausreichend sein
+sollte. In jedem Fall sollte jedoch der Autor der entsprechenden Klasse oder
+des entsprechenden Pakets verständigt werden, damit dieser eine Anpassung an
+die aktuelle Version von \Package{scrlfile} oder direkt an \LaTeX{} ab Version
+2020-10-01 vornimmt.%
+%
+\EndIndexGroup
+
 
 \section{Aktionen vor und nach dem Laden}
 \seclabel{macros}
@@ -189,52 +218,41 @@ mit seinem Dateinamen angegeben wird. Die Endungen »\File{.cls}« und
 \begin{Declaration}
   \Macro{AfterClass}\Parameter{Klasse}\Parameter{Anweisungen}
   \Macro{AfterClass*}\Parameter{Klasse}\Parameter{Anweisungen}
-  \Macro{AfterClass+}\Parameter{Klasse}\Parameter{Anweisungen}
-  \Macro{AfterClass!}\Parameter{Klasse}\Parameter{Anweisungen}
   \Macro{AfterAtEndOfClass}\Parameter{Klasse}\Parameter{Anweisungen}
+  \Macro{AfterAtEndOfClass*}\Parameter{Klasse}\Parameter{Anweisungen}
   \Macro{AfterPackage}\Parameter{Paket}\Parameter{Anweisungen}
   \Macro{AfterPackage*}\Parameter{Paket}\Parameter{Anweisungen}
-  \Macro{AfterPackage+}\Parameter{Paket}\Parameter{Anweisungen}
-  \Macro{AfterPackage!}\Parameter{Paket}\Parameter{Anweisungen}
   \Macro{AfterAtEndOfPackage}\Parameter{Paket}\Parameter{Anweisungen}
+  \Macro{AfterAtEndOfPackage*}\Parameter{Paket}\Parameter{Anweisungen}
 \end{Declaration}%
-Die Anweisungen \Macro{AfterClass} und \Macro{AfterPackage} arbeiten
-weitgehend wie \DescRef{\LabelBase.cmd.AfterFile}, mit dem winzigen
-Unterschied, dass die \PName{Klasse} beziehungsweise das \PName{Paket} mit
-seinem Namen und nicht mit seinem Dateinamen angegeben wird. Die Endungen
-»\File{.cls}« und »\File{.sty}« entfallen hier also.
+Die\important[i]{\Macro{AfterClass}\\\Macro{AfterPackage}} Anweisungen
+\Macro{AfterClass} und \Macro{AfterPackage} arbeiten weitgehend wie
+\DescRef{\LabelBase.cmd.AfterFile}, mit dem winzigen Unterschied, dass die
+\PName{Klasse} beziehungsweise das \PName{Paket} mit seinem Namen und nicht
+mit seinem Dateinamen angegeben wird. Die Endungen »\File{.cls}« und
+»\File{.sty}« entfallen hier also.
 
 Bei\important[i]{\Macro{AfterClass*}\\\Macro{AfterPackage*}} den
-Sternvarianten gibt es eine zusätzliche Funktionalität. Wurde oder wird die
-entsprechende Klasse oder das entsprechende Paket bereits geladen, so werden
-die \PName{Anweisungen} nicht nach dem nächsten Laden, sondern unmittelbar
-ausgeführt.
+Sternvarianten \Macro{AfterClass*} und \Macro{AfterPackage*} gibt es eine
+zusätzliche Funktionalität. Wurde oder wird die entsprechende Klasse oder das
+entsprechende Paket bereits geladen, so werden die \PName{Anweisungen} nicht
+nach dem nächsten Laden, sondern unmittelbar ausgeführt.
 
-Bei\important[i]{\Macro{AfterClass+}\\\Macro{AfterPackage+}} der
-Plusvariante\ChangedAt{v3.09}{\Package{scrlfile}} werden die
-\PName{Anweisungen} sicher erst dann ausgeführt, wenn die Klasse oder das
-Paket vollständig geladen wurde. Der Unterschied zwischen der Stern- und der
-Plusvariante kommt nur zum Tragen, falls die Anweisung verwendet wird, während
-das Laden der Klassen bzw. des Pakets zwar bereits begonnen hat, aber noch
-nicht beendet wurde. Wenn das Laden der Klasse bzw. des Pakets noch nicht
-abgeschlossen wurde, werden die \PName{Anweisungen} in allen Fällen vor den in
-der Klasse bzw. dem Paket mit \Macro{AtEndOfClass} oder \Macro{AtEndOfPackage}
-verzögerten Anweisungen ausgeführt.
+Code,\ChangedAt{v3.09}{\Package{scrlfile}}%
+\important[i]{\Macro{AfterAtEndOfClass}\\\Macro{AfterAtEndOfPackage}}
+dessen Ausführung per \Macro{AtEndOfClass}\IndexCmd{AtEndOfClass} oder
+\Macro{AtEndOfPackage}\IndexCmd{AtEndOfPackage} innerhalb der Klasse
+respektive des Pakets verzögert wird, wird allerdings erst danach
+ausgeführt. Mit \Macro{AfterAtEndOfClass} beziehungsweise
+\Macro{AfterAtEndOfPackage} wird dagegen sichergestellt, dass
+\PName{Anweisungen} erst nach solchem Code ausgeführt wird.
 
-Um\important[i]{\Macro{AfterClass!}\\\Macro{AfterPackage!}} eine Ausführung
-nach den in der Klasse oder dem Paket selbst mit \Macro{AtEndOfClass} oder
-\Macro{AtEndOfPackage} verzögerten Anweisungen sicherzustellen, ist die
-Variante mit Ausrufezeichen\ChangedAt{v3.09}{\Package{scrlfile}} zu
-verwenden. Bei dieser Spielart werden die \PName{Anweisungen} nicht mehr im
-Kontext der angegebenen Klasse oder des angegebenen Pakets ausgeführt.
-
-Will\important[i]{\Macro{AfterAtEndOfClass}\\\Macro{AfterAtEndOfPackage}} man
-nur für den Fall, dass die Klasse bzw. das Paket noch nicht geladen wurde,
-erreichen, dass \PName{Anweisungen} nach der Klasse bzw. dem Paket und
-außerhalb des Kontextes der angegebenen Klasse bzw. des angegebenen Pakets
-ausgeführt werden, so verwendet man für Klassen die Anweisung
-\Macro{AfterAtEndOfClass}\ChangedAt{v3.09}{\Package{scrlfile}}
-und für Pakete \Macro{AfterAtEndOfPackage}.%
+Auch\ChangedAt{v3.32}{\Package{scrlfile}}%
+\important[i]{\Macro{AfterAtEndOfClass*}\\\Macro{AfterAtEndOfPackage*}}
+hierzu gibt es Sternvarianten, die dafür sorgen, dass \PName{Anweisungen}
+sofort ausgeführt werden, falls die Klasse beziehungsweise das Paket bereits
+vollständig geladen ist. Wird eine Klasse oder ein Paket gerade geladen, so
+wird die Ausführung wie bei der Version ohne Stern verzögert.
 %
 \begin{Example}
   Als Beispiel für Paket- oder Klassenautoren will ich zunächst
@@ -266,7 +284,7 @@ und für Pakete \Macro{AfterAtEndOfPackage}.%
   es sich um eine verträgliche Version handelt. Falls dies nicht der
   Fall ist, wird eine Warnung ausgegeben.
 
-  An anderer Stelle findet sich in drei der \KOMAScript-Klassen Folgendes:
+  An anderer Stelle findet sich in drei der \KOMAScript-Klassen folgendes:
 \begin{lstcode}
   \AfterPackage{caption2}{%
     \renewcommand*{\setcapindent}{%
@@ -434,16 +452,25 @@ Stelle noch kritischer zu betrachten als bei \Macro{BeforeClosingMainAux}.%
 \section{Dateien beim Einlesen ersetzen}
 \seclabel{replace}
 
+\begin{Explain}%
 In den bisherigen Abschnitten wurden Anweisungen erklärt, mit denen es möglich
 ist, vor oder nach dem Einlesen einer bestimmten Datei, eines bestimmten
 Pakets oder einer Klasse Aktionen auszuführen. Es ist mit \Package{scrlfile}
 aber auch möglich, eine ganz andere Datei als die angeforderte einzulesen.
+\ChangedAt{v3.32}{\Package{scrlfile}}Allerdings ergab sich in einem Dialog
+mit dem \LaTeX-Team, dass dieses ein solches Vorgehen als überwiegend nicht
+empfehlenswert betrachtet. Daher gelten sämtliche Anweisungen dieses
+Abschnitts als veraltet und sollten nicht mehr verwendet werden. Bei
+Verwendung von \LaTeX{} ab Version 2020-10-01 werden sie teilweise gar nicht
+angeboten oder erzeugen eine Fehlermeldung.
 
 \begin{Declaration}[0]
   \Macro{ReplaceInput}\Parameter{Dateiname}\Parameter{Ersatzdatei}
 \end{Declaration}
-Mit\ChangedAt{v2.96}{\Package{scrlfile}} dieser Anweisung wird eine Ersetzung
-der Datei mit dem als erstes angegebenen \PName{Dateiname} definiert. Wenn
+Diese\ChangedAt{v3.32}{\Package{scrlfile}} Anweisung gilt bei Verwendung von
+\LaTeX{} ab Version 2020-10-01 als veraltet, funktioniert derzeit jedoch
+noch. Mit\ChangedAt{v2.96}{\Package{scrlfile}} ihr wird eine Ersetzung der
+Datei mit dem als erstes angegebenen \PName{Dateiname} definiert. Wenn
 \LaTeX{} anschließend angewiesen wird, diese Datei zu laden, wird stattdessen
 \PName{Ersatzdatei} geladen. Die Definition der Ersatzdatei wirkt sich auf
 alle Dateien aus, die vom Anwender oder intern von \LaTeX{} mit Hilfe von
@@ -486,6 +513,13 @@ der Klasse passen. Eine Lösung dieses Problems finden Sie nachfolgend.
   \Macro{ReplaceClass}\Parameter{Klasse}\Parameter{Ersatzklasse}
   \Macro{ReplacePackage}\Parameter{Paket}\Parameter{Ersatzpaket}
 \end{Declaration}
+Diese\ChangedAt{v3.32}{\Package{scrlfile}} Anweisungen gelten bei Verwendung
+von \LaTeX{} ab Version 2020-10-01 als veraltet und werden aufgrund eines
+Problems auch nicht via Option \DescRef{\LabelBase.option.withdeprecated}
+bereit gestellt. Bei Verwendung einer älteren \LaTeX-Version gelten die
+Anweisungen ebenfalls als veraltet und werden voraussichtlich nur noch
+begrenzte Zeit verfügbar sein.
+
 Eine\ChangedAt{v2.96}{\Package{scrlfile}}\textnote{Achtung!} Klasse oder ein
 Paket sollte niemals mit Hilfe der oben erklärten Anweisung
 \DescRef{\LabelBase.cmd.ReplaceInput} ersetzt werden. In diesem Fall würde
@@ -508,7 +542,7 @@ einem falschen Dateinamen geladen wird.
   gar nicht \Package{scrlayer-scrpage}, sondern tatsächlich \Package{scrpage2}
   angefordert, das jedoch durch \Package{scrlayer-scrpage} ersetzt wurde.
 \end{Example}
-Eine Lösung dieser Probleme besteht nun darin, statt
+Eine Lösung dieser Probleme bestand bis Version 3.31 darin, statt
 \DescRef{\LabelBase.cmd.ReplaceInput} eine der Anweisungen
 \Macro{ReplaceClass} oder \Macro{ReplacePackage} zu verwenden. Es ist zu
 beachten, dass wie bei \Macro{documentclass} und \Macro{usepackage} der Name
@@ -599,8 +633,15 @@ der Aufhebung der Ersetzung führen Ladebefehle für die entsprechende
 \PName{Datei}, das entsprechende \PName{Paket} oder die entsprechende
 \PName{Klasse} dann wieder dazu, dass die \PName{Datei}, das \PName{Paket}
 oder die \PName{Klasse} selbst anstelle der Ersatzdatei, des Ersatzpakets oder
-der Ersatzklasse geladen wird.%
+der Ersatzklasse geladen wird.
+
+Da\ChangedAt{v3.32}{\Package{scrlfile}} die Anweisungen
+\DescRef{\LabelBase.cmd.ReplaceInput}, \DescRef{\LabelBase.cmd.ReplaceClass}
+und \DescRef{\LabelBase.cmd.ReplacePackage} als veraltet gelten, trifft dies
+aber natürlich auch für die Befehle zur Aufhebung der Ersetzung zu. Sie
+sollten daher ebenfalls nicht mehr verwendet werden.%
 \EndIndexGroup
+\end{Explain}
 
 
 \section{Dateien gar nicht erst einlesen}

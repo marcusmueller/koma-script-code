@@ -1,6 +1,6 @@
 % ======================================================================
 % scrlfile.tex
-% Copyright (c) Markus Kohm, 2001-2019
+% Copyright (c) Markus Kohm, 2001-2020
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -18,7 +18,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrlfile.tex
-% Copyright (c) Markus Kohm, 2001-2019
+% Copyright (c) Markus Kohm, 2001-2020
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -50,7 +50,7 @@
                   KOMA-Script guide (chapter: scrlfile)]
 \translator{Gernot Hassenpflug\and Markus Kohm\and Karl Hagen}
 
-% Date of the translated German file: 2019-12-03
+% Date of the translated German file: 2020-09-11
 
 \chapter{Controlling Package Dependencies with \Package{scrlfile}}
 \labelbase{scrlfile}
@@ -111,6 +111,32 @@ are also applications for normal \LaTeX{} users.  Therefore, this chapter
 gives examples for both groups.
 %\end{Explain}
 
+\begin{Declaration}
+  \Option{withdeprecated}
+\end{Declaration}
+With\ChangedAt{v3.32}{\Package{scrlfile}} \LaTeX{} 2020-10-01 a completely new
+hook mechanism is available. Instead of redefining macros of the \LaTeX{}
+kernel, \Package{scrlfile} 3.32 and newer makes use of it. For this purpose it
+loads the internal package
+\Package{scrfile-hook}\IndexPackage[indexmain]{scrlfile-hook}. With older
+\LaTeX{} versions, the internal package \Package{scrlayer-patcholdkernel}%
+\IndexPackage[indexmain]{scrlfile-patcholdkernel} is used. However, since it
+was not possible to achieve identical functionality with the new mechanism in
+\LaTeX, some commands of \Package{scrlfile} were marked as
+deprecated. Furthermore, the opportunity was taken to organize the
+proliferation of command variants. If a user uses a class or package that is
+still based on the commands that are no longer supported by
+\Package{scrlfile}, the package \Package{scrlfile} can be loaded with
+\begin{lstcode}
+  \RequirePackage[withdeprecated]{scrlfile}
+\end{lstcode}
+before loading the class. \Package{scrlfile} then additionally emulates some
+of the deprecated commands in a way that should be sufficient in most
+cases. In any case, the author of the corresponding class or package should be
+informed, so that he or she can make an adaptation to the current version of
+\Package{scrlfile} or directly to \LaTeX{} from version 2020-10-01.%
+%
+\EndIndexGroup
 
 \section{Actions Before and After Loading}
 \seclabel{macros}
@@ -168,14 +194,12 @@ should omit the file extensions \File{.cls} or \File{.sty}.%
 \begin{Declaration}
   \Macro{AfterClass}\Parameter{class}\Parameter{commands}%
   \Macro{AfterClass*}\Parameter{class}\Parameter{commands}%
-  \Macro{AfterClass+}\Parameter{class}\Parameter{commands}%
-  \Macro{AfterClass!}\Parameter{class}\Parameter{commands}%
   \Macro{AfterAtEndOfClass}\Parameter{class}\Parameter{commands}%
+  \Macro{AfterAtEndOfClass*}\Parameter{class}\Parameter{commands}%
   \Macro{AfterPackage}\Parameter{package}\Parameter{commands}%
   \Macro{AfterPackage*}\Parameter{package}\Parameter{commands}%
-  \Macro{AfterPackage+}\Parameter{package}\Parameter{commands}%
-  \Macro{AfterPackage!}\Parameter{package}\Parameter{commands}%
   \Macro{AfterAtEndOfPackage}\Parameter{package}\Parameter{commands}
+  \Macro{AfterAtEndOfPackage*}\Parameter{package}\Parameter{commands}
 \end{Declaration}%
 The \Macro{AfterClass} and \Macro{AfterPackage} commands work much like
 \DescRef{\LabelBase.cmd.AfterFile}. The only difference is that the
@@ -188,29 +212,19 @@ function somewhat differently. If the class or package has already been
 loaded, they execute the \PName{commands} immediately rather than waiting
 until the next time the class or package is loaded.
 
-The\important[i]{\Macro{AfterClass+}\\\Macro{AfterPackage+}}
-plus\ChangedAt{v3.09}{\Package{scrlfile}} version executes the
-\PName{commands} after the class or package has been completely loaded. This
-behaviour differs from that of the starred version only if you use the command
-when the class or package has begun loading but has not yet finished. If the
-class or package has not finished loading, the \PName{commands} will always be
-executed before the commands in \Macro{AtEndOfClass} or
-\Macro{AtEndOfPackage}.
+However\ChangedAt{v3.09}{\Package{scrlfile}}%
+\important[i]{\Macro{AfterAtEndOfClass}\\\Macro{AfterAtEndOfPackage}}, code
+whose execution is delayed by \Macro{AtEndOfClass} or \Macro{AtEndOfPackage}
+within the class or package is first executed afterwards. In contrast,
+\Macro{AfterAtEndOfClass} or \Macro{AfterAtEndOfPackage} ensures that
+\PName{commands} are executed after such code.
 
-If\important[i]{\Macro{AfterClass!}\\\Macro{AfterPackage!}} a class uses
-\Macro{AtEndOfClass} or a package uses \Macro{AtEndOfPackage} to execute
-commands after the class of package file has been loaded completely, and
-if you want to execute \PName{commands} after these deferred
-commands have been executed, you can use the exclamation-mark versions
-\Macro{AfterClass!}\ChangedAt{v3.09}{\Package{scrlfile}} or
-\Macro{AfterPackage!}.
-
-If\important[i]{\Macro{AfterAtEndOfClass}\\\Macro{AfterAtEndOfPackage}} you
-want to execute the \PName{commands} only when the class or package is loaded
-later and outside the context of that class or package, you can use
-\Macro{AfterAtEndOfClass}\ChangedAt{v3.09}{\Package{scrlfile}} for classes and
-\Macro{AfterAtEndOfPackage} for packages.
-
+Again\ChangedAt{v3.32}{\Package{scrlfile}}%
+\important[i]{\Macro{AfterAtEndOfClass*}\\\Macro{AfterAtEndOfPackage*}}, there
+are star variants that ensure that \PName{commands} are executed immediately
+if the class or package is already completely loaded. If a class or package is
+currently loaded, the execution is delayed like in the version without star.
+%
 \begin{Example}
   The following example for class and package authors shows how \KOMAScript{}
   itself makes use of the new commands. The class \Class{scrbook} contains the
@@ -391,20 +405,28 @@ dangerous inside these \PName{commands} than inside the argument of
 \section{Replacing Files at Input}
 \seclabel{replace}
 
+\begin{Explain}
 The previous sections in this chapter have explained commands to perform
 actions before or after loading a particular file, package, or class. You can
 also use \Package{scrlfile} to input a completely different file than the one
-that was requested.
+that was requested. \ChangedAt{v3.32}{\Package{scrlfile}}However, a contact
+with the \LaTeX team revealed that they do not consider such a procedure to be
+recommendable in most cases. Therefore all instructions in this section are
+considered deprecated and should not be used anymore. When using \LaTeX{} from
+version 2020-10-01 on they are partly not offered at all or generate an error
+message.
 
 
 \begin{Declaration}
   \Macro{ReplaceInput}\Parameter{original file}%
                       \Parameter{replacement file}%
 \end{Declaration}%
-This\ChangedAt{v2.96}{\Package{scrlfile}} command defines a replacement for
-the file specified in the first argument, \PName{original file}. If \LaTeX{}
-is instructed to load this file, the \PName{replacement file} will be loaded
-instead. The replacement-file definition affects all files loaded using
+This\ChangedAt{v3.32}{\Package{scrlfile}} statement applies when using
+\LaTeX{} from version 2020-10-01 as deprecated, but currently works
+still. It\ChangedAt{v2.96}{\Package{scrlfile}} defines a replacement
+for the file specified in the first argument, \PName{original file}. If
+\LaTeX{} is instructed to load this file, the \PName{replacement file} will be
+loaded instead. The replacement-file definition affects all files loaded using
 \Macro{InputIfFileExists}, whether they are loaded by the user or internally
 by \LaTeX{}. To do so, \Package{scrlfile} redefines \Macro{InputIfFileExists}.
 
@@ -445,6 +467,12 @@ solution for this problem below.%
   \Macro{ReplacePackage}\Parameter{original package}%
                         \Parameter{replacement package}%
 \end{Declaration}%
+These\ChangedAt{v3.32}{\Package{scrlfile}} instructions are considered
+deprecated when using \LaTeX{} from version 2020-10-01 on and are not provided
+via option \DescRef{\LabelBase.option.withdeprecated} due to a problem. If you
+are using an older \LaTeX{} versions, the instructions are also considered
+deprecated and will probably be available only for a limited time.
+
 You\ChangedAt{v2.96}{\Package{scrlfile}}\textnote{Attention!} should never
 replace a class or package using the \DescRef{\LabelBase.cmd.ReplaceInput}
 command described above. Doing so would result in a \LaTeX{} warning about
@@ -551,8 +579,11 @@ class using \Macro{RequirePackage} instead of \Macro{usepackage}.
 You\ChangedAt{v3.12}{\Package{scrlfile}} can also remove a replacement. You
 should remove the replacement definition for an input file using
 \Macro{UnReplaceInput}, for a package using \Macro{UnReplacePackage}, and for
-a class using \Macro{UnReplaceClass}.%
+a class using \Macro{UnReplaceClass}.
+
+Since\ChangedAt{v3.32}{\Package{scrlfile}} the statements \DescRef{\LabelBase.cmd.ReplaceInput}, \DescRef{\LabelBase.cmd.ReplaceClass}, and \DescRef{\LabelBase.cmd.ReplacePackage} are deprecated, the same applies to the commands for cancelling the replacement. They should therefore also no longer be used.% 
 \EndIndexGroup
+\end{Explain}
 
 
 \section{Preventing File Loading}
