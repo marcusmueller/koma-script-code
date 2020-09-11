@@ -2,7 +2,7 @@
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlayer-notecolumn.dtx
-% Copyright (c) Markus Kohm, 2013-2019
+% Copyright (c) Markus Kohm, 2013-2020
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrlayer-notecolumn.dtx
-% Copyright (c) Markus Kohm, 2013-2019
+% Copyright (c) Markus Kohm, 2013-2020
 %
 % Diese Datei ist Teil der LaTeX2e KOMA-Script-Sammlung.
 %
@@ -204,6 +204,7 @@
 % \selectlanguage{english}
 %
 % \changes{v0.0}{2013/04/26}{start of interface}
+% \changes{v0.3.3532}{2020/09/11}{do not use deprecated interface commands}
 %
 % \StopEventually{}
 %
@@ -285,8 +286,7 @@
 % column needs.
 %    \begin{macrocode}
 %<*body>
-\scrlayerAddToInterface\DeclareNoteColumn{%
-  \newcommand*{\DeclareNoteColumn}[2][]{%
+\newcommand*{\DeclareNoteColumn}[2][]{%
 %    \end{macrocode}
 % First of all we need a box register. The contents of the note column will be
 % build inside of this register. Since \eTeX{} registers shouldn't be a
@@ -294,131 +294,91 @@
 % registers. Note, that the registers will stay allocated, if the interface
 % will be removed! Nevertheless, the name will be destroyed!
 %    \begin{macrocode}
-    \@ifundefined{slnc@#2@box}{%
-      \expandafter\newsavebox\csname slnc@#2@box\endcsname
-      \scrlayerOnAutoRemoveInterface[scrlayer-notecolumn.sty]{%
-        \expandafter\let\csname slnc@#2@box\endcsname\relax
-      }%
-    }{}%
+  \@ifundefined{slnc@#2@box}{%
+    \expandafter\newsavebox\csname slnc@#2@box\endcsname
+  }{}%
 %    \end{macrocode}
 % There's also a kind of item stack of unprocessed notes for each note column.
 %    \begin{macrocode}
-    \@ifundefined{slnc@#2@unprocessed}{%
-      \@namedef{slnc@#2@unprocessed}{}%
-      \scrlayerOnAutoRemoveInterface[scrlayer-notecolumn.sty]{%
-        \expandafter\let\csname slnc@#2@unprocessed\endcsname\relax
-      }%
-    }{}%
+  \@ifundefined{slnc@#2@unprocessed}{%
+    \@namedef{slnc@#2@unprocessed}{}%
+  }{}%
 %    \end{macrocode}
 % Next we need a horizontal positions and a width for the note column. Neither
 % the horizontal position nor the width are stretchable or shrinkable. The
 % position should be variable depending on the page. So it's better to use a
 % macro instead of a length. The width isn't more variable than, e.g., the
 % text width. So we can use a macro too. Both will be initialised to the
-% normal marginal note column.
-%    \begin{macrocode}
-    \@ifundefined{slnc@#2@pos}{%
-      \scrlayerOnAutoRemoveInterface[scrlayer-notecolumn.sty]{%
-        \expandafter\let\csname slnc@#2@pos\endcsname\relax
-      }%
-    }{}%
-    \@ifundefined{slnc@#2@width}{%
-      \scrlayerOnAutoRemoveInterface[scrlayer-notecolumn.sty]{%
-        \expandafter\let\csname slnc@#2@width\endcsname\relax
-      }%
-    }{}%
-%    \end{macrocode}
+% normal marginal note column later.
 % \changes{3.27}{2019/02/14}{initialization of one colour stack per note
 %   column}%^^A
 % For colour support we also need one colour stack per note column. A colour
 % stack is a feature only available for pdf\TeX{} and lua\TeX{}.
 %    \begin{macrocode}
-    \@ifundefined{slnc@#2@colorstack}{%
-      \scr@ifundefinedorrelax{pdfcolorstackinit}{%
-        \scr@ifundefinedorrelax{pdffeedback}{}{%
-          \expandafter\chardef\csname slnc@#2@colorstack\endcsname=
-          \pdffeedback colorstackinit direct {\slnc@initial@black}%
-          \scrlayerOnAutoRemoveInterface[scrlayer-notecolumn.sty]{%
-            \expandafter\let\csname slnc@#2@colorstack\endcsname\relax
-          }%
-        }%
-      }{%
+  \@ifundefined{slnc@#2@colorstack}{%
+    \scr@ifundefinedorrelax{pdfcolorstackinit}{%
+      \scr@ifundefinedorrelax{pdffeedback}{}{%
         \expandafter\chardef\csname slnc@#2@colorstack\endcsname=
-          \pdfcolorstackinit direct {\slnc@initial@black}%
-        \scrlayerOnAutoRemoveInterface[scrlayer-notecolumn.sty]{%
-          \expandafter\let\csname slnc@#2@colorstack\endcsname\relax
-        }%
+        \pdffeedback colorstackinit direct {\slnc@initial@black}%
       }%
-    }{}%
+    }{%
+      \expandafter\chardef\csname slnc@#2@colorstack\endcsname=
+        \pdfcolorstackinit direct {\slnc@initial@black}%
+    }%
+  }{}%
 %    \end{macrocode}
 % If there isn't a font element for the (new) note column, we define a new one
 % and add it to the auto-remove code:
 %    \begin{macrocode}
-    \@ifundefined{scr@fnt@notecolumn.#2}{%
-      \@ifundefined{@notecolumn.#2font}{%
-        \scrlayerOnAutoRemoveInterface[scrlayer-notecolumn.sty]{%
-          \expandafter\let\csname @notecolumn.#2font\endcsname\relax
-        }%
-      }{%
-        \PackageInfo{scrlayer-notecolumn}{using already defined
-          macro\MessageBreak
-          `\expandafter\string\csname @notecolumn.#2font\endcsname' for font
-          element\MessageBreak
-          `notecolumn.#2'%
-        }%
-      }%
-      \newkomafont{notecolumn.#2}{}%
-      \scrlayerOnAutoRemoveInterface[scrlayer-notecolumn.sty]{%
-        \expandafter\let\csname scr@fnt@notecolumn.#2\endcsname\relax
-      }%
-    }{%
-      \PackageInfo{scrlayer-notecolumn}{using already defined font
+  \@ifundefined{scr@fnt@notecolumn.#2}{%
+    \@ifundefined{@notecolumn.#2font}{}{%
+      \PackageInfo{scrlayer-notecolumn}{using already defined
+        macro\MessageBreak
+        `\expandafter\string\csname @notecolumn.#2font\endcsname' for font
         element\MessageBreak
         `notecolumn.#2'%
       }%
     }%
+    \newkomafont{notecolumn.#2}{}%
+  }{%
+    \PackageInfo{scrlayer-notecolumn}{using already defined font
+      element\MessageBreak
+      `notecolumn.#2'%
+    }%
+  }%
 %    \end{macrocode}
 % After the initialisation we process the options, that may change the initial
 % values.
 %    \begin{macrocode}
-    \newcommand*{\slnc@name}{}%
-    \edef\slnc@name{#2}%
-    \FamilyExecuteOptions[.definenotecolumn]{KOMAarg}{marginpar,#1}%
-    \let\slnc@name\relax
+  \newcommand*{\slnc@name}{}%
+  \edef\slnc@name{#2}%
+  \FamilyExecuteOptions[.definenotecolumn]{KOMAarg}{marginpar,#1}%
+  \let\slnc@name\relax
 %    \end{macrocode}
 % The values are set up, so they may be used to declare a layer.
 %    \begin{macrocode}
-    \DeclareLayer[%
-      foreground,%
-      align=tl,%
-      voffset=1in+\topmargin+\headheight+\headsep,%
-      height=\dimexpr\textheight+\topskip\relax,%
-      hoffset=\csname slnc@#2@pos\endcsname,%
-      width=\csname slnc@#2@width\endcsname,%
-      contents=\slnc@processnotes{#2}%
-    ]{notecolumn.#2}
+  \DeclareLayer[%
+    foreground,%
+    align=tl,%
+    voffset=1in+\topmargin+\headheight+\headsep,%
+    height=\dimexpr\textheight+\topskip\relax,%
+    hoffset=\csname slnc@#2@pos\endcsname,%
+    width=\csname slnc@#2@width\endcsname,%
+    contents=\slnc@processnotes{#2}%
+  ]{notecolumn.#2}
 %    \end{macrocode}
 % We need to add the layer to every page style. The easiest way to do this is
 % to add it to the pseudo layer page style \Pagestyle{@everystyle@}.
 % \changes{v0.1.1681}{2014/02/05}{add the layer only once}
 %    \begin{macrocode}
-    \IfLayerAtPageStyle{@everystyle@}{notecolumn.#2}{}{%
-      \AddLayersToPageStyle{@everystyle@}{notecolumn.#2}%
-%    \end{macrocode}
-% On auto-removing the interface, the layer should be removed from
-% \Pagestyle{@everystyle@} and should be destroyed.
-%    \begin{macrocode}
-    }%
-    \scrlayerOnAutoRemoveInterface[scrlayer-notecolumn.sty]{%
-      \RemoveLayersFromPageStyle{@everystyle@}{notecolumn.#2}%
-      \DestroyLayer{notecolumn.#2}%
-    }%
+  \IfLayerAtPageStyle{@everystyle@}{notecolumn.#2}{}{%
+    \AddLayersToPageStyle{@everystyle@}{notecolumn.#2}%
+  }%
 %    \end{macrocode}
 % Last but not least, we add the new note column to the note column procession
 % list.
 %    \begin{macrocode}
-    \@cons\slnc@processnotecolumns{{#2}}%
-  }%
+  \@cons\slnc@processnotecolumns{{#2}}%
 }
 %    \end{macrocode}
 % \begin{macro}{\slnc@initial@black}
@@ -429,26 +389,22 @@
 % \cs{current@color} of the used colour package. Using \cs{default@color} would
 % be even better, but this is not available until \cs{begin\{document\}}.
 %    \begin{macrocode}
-\scrlayerAddToInterface\slnc@initial@black{%
-  \newcommand*{\slnc@initial@black}{0 g 0 G}%
-  \AfterPackage*{color}{%
-    \let\slnc@initial@black\current@color
-    \AtBeginDocument{\let\slnc@initial@black\default@color}%
-  }%
-  \AfterPackage*{xcolor}{%
-    \let\slnc@initial@black\current@color
-    \AtBeginDocument{\let\slnc@initial@black\default@color}%
-  }%
-}
+\newcommand*{\slnc@initial@black}{0 g 0 G}%
+\AfterPackage*{color}{%
+  \let\slnc@initial@black\current@color
+  \AtBeginDocument{\let\slnc@initial@black\default@color}%
+}%
+\AfterPackage*{xcolor}{%
+  \let\slnc@initial@black\current@color
+  \AtBeginDocument{\let\slnc@initial@black\default@color}%
+}%
 %    \end{macrocode}
 % \end{macro}%^^A \slnc@initial@black
 % \begin{macro}{\slnc@processnotecolumns}
 % This is a list of all declared note columns in \LaTeX{} syntax (using
 % \Macro{@cons} and \Macro{@elt} etc.).
 %    \begin{macrocode}
-\scrlayerAddToInterface\slnc@processnotecolumns{%
-  \newcommand*{\slnc@processnotecolumns}{}%
-}
+\newcommand*{\slnc@processnotecolumns}{}%
 %    \end{macrocode}
 % \end{macro}%^^A \slnc@processnotecolumns
 %    \begin{macrocode}
@@ -466,18 +422,16 @@
 % extended by the note column layers. So we warn, if another page style has
 % been selected.
 %    \begin{macrocode}
-\scrlayerAddToInterface\slnc@testforpagestylewarning{%
-  \newcommand*{\slnc@testforpagestylewarning}{%
-    \IfLayerPageStyleExists{\currentpagestyle}{}{%
-      \PackageWarning{scrlayer-notecolumn}{%
-        output of note columns delayed,\MessageBreak
-        because with `\currentpagestyle'\MessageBreak
-        a page style has been selected, that\MessageBreak
-        isn't a layer page style,%
-      }%
+\newcommand*{\slnc@testforpagestylewarning}{%
+  \IfLayerPageStyleExists{\currentpagestyle}{}{%
+    \PackageWarning{scrlayer-notecolumn}{%
+      output of note columns delayed,\MessageBreak
+      because with `\currentpagestyle'\MessageBreak
+      a page style has been selected, that\MessageBreak
+      isn't a layer page style,%
     }%
   }%
-}
+}%
 \AfterSelectAnyPageStyle{\slnc@testforpagestylewarning}
 %    \end{macrocode}
 % \end{macro}%^^A \slnc@testforpagestylewarning
@@ -495,79 +449,69 @@
   \@namedef{slnc@\slnc@name @pos}{\dimexpr #1\relax}%
   \FamilyKeyStateProcessed
 }
-\scrlayer@AddCsToInterface{KV@KOMAarg.definenotecolumn@position}
-\scrlayer@AddCsToInterface{KV@KOMAarg.definenotecolumn@position@default}
 \DefineFamilyKey[.definenotecolumn]{KOMAarg}{width}{%
   \@namedef{slnc@\slnc@name @width}{\dimexpr #1\relax}%
   \FamilyKeyStateProcessed
 }
-\scrlayer@AddCsToInterface{KV@KOMAarg.definenotecolumn@width}
-\scrlayer@AddCsToInterface{KV@KOMAarg.definenotecolumn@width@default}
 \DefineFamilyKey[.definenotecolumn]{KOMAarg}{font}{%
   \setkomafont{notecolumn.\slnc@name}{#1}%
   \FamilyKeyStateProcessed
 }
-\scrlayer@AddCsToInterface{KV@KOMAarg.definenotecolumn@font}
-\scrlayer@AddCsToInterface{KV@KOMAarg.definenotecolumn@font@default}
 \DefineFamilyKey[.definenotecolumn]{KOMAarg}{marginpar}[\relax]{%
   \FamilyKeyStateProcessed
   \scrlayer@testunexpectedarg{marginpar}{#1}%
   \edef\reserved@a{\noexpand\slnc@defpos{\slnc@name}}\reserved@a
   \@namedef{slnc@\slnc@name @width}{\marginparwidth}%
 }
-\scrlayer@AddCsToInterface{KV@KOMAarg.definenotecolumn@marginpar}
-\scrlayer@AddCsToInterface{KV@KOMAarg.definenotecolumn@marginpar@default}
 %    \end{macrocode}
 % \begin{macro}{\slnc@defpos}
 % Little helper for option \Option{marginpar}. The argument is the expanded
 % name of the note column.
 %    \begin{macrocode}
-\scrlayerAddToInterface\slnc@defpos{%
-  \newcommand*\slnc@defpos[1]{%
-    \@namedef{slnc@#1@pos}{%
-      \ifodd\value{page}
-        \if@reversemargin
+\newcommand*\slnc@defpos[1]{%
+  \@namedef{slnc@#1@pos}{%
+    \ifodd\value{page}
+      \if@reversemargin
 %    \end{macrocode}
 % The reverse marginal note column on odd pages is at the left margin.
 %    \begin{macrocode}
-          \dimexpr \oddsidemargin+1in
-                  -\marginparsep-\csname slnc@#1@width\endcsname\relax
-        \else
+        \dimexpr \oddsidemargin+1in
+                -\marginparsep-\csname slnc@#1@width\endcsname\relax
+      \else
 %    \end{macrocode}
 % The normal marginal note column on odd pages is the right margin.
 %    \begin{macrocode}
-          \dimexpr \oddsidemargin+1in
-                  +\textwidth+\marginparsep\relax
-        \fi
-      \else
-        \if@twoside
-          \if@reversemargin
+        \dimexpr \oddsidemargin+1in
+                +\textwidth+\marginparsep\relax
+      \fi
+    \else
+      \if@twoside
+        \if@reversemargin
 %    \end{macrocode}
 % The reverse marginal note column on even pages is the right margin.
 %    \begin{macrocode}
-            \dimexpr \evensidemargin+1in
-                    +\textwidth+\marginparsep\relax
-          \else
+          \dimexpr \evensidemargin+1in
+                  +\textwidth+\marginparsep\relax
+        \else
 %    \end{macrocode}
 % The normal marginal note column on even pages is at the left margin.
 %    \begin{macrocode}
-            \dimexpr \evensidemargin+1in
-                    -\marginparsep-\csname slnc@#1@width\endcsname\relax
-          \fi
-        \else
+          \dimexpr \evensidemargin+1in
+                  -\marginparsep-\csname slnc@#1@width\endcsname\relax
+        \fi
+      \else
 %    \end{macrocode}
 %    \begin{macrocode}
 % If not in two-side mode, do the same already done for odd pages.
-          \if@reversemargin
-            \dimexpr \oddsidemargin+1in
-                    -\marginparsep-\csname slnc@#1@width\endcsname\relax
-          \else
-            \dimexpr \oddsidemargin+1in
-                    +\textwidth+\marginparsep\relax
-          \fi
+        \if@reversemargin
+          \dimexpr \oddsidemargin+1in
+                  -\marginparsep-\csname slnc@#1@width\endcsname\relax
+        \else
+          \dimexpr \oddsidemargin+1in
+                  +\textwidth+\marginparsep\relax
         \fi
       \fi
-    }%
+    \fi
   }%
 }%
 %    \end{macrocode}
@@ -579,38 +523,34 @@
   \edef\reserved@a{\noexpand\slnc@defnormalpos{\slnc@name}}\reserved@a
   \@namedef{slnc@\slnc@name @width}{\marginparwidth}%
 }
-\scrlayer@AddCsToInterface{KV@KOMAarg.definenotecolumn@normalmarginpar}
-\scrlayer@AddCsToInterface{KV@KOMAarg.definenotecolumn@normalmarginpar@default}
 %    \end{macrocode}
 % \begin{macro}{\slnc@defnormalpos}
 % Little helper for option \Option{normalmarginpar}. The argument is the
 % expanded name of the note column.
 %    \begin{macrocode}
-\scrlayerAddToInterface\slnc@defnormalpos{%
-  \newcommand*\slnc@defnormalpos[1]{%
-    \@namedef{slnc@#1@pos}{%
-      \ifodd\value{page}
+\newcommand*\slnc@defnormalpos[1]{%
+  \@namedef{slnc@#1@pos}{%
+    \ifodd\value{page}
 %    \end{macrocode}
 % The normal marginal note column on odd pages is the right margin.
 %    \begin{macrocode}
-        \dimexpr \oddsidemargin+1in
-                +\textwidth+\marginparsep\relax
-      \else
-        \if@twoside
+      \dimexpr \oddsidemargin+1in
+              +\textwidth+\marginparsep\relax
+    \else
+      \if@twoside
 %    \end{macrocode}
 % The normal marginal note column on even pages is at the left margin.
 %    \begin{macrocode}
-          \dimexpr \evensidemargin+1in
-                  -\marginparsep-\csname slnc@#1@width\endcsname\relax
-        \else
+        \dimexpr \evensidemargin+1in
+                -\marginparsep-\csname slnc@#1@width\endcsname\relax
+      \else
 %    \end{macrocode}
 %    \begin{macrocode}
 % If not in two-side mode, do the same already done for odd pages.
-          \dimexpr \oddsidemargin+1in
-                  +\textwidth+\marginparsep\relax
-        \fi
+        \dimexpr \oddsidemargin+1in
+                +\textwidth+\marginparsep\relax
       \fi
-    }%
+    \fi
   }%
 }%
 %    \end{macrocode}
@@ -622,38 +562,34 @@
   \edef\reserved@a{\noexpand\slnc@defreversepos{\slnc@name}}\reserved@a
   \@namedef{slnc@\slnc@name @width}{\marginparwidth}%
 }
-\scrlayer@AddCsToInterface{KV@KOMAarg.definenotecolumn@reversemarginpar}
-\scrlayer@AddCsToInterface{KV@KOMAarg.definenotecolumn@reversemarginpar@default}
 %    \end{macrocode}
 % \begin{macro}{\slnc@defreversepos}
 % Little helper for option \Option{reversemarginpar}. The argument is the
 % expanded name of the note column.
 %    \begin{macrocode}
-\scrlayerAddToInterface\slnc@defreversepos{%
-  \newcommand*\slnc@defreversepos[1]{%
-    \@namedef{slnc@#1@pos}{%
-      \ifodd\value{page}
+\newcommand*\slnc@defreversepos[1]{%
+  \@namedef{slnc@#1@pos}{%
+    \ifodd\value{page}
 %    \end{macrocode}
 % The reverse marginal note column on odd pages is at the left margin.
 %    \begin{macrocode}
-        \dimexpr \oddsidemargin+1in
-                -\marginparsep-\csname slnc@#1@width\endcsname\relax
-      \else
-        \if@twoside
+      \dimexpr \oddsidemargin+1in
+              -\marginparsep-\csname slnc@#1@width\endcsname\relax
+    \else
+      \if@twoside
 %    \end{macrocode}
 % The reverse marginal note column on even pages is the right margin.
 %    \begin{macrocode}
-          \dimexpr \evensidemargin+1in
-                  +\textwidth+\marginparsep\relax
-        \else
+        \dimexpr \evensidemargin+1in
+                +\textwidth+\marginparsep\relax
+      \else
 %    \end{macrocode}
 %    \begin{macrocode}
 % If not in two-side mode, do the same already done for odd pages.
-          \dimexpr \oddsidemargin+1in
-                  -\marginparsep-\csname slnc@#1@width\endcsname\relax
-        \fi
+        \dimexpr \oddsidemargin+1in
+                -\marginparsep-\csname slnc@#1@width\endcsname\relax
       \fi
-    }%
+    \fi
   }%
 }%
 %    \end{macrocode}
@@ -676,48 +612,42 @@
 % (not) been declared already.
 %    \begin{macrocode}
 %<*body>
-\scrlayerAddToInterface\DeclareNewNoteColumn{%
-  \newcommand*{\DeclareNewNoteColumn}[2][]{%
-    \scr@ifundefinedorrelax{slnc@#2@box}{}{%
-      \PackageError{scrlayer-notecolumn}{note column `#2' already defined}{%
-        You may declare only note columns, that haven't been declared
-        previously using\MessageBreak
-        \string\DeclareNewNoteColumn. See also the alternatives
-        \string\RedeclareNoteColumn,\MessageBreak
-        \string\ProvideNoteColumn, and \string\DeclareNoteColumn.\MessageBreak
-        Nevertheless, if you'll continue, declaration will be done.%
-      }%
-    }%
-    \DeclareNoteColumn[{#1}]{#2}%
-  }%
-}
-\scrlayerAddToInterface\ProvideNoteColumn{%
-  \newcommand*{\ProvideNoteColumn}[2][]{%
-    \scr@ifundefinedorrelax{slnc@#2@box}{}{%
-      \PackageInfo{scrlayer-notecolumn}{\string\ProvideNoteColumn{#2}
-        ignored,\MessageBreak
-        because of already defined\MessageBreak
-        not column}%
-    }{%
-      \DeclareNoteColumn[{#1}]{#2}%
+\newcommand*{\DeclareNewNoteColumn}[2][]{%
+  \scr@ifundefinedorrelax{slnc@#2@box}{}{%
+    \PackageError{scrlayer-notecolumn}{note column `#2' already defined}{%
+      You may declare only note columns, that haven't been declared
+      previously using\MessageBreak
+      \string\DeclareNewNoteColumn. See also the alternatives
+      \string\RedeclareNoteColumn,\MessageBreak
+      \string\ProvideNoteColumn, and \string\DeclareNoteColumn.\MessageBreak
+      Nevertheless, if you'll continue, declaration will be done.%
     }%
   }%
-}
-\scrlayerAddToInterface\RedeclareNoteColumn{%
-  \newcommand*{\RedeclareNoteColumn}[2][]{%
-    \scr@ifundefinedorrelax{slnc@#2@box}{%
-      \PackageError{scrlayer-notecolumn}{note column `#2' undefined}{%
-        You may declare only note columns, that have been declared
-        previously using\MessageBreak
-        \string\RedeclareNoteColumn. See also the alternatives
-        \string\DeclareNewNoteColumn,\MessageBreak
-        \string\ProvideNoteColumn, and \string\DeclareNoteColumn.\MessageBreak
-        Nevertheless, if you'll continue, declaration will be done.%
-      }%
-    }{}%
+  \DeclareNoteColumn[{#1}]{#2}%
+}%
+\newcommand*{\ProvideNoteColumn}[2][]{%
+  \scr@ifundefinedorrelax{slnc@#2@box}{}{%
+    \PackageInfo{scrlayer-notecolumn}{\string\ProvideNoteColumn{#2}
+      ignored,\MessageBreak
+      because of already defined\MessageBreak
+      not column}%
+  }{%
     \DeclareNoteColumn[{#1}]{#2}%
   }%
-}
+}%
+\newcommand*{\RedeclareNoteColumn}[2][]{%
+  \scr@ifundefinedorrelax{slnc@#2@box}{%
+    \PackageError{scrlayer-notecolumn}{note column `#2' undefined}{%
+      You may declare only note columns, that have been declared
+      previously using\MessageBreak
+      \string\RedeclareNoteColumn. See also the alternatives
+      \string\DeclareNewNoteColumn,\MessageBreak
+      \string\ProvideNoteColumn, and \string\DeclareNoteColumn.\MessageBreak
+      Nevertheless, if you'll continue, declaration will be done.%
+    }%
+  }{}%
+  \DeclareNoteColumn[{#1}]{#2}%
+}%
 %</body>
 %    \end{macrocode}
 % \end{macro}
@@ -743,28 +673,24 @@
 % interface!
 %    \begin{macrocode}
 %<*body>
-\scrlayerAddToInterface\tf@slnc{%
-  \newwrite\tf@slnc
-  \AtBeginDocument{%
-    \if@filesw
-      \immediate\write\@auxout{%
-        \noexpand\csname slnc@initwrite\noexpand\endcsname
-      }%
-    \fi
-  }%
-  \AtEndDocument{\let\slnc@initwrite\slnc@openwrite}%
-}
-\scrlayerAddToInterface\slnc@initwrite{}%
-\scrlayerAddToInterface\slnc@openwrite{%
-  \newcommand*{\slnc@openwrite}{%
-    \immediate\closein\slnc@file
+\newwrite\tf@slnc
+\AtBeginDocument{%
+  \if@filesw
+    \immediate\write\@auxout{%
+      \noexpand\csname slnc@initwrite\noexpand\endcsname
+    }%
+  \fi
+}%
+\AtEndDocument{\let\slnc@initwrite\slnc@openwrite}%
+\newcommand*{\slnc@initwrite}{}%
+\newcommand*{\slnc@openwrite}{%
+  \immediate\closein\slnc@file
 %<*trace>
-    \PackageInfo{scrlayer-notecolumn}{%
-      Opening `\jobname.slnc'\MessageBreak
-      for writing}%
+  \PackageInfo{scrlayer-notecolumn}{%
+    Opening `\jobname.slnc'\MessageBreak
+    for writing}%
 %</trace>
-    \immediate\openout\tf@slnc\jobname.slnc
-  }%
+  \immediate\openout\tf@slnc\jobname.slnc
 }
 %    \end{macrocode}
 % After reading the main \File{aux}-file at |\end{document}|, we again
@@ -847,28 +773,23 @@
 % \changes{0.1.2583}{2017/02/08}{new (internal)}%^^A
 %    \begin{macrocode}
 %<*body>
-\scrlayerAddToInterface\slnc@unexpanded{%
-  \let\slnc@unexpanded\detokenize
-}
-\scrlayerAddToInterface\makenote{%
-  \newcommand*{\makenote}{%
-    \kernel@ifstar{\let\slnc@unexpanded\detokenize\slnc@makenote}%
-                  {\let\slnc@unexpanded\@firstofone\slnc@makenote}%
+\newcommand*{\slnc@unexpanded}{}
+\let\slnc@unexpanded\detokenize
+\newcommand*{\makenote}{%
+  \kernel@ifstar{\let\slnc@unexpanded\detokenize\slnc@makenote}%
+                {\let\slnc@unexpanded\@firstofone\slnc@makenote}%
+}%
+\newcommand{\slnc@makenote}[2][marginpar]{%
+  \@bsphack
+  \scr@savepos
+  \addtocontents{slnc}{%
+    \string\slnc@note{#1}%
+                     {\noexpand\number\value{slncpage}}%
+                     {\noexpand\number\scr@lastypos}%
+                     {\slnc@unexpanded{#2}}%
   }%
-}
-\scrlayerAddToInterface\slnc@makenote{%
-  \newcommand{\slnc@makenote}[2][marginpar]{%
-    \@bsphack
-    \scr@savepos
-    \addtocontents{slnc}{%
-      \string\slnc@note{#1}%
-                       {\noexpand\number\value{slncpage}}%
-                       {\noexpand\number\scr@lastypos}%
-                       {\slnc@unexpanded{#2}}%
-    }%
-    \@esphack
-  }%
-}
+  \@esphack
+}%
 %    \end{macrocode}
 %^^A \begin{counter}{slncpage}
 % This counter should be increased once per page with note column. This may
@@ -898,53 +819,52 @@
 % steps:
 %    \begin{macrocode}
 %<*body>
-\scrlayerAddToInterface\slnc@processnotes{%
-  \newcommand*{\slnc@processnotes}[1]{%
+\newcommand*{\slnc@processnotes}[1]{%
 %    \end{macrocode}
 % Read as long notes from the notes file until the number at \#2 of
 % \Macro{slnc@note} in the file is greater than \Counter{slncpage}. Put all
 % these to the corresponding unprocessed list.
 %    \begin{macrocode}
-    \begingroup
-      \slnc@readnotes{\value{slncpage}}%
+  \begingroup
+    \slnc@readnotes{\value{slncpage}}%
 %    \end{macrocode}
 % Process the unprocessed list of the current note column
 %    \begin{macrocode}
-      \expandafter\let\expandafter\reserved@a
-      \csname slnc@#1@unprocessed\endcsname
-      \expandafter\global
-      \expandafter\let\csname slnc@#1@unprocessed\endcsname\@empty
-      \def\slnc@notesyncfonttest##1{%
-        \ifhmode
-          \PackageError{scrlayer-notecolumn}{%
-            illegal font setting for `notecolumn.##1'%
-          }{%
-            Current setting of font for `notecolumn.##1' switches
-            from\MessageBreak
-            vertical mode to horizontal mode. This is
-            illegal!\MessageBreak
-            You have to change the font setting to fix
-            this.\MessageBreak
-            If you'll continue vertical alignment of notes may fail%
-          }%
-          \par\vskip-\dimexpr \baselineskip+\parskip\relax
-        \fi
-      }%
-      \long\def\slnc@note##1##2##3##4{%
+    \expandafter\let\expandafter\reserved@a
+    \csname slnc@#1@unprocessed\endcsname
+    \expandafter\global
+    \expandafter\let\csname slnc@#1@unprocessed\endcsname\@empty
+    \def\slnc@notesyncfonttest##1{%
+      \ifhmode
+        \PackageError{scrlayer-notecolumn}{%
+          illegal font setting for `notecolumn.##1'%
+        }{%
+          Current setting of font for `notecolumn.##1' switches
+          from\MessageBreak
+          vertical mode to horizontal mode. This is
+          illegal!\MessageBreak
+          You have to change the font setting to fix
+          this.\MessageBreak
+          If you'll continue vertical alignment of notes may fail%
+        }%
+        \par\vskip-\dimexpr \baselineskip+\parskip\relax
+      \fi
+    }%
+    \long\def\slnc@note##1##2##3##4{%
 %<trace>        \typeout{TRACE (slnc): ##2<=\theslncpage?}%
-        \ifnum ##2>\value{slncpage}\relax
+      \ifnum ##2>\value{slncpage}\relax
 %<trace>          \typeout{TRACE (slnc): no: unprocess note}%
-          \expandafter\g@addto@macro\csname slnc@#1@unprocessed\endcsname{%
-            \slnc@note{##1}{##2}{##3}{##4}%
-          }%
-        \else
-          \ifnum ##2<\value{slncpage}\relax
-            \PackageWarning{scrlayer-notecolumn}{note of type `#1' delayed}%
-          \fi
-          \boxmaxdepth\maxdepth
-          \expandafter\setbox\csname slnc@#1@box\endcsname\vbox{%
-            \expandafter\hsize\csname slnc@#1@width\endcsname
-            \normalfont\normalsize
+        \expandafter\g@addto@macro\csname slnc@#1@unprocessed\endcsname{%
+          \slnc@note{##1}{##2}{##3}{##4}%
+        }%
+      \else
+        \ifnum ##2<\value{slncpage}\relax
+          \PackageWarning{scrlayer-notecolumn}{note of type `#1' delayed}%
+        \fi
+        \boxmaxdepth\maxdepth
+        \expandafter\setbox\csname slnc@#1@box\endcsname\vbox{%
+          \expandafter\hsize\csname slnc@#1@width\endcsname
+          \normalfont\normalsize
 %    \end{macrocode}
 % \changes{v0.2.3085}{2019/02/14}{using colour stack if available}%^^A
 % If a color stack is available we switch to it before changing the font. So a
@@ -952,152 +872,151 @@
 % the column! But if we don't have a color stack, color switching is not
 % permitted!
 %    \begin{macrocode}
-            \slnc@switchcolorstack{#1}%
-            {%
-              \usekomafont{notecolumn.#1}{%
-                \slnc@notesyncfonttest{#1}%
-                \expandafter\ifvoid\csname slnc@#1@box\endcsname
-                  \expandafter\setbox\csname slnc@#1@box\endcsname\vbox{%
-                    \kern\dimexpr\topskip-\baselineskip\relax
-                  }%
-                \fi
+          \slnc@switchcolorstack{#1}%
+          {%
+            \usekomafont{notecolumn.#1}{%
+              \slnc@notesyncfonttest{#1}%
+              \expandafter\ifvoid\csname slnc@#1@box\endcsname
+                \expandafter\setbox\csname slnc@#1@box\endcsname\vbox{%
+                  \kern\dimexpr\topskip-\baselineskip\relax
+                }%
+              \fi
 %    \end{macrocode}
 % \changes{v0.1}{2015/10/07}{ready for renaming \cs{pdfpageheight} in
 %   luaTeX}%^^A
 % From lua\TeX~0.80.1 \cs{pdfpageheight} will be renamed into
 % \cs{pageheight}. So we have to do an extra test for the new primitive.
 %    \begin{macrocode}
-                \scr@ifundefinedorrelax{pdfpageheight}{%
-                  \scr@ifundefinedorrelax{pageheight}{%
-                    \@tempdima=\paperheight
-                  }{%
-                    \@tempdima=\pageheight
-                  }%
+              \scr@ifundefinedorrelax{pdfpageheight}{%
+                \scr@ifundefinedorrelax{pageheight}{%
+                  \@tempdima=\paperheight
                 }{%
-                  \@tempdima=\pdfpageheight
+                  \@tempdima=\pageheight
                 }%
-                \@tempdima=\dimexpr \@tempdima-##3sp
-                                    -1in-\topmargin
-                                    -\headheight-\headsep
-                                    -\baselineskip
-                           \relax
-                \@tempdimb=\dimexpr \expandafter\ht\csname slnc@#1@box\endcsname
-                                   +\expandafter\dp\csname slnc@#1@box\endcsname
-                           \relax
-                \typeout{Soll: \the\@tempdima^^JIst: \space\the\@tempdimb}%
-                \ifdim\@tempdima<\@tempdimb
+              }{%
+                \@tempdima=\pdfpageheight
+              }%
+              \@tempdima=\dimexpr \@tempdima-##3sp
+                                  -1in-\topmargin
+                                  -\headheight-\headsep
+                                  -\baselineskip
+                         \relax
+              \@tempdimb=\dimexpr \expandafter\ht\csname slnc@#1@box\endcsname
+                                 +\expandafter\dp\csname slnc@#1@box\endcsname
+                         \relax
+              \typeout{Soll: \the\@tempdima^^JIst: \space\the\@tempdimb}%
+              \ifdim\@tempdima<\@tempdimb
+%<*trace>
+                \PackageInfo{scrlayer-notecolumn}{%
+                  Note moved down from\MessageBreak
+                  \the\@tempdima\space to \the\@tempdimb\MessageBreak
+                  at note box `#1'
+                }%
+%</trace>
+              \else
+                \ifdim\@tempdima>\@tempdimb
 %<*trace>
                   \PackageInfo{scrlayer-notecolumn}{%
-                    Note moved down from\MessageBreak
-                    \the\@tempdima\space to \the\@tempdimb\MessageBreak
-                    at note box `#1'
+                    Adding vertical white space from\MessageBreak
+                    \the\@tempdimb\space to \the\@tempdima\MessageBreak
+                    into note box `#1'
                   }%
-%</trace>
-                \else
-                  \ifdim\@tempdima>\@tempdimb
-%<*trace>
-                    \PackageInfo{scrlayer-notecolumn}{%
-                      Adding vertical white space from\MessageBreak
-                      \the\@tempdimb\space to \the\@tempdima\MessageBreak
-                      into note box `#1'
-                    }%
 %</trace> 
-                    \expandafter\setbox\csname slnc@#1@box\endcsname
-                    \vbox {%
-                      \expandafter\unvbox\csname slnc@#1@box\endcsname
-                      \kern\dimexpr\@tempdima-\@tempdimb\relax
-                    }%
-                  \fi
+                  \expandafter\setbox\csname slnc@#1@box\endcsname
+                  \vbox {%
+                    \expandafter\unvbox\csname slnc@#1@box\endcsname
+                    \kern\dimexpr\@tempdima-\@tempdimb\relax
+                  }%
                 \fi
-                \expandafter\ifvoid\expandafter\csname slnc@#1@box\endcsname
-                \else
-                  \@tempdima\dimexpr
-                              \dp\strutbox
-                              -\dp\csname slnc@#1@box\endcsname
-                            \relax
-                  \expandafter\unvbox\csname slnc@#1@box\endcsname
-                  \ifdim\@tempdima>\z@ \kern\@tempdima\fi
-                \fi
+              \fi
+              \expandafter\ifvoid\expandafter\csname slnc@#1@box\endcsname
+              \else
+                \@tempdima\dimexpr
+                            \dp\strutbox
+                            -\dp\csname slnc@#1@box\endcsname
+                          \relax
+                \expandafter\unvbox\csname slnc@#1@box\endcsname
+                \ifdim\@tempdima>\z@ \kern\@tempdima\fi
+              \fi
 %    \end{macrocode}
 % \changes{v0.1.2582}{2017/02/08}{restore several commands}%^^A
 % Some commands have to be restored when processing the note.
 %    \begin{macrocode}
-                \slnc@restoreinnote
-                \strut\ignorespaces ##4\par
-              }%
+              \slnc@restoreinnote
+              \strut\ignorespaces ##4\par
             }%
           }%
-        \fi
-      }%
-      \def\slnc@sync##1##2##3##4{%
-        \ifnum ##2>\value{slncpage}\relax
-          \expandafter\g@addto@macro\csname slnc@#1@unprocessed\endcsname{%
-            \slnc@sync{##1}{##2}{##3}{}%
-          }%
-        \else
-          \if@filesw
-            \expandafter\setbox\csname slnc@#1@box\endcsname\vbox{%
-              \expandafter\unvbox\csname slnc@#1@box\endcsname
-              \scr@savepos
-              \protected@write\@auxout{}{%
-                \string\newlabel{notecolumn.##1.##3.syncnote.label}{%
-                  {%
-                    \noexpand\number\scr@lastypos
-                  }{\thepage}%
-                }%
-              }%
-            }%
-          \fi
-        \fi
-      }%
-      \reserved@a
-      \expandafter\ifvoid\csname slnc@#1@box\endcsname
-%<*trace>
-        \PackageInfo{scrlayer-notecolumn}{Note box `#1' empty}%
-%</trace>
+        }%
+      \fi
+    }%
+    \def\slnc@sync##1##2##3##4{%
+      \ifnum ##2>\value{slncpage}\relax
+        \expandafter\g@addto@macro\csname slnc@#1@unprocessed\endcsname{%
+          \slnc@sync{##1}{##2}{##3}{}%
+        }%
       \else
-        \ifdim \dimexpr \expandafter\ht\csname slnc@#1@box\endcsname
-                       +\expandafter\dp\csname slnc@#1@box\endcsname
-               \relax >\textheight\relax
-%<*trace>
-          \PackageInfo{scrlayer-notecolumn}{Split note box `#1'}%
-%</trace>
-          \splittopskip\topskip
-          \splitmaxdepth\baselineskip
-%    \end{macrocode}
-% Bring back the colours:
-% \changes{v0.2.3085}{2019/02/14}{\cs{slnc@switchcolorstack} added}%^^A
-%    \begin{macrocode}
-          \usekomafont{notecolumn.#1}{%
-            \expandafter\vsplit\csname slnc@#1@box\endcsname to
-            \textheight\relax
-          }%
-          \expandafter\ifvoid\csname slnc@#1@box\endcsname
-          \else
-            \expandafter\setbox\csname slnc@#1@box\endcsname\vbox{%
-              \slnc@switchcolorstack{#1}%
-              \expandafter\unvbox\csname slnc@#1@box\endcsname
+        \if@filesw
+          \expandafter\setbox\csname slnc@#1@box\endcsname\vbox{%
+            \expandafter\unvbox\csname slnc@#1@box\endcsname
+            \scr@savepos
+            \protected@write\@auxout{}{%
+              \string\newlabel{notecolumn.##1.##3.syncnote.label}{%
+                {%
+                  \noexpand\number\scr@lastypos
+                }{\thepage}%
+              }%
             }%
-          \fi
-        \else
-%<*trace>
-          \PackageInfo{scrlayer-notecolumn}{Flush note box `#1'}%
-%</trace>
-%    \end{macrocode}
-% Bring back the colours:
-% \changes{v0.2.3085}{2019/02/14}{\cs{slnc@switchcolorstack} added}%^^A
-%    \begin{macrocode}
-          \usekomafont{notecolumn.#1}{%
-            \slnc@switchcolorstack{#1}%
-            \expandafter\box\csname slnc@#1@box\endcsname%
           }%
         \fi
       \fi
-      \expandafter\global
-      \expandafter\setbox\csname slnc@#1@box\expandafter\endcsname
-      \expandafter\box\csname slnc@#1@box\endcsname
-    \endgroup
-  }
+    }%
+    \reserved@a
+    \expandafter\ifvoid\csname slnc@#1@box\endcsname
+%<*trace>
+      \PackageInfo{scrlayer-notecolumn}{Note box `#1' empty}%
+%</trace>
+    \else
+      \ifdim \dimexpr \expandafter\ht\csname slnc@#1@box\endcsname
+                     +\expandafter\dp\csname slnc@#1@box\endcsname
+             \relax >\textheight\relax
+%<*trace>
+        \PackageInfo{scrlayer-notecolumn}{Split note box `#1'}%
+%</trace>
+        \splittopskip\topskip
+        \splitmaxdepth\baselineskip
+%    \end{macrocode}
+% Bring back the colours:
+% \changes{v0.2.3085}{2019/02/14}{\cs{slnc@switchcolorstack} added}%^^A
+%    \begin{macrocode}
+        \usekomafont{notecolumn.#1}{%
+          \expandafter\vsplit\csname slnc@#1@box\endcsname to
+          \textheight\relax
+        }%
+        \expandafter\ifvoid\csname slnc@#1@box\endcsname
+        \else
+          \expandafter\setbox\csname slnc@#1@box\endcsname\vbox{%
+            \slnc@switchcolorstack{#1}%
+            \expandafter\unvbox\csname slnc@#1@box\endcsname
+          }%
+        \fi
+      \else
+%<*trace>
+        \PackageInfo{scrlayer-notecolumn}{Flush note box `#1'}%
+%</trace>
+%    \end{macrocode}
+% Bring back the colours:
+% \changes{v0.2.3085}{2019/02/14}{\cs{slnc@switchcolorstack} added}%^^A
+%    \begin{macrocode}
+        \usekomafont{notecolumn.#1}{%
+          \slnc@switchcolorstack{#1}%
+          \expandafter\box\csname slnc@#1@box\endcsname%
+        }%
+      \fi
+    \fi
+    \expandafter\global
+    \expandafter\setbox\csname slnc@#1@box\expandafter\endcsname
+    \expandafter\box\csname slnc@#1@box\endcsname
+  \endgroup
 }
 %    \end{macrocode}
 % \begin{macro}{\slnc@switchcolorstack}
@@ -1105,50 +1024,48 @@
 % This either redefines \cs{set@color} or switches to the colour stack of the
 % note column given by the argument.
 %    \begin{macrocode}
-\scrlayerAddToInterface{\slnc@switchcolorstack}{%
-  \newcommand*{\slnc@switchcolorstack}[1]{%
-    \scr@ifundefinedorrelax{slnc@#1@colorstack}{%
-      \def\set@color{%
-        \PackageWarningNoLine{scrlayer-notecolumn}{%
-          unsupported change of colour!\MessageBreak
-          It seems you are using a TeX engine,\MessageBreak
-          that does not support switching the\MessageBreak
-          colour stack like pdfTeX or luaTeX do.\MessageBreak
-          Because of this, usage of \string\color,\MessageBreak
-          \string\textcolor\space etc. inside a note
-          column\MessageBreak
-          is not supported%
-        }%
-      }%
-    }{%
-      \scr@ifundefinedorrelax{@pdfcolorstack}{%
-      }{%
-        \expandafter\let\expandafter\@pdfcolorstack
-        \csname slnc@#1@colorstack\endcsname
-      }%
-      \scr@ifundefinedorrelax{pdfcolorstack}{%
-        \scr@ifundefinedorrelax{pdfextension}{%
-          \PackageError{scrlayer-notecolumm}{%
-            colour stack defined but not usable%
-          }{%
-            \expandafter\string
-            \csname slnc@#1@colorstack\endcsname\space defined
-            \MessageBreak
-            but neither \string\pdfcolorstack\space nor
-            \string\pdfextension.\MessageBreak
-            This should never happen!%
-          }%
-        }{%
-          \pdfextension colorstack
-          \csname slnc@#1@colorstack\endcsname current\relax
-        }%
-      }{%
-        \pdfcolorstack
-        \csname slnc@#1@colorstack\endcsname current\relax
+\newcommand*{\slnc@switchcolorstack}[1]{%
+  \scr@ifundefinedorrelax{slnc@#1@colorstack}{%
+    \def\set@color{%
+      \PackageWarningNoLine{scrlayer-notecolumn}{%
+        unsupported change of colour!\MessageBreak
+        It seems you are using a TeX engine,\MessageBreak
+        that does not support switching the\MessageBreak
+        colour stack like pdfTeX or luaTeX do.\MessageBreak
+        Because of this, usage of \string\color,\MessageBreak
+        \string\textcolor\space etc. inside a note
+        column\MessageBreak
+        is not supported%
       }%
     }%
+  }{%
+    \scr@ifundefinedorrelax{@pdfcolorstack}{%
+    }{%
+      \expandafter\let\expandafter\@pdfcolorstack
+      \csname slnc@#1@colorstack\endcsname
+    }%
+    \scr@ifundefinedorrelax{pdfcolorstack}{%
+      \scr@ifundefinedorrelax{pdfextension}{%
+        \PackageError{scrlayer-notecolumm}{%
+          colour stack defined but not usable%
+        }{%
+          \expandafter\string
+          \csname slnc@#1@colorstack\endcsname\space defined
+          \MessageBreak
+          but neither \string\pdfcolorstack\space nor
+          \string\pdfextension.\MessageBreak
+          This should never happen!%
+        }%
+      }{%
+        \pdfextension colorstack
+        \csname slnc@#1@colorstack\endcsname current\relax
+      }%
+    }{%
+      \pdfcolorstack
+      \csname slnc@#1@colorstack\endcsname current\relax
+    }%
   }%
-}
+}%
 %    \end{macrocode}
 % \end{macro}%^^A \slnc@switchcolorstack
 % \begin{macro}{\restoreinnote}
@@ -1159,25 +1076,21 @@
 % these are \cs{label}, \cs{index}, \cs{glossary}. More can be added using
 % \cs{restoreinnote}. The storage is \cs{slnc@restoreinnote}.
 %    \begin{macrocode}
-\scrlayerAddToInterface\slnc@restoreinnote{%
-  \let\slnc@restoreinnote\@empty
-}
-\scrlayerAddToInterface\restoreinnote{%
-  \newcommand*\restoreinnote[1]{%
-    \AtBeginDocument{%
-      \expandafter\scrlayerAddCsToInterface[scrlayer-notecolumn.sty]{slnc\string#1}{%
-        \expandafter\let\csname slnc\string#1\endcsname#1%
-        \g@addto@macro\slnc@restoreinnote{%
-          \expandafter\let\expandafter#1\csname slnc\string#1\endcsname
-        }%
-      }%
+\newcommand*{\slnc@restoreinnote}{}
+\let\slnc@restoreinnote\@empty
+\newcommand*\restoreinnote[1]{%
+  \AtBeginDocument{%
+    \expandafter\newcommand\expandafter*\csname slnc\string#1\endcsname{}%
+    \expandafter\let\csname slnc\string#1\endcsname#1%
+    \g@addto@macro\slnc@restoreinnote{%
+      \expandafter\let\expandafter#1\csname slnc\string#1\endcsname
     }%
   }%
-  \@onlypreamble\restoreinnote
-  \restoreinnote\label
-  \restoreinnote\index
-  \restoreinnote\glossary
 }
+\@onlypreamble\restoreinnote
+\restoreinnote\label
+\restoreinnote\index
+\restoreinnote\glossary
 %    \end{macrocode}
 % \end{macro}%^^A \slnc@restoreinnote
 % \end{macro}%^^A \restoreinnote
@@ -1190,9 +1103,7 @@
 % We need a helper macro \cs{slnc@catcodes} to restore (some of) the catcodes
 % before reading from file.
 %    \begin{macrocode}
-\scrlayerAddToInterface\slnc@catcodes{%
-  \newcommand*{\slnc@catcodes}{}%
-}
+\newcommand*{\slnc@catcodes}{}%
 \AtBeginDocument{%
   \begingroup
     \def\do#1{%
@@ -1208,94 +1119,86 @@
 %    \end{macrocode}
 % \end{macro}%^^A \slnc@catcodes
 %    \begin{macrocode}
-\scrlayerAddToInterface\slnc@readnotes{%
-  \newcommand*\slnc@readnotes[1]{%
-    \ifeof\slnc@file\else
-      \ifnum \number #1<\slnc@unprocessed\relax
+\newcommand*\slnc@readnotes[1]{%
+  \ifeof\slnc@file\else
+    \ifnum \number #1<\slnc@unprocessed\relax
+      \@tempswafalse
+    \else
+      \@tempswatrue
+    \fi
+    \@whilesw\if@tempswa\fi{%
+      \begingroup
+        \slnc@catcodes
+        \endlinechar\m@ne
+        \read\slnc@file to\reserved@a
+        \edef\reserved@a{%
+          \endgroup
+          \noexpand\def\noexpand\reserved@a{%
+            \unexpanded\expandafter{\reserved@a}%
+          }%
+        }%
+      \reserved@a
+      \expandafter\slnc@iofv\expandafter\reserved@b\reserved@a
+      \@empty\@empty\@empty\@empty\@empty
+      \@tempswafalse
+      \@for\reserved@c :={\slnc@note },{\slnc@sync }\do{%
+        \ifx\reserved@b\reserved@c \@tempswatrue\fi
+      }%
+      \if@tempswa
         \@tempswafalse
-      \else
-        \@tempswatrue
-      \fi
-      \@whilesw\if@tempswa\fi{%
-        \begingroup
-          \slnc@catcodes
-          \endlinechar\m@ne
-          \read\slnc@file to\reserved@a
-          \edef\reserved@a{%
-            \endgroup
-            \noexpand\def\noexpand\reserved@a{%
-              \unexpanded\expandafter{\reserved@a}%
+        \expandafter\slnc@iiiofv\expandafter\reserved@b\reserved@a
+        \@empty\@empty\@empty\@empty\@empty
+        \ifx\reserved@b\@empty
+          \PackageError{scrlayer-notecolumn}{internal syntax error}{%
+            Unexpected syntax of file `\jobname.slnc'.\MessageBreak
+            Second argument should be a number.\MessageBreak
+            I don't know what to do with\MessageBreak
+            \expandafter\detokenize\expandafter{\reserved@a}%
+          }%
+          \@tempswatrue
+        \else
+          \global\let\slnc@unprocessed\reserved@b
+          \expandafter\slnc@iiofv\expandafter\reserved@b\reserved@a
+          \@empty\@empty\@empty\@empty\@empty
+          \@ifundefined{slnc@\reserved@b @unprocessed}{%
+            \PackageWarning{scrlayer-notecolumn}{%
+              column `\reserved@b' undefined.\MessageBreak
+              You should declare the column before the usage.\MessageBreak
+              Notes will be lost%
+            }%
+          }{%
+            \expandafter\g@addto@macro
+            \csname slnc@\reserved@b @unprocessed\expandafter\endcsname
+            \expandafter{%
+              \reserved@a
             }%
           }%
-        \reserved@a
-        \expandafter\slnc@iofv\expandafter\reserved@b\reserved@a
-        \@empty\@empty\@empty\@empty\@empty
-        \@tempswafalse
-        \@for\reserved@c :={\slnc@note },{\slnc@sync }\do{%
-          \ifx\reserved@b\reserved@c \@tempswatrue\fi
-        }%
-        \if@tempswa
-          \@tempswafalse
-          \expandafter\slnc@iiiofv\expandafter\reserved@b\reserved@a
-          \@empty\@empty\@empty\@empty\@empty
-          \ifx\reserved@b\@empty
-            \PackageError{scrlayer-notecolumn}{internal syntax error}{%
-              Unexpected syntax of file `\jobname.slnc'.\MessageBreak
-              Second argument should be a number.\MessageBreak
-              I don't know what to do with\MessageBreak
-              \expandafter\detokenize\expandafter{\reserved@a}%
-            }%
-            \@tempswatrue
+          \ifnum \number #1<\slnc@unprocessed\relax
+            \@tempswafalse
           \else
-            \global\let\slnc@unprocessed\reserved@b
-            \expandafter\slnc@iiofv\expandafter\reserved@b\reserved@a
-            \@empty\@empty\@empty\@empty\@empty
-            \@ifundefined{slnc@\reserved@b @unprocessed}{%
-              \PackageWarning{scrlayer-notecolumn}{%
-                column `\reserved@b' undefined.\MessageBreak
-                You should declare the column before the usage.\MessageBreak
-                Notes will be lost%
-              }%
-            }{%
-              \expandafter\g@addto@macro
-              \csname slnc@\reserved@b @unprocessed\expandafter\endcsname
-              \expandafter{%
-                \reserved@a
-              }%
-            }%
-            \ifnum \number #1<\slnc@unprocessed\relax
-              \@tempswafalse
-            \else
-              \@tempswatrue
-            \fi
+            \@tempswatrue
           \fi
-        \else
-%<*trace>
-          \PackageInfo{scrlayer-notecolumn}{%
-            Ignoring `\expandafter\detokenize\expandafter{\reserved@a}'}%
-%</trace>
-          \@tempswatrue
         \fi
-        \ifeof\slnc@file\@tempswafalse\fi
-      }%
-    \fi
-  }%
-}
+      \else
+%<*trace>
+        \PackageInfo{scrlayer-notecolumn}{%
+          Ignoring `\expandafter\detokenize\expandafter{\reserved@a}'}%
+%</trace>
+        \@tempswatrue
+      \fi
+      \ifeof\slnc@file\@tempswafalse\fi
+    }%
+  \fi
+}%
 %    \end{macrocode}
 % \end{macro}%^^A \slnc@readnotes
 % \begin{macro}{\slnc@iofv}
 % \begin{macro}{\slnc@iiofv}
 % \begin{macro}{\slnc@iiiofv}
 %    \begin{macrocode}
-\scrlayerAddToInterface\slnc@iofv{%
-  \newcommand\slnc@iofv[6]{\def#1{#2}}%
-}
-\scrlayerAddToInterface\slnc@iiofiv{%
-  \newcommand\slnc@iiofv[6]{\def#1{#3}}%
-}
-\scrlayerAddToInterface\slnc@iiiofiv{%
-  \newcommand\slnc@iiiofv[6]{\def#1{#4}}%
-}
+\newcommand\slnc@iofv[6]{\def#1{#2}}%
+\newcommand\slnc@iiofv[6]{\def#1{#3}}%
+\newcommand\slnc@iiiofv[6]{\def#1{#4}}%
 %    \end{macrocode}
 % \end{macro}%^^A \slnc@iiiofv
 % \end{macro}%^^A \slnc@iiofv
@@ -1303,9 +1206,7 @@
 % \begin{macro}{\slnc@unprocessed}
 % The \#2 of the last read note column from notes file.
 %    \begin{macrocode}
-\scrlayerAddToInterface\slnc@unprocessed{%
-  \newcommand*{\slnc@unprocessed}{0}%
-}
+\newcommand*{\slnc@unprocessed}{0}%
 %</body>
 %    \end{macrocode}
 % \begin{macro}{\slnc@file}
@@ -1320,42 +1221,38 @@
 % The MD5 sum of the file before opening it for reading.
 %    \begin{macrocode}
 %<*body>
-\scrlayerAddToInterface\slnc@mdfivesum{%
-  \let\slnc@mdfivesum\@empty
-}
-\scrlayerAddToInterface\slnc@file{%
-  \scr@ifundefinedorrelax{pdfmdfivesum}{%
-    \scr@ifundefinedorrelax{mdfivesum}{%
-      \ifdefined\directlua
-        \directlua{%
-          function slncmdfivesum(filename)
-            local fh = io.open(filename,"rb")
-            if fh then
-              local sum=md5.sumhexa(fh:read("*a"))
-              tex.sprint(sum)
-              fh:close()
-            end
+\newcommand*{\slnc@mdfivesum}{}
+\let\slnc@mdfivesum\@empty
+\scr@ifundefinedorrelax{pdfmdfivesum}{%
+  \scr@ifundefinedorrelax{mdfivesum}{%
+    \ifdefined\directlua
+      \directlua{%
+        function slncmdfivesum(filename)
+          local fh = io.open(filename,"rb")
+          if fh then
+            local sum=md5.sumhexa(fh:read("*a"))
+            tex.sprint(sum)
+            fh:close()
           end
-        }%
-        \xdef\slnc@mdfivesum{\directlua{slncmdfivesum("\jobname.slnc")}}%
-      \fi
-    }{%
-      \xdef\slnc@mdfivesum{\mdfivesum file {\jobname.slnc}}%
-    }%
+        end
+      }%
+      \xdef\slnc@mdfivesum{\directlua{slncmdfivesum("\jobname.slnc")}}%
+    \fi
   }{%
-    \xdef\slnc@mdfivesum{\pdfmdfivesum file {\jobname.slnc}}%
+    \xdef\slnc@mdfivesum{\mdfivesum file {\jobname.slnc}}%
   }%
+}{%
+  \xdef\slnc@mdfivesum{\pdfmdfivesum file {\jobname.slnc}}%
+}%
 %<*trace>
-  \scr@ifundefinedorrelax{slnc@mdfivesum}{}{%
-    \PackageInfo{scrlayer-notecolumn}{%
-      MD5 of last `\jobname.slnc':\MessageBreak
-      \slnc@mdfivesum}%
-  }%
+\scr@ifundefinedorrelax{slnc@mdfivesum}{}{%
+  \PackageInfo{scrlayer-notecolumn}{%
+    MD5 of last `\jobname.slnc':\MessageBreak
+    \slnc@mdfivesum}%
+}%
 %</trace>
-  \newread\slnc@file
-  \immediate\openin\slnc@file \jobname.slnc
-  \scrlayerOnAutoRemoveInterface{\immediate\closein\slnc@file}%
-}
+\newread\slnc@file
+\immediate\openin\slnc@file \jobname.slnc
 %</body>
 %    \end{macrocode}
 % \end{macro}%^^A \slnc@mdfivesum
@@ -1366,9 +1263,8 @@
 % \begin{option}{autoclearnotecolumns}
 %    \begin{macrocode}
 %<*options>
-\KOMA@ifkey{autoclearnotecolumns}{slnc@autoclearnotecolumns}\slnc@autoclearnotecolumnstrue
-\scrlayer@AddCsToInterface{KV@KOMA.\@currname.\@currext @autoclearnotecolumns}
-\scrlayer@AddCsToInterface{KV@KOMA.\@currname.\@currext @autoclearnotecolumns@default}
+\KOMA@ifkey{autoclearnotecolumns}{slnc@autoclearnotecolumns}
+\slnc@autoclearnotecolumnstrue
 %</options>
 %<*final>
 \let\reserved@a\clearpage
@@ -1390,66 +1286,99 @@
 % unprocessed notes. But the output of the following (empty) pages shouldn't.
 %    \begin{macrocode}
 %<*body>
-\scrlayerAddToInterface\c@slnc@clearnote@label{%
-  \newcounter{slnc@clearnote@label}%
-}
-\scrlayerAddToInterface\clearnotecolumn{%
-  \newcommand*\clearnotecolumn[1][marginpar]{%
-    \begingroup
-      \slnc@autoclearnotecolumnsfalse
+\newcounter{slnc@clearnote@label}%
+\newcommand*\clearnotecolumn[1][marginpar]{%
+  \begingroup
+    \slnc@autoclearnotecolumnsfalse
 %    \end{macrocode}
 % First of all we need to know the note column page of this page.
 %    \begin{macrocode}
-      \stepcounter{slnc@clearnote@label}%
-      \if@filesw
-        \protected@write\@auxout{%
-          \let\theslncpage\relax
-          \let\slnc@voidtest\relax
-        }{%
-          \string\newlabel{notecolumn.\theslnc@clearnote@label}%
-          {{\theslncpage}{\slnc@voidtest{#1}}}%
-        }%
-      \fi
-      \scr@ifundefinedorrelax{r@notecolumn.\theslnc@clearnote@label}{%
-        \PackageInfo{scrlayer-notecolumn}{%
-          Using estimated to low value for clearing\MessageBreak
-          note colum `#1'%
-        }
-        \edef\slnc@cmp@value{\the\value{slncpage}}%
-        \let\reserved@a\z@
+    \stepcounter{slnc@clearnote@label}%
+    \if@filesw
+      \protected@write\@auxout{%
+        \let\theslncpage\relax
+        \let\slnc@voidtest\relax
       }{%
-        \edef\reserved@a{%
-          \@nameuse{r@notecolumn.\theslnc@clearnote@label}\@empty\@empty
-        }%
-        \edef\slnc@cmp@value{\expandafter\slnc@firstof\reserved@a\@nil}%
-        \edef\reserved@a{\expandafter\slnc@secondof\reserved@a\@nil}%
+        \string\newlabel{notecolumn.\theslnc@clearnote@label}%
+        {{\theslncpage}{\slnc@voidtest{#1}}}%
       }%
+    \fi
+    \scr@ifundefinedorrelax{r@notecolumn.\theslnc@clearnote@label}{%
+      \PackageInfo{scrlayer-notecolumn}{%
+        Using estimated to low value for clearing\MessageBreak
+        note colum `#1'%
+      }
+      \edef\slnc@cmp@value{\the\value{slncpage}}%
+      \let\reserved@a\z@
+    }{%
+      \edef\reserved@a{%
+        \@nameuse{r@notecolumn.\theslnc@clearnote@label}\@empty\@empty
+      }%
+      \edef\slnc@cmp@value{\expandafter\slnc@firstof\reserved@a\@nil}%
+      \edef\reserved@a{\expandafter\slnc@secondof\reserved@a\@nil}%
+    }%
 %<*trace>
-      \typeout{TRACE (slnc): clearnote=\@nameuse{theslnc@clearnote@label},
-        abspage=\the\value{slncpage}, until page=\slnc@cmp@value,
-        process=\reserved@a, pagetotal=\the\pagetotal, topskip=\the\topskip}%
+    \typeout{TRACE (slnc): clearnote=\@nameuse{theslnc@clearnote@label},
+      abspage=\the\value{slncpage}, until page=\slnc@cmp@value,
+      process=\reserved@a, pagetotal=\the\pagetotal, topskip=\the\topskip}%
 %</trace>
-      \ifvmode\ifdim \pagetotal<\topskip
+    \ifvmode\ifdim \pagetotal<\topskip
 %    \end{macrocode}
 % \Macro{clearpage} wouldn't result in a new page, so we do not have to output
 % the notes of this page but only until the previous.
 %    \begin{macrocode}
-          \edef\slnc@cmp@value{\the\numexpr\slnc@cmp@value-1}%
+        \edef\slnc@cmp@value{\the\numexpr\slnc@cmp@value-1}%
 %<trace>          \typeout{TRACE (slnc): until page=\slnc@cmp@value}%
-      \fi\fi
-      \ifnum \reserved@a=\z@
+    \fi\fi
+    \ifnum \reserved@a=\z@
 %    \end{macrocode}
 % Next we read all notes until the end of the current page, but only
 % if a \Macro{clearpage} wouldn't result in a new page.
 %    \begin{macrocode}
-        \ifvmode
-          \ifdim \pagetotal<\topskip
-          \else
-            \slnc@readnotes{\slnc@cmp@value}%
-          \fi
+      \ifvmode
+        \ifdim \pagetotal<\topskip
         \else
           \slnc@readnotes{\slnc@cmp@value}%
         \fi
+      \else
+        \slnc@readnotes{\slnc@cmp@value}%
+      \fi
+      \begingroup
+        \aftergroup\@tempswafalse
+        \long\def\slnc@note##1##2##3##4{%
+          \ifnum ##2>\slnc@cmp@value\relax \else \aftergroup\@tempswatrue\fi
+        }%
+        \let\slnc@sync\slnc@note
+        \csname slnc@#1@unprocessed\endcsname
+      \endgroup
+    \else
+      \PackageInfo{scrlayer-notecolumn}{%
+        box of note column `#1'\MessageBreak
+        not empty after page of \string\clearnotecolumn}%
+      \@tempswatrue
+    \fi
+    \if@tempswa
+%    \end{macrocode}
+% Yes, we have!
+%    \begin{macrocode}
+      \IfLayerPageStyleExists{\currentpagestyle}{}{%
+        \PackageWarning{scrlayer-notecolumn}{%
+          \string\clearnotecolumn\space while active non-layer page
+          style.\MessageBreak
+          Activate empty page style until note column\MessageBreak
+          has been cleared%
+        }%
+        \pagestyle{empty}%
+      }%
+      \@tempswatrue
+    \fi
+    \@whilesw\if@tempswa\fi{%
+%<trace>    \typeout{TRACE (slnc): add \string\clearpage}%
+%    \end{macrocode}
+% Yes, we have (maybe again)!
+%    \begin{macrocode}
+      \clearpage
+      \expandafter\ifcase \slnc@voidtest{#1}%
         \begingroup
           \aftergroup\@tempswafalse
           \long\def\slnc@note##1##2##3##4{%
@@ -1459,53 +1388,16 @@
           \csname slnc@#1@unprocessed\endcsname
         \endgroup
       \else
-        \PackageInfo{scrlayer-notecolumn}{%
-          box of note column `#1'\MessageBreak
-          not empty after page of \string\clearnotecolumn}%
         \@tempswatrue
       \fi
       \if@tempswa
 %    \end{macrocode}
-% Yes, we have!
-%    \begin{macrocode}
-        \IfLayerPageStyleExists{\currentpagestyle}{}{%
-          \PackageWarning{scrlayer-notecolumn}{%
-            \string\clearnotecolumn\space while active non-layer page
-            style.\MessageBreak
-            Activate empty page style until note column\MessageBreak
-            has been cleared%
-          }%
-          \pagestyle{empty}%
-        }%
-        \@tempswatrue
-      \fi
-      \@whilesw\if@tempswa\fi{%
-%<trace>        \typeout{TRACE (slnc): add \string\clearpage}%
-%    \end{macrocode}
-% Yes, we have (maybe again)!
-%    \begin{macrocode}
-        \clearpage
-        \expandafter\ifcase \slnc@voidtest{#1}%
-          \begingroup
-            \aftergroup\@tempswafalse
-            \long\def\slnc@note##1##2##3##4{%
-              \ifnum ##2>\slnc@cmp@value\relax \else \aftergroup\@tempswatrue\fi
-            }%
-            \let\slnc@sync\slnc@note
-            \csname slnc@#1@unprocessed\endcsname
-          \endgroup
-        \else
-          \@tempswatrue
-        \fi
-        \if@tempswa
-%    \end{macrocode}
 % And we still have: So we have to output one more page.
 %    \begin{macrocode}
-          \null
-        \fi
-      }%
-    \endgroup
-  }%
+        \null
+      \fi
+    }%
+  \endgroup
 }
 %    \end{macrocode}
 % \begin{macro}{\slnc@firstof}
@@ -1513,12 +1405,10 @@
 %   We need these little helpers, because some packages like
 %   \Package{hyperref} extend the label mechanism by additional arguments.
 %    \begin{macrocode}
-\scrlayerAddToInterface{\slnc@firstof}{%
-  \def\slnc@firstof#1#2\@nil{#1}%
-}
-\scrlayerAddToInterface{slnc@secondof}{%
-  \def\slnc@secondof#1#2#3\@nil{#2}%
-}
+\newcommand*{\slnc@firstof}{}
+\def\slnc@firstof#1#2\@nil{#1}%
+\newcommand*{\slnc@secondof}{}
+\def\slnc@secondof#1#2#3\@nil{#2}%
 %    \end{macrocode}
 % \end{macro}%^^A \slnc@firstof
 % \end{macro}%^^A \slnc@secondof
@@ -1530,10 +1420,8 @@
 % If the box of the note column is empty/void it returns \Macro{z@} otherwise
 % \Macro{@ne}.
 %    \begin{macrocode}
-\scrlayerAddToInterface\slnc@voidtest{%
-  \newcommand*{\slnc@voidtest}[1]{%
-    \expandafter\ifvoid \csname slnc@#1@box\endcsname \z@\else \@ne\fi
-  }%
+\newcommand*{\slnc@voidtest}[1]{%
+  \expandafter\ifvoid \csname slnc@#1@box\endcsname \z@\else \@ne\fi
 }
 %</body>
 %    \end{macrocode}
@@ -1555,82 +1443,119 @@
 % pages shouldn't.
 %    \begin{macrocode}
 %<*body>
-\scrlayerAddToInterface\clearnotecolumns{%
-  \newcommand*\clearnotecolumns[1][\relax]{%
-    \begingroup
-      \slnc@autoclearnotecolumnsfalse
-      \ifx\relax#1\relax\else
-        \let\slnc@processnotecolumns\@empty
-        \edef\reserved@a{#1}%
-        \@for\reserved@a:=\reserved@a\do {%
-          \scr@trim@spaces\reserved@a
-          \ifx\reserved@a\@empty\else
-            \expandafter\l@addto@macro\expandafter\slnc@processnotecolumns
-            \expandafter{\expandafter\@elt\expandafter{\reserved@a}}%
-          \fi
-        }%
-      \fi
+\newcommand*\clearnotecolumns[1][\relax]{%
+  \begingroup
+    \slnc@autoclearnotecolumnsfalse
+    \ifx\relax#1\relax\else
+      \let\slnc@processnotecolumns\@empty
+      \edef\reserved@a{#1}%
+      \@for\reserved@a:=\reserved@a\do {%
+        \scr@trim@spaces\reserved@a
+        \ifx\reserved@a\@empty\else
+          \expandafter\l@addto@macro\expandafter\slnc@processnotecolumns
+          \expandafter{\expandafter\@elt\expandafter{\reserved@a}}%
+        \fi
+      }%
+    \fi
 %    \end{macrocode}
 % First of all we need to know the note column page of this page.
 %    \begin{macrocode}
-      \stepcounter{slnc@clearnote@label}%
-      \if@filesw
-        \begingroup
-          \def\@elt##1{+\slnc@voidtest{##1}}%
-          \protected@write\@auxout{%
-            \let\theslncpage\relax
-            \let\slnc@voidtest\relax
-          }{%
-            \string\newlabel{notecolumn.\theslnc@clearnote@label}%
-            {{\theslncpage}{\numexpr \slnc@processnotecolumns\relax}}%
-          }%
-        \endgroup
-      \fi
-      \scr@ifundefinedorrelax{r@notecolumn.\theslnc@clearnote@label}{%
-        \begingroup
-          \def\@elt##1{, `##1'}%
-          \PackageInfo{scrlayer-notecolumn}{%
-            Using estimated to low value for\MessageBreak
-            clearing note colums\MessageBreak
-            \expandafter\@gobble\slnc@processnotecolumns
-          }%
-        \endgroup
-        \edef\slnc@cmp@value{\the\value{slncpage}}%
-        \let\reserved@a\z@
-      }{%
-        \edef\reserved@a{%
-          \@nameuse{r@notecolumn.\theslnc@clearnote@label}\@empty\@empty
+    \stepcounter{slnc@clearnote@label}%
+    \if@filesw
+      \begingroup
+        \def\@elt##1{+\slnc@voidtest{##1}}%
+        \protected@write\@auxout{%
+          \let\theslncpage\relax
+          \let\slnc@voidtest\relax
+        }{%
+          \string\newlabel{notecolumn.\theslnc@clearnote@label}%
+          {{\theslncpage}{\numexpr \slnc@processnotecolumns\relax}}%
         }%
-        \edef\slnc@cmp@value{\expandafter\slnc@firstof\reserved@a\@nil}%
-        \edef\reserved@a{\expandafter\slnc@secondof\reserved@a\@nil}%
+      \endgroup
+    \fi
+    \scr@ifundefinedorrelax{r@notecolumn.\theslnc@clearnote@label}{%
+      \begingroup
+        \def\@elt##1{, `##1'}%
+        \PackageInfo{scrlayer-notecolumn}{%
+          Using estimated to low value for\MessageBreak
+          clearing note colums\MessageBreak
+          \expandafter\@gobble\slnc@processnotecolumns
+        }%
+      \endgroup
+      \edef\slnc@cmp@value{\the\value{slncpage}}%
+      \let\reserved@a\z@
+    }{%
+      \edef\reserved@a{%
+        \@nameuse{r@notecolumn.\theslnc@clearnote@label}\@empty\@empty
       }%
+      \edef\slnc@cmp@value{\expandafter\slnc@firstof\reserved@a\@nil}%
+      \edef\reserved@a{\expandafter\slnc@secondof\reserved@a\@nil}%
+    }%
 %<*trace>
-      \typeout{TRACE (slnc): clearnote=\@nameuse{theslnc@clearnote@label},
-        abspage=\theslncpage, until page=\slnc@cmp@value,
-        process=\reserved@a, pagetotal=\the\pagetotal, topskip=\the\topskip}%
+    \typeout{TRACE (slnc): clearnote=\@nameuse{theslnc@clearnote@label},
+      abspage=\theslncpage, until page=\slnc@cmp@value,
+      process=\reserved@a, pagetotal=\the\pagetotal, topskip=\the\topskip}%
 %</trace>
-      \ifvmode\ifdim \pagetotal<\topskip
+    \ifvmode\ifdim \pagetotal<\topskip
 %    \end{macrocode}
 % \Macro{clearpage} wouldn't result in a new page, so we do not have to output
 % the notes of this page but only until the previous.
 %    \begin{macrocode}
-          \edef\slnc@cmp@value{\the\numexpr\slnc@cmp@value-1}%
+        \edef\slnc@cmp@value{\the\numexpr\slnc@cmp@value-1}%
 %<trace>          \typeout{TRACE (slnc): until page=\slnc@cmp@value}%
-      \fi\fi
-      \ifnum \reserved@a=\z@
+    \fi\fi
+    \ifnum \reserved@a=\z@
 %    \end{macrocode}
 % Next we read all notes until the end of the current page, but only
 % if a \Macro{clearpage} wouldn't result in a new page.
 %    \begin{macrocode}
-        \ifvmode
-          \ifdim \pagetotal<\topskip
-          \else
-            \slnc@readnotes{\slnc@cmp@value}%
-          \fi
+      \ifvmode
+        \ifdim \pagetotal<\topskip
         \else
           \slnc@readnotes{\slnc@cmp@value}%
         \fi
-        \begingroup
+      \else
+        \slnc@readnotes{\slnc@cmp@value}%
+      \fi
+      \begingroup
+        \aftergroup\@tempswafalse
+        \long\def\slnc@note##1##2##3##4{%
+          \ifnum ##2>\slnc@cmp@value\relax \else \aftergroup\@tempswatrue\fi
+        }%
+        \let\slnc@sync\slnc@note
+        \def\@elt##1{\csname slnc@##1@unprocessed\endcsname}%
+        \slnc@processnotecolumns
+      \endgroup
+    \else
+      \PackageInfo{scrlayer-notecolumn}{%
+        box of at least one note column\MessageBreak
+        not empty after page of \string\clearnotecolumns}%
+      \@tempswatrue
+    \fi
+    \if@tempswa
+%    \end{macrocode}
+% Yes, we have!
+%    \begin{macrocode}
+      \IfLayerPageStyleExists{\currentpagestyle}{}{%
+        \PackageWarning{scrlayer-notecolumn}{%
+          \string\clearnotecolumns\space while active non-layer page
+          style.\MessageBreak
+          Activate empty page style until note column\MessageBreak
+          has been cleared%
+        }%
+        \pagestyle{empty}%
+      }%
+      \@tempswatrue
+    \fi
+    \@whilesw\if@tempswa\fi{%
+%<trace>    \typeout{TRACE (slnc): add \string\clearpage}%
+%    \end{macrocode}
+% Yes, we have (maybe again)!
+%    \begin{macrocode}
+      \clearpage
+      \begingroup
+        \def\@elt##1{+\slnc@voidtest{##1}}%
+        \ifcase \numexpr \slnc@processnotecolumns\relax
           \aftergroup\@tempswafalse
           \long\def\slnc@note##1##2##3##4{%
             \ifnum ##2>\slnc@cmp@value\relax \else \aftergroup\@tempswatrue\fi
@@ -1638,57 +1563,18 @@
           \let\slnc@sync\slnc@note
           \def\@elt##1{\csname slnc@##1@unprocessed\endcsname}%
           \slnc@processnotecolumns
-        \endgroup
-      \else
-        \PackageInfo{scrlayer-notecolumn}{%
-          box of at least one note column\MessageBreak
-          not empty after page of \string\clearnotecolumns}%
-        \@tempswatrue
-      \fi
+        \else
+          \aftergroup\@tempswatrue
+        \fi
+      \endgroup
       \if@tempswa
-%    \end{macrocode}
-% Yes, we have!
-%    \begin{macrocode}
-        \IfLayerPageStyleExists{\currentpagestyle}{}{%
-          \PackageWarning{scrlayer-notecolumn}{%
-            \string\clearnotecolumns\space while active non-layer page
-            style.\MessageBreak
-            Activate empty page style until note column\MessageBreak
-            has been cleared%
-          }%
-          \pagestyle{empty}%
-        }%
-        \@tempswatrue
-      \fi
-      \@whilesw\if@tempswa\fi{%
-%<trace>        \typeout{TRACE (slnc): add \string\clearpage}%
-%    \end{macrocode}
-% Yes, we have (maybe again)!
-%    \begin{macrocode}
-        \clearpage
-        \begingroup
-          \def\@elt##1{+\slnc@voidtest{##1}}%
-          \ifcase \numexpr \slnc@processnotecolumns\relax
-            \aftergroup\@tempswafalse
-            \long\def\slnc@note##1##2##3##4{%
-              \ifnum ##2>\slnc@cmp@value\relax \else \aftergroup\@tempswatrue\fi
-            }%
-            \let\slnc@sync\slnc@note
-            \def\@elt##1{\csname slnc@##1@unprocessed\endcsname}%
-            \slnc@processnotecolumns
-          \else
-            \aftergroup\@tempswatrue
-          \fi
-        \endgroup
-        \if@tempswa
 %    \end{macrocode}
 % And we still have: So we have to output one more page.
 %    \begin{macrocode}
-          \null
-        \fi
-      }%
-    \endgroup
-  }%
+        \null
+      \fi
+    }%
+  \endgroup
 }
 %</body>
 %    \end{macrocode}
@@ -1719,176 +1605,168 @@
 % runs to terminate.
 %    \begin{macrocode}
 %<*body>
-\scrlayerAddToInterface{\c@slnc@syncpoint}{%
-  \newcounter{slnc@syncpoint}%
+\newcounter{slnc@syncpoint}%
+\newcommand*{\syncwithnotecolumn}[1][marginpar]{%
+  \begingroup
+    \edef\reserved@a{\endgroup\noexpand\syncwithnotecolumns[{#1}]}%
+  \reserved@a
 }
-\scrlayerAddToInterface{\syncwithnotecolumn}{%
-  \newcommand*{\syncwithnotecolumn}[1][marginpar]{%
-    \begingroup
-      \edef\reserved@a{\endgroup\noexpand\syncwithnotecolumns[{#1}]}%
-    \reserved@a
-  }%
-}
-\scrlayerAddToInterface{\syncwithnotecolumns}{%
-  \newcommand*{\syncwithnotecolumns}[1][\relax]{%
-    \begingroup
-      \ifx\relax#1\relax\else
-        \let\slnc@processnotecolumns\@empty
-        \edef\reserved@a{#1}%
-        \@for\reserved@a:=\reserved@a\do {%
-          \scr@trim@spaces\reserved@a
-          \ifx\reserved@a\@empty\else
-            \expandafter\l@addto@macro\expandafter\slnc@processnotecolumns
-            \expandafter{\expandafter\@elt\expandafter{\reserved@a}}%
-          \fi
-        }%
-      \fi
-      \stepcounter{slnc@syncpoint}%
-      \def\@elt##1{%
-        \addtocontents{slnc}{%
-          \string\slnc@sync{##1}%
-                           {\noexpand\number\value{slncpage}}%
-                           {\theslnc@syncpoint}%
-                           {}%
-        }%
-      }%
-      \slnc@processnotecolumns
-      \ifvmode
-        \let\slnc@voffset\@empty%
-        \expandafter\@firstofone
-      \else
-        \PackageWarning{scrlayer-notecolumn}{%
-          \string\syncwithnotecolumn\space in hmode.\MessageBreak
-          Using \string\syncwithnotecolumn\space in horizontal\MessageBreak
-          mode may result in unwanted vertical\MessageBreak
-          space inside paragraphs and may lost\MessageBreak
-          colours of text of notes. \space So perhaps you\MessageBreak
-          should move \string\syncwithnotecolumn\space before\MessageBreak
-          or after the paragraph%
-        }%
-        \let\slnc@voffset\@empty%\def\slnc@voffset{-\number\baselineskip}%
-        \expandafter\slnc@vadjust
-      \fi
-      {%
-        \if@filesw
-          \scr@savepos
-          \protected@write\@auxout{}{%
-            \string\newlabel{notecolumn.\theslnc@syncpoint.synctext.label}{%
-              {%
-                \noexpand\number
-                \numexpr \scr@lastypos\slnc@voffset\relax
-              }{\thepage}%
-            }%
-          }%
+\newcommand*{\syncwithnotecolumns}[1][\relax]{%
+  \begingroup
+    \ifx\relax#1\relax\else
+      \let\slnc@processnotecolumns\@empty
+      \edef\reserved@a{#1}%
+      \@for\reserved@a:=\reserved@a\do {%
+        \scr@trim@spaces\reserved@a
+        \ifx\reserved@a\@empty\else
+          \expandafter\l@addto@macro\expandafter\slnc@processnotecolumns
+          \expandafter{\expandafter\@elt\expandafter{\reserved@a}}%
         \fi
-        \@ifundefined{r@notecolumn.\theslnc@syncpoint.synctext.label}{%
-          \PackageInfo{scrlayer-notecolumn}{%
-            No text label for \string\syncwithnotecolumn.\MessageBreak
-            Need rerun to sync position}%
-        }{%
-          \edef\reserved@a{%
-            \@nameuse{r@notecolumn.\theslnc@syncpoint.synctext.label}%
-            \@empty\@empty
+      }%
+    \fi
+    \stepcounter{slnc@syncpoint}%
+    \def\@elt##1{%
+      \addtocontents{slnc}{%
+        \string\slnc@sync{##1}%
+                         {\noexpand\number\value{slncpage}}%
+                         {\theslnc@syncpoint}%
+                         {}%
+      }%
+    }%
+    \slnc@processnotecolumns
+    \ifvmode
+      \let\slnc@voffset\@empty%
+      \expandafter\@firstofone
+    \else
+      \PackageWarning{scrlayer-notecolumn}{%
+        \string\syncwithnotecolumn\space in hmode.\MessageBreak
+        Using \string\syncwithnotecolumn\space in horizontal\MessageBreak
+        mode may result in unwanted vertical\MessageBreak
+        space inside paragraphs and may lost\MessageBreak
+        colours of text of notes. \space So perhaps you\MessageBreak
+        should move \string\syncwithnotecolumn\space before\MessageBreak
+        or after the paragraph%
+      }%
+      \let\slnc@voffset\@empty%\def\slnc@voffset{-\number\baselineskip}%
+      \expandafter\slnc@vadjust
+    \fi
+    {%
+      \if@filesw
+        \scr@savepos
+        \protected@write\@auxout{}{%
+          \string\newlabel{notecolumn.\theslnc@syncpoint.synctext.label}{%
+            {%
+              \noexpand\number
+              \numexpr \scr@lastypos\slnc@voffset\relax
+            }{\thepage}%
           }%
-          \edef\slnc@textpos{\expandafter\slnc@firstof\reserved@a\@nil}%
-          \edef\slnc@textpage{\expandafter\slnc@secondof\reserved@a\@nil}%
-          \let\slnc@notepos\slnc@textpos
-          \let\slnc@notepage\slnc@textpage
-          \def\@elt##1{%
-            \@ifundefined{r@notecolumn.##1.\theslnc@syncpoint.syncnote.label}{%
-              \PackageInfo{scrlayer-notecolumn}{%
-                No note label for sync with note column\MessageBreak
-                `##1'.\MessageBreak
-                Need rerun to sync position}%
-              \G@refundefinedtrue
-            }{%
-              \edef\reserved@a{%
-                \@nameuse{r@notecolumn.##1.\theslnc@syncpoint.syncnote.label}%
-                \@empty\@empty
-              }%
-              \edef\reserved@b{\expandafter\slnc@firstof\reserved@a\@nil}%
-              \edef\reserved@c{\expandafter\slnc@secondof\reserved@a\@nil}%
-              \ifnum \slnc@notepage<\reserved@c\relax
-                \let\slnc@notepos=\reserved@b
-                \let\slnc@notepage=\reserved@c
-              \else
-                \ifnum \slnc@notepage=\reserved@c\relax
-                  \ifnum \slnc@notepos>\reserved@b
-                    \let\slnc@notepos=\reserved@b
-                    \let\slnc@notepage=\reserved@c
-                  \fi
+        }%
+      \fi
+      \@ifundefined{r@notecolumn.\theslnc@syncpoint.synctext.label}{%
+        \PackageInfo{scrlayer-notecolumn}{%
+          No text label for \string\syncwithnotecolumn.\MessageBreak
+          Need rerun to sync position}%
+      }{%
+        \edef\reserved@a{%
+          \@nameuse{r@notecolumn.\theslnc@syncpoint.synctext.label}%
+          \@empty\@empty
+        }%
+        \edef\slnc@textpos{\expandafter\slnc@firstof\reserved@a\@nil}%
+        \edef\slnc@textpage{\expandafter\slnc@secondof\reserved@a\@nil}%
+        \let\slnc@notepos\slnc@textpos
+        \let\slnc@notepage\slnc@textpage
+        \def\@elt##1{%
+          \@ifundefined{r@notecolumn.##1.\theslnc@syncpoint.syncnote.label}{%
+            \PackageInfo{scrlayer-notecolumn}{%
+              No note label for sync with note column\MessageBreak
+              `##1'.\MessageBreak
+              Need rerun to sync position}%
+            \G@refundefinedtrue
+          }{%
+            \edef\reserved@a{%
+              \@nameuse{r@notecolumn.##1.\theslnc@syncpoint.syncnote.label}%
+              \@empty\@empty
+            }%
+            \edef\reserved@b{\expandafter\slnc@firstof\reserved@a\@nil}%
+            \edef\reserved@c{\expandafter\slnc@secondof\reserved@a\@nil}%
+            \ifnum \slnc@notepage<\reserved@c\relax
+              \let\slnc@notepos=\reserved@b
+              \let\slnc@notepage=\reserved@c
+            \else
+              \ifnum \slnc@notepage=\reserved@c\relax
+                \ifnum \slnc@notepos>\reserved@b
+                  \let\slnc@notepos=\reserved@b
+                  \let\slnc@notepage=\reserved@c
                 \fi
               \fi
-            }%
+            \fi
           }%
-          \slnc@processnotecolumns
-          \ifnum\slnc@textpage>\slnc@notepage\relax
-            \PackageInfo{scrlayer-notecolumn}{%
-              Last note page before last text page.\MessageBreak
-              Need rerun to sync position}%
-          \else
-            \ifnum\slnc@textpage<\slnc@notepage\relax
-             \@whilenum \slnc@textpage<\slnc@notepage\do {%
-               \newpage\null\vskip-\dimexpr \baselineskip+\parskip\relax
-                \edef\slnc@textpage{\the\numexpr\slnc@textpage+1\relax}%
-              }%
+        }%
+        \slnc@processnotecolumns
+        \ifnum\slnc@textpage>\slnc@notepage\relax
+          \PackageInfo{scrlayer-notecolumn}{%
+            Last note page before last text page.\MessageBreak
+            Need rerun to sync position}%
+        \else
+          \ifnum\slnc@textpage<\slnc@notepage\relax
+           \@whilenum \slnc@textpage<\slnc@notepage\do {%
+             \newpage\null\vskip-\dimexpr \baselineskip+\parskip\relax
+              \edef\slnc@textpage{\the\numexpr\slnc@textpage+1\relax}%
+            }%
 %    \end{macrocode}
 % \changes{v0.1}{2015/10/07}{ready for renaming \cs{pdfpageheight} in
 %   luaTeX}%^^A
 % From lua\TeX~0.80.1 \cs{pdfpageheight} will be renamed into
 % \cs{pageheight}. So we have to do an extra test for the new primitive.
 %    \begin{macrocode}
-              \scr@ifundefinedorrelax{pdfpageheight}{%
-                \scr@ifundefinedorrelax{pageheight}{%
-                  \@tempdima=\paperheight
-                }{%
-                  \@tempdima=\pageheight
-                }%
+            \scr@ifundefinedorrelax{pdfpageheight}{%
+              \scr@ifundefinedorrelax{pageheight}{%
+                \@tempdima=\paperheight
               }{%
-                \@tempdima=\pdfpageheight
+                \@tempdima=\pageheight
               }%
-              \@tempdima=\dimexpr \@tempdima
-                                 -\topmargin-1in
-                                 -\headheight-\headsep
-                                 -\topskip+\baselineskip
-                                 \relax
-              \edef\slnc@textpos{\number\@tempdima}%
+            }{%
+              \@tempdima=\pdfpageheight
+            }%
+            \@tempdima=\dimexpr \@tempdima
+                               -\topmargin-1in
+                               -\headheight-\headsep
+                               -\topskip+\baselineskip
+                               \relax
+            \edef\slnc@textpos{\number\@tempdima}%
 %<*trace>
-              \PackageInfo{scrlayer-notecolumn}{%
-                Top position is \slnc@textpos%
-              }%
+            \PackageInfo{scrlayer-notecolumn}{%
+              Top position is \slnc@textpos%
+            }%
 %</trace>
-            \fi
-            \ifnum\slnc@notepos>\slnc@textpos\relax
+          \fi
+          \ifnum\slnc@notepos>\slnc@textpos\relax
+            \PackageInfo{scrlayer-notecolumn}{%
+              Last note position before last text\MessageBreak
+              position.\MessageBreak
+              Need rerun to sync position%
+            }%
+          \else
+            \ifnum\slnc@notepos<\slnc@textpos\relax
+              \@tempdima=\numexpr \slnc@textpos-\slnc@notepos\relax sp
               \PackageInfo{scrlayer-notecolumn}{%
-                Last note position before last text\MessageBreak
-                position.\MessageBreak
-                Need rerun to sync position%
+                skipping \the\@tempdima\space to sync%
               }%
-            \else
-              \ifnum\slnc@notepos<\slnc@textpos\relax
-                \@tempdima=\numexpr \slnc@textpos-\slnc@notepos\relax sp
-                \PackageInfo{scrlayer-notecolumn}{%
-                  skipping \the\@tempdima\space to sync%
-                }%
-                \vskip\@tempdima
-              \fi
+              \vskip\@tempdima
             \fi
           \fi
-        }%
+        \fi
       }%
-    \endgroup
-  }%
+    }%
+  \endgroup
 }
 %    \end{macrocode}
 % \begin{macro}{\slnc@vadjust}
 %    \begin{macrocode}
-\scrlayerAddToInterface\slnc@vadjust{%
-  \newcommand{\slnc@vadjust}[1]{%
-    \@bsphack
-    \vadjust{#1}%
-    \@esphack
-  }%
+\newcommand{\slnc@vadjust}[1]{%
+  \@bsphack
+  \vadjust{#1}%
+  \@esphack
 }
 %</body>
 %    \end{macrocode}
