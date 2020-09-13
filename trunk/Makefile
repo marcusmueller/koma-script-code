@@ -165,6 +165,8 @@ CLS_MAIN_DTX    = scrkernel-basics.dtx \
 		  scrkernel-variables.dtx \
 		  scrkernel-version.dtx \
 		  scrlfile.dtx \
+		  scrlfile-hook.dtx \
+		  scrlfile-patcholdlatex.dtx \
 		  scrwfile.dtx \
 		  scraddr.dtx \
 		  scrtime.dtx \
