@@ -99,6 +99,7 @@ CLS_MAIN	= scrbook.cls \
 		  scrlfile.sty \
 		  scrlfile-hook.sty \
 		  scrlfile-patcholdlatex.sty \
+		  scrlogo.sty \
 	   	  scrwfile.sty \
 		  scrbase.sty \
 		  scrkbase.sty \
