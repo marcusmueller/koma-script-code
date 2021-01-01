@@ -1,7 +1,7 @@
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlfile-hook.dtx
-% Copyright (c) Markus Kohm, 2020
+% Copyright (c) Markus Kohm, 2021
 %
 % This file is part of the work `scrlfile' which is part of the LaTeX2e
 % KOMA-Script bundle.
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrlfile-hook.dtx
-% Copyright (c) Markus Kohm, 2020
+% Copyright (c) Markus Kohm, 2021
 %
 % Diese Datei ist Teil des Werks `scrlfile', das wiederum Teil des
 % LaTeX2e KOMA-Script Pakets ist.
@@ -36,7 +36,6 @@
 % (allein durch den Autor verwaltet).
 %
 % Der Aktuelle Verwalter und Autor dieses Werkes ist Markus Kohm.
-% 
 % 
 % Dieses Werk besteht aus den in manifest.txt aufgeführten Dateien.
 % ======================================================================
@@ -245,26 +244,29 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{variable}[added = 2020-06-26]{\g__scrlfile_input_file_seq}
+% \begin{variable}[added = 2020-06-26,
+%   updated = 2021-01-01]{\g__scrlfile_input_file_seq}
+% \changes{3.33}{2021/01/01}{message definition moved outside function}
 % \cs{g__scrlfile_input_file_seq} is a sequence of active file inputs (without
 % path information). Two global hooks are used to setup the sequence. The new
-% conditional tests if a file is in the sequence.
+% conditional tests if a file is in the sequence. And a message is defined for
+% the case of more pops than pushs to the stack.
 %    \begin{macrocode}
 \seq_new:N \g__scrlfile_input_file_seq
 \hook_gput_code:nnn { file / before } { . }
   { \seq_gpush:Nx \g__scrlfile_input_file_seq { \CurrentFile }  }
+\msg_new:nnn { scrlfile-hook } { to-much-pops }
+  {
+    More~file~names~popped~from~stack~than~put~to.~
+    This~should~never~happen.~
+    However,~it~could~happen~if~scrlfile-hook~is~loaded~by~another~
+    package~or~class.~In~this~case~some~packages~or~classes~are~not~
+    recognised~correctly.
+  }
 \hook_gput_code:nnn { file / after } { . }
   {
     \seq_gpop:NNF \g__scrlfile_input_file_seq \l_tmpa_seq
       {
-        \msg_new:nnn { scrlfile-hook } { to-much-pops }
-          {
-            More~file~names~popped~from~stack~than~put~to.~
-            This~should~never~happen.~
-            However,~it~could~happen~if~scrlfile-hook~is~loaded~by~another~
-            package~or~class.~In~this~case~some~packages~or~classes~are~not~
-            recognised~correctly.
-          }
         \msg_warning:nn { scrlfile-hook } { to-much-pops }
       }
   }
