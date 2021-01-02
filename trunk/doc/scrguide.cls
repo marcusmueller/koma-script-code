@@ -2320,32 +2320,32 @@ KOMAScript \endcsname
 % Use of a preamble and sime other usefull changes.
 %    \begin{macrocode}
 \ifusebabelbib
-\AtBeginDocument{%
-  \setbibpreamble{\GuideBibPreamble\bigskip}%
-  \selectbiblanguage{\languagename}%
-  \bibliographystyle{babalpha-fl}%
-  \renewcommand*{\@openbib@code}{%
-    \setlength{\parsep}{0pt}%
-    \renewcommand*{\btxauthorcolon}[1]{:\par\nobreak}%
-    \renewcommand*{\btxurlfont}{\par\nobreak\url}%
-    \raggedright
-  }%
-}
+  \AtBeginDocument{%
+    \setbibpreamble{\GuideBibPreamble\bigskip}%
+    \bibliographystyle{babalpha-fl}%
+    \renewcommand*{\@openbib@code}{%
+      \setlength{\parsep}{0pt}%
+      \renewcommand*{\btxauthorcolon}[1]{:\par\nobreak}%
+      \renewcommand*{\btxurlfont}{\par\nobreak\url}%
+      \raggedright
+    }%
+  }
+%    \end{macrocode}
+%
+% The generated argument of thebibliography is to short:
+%    \begin{macrocode}
+  \newcommand*{\OrigTheBibliography}{}
+  \let\OrigTheBibliography\thebibliography
+  \renewcommand*{\thebibliography}[1]{%
+    \selectbiblanguage{\languagename}%
+    \OrigTheBibliography{XXXX99}%
+  }
 \else
   \AtBeginDocument{%
     \defbibnote{bibpreamble}{\GuideBibPreamble}%
   }%
   \addbibresource{guide.bib}
 \fi
-%    \end{macrocode}
-%
-% The generated argument of thebibliography is to short:
-%    \begin{macrocode}
-\newcommand*{\OrigTheBibliography}{}
-\let\OrigTheBibliography\thebibliography
-\renewcommand*{\thebibliography}[1]{%
-  \OrigTheBibliography{XXXX99}%
-}
 %    \end{macrocode}
 %
 %
