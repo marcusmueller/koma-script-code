@@ -1,6 +1,6 @@
 % ======================================================================
 % scrguide.cls
-% Copyright (c) Markus Kohm, 2005-2020
+% Copyright (c) Markus Kohm, 2005-2021
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -18,7 +18,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrguide.cls
-% Copyright (c) Markus Kohm, 2005-2020
+% Copyright (c) Markus Kohm, 2005-2021
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2020/03/17 v1.23 internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2021/01/02 v1.24 internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -128,8 +128,27 @@
 \expandafter\RequirePackage\expandafter[\languages]{babel}%
 \AtBeginDocument{%
   \typeout{TRACE: Current language is `\languagename`.}}%
-\RequirePackage[fixlanguage]{babelbib}
-\expandafter\selectbiblanguage\expandafter{\uselanguage}
+%    \end{macrocode}
+% In future we should use biblatex instead of babelbib, but currently some
+% things are still missing:
+% \begin{itemize}
+% \item prefix \texttt{CTAN://},
+% \item line breaks after the author (but not full \texttt{openbib} style like
+%   \texttt{block=nbpar}),
+% \item removing language tag \texttt{ngerman} from output.
+% \end{itemize}
+% So currently we still use babelbib. However it seems that babelbib has been
+% brocken with LaTeX 2020-10-01 patch level 2. So this also currently does not
+% work (but does on TeX Live 2019 of the build server). It's a real mess.
+%    \begin{macrocode}
+\newif\ifusebabelbib\usebabelbibtrue % Should be deactivated soon
+\ifusebabelbib
+  \RequirePackage[fixlanguage]{babelbib}
+  \newcommand*{\printbibliography}[1][]{\bibliography{\jobname}}
+\else
+  \RequirePackage[backend=bibtex,style=alphabetic,block=ragged]{biblatex}
+  \DeclareFieldFormat{url}{\url{#1}}
+\fi  
 \RequirePackage{afterpage}
 \RequirePackage{makeidx}
 \RequirePackage{scrdate}
@@ -2300,6 +2319,7 @@ KOMAScript \endcsname
 %
 % Use of a preamble and sime other usefull changes.
 %    \begin{macrocode}
+\ifusebabelbib
 \AtBeginDocument{%
   \setbibpreamble{\GuideBibPreamble\bigskip}%
   \selectbiblanguage{\languagename}%
@@ -2311,6 +2331,12 @@ KOMAScript \endcsname
     \raggedright
   }%
 }
+\else
+  \AtBeginDocument{%
+    \defbibnote{bibpreamble}{\GuideBibPreamble}%
+  }%
+  \addbibresource{guide.bib}
+\fi
 %    \end{macrocode}
 %
 % The generated argument of thebibliography is to short:
