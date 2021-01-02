@@ -137,9 +137,7 @@
 %   \texttt{block=nbpar}),
 % \item removing language tag \texttt{ngerman} from output.
 % \end{itemize}
-% So currently we still use babelbib. However it seems that babelbib has been
-% brocken with LaTeX 2020-10-01 patch level 2. So this also currently does not
-% work (but does on TeX Live 2019 of the build server). It's a real mess.
+% So currently we still use babelbib.
 %    \begin{macrocode}
 \newif\ifusebabelbib\usebabelbibtrue % Should be deactivated soon
 \ifusebabelbib
