@@ -1,7 +1,7 @@
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlfile.dtx
-% Copyright (c) Markus Kohm, 2002-2020
+% Copyright (c) Markus Kohm, 2002-2021
 %
 % This file is part of the work `scrlfile' which is part of the LaTeX2e
 % KOMA-Script bundle.
@@ -20,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrlfile.dtx
-% Copyright (c) Markus Kohm, 2002-2020
+% Copyright (c) Markus Kohm, 2002-2021
 %
 % Diese Datei ist Teil des Werks `scrlfile', das wiederum Teil des
 % LaTeX2e KOMA-Script Pakets ist.
@@ -135,15 +135,31 @@
 %
 % \section{Implementation of \textsf{scrlfile}}
 %
-% We either need to load one of these packages. We could do the decision by
-% testing the \LaTeX{} version. But the existence of macro \cs{AddToHook} is
-% easier and better.
+% We either need to load one of these packages.
+% \changes{v3.33}{2021/02/09}{do not test for existence of \cs{AddToHook} any
+%   longer, but \cs{IfFormatAtLeastTF} and the format version}%
+% We cannot do the decision by testing the existence of macro \cs{AddToHook},
+% because package \textsf{latexrelease} does not rollback to prior format
+% versions good enough. Instead of undefining the macro an so really reverting
+% to the definition of \LaTeX{} kernels prior to 2020/10/01 it only redefines
+% it to a do-nothing macro. Because of this and similar issues with
+% \textsf{latexrelease} cannot (or only with provision) be used to simulate a
+% real old \LaTeX{} kernel, i.e. for testing. So the only valid test for the
+% existence of the wanted \cs{AddToHook} would be to test the definite
+% definition of \cs{AddToHook} and the existence of the hooks we are
+% using. But, because this is to much effort, we simply test the format
+% version. Nevertheless, we know, this may fail!
 %    \begin{macrocode}
-\@ifundefined{AddToHook}{%
+\@ifundefined{IfFormatAtLeastTF}{%
   \RequirePackage{scrlfile-patcholdlatex}%
   \RequirePackage{xparse}%
 }{%
-  \RequirePackage{scrlfile-hook}%
+  \IfFormatAtLeastTF{2020/10/01}{%
+    \RequirePackage{scrlfile-hook}%
+  }{%
+    \RequirePackage{scrlfile-patcholdlatex}%
+    \RequirePackage{xparse}%
+  }%
 }
 %    \end{macrocode}
 %
