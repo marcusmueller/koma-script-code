@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2021/01/02 v1.24 internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2021/02/11 v1.25 internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -1239,9 +1239,15 @@
 % \end{macro}
 %
 % \begin{macro}{\eTeX}
+%   \changes{v1.25}{2021/02/11}{workaround for changes in \textsf{hyperref}}
 %   This may already be defined.
 %    \begin{macrocode}
 \providecommand*{\eTeX}{\ensuremath{\varepsilon}-\TeX}
+\AtBeginDocument{%
+  \@ifundefined{textepsilon}{%
+    \@ifundefined{pdfstringdef}{}{\pdfstringdef{\textepsilon}{ε}}%
+  }{}%
+}
 \providecommand*{\NTS}{%
   \leavevmode\hbox{$\cal N\kern-0.35em\lower0.5ex\hbox{$\cal T$}%
   \kern-0.2emS$}}
