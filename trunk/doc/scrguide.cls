@@ -610,12 +610,15 @@
 % \end{macro}
 %
 % \begin{macro}{\File}
+%   \changes{v1.25}{2021/02/11}{usage of \cs{texorpdfstring}}
 % \begin{macro}{\Class}
+%   \changes{v1.25}{2021/02/11}{usage of \cs{texorpdfstring}}
 % \begin{macro}{\Package}
+%   \changes{v1.25}{2021/02/11}{usage of \cs{texorpdfstring}}
 %   Some markup macros for files with special meanings.
-\DeclareRobustCommand*{\File}[1]{\mbox{\texttt{#1}}}
-\DeclareRobustCommand*{\Class}[1]{\mbox{\textsfrm{#1}}}
-\DeclareRobustCommand*{\Package}[1]{\mbox{\textsfrm{#1}}}
+\DeclareRobustCommand*{\File}[1]{\texorpdfstring{\mbox{\texttt{#1}}}{#1}}
+\DeclareRobustCommand*{\Class}[1]{\texorpdfstring{\mbox{\textsfrm{#1}}}{#1}}
+\DeclareRobustCommand*{\Package}[1]{\texorpdfstring{\mbox{\textsfrm{#1}}}{#1}}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -662,12 +665,14 @@
 % \end{macro}
 %
 % \begin{macro}{\Macro}
+%   \changes{v1.25}{2021/02/11}{usage of \cs{texorpdfstring}}
 % \begin{macro}{\Option}
 % \begin{macro}{\KOption}
 % \begin{macro}{\OptionValue}
 % \begin{macro}{\Environment}
 % \begin{macro}{\Counter}
 % \begin{macro}{\Length}
+%   \changes{v1.25}{2021/02/11}{usage of \cs{texorpdfstring}}
 % \begin{macro}{\PLength}
 % \changes{v1.17}{2019/10/24}{\cs{setplength} verschoben}%^^A
 % \begin{macro}{\FloatStyle}
@@ -721,7 +726,9 @@
   \kernel@ifstar {\@DescPageRef*}{\@DescPageRef\space}%
 }
 \newcommand*{\@DescPageRef}[2]{\expandafter\autopageref#1{\label@desc@prefix#2}}
-\DeclareSpecialMarkup{\Macro}{\mbox{\texttt{\char`\\#1}}}{%
+\DeclareSpecialMarkup{\Macro}{%
+  \texorpdfstring{\mbox{\texttt{\char`\\#1}}}{\textbackslash#1}%
+}{%
   \par
   \settowidth{\leftskip}{\textMacro{#1}}% indent from left
   \hskip-\leftskip
@@ -997,7 +1004,9 @@
     \label{\label@desc@prefix\label@base.length.#2#1}%
   \endgroup
 }
-\DeclareSpecialMarkup{\Length}{\mbox{\texttt{\char`\\#1}}}{%
+\DeclareSpecialMarkup{\Length}{%
+  \texorpdfstring{\mbox{\texttt{\char`\\#1}}}{\textbackslash#1}%
+}{%
   \par
   \leftskip\z@
   \BeginIndex{Length}{#1}% index entry
