@@ -1,7 +1,7 @@
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlayer-fancyhdr.dtx
-% Copyright (c) Markus Kohm, 2019
+% Copyright (c) Markus Kohm, 2021
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -20,7 +20,7 @@
 % `scrlayer-fancyhdr.dtx'.
 % ----------------------------------------------------------------------
 % scrlayer-fancyhdr.dtx
-% Copyright (c) Markus Kohm, 2019
+% Copyright (c) Markus Kohm, 2021
 %
 % Diese Datei ist Teil der LaTeX2e KOMA-Script-Sammlung.
 %
@@ -68,7 +68,7 @@
 \begingroup
   \def\filedate$#1: #2-#3-#4 #5${\gdef\filedate{#2/#3/#4}}
   \filedate$Date$
-  \def\filerevision$#1: #2 ${\gdef\filerevision{v0.1.#2 ALPHA}}
+  \def\filerevision$#1: #2 ${\gdef\filerevision{v0.1.#2}}
   \filerevision$Revision$
   \edef\reserved@a{%
     \noexpand\endgroup
@@ -104,13 +104,9 @@
   \generate{\usepreamble\defaultpreamble
     \file{scrlayer-fancyhdr.sty}{%
       \from{scrlayer-fancyhdr.dtx}{interface,trace,fancyhdr,identify}%
-      \from{scrlayer.dtx}{interface,trace,fancyhdr,init}%
       \from{scrlayer-fancyhdr.dtx}{interface,trace,fancyhdr,init}%
-      \from{scrlayer.dtx}{interface,trace,fancyhdr,options}%
       \from{scrlayer-fancyhdr.dtx}{interface,trace,fancyhdr,options}%
-      \from{scrlayer.dtx}{interface,trace,fancyhdr,body}%
       \from{scrlayer-fancyhdr.dtx}{interface,trace,fancyhdr,body}%
-      \from{scrlogo.dtx}{trace,logo}%
     }%
   }
   \expandafter\let\csname ifbeta\expandafter\endcsname
@@ -374,13 +370,17 @@
 % \begin{itemize}
 % \item
 %   \DescribeMacro\ps@fancy
+%   \DescribeMacro\ps@f@nch@fancycore
 %   \DescribeMacro\ps@fancyplain
 %   \DescribeMacro\fancypagestyle
 %   \DescribeMacro\ps@@fancy
 %   You are not able to add layers to the user level page style
 %   \Pagestyle{fancy} or \Pagestyle{fancyplain} or any page style defined by
 %   \Macro{fancypagestyle} but only to the internal page style
-%   \Pagestyle{@fancy}. This is intended as explained in this manual.
+%   \Pagestyle{@fancy} (if you are using \Package{fancyhdr} up to version
+%   3.10) resp. \Pagestyle{f@nch@fancycore} (if you are using
+%   \Package{fancyhdr} from version 4). This is intended as explained in this
+%   manual.
 % \item
 %   \DescribeMacro\ps@@empty
 %   Using \Package{fancyhdr}'s internal page style \Pagestyle{@empty}
@@ -389,6 +389,7 @@
 %   style \Pagestyle{empty}!
 % \item
 %   \DescribeMacro\ps@@fancy
+%   \DescribeMacro\ps@f@nch@fancycore
 %   The vertical position of the page header does differ a little bit, if
 %   \Package{scrlayer-fancyhdr} is used instead of \Package{fancyhdr}. This
 %   could be fixed by a modification of the layers \texttt{fancy.head.odd} and
@@ -418,6 +419,28 @@
 }
 %</identify>
 %\fi
+%
+% We need \Package{scrlayer} at least version 2021/02/15,
+%    \begin{macrocode}
+%<*init>
+\RequirePackage{scrlayer}[2021/02/15]
+%</init>
+%    \end{macrocode}
+% Because before \cs{scrlayer@do@inherited@options} would not be defined. And
+% we need it, to inherit all options of \Package{scrlayer}.
+%    \begin{macrocode}
+%<*options>
+\scrlayer@do@inherited@options{\scrlayer@inherit@option}
+%</options>
+%    \end{macrocode}
+%
+% And the very first thing at the body, after definition of the options is to
+% process the options.
+%    \begin{macrocode}
+%<*body>
+\KOMAProcessOptions
+%</body>
+%    \end{macrocode}
 %
 % Note: The main problem of this interface is, that it tries to implement the
 % user interface of package \Package{fancyhdr} by Piet van Oostrum, that is
@@ -472,20 +495,22 @@
       \f@nch@foot\f@nch@Oelf\f@nch@elf\f@nch@ecf\f@nch@erf\f@nch@Oerf}}
 ]{fancy.foot.even}
 %    \end{macrocode}
+% \begin{macro}{\ps@f@nch@fancycore}
+% \changes{0.1.3556}{2021/02/15}{support for \Package{fancyhdr} 4}
 % \begin{macro}{\ps@@fancy}
 % \begin{macro}{\@mkboth}
 % And have to create a layer page style from this new layers, but we do not
 % redefine page style \Pagestyle{fancy} but the low level page style
-% \Pagestyle{@fancy}. 
-%    \begin{macrocode}
-\DeclarePageStyleByLayers[
-%    \end{macrocode}
+% \Pagestyle{@fancy} (up to \Package{fancyhdr} version 3.10)
+% resp. \Pagestyle{f@nch@fancycore} (from \Package{fancyhdr} version 4.0).
+%
 % \Package{fancyhdr} does some initialization at the very first call
 % of \cs{pagestyle{fancy}}. To do so \Package{fancyhdr} first uses a different
 % page style definition, that does the initialization and redefines the page
 % style afterwards. This is still active with \Package{scrlayer-fancyhdr}.
 % Additionally, \Package{fancyhdr} redefines \cs{@mkboth} at every selection
-% of the internal page style \Pagestyle{@fancy}. This can be adapted using the
+% of the internal page style \Pagestyle{@fancy}
+% resp. \Pagestyle{f@nch@fancycore}. This can be adapted using the
 % \Option{onselect} feature of the new layer page style \Pagestyle{@fancy}. In
 % my opinion, the |\let\@mkboth\markboth| used by page style
 % \Pagestyle{headings} of, e.\,g., the standard classes or the \KOMAScript{}
@@ -496,13 +521,23 @@
 % manual) does also recognize the \Package{fancyhdr} definition and copying
 % this is more compatible with \Package{fancyhdr}.
 %    \begin{macrocode}
-  onselect={\def\@mkboth{\protect\markboth}},
-]{@fancy}{%
-  fancy.head.odd,fancy.head.even,fancy.foot.odd,fancy.foot.even
+\@ifpackagelater{fancyhdr}{2019/03/21}{%
+  \DeclarePageStyleByLayers[
+    onselect={\def\@mkboth{\protect\markboth}},
+  ]{f@nch@fancycore}{%
+    fancy.head.odd,fancy.head.even,fancy.foot.odd,fancy.foot.even
+  }%
+}{%
+  \DeclarePageStyleByLayers[
+    onselect={\def\@mkboth{\protect\markboth}},
+  ]{@fancy}{%
+    fancy.head.odd,fancy.head.even,fancy.foot.odd,fancy.foot.even
+  }%
 }
 %</body>
 %    \end{macrocode}
-% Note: Redefining page style \Pagestyle{@fancy} instead of \Pagestyle{fancy}
+% Note: Redefining page style \Pagestyle{@fancy}
+% resp. \Pagestyle{f@nch@fancycore} instead of \Pagestyle{fancy}
 % does also mean, that features like options \Option{automark} and
 % \Option{manualmark} resp. \cs{automark} and \cs{manualmark} are not fully
 % supported by \Package{scrlayer-fancyhdr}. Also currently the font features
@@ -513,6 +548,7 @@
 % \Package{scrlayer-fancyhdr}.
 % \end{macro}%^^A \@mkboth
 % \end{macro}%^^A \ps@@fancy
+% \end{macro}%^^A \ps@f@nch@fancycore
 %
 % A future release of \Package{scrlayer-fancyhdr} may even provide the font
 % features of the \KOMAScript{} classes and a working
