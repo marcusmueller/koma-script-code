@@ -1052,12 +1052,19 @@
 % Fast zum Schluss wird wir im \LaTeX-Kern der Optionencode für alle
 % deklarierten \LaTeX-Optionen gelöscht und dafür gesorgt, dass nach dem Paket
 % keine unverarbeiteten Optionen mehr vorhanden sind.
+% \changes{v3.33}{2021/02/15}{prepared for \LaTeX{} 2020/10/01}
 %    \begin{macrocode}
   \@for\CurrentOption:=\@declaredoptions\do{%
     \expandafter\let\csname ds@\CurrentOption\endcsname\relax}%
   \let\CurrentOption\@empty
   \let\@fileswith@pti@ns\@@fileswith@pti@ns
-  \AtEndOfPackage{\let\@unprocessedoptions\relax}%
+  \IfLTXAtLeastTF{2020/10/01}{%
+    \AtEndOfPackage{\expandafter\let
+      \csname unprocessedoptions-\@currname.\@currext\endcsname
+      \relax}%
+  }{%
+    \AtEndOfPackage{\let\@unprocessedoptions\relax}%
+  }%
 %    \end{macrocode}
 % Jetzt muss noch der Hook ausgeführt und wieder gelöscht werden.
 % \changes{v3.23}{2017/02/16}{Korrektur: Haken danach verwendet die Familie
