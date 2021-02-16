@@ -1248,13 +1248,16 @@
 % \end{macro}
 %
 % \begin{macro}{\eTeX}
-%   \changes{v1.25}{2021/02/11}{workaround for changes in \textsf{hyperref}}
-%   This may already be defined.
+% \changes{v1.25}{2021/02/16}{workaround for (temporary) changes in
+%   \textsf{hyperref}}
+% This may already be defined.
 %    \begin{macrocode}
 \providecommand*{\eTeX}{\ensuremath{\varepsilon}-\TeX}
 \AtBeginDocument{%
   \@ifundefined{textepsilon}{%
-    \@ifundefined{pdfstringdef}{}{\pdfstringdef{\textepsilon}{ε}}%
+    \@ifundefined{pdfstringdef}{}{%
+      \pdfstringdef{\textepsilon}{\ifHy@unicode\83\265\else e\fi}%
+    }%%
   }{}%
 }
 \providecommand*{\NTS}{%
