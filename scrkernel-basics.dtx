@@ -943,45 +943,22 @@
   }%
 %    \end{macrocode}
 % If this is not a class, we first have to process all raw class options.
+% \changes{v3.33}{2021/03/12}{switched to fast test like \LaTeX{} 2021/05/01}
 %    \begin{macrocode}
   \ifx\@currext\@clsextension\else
     \@for\CurrentOption:=\@raw@classoptionslist\do{%
       \scr@trim@spaces\CurrentOption
       \ifx\CurrentOption\@empty\else
-%    \end{macrocode}
-% I think,
-% \begin{verbatim}
-%        \@ifundefined{ds@\reserved@a}{%
-%          \scr@ifprocess@curroption{#1}{#2}{%
-%            \@expandtwoargs\@removeelement{%
-%              \expandafter\@remove@eq@value\CurrentOption=\@nil}%
-%            \@unusedoptionlist\@unusedoptionlist
-%          }{}%
-%        }{%
-%          \@use@ption
-%          \expandafter\let\csname ds@\CurrentOption\endcsname\@empty
-%        }%
-% \end{verbatim}
-% would be a fast solution for the declared-option test. But The \LaTeX{} Team
-% currently tests of existence in \cs{@declaredoptions}. So currently, I've
-% decided to also use an existence in \cs{@declaredoptions} test. This one is
-% brace-robust but very slow, if there are a lot of classic options.
-%    \begin{macrocode}
-        \in@false
-        \@for \reserved@a:=\@declaredoptions\do{%
-          \ifx\CurrentOption\reserved@a\in@true\fi
-        }%
-        \ifin@
-          \@use@ption
-          \expandafter\let\csname ds@\CurrentOption\endcsname\@empty
-        \else
+        \@ifundefined{ds@\CurrentOption}{%
           \scr@ifprocess@curroption{#1}{#2}{%
             \@expandtwoargs\@removeelement{%
               \expandafter\@remove@eq@value\CurrentOption=\@nil}%
             \@unusedoptionlist\@unusedoptionlist
-          }{%
-          }%
-        \fi
+          }{}%
+        }{%
+          \@use@ption
+          \expandafter\let\csname ds@\CurrentOption\endcsname\@empty
+        }%
       \fi
     }%
   \fi
