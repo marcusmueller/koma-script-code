@@ -1,7 +1,8 @@
+% \CheckSum{4335}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-basics.dtx
-% Copyright (c) Markus Kohm, 2002-2021
+% Copyright (c) Markus Kohm, 2002-2019
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -19,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrkernel-basics.dtx
-% Copyright (c) Markus Kohm, 2002-2021
+% Copyright (c) Markus Kohm, 2002-2019
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -35,7 +36,25 @@
 % 
 % Dieses Werk besteht aus den in manifest.txt aufgefuehrten Dateien.
 % ======================================================================
+% \fi
 %
+% \CharacterTable
+%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%   Digits        \0\1\2\3\4\5\6\7\8\9
+%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%   Dollar        \$     Percent       \%     Ampersand     \&
+%   Acute accent  \'     Left paren    \(     Right paren   \)
+%   Asterisk      \*     Plus          \+     Comma         \,
+%   Minus         \-     Point         \.     Solidus       \/
+%   Colon         \:     Semicolon     \;     Less than     \<
+%   Equals        \=     Greater than  \>     Question mark \?
+%   Commercial at \@     Left bracket  \[     Backslash     \\
+%   Right bracket \]     Circumflex    \^     Underscore    \_
+%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%   Right brace   \}     Tilde         \~}
+%
+% \iffalse
 %%% From File: $Id$
 %<prepare>%%%            (run: prepare)
 %<option>%%%            (run: option)
@@ -84,6 +103,7 @@
       \from{scrkernel-basics.dtx}{trace,package,prepare,base}%
       \from{scrkernel-basics.dtx}{trace,package,option,base}%
       \from{scrkernel-language.dtx}{trace,package,option,base}%
+      \from{scrlfile.dtx}{trace,load}%
       \from{scrkernel-basics.dtx}{trace,package,body,base}%
       \from{scrkernel-language.dtx}{trace,package,body,base}%
       \from{scrlogo.dtx}{trace,logo}%
@@ -115,10 +135,9 @@
 %
 % \selectlanguage{ngerman}
 %
-% \changes{v1.0}{2002/07/06}{Beginn der ersten Version}
+% \changes{v1.0}{2002/07/06}{Beginn der ersten Version}%^^A
 % \changes{v3.12}{203/03/05}{Verwendung von \cs{@tempa}, \cs{@tempb},
 %   \cs{@tempc} eliminiert}
-% \changes{v3.32}{2020/09/11}{\textsf{scrlfile} wird nicht mehr geladen}
 %
 % \section{Grundlegenden \KOMAScript-Erweiterungen}
 %
@@ -139,15 +158,6 @@
 % unabhängig voneinander verwendet werden. Selbstverständlich kann man dieses
 % Paket auch ohne den Rest von \KOMAScript{} zum Einsatz bringen.
 %
-% \selectlanguage{english}
-% \subsection{Functions not yet in the Manual}
-%
-% \DescribeMacro\IfLTXAtLeastTF
-% \marginpar{\raggedleft\tiny New: 2021-01-31}%
-% This is the same like \cs{IfFormatAtLeast} of \LaTeX{} from 2020/10/01, but
-% works also with older \LaTeX{} kernels.
-%
-% \selectlanguage{ngerman}
 % \StopEventually{\PrintIndex\PrintChanges}
 %
 % \iffalse
@@ -206,17 +216,6 @@
 %<koma>\RequirePackage{scrbase}[\KOMAScriptVersion]
 %    \end{macrocode}
 %
-% \subsection{Laden von \textsf{scrlfile}}
-%
-% \textsf{scrlfile} wird benötigt, um auf das Laden anderer Pakete reagieren
-% zu können. Dazu gehört beispielsweise \textsf{polyglossia} wegen dessen
-% unzureichender Behandlung unterschiedlicher Sprachvarianten. Welche Version
-% davon geladen wird, ist allerdings ziemlich egal.
-%
-%    \begin{macrocode}
-%<base>\RequirePackage{scrlfile}
-%    \end{macrocode}
-%
 % \subsection{Laden von \textsf{keyval}}
 %
 % Hier wird nicht nur das Paket geladen, was ruckzuck mit:
@@ -244,54 +243,6 @@
 %<base>\providecommand*\kernel@ifstar[1]{\kernel@ifnextchar*{\@firstoftwo{#1}}}
 %    \end{macrocode}
 % \end{macro}%^^A \kernel@ifstar
-%
-% \selectlanguage{english}
-%
-% \subsection{Improved \LaTeX{} kernel commands}
-% The \LaTeX{} kernel already provides some useful commands, but some can be
-% improved.
-%
-% \begin{macro}{\rloop}
-% \changes{v3.30}{2020/03/07}{new}
-% The \cs{loop} \dots \cs{repeat} of the \LaTeX{} kernel cannot be used inside
-% a \cs{loop} \dots \cs{repeat} without extra code for preserving
-% \cs{iterate}. So here is a re-entrant version that is also long. This
-% version can be used even inside a \cs{loop} \dots \cs{repeat}. However you
-% should not use \cs{loop} \dots \cs{repeat} inside \cs{rloop} \dots
-% \cs{repeat}.
-%    \begin{macrocode}
-%<*base>
-\newcommand{\rloop}[1]{}
-\long\def\rloop#1\repeat{%
-  \ifdefined\iterate
-    \edef\iterate{\unexpanded{#1\relax\expandafter\iterate\fi\def\iterate}%
-      {\unexpanded\expandafter{\iterate}}}%
-  \else
-    \def\iterate{#1\relax\expandafter\iterate\fi\let\iterate\relax}%
-  \fi
-  \iterate
-}
-%</base>
-%    \end{macrocode}
-% \end{macro}
-%
-% \begin{macro}{\IfLTXAtLeastTF}
-% \changes{v3.33}{2021/01/21}{new}
-% This is the same like \cs{IfFormatAtLeastTF} of the current \LaTeX{} kernel,
-% but does also work, if \cs{IfFormatAtLeastTF} is not defined because of
-% very old \LaTeX{} kernel.
-%    \begin{macrocode}
-%<*base>
-\newcommand*{\IfLTXAtLeastTF}{\@ifl@t@r\fmtversion}
-\ifcsname IfFormatAtLeastTF\endcsname
-  \let\IfLTXAtLeastTF\IfFormatAtLeastTF
-\fi
-\@onlypreamble\IfLTXAtLeastTF
-%</base>
-%    \end{macrocode}
-% \end{macro}
-% \selectlanguage{ngerman}
-%
 %
 % \subsection{Test von Anweisungen}
 %
@@ -575,8 +526,8 @@
     \expandafter\l@addto@macro\csname scr@kav@KOMA#1\endcsname{\do{{#2}{#3}}}%
   }%
 }
-%</koma>
 %    \end{macrocode}
+%</koma>
 % \end{macro}
 %
 % \begin{macro}{\KOMA@kav@xadd}
@@ -595,8 +546,8 @@
     \expandafter{\expandafter\do\expandafter{\reserved@a}}%
   }%
 }
-%</koma>
 %    \end{macrocode}
+%</koma>
 % \end{macro}
 %
 % \begin{macro}{\KOMA@kav@remove}
@@ -851,6 +802,19 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}{\FamilyProcessOptions}
+% \changes{v3.00}{2008/04/30}{Neue Anweisung}%
+% \changes{v3.11a}{2012/06/11}{Klassen melden falsche Werte nicht
+%     selbst als Fehler, sondern informieren nur darüber}%^^A
+% \changes{v3.12}{2013/03/04}{Fehlerbehandlung}%^^A
+% Es ist zu beachten, dass falsche Werte für Optionen grundsätzlich nicht in
+% der Verarbeitung der Optionen per Info, Warnung oder Fehler gemeldet werden
+% sollten, sondern über setzen von \cs{FamilyKeyState}. Erst, wenn auch andere
+% Familienmitglieder den Wert nicht verarbeiten können, ergibt sich daraus
+% ggf. eine Meldung, die dann von der Verarbeitung hier erzeugt wird.
+% Es wird darauf hingewiesen, dass diese Anweisung nicht reentrant ist. Das
+% bedeutet, dass man es innerhalb der eigenen Ausführung nicht erneut aufrufen
+% darf.
 % \begin{macro}{\scr@removeunused}
 % \changes{v3.10}{2011/09/12}{neu (intern)}%
 % \changes{v3.12}{2013/03/04}{entfernt}%^^A
@@ -863,136 +827,8 @@
 % \changes{v3.12}{2013/03/04}{entfernt}%
 % \end{macro}%^^A \scr@pti@ntest
 % \end{macro}%^^A \scr@optiontest
-%
-% \begin{macro}{\FamilyProcessOptions}
-% \changes{v3.00}{2008/04/30}{Neue Anweisung}
-% \changes{v3.11a}{2012/06/11}{Klassen melden falsche Werte nicht
-%   selbst als Fehler, sondern informieren nur darüber}
-% \changes{v3.12}{2013/03/04}{Fehlerbehandlung}
-% Es ist zu beachten, dass falsche Werte für Optionen grundsätzlich nicht in
-% der Verarbeitung der Optionen per Info, Warnung oder Fehler gemeldet werden
-% sollten, sondern über setzen von \cs{FamilyKeyState}. Erst, wenn auch andere
-% Familienmitglieder den Wert nicht verarbeiten können, ergibt sich daraus
-% ggf. eine Meldung, die dann von der Verarbeitung hier erzeugt wird.
-% Es wird darauf hingewiesen, dass diese Anweisung nicht reentrant ist. Das
-% bedeutet, dass man es innerhalb der eigenen Ausführung nicht erneut aufrufen
-% darf.
-% \selectlanguage{english}%
-% \changes{v3.33}{2021/03/02}{new version using raw options lists of \LaTeX{}
-% 2021/05/01}
 %    \begin{macrocode}
 %<*base>
-\IncludeInRelease{2021/05/01}{\FamilyProcessOptions}{%
-  Usage of raw option list}
-\newcommand*{\FamilyProcessOptions}[2][.\@currname.\@currext]{%
-%    \end{macrocode}
-% Before processing of the options we have to execute an initialise several
-% hooks:
-%    \begin{macrocode}
-  \ifx\AtEndOfFamilyOptions\scr@AtEndOfFamilyOptions
-    \PackageError{scrbase}{nested \string\FamilyProcessOptions\space
-      detected\MessageBreak}{%
-      \string\FamilyProcessOptions\space has been used while processing or
-      setting options.\MessageBreak
-      This is currently not allowed. You should contact the author of the
-      causing\MessageBreak
-      code.\MessageBreak
-      This error is fatal. You should not continue.%
-    }%
-  \fi
-  \scr@ifundefinedorrelax{scr@before@process@options@#2@hook}{}{%
-    \@nameuse{scr@before@process@options@#2@hook}%
-  }%
-  \scr@ifundefinedorrelax{scr@before@process@options@#2#1@hook}{}{%
-    \@nameuse{scr@before@process@options@#2#1@hook}%
-    \expandafter\let\csname scr@before@process@options@#2#1@hook\endcsname
-    \relax
-  }%
-  \scr@ifundefinedorrelax{scr@after@options@#2@hook}{%
-    \@namedef{scr@after@options@#2@hook}{%
-      \@namedef{scr@after@options@#2@hook}{}%
-    }%
-  }{%
-    \expandafter\edef\csname scr@after@options@#2@hook\endcsname{%
-      \noexpand\@namedef{scr@after@options@#2@hook}{%
-        \unexpanded\expandafter\expandafter\expandafter
-        {\csname scr@after@options@#2@hook\endcsname}%
-      }%
-    }%
-  }%
-  \ifx\AtEndOfFamilyOptions\scr@AtEndOfFamilyOptions@immediate
-    \@namedef{scr@after@options@#2@hook@topmost}{%
-      \@namedef{scr@after@options@#2@hook@topmost}{}%
-    }%
-    \expandafter\l@addto@macro\csname scr@after@options@#2@hook\endcsname{%
-      \let\AtEndOfFamilyOptions\scr@AtEndOfFamilyOptions@immediate
-      \@nameuse{scr@after@options@#2@hook@topmost}%
-    }%
-    \let\AtEndOfFamilyOptions\scr@AtEndOfFamilyOptions
-  \fi
-  \let\ds@\@empty
-%    \end{macrocode}
-% Here we set up \cs{@curroptions} to the raw options of the current class or
-% package or empty if the options are not defined.
-%    \begin{macrocode}
-  \@ifundefined{@raw@opt@\@currname.\@currext}{%
-    \let\@curroptions\@empty
-  }{%
-    \expandafter\let\expandafter\@curroptions
-    \csname @raw@opt@\@currname.\@currext\endcsname
-  }%
-%    \end{macrocode}
-% If this is not a class, we first have to process all raw class options.
-% \changes{v3.33}{2021/03/12}{switched to fast test like \LaTeX{} 2021/05/01}
-%    \begin{macrocode}
-  \ifx\@currext\@clsextension\else
-    \@for\CurrentOption:=\@raw@classoptionslist\do{%
-      \scr@trim@spaces\CurrentOption
-      \ifx\CurrentOption\@empty\else
-        \@ifundefined{ds@\CurrentOption}{%
-          \scr@ifprocess@curroption{#1}{#2}{%
-            \@expandtwoargs\@removeelement{%
-              \expandafter\@remove@eq@value\CurrentOption=\@nil}%
-            \@unusedoptionlist\@unusedoptionlist
-          }{}%
-        }{%
-          \@use@ption
-          \expandafter\let\csname ds@\CurrentOption\endcsname\@empty
-        }%
-      \fi
-    }%
-  \fi
-%    \end{macrocode}
-% Afterwards we have to process the current options.
-%    \begin{macrocode}
-  \@for\CurrentOption:=\@curroptions\do{%
-    \scr@trim@spaces\CurrentOption
-    \@ifundefined{ds@\CurrentOption}{%
-      \@use@ption
-      \scr@ifprocess@curroption{#1}{#2}{}\default@ds
-    }\@use@ption
-  }%
-%    \end{macrocode}
-% Clear all the definitions for declared options and the current option. Then
-% reset the marker macro, initiate emptying the unprocessed options list of
-% the current file and execute the exit hook.
-%    \begin{macrocode}
-  \@for\CurrentOption:=\@declaredoptions\do{%
-    \expandafter\let\csname ds@\CurrentOption\endcsname\relax}%
-  \let\CurrentOption\@empty
-  \let\@fileswith@pti@ns\@@fileswith@pti@ns
-  \AtEndOfPackage{\expandafter\let
-    \csname unprocessedoptions-\@currname.\@currext\endcsname
-    \relax}%
-  \@nameuse{scr@after@options@#2@hook}%
-}
-\EndIncludeInRelease
-%    \end{macrocode}
-% And here the old version for old \LaTeX{} kernel version:
-% \selectlanguage{ngerman}%
-%    \begin{macrocode}
-\IncludeInRelease{0000/00/00}{\FamilyProcessOptions}{%
-  compatibility for LaTeX before 2021/05/01}
 \newcommand*{\FamilyProcessOptions}[2][.\@currname.\@currext]{%
   \ifx\AtEndOfFamilyOptions\scr@AtEndOfFamilyOptions
     \PackageError{scrbase}{nested \string\FamilyProcessOptions\space
@@ -1167,19 +1003,12 @@
 % Fast zum Schluss wird wir im \LaTeX-Kern der Optionencode für alle
 % deklarierten \LaTeX-Optionen gelöscht und dafür gesorgt, dass nach dem Paket
 % keine unverarbeiteten Optionen mehr vorhanden sind.
-% \changes{v3.33}{2021/02/15}{prepared for \LaTeX{} 2020/10/01}
 %    \begin{macrocode}
   \@for\CurrentOption:=\@declaredoptions\do{%
     \expandafter\let\csname ds@\CurrentOption\endcsname\relax}%
   \let\CurrentOption\@empty
   \let\@fileswith@pti@ns\@@fileswith@pti@ns
-  \IfLTXAtLeastTF{2020/10/01}{%
-    \AtEndOfPackage{\expandafter\let
-      \csname unprocessedoptions-\@currname.\@currext\endcsname
-      \relax}%
-  }{%
-    \AtEndOfPackage{\let\@unprocessedoptions\relax}%
-  }%
+  \AtEndOfPackage{\let\@unprocessedoptions\relax}%
 %    \end{macrocode}
 % Jetzt muss noch der Hook ausgeführt und wieder gelöscht werden.
 % \changes{v3.23}{2017/02/16}{Korrektur: Haken danach verwendet die Familie
@@ -1187,7 +1016,6 @@
 %    \begin{macrocode}
   \@nameuse{scr@after@options@#2@hook}%
 }
-\EndIncludeInRelease
 \@onlypreamble\FamilyProcessOptions
 %    \end{macrocode}
 % \begin{macro}{\BeforeFamilyProcessOptions}
@@ -1395,25 +1223,6 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\scr@trim@spaces}
-% \changes{v3.12}{2013/11/06}{neu (intern)}
-% \changes{v3.26}{2018/08/29}{von \texttt{scrkernel-language.dtx} nach
-%   \texttt{scrkernel-basics.dtx} verschoben}
-% \changes{v3.33}{2021/03/02}{moved to preparation section}
-% Diese Hilfsanweisung entfernt führende und abschließende
-% Leerzeichen. Argument ist die Anweisung, deren Inhalt von den Leerzeichen
-% befreit werden soll. Gedacht ist das ganze für die Listenverarbeitung mit
-% Hilfe von \cs{@for}. Als Argument wird ein Makro übergeben, in dessen
-% Definition führende und abschließende space-Tokens entfernt werden sollen.
-%    \begin{macrocode}
-%<*base>
-\newcommand\scr@trim@spaces[1]{%
-  \expandafter\scr@sp@def\expandafter#1\expandafter{#1}%
-}
-%</base>
-%    \end{macrocode}
-% \end{macro}%^^A \scr@trim@space
-%
 % \iffalse
 %</prepare>
 %<*option>
@@ -1528,6 +1337,24 @@
 %    \end{macrocode}
 % \end{macro}%^^A \scr@ForEachTrimmedListElement
 % \selectlanguage{ngerman}%^^A
+%
+% \begin{macro}{\scr@trim@spaces}
+% \changes{v3.12}{2013/11/06}{neu (intern)}%^^A
+% \changes{v3.26}{2018/08/29}{von \texttt{scrkernel-language.dtx} nach
+%   \texttt{scrkernel-basics.dtx} verschoben}%^^A
+% Diese Hilfsanweisung entfernt führende und abschließende
+% Leerzeichen. Argument ist die Anweisung, deren Inhalt von den Leerzeichen
+% befreit werden soll. Gedacht ist das ganze für die Listenverarbeitung mit
+% Hilfe von \cs{@for}. Als Argument wird ein Makro übergeben, in dessen
+% Definition führende und abschließende space-Tokens entfernt werden sollen.
+%    \begin{macrocode}
+%<*base>
+\newcommand\scr@trim@spaces[1]{%
+  \expandafter\scr@sp@def\expandafter#1\expandafter{#1}%
+}
+%</base>
+%    \end{macrocode}
+% \end{macro}%^^A \scr@trim@space
 %
 % \begin{macro}{\if@atdocument}
 % \changes{v2.95}{2002/12/05}{neuer Schalter}%^^A
@@ -2934,12 +2761,10 @@
 % \changes{v3.28}{2019/11/18}{entfernt}%^^A
 % \begin{macro}{\scr@ifpdftex}
 % \changes{v2.95}{2002/08/19}{neu (intern)}%^^A
-% \changes{v3.30}{2020/03/06}{veralteten Befehl \cs{ifnotundefined} durch
-%   \cs{Ifnotundefined} ersetzt}%^^A
 % If-then-else-Konstrukt, um zu testen, ob pdf\TeX{} verwendet wird.
 %    \begin{macrocode}
 %<*base>
-\newcommand{\scr@ifpdftex}{\Ifnotundefined{pdftexversion}}
+\newcommand{\scr@ifpdftex}{\ifnotundefined{pdftexversion}}
 %</base>
 %    \end{macrocode}
 % \end{macro}
@@ -2947,12 +2772,10 @@
 %
 % \begin{macro}{\scr@ifluatex}
 % \changes{v3.21}{2016/05/27}{neu (intern)}%^^A
-% \changes{v3.30}{2020/03/06}{veralteten Befehl \cs{ifnotundefined} durch
-%   \cs{Ifnotundefined} ersetzt}%^^A
 % If-the-else-Konstrukt, um zu testen, ob lua\TeX{} verwendet wird.
 %    \begin{macrocode}
 %<*base>
-\newcommand{\scr@ifluatex}{\Ifnotundefined{luatexversion}}
+\newcommand{\scr@ifluatex}{\ifnotundefined{luatexversion}}
 %</base>
 %    \end{macrocode}
 % \end{macro}
@@ -2977,12 +2800,10 @@
 % \begin{macro}{\scr@ifVTeX}
 % \changes{v2.95}{2002/08/19}{neu}%^^A
 % \changes{v2.97c}{2007/06/20}{umdefiniert von \cs{scr@ifvtex}}
-% \changes{v3.30}{2020/03/06}{veralteten Befehl \cs{ifnotundefined} durch
-%   \cs{Ifnotundefined} ersetzt}%^^A
 % If-then-else-Konstrukt, um zu testen, ob V\TeX{} verwendet wird.
 %    \begin{macrocode}
 %<*base>
-\newcommand{\scr@ifVTeX}{\Ifnotundefined{VTeXversion}}
+\newcommand{\scr@ifVTeX}{\ifnotundefined{VTeXversion}}
 %</base>
 %    \end{macrocode}
 % \end{macro}
@@ -3059,21 +2880,19 @@
 % \begin{macro}{\scr@ifpsoutput}
 % \changes{v2.95}{2002/08/21}{neu (intern)}%^^A
 % \changes{v2.95}{2004/07/20}{Expandierbarkeit verbessert}%^^A
-% \changes{v3.30}{2020/03/06}{veralteten Befehl \cs{ifnotundefined} durch
-%   \cs{Ifnotundefined} ersetzt}%^^A
 % If-then-else-Konstrukt, um abhängig davon, ob früher oder später
 % \texttt{ps} ausgegeben wird oder nicht, Befehle auszuführen.
 %    \begin{macrocode}
 %<*base>
 \newcommand*{\scr@ifpsoutput}{%
-  \Ifnotundefined{if@dvips}{%
+  \ifnotundefined{if@dvips}{%
     \if@dvips 
       \expandafter\@firstoftwo
     \else 
       \expandafter\@secondoftwo
     \fi
   }{%
-    \Ifnotundefined{OpMode}{%
+    \ifnotundefined{OpMode}{%
       \ifnum\OpMode=2
         \expandafter\@firstoftwo
       \else
@@ -4286,9 +4105,8 @@
 % \begin{macro}{\FamilyUnknownKeyValue}
 % \changes{v3.10}{2011/09/12}{no error while processing global options}%^^A
 % \changes{v3.11a}{2012/05/28}{prevent remove from list of unused global
-%   options globally}%^^A
+%     options globally}%^^A
 % \changes{v3.14}{2014/10/17}{\cs{long}}%^^A
-% \changes{v3.30}{2020/02/25}{spurious space in warning message removed}%^^A
 % Dieses Makro berichtet über Fehler wegen unbekannter Wertübergabe an einen
 % Schlüssel. Das erste Argument ist die Familie, das zweite der Schlüssel,
 % das dritte der Wert und das vierte die Liste der möglichen Werte.
@@ -4302,7 +4120,7 @@
       Setting this command to a non empty\MessageBreak
       value for option `#2' of\MessageBreak
       family `#1' is deprecated,\MessageBreak
-      but has been found%
+      but has been found
     }%
   \fi
 }
@@ -5290,8 +5108,6 @@
 % \begin{macro}{\ForDoHook}
 % \changes{v3.27}{2019/02/05}{New}%^^A
 % \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
-% \changes{v3.30}{2020/03/07}{\cs{loop}\dots\cs{repeat} inside group}%^^A
-% \changes{v3.30}{2020/03/07}{using \cs{rloop} instead of \cs{loop}}%^^A
 % Arguments:
 % \begin{description}
 % \item[\meta{specificator}:]
@@ -5313,20 +5129,18 @@
       but do-hook specificators must not be empty.%
     }%
   }{%
-    \begingroup
-      \def\scr@hookrun{\endgroup}%
-      \let\scr@hookname\relax
-      \edef\scr@hookargument{#1}%
-      \rloop
-        \scr@hooksplit@specificator\scr@hookname\scr@hookargument
-                                   \scr@hookargument
-        \edef\scr@hookrun{%
-          \unexpanded\expandafter{\scr@hookrun}%
-          \unexpanded{#2}{\scr@hookname}{\scr@hookargument}%
-        }%
-      \ifx\scr@hookargument\@empty\else
-      \repeat
-    \scr@hookrun
+    \let\scr@hookname\relax
+    \edef\scr@hookargument{#1}%
+    \loop
+      \scr@hooksplit@specificator\scr@hookname\scr@hookargument
+                                 \scr@hookargument
+      \begingroup\edef\reserved@a{%
+        \unexpanded{\endgroup #2}{\scr@hookname}{\scr@hookargument}%
+      }\reserved@a
+    \ifx\scr@hookargument\@empty\else
+    \repeat
+    \let\scr@hookname\relax
+    \let\scr@hookargument\relax
   }%
 }
 %    \end{macrocode}
