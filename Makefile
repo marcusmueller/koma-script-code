@@ -1,6 +1,6 @@
 # ======================================================================
 # Makefile
-# Copyright (c) Markus Kohm, 2002-2021
+# Copyright (c) Markus Kohm, 2002-2020
 #
 # This file is part of the LaTeX2e KOMA-Script bundle.
 #
@@ -18,7 +18,7 @@
 # This work consists of all files listed in manifest.txt.
 # ----------------------------------------------------------------------
 # Makefile
-# Copyright (c) Markus Kohm, 2002-2021
+# Copyright (c) Markus Kohm, 2002-2020
 #
 # Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 # Version 1.3c, verteilt und/oder veraendert werden.
@@ -138,7 +138,8 @@ CLS_MAIN	= scrbook.cls \
 		  KakuLL.lco \
 		  scrlayer.sty \
 		  scrlayer-scrpage.sty \
-		  scrlayer-notecolumn.sty
+		  scrlayer-notecolumn.sty \
+		  scrlayer-fancyhdr.sty
 
 CLS_MAIN_DTX    = scrkernel-basics.dtx \
 		  scrkernel-bibliography.dtx \
@@ -177,7 +178,8 @@ CLS_MAIN_DTX    = scrkernel-basics.dtx \
 		  tocbasic.dtx \
 		  scrlayer.dtx \
 		  scrlayer-scrpage.dtx \
-		  scrlayer-notecolumn.dtx
+		  scrlayer-notecolumn.dtx \
+		  scrlayer-fancyhdr.dtx
 
 STATIC_DOC      = README \
 	          INSTALL.txt \
@@ -193,9 +195,9 @@ CLS_MAIN_INS	= scrmain.ins
 
 CLS_MAIN_SUBINS	= scrstrip.inc scrstrop.inc scrdocstrip.tex
 
-ALPHA_INS       =
+ALPHA_INS       = scrlayer-fancyhdr.dtx
 
-ALPHA_DOC       =
+ALPHA_DOC       = scrlayer-fancyhdr.pdf
 
 ALPHA_DTX       = $(subst .pdf,.dtx,$(ALPHA_DOC))
 
