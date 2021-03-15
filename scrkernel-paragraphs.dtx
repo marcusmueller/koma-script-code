@@ -1,7 +1,8 @@
+% \CheckSum{721}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-paragraphs.dtx
-% Copyright (c) Markus Kohm, 2002-2021
+% Copyright (c) Markus Kohm, 2002-2019
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -19,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrkernel-paragraphs.dtx
-% Copyright (c) Markus Kohm, 2002-2021
+% Copyright (c) Markus Kohm, 2002-2019
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -464,52 +465,16 @@
 % \end{Length}
 %
 % \begin{macro}{\selectfont}
-% \changes{v3.33}{2021/01/21}{from \LaTeX{} 2021/01/05 use hook instead of
-% patch}
-%    \begin{macrocode}
-\IfLTXAtLeastTF{2021/01/05}{%
-  \AddToHook{selectfont}{\par@update}%
-  \AfterPackage{everysel}{%
-    \IfPackageAtLeastTF{everysel}{2021/01/18}{}{%
-      \ClassError{\KOMAClassName}{%
-        incompatible `everysel' detected
-      }{%
-        You are using an old version of `everysel' in combination with a
-        LaTeX\MessageBreak
-        version >= 2021/01/05 and KOMA-Script >= 3.33. This combination
-        is\MessageBreak
-        not supported.\MessageBreak
-        You could switch back to an older LaTeX using package
-        `latexrelease'.\MessageBreak
-        But I recommend to update `everysel'%
-      }%
-    }%
-  }%
-  \AfterPackage{tracefnt}{%
-    \IfPackageAtLeastTF{tracefnt}{2020/12/22}{}{%
-      \ClassError{\KOMAClassName}{%
-        incompatible `tracefnt' detected
-      }{%
-        `tracefnt' is a LaTeX base package and therefore should be updated
-        together\MessageBreak
-        with LaTeX kernel. So this should never happen! Please check
-        your\MessageBreak
-        LaTeX installation%
-      }%
-    }%
-  }%
-}{%
-%    \end{macrocode}
-% \changes{v2.95}{2004/11/05}{neue Änderung}
+% \changes{v2.95}{2004/11/05}{neue Änderung}%^^A
 % Spätestens ab Version~3.0 soll die Möglichkeit bestehen, |\parskip|,
 % |\parindent| und |\parfillskip| mit der Schriftgröße automatisch
 % anzupassen. Dazu muss |\selectfont| entsprechend erweitert werden.
 % \begin{macro}{\scr@selectfont}
-% \changes{v2.95}{2006/04/14}{neue Erweiterung}
+% \changes{v2.95}{2006/04/14}{neue Erweiterung}%^^A
 % \changes{v3.10}{2010/09/28}{\textsf{everysel}-Behandlung korrigiert}
 % \changes{v3.10}{2010/09/28}{\textsf{tracefnt}-Behandlung hinzugefügt}
 % \begin{macro}{\scr@new@selectfont}
-% \changes{v2.95}{2006/04/14}{neue Erweiterung}
+% \changes{v2.95}{2006/04/14}{neue Erweiterung}%^^A
 % \changes{v3.10}{2010/09/28}{\textsf{everysel}-Behandlung korrigiert}
 % \changes{v3.10}{2010/09/28}{\textsf{tracefnt}-Behandlung hinzugefügt}
 % \changes{v3.10b}{2011/03/13}{\textsf{everysel} kann jetzt auch während
@@ -517,53 +482,51 @@
 % Damit das auch bei Verwendung des \textsf{everysel}-Pakets funktioniert,
 % wird hier zusätzliche Vorsorge getroffen.
 %    \begin{macrocode}
-  \newcommand*{\scr@selectfont}{}
-  \expandafter\let\expandafter\scr@selectfont\csname selectfont \endcsname
-  \BeforePackage{everysel}{%
-    \AtBeginDocument{%
-      \expandafter\ifx\csname selectfont \endcsname\scr@new@selectfont\else
-        \ClassWarningNoLine{\KOMAClassName}{%
-          discard change of \string\selectfont}%
-      \fi
-      \expandafter\let\csname selectfont \endcsname\scr@selectfont
-    }%
+\newcommand*{\scr@selectfont}{}
+\expandafter\let\expandafter\scr@selectfont\csname selectfont \endcsname
+\BeforePackage{everysel}{%
+  \AtBeginDocument{%
+    \expandafter\ifx\csname selectfont \endcsname\scr@new@selectfont\else
+      \ClassWarningNoLine{\KOMAClassName}{discard change of \string\selectfont}%
+    \fi
+    \expandafter\let\csname selectfont \endcsname\scr@selectfont
   }%
-  \AfterPackage{everysel}{%
-    \scr@ifundefinedorrelax{@EverySelectfont@Init}{%
+}
+\AfterPackage{everysel}{%
+  \scr@ifundefinedorrelax{@EverySelectfont@Init}{%
 %    \end{macrocode}
 % Jetzt gibt es zwei Möglichkeiten: Entweder wurde ein \textsf{everysel}
 % verwendet, bei dem alles anders funktioniert, oder es wurde während
 % \cs{begin}\marg{document} geladen. In beiden Fällen versuchen wir einen
 % direkten Patch:
 %    \begin{macrocode}
-      \expandafter\ifx\csname selectfont \endcsname\scr@new@selectfont
-        \ClassWarningNoLine{\KOMAClassName}{%
-          \string\selectfont\space already changed}%
-      \else
-        \expandafter\g@addto@macro\csname selectfont \endcsname{\par@update}%
-        \expandafter\let\expandafter\scr@new@selectfont
-          \csname selectfont \endcsname
-      \fi
-    }{%
+    \expandafter\ifx\csname selectfont \endcsname\scr@new@selectfont
+      \ClassWarningNoLine{\KOMAClassName}{%
+        \string\selectfont\space already changed}%
+    \else
+      \expandafter\g@addto@macro\csname selectfont \endcsname{\par@update}%
+      \expandafter\let\expandafter\scr@new@selectfont
+        \csname selectfont \endcsname
+    \fi
+  }{%
 %    \end{macrocode}
 % In diesem Fall muss hingegen indirekt gepatcht werden.
 %    \begin{macrocode}
-      \g@addto@macro\@EverySelectfont@Init{%
-        \expandafter\g@addto@macro\csname selectfont \endcsname{\par@update}%
-        \expandafter\let\expandafter\scr@new@selectfont
-          \csname selectfont \endcsname
-      }%
+    \g@addto@macro\@EverySelectfont@Init{%
+      \expandafter\g@addto@macro\csname selectfont \endcsname{\par@update}%
+      \expandafter\let\expandafter\scr@new@selectfont
+        \csname selectfont \endcsname
     }%
   }%
-  \AfterPackage{tracefnt}{%
-    \expandafter\let\expandafter\scr@selectfont\csname selectfont \endcsname
-    \expandafter\g@addto@macro\csname selectfont \endcsname{\par@update}%
-    \expandafter\let\expandafter\scr@new@selectfont\csname selectfont \endcsname
-  }%
-  \expandafter\g@addto@macro\csname selectfont \endcsname{\par@update}
-  \newcommand*{\scr@new@selectfont}{}
+}
+\AfterPackage{tracefnt}{%
+  \expandafter\let\expandafter\scr@selectfont\csname selectfont \endcsname
+  \expandafter\g@addto@macro\csname selectfont \endcsname{\par@update}%
   \expandafter\let\expandafter\scr@new@selectfont\csname selectfont \endcsname
 }
+\expandafter\g@addto@macro\csname selectfont \endcsname{\par@update}
+\newcommand*{\scr@new@selectfont}{}
+\expandafter\let\expandafter\scr@new@selectfont\csname selectfont \endcsname
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}

@@ -1,6 +1,6 @@
 % ======================================================================
 % scrlfile.tex
-% Copyright (c) Markus Kohm, 2001-2020
+% Copyright (c) Markus Kohm, 2001-2019
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -18,7 +18,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrlfile.tex
-% Copyright (c) Markus Kohm, 2001-2020
+% Copyright (c) Markus Kohm, 2001-2019
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -124,35 +124,6 @@ dürfte, gibt es durchaus auch Anwendungen für normale \LaTeX-Benutzer. Deshalb
 sind in diesem Kapitel auch für beide Gruppen Beispiele aufgeführt.
 %\end{Explain}
 
-\begin{Declaration}
-  \Option{withdeprecated}
-\end{Declaration}
-Mit\ChangedAt{v3.32}{\Package{scrlfile}} \LaTeX{} 2020-10-01 steht ein
-komplett neuer \emph{Hook}-Mechanismus zur Verfügung. Statt Makros des
-\LaTeX-Kerns umzudefinieren, macht \Package{scrlfile} ab Version 3.32 davon
-auch Gebrauch. Dazu lädt es das interne Paket
-\Package{scrlfile-hook}\IndexPackage[indexmain]{scrlfile-hook}. Bei älteren
-\LaTeX-Versionen wird dagegen das interne Paket
-\Package{scrlfile-patcholdkernel}%
-\IndexPackage[indexmain]{scrlfile-patcholdkernel} verwendet. Da mit dem neuen
-Mechanismus in \LaTeX{} jedoch keine identische Funktionalität zu erreichen
-war, wurden einige Anweisungen von \Package{scrlfile} als veraltet
-markiert. Darüber hinaus wurde die Gelegenheit genutzt, den Wildwuchs an
-Befehlsvarianten zu ordnen. Sollte ein Anwender eine Klasse oder Pakete
-verwenden, die noch auf den dadurch nicht mehr unterstützten Befehlen
-basieren, so kann vor \Package{scrlfile} vor dem Laden der Klasse mit
-\begin{lstcode}
-  \RequirePackage[withdeprecated]{scrlfile}
-\end{lstcode}
-geladen werden. \Package{scrlfile} emuliert dann zusätzlich einige der
-veralteten Befehle in einer Weise, die in den meisten Fällen ausreichend sein
-sollte. In jedem Fall sollte jedoch der Autor der entsprechenden Klasse oder
-des entsprechenden Pakets verständigt werden, damit dieser eine Anpassung an
-die aktuelle Version von \Package{scrlfile} oder direkt an \LaTeX{} ab Version
-2020-10-01 vornimmt.%
-%
-\EndIndexGroup
-
 
 \section{Aktionen vor und nach dem Laden}
 \seclabel{macros}
@@ -163,8 +134,8 @@ Dateien, Klassen und Paketen unterschieden.
 
 
 \begin{Declaration}
-  \Macro{BeforeFile}\Parameter{Datei}\OParameter{Label}\Parameter{Anweisungen}
-  \Macro{AfterFile}\Parameter{Datei}\OParameter{Label}\Parameter{Anweisungen}
+  \Macro{BeforeFile}\Parameter{Datei}\Parameter{Anweisungen}
+  \Macro{AfterFile}\Parameter{Datei}\Parameter{Anweisungen}
 \end{Declaration}%
 Mit Hilfe von \Macro{BeforeFile} kann dafür gesorgt werden, dass die
 \PName{Anweisungen} vor dem nächsten Laden einer bestimmten \PName{Datei}
@@ -174,23 +145,13 @@ ausgeführt. Wird die Datei nie geladen, so werden die \PName{Anweisungen} in
 beiden Fällen natürlich auch nie ausgeführt. Bei \PName{Datei} sind etwaige
 Dateiendungen wie bei \Macro{input} als Teil des Dateinamens anzugeben.
 
-Um die Funktionalität für \LaTeX{} vor Version 2020-10-01 bereitstellen zu
-können, bedient sich \Package{scrlfile-patcholdlatex} der bekannten
-\LaTeX-Anweisung \Macro{InputIfFileExists}. Diese\textnote{Achtung!} wird
-hierzu umdefiniert.  Falls die Anweisung nicht die erwartete Definition hat,
-gibt \Package{scrlfile-patcholdlatex} eine Warnung aus.  Dies geschieht für
-den Fall, dass die Anweisung bereits von einem inkompatiblen Paket umdefiniert
-wurde.
-
-Bei\ChangedAt{v3.32}{\Package{scrlfile}}\IndexCmd{AddToHook} \LaTeX{} ab
-Version 2020-10-01 wird von \Package{scrlfile-hook} hingegen
-\Macro{AddToHook}\PParameter{file/before/\PName{Datei}}\OParameter{Label}\Parameter{Anweisungen}
-beziehungsweise
-\Macro{AddToHook}\PParameter{file/after/\PName{Datei}}\OParameter{Label}\Parameter{Anweisungen}
-verwendet. Näheres zur Bedeutung des optionalen Arguments \PName{Label} ist
-der zugehörigen Anleitung zur \LaTeX-Kern-Anweisung \Macro{AddToHook} zu
-entnehmen. Empfohlen wird in der Regel der Verzicht auf das optionale
-Argument. Bei älteren \LaTeX-Versionen wird dieses ohnehin ignoriert.
+Um die Funktionalität bereitstellen zu können, bedient sich \Package{scrlfile}
+der bekannten \LaTeX-Anweisung
+\Macro{InputIfFileExists}. Diese\textnote{Achtung!} wird hierzu umdefiniert.
+Falls die Anweisung nicht die erwartete Definition hat, gibt
+\Package{scrlfile} eine Warnung aus.  Dies geschieht für den Fall, dass die
+Anweisung in späteren \LaTeX-Versionen geändert wird oder bereits von einem
+anderen Paket umdefiniert wurde.
   
 Die Anweisung \Macro{InputIfFileExists} wird von \LaTeX{} immer verwendet,
 wenn eine Datei geladen werden soll. Dies geschieht unabhängig davon, ob die
@@ -213,76 +174,68 @@ verwenden. Beachten Sie die Klammern um den Dateinamen!%
 
 
 \begin{Declaration}
-  \Macro{BeforeClass}\Parameter{Klasse}\OParameter{Label}\Parameter{Anweisungen}
-  \Macro{BeforePackage}\Parameter{Paket}\OParameter{Label}\Parameter{Anweisungen}
+  \Macro{BeforeClass}\Parameter{Klasse}\Parameter{Anweisungen}
+  \Macro{BeforePackage}\Parameter{Paket}\Parameter{Anweisungen}
 \end{Declaration}%
 Diese beiden Befehle arbeiten vergleichbar zu
 \DescRef{\LabelBase.cmd.BeforeFile} mit dem einen Unterschied, dass die
 \PName{Klasse} beziehungsweise das \PName{Paket} mit seinem Namen und nicht
 mit seinem Dateinamen angegeben wird. Die Endungen »\File{.cls}« und
-»\File{.sty}« entfallen hier also.
-
-Es ist zu beachten\important{Achtung!}, dass hier von \Package{scrlfile-hook}
-ebenfalls \PValue{file} und nicht \PValue{class} respektive \PValue{package}
-für den Hook verwendet wird. Nur so ist sichergestellt, dass die Ausführung
-der \PName{Anweisungen} bereits im Kontext der Klasse beziehungsweise des
-Pakets erfolgt. Zur Bedeutung des optionalen Arguments \PName{label} sei
-wiederum auf die Anleitung der \LaTeX-Kernanweisung
-\Macro{AddToHook}\IndexCmd{AddToHook} verwiesen. Empfohlen wird in der Regel
-der Verzicht auf das optionale Argument. Bei älteren \LaTeX-Versionen wird
-dieses ohnehin ignoriert.%
+»\File{.sty}« entfallen hier also.%
+%
 \EndIndexGroup
 
 
 \begin{Declaration}
-  \Macro{AfterClass}\Parameter{Klasse}\OParameter{Label}\Parameter{Anweisungen}
-  \Macro{AfterClass*}\Parameter{Klasse}\OParameter{Label}\Parameter{Anweisungen}
-  \Macro{AfterAtEndOfClass}\Parameter{Klasse}\OParameter{Label}\Parameter{Anweisungen}
-  \Macro{AfterAtEndOfClass*}\Parameter{Klasse}\OParameter{Label}\Parameter{Anweisungen}
-  \Macro{AfterPackage}\Parameter{Paket}\OParameter{Label}\Parameter{Anweisungen}
-  \Macro{AfterPackage*}\Parameter{Paket}\OParameter{Label}\Parameter{Anweisungen}
-  \Macro{AfterAtEndOfPackage}\Parameter{Paket}\OParameter{Label}\Parameter{Anweisungen}
-  \Macro{AfterAtEndOfPackage*}\Parameter{Paket}\OParameter{Label}\Parameter{Anweisungen}
+  \Macro{AfterClass}\Parameter{Klasse}\Parameter{Anweisungen}
+  \Macro{AfterClass*}\Parameter{Klasse}\Parameter{Anweisungen}
+  \Macro{AfterClass+}\Parameter{Klasse}\Parameter{Anweisungen}
+  \Macro{AfterClass!}\Parameter{Klasse}\Parameter{Anweisungen}
+  \Macro{AfterAtEndOfClass}\Parameter{Klasse}\Parameter{Anweisungen}
+  \Macro{AfterPackage}\Parameter{Paket}\Parameter{Anweisungen}
+  \Macro{AfterPackage*}\Parameter{Paket}\Parameter{Anweisungen}
+  \Macro{AfterPackage+}\Parameter{Paket}\Parameter{Anweisungen}
+  \Macro{AfterPackage!}\Parameter{Paket}\Parameter{Anweisungen}
+  \Macro{AfterAtEndOfPackage}\Parameter{Paket}\Parameter{Anweisungen}
 \end{Declaration}%
-Die\important[i]{\Macro{AfterClass}\\\Macro{AfterPackage}} Anweisungen
-\Macro{AfterClass} und \Macro{AfterPackage} arbeiten weitgehend wie
-\DescRef{\LabelBase.cmd.AfterFile}, mit dem winzigen Unterschied, dass die
-\PName{Klasse} beziehungsweise das \PName{Paket} mit seinem Namen und nicht
-mit seinem Dateinamen angegeben wird. Die Endungen »\File{.cls}« und
-»\File{.sty}« entfallen hier also.
+Die Anweisungen \Macro{AfterClass} und \Macro{AfterPackage} arbeiten
+weitgehend wie \DescRef{\LabelBase.cmd.AfterFile}, mit dem winzigen
+Unterschied, dass die \PName{Klasse} beziehungsweise das \PName{Paket} mit
+seinem Namen und nicht mit seinem Dateinamen angegeben wird. Die Endungen
+»\File{.cls}« und »\File{.sty}« entfallen hier also.
 
 Bei\important[i]{\Macro{AfterClass*}\\\Macro{AfterPackage*}} den
-Sternvarianten \Macro{AfterClass*} und \Macro{AfterPackage*} gibt es eine
-zusätzliche Funktionalität. Wurde oder wird die entsprechende Klasse oder das
-entsprechende Paket bereits geladen, so werden die \PName{Anweisungen} nicht
-nach dem nächsten Laden, sondern unmittelbar ausgeführt.
+Sternvarianten gibt es eine zusätzliche Funktionalität. Wurde oder wird die
+entsprechende Klasse oder das entsprechende Paket bereits geladen, so werden
+die \PName{Anweisungen} nicht nach dem nächsten Laden, sondern unmittelbar
+ausgeführt.
 
-Code,\ChangedAt{v3.09}{\Package{scrlfile}}%
-\important[i]{\Macro{AfterAtEndOfClass}\\\Macro{AfterAtEndOfPackage}}
-dessen Ausführung per \Macro{AtEndOfClass}\IndexCmd{AtEndOfClass} oder
-\Macro{AtEndOfPackage}\IndexCmd{AtEndOfPackage} innerhalb der Klasse
-respektive des Pakets verzögert wird, wird allerdings erst danach
-ausgeführt. Mit \Macro{AfterAtEndOfClass} beziehungsweise
-\Macro{AfterAtEndOfPackage} wird dagegen sichergestellt, dass
-\PName{Anweisungen} erst nach solchem Code ausgeführt wird.
+Bei\important[i]{\Macro{AfterClass+}\\\Macro{AfterPackage+}} der
+Plusvariante\ChangedAt{v3.09}{\Package{scrlfile}} werden die
+\PName{Anweisungen} sicher erst dann ausgeführt, wenn die Klasse oder das
+Paket vollständig geladen wurde. Der Unterschied zwischen der Stern- und der
+Plusvariante kommt nur zum Tragen, falls die Anweisung verwendet wird, während
+das Laden der Klassen bzw. des Pakets zwar bereits begonnen hat, aber noch
+nicht beendet wurde. Wenn das Laden der Klasse bzw. des Pakets noch nicht
+abgeschlossen wurde, werden die \PName{Anweisungen} in allen Fällen vor den in
+der Klasse bzw. dem Paket mit \Macro{AtEndOfClass} oder \Macro{AtEndOfPackage}
+verzögerten Anweisungen ausgeführt.
 
-Auch\ChangedAt{v3.32}{\Package{scrlfile}}%
-\important[i]{\Macro{AfterAtEndOfClass*}\\\Macro{AfterAtEndOfPackage*}}
-hierzu gibt es Sternvarianten, die dafür sorgen, dass \PName{Anweisungen}
-sofort ausgeführt werden, falls die Klasse beziehungsweise das Paket bereits
-vollständig geladen ist. Wird eine Klasse oder ein Paket gerade geladen, so
-wird die Ausführung wie bei der Version ohne Stern verzögert.
+Um\important[i]{\Macro{AfterClass!}\\\Macro{AfterPackage!}} eine Ausführung
+nach den in der Klasse oder dem Paket selbst mit \Macro{AtEndOfClass} oder
+\Macro{AtEndOfPackage} verzögerten Anweisungen sicherzustellen, ist die
+Variante mit Ausrufezeichen\ChangedAt{v3.09}{\Package{scrlfile}} zu
+verwenden. Bei dieser Spielart werden die \PName{Anweisungen} nicht mehr im
+Kontext der angegebenen Klasse oder des angegebenen Pakets ausgeführt.
 
-Es ist zu beachten, dass \Package{scrlfile-hook} für \Macro{AfterClass},
-\Macro{AfterPackage} und deren Sternvarianten einen \PValue{file/after}-Hook
-verwendet. Dagegen setzen \Macro{AfterAtEndOfClass} und dessen Sternvariante
-einen \PValue{class/after}-Hook und \Macro{AfterAtEndOfPackage} und dessen
-Sternvariante entsprechend einen \PValue{package/after}-Hook. Zur Bedeutung
-des optionalen Arguments \PName{label} sei wiederum auf die Anleitung der
-\LaTeX-Kernanweisung \Macro{AddToHook}\IndexCmd{AddToHook}
-verwiesen. Empfohlen wird in der Regel der Verzicht auf das optionale
-Argument. Bei älteren \LaTeX-Versionen wird dieses ohnehin ignoriert.
-
+Will\important[i]{\Macro{AfterAtEndOfClass}\\\Macro{AfterAtEndOfPackage}} man
+nur für den Fall, dass die Klasse bzw. das Paket noch nicht geladen wurde,
+erreichen, dass \PName{Anweisungen} nach der Klasse bzw. dem Paket und
+außerhalb des Kontextes der angegebenen Klasse bzw. des angegebenen Pakets
+ausgeführt werden, so verwendet man für Klassen die Anweisung
+\Macro{AfterAtEndOfClass}\ChangedAt{v3.09}{\Package{scrlfile}}
+und für Pakete \Macro{AfterAtEndOfPackage}.%
+%
 \begin{Example}
   Als Beispiel für Paket- oder Klassenautoren will ich zunächst
   erklären, wie \KOMAScript{} selbst Gebrauch von den neuen
@@ -313,7 +266,7 @@ Argument. Bei älteren \LaTeX-Versionen wird dieses ohnehin ignoriert.
   es sich um eine verträgliche Version handelt. Falls dies nicht der
   Fall ist, wird eine Warnung ausgegeben.
 
-  An anderer Stelle findet sich in drei der \KOMAScript-Klassen folgendes:
+  An anderer Stelle findet sich in drei der \KOMAScript-Klassen Folgendes:
 \begin{lstcode}
   \AfterPackage{caption2}{%
     \renewcommand*{\setcapindent}{%
@@ -494,47 +447,38 @@ der Datei mit dem als erstes angegebenen \PName{Dateiname} definiert. Wenn
 \LaTeX{} anschließend angewiesen wird, diese Datei zu laden, wird stattdessen
 \PName{Ersatzdatei} geladen. Die Definition der Ersatzdatei wirkt sich auf
 alle Dateien aus, die vom Anwender oder intern von \LaTeX{} mit Hilfe von
-\Macro{InputIfFileExists} geladen werden.
-
-Bei\ChangedAt{v3.32}{\Package{scrlfile}} Verwendung eines \LaTeX-Version bis
-2020-04-01 muss dass Paket \Package{scrlfile-patcholdlatex} dazu die Anweisung
-\Macro{InputIfFileExists} umdefinieren. Bei Verwendung von \LaTeX{} ab Version
-2020-10-01 wird hingegen von \Package{scrlfile-hook} die interne
-\LaTeX-Anweisung \Macro{declare@file@substitution} verwendet. Das
-\LaTeX{}-Team bittet darum, eine derartige Dateiersetzung nur vorzunehmen,
-wenn es keine andere Möglichkeit gibt, zu dem gewünschten Ergebnis zu
-gelangen, beispielsweise wenn eine solche Ersetzung zum Erhalt der
-Kompatibilität unabdingbar ist und dabei die \PName{Ersatzdatei} die gleiche
-Funktionalität bereitstellt.
+\Macro{InputIfFileExists} geladen werden. Dazu ist es allerdings erforderlich,
+dass \Package{scrlfile} diese Anweisung umdefiniert.
 
 \begin{Example}
-  Sie wollen, dass anstelle der Datei \File{\Macro{jobname}.lot}, die Datei
-  \File{\Macro{jobname}.tol} geladen wird. Dazu verwenden Sie:
+  Sie wollen, dass anstelle der Datei \File{\Macro{jobname}.aux}, die Datei
+  \File{\Macro{jobname}.xua} geladen wird. Dazu verwenden Sie:
 \begin{lstcode}
-  \ReplaceInput{\jobname.lot}{\jobname.tol}
+  \ReplaceInput{\jobname.aux}{\jobname.xua}
 \end{lstcode}
-  Wenn Sie nun zusätzlich \File{\Macro{jobname}.tol} auch noch durch
-  \File{\Macro{jobname}.tlo} ersetzen:
+  Wenn Sie nun zusätzlich \File{\Macro{jobname}.xua} auch noch durch
+  \File{\Macro{jobname}.uxa} ersetzen:
 \begin{lstcode}
-  \ReplaceInput{\jobname.tol}{\jobname.tlo}
+  \ReplaceInput{\jobname.xua}{\jobname.uxa}
 \end{lstcode}
-  dann wird \File{\Macro{jobname}.lot} am Ende durch
-  \File{\Macro{jobname}.tlo} ersetzt. Es wird also die komplette
+  dann wird \File{\Macro{jobname}.aux} am Ende durch
+  \File{\Macro{jobname}.uxa} ersetzt. Es wird also die komplette
   Ersetzungskette abgearbeitet.
 
   Einer Ersetzung im Kreis:
 \begin{lstcode}
-  \ReplaceInput{\jobname.lot}{\jobname.tol}
-  \ReplaceInput{\jobname.tol}{\jobname.lot}
+  \ReplaceInput{\jobname.aux}{\jobname.xua}
+  \ReplaceInput{\jobname.xua}{\jobname.aux}
 \end{lstcode}
-  würde jedoch zu einem Fehler führen. Es ist also nicht möglich, eine einmal
-  ersetzte Datei wieder durch ihren Ursprung zu ersetzen.
+  würde jedoch zu einem \emph{stack size error} führen. Es ist also nicht
+  möglich, eine einmal ersetzte Datei wieder durch ihren Ursprung zu ersetzen.
 \end{Example}
 
 Theoretisch wäre es auch möglich, auf diesem Wege ein Paket durch ein anderes
-oder eine Klasse durch eine andere zu ersetzen. Es wird jedoch empfohlen, für
-das Ersetzen eines Pakets oder einer Klasse die nachfolgenden Anweisungen zu
-verwenden. Bei älteren \LaTeX-Versionen ist dies sogar zwingend.%
+oder eine Klasse durch eine andere zu ersetzen. Dabei würde \LaTeX{} aber
+erkennen, dass die angeforderten Dateinamen nicht zum Namen des Pakets oder
+der Klasse passen. Eine Lösung dieses Problems finden Sie nachfolgend.
+%
 \EndIndexGroup
 
 
@@ -544,40 +488,101 @@ verwenden. Bei älteren \LaTeX-Versionen ist dies sogar zwingend.%
 \end{Declaration}
 Eine\ChangedAt{v2.96}{\Package{scrlfile}}\textnote{Achtung!} Klasse oder ein
 Paket sollte niemals mit Hilfe der oben erklärten Anweisung
-\DescRef{\LabelBase.cmd.ReplaceInput} ersetzt werden. Stattdessen sollte für
-Paketersetzungen \Macro{ReplacePackage} und für Klassenersetzungen
-\Macro{ReplaceClass} verwendet werden. Es ist zu beachten, dass wie bei
-\Macro{documentclass} und \Macro{usepackage} der Name der Klasse oder des
-Pakets und nicht deren kompletter Dateiname anzugeben ist.
+\DescRef{\LabelBase.cmd.ReplaceInput} ersetzt werden. In diesem Fall würde
+\LaTeX{} eine Warnung über nicht übereinstimmende Klassen- oder Paketnamen
+melden. Auch echte Fehler sind möglich, wenn eine Klasse oder ein Paket unter
+einem falschen Dateinamen geladen wird.
+\begin{Example}
+  Sie ersetzen das Paket \Package{scrpage2} durch dessen offiziellen
+  Nachfolger \Package{scrlayer-scrpage}, indem Sie
+\begin{lstcode}[escapechar=\$]
+  \ReplaceInput{scrpage2.sty}{scrlayer-scrpage.sty}$\textnote{Nicht nachmachen!}$
+\end{lstcode}
+  verwenden. Dies wird beim Laden von \Package{scrpage2} zu der Warnung
+\begin{lstcode}
+  LaTeX warning: You have requested `scrpage2',
+                 but the package provides
+                 `scrlayer-scrpage'.
+\end{lstcode}
+  führen. Für den Anwender wäre diese Warnung mehr als verwirrend, hat er doch
+  gar nicht \Package{scrlayer-scrpage}, sondern tatsächlich \Package{scrpage2}
+  angefordert, das jedoch durch \Package{scrlayer-scrpage} ersetzt wurde.
+\end{Example}
+Eine Lösung dieser Probleme besteht nun darin, statt
+\DescRef{\LabelBase.cmd.ReplaceInput} eine der Anweisungen
+\Macro{ReplaceClass} oder \Macro{ReplacePackage} zu verwenden. Es ist zu
+beachten, dass wie bei \Macro{documentclass} und \Macro{usepackage} der Name
+der Klasse oder des Pakets und nicht deren kompletter Dateiname anzugeben ist.
 
-Die Ersetzung funktioniert für Klassen, die mit \Macro{documentclass},
-\Macro{LoadClassWithOptions} oder \Macro{LoadClass} geladen werden. Für Pakete
-funktioniert die Ersetzung beim Laden mit \Macro{usepackage},
-\Macro{RequirePackageWithOptions} und \Macro{RequirePackage}.
+Die Ersetzung funktioniert für Klassen, die mit
+\Macro{documentclass}, \Macro{LoadClassWithOptions} oder \Macro{LoadClass}
+geladen werden. Für Pakete funktioniert die Ersetzung beim Laden mit
+\Macro{usepackage}, \Macro{RequirePackageWithOptions} und
+\Macro{RequirePackage}.
 
 Es\textnote{Achtung!} ist zu beachten, dass die \PName{Ersatzklasse} oder das
 \PName{Ersatzpaket} mit denselben Optionen geladen wird, mit denen die
 ursprünglich geforderte Klasse oder das ursprünglich geforderte Paket geladen
 würden. Wird ein Paket oder eine Klasse durch ein Paket oder eine Klasse
 ersetzt, die eine geforderte Option nicht unterstützt, würde das zu den
-üblichen Warnungen und Fehlern führen.
+üblichen Warnungen und Fehlern führen. Es ist jedoch möglich, solche in der
+\PName{Ersatzklasse} oder dem \PName{Ersatzpaket} fehlenden Optionen per
+\DescRef{\LabelBase.cmd.BeforeClass} oder
+\DescRef{\LabelBase.cmd.BeforePackage} neu zu definieren.
+
+\begin{Example}
+  Angenommen, das Paket \Package{oldfoo} soll beim Laden durch das
+  Paket \Package{newfoo} ersetzt werden. Dies wird mit
+\begin{lstcode}
+  \ReplacePackage{oldfoo}{newfoo}
+\end{lstcode}
+  erreicht. Das alte Paket hat eine Option \Option{oldopt}, die das neue Paket
+  jedoch nicht hat. Mit
+\begin{lstcode}
+  \BeforePackage{newfoo}{%
+    \DeclareOption{oldopt}{%
+      \PackageInfo{newfoo}%
+                  {option `oldopt' not supported}}}%
+\end{lstcode}
+  wird diese Option nun für das Paket \Package{newfoo} nachdefiniert. Dadurch
+  wird vermieden, dass beim Laden des Pakets \Package{oldfoo} ein Fehler über
+  die im Paket \Package{newfoo} nicht unterstützte Option gemeldet wird.
+
+  Existiert hingegen eine Option \Option{newopt}, die anstelle der Option
+  \Option{oldopt} verwendet werden soll, so kann dies ebenfalls erreicht
+  werden:
+\begin{lstcode}
+  \BeforePackage{newfoo}{%
+    \DeclareOption{oldopt}{\ExecuteOptions{newopt}}}%
+\end{lstcode}
+  Es ist sogar möglich, festzulegen, dass beim Laden des neuen Pakets
+  andere Voreinstellung gelten sollen:
+\begin{lstcode}
+  \BeforePackage{newfoo}{%
+    \DeclareOption{oldopt}{\ExecuteOptions{newopt}}%
+    \PassOptionsToPackage{newdefoptA,newdefoptB}%
+                         {newfoo}%
+  }
+\end{lstcode}
+  oder auch direkt:
+\begin{lstcode}
+  \BeforePackage{newfoo}{%
+    \DeclareOption{oldopt}{\ExecuteOptions{newopt}}%
+  }%
+  \PassOptionsToPackage{newdefoptA,newdefoptB}%
+                       {newfoo}%
+\end{lstcode}
+  \iffalse% Umbruchkorrektur
+  Man beachte, dass im letzten Beispiel der Aufruf von
+  \Macro{PassOptionsToPackage} nicht innerhalb, sondern nach
+  \Macro{BeforePackage} erfolgt.%
+  \fi%
+\end{Example}
 
 Damit Klassen mit \Macro{ReplaceClass} ersetzt werden können, ist es natürlich
 erforderlich \Package{scrlfile} vor der Klasse zu laden. Dazu ist
 \Macro{RequirePackage}\IndexCmd{RequirePackage} anstelle von
-\DescRef{maincls.cmd.usepackage} zu verwenden (siehe \cite{latex:clsguide}).
-
-Bei\ChangedAt{v3.32}{\Package{scrlfile}} Verwendung eines \LaTeX-Version bis
-2020-04-01 muss dass Paket \Package{scrlfile-patcholdlatex} die internen
-Anweisung \Macro{@onefilewithoptions} und \Macro{@loadwithoptions}
-umdefinieren. Bei Verwendung von \LaTeX{} ab Version 2020-10-01 wird hingegen
-von \Package{scrlfile-hook} die interne \LaTeX-Anweisung
-\Macro{declare@file@substitution} verwendet. Das \LaTeX{}-Team bittet darum,
-eine derartige Ersetzung nur vorzunehmen, wenn es keine andere Möglichkeit
-gibt, zu dem gewünschten Ergebnis zu gelangen, beispielsweise wenn eine solche
-Ersetzung zum Erhalt der Kompatibilität unabdingbar ist und dabei die
-\PName{Ersatzpaket} beziehungsweise \PName{Ersatzklasse} die gleiche
-Funktionalität bereitstellt.%
+\DescRef{maincls.cmd.usepackage} zu verwenden (siehe \cite{latex:clsguide}).%
 \EndIndexGroup
 
 
