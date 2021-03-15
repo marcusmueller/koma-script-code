@@ -1,0 +1,145 @@
+#!/bin/sh
+# ======================================================================
+# pdfcmp
+# Copyright (c) Markus Kohm, 2002-2006
+#
+# This file is part of the LaTeX2e KOMA-Script bundle.
+#
+# This work may be distributed and/or modified under the conditions of
+# the LaTeX Project Public License, version 1.3b of the license.
+# The latest version of this license is in
+#   http://www.latex-project.org/lppl.txt
+# and version 1.3b or later is part of all distributions of LaTeX 
+# version 2005/12/01 or later and of this work.
+#
+# This work has the LPPL maintenance status "author-maintained".
+#
+# The Current Maintainer and author of this work is Markus Kohm.
+#
+# This work consists of all files listed in manifest.txt.
+# ----------------------------------------------------------------------
+# pdfcmp
+# Copyright (c) Markus Kohm, 2002-2006
+#
+# Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
+# Version 1.3b, verteilt und/oder veraendert werden.
+# Die neuste Version dieser Lizenz ist
+#   http://www.latex-project.org/lppl.txt
+# und Version 1.3b ist Teil aller Verteilungen von LaTeX
+# Version 2005/12/01 oder spaeter und dieses Werks.
+#
+# Dieses Werk hat den LPPL-Verwaltungs-Status "author-maintained"
+# (allein durch den Autor verwaltet).
+#
+# Der Aktuelle Verwalter und Autor dieses Werkes ist Markus Kohm.
+# 
+# Dieses Werk besteht aus den in manifest.txt aufgefuehrten Dateien.
+# ======================================================================
+
+error() {
+    echo $2 >&2
+    exit $1
+}
+
+pageoptions=''
+printoption='-dPrinted=false'
+
+pnum=0
+while [ $# -gt 0 ]; do
+    case $1 in
+	-f) # first page
+	    [ $# -gt 1 ] || error 2 "$0: option \`$1' expects parameter!"
+	    shift
+	    pageoptions="$pageoptions -dFirstPage=$1"
+	    ;;
+	-l) # last page
+	    [ $# -gt 1 ] || error 2 "$0: option \`$1' expects parameter!"
+	    shift
+	    pageoptions="$pageoptions -dLastPage=$1"
+	    ;;
+	-p) # printed
+	    printoptions="-dPrinted=true"
+	    ;;
+	-s) # screen
+	    printoptions="-dPrinted=false"
+	    ;;
+	--) # all the rest are parameters not options
+	    error 2 "$0: some of the used programms do not undertand \`--'!"
+	    ;;
+	-*) # unknown option
+	    error 2 "$0: unexpected option \`$1'!"
+	    ;;
+	*)  # first or second parameter
+	    if [ $pnum -eq 0 ]; then
+		firstin=$1
+	    elif [ $pnum -eq 1 ]; then
+		secondin=$1
+	    else
+		error 2 "$0: unexpected parameter \`$1'!"
+	    fi
+	    pnum=$((++pnum))
+	    ;;
+    esac
+    shift
+done
+
+[ $pnum -eq 2 ] || error 2 "$0: missing parameter!"
+
+firstbase=`basename ${firstin%.pdf}`
+firstbase=`basename ${firstbase%.ps}`
+
+# Evetnuell -dTextAlphaBits=1 -dGraphicsAlphaBits=1
+
+gs -dSAFER -dBATCH -dNOPAUSE -dQUIET -sDEVICE=png256 -dNOINTERPOLATE \
+    $pageoptions $printoption \
+    -sOutputFile=${firstbase}-\%03d.png ${firstin} || \
+    error 2 "Error ${firstin}: Cannot create page images!"
+
+secondbase=`basename ${secondin%.pdf}`
+secondbase=`basename ${secondbase%.ps}`
+
+# Evetnuell -dTextAlphaBits=1 -dGraphicsAlphaBits=1
+
+gs -dSAFER -dBATCH -dNOPAUSE -dQUIET -sDEVICE=png256 -dNOINTERPOLATE \
+    $pageoptions $printoption \
+    -sOutputFile=${secondbase}-\%03d.png ${secondin} || \
+    error 1 "Error ${secondin}: Cannot create page images!"
+
+differ=false
+for first in ${firstbase}-[0-9][0-9][0-9].png; do
+    if [ -f $first ]; then
+	page=${first#${firstbase}-}
+	page=${page%.png}
+	second=${secondbase}-${page}.png
+	if [ -f $second ]; then
+	    diffbase=${first%.png}-diff
+	    composite -compose difference ${first} ${second} ${diffbase}.rgb
+	    size=`du -ab ${diffbase}.rgb | cut -f 1`
+	    if ! cmp -n $size -s /dev/zero ${diffbase}.rgb; then
+		differ=true
+		echo "! ${firstin}, ${secondin}: differ at page $page."
+		composite -compose difference ${first} ${second} ${diffbase}.png
+	    fi
+	    rm ${diffbase}.rgb ${first} ${second}
+	else
+	    differ=true
+	    echo "- ${firstin}, ${secondin}: missing page $page."
+	fi
+    else
+	error 2 "$0 internal error: No input image generated!"
+    fi
+done
+
+for second in ${secondbase}-[0-9][0-9][0-9].png; do
+    if [ -f $second ]; then
+	differ=true
+	page=${second#${secondbase}-}
+	page=${page%.png}
+	echo "+ ${firstin}, ${secondin}: additional page $page."
+    fi
+done
+
+$differ || echo "  ${firstin}, ${secondin}: all the same."
+
+$differ && exit 3
+exit 0
