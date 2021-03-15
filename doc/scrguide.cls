@@ -1,6 +1,6 @@
 % ======================================================================
 % scrguide.cls
-% Copyright (c) Markus Kohm, 2005-2021
+% Copyright (c) Markus Kohm, 2005-2019
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -18,7 +18,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrguide.cls
-% Copyright (c) Markus Kohm, 2005-2021
+% Copyright (c) Markus Kohm, 2005-2019
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -38,7 +38,7 @@
 % \section{Identification}
 %
 %    \begin{macrocode}
-\ProvidesClass{scrguide}[2021/02/11 v1.25 internal KOMA-Script guide class]
+\ProvidesClass{scrguide}[2019/12/06 v1.22d internal KOMA-Script guide class]
 %    \end{macrocode}
 %
 %
@@ -128,25 +128,8 @@
 \expandafter\RequirePackage\expandafter[\languages]{babel}%
 \AtBeginDocument{%
   \typeout{TRACE: Current language is `\languagename`.}}%
-%    \end{macrocode}
-% In future we should use biblatex instead of babelbib, but currently some
-% things are still missing:
-% \begin{itemize}
-% \item prefix \texttt{CTAN://},
-% \item line breaks after the author (but not full \texttt{openbib} style like
-%   \texttt{block=nbpar}),
-% \item removing language tag \texttt{ngerman} from output.
-% \end{itemize}
-% So currently we still use babelbib.
-%    \begin{macrocode}
-\newif\ifusebabelbib\usebabelbibtrue % Should be deactivated soon
-\ifusebabelbib
-  \RequirePackage[fixlanguage]{babelbib}
-  \newcommand*{\printbibliography}[1][]{\bibliography{\jobname}}
-\else
-  \RequirePackage[backend=bibtex,style=alphabetic,block=ragged]{biblatex}
-  \DeclareFieldFormat{url}{\url{#1}}
-\fi  
+\RequirePackage[fixlanguage]{babelbib}
+\expandafter\selectbiblanguage\expandafter{\uselanguage}
 \RequirePackage{afterpage}
 \RequirePackage{makeidx}
 \RequirePackage{scrdate}
@@ -180,6 +163,7 @@
 \newif\ifshortversion\shortversionfalse
 \InputIfFileExists{scrnonfree.tex}{}{%
   \RequirePackage[svgnames]{xcolor}%
+  \RequirePackage{tocstyle}% hyperref needs xcolor with tocstyle
   \RequirePackage{tikz}%
   \usetikzlibrary{calc}%
   \RequirePackage[\uselanguage]{hyperref}%
@@ -610,15 +594,12 @@
 % \end{macro}
 %
 % \begin{macro}{\File}
-%   \changes{v1.25}{2021/02/11}{usage of \cs{texorpdfstring}}
 % \begin{macro}{\Class}
-%   \changes{v1.25}{2021/02/11}{usage of \cs{texorpdfstring}}
 % \begin{macro}{\Package}
-%   \changes{v1.25}{2021/02/11}{usage of \cs{texorpdfstring}}
 %   Some markup macros for files with special meanings.
-\DeclareRobustCommand*{\File}[1]{\texorpdfstring{\mbox{\texttt{#1}}}{#1}}
-\DeclareRobustCommand*{\Class}[1]{\texorpdfstring{\mbox{\textsfrm{#1}}}{#1}}
-\DeclareRobustCommand*{\Package}[1]{\texorpdfstring{\mbox{\textsfrm{#1}}}{#1}}
+\DeclareRobustCommand*{\File}[1]{\mbox{\texttt{#1}}}
+\DeclareRobustCommand*{\Class}[1]{\mbox{\textsfrm{#1}}}
+\DeclareRobustCommand*{\Package}[1]{\mbox{\textsfrm{#1}}}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -665,14 +646,12 @@
 % \end{macro}
 %
 % \begin{macro}{\Macro}
-%   \changes{v1.25}{2021/02/11}{usage of \cs{texorpdfstring}}
 % \begin{macro}{\Option}
 % \begin{macro}{\KOption}
 % \begin{macro}{\OptionValue}
 % \begin{macro}{\Environment}
 % \begin{macro}{\Counter}
 % \begin{macro}{\Length}
-%   \changes{v1.25}{2021/02/11}{usage of \cs{texorpdfstring}}
 % \begin{macro}{\PLength}
 % \changes{v1.17}{2019/10/24}{\cs{setplength} verschoben}%^^A
 % \begin{macro}{\FloatStyle}
@@ -726,9 +705,7 @@
   \kernel@ifstar {\@DescPageRef*}{\@DescPageRef\space}%
 }
 \newcommand*{\@DescPageRef}[2]{\expandafter\autopageref#1{\label@desc@prefix#2}}
-\DeclareSpecialMarkup{\Macro}{%
-  \texorpdfstring{\mbox{\texttt{\char`\\#1}}}{\textbackslash#1}%
-}{%
+\DeclareSpecialMarkup{\Macro}{\mbox{\texttt{\char`\\#1}}}{%
   \par
   \settowidth{\leftskip}{\textMacro{#1}}% indent from left
   \hskip-\leftskip
@@ -1004,9 +981,7 @@
     \label{\label@desc@prefix\label@base.length.#2#1}%
   \endgroup
 }
-\DeclareSpecialMarkup{\Length}{%
-  \texorpdfstring{\mbox{\texttt{\char`\\#1}}}{\textbackslash#1}%
-}{%
+\DeclareSpecialMarkup{\Length}{\mbox{\texttt{\char`\\#1}}}{%
   \par
   \leftskip\z@
   \BeginIndex{Length}{#1}% index entry
@@ -1248,18 +1223,9 @@
 % \end{macro}
 %
 % \begin{macro}{\eTeX}
-% \changes{v1.25}{2021/02/16}{workaround for (temporary) changes in
-%   \textsf{hyperref}}
-% This may already be defined.
+%   This may already be defined.
 %    \begin{macrocode}
 \providecommand*{\eTeX}{\ensuremath{\varepsilon}-\TeX}
-\AtBeginDocument{%
-  \@ifundefined{textepsilon}{%
-    \@ifundefined{pdfstringdef}{}{%
-      \pdfstringdef{\textepsilon}{\ifHy@unicode\83\265\else e\fi}%
-    }%%
-  }{}%
-}
 \providecommand*{\NTS}{%
   \leavevmode\hbox{$\cal N\kern-0.35em\lower0.5ex\hbox{$\cal T$}%
   \kern-0.2emS$}}
@@ -2264,24 +2230,19 @@ KOMAScript \endcsname
 % We have large page numbers, so better setup the needed width. And we like
 % other dot seperation.
 %    \begin{macrocode}
-\RedeclareSectionCommand[%
-  tocdynnumwidth,%
-  tocbreakafternumber=true,%
-  tocentrynumberformat=\partnumberwithprefix,%
-  tocpagenumberformat=\@firstofone
-]{part}%
-\newcommand*{\partnumberwithprefix}[1]{\let\autodot:\partname~#1}%
-\RedeclareSectionCommand[%
-  tocnumwidth=21pt,%
-  tocpagenumberformat=\@firstofone,%
-  tocraggedentrytext=true%
-]{chapter}%
-\RedeclareSectionCommand[tocindent=21pt,tocnumwidth=34pt]{section}%
-\RedeclareSectionCommand[tocindent=55pt,tocnumwidth=36pt]{subsection}%
-\DeclareTOCStyleEntries[dynnumwidth]{default}{figure,table}%
+\usetocstyle{classic}
 \renewcommand*{\@pnumwidth}{1.8em}% 1.67
 \renewcommand*\@tocrmarg {2.70em}% 2.55em
-\renewcommand*\@dotsep{2.5}%
+\renewcommand*\@dotsep{2.5}
+\settocfeature[toc][-1]{entryhook}{%
+  \let\sg@numberline\numberline
+  \renewcommand*{\numberline}[1]{%
+    \sg@numberline{\partname~##1}%
+    ~\linebreak\nopagebreak\hspace*{-\@tempdima}%
+  }%
+  \def\autodot{: }%
+  \sectfont
+}
 %    \end{macrocode}
 %
 % \section{Part}
@@ -2335,33 +2296,26 @@ KOMAScript \endcsname
 %
 % Use of a preamble and sime other usefull changes.
 %    \begin{macrocode}
-\ifusebabelbib
-  \AtBeginDocument{%
-    \setbibpreamble{\GuideBibPreamble\bigskip}%
-    \bibliographystyle{babalpha-fl}%
-    \renewcommand*{\@openbib@code}{%
-      \setlength{\parsep}{0pt}%
-      \renewcommand*{\btxauthorcolon}[1]{:\par\nobreak}%
-      \renewcommand*{\btxurlfont}{\par\nobreak\url}%
-      \raggedright
-    }%
-  }
+\AtBeginDocument{%
+  \setbibpreamble{\GuideBibPreamble\bigskip}%
+  \selectbiblanguage{\languagename}%
+  \bibliographystyle{babalpha-fl}%
+  \renewcommand*{\@openbib@code}{%
+    \setlength{\parsep}{0pt}%
+    \renewcommand*{\btxauthorcolon}[1]{:\par\nobreak}%
+    \renewcommand*{\btxurlfont}{\par\nobreak\url}%
+    \raggedright
+  }%
+}
 %    \end{macrocode}
 %
 % The generated argument of thebibliography is to short:
 %    \begin{macrocode}
-  \newcommand*{\OrigTheBibliography}{}
-  \let\OrigTheBibliography\thebibliography
-  \renewcommand*{\thebibliography}[1]{%
-    \selectbiblanguage{\languagename}%
-    \OrigTheBibliography{XXXX99}%
-  }
-\else
-  \AtBeginDocument{%
-    \defbibnote{bibpreamble}{\GuideBibPreamble}%
-  }%
-  \addbibresource{guide.bib}
-\fi
+\newcommand*{\OrigTheBibliography}{}
+\let\OrigTheBibliography\thebibliography
+\renewcommand*{\thebibliography}[1]{%
+  \OrigTheBibliography{XXXX99}%
+}
 %    \end{macrocode}
 %
 %

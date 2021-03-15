@@ -1,7 +1,8 @@
+% \CheckSum{1936}
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-tocstyle.dtx
-% Copyright (c) Markus Kohm, 2015-2020
+% Copyright (c) Markus Kohm, 2015-2019
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -19,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrkernel-tocstyle.dtx
-% Copyright (c) Markus Kohm, 2015-2020
+% Copyright (c) Markus Kohm, 2015-2019
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -81,7 +82,7 @@
   \def\filedate$#1: #2-#3-#4 #5${\gdef\filedate{#2/#3/#4}}
   \filedate$Date$
   \def\filerevision$#1: #2 ${\gdef\filerevision{r#2}}
-  \filerevision$Revision$
+  \filerevision$Revision: 2254 $
   \edef\reserved@a{%
     \noexpand\endgroup
     \noexpand\ProvidesFile{scrkernel-tocstyle.dtx}%
@@ -352,97 +353,6 @@
 %    \end{macrocode}
 % \end{macro}%^^A \@RelaxTOCEntryOptions
 %
-% \selectlanguage{english}
-% \begin{macro}{\@DefineTOCEntryListOption}
-% \changes{v3.31}{2020/06/11}{new (internal)}%^^A
-% Use \cs{DefineTOCEntryOption} to define an option that represents a list.
-% It has following parameters:
-% \begin{description}
-% \item[\marg{style}: \meta{string},] name of the entry style
-% \item[\marg{option}: \meta{string},] name of the option
-% \item[\oarg{default}: \meta{string},] default value of the option
-% \item[\marg{prefix}: \meta{string},] prefix of the macro to be defined
-% \item[\marg{postfix}: \meta{string},] postfix of the macro to be defined
-% \item[\marg{description}: \meta{String},] short description of the option
-% \item[\oarg{init}: \meta{code},] initialization of the option
-% \end{description}
-% Between the \meta{prefix} and \meta{postfix} automatically
-% \cs{scr@dte@current} will be added. A copy option using ``\texttt{:=}''
-% instead of ``\texttt{=}'' and an add (append) option using ``\texttt{+=}''
-% instead of ``\texttt{=}'' is also defined.
-%    \begin{macrocode}
-%<*body>
-\newcommand*{\@DefineTOCEntryListOption}[2]{%
-  \kernel@ifnextchar [%]
-    {\@DefineTOCEntryListOptionWithDefault{#1}{#2}}
-    {\@DefineTOCEntryListOptionWithoutDefault{#1}{#2}}%
-}
-%    \end{macrocode}
-% \begin{macro}{\@DefineTOCEntryListOptionWithoutDefault}
-% \changes{v3.31}{2020/06/11}{new (internal)}%^^A
-% This is the case without default value. So we only have to define
-% the three internal options, that manipulate a macro.
-% \begin{macrocode}
-\newcommand*{\@DefineTOCEntryListOptionWithoutDefault}[5]{%
-  \@TOCEntryStyleNeedsCommandByOption{#1}{#3}{#4}{#2}{#5}%
-  \@DefineTOCEntryOption{#1}{#2}{%
-    \expandafter\protected@edef\csname #3\scr@dte@current#4\endcsname{##1}%
-    \FamilyKeyStateProcessed
-  }%
-  \DefineFamilyKey[.dte]{KOMAarg}{#2:}{%
-    \scr@ifundefinedorrelax{#3##1#4}{\FamilyKeyStateUnknownValue}{%
-      \expandafter\let
-      \csname #3\scr@dte@current#4\expandafter\endcsname
-      \csname #3##1#4\endcsname
-      \FamilyKeyStateProcessed
-    }%
-  }%
-  \DefineFamilyKey[.dte]{KOMAarg}{#2+}{%
-    \expandafter\protected@edef\csname #2\scr@dte@current#4\endcsname{%
-      \csname #2\scr@dte@current#4\endcsname,##1}%
-    \FamilyKeyStateProcessed
-  }%
-  \edef\scr@dte@doopts{%
-    \unexpanded\expandafter{\scr@dte@doopts}\noexpand\do{#2:}\noexpand\do{#2+}%
-  }%
-}
-%    \end{macrocode}
-% \end{macro}%^^A \@DefineTOCEntryListOptionWithoutDefault
-% \begin{macro}{\@DefineTOCEntryListOptionWithDefault}
-% \changes{v3.31}{2020/06/11}{new (internal)}%^^A
-% This is the case with a default value. It's almost the same, but the
-% argument numbers and using \cs{DefineFamilyKey} with optional argument.
-%    \begin{macrocode}
-\newcommand*{\@DefineTOCEntryListOptionWithDefault}{}
-\def\@DefineTOCEntryListOptionWithDefault#1#2[#3]#4#5#6{%
-  \@TOCEntryStyleNeedsCommandByOption{#1}{#4}{#5}{#2}{#6}%
-  \@DefineTOCEntryOption{#1}{#2}[{#3]}{%
-    \expandafter\protected@edef\csname #4\scr@dte@current#5\endcsname{##1}%
-    \FamilyKeyStateProcessed
-  }%
-  \DefineFamilyKey[.dte]{KOMAarg}{#2:}{%
-    \scr@ifundefinedorrelax{#4##1#5}{\FamilyKeyStateUnknownValue}{%
-      \expandafter\let
-      \csname #4\scr@dte@current#5\expandafter\endcsname
-      \csname #4##1#5\endcsname
-      \FamilyKeyStateProcessed
-    }%
-  }%
-  \DefineFamilyKey[.dte]{KOMAarg}{#2+}{%
-    \expandafter\protected@edef\csname #4\scr@dte@current#5\endcsname{%
-      \csname #4\scr@dte@current#5\endcsname,##1}%
-    \FamilyKeyStateProcessed
-  }%
-  \edef\scr@dte@doopts{%
-    \unexpanded\expandafter{\scr@dte@doopts}\noexpand\do{#2:}\noexpand\do{#2+}%
-  }%  
-}
-%</body>
-%    \end{macrocode}
-% \end{macro}%^^A \@DefineTOCEntryListOptionWithDefault
-% \end{macro}%^^A \@DefineTOCEntryListOption
-% \selectlanguage{ngerman}
-%
 % \begin{macro}{\@DefineTOCEntryLengthOption}
 % \changes{v3.20}{2015/12/04}{neu (intern)}%^^A
 % Verwendet \cs{DefineTOCEntryOption}, um eine Option zu definieren, die ein
@@ -450,7 +360,7 @@
 % \begin{description}
 % \item[\marg{Stil}: \meta{String},] Name des Eintragsstils
 % \item[\marg{Option}: \meta{String},] Name der Option
-% \item[\oarg{Wert}: \meta{Länge},] der Säumniswert der Option
+% \item[\oarg{Wert}:] der Säumniswert der Option
 % \item[\marg{Prefix}: \meta{String},] Präfix des zu definierenden Makros
 % \item[\marg{Postfix}: \meta{String},] Postfix des zu definierenden Makros
 % \item[\marg{Erklärung}: \meta{String},] Erklärung der Option
@@ -1157,7 +1067,6 @@
     \def\DefineTOCEntryCommandOption{\@DefineTOCEntryCommandOption{#1}}%
     \def\DefineTOCEntryIfOption{\@DefineTOCEntryIfOption{#1}}%
     \def\DefineTOCEntryLengthOption{\@DefineTOCEntryLengthOption{#1}}%
-    \def\DefineTOCEntryListOption{\@DefineTOCEntryListOption{#1}}%
     \def\DefineTOCEntryNumberOption{\@DefineTOCEntryNumberOption{#1}}%
     \def\DefineTOCEntryOption{\@DefineTOCEntryOption{#1}}%
     \def\AddToDeclareTOCEntryStylePreCheckNeeds{%
@@ -1172,7 +1081,6 @@
     \let\AddToDeclareTOCEntryStylePreCheckNeeds\relax
     \let\DefineTOCEntryOption\relax
     \let\DefineTOCEntryNumberOption\relax
-    \let\DefineTOCEntryListOption\relax
     \let\DefineTOCEntryLengthOption\relax
     \let\DefineTOCEntryIfOption\relax
     \let\DefineTOCEntryCommandOption\relax
@@ -1542,29 +1450,12 @@
 %<*tocline>
 %%%            (run: style,tocline)
 \DeclareTOCEntryStyle{tocline}[{%
-%</tocline>
-%    \end{macrocode}
-% \selectlanguage{english}%^^A
-% \changes{v3.31}{2020/06/09}{style \texttt{toctext} has also option
-%   \texttt{beforeskip}}%^^A
-% \selectlanguage{ngerman}%^^A
-%    \begin{macrocode}
-%<*tocline|toctext>
   \DefineTOCEntryLengthOption{beforeskip}%
     {scr@tso@}{@beforeskip}{vertical skip before the entry}%
-%</tocline|toctext>
-%<*tocline>
   \DefineTOCEntryIfOption{breakafternumber}%
     {scr@tso@}{@breakafternumber}{line break after number flag}%
   \DefineTOCEntryIfOption{dynnumwidth}%
     {scr@tso@}{@dynnumwidth}{dynamic number width flag}%
-%    \end{macrocode}
-% \changes{v3.31}{2020/06/08}{option for indent follows list}%^^A
-%    \begin{macrocode}
-  \DefineTOCEntryListOption{indentfollows}%
-    {scr@tso@}{@indentfollows}{list of levels that define the indent}%
-  \DefineTOCEntryIfOption{dynindent}%
-    {scr@tso@}{@dynindent}{dynamic indent width flag}%
 %</tocline>
 %<*tocline|toctext>
   \DefineTOCEntryCommandOption{entryformat}%
@@ -1973,20 +1864,6 @@
     \expandafter\providecommand\expandafter*%
     \csname scr@tso@#1@beforeskip\endcsname{\glueexpr \z@ plus .2\p@\relax}%
   }{}%
-%</tocline>
-%    \end{macrocode}
-% \selectlanguage{english}%^^A
-% \changes{v3.31}{2020/06/09}{\texttt{beforeskip} default also for style
-%   \texttt{toctext}}%^^A
-% For style \texttt{toctext} a default without glue is used to stay
-% compatible.
-% \selectlanguage{ngerman}%^^A
-%    \begin{macrocode}
-%<*toctext>
-  \expandafter\providecommand\expandafter*%
-  \csname scr@tso@#1@beforeskip\endcsname{\z@}%
-%</toctext>
-%<*tocline>
 %    \end{macrocode}
 % Es ist gut zu wissen, wie breit die breiteste Nummer ist, damit wir
 % ggf. prüfen können, ob entsprechende Bedingungen eingehalten werden.
@@ -2137,22 +2014,6 @@
   \csname scr@tso@#1@pagenumberbox\endcsname[1]{%
     \hb@xt@\@nameuse{scr@dte@pagenumberwidth}{\hfil ##1}}%
   \expandafter\providecommand\csname Ifscr@tso@#1@dynnumwidth\endcsname[2]{##2}%
-%    \end{macrocode}
-% \selectlanguage{english}%
-% \changes{v3.31}{2020/06/08}{init indent follows list}%^^A
-% This command defines a list of levels that specify the indent (if not empty).
-% \selectlanguage{ngerman}%^^A
-%    \begin{macrocode}
-  \expandafter\providecommand\csname Ifscr@tso@#1@dynindent\endcsname[2]{##2}%
-  \scr@ifundefinedorrelax{scr@tso@#1@indentfollows}{%
-    \Ifstrstart{#1}{sub}{%
-      \expandafter\edef\csname scr@tso@#1@indentfollows\endcsname{%
-        \scr@dte@nosub{#1}%
-      }%
-    }{%
-      \expandafter\let\csname scr@tso@#1@indentfollows\endcsname\@empty
-    }%
-  }{}%
 %</tocline>
 %    \end{macrocode}
 % \changes{v3.27}{2019/07/08}{Initialisierung von \texttt{raggedentry}}%^^A
@@ -2355,49 +2216,6 @@
   \else
     \tocbasic@DependOnPenaltyAndTOCLevel{#1}%
     \addvspace{\@nameuse{scr@tso@#1@beforeskip}}\relax
-%    \end{macrocode}
-% \selectlanguage{english}%
-% \changes{v3.31}{2020/06/08}{code for indent following list processing}%^^A
-% If a indent following list exists and the depth of an entry is lower than
-% the depth of the current entry, use the maximum of the ident + number width
-% for the indent of this entry.
-% \selectlanguage{ngerman}%^^A
-%    \begin{macrocode}
-    \@nameuse{Ifscr@tso@#1@dynindent}{%
-      \expandafter\ifx\csname scr@tso@#1@indentfollows\endcsname\@empty
-        \PackageWarning{tocbasic}{`dynindent' for `#1' not available}%
-      \else
-        \edef\reserved@a{\@nameuse{scr@tso@#1@indentfollows}}%    
-        \@for \reserved@a:=\reserved@a\do {%
-          \scr@trim@spaces\reserved@a
-          \ifx\reserved@a\@empty\else
-            \scr@ifundefinedorrelax{\reserved@a tocdepth}{%
-            }{%
-              \ifnum \@nameuse{\reserved@a tocdepth}<\@nameuse{#1tocdepth}%
-                \@tempdima\@nameuse{scr@tso@\reserved@a @indent}\relax
-                \@nameuse{Ifscr@tso@\reserved@a @dynnumwidth}{%
-                  \scr@ifundefinedorrelax
-                  {scr@dte@\reserved@a @lastmaxnumwidth}{%
-                    \advance\@tempdima
-                    \@nameuse{scr@tso@\reserved@a @numwidth}\relax
-                  }{%
-                    \advance\@tempdima
-                    \@nameuse{scr@dte@\reserved@a @lastmaxnumwidth}\relax
-                  }%
-                }{%
-                  \advance\@tempdima
-                  \@nameuse{scr@tso@\reserved@a @numwidth}\relax
-                }%
-                \ifdim \@tempdima>\@nameuse{scr@tso@#1@indent}\relax
-                  \expandafter\edef\csname scr@tso@#1@indent\endcsname
-                  {\the\@tempdima}%
-                \fi
-              \fi
-            }%
-          \fi
-        }%
-      \fi
-    }{}%  
     {%
       \Iftocfeature{\@currext}{noindent}{%
         \leftskip \z@
@@ -2624,11 +2442,8 @@
       \@nameuse{scr@tso@#1@onstartentry}%
     \else
 %    \end{macrocode}
-% \changes{v3.31}{2020/06/09}{use of option \texttt{beforeskip}}%^^A
-% In v-mode it is a new text entry. Before leaving v-mode the vertical space
-% is added.
+% In v-mode it is a new text entry.
 %    \begin{macrocode}
-      \addvspace{\@nameuse{scr@tso@#1@beforeskip}}%
       \leavevmode
 %    \end{macrocode}
 % The paragraph end has to be prepared to eventually change the right
@@ -2656,27 +2471,8 @@
       }%
       \rightskip \@nameuse{scr@tso@#1@rightindent}\relax
       \parfillskip \z@ \@plus 1fill\relax
-%    \end{macrocode}
-% \changes{v3.31}{2020/06/09}{redefinition of \cs{addvspace}}%^^A
-% \changes{v3.31}{2020/06/09}{redefinition of \cs{addpenalty}}%^^A
-% Now, make sure, that the first non-\texttt{toctext} entry does do a \cs{par}
-% before it uses \cs{addpenalty} or \cs{addvspace}. Before version~3.31 this
-% has been done by redefining \cs{@noitemerr} but this does not work, because
-% it ignores the argument of \cs{addpenalty} or \cs{addvspace}. So, this more
-% dangerous solution has been made, that redefines \cs{addvspace} and
-% \cs{addpenalty} locally.
-%    \begin{macrocode}
-      \ifx\addvspace\scr@dte@xaddvspace\else
-        \let\scr@dte@saddvspace\addvspace
-        \def\scr@dte@xaddvspace{%
-          \let\addvspace\scr@dte@saddvspace\par\addvspace}%
-        \let\addvspace\scr@dte@xaddvspace
-      \fi
-      \ifx\addpenalty\scr@dte@xaddpenalty\else
-        \let\scr@dte@saddpenalty\addpenalty
-        \def\scr@dte@xaddpenalty{%
-          \let\addpenalty\scr@dte@saddpenalty\par\addpenalty}%
-      \fi
+      \edef\@noitemerr{\unexpanded{\par\def\@noitemerr}%
+        {\unexpanded\expandafter{\@noitemerr}}}%
 %    \end{macrocode}
 % Finally the init code of the first entry has to be used.
 %    \begin{macrocode}

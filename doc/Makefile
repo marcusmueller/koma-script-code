@@ -1,6 +1,6 @@
 # ======================================================================
 # Makefile
-# Copyright (c) Markus Kohm, 2002-2020
+# Copyright (c) Markus Kohm, 2002-2014
 #
 # This file is part of the LaTeX2e KOMA-Script bundle.
 #
@@ -18,7 +18,7 @@
 # This work consists of all files listed in manifest.txt.
 # ----------------------------------------------------------------------
 # Makefile
-# Copyright (c) Markus Kohm, 2002-2020
+# Copyright (c) Markus Kohm, 2002-2014
 #
 # Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 # Version 1.3c, verteilt und/oder veraendert werden.
@@ -108,9 +108,10 @@ STATIC_DOC_LINKS= komascript.html komascr.html \
 
 DOC_SRC		= scrguide.cls scrguide.ist scrguide.gst \
 	          guide.tex guide.bib plength.dtx \
-		  linkalias.tex
+		  linkalias.tex \
+		  scrpage2.tex
 
-DOC_FILES       =
+DOC_FILES       = scrpage2.pdf
 
 DOC_DIR         = doc
 
@@ -134,6 +135,11 @@ prepare_local: $(STATIC_DOC_LINKS)
 
 default_local: $(STATIC_DOC) $(DOC_FILES)
 	$(make_recursive)
+
+scrpage2.pdf: $(DOC_SRC)
+	$(LATEX) $(NONSTOPMODE) $(PDFOUTPUT) scrpage2.tex
+	$(LATEX) $(NONSTOPMODE) $(PDFOUTPUT) scrpage2.tex
+	$(LATEX) $(NONSTOPMODE) $(PDFOUTPUT) scrpage2.tex
 
 $(STATIC_DOC_LINKS): $(STATIC_DOC_SRC)
 	$(SYMLINK) $< $@
@@ -197,7 +203,7 @@ dist_local: $(DIST_FILES)
 	$(MKDIR) $(DISTDIR)/$(BIN_DIR)
 	$(CP) $(DIST_FILES) $(DISTDIR)
 	$(CP) $(BIN_FILES) $(DISTDIR)/$(BIN_DIR)
-#	$(CP) $(DOC_FILES) $(DISTDIR)/$(DOC_DIR)
+	$(CP) $(DOC_FILES) $(DISTDIR)/$(DOC_DIR)
 	$(make_recursive)
 
 maintain_local:
@@ -209,10 +215,12 @@ maintain_local:
 	$(make_recursive)
 
 distclean_local:
+	$(SRM) scrpage2-ngerman.tex scrpage2-english.tex
 	$(make_recursive)
 
 maintainclean_local:
-	$(SRM) ChangeLog.svn ChangeLog.bak $(STATIC_DOC_LINKS) $(DOC_FILES)
+	$(SRM) ChangeLog.svn ChangeLog.bak $(STATIC_DOC_LINKS) $(DOC_FILES) \
+	       scrpage2-ngerman.tex scrpage2-english.tex
 	$(make_recursive)
 
 edit:

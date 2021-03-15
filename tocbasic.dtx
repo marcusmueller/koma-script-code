@@ -1,7 +1,8 @@
+% \CheckSum{1643}
 % \iffalse meta-comment
 % ======================================================================
 % tocbasic.dtx
-% Copyright (c) Markus Kohm, 2008-2020
+% Copyright (c) Markus Kohm, 2008-2019
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -19,7 +20,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % tocbasic.dtx
-% Copyright (c) Markus Kohm, 2008-2020
+% Copyright (c) Markus Kohm, 2008-2019
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -133,11 +134,11 @@
 \RecordChanges
 \GetFileInfo{tocbasic.dtx}
 \sloppy
-\begin{document}
 \DocInput{\filename}
 \end{document}
 % \fi
 %
+% \begin{document}
 % \title{\KOMAScript{} \partname\ \texttt{\filename}%
 %   \thanks{Diese Datei ist Version \fileversion\ von \texttt{\filename}.}}
 % \date{\filedate}
@@ -764,12 +765,10 @@
 % too. Here are basics and high level commands for this.
 %
 % \begin{macro}{\tocbasic@starttoc}
-% \changes{v3.17}{2015/03/23}{usage of feature \texttt{noparskipfake}}
-% \changes{v3.27}{2019/07/08}{hack to add \cs{par} at end of (main) file}
+% \changes{v3.17}{2015/03/23}{usage of feature \texttt{noparskipfake}}%^^A
+% \changes{v3.27}{2019/07/08}{hack to add \cs{par} at end of (main) file}%^^A
 % \changes{v3.28}{2019/11/19}{\cs{iftocfeature} replaced by
-%   \cs{Iftocfeature}}
-% \changes{v3.32}{2020/08/25}{replace \cs{par} hack by \cs{par} solution}}
-% \changes{v3.32}{2020/08/25}{reentrant warning}
+%   \cs{Iftocfeature}}%^^A
 % Some basics are done like setting up \cs{parskip}, \cs{parindent} and
 % \cs{parfillskip}, a general hook will be called, an individual hook will
 % be called, the toc will be started, an individual hook will be called, an
@@ -778,16 +777,6 @@
 %<*body>
 \newcommand*{\tocbasic@starttoc}[1]{%
   \begingroup
-    \tocbasic@reentrant@warning
-    \def\tocbasic@reentrant@warning{%
-      \PackageWarning{tocbasic}{%
-        Loading one auxiliary file inside the setup context\MessageBreak
-        of another auxiliary file is not recommended.\MessageBreak
-        In this case settings for `\@currext' could also influence\MessageBreak
-        settings of `#1' and local states of `#1' can also\MessageBreak
-        influence local states of `\@currext'%
-      }%
-    }%
     \edef\@currext{#1}%
     \Iftocfeature{\@currext}{noparskipfake}{}{%
       \ifvmode
@@ -802,29 +791,16 @@
     \setlength{\parfillskip}{\z@\@plus 1fil}%
     \csname tocbasic@@before@hook\endcsname
     \csname tb@#1@before@hook\endcsname
-    \@starttoc{#1}%
-    \BeforeClosingMainAux{%
-      \addtocontents{#1}{%
-        \string\providecommand\string\tocbasic@end@toc@file{}%
-        \string\tocbasic@end@toc@file
-      }%
+    \let\tocbasic@saved@input\@input
+    \def\@input##1{%
+      \let\@input\tocbasic@saved@input\@input{##1}\par
     }%
-    \edef\@currext{#1}%
+    \@starttoc{#1}%
     \csname tb@#1@after@hook\endcsname
     \csname tocbasic@@after@hook\endcsname
   \endgroup
 }
 %    \end{macrocode}
-% \begin{macro]{tocbasic@end@toc@file}
-% \changes{v3.32}{2020/08/25}{new}
-%    \begin{macrocode}
-\newcommand*{\tocbasic@end@toc@file}{\par}
-%    \end{macrocode}
-% \end{macro}%^^A \tocbasic@end@toc@file
-% \begin{macro}{\tocbasic@reentrant@warning}
-% \changes{v3.32}{2020/08/25}{new}
-\newcommand*{\tocbasic@reentrant@warning}{}
-% \end{macro}
 % \begin{macro}{\tocbasic@@before@hook}
 % \begin{macro}{\tocbasic@@after@hook}
 % These are the general hooks. They may be used by classes and packages for
@@ -890,8 +866,6 @@
 %   of \cs{def}}%^^A
 % \changes{v3.28}{2019/11/19}{\cs{iftocfeature} replaced by
 %   \cs{Iftocfeature}}%^^A
-% \changes{v3.31}{2020/07/08}{use one time expansion of local
-%   \cs{list@fname}}%^^A
 % Command to handle the hole list of something. There are additional hooks
 % for this. The first optional argument is the title for this list. If the
 % optional argument was omitted \cs{listof\#2name} will be used. The star
@@ -900,11 +874,11 @@
 \newcommand*{\listoftoc}{%
   \kernel@ifstar \tocbasic@starttoc\@listoftoc
 }
-\newcommand*{\@listoftoc}[2][]{%
+\newcommand*{\@listoftoc}[2][\list@fname]{%
   \begingroup
-    \def\list@fname{#1}%
     \@ifundefined{listof#2name}{%
-      \ifx\list@fname\@empty
+      \let\list@fname\relax
+      \ifx\relax#1\relax
         \PackageWarning{tocbasic}{%
           You should either define \expandafter\string\csname
           listof#2name\endcsname\MessageBreak
@@ -925,7 +899,7 @@
       }%
     }{}%
     \Iftocfeature{\@currext}{numberline}{\def\nonumberline{\numberline{}}}{}%
-    \expandafter\tocbasic@listhead\expandafter{\list@fname}%
+    \tocbasic@listhead{#1}%
     \scr@ifundefinedorrelax{microtypesetup}{}{%
       \Iftocfeature{\@currext}{noprotrusion}{}{%
         \microtypesetup{protrusion=false}%
@@ -1675,7 +1649,6 @@
 % \begin{macro}{\tb@nt@level}
 % \changes{v3.20}{2015/12/16}{undefined}%^^A
 % \changes{v3.20}{2015/12/16}{local valid only}%^^A
-% \changes{v3.30}{2020/02/25}{spurious space in warning message removed}%^^A
 % Each entry to a TOC/list of has a numeric level. You may set up your own
 % level.
 %    \begin{macrocode}
@@ -1683,7 +1656,7 @@
       \PackageWarning{tocbasic}{%
         deprecated option `level'.\MessageBreak
         You should replace option `level' by option\MessageBreak
-        `tocentrylevel'%
+        `tocentrylevel'
       }%
       \l@addto@macro\tb@nt@tocstyle@options{,level={##1}}%
       \FamilyKeyStateProcessed
