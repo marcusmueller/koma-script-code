@@ -1,7 +1,7 @@
 % \iffalse^^A meta-comment
 % ======================================================================
 % scrlayer-notecolumn.dtx
-% Copyright (c) Markus Kohm, 2013-2020
+% Copyright (c) Markus Kohm, 2013-2021
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -19,7 +19,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrlayer-notecolumn.dtx
-% Copyright (c) Markus Kohm, 2013-2020
+% Copyright (c) Markus Kohm, 2013-2021
 %
 % Diese Datei ist Teil der LaTeX2e KOMA-Script-Sammlung.
 %
@@ -678,9 +678,9 @@
 % calculate the md5 checksum of the \File{slnc}-file. If it has been changed
 % we set |\if@tempswa| to |\iftrue| to provocate a rerun message.
 % \changes{v0.1.2872}{2018/01/17}{usage of Lua function
-%   \texttt{slncmdfivesum}}%^^A
+%   \texttt{slncmdfivesum}}
 % \changes{v0.1.2972}{2018/04/01}{usage of not yet documented Xe\TeX{}
-%   primitive \cs{mdfivesum}}%^^A
+%   primitive \cs{mdfivesum}}
 %    \begin{macrocode}
 \AfterReadingMainAux{%
   \immediate\closeout\tf@slnc
@@ -688,7 +688,7 @@
     \scr@ifundefinedorrelax{pdfmdfivesum}{%
       \scr@ifundefinedorrelax{mdfivesum}{%
         \ifdefined\directlua
-          \edef\reserved@a{\directlua{slncmdfivesum("\jobname.slnc")}}%
+          \edef\reserved@a{\directlua{slnc.mdfivesum(slnc.slncfile)}}%
         \else
           \let\reserved@a\relax
         \fi
@@ -1208,7 +1208,8 @@
   \scr@ifundefinedorrelax{mdfivesum}{%
     \ifdefined\directlua
       \directlua{%
-        function slncmdfivesum(filename)
+        slnc = slnc or {}
+        function slnc.mdfivesum(filename)
           local fh = io.open(filename,"rb")
           if fh then
             local sum=md5.sumhexa(fh:read("*a"))
@@ -1216,8 +1217,16 @@
             fh:close()
           end
         end
+        if (string.sub(tex.jobname,1,1) == '"')
+           and (string.sub(tex.jobname,string.len(tex.jobname),-1) == '"')
+           then
+          slnc.slncfile = string.sub(tex.jobname,2,-2)
+        else
+          slnc.slncfile = tex.jobname
+        end
+        slnc.slncfile = slnc.slncfile .. '.slnc'
       }%
-      \xdef\slnc@mdfivesum{\directlua{slncmdfivesum("\jobname.slnc")}}%
+      \xdef\slnc@mdfivesum{\directlua{slnc.mdfivesum(slnc.slncfile)}}%
     \fi
   }{%
     \xdef\slnc@mdfivesum{\mdfivesum file {\jobname.slnc}}%
