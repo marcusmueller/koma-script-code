@@ -147,19 +147,35 @@
 %<@@=scrlfile>
 %    \end{macrocode}
 %
-% Test whether the uses \LaTeX{} provides all commands we need.
+% Test whether the used \LaTeX{} provides all commands we need.
+% \changes{v3.34}{2021/04/21}{make it more robust agains not recommended
+%   direct usage}
 %    \begin{macrocode}
-\@ifundefined{AddToHook}{%
-  \PackageError{scrlfile-hook}{LaTeX too old for this package}{%
-    \string\AddToHook\space of LaTeX 2020-10-01 or newer is
-    needed.\MessageBreak
-    Please update LaTeX or use package scrlfile-patch instead of\MessageBreak
-    scrlfile-hook.\MessageBreak
-    If you would continue, I will try to load scrlfile-patch
+\@ifundefined{IfFormatAtLeastTF}{%
+  \PackageError{scrlfile-hook}{not recommended usage of package}{%
+    It seems this package has been loaded directly using a LaTeX
+    version\MessageBreak
+    prior to 2020-10-01. This is not recommend. Please always load
+    package\MessageBreak
+    scrlfile instead of scrlfile-hook.\MessageBreak
+    If you would continue, I will try to load scrlfile-patcholdlatex%
   }%
-  \RequirePackage{scrlfile-patch}%
+  \RequirePackage{scrlfile-patcholdlatex}%
   \endinput
-}{}
+}{%
+  \IfFormatAtLeastTF{2020/10/01}{}{%
+    \PackageError{scrlfile-hook}{LaTeX too old for this package}{%
+      It seems this package has been loaded directly using a LaTeX
+      version\MessageBreak
+      prior to 2020-10-01. This is not recommend. Please always load
+      package\MessageBreak
+      scrlfile instead of scrlfile-hook.\MessageBreak
+      If you would continue, I will try to load scrlfile-patcholdlatex%
+    }%
+    \RequirePackage{scrlfile-patcholdlatex}%
+    \endinput
+  }{}%
+}
 %    \end{macrocode}
 %
 %
