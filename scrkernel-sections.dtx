@@ -1,7 +1,7 @@
 % \iffalse meta-comment
 % ======================================================================
 % scrkernel-sections.dtx
-% Copyright (c) Markus Kohm, 2002-2020
+% Copyright (c) Markus Kohm, 2002-2021
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -19,7 +19,7 @@
 % This work consists of all files listed in manifest.txt.
 % ----------------------------------------------------------------------
 % scrkernel-sections.dtx
-% Copyright (c) Markus Kohm, 2002-2020
+% Copyright (c) Markus Kohm, 2002-2021
 %
 % Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
 % Version 1.3c, verteilt und/oder veraendert werden.
@@ -3677,30 +3677,30 @@
 % \end{macro}
 %
 %
-% \subsection{Anhang}
+% \selectlanguage{english}
+% \subsection{Appendix}
 %
-% Teile gibt es tatsächlich bei allen drei Hauptklassen.
+% The classes (except \textsf{scrlttr2}) does provide an appendix switch,
+% similar but not identical to the standard classes.
 %
 % \begin{macro}{\appendix}
-% Wird der Anhang aktiviert, so werden Kapitel bzw. Abschnitte zukünftig mit
-% Buchstaben nummeriert.
-% \changes{v2.2d}{1995/05/28}{\textsf{scrartcl} benötigt keinen Zähler für
-%     \cs{chapter}}%^^A 
-% \changes{v2.3c}{1995/08/06}{alternative Nummerierung bei Verwendung eines
-%     Anhangs}%^^A
-% \changes{v2.8}{2001/06/15}{\cs{appendixmore} wird beachtet}%^^A
-% \changes{v2.8e}{2001/07/10}{\cs{@altsecnumformattrue} wird nicht länger
-%     ausgeführt}%^^A
-% \changes{v2.8o}{2001/09/19}{\cs{par} eingefügt}%^^A
-% \changes{v2.95}{2006/07/04}{\cs{newcommand*} durch \cs{gdef} ersetzt}%^^A
-% \changes{v2.95}{2006/07/04}{Ausführung von \cs{appendixmore}%^^A
-%     vereinfacht}%^^A
-% \changes{v3.20}{2016/12/05}{neue eindeutige Warnung}
-% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
+% Activation of the appendix switch over to numbering of chapters
+% resp. sections with uppercase letters.
+% \changes{v2.2d}{1995/05/28}{\textsf{scrartcl} doesn't have a chapter
+% counter}
+% \changes{v2.3c}{1995/08/06}{alternative section numbering in appendix}
+% \changes{v2.8}{2001/06/15}{new \cs{appendixmore}}
+% \changes{v2.8e}{2001/07/10}{\cs{@altsecnumformattrue} removed}
+% \changes{v2.8o}{2001/09/19}{initial \cs{par} added}
+% \changes{v2.95}{2006/07/04}{\cs{newcommand*} replaced by \cs{gdef}}
+% \changes{v2.95}{2006/07/04}{simplified usage of \cs{appendixmore}}
+% \changes{v3.20}{2016/12/05}{improved warning}
+% \changes{v3.28}{2019/11/18}{\cs{ifstr} renamed to \cs{Ifstr}}
+% \changes{v3.34}{2021/04/30}{\LaTeX{} hook added}
 % \begin{macro}{\appendixmore}
-% \cs{appendixmore} kann als \emph{hook} verwendet werden. Derzeit wird dieser
-% allerdings noch recht stiefmütterlich behandelt und lediglich von Option
-% \texttt{appendixprefix} definiert.
+% \changes{v2.8}{2001/06/15}{new}
+% \cs{appendixmore} is deprecated with \LaTeX{} 2020/10/01 (or newer) but
+% still executed as a kind of hook.
 %    \begin{macrocode}
 %<*class>
 %<*body>
@@ -3723,7 +3723,7 @@
       `\string\appendix'%
     }%
   }{}%
-  \par%
+  \par
 %<*article>
   \setcounter{section}{0}%
   \setcounter{subsection}{0}%
@@ -3735,15 +3735,22 @@
   \gdef\@chapapp{\appendixname}%
   \gdef\thechapter{\@Alph\c@chapter}%
 %</report|book>
-  \csname appendixmore\endcsname
 }
+\IfLTXAtLeastTF{2020/10/01}{%
+  \g@addto@macro{\appendix}{\UseOneTimeHook{\KOMAClassName/appendix}}%
+}{}
+\g@addto@macro{\appendix}{\csname appendixmore\endcsname}
 %</body>
+%<*prepare>
+\IfLTXAtLeastTF{2020/10/01}{\NewHook{\KOMAClassName/appendix}}{}
+%</prepare>
 %</class>
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
 %
 %
+% \selectlanguage{ngerman}
 % \subsection{Teile}
 %
 % \changes{v2.8e}{2001/07/10}{\cs{@thepart} entfernt}
@@ -4596,53 +4603,93 @@
 % \end{option}
 % \end{option}
 %
+% \selectlanguage{english}
 % \begin{option}{appendixprefix}
-% \changes{v2.8}{2001/06/15}{neue Option}%^^A
-% \changes{v2.95c}{2006/08/21}{als \textsf{keyval}-Option}%^^A
-% \changes{v3.12}{2013/03/05}{Verwendung der Status-Signalisierung mit
-%     \cs{FamilyKeyState}}%^^A
-% \changes{v3.17}{2015/03/09}{interne Speicherung des Wert}%^^A
-% \begin{option}{noappendixprefix}
-% \changes{v2.8}{2001/06/15}{neue Option}%^^A
-% \changes{v2.95c}{2006/08/21}{obsolete Option}%^^A
-% \changes{v3.01a}{2008/11/20}{deprecated}%^^A
-% Will man abweichend von der Option \texttt{chapterprefix} die großen
-% Überschriften für den Anhang aktivieren oder deaktivieren, so kann man das
-% mit dieser Option erreichen. Allerdings setzt diese keinen Schalter, sondern
-% ein Zusatzmakro, das auch für andere Zwecke genutzt werden kann. Übrigens
-% ist keine der beiden Einstellungen die Voreinstellung!
+% \changes{v2.8}{2001/06/15}{new option}
+% \changes{v2.95c}{2006/08/21}{re-implementation as \textsf{keyval} option}
+% \changes{v3.12}{2013/03/05}{usage of \cs{FamilyKeyState}}
+% \changes{v3.17}{2015/03/09}{internal value storage}
+% \changes{v3.34}{2021/04/30}{usage of \LaTeX{} hook, if available}
+% \changes{v3.34}{2021/04/30}{new value \texttt{default} with \LaTeX{} hooks}
+% If the appendix chapters should be with or without prefix line independent
+% from the chapters of the main part, option \Option{appendixprefix} can be
+% used. This does not set up a new boolean but just activates or deactivates
+% the boolean for chapters inside \cs{appendix}. From \KOMAScript{} v3.34 and
+% \LaTeX{} 2020/10/01 this is done using a new \LaTeX{} hook. Otherwise still
+% \cs{appendixmore} is used. Default is, using the settings for chapters.
 %    \begin{macrocode}
 %<*option>
-\KOMA@key{appendixprefix}[true]{%
-  \KOMA@set@ifkey{appendixprefix}{@tempswa}{#1}%
-  \ifx\FamilyKeyState\FamilyKeyStateProcessed
-    \KOMA@kav@xreplacevalue{.\KOMAClassFileName}{appendixprefix}{#1}%
-    \KOMA@kav@remove{.\KOMAClassFileName}{headings}{twolineappendix}%
-    \KOMA@kav@remove{.\KOMAClassFileName}{headings}{onelineappendix}%
-    \if@tempswa
-      \KOMA@kav@add{.\KOMAClassFileName}{headings}{twolineappendix}%
-      \@ifundefined{appendixmore}{%
-        \def\appendixmore{\@chapterprefixtrue}%
-      }{%
-        \l@addto@macro\appendixmore{\@chapterprefixtrue}%
+\IfLTXAtLeastTF{2020/10/01}{%
+  \KOMA@key{appendixprefix}[true]{%
+    \Ifstr{#1}{default}{%
+      \KOMA@kav@removekey{.\KOMAClassFileName}{appendixprefix}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{headings}{twolineappendix}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{headings}{onelineappendix}%
+      \IfHookEmptyTF{\KOMAClassName/appendix}{}{%
+        \RemoveFromHook{\KOMAClassName/appendix}[appendixprefix]%
       }%
-    \else
-      \KOMA@kav@add{.\KOMAClassFileName}{headings}{onelineappendix}%
-      \@ifundefined{appendixmore}{%
-        \def\appendixmore{\@chapterprefixfalse}%
-      }{%
-        \l@addto@macro\appendixmore{\@chapterprefixfalse}%
-      }%
+      \FamilyKeyStateProcessed
+    }{%
+      \KOMA@set@ifkey{appendixprefix}{@tempswa}{#1}%
+      \ifx\FamilyKeyState\FamilyKeyStateProcessed
+        \KOMA@kav@xreplacevalue{.\KOMAClassFileName}{appendixprefix}{#1}%
+        \KOMA@kav@remove{.\KOMAClassFileName}{headings}{twolineappendix}%
+        \KOMA@kav@remove{.\KOMAClassFileName}{headings}{onelineappendix}%
+        \IfHookEmptyTF{\KOMAClassName/appendix}{}{%
+          \RemoveFromHook{\KOMAClassName/appendix}[appendixprefix]%
+        }%
+        \if@tempswa
+          \KOMA@kav@add{.\KOMAClassFileName}{headings}{twolineappendix}%
+          \AddToHook{\KOMAClassName/appendix}[appendixprefix]%
+                    {\@chapterprefixtrue}%
+        \else
+          \KOMA@kav@add{.\KOMAClassFileName}{headings}{onelineappendix}%
+          \AddToHook{\KOMAClassName/appendix}[appendixprefix]%
+                    {\@chapterprefixfalse}%
+        \fi
+      \fi
+    }%  
+  }%
+}{%
+  \KOMA@key{appendixprefix}[true]{%
+    \KOMA@set@ifkey{appendixprefix}{@tempswa}{#1}%
+    \ifx\FamilyKeyState\FamilyKeyStateProcessed
+      \KOMA@kav@xreplacevalue{.\KOMAClassFileName}{appendixprefix}{#1}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{headings}{twolineappendix}%
+      \KOMA@kav@remove{.\KOMAClassFileName}{headings}{onelineappendix}%
+      \if@tempswa
+        \KOMA@kav@add{.\KOMAClassFileName}{headings}{twolineappendix}%
+        \@ifundefined{appendixmore}{%
+          \def\appendixmore{\@chapterprefixtrue}%
+        }{%
+          \l@addto@macro\appendixmore{\@chapterprefixtrue}%
+        }%
+      \else
+        \KOMA@kav@add{.\KOMAClassFileName}{headings}{onelineappendix}%
+        \@ifundefined{appendixmore}{%
+          \def\appendixmore{\@chapterprefixfalse}%
+        }{%
+          \l@addto@macro\appendixmore{\@chapterprefixfalse}%
+        }%
+      \fi
     \fi
-  \fi
+  }%  
 }
+%    \end{macrocode}
+% \end{option}%^^A appendixprefix
+%
+% \begin{option}{noappendixprefix}
+% \changes{v2.8}{2001/06/15}{new option}
+% \changes{v2.95c}{2006/08/21}{obsolete option}
+% \changes{v3.01a}{2008/11/20}{deprecated}
+%    \begin{macrocode}
 \KOMA@DeclareDeprecatedOption{noappendixprefix}{appendixprefix=false}
 %</option>
 %    \end{macrocode}
 % \end{option}%^^A noappendixprefix
-% \end{option}%^^A appendixprefix
 %
 %
+% \selectlanguage{ngerman}
 % \begin{macro}{\size@chapter}
 % \changes{v2.8o}{2001/09/14}{neu (intern)}%^^A
 % \changes{v2.96a}{2006/12/02}{letztes Element darf ein Argument erwarten,
