@@ -1,8 +1,7 @@
-% \CheckSum{306}
 % \iffalse meta-comment
 % ======================================================================
 % scrwfile.dtx
-% Copyright (c) Markus Kohm, 2010-2020
+% Copyright (c) Markus Kohm, 2010-2021
 %
 % This file is part of the LaTeX2e KOMA-Script bundle.
 %
@@ -29,7 +28,7 @@
 % at least three times.
 % ----------------------------------------------------------------------
 % scrwfile.dtx
-% Copyright (c) Markus Kohm, 2010-2020
+% Copyright (c) Markus Kohm, 2010-2021
 %
 % Diese Datei ist Teil des LaTeX2e KOMA-Script-Pakets.
 %
@@ -84,7 +83,7 @@
 %<package&identify>\ProvidesPackage{scrwfile}
 %<driver>\ProvidesFile{scrwfile.drv}
 %<*dtx|(package&identify)|driver>
-  [2013/08/05 v0.1f-alpha KOMA-Script package (write and clone files)]
+  [2021/05/30 v0.1.9-alpha KOMA-Script package (write and clone files)]
 %</dtx|(package&identify)|driver>
 %<*dtx>
 \ifx\documentclass\undefined
@@ -158,7 +157,8 @@
 % \selectlanguage{english}
 %
 % \changes{v0.1}{2010/10/01}{start of new package}
-% \changes{v0.1g}{2014/10/13}{manual moved to \KOMAScript{} manual}
+% \changes{v0.1.7}{2014/10/13}{manual moved to \KOMAScript{} manual}
+% \changes{v0.1.9}{2021/05/30}{version number scheme changed}
 %
 % \StopEventually{%
 %   \clearpage
@@ -219,6 +219,21 @@
 % handling and \verb|\protected@immediate@write|.
 %    \begin{macrocode}
 \RequirePackage{scrlfile}[2010/09/30]
+%    \end{macrocode}
+%
+% \subsubsection{Is is needed?}
+%
+% \changes{v0.1.9}{2021/05/30}{with Lua\LaTeX{} using is not recommended}
+% If the user uses Lua\LaTeX{} usage of \textsf{scrwfile} should not be
+% needed.
+%    \begin{macrocode}
+\scr@ifluatex{%
+  \PackageInfoNoLine{scrwfile}{LuaLaTeX detected.\MessageBreak
+    With LuaLaTeX you should never get an error message:\MessageBreak
+    \space\space`No room for a new \string\write'.\MessageBreak
+    So scrwfile could make much more harm than benefit\MessageBreak
+    and using it is not recommended}%
+}{}
 %    \end{macrocode}
 %
 % \subsubsection{\LaTeX{} Kernel Patchs}
@@ -356,13 +371,35 @@
   \fi
 }
 %    \end{macrocode}
+% \changes{v0.1.8}{2021/05/30}{added order rule for
+%   \textsf{scrlayer-notecolumn}}
+% Note: Here we use a \LaTeX{} version test, because a do-nothing-definition
+% like the one of \textsf{latexrelease} wouldn't be correct, if the command is
+% not supported by the current \LaTeX{} kernel version setting.
+%    \begin{macrocode}
+\IfLTXAtLeastTF{2020/10/01}{%
+  \DeclareHookRule{enddocument/afteraux}%
+                  {scrwfile}{before}{scrlayer-notecolumn}%
+}{%
+  \@ifpackageloaded{scrlayer-notecolumn}{%
+    \PackageWarningNoLine{scrwfile}{%
+      Dangerous package order detected!\MessageBreak
+      As a general rule, you should load scrwfile as soon\MessageBreak
+      as possible, maybe even before `\string\documentclass'\MessageBreak
+      (using `\string\RequirePackage' instead of
+      `\string\usepackage').\MessageBreak
+      Following packages should be loaded after scrwfile:\MessageBreak
+      \space - scrlayer-notecolumn}%
+  }{}%
+}
+%    \end{macrocode}
 % \end{macro}
 % \end{macro}
 %
 % \begin{macro}{\@starttoc}
 % We have to add the single handle feature to this.
 % \begin{macro}{\scrwfile@saved@starttoc}
-% \changes{v0.1e}{2013/07/24}{take care for unfriendly \textsl{hyperref}}
+% \changes{v0.1.5}{2013/07/24}{take care for unfriendly \textsl{hyperref}}
 % This is the original definition, that will be used, if the file is not under
 % \texttt{scrwfile}'s control. Because of package \textsl{hyperref}, that does
 % a hard redefinition without any care for changed definitions, we have to
@@ -449,12 +486,11 @@
 % \end{macro}
 %
 % \begin{macro}{\TOCclone}
-% \changes{v3.28}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}%^^A
-% \changes{v3.28}{2019/11/19}{\cs{ifattoclist} replaced by
-%   \cs{Ifattoclist}}%^^A
-% \changes{v3.28}{2019/11/19}{\cs{iftocfeature} replaced by
-%   \cs{Iftocfeature}}%^^A
-% \changes{v3.30}{2020/02/25}{spurious space in warning message removed}%^^A
+% \changes{v0.1.8}{2019/11/18}{\cs{ifstr} umbenannt in \cs{Ifstr}}
+% \changes{v0.1.8}{2019/11/19}{\cs{ifattoclist} replaced by \cs{Ifattoclist}}
+% \changes{v0.1.8}{2019/11/19}{\cs{iftocfeature} replaced by
+%   \cs{Iftocfeature}}
+% \changes{v0.1.8}{2020/02/25}{spurious space in warning message removed}
 % Clone the entries from the second (first mandatory) argument TOC to the
 % third (second mandatory) argument TOC.  If the first (optional) argument was
 % given, define |\listof#3name| to this and also define |\listof#3| and clone
