@@ -947,22 +947,27 @@
 %    \end{macrocode}
 % If this is not a class, we first have to process all raw class options.
 % \changes{v3.33}{2021/03/12}{switched to fast test like \LaTeX{} 2021/06/01}
+% \changes{v3.34}{2021/05/30}{use \cs{@raw@classoptionslist} only, if defined}
+% Note, if \Package{scrbase} or a depending package is loaded before the class,
+% \cs{@raw@classoptionslist} should not be processed.
 %    \begin{macrocode}
   \ifx\@currext\@clsextension\else
-    \@for\CurrentOption:=\@raw@classoptionslist\do{%
-      \scr@trim@spaces\CurrentOption
-      \ifx\CurrentOption\@empty\else
-        \@ifundefined{ds@\CurrentOption}{%
-          \scr@ifprocess@curroption{#1}{#2}{%
-            \@expandtwoargs\@removeelement{%
-              \expandafter\@remove@eq@value\CurrentOption=\@nil}%
-            \@unusedoptionlist\@unusedoptionlist
-          }{}%
-        }{%
-          \@use@ption
-          \expandafter\let\csname ds@\CurrentOption\endcsname\@empty
-        }%
-      \fi
+    \@ifundefined{@raw@classoptionslist}{}{%
+      \@for\CurrentOption:=\@raw@classoptionslist\do{%
+        \scr@trim@spaces\CurrentOption
+        \ifx\CurrentOption\@empty\else
+          \@ifundefined{ds@\CurrentOption}{%
+            \scr@ifprocess@curroption{#1}{#2}{%
+              \@expandtwoargs\@removeelement{%
+                \expandafter\@remove@eq@value\CurrentOption=\@nil}%
+              \@unusedoptionlist\@unusedoptionlist
+            }{}%
+          }{%
+            \@use@ption
+            \expandafter\let\csname ds@\CurrentOption\endcsname\@empty
+          }%
+        \fi
+      }%
     }%
   \fi
 %    \end{macrocode}
