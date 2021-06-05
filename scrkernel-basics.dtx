@@ -971,10 +971,57 @@
     }%
   \fi
 %    \end{macrocode}
-% Afterwards we have to process the current options.
+% \changes{v3.34}{2021/06/05}{extra test because of \LaTeX{} raw option issue}
+% Afterwards we have to process the current options. Unfortunately there is an
+% issue with the raw option list of the \LaTeX{} kernel, that could result in
+% \cs{CurrentOption} in the option list instead of the one step expansion of
+% \cs{CurrentOption} (see
+% \url{https://sourceforge.net/p/koma-script/tickets/10/}). This would result
+% in an infinite loop using the usual loop:
 %    \begin{macrocode}
+%<*dontusethis>
   \@for\CurrentOption:=\@curroptions\do{%
     \scr@trim@spaces\CurrentOption
+    \@ifundefined{ds@\CurrentOption}{%
+      \@use@ption
+      \scr@ifprocess@curroption{#1}{#2}{}\default@ds
+    }\@use@ption
+  }%
+%</dontusethis>
+%    \end{macrocode}
+% So for a little more rosbustnes we do an extra test.
+%    \begin{macrocode}
+  \@for\reserved@a:=\@curroptions\do{%
+    \scr@trim@spaces\reserved@a
+    \def\reserved@b{\CurrentOption}%
+    \ifx\reserved@a\reserved@b
+      \PackageError{scrbase}{%
+        \string\CurrentOption\space loop detected\MessageBreak
+        Perhaps someone uses:\MessageBreak\space\space
+        \ifx\@currext\@clsextension
+          \string\PassOptionsToClass
+        \else
+          \string\PassOptionsToPackage
+        \fi
+        {\string\CurrentOption}{…}.\MessageBreak
+        With LaTeX 2020/10/01 this results in
+        \string\CurrentOption\MessageBreak
+        in the raw option list and therefore is not allowed.\MessageBreak
+        Please ask the class or package author to use:\MessageBreak\space\space
+        \string\expandafter
+        \ifx\@currext\@clsextension
+          \string\PassOptionsToClass
+        \else
+          \string\PassOptionsToPackage
+        \fi
+        \MessageBreak\space\space\space
+        \string\expandafter{\string\CurrentOption}{…}\MessageBreak
+        instead%
+      }%
+      \let\CurrentOption\@empty
+    \else
+      \let\CurrentOption\reserved@a
+    \fi
     \@ifundefined{ds@\CurrentOption}{%
       \@use@ption
       \scr@ifprocess@curroption{#1}{#2}{}\default@ds
