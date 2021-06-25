@@ -1,0 +1,172 @@
+# ======================================================================
+# Makefile.tspec
+# Copyright (c) Markus Kohm, 2002-2006
+#
+# This file is part of the LaTeX2e KOMA-Script bundle.
+#
+# This work may be distributed and/or modified under the conditions of
+# the LaTeX Project Public License, version 1.3b of the license.
+# The latest version of this license is in
+#   http://www.latex-project.org/lppl.txt
+# and version 1.3b or later is part of all distributions of LaTeX 
+# version 2005/12/01 or later and of this work.
+#
+# This work has the LPPL maintenance status "author-maintained".
+#
+# The Current Maintainer and author of this work is Markus Kohm.
+#
+# This work consists of all files listed in manifest.txt.
+# ----------------------------------------------------------------------
+# Makefile.tspec
+# Copyright (c) Markus Kohm, 2002-2006
+#
+# Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
+# Version 1.3b, verteilt und/oder veraendert werden.
+# Die neuste Version dieser Lizenz ist
+#   http://www.latex-project.org/lppl.txt
+# und Version 1.3b ist Teil aller Verteilungen von LaTeX
+# Version 2005/12/01 oder spaeter und dieses Werks.
+#
+# Dieses Werk hat den LPPL-Verwaltungs-Status "author-maintained"
+# (allein durch den Autor verwaltet).
+#
+# Der Aktuelle Verwalter und Autor dieses Werkes ist Markus Kohm.
+# 
+# Dieses Werk besteht aus den in manifest.txt aufgefuehrten Dateien.
+# ======================================================================
+
+# ----------------------------------------------------------------------
+# HOWTO use tspec files:
+# ----------------------
+#
+# tspec files are used to generate Makefiles for a test.
+# There are 6 types of tests available that may be specified using
+# a corresponding line at the tspec file:
+#
+# Test   IFlag   Source                      Runs   Additional Infos
+# ------------------------------------------------------------------
+# PDF    <Flags> <Basename of main TeX file> <runs> <PageList>
+# DVI    <Flags> <Basename of main TeX file> <runs> <PageList>
+# TYPE   <Flags> <Basename of main TeX file> <runs> <PageList>
+# PS     <Flags> <Basename of main TeX file> <runs> <PageList>
+# LOG    <Flags> <Basename of main TeX file> <runs> [ERROR] [CMP]
+# DVILOG <Flags> <Basename of main TeX file> <runs> [ERROR] [CMP]
+# PDFLOG <Flags> <Basename of main TeX file> <runs> [ERROR] [CMP]
+# ------------------------------------------------------------------
+# 
+# PDF test: Do <runs> calls of pdflatex with 
+#       <Basename of main TeX file>.tex. Extract the pages given by the
+#       <PageList> and do a graphicle compare of the result with the
+#       expected result.
+#
+# DVI test: Do <runs> calls of latex with 
+#       <Basename of main TeX file>.tex. Extract the pages given by the
+#       <PageList> and do a graphicle compare ot the result with the
+#       expected result.
+#
+# TYPE test: Do <runs> calls of latex with
+#       <Basename of main TeX file>.tex. Extract the pages given by the
+#       <PageList> and do a compare of the result with the expected 
+#       result using dvitype.
+#
+# PS test: Do <runs> calls of latex with 
+#       <Basename of main TeX file>.tex. Extract the pages given by the
+#       <PageList>, generate a PostScript file and do a graphicle 
+#       compare ot the result with the expected result.
+#
+# DVILOG test: Do <runs> calls of latex with
+#       <Basename of main TeX file>.tex. Expect an error return iff
+#       ERROR was given. If CMP was given compare all parts of the
+#       resulting log file between "[START COMPARE MARKER]" and
+#       "[END COMPARE MARKER]" with the same parts of the expected
+#       log file. You may omit "[END COMPARE MARKER]" iff comparison
+#       should be done until end of file.
+#
+# PDFLOG test: Do <runs> calls of pdflatex with
+#       <Basename of main TeX file>.tex. Expect an error return iff
+#       ERROR was given. If CMP was given compare all parts of the
+#       resulting log file between "[START COMPARE MARKER]" and
+#       "[END COMPARE MARKER]" with the same parts of the expected
+#       log file. You may omit "[END COMPARE MARKER]" iff comparison
+#       should be done until end of file.
+#
+# LOG test: same like DVILOG
+#
+# You may also add comment lines starting with "#" or "%".
+#
+# The IFlag shows, what to do at init run:
+#  N : do nothing
+#  I : run with already installed TeX
+#  X : run with TEXMF extended by $(BASEDIR)
+#
+# <PageList>  := <PageRange>[,<PageList>]
+# <PageRange> := <PageNumber>|[<PageNumber>]-[<PageNumber>]
+#
+# To do all these tests a init run is needed to generate all expected
+# results. These init runs do all the same like the tests but save the
+# expected result instead of compare with it.
+#
+# The result of the tests will be reported at $(TESTLOG). Each line of
+# the report is either a success message with a trailing space or a
+# fail message with a fail indicator at the first column. Known fail
+# indicators are:
+#
+# ! difference found
+# + additional page found
+# - page missing
+#
+# NOTE: The make of one test does only fail, if the test couldn't be 
+#       done but not if the test fails!
+#       Currently there are no call optimizations.  Because of this
+#         DVI foo 1 1-3
+#         DVI foo 1 5-6
+#         LOG foo 2 CMP
+#       would need 4 latex runs while
+#         DVI foo 1 1-3,5-6
+#         LOG foo 2 CMP
+#       would need 3 latex runs only.
+#       TYPE test does not save the expected result of the dvitype run
+#       but the dvi file, because dvi file is much smaller.
+#
+# Instead of such a tspec file you may simply use a tspec file with
+# file size 0. You may use touch to generate this. In this case
+# ypu have to write the Makefile for the init and test on your own.
+#
+# Makefile.tspec itself is a template for make files using tspec files.
+# The simpliest kind of Makefile to use it would be:
+#
+#   include ../Makefile.tspec
+#
+# That's all.
+# ----------------------------------------------------------------------
+
+# Where's the base directory?
+BASEDIR ?= $(PWD)/../../
+
+# Include the basic rule
+include $(BASEDIR)Makefile.baseinit
+
+ifdef TESTLOG
+      LOG = >>$(TESTLOG)
+else
+      LOG =
+endif
+BINDIR  ?= $(BASEDIR)testsuite/bin
+
+ALLCLEANFILES ?= *.dvi *.pdf *.log
+
+.PHONY: init test clean allclean
+
+init:
+	PATH="$(BINDIR):$(PATH)" \
+	  $(BINDIR)/dotest true $(BASEDIR) *.tspec $(LOG)
+
+test:
+	PATH="$(BINDIR):$(PATH)" \
+	  $(BINDIR)/dotest false $(BASEDIR) *.tspec $(LOG)
+
+clean:
+	$(RMDIR) .tmp auto *.synctex.gz *~ *.aux
+
+allclean: clean
+	$(RM) $(ALLCLEANFILES)
