@@ -1917,9 +1917,14 @@
 %    \end{macrocode}
 % The counter and hooks of float and nonfloat environments:
 % \changes{v3.10b}{2012/04/04}{\cs{noexpand} added to fix problems using
-%   \cs{autodot}}%^^A
+%   \cs{autodot}}
 % \changes{v3.13}{2014/07/31}{add \cs{autodot} only to hierachical
-%   counters}%^^A
+%   counters}
+% \changes{v3.35}{2021/10/12}{ignore \texttt{counterwithin} for counters less
+%   than 1}
+% \changes{v3.35}{2021/10/12}{if \texttt{counterwithin} is
+%   ``\texttt{chapter}'' and \cs{ifmainmatter} is defined, respect
+%   \texttt{counterwithin} if \cs{ifmainmatter} is \cs{iftrue}}
 %    \begin{macrocode}
   \if@tempswa
     \@ifundefined{c@\tb@nt@type}{%
@@ -1929,14 +1934,42 @@
     }%
     \ifx\tb@nt@counterwithin\@empty\else
       \@addtoreset{\tb@nt@type}{\tb@nt@counterwithin}%
-      \begingroup\edef\@tempa{%
-        \noexpand\endgroup
-        \noexpand\renewcommand*\expandafter\noexpand
-        \csname the\tb@nt@type\endcsname{%
-          \expandafter\noexpand\csname the\tb@nt@counterwithin\endcsname
-          .\noexpand\arabic{\tb@nt@type}%
+      \begingroup
+        \Ifstr{\tb@nt@counterwithin}{chapter}{%
+          \edef\@tempa{%
+            \noexpand\endgroup
+            \noexpand\renewcommand*\expandafter\noexpand
+            \csname the\tb@nt@type\endcsname{%
+              \unexpanded{%
+                \expandafter\ifx\csname ifmainmatter\expandafter\endcsname
+                \csname iffalse\endcsname\else
+              }%
+                \noexpand\ifnum
+                \expandafter\noexpand\csname c@\tb@nt@counterwithin\endcsname
+                >\noexpand\z@
+                  \expandafter\noexpand\csname the\tb@nt@counterwithin\endcsname
+                  .%
+                \noexpand\fi
+              \noexpand\fi  
+              \noexpand\arabic{\tb@nt@type}%
+            }%
+          }%
+        }{%
+          \edef\@tempa{%
+            \noexpand\endgroup
+            \noexpand\renewcommand*\expandafter\noexpand
+            \csname the\tb@nt@type\endcsname{%
+              \noexpand\ifnum
+                \expandafter\noexpand\csname c@\tb@nt@counterwithin\endcsname
+                >\noexpand\z@
+                \expandafter\noexpand\csname the\tb@nt@counterwithin\endcsname
+                .%
+              \noexpand\fi
+              \noexpand\arabic{\tb@nt@type}%
+            }%
+          }%
         }%
-      }\@tempa
+      \@tempa
     \fi
     \begingroup
       \edef\@tempa{%
