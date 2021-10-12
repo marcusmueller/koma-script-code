@@ -1920,11 +1920,9 @@
 %   \cs{autodot}}
 % \changes{v3.13}{2014/07/31}{add \cs{autodot} only to hierachical
 %   counters}
-% \changes{v3.35}{2021/10/12}{ignore \texttt{counterwithin} for counters less
-%   than 1}
-% \changes{v3.35}{2021/10/12}{if \texttt{counterwithin} is
-%   ``\texttt{chapter}'' and \cs{ifmainmatter} is defined, respect
-%   \texttt{counterwithin} if \cs{ifmainmatter} is \cs{iftrue}}
+% \changes{v3.35}{2021/10/12}{ignore \texttt{counterwithin} if it is
+%   ``\texttt{chapter}'' resp. ``\texttt{section}'' and \cs{ifmainmatter} is
+%   not \cs{iffalse} and the counterwithin counter is < 1}
 %    \begin{macrocode}
   \if@tempswa
     \@ifundefined{c@\tb@nt@type}{%
@@ -1935,7 +1933,12 @@
     \ifx\tb@nt@counterwithin\@empty\else
       \@addtoreset{\tb@nt@type}{\tb@nt@counterwithin}%
       \begingroup
-        \Ifstr{\tb@nt@counterwithin}{chapter}{%
+        \def\reserved@c{section}%
+        \@ifundefined{chapter}{}{%
+          \@ifundefined{c@chapter}{}{%
+            \@ifundefined{l@chapter}{}{%
+              \def\reserved@c{chapter}}}}%
+        \expandafter\Ifstr\expandafter{\reserved@c}{\tb@nt@counterwithin}{%
           \edef\@tempa{%
             \noexpand\endgroup
             \noexpand\renewcommand*\expandafter\noexpand
@@ -1959,12 +1962,8 @@
             \noexpand\endgroup
             \noexpand\renewcommand*\expandafter\noexpand
             \csname the\tb@nt@type\endcsname{%
-              \noexpand\ifnum
-                \expandafter\noexpand\csname c@\tb@nt@counterwithin\endcsname
-                >\noexpand\z@
-                \expandafter\noexpand\csname the\tb@nt@counterwithin\endcsname
-                .%
-              \noexpand\fi
+              \expandafter\noexpand\csname the\tb@nt@counterwithin\endcsname
+              .%
               \noexpand\arabic{\tb@nt@type}%
             }%
           }%
