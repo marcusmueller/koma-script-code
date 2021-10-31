@@ -56,7 +56,8 @@
   }%
 \reserved@a
 %</dtx>
-%<package>\ProvidesPackage{scrlfile-hook}[%
+%<package&current>\ProvidesPackage{scrlfile-hook}[%
+%<package&3.34>\ProvidesPackage{scrlfile-hook-3.34}[%
 %!KOMAScriptVersion
 %<package>  package
   (using LaTeX hooks)]
@@ -68,7 +69,10 @@
   \KOMAdefVariable{COPYRIGHTFROM}{2002}
   \generate{\usepreamble\defaultpreamble
     \file{scrlfile-hook.sty}{%
-      \from{scrlfile-hook.dtx}{package}%
+      \from{scrlfile-hook.dtx}{package,current}%
+    }%
+    \file{scrlfile-hook-3.34.sty}{%
+      \from{scrlfile-hook.dtx}{package,3.34}%
     }%
   }%
   \@@input scrstrop.inc
@@ -150,31 +154,57 @@
 % Test whether the used \LaTeX{} provides all commands we need.
 % \changes{v3.34}{2021/04/21}{make it more robust agains not recommended
 %   direct usage}
+% \changes{v3.35}{2021/10/31}{new file version because \LaTeX{} kernel
+%   2021/11/15 has changed the field order of gerneric hooks}
 %    \begin{macrocode}
 \@ifundefined{IfFormatAtLeastTF}{%
   \PackageError{scrlfile-hook}{not recommended usage of package}{%
     It seems this package has been loaded directly using a LaTeX
     version\MessageBreak
-    prior to 2020-10-01. This is not recommend. Please always load
+    prior to 2020-10-01. This is not recommended. Please always load
     package\MessageBreak
     scrlfile instead of scrlfile-hook.\MessageBreak
     If you would continue, I will try to load scrlfile-patcholdlatex%
   }%
-  \RequirePackage{scrlfile-patcholdlatex}%
-  \endinput
+  \RequirePackage{scrlfile-patcholdlatex}\endinput
 }{%
-  \IfFormatAtLeastTF{2020/10/01}{}{%
+  \IfFormatAtLeastTF{2020/10/01}{%
+    \IfFormatAtLeastTF{2021/11/15}{%
+%<*3.34>
+      \PackageError{scrfile-hook-3.34}{LaTeX too new for this package}{%
+        It seems this package has ben loaded directly using a LaTeX
+        version\MessageBreak
+        newer than 2021-06-01. This is not recommended. Please always load
+        package\MessageBreak
+        scrlfile instead of scrlfile-hook-3.34.\MessageBreak
+        If you would continue, I will try to load scrlfile-hook%
+      }%
+      \RequirePackage{scrlfile-hook}\endinput
+%</3.34>
+    }{%
+%<*current>
+      \PackageError{scrlfile-hook}{LaTeX too old for this package}{%
+        It seems this package has been loaded directly using LaTeX
+        version\MessageBreak
+        prior to 2021-11-15. This is not recommended. Please always load
+        package\MessageBreak
+        scrlfile instead of scrlfile-hook.\MessageBreak
+        If you would continue, I will try to load scrfile-hook-3.34%
+      }%
+      \RequirePackage{scrlfile-hook-3.34}\endinput
+%</current>
+    }%
+  }{%
     \PackageError{scrlfile-hook}{LaTeX too old for this package}{%
       It seems this package has been loaded directly using a LaTeX
       version\MessageBreak
-      prior to 2020-10-01. This is not recommend. Please always load
+      prior to 2020-10-01. This is not recommended. Please always load
       package\MessageBreak
       scrlfile instead of scrlfile-hook.\MessageBreak
       If you would continue, I will try to load scrlfile-patcholdlatex%
     }%
-    \RequirePackage{scrlfile-patcholdlatex}%
-    \endinput
-  }{}%
+    \RequirePackage{scrlfile-patcholdlatex}\endinput
+  }%
 }
 %    \end{macrocode}
 %
@@ -188,26 +218,34 @@
 \ExplSyntaxOn
 %    \end{macrocode}
 %
-% \begin{macro}{\BeforeFile}
+% \begin{macro}[updated = 2021-10-31]{\BeforeFile}
 % The hook version of this command is just a wrapper to the corresponding
 % \LaTeX{} file hooks. It supports a mandatory \meta{file} argument, an
 % optional \meta{label} argument and a mandatory \meta{hook code} argument.
+% From \LaTeX{} kernel version 2021/11/15 the hook has
+% been changed from \texttt{file/before/\meta{file name}} to
+% \texttt{file/\meta{file name}/before}.
 %    \begin{macrocode}
 \NewDocumentCommand \BeforeFile { m }
   {
-    \AddToHook { file / before / #1 } 
+%<3.34>    \AddToHook { file / before / #1 } 
+%<current>    \AddToHook { file / #1 / before } 
   }
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\AfterFile}
+% \begin{macro}[updated = 2021-10-31]{\AfterFile}
 % The hook version of this command is just a wrapper to the corresponding
 % \LaTeX{} file hooks. It supports a mandatory \meta{file} argument, an
 % optional \meta{label} argument and a mandatory \meta{hook code} argument.
+% From \LaTeX{} kernel version 2021/11/15 the hook has
+% been changed from \texttt{file/after/\meta{file name}} to
+% \texttt{file/\meta{file name}/after}.
 %    \begin{macrocode}
 \NewDocumentCommand \AfterFile { m }
   {
-    \AddToHook { file / after / #1 } 
+%<3.34>    \AddToHook { file / after / #1 } 
+%<current>    \AddToHook { file / #1 / after } 
   }
 %    \end{macrocode}
 % \end{macro}
@@ -228,7 +266,7 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\AfterAtEndOfClass,\AfterAtEndOfPackage}
+% \begin{macro}[updated = 2021-10-31]{\AfterAtEndOfClass,\AfterAtEndOfPackage}
 % With version 3.32 the syntax of these commands have been changed. Now, there
 % is also a star variant, that runs the \meta{code} immediately if the class
 % or package has already been loaded completely. Otherwise and in the normal
@@ -236,6 +274,11 @@
 % \texttt{package/after} hook, because this hook is used outside the context
 % of the class or package and after the \cs{AtEndOfClass} or
 % \cs{AtEndOfPackage} code.
+% From \LaTeX{} kernel version 2021/11/15 the hooks has
+% been changed from \texttt{class/after/\meta{class name}} to
+% \texttt{class/\meta{class name}/after} and from
+% \texttt{package/after/\meta{package name}} to
+% \texttt{package/\meta{package name}/after}.
 %    \begin{macrocode}
 \NewDocumentCommand \AfterAtEndOfClass { s m o +m }
   {
@@ -243,9 +286,11 @@
       {
         \scrlfile_if_class_loaded:nTF { #2 }
           { #4 }
-          { \hook_gput_code:nnn { class / after / #2 } { #3 } { #4 } }
+%<3.34>          { \hook_gput_code:nnn { class / after / #2 } { #3 } { #4 } }
+%<current>          { \hook_gput_code:nnn { class / #2 / after } { #3 } { #4 } }
       }
-      { \hook_gput_code:nnn { class / after / #2 } { #3 } { #4 } }
+%<3.34>      { \hook_gput_code:nnn { class / after / #2 } { #3 } { #4 } }
+%<current>      { \hook_gput_code:nnn { class / #2 / after } { #3 } { #4 } }
   }
 \NewDocumentCommand \AfterAtEndOfPackage { s m o +m }
   {
@@ -253,9 +298,11 @@
       {
         \scrlfile_if_package_loaded:nTF { #2 }
           { #4 }
-          { \hook_gput_code:nnn { package / after / #2 } { #3 } { #4 } }
+%<3.34>          { \hook_gput_code:nnn { package / after / #2 } { #3 } { #4 } }
+%<current>          { \hook_gput_code:nnn { package / #2 / after } { #3 } { #4 } }
       }
-      { \hook_gput_code:nnn { package / after / #2} { #3 } { #4 } }
+%<3.34>      { \hook_gput_code:nnn { package / after / #2 } { #3 } { #4 } }
+%<current>      { \hook_gput_code:nnn { package / #2 / after } { #3 } { #4 } }
   }
 %    \end{macrocode}
 % \end{macro}
@@ -357,13 +404,16 @@
 %    \end{macrocode}
 % \end{function}
 %
-% \begin{macro}{\AfterClass,\AfterPackage}
+% \begin{macro}[updated = 2021-10-31]{\AfterClass,\AfterPackage}
 % With version 3.32 these do not support plus or exclamation mark variants,
 % but only the normal and the star variants. Instead of the plus or
 % exclamation mark variants users should use the star variant of
 % \cs{AfterAtEndOfClass} and \cs{AfterAtEndOfPackage}. The commands use the
 % \texttt{file/after} hook, because the user manual declares, that \meta{code}
 % is used before the code of \cs{AtEndOfClass} or \cs{AtEndOfPackage}.
+% From \LaTeX{} kernel version 2021/11/15 the hook has
+% been changed from \texttt{file/after/\meta{file name}} to
+% \texttt{file/\meta{file name}/after}.
 %    \begin{macrocode}
 \NewDocumentCommand \scrlfile@AfterClass { s m o +m }
   {
@@ -373,13 +423,15 @@
           { #4 }
           {
             \hook_gput_code:nnn
-              { file / after / #2.\@clsextension }
+%<3.34>              { file / after / #2.\@clsextension }
+%<current>              { file / #2.\@clsextension / after }
               { #3 }
               { #4 }
           }
       }
       {
-        \hook_gput_code:nnn { file / after / #2.\@clsextension } { #3 } { #4 }
+%<3.34>        \hook_gput_code:nnn { file / after / #2.\@clsextension } { #3 } { #4 }
+%<current>        \hook_gput_code:nnn { file / #2.\@clsextension / after } { #3 } { #4 }
       }
   }
 \NewDocumentCommand \AfterClass { } { \scrlfile@AfterClass }
@@ -391,13 +443,15 @@
           { #4 }
           {
             \hook_gput_code:nnn
-              { file / after / #2.\@pkgextension }
+%<3.34>              { file / after / #2.\@pkgextension }
+%<current>              { file / #2.\@pkgextension / after }
               { #3 }
               { #4 }
           }
       }
       {
-        \hook_gput_code:nnn { file / after / #2.\@pkgextension } { #3 } { #4 }
+%<3.34>        \hook_gput_code:nnn { file / after / #2.\@pkgextension } { #3 } { #4 }
+%<current>        \hook_gput_code:nnn { file / #2.\@pkgextension / after } { #3 } { #4 }
       }
   }
 \NewDocumentCommand \AfterPackage { } { \scrlfile@AfterPackage }

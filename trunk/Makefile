@@ -98,6 +98,7 @@ CLS_MAIN	= scrbook.cls \
 		  scrsize12pt.clo \
 		  scrlfile.sty \
 		  scrlfile-hook.sty \
+		  scrlfile-hook-3.34.sty \
 		  scrlfile-patcholdlatex.sty \
 		  scrlogo.sty \
 	   	  scrwfile.sty \
