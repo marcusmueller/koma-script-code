@@ -171,27 +171,48 @@ restore all current type-area settings. So you can save the current settings,
 change them, and then restore the previous settings afterwards.
 
 \begin{Example}
-  You want a landscape page inside a document with portrait format. That's
-  no problem using \Macro{storeareas}:
+  Time and again, users ask about the possibility of inserting an A3 page in
+  landscape format in an A4 document while retaining the margin settings. The
+  text area should therefore only be widened by the extra paper width. With
+  \Macro{storeareas}, \DescRef{\LabelBase.cmd.areaset} and the previously
+  explained option \DescRef{\LabelBase.option.areasetadvanced} this is very
+  easily possible:
+
 \begin{lstcode}
-  \documentclass[pagesize]{scrartcl}
+  \documentclass[areasetadvanced]{scrartcl}
+  \areaset[current]{\textwidth}{\textheight}
 
   \begin{document}
   \noindent\rule{\textwidth}{\textheight}
 
-  \storeareas\MySavedValues
-  \KOMAoptions{paper=landscape,DIV=current}
+  \storeareas\MySavedTypingArea
+  \KOMAoption{paper}{a3,landscape}
+  \areaset[current]
+          {\dimexpr\textwidth+.5\paperwidth\relax}
+          {\textheight}
   \noindent\rule{\textwidth}{\textheight}
 
   \clearpage
-  \MySavedValues
+  \MySavedTypingArea
   \noindent\rule{\textwidth}{\textheight}
   \end{document}
 \end{lstcode}
+  The \DescRef{\LabelBase.cmd.areaset} command\IndexCmd{areaset} in the
+  document preamble is used together with the
+  \DescRef{\LabelBase.option.areasetadvanced}\IndexOption{areasetadvanced}
+  option to compensate for the differences between the
+  \DescRef{typearea.cmd.typearea} preset and the later use of
+  \DescRef{\LabelBase.cmd.areaset}, as already explained on
+  \DescPageRef{\LabelBase.option.areasetadvanced}. Without this, there could
+  be significant differences in margin settings, especially when using options
+  like \DescRef{typearea.option.headinclude} and
+  \DescRef{typearea.option.headheight}.
+
   It's\textnote{Attention} important to call \DescRef{maincls.cmd.clearpage}
-  before \Macro{MySavedValues} so that the saved values are restored on the
-  next page. With two-sided documents, changes to the paper format should even
-  use \DescRef{maincls.cmd.cleardoubleoddpage}\IndexCmd{cleardoubleoddpage}
+  before \Macro{MySavedTypingArea} so that the saved values are restored on
+  the next page. With two-sided documents, changes to the paper format should
+  even use
+  \DescRef{maincls.cmd.cleardoubleoddpage}\IndexCmd{cleardoubleoddpage}
   or\,---\,if you are not using a \KOMAScript{}
   class\,---\,\DescRef{maincls.cmd.cleardoublepage}%
   \IndexCmd{cleardoublepage}.%
