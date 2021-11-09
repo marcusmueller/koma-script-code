@@ -143,7 +143,7 @@
 % \end{function}
 %
 %
-% \StopEventually{\PrintIndex}
+% \StopEventually{\PrintIndex\PrintChanges}
 %
 % \section{The Implementation of \textsf{scrlfile-hook}}
 %
@@ -266,7 +266,12 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}[updated = 2021-10-31]{\AfterAtEndOfClass,\AfterAtEndOfPackage}
+% \begin{macro}[updated = 2021-10-31, updated = 2021-11-09]
+%   {\AfterAtEndOfClass,\AfterAtEndOfPackage}
+% \changes{v3.35}{2021/10/31}{field order of generic hooks changed in
+%   \LaTeX{} 2021/11/15}
+% \changes{v3.35}{2021/11/09}{hooks became one-time hooks in
+%   \LaTeX{} 2021/11/15}
 % With version 3.32 the syntax of these commands have been changed. Now, there
 % is also a star variant, that runs the \meta{code} immediately if the class
 % or package has already been loaded completely. Otherwise and in the normal
@@ -278,7 +283,10 @@
 % been changed from \texttt{class/after/\meta{class name}} to
 % \texttt{class/\meta{class name}/after} and from
 % \texttt{package/after/\meta{package name}} to
-% \texttt{package/\meta{package name}/after}.
+% \texttt{package/\meta{package name}/after}. Additionally the hooks became
+% one-time hooks. So they are executed immediately, if the class or package
+% has already been loaded. Because of this, we additionally have to test this
+% case in the non star variant.
 %    \begin{macrocode}
 \NewDocumentCommand \AfterAtEndOfClass { s m o +m }
   {
@@ -290,7 +298,13 @@
 %<current>          { \hook_gput_code:nnn { class / #2 / after } { #3 } { #4 } }
       }
 %<3.34>      { \hook_gput_code:nnn { class / after / #2 } { #3 } { #4 } }
-%<current>      { \hook_gput_code:nnn { class / #2 / after } { #3 } { #4 } }
+%<*current>
+      {
+        \scrlfile_if_class_loaded:nF
+          { #2 }
+          { \hook_gput_code:nnn { class / #2 / after } { #3 } { #4 } }
+      }
+%</current>
   }
 \NewDocumentCommand \AfterAtEndOfPackage { s m o +m }
   {
@@ -302,7 +316,13 @@
 %<current>          { \hook_gput_code:nnn { package / #2 / after } { #3 } { #4 } }
       }
 %<3.34>      { \hook_gput_code:nnn { package / after / #2 } { #3 } { #4 } }
-%<current>      { \hook_gput_code:nnn { package / #2 / after } { #3 } { #4 } }
+%<*current>
+      {
+        \scrlfile_if_package_loaded:nF
+          { #2 }
+          { \hook_gput_code:nnn { package / #2 / after } { #3 } { #4 } }
+      }
+%</current>
   }
 %    \end{macrocode}
 % \end{macro}
