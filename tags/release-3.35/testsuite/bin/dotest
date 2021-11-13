@@ -1,0 +1,396 @@
+#!/bin/sh
+# ======================================================================
+# dotest
+# Copyright (c) Markus Kohm, 2002-2006
+#
+# This file is part of the LaTeX2e KOMA-Script bundle.
+#
+# This work may be distributed and/or modified under the conditions of
+# the LaTeX Project Public License, version 1.3b of the license.
+# The latest version of this license is in
+#   http://www.latex-project.org/lppl.txt
+# and version 1.3b or later is part of all distributions of LaTeX 
+# version 2005/12/01 or later and of this work.
+#
+# This work has the LPPL maintenance status "author-maintained".
+#
+# The Current Maintainer and author of this work is Markus Kohm.
+#
+# This work consists of all files listed in manifest.txt.
+# ----------------------------------------------------------------------
+# dotest
+# Copyright (c) Markus Kohm, 2002-2006
+#
+# Dieses Werk darf nach den Bedingungen der LaTeX Project Public Lizenz,
+# Version 1.3b, verteilt und/oder veraendert werden.
+# Die neuste Version dieser Lizenz ist
+#   http://www.latex-project.org/lppl.txt
+# und Version 1.3b ist Teil aller Verteilungen von LaTeX
+# Version 2005/12/01 oder spaeter und dieses Werks.
+#
+# Dieses Werk hat den LPPL-Verwaltungs-Status "author-maintained"
+# (allein durch den Autor verwaltet).
+#
+# Der Aktuelle Verwalter und Autor dieses Werkes ist Markus Kohm.
+# 
+# Dieses Werk besteht aus den in manifest.txt aufgefuehrten Dateien.
+# ======================================================================
+
+error() {
+    echo $2 >&2
+    exit $1
+}
+
+KTEXINPUTS=`kpsewhich -progname=latex -var-value=TEXINPUTS`
+
+nopt=0
+optinit=false
+while [ $# -gt 0 ]; do
+    if [ $nopt -eq 0 ]; then
+	optinit=$1
+    elif [ $nopt -eq 1 ]; then
+	basedir="$1"
+    elif [ $nopt -eq 2 ]; then
+	tspec="$1"
+    else
+	error 2 "$0: Unexpected parameter \`$1'!"
+    fi
+    nopt=$((++nopt))
+    shift
+done
+
+[ $nopt -eq 0 ] && error 2 "$0: parameter <init> expected!"
+[ $nopt -eq 1 ] && error 2 "$0: parameter <basedir> expected!"
+[ $nopt -eq 2 ] && error 2 "$0: parameter <tspec file> expected!"
+
+dirname=`dirname $tspec`
+[ ${dirname} == '.' ] && dirname=$PWD
+
+retval=0
+
+latexrun() {
+    local latex aflag aname aruns ainfo nline errorflag
+    latex="$1"
+    errorflag="$2"
+    aflag="$3"
+    aname="$4"
+    aruns="$5"
+    ainfo="$6"
+    nline="$7"
+    TEXINPUTS="$KTEXINPUTS"
+    case $aflag in
+	N|n) # do nothing
+	    $optinit && return
+	    ;;
+	I|i) # ignore
+	    ;;
+	X|x) # extend TEXINPUTS
+	    if $optinit; then
+		TEXINPUTS="${basedir}:${KTEXINPUTS}"
+	    fi
+	    ;;
+	*)  # unkown flag
+	    error 2 "$tspec: Syntax error at line ${nline} (unknown flag \`${aflag}')!"
+	    ;;
+    esac
+    $optinit || TEXINPUTS="${basedir}:${KTEXINPUTS}"
+    TEXINPUTS="${dirname}:$TEXINPUTS"
+    export TEXINPUTS
+    rm -rf .tmp
+    mkdir .tmp || error 2 "$0: Cannot create directory .tmp!"
+    cd .tmp || error 2 "$0: Cannot switch to directory .tmp!"
+    input='\newif\ifINITTESTRUN\INITTESTRUNfalse\input'
+    $optinit && input='\newif\ifINITTESTRUN\INITTESTRUNtrue\input'
+    while [ $((aruns--)) -gt 0 ]; do
+	if $errorflag; then
+	    if $latex -interaction=batchmode $input ${aname} >/dev/null; then
+		$optinit && error 1 "$tspec: Init of line ${nline} (TAPE ${aname}) falied!"
+		[ $retval -eq 1 ] || [ $retval -eq 2 ] || retval=3
+		echo "! ${aname}: $latex run failed!"
+		return $retval
+	    fi
+	elif ! $latex -interaction=batchmode $input ${aname} >/dev/null; then
+	    $optinit && error 1 "$tspec: Init of line ${nline} (TYPE ${aname}) failed!"
+	    [ $retval -eq 1 ] || [ $retval -eq 2 ] || retval=3
+	    echo "! ${aname}: $latex run failed!"
+	    return $retval
+	fi
+    done
+    return 0
+}
+
+pdftest() {
+    local aflag aname aruns ainfo nline
+    aflag="$1"
+    aname="$2"
+    aruns="$3"
+    ainfo="$4"
+    nline="$5"
+    $optinit && [ "x$aflag" = "xN" -o "x$aflag" = "xn" ] && return $retval
+    if latexrun pdflatex false "$@"; then
+	if pdfselect.sh "$ainfo" ${aname%.tex}.pdf ${aname%.tex}.test.pdf; then
+	    if $optinit; then
+		cp -f ${aname%.tex}.test.pdf ../${aname%.tex}.pdf
+		cd ..
+		rm -rf .tmp
+	    else
+		pdfcmp ../${aname%.tex}.pdf ${aname%.text}.test.pdf
+		nr=$?
+		cd ..
+		if [ $nr -eq 1 ] || [ $nr eq 2 ]; then
+		    retval=$nr
+		    exit $retval
+		elif [ $nr -eq 3 ]; then
+		    [ $retval -eq 1 ] || [ $retval -eq 2 ] || retval=$nr
+		else
+		    rm -rf .tmp
+		fi
+	    fi
+	else
+	    retval=2
+	    exit $retval
+	fi
+    fi
+    return $retval
+}
+
+dvitest() {
+    local aflag aname aruns ainfo nline
+    aflag="$1"
+    aname="$2"
+    aruns="$3"
+    ainfo="$4"
+    nline="$5"
+    $optinit && [ "x$aflag" = "xN" -o "x$aflag" = "xn" ] && return $retval
+    if latexrun latex false "$@"; then
+	if dviselect.sh "$ainfo" ${aname%.tex}.dvi ${aname%.tex}.test.dvi; then
+	    if $optinit; then
+		cp -f ${aname%.tex}.test.dvi ../${aname%.tex}.dvi
+		cd ..
+		rm -rf .tmp
+	    else
+		dvicmp ../${aname%.tex}.dvi ${aname%.tex}.test.dvi
+		nr=$?
+		cd ..
+		if [ $nr -eq 1 ] || [ $nr -eq 2 ]; then
+		    retval=$nr
+		    exit $retval
+		elif [ $nr -eq 3 ]; then
+		    [ $retval -eq 1 ] || [ $retval -eq 2 ] || retval=$nr
+		else
+		    rm -rf .tmp
+		fi
+	    fi
+	else
+	    retval=2
+	    exit $retval
+	fi
+    fi
+    return $retval
+}
+
+pstest() {
+    local aflag aname aruns ainfo nline
+    aflag="$1"
+    aname="$2"
+    aruns="$3"
+    ainfo="$4"
+    nline="$5"
+    $optinit && [ "x$aflag" = "xN" -o "x$aflag" = "xn" ] && return $retval
+    if latexrun latex false "$@"; then
+	if dviselect.sh "$ainfo" ${aname%.tex}.dvi ${aname%.tex}.test.dvi; then
+	    if dvips ${aname%.tex}.test.dvi -o ${aname%.tex}.test.ps; then
+		if $optinit; then
+		    cp -f ${aname%.tex}.test.ps ../${aname%.tex}.ps
+		    cd ..
+		    rm -rf .tmp
+		else
+		    pdfcmp ../${aname%.tex}.ps ${aname%.tex}.test.ps
+		    nr=$?
+		    cd ..
+		    if [ $nr -eq 1 ] || [ $nr -eq 2 ]; then
+			retval=$nr
+			exit $retval
+		    elif [ $nr -eq 3 ]; then
+			[ $retval -eq 1 ] || [ $retval -eq 2 ] || retval=$nr
+		    else
+			rm -rf .tmp
+		    fi
+		fi
+	    else
+		echo "${aname}: Error calling dvips!\n" >&2
+		retval=2
+		exit $retval
+	    fi
+	else
+	    retval=2
+	    exit $retval
+	fi
+    fi
+    return $retval
+}
+
+typetest() {
+    local aflag aname aruns ainfo nline
+    aflag="$1"
+    aname="$2"
+    aruns="$3"
+    ainfo="$4"
+    nline="$5"
+    $optinit && [ "x$aflag" = "xN" -o "x$aflag" = "xn" ] && return $retval
+    if latexrun latex false "$@"; then
+	if dviselect.sh "$ainfo" ${aname%.tex}.dvi ${aname%.tex}.test.dvi; then
+	    if $optinit; then
+		cp -f ${aname%.tex}.test.dvi ../${aname%.tex}.dvi
+		cd ..
+		rm -rf .tmp
+	    else
+		dvitypecmp ../${aname%.tex}.dvi ${aname%.tex}.test.dvi
+		nr=$?
+		cd ..
+		if [ $nr -eq 1 ] || [ $nr -eq 2 ]; then
+		    retval=$nr
+		    exit $retval
+		elif [ $nr -eq 3 ]; then
+		    [ $retval -eq 1 ] || [ $retval -eq 2 ] || retval=$nr
+		else
+		    rm -rf .tmp
+		fi
+	    fi
+	else
+	    retval=2
+	    exit $retval
+	fi
+    fi
+    return $retval
+}
+
+dvilogtest() {
+    local aflag aname aruns ainfo nline
+    aflag="$1"
+    aname="$2"
+    aruns="$3"
+    ainfo="$4"
+    nline="$5"
+    errorflag=false
+    cmpflag=false
+    case $ainfo in
+	ERROR|ERROR\ *|*\ ERROR|*\ ERROR\ *)
+	    errorflag=true
+	    ;;
+	CMP|CMP\ *|*\ CMP|*\ CMP\ *)
+	    cmpflag=true
+	    ;;
+    esac
+    $optinit && [ "x$aflag" = "xN" -o "x$aflag" = "xn" ] && return $retval
+    if latexrun latex $errorflag "$@"; then
+	if logselect.pl ${aname%.tex}.log ${aname%.tex}.test.log; then
+	    if $optinit; then
+		cp -f ${aname%.tex}.test.log ../${aname%.tex}.log
+		cd ..
+		rm -rf .tmp
+	    else
+		if $cmpflag; then
+		    logcmp ../${aname%.tex}.log ${aname%.tex}.test.log
+		fi
+		nr=$?
+		cd ..
+		if [ $nr -eq 1 ] || [ $nr -eq 2 ]; then
+		    retval=$nr
+		    exit $retval
+		elif [ $nr -eq 3 ]; then
+		    [ $retval -eq 1 ] || [ $retval -eq 2 ] || retval=$nr
+		else
+		    rm -rf .tmp
+		fi
+	    fi
+	else
+	    retval=2
+	    exit $retval
+	fi
+    fi
+    return $retval
+}
+
+pdflogtest() {
+    local aflag aname aruns ainfo nline
+    aflag="$1"
+    aname="$2"
+    aruns="$3"
+    ainfo="$4"
+    nline="$5"
+    errorflag=false
+    cmpflag=false
+    case $ainfo in
+	ERROR|ERROR\ *|*\ ERROR|*\ ERROR\ *)
+	    errorflag=true
+	    ;;
+	CMP|CMP\ *|*\ CMP|*\ CMP\ *)
+	    cmpflag=true
+	    ;;
+    esac
+    $optinit && [ "x$aflag" = "xN" -o "x$aflag" = "xn" ] && return $retval
+    if latexrun pdflatex $errorflag "$@"; then
+	if logselect.pl ${aname%.tex}.log ${aname%.tex}.test.log; then
+	    if $optinit; then
+		cp -f ${aname%.tex}.test.log ../${aname%.tex}.log
+		cd ..
+		rm -rf .tmp
+	    else
+		logcmp ../${aname%.tex}.log ${aname%.tex}.test.log
+		nr=$?
+		cd ..
+		if [ $nr -eq 1 ] || [ $nr -eq 2 ]; then
+		    retval=$nr
+		    exit $retval
+		elif [ $nr -eq 3 ]; then
+		    [ $retval -eq 1 ] || [ $retval -eq 2 ] || retval=$nr
+		else
+		    rm -rf .tmp
+		fi
+	    fi
+	else
+	    retval=2
+	    exit $retval
+	fi
+    fi
+    return $retval
+}
+
+readtspec() {
+    local atype aflag aname aruns ainfo nline
+    nline=1
+    while read atype aflag aname aruns ainfo; do
+	case $atype in
+	    '') # empty line
+		;;
+	    \#*) # comment
+		;;
+	    DVI)  # DVI test
+		dvitest "$aflag" "$aname" "$aruns" "$ainfo"
+		;;
+	    PDF)  # PDF test
+		pdftest "$aflag" "$aname" "$aruns" "$ainfo"
+		;;
+	    PS)   # PS test
+		pstest "$aflag" "$aname" "$aruns" "$ainfo"
+		;;
+	    TYPE) # type test
+		typetest "$aflag" "$aname" "$aruns" "$ainfo"
+		;;
+	    LOG|DVILOG) # DVILOG test
+		dvilogtest "$aflag" "$aname" "$aruns" "$ainfo"
+		;;
+	    PDFLOG) # PDFLOG test
+		pdflogtest "$aflag" "$aname" "$aruns" "$ainfo"
+		;;
+	    *) # error
+		error 2 "$tspec: syntax error at line ${nline} (unknown test type \`$atype')!"
+		;;
+	esac
+	nline=$((++nline))
+    done
+}
+
+readtspec < $tspec
+exit $retval
